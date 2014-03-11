@@ -247,7 +247,7 @@ datagrid:
                     data_name: r.label
 
     users-email-grid:
-        extend: email-grid
+        extends: email-grid
         source:
             query:
                 join:
@@ -296,7 +296,7 @@ datagrid:
         filters: []
 
     role-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         source:
             acl_resource: oro_user_role_update
             query:
@@ -361,7 +361,7 @@ datagrid:
                     excluded: '#roleRemoveUsers'
 
     group-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         source:
             acl_resource: oro_user_group_update
             query:
@@ -453,7 +453,7 @@ datagrid:
                     default_per_page: 10
 
     dashboard-recent-emails-inbox-grid:
-        extend: dashboard-recent-emails-grid
+        extends: dashboard-recent-emails-grid
         options:
             entityHint: email
         source:
@@ -488,7 +488,7 @@ datagrid:
     dashboard-recent-emails-sent-grid:
         options:
             entityHint: email
-        extend: dashboard-recent-emails-grid
+        extends: dashboard-recent-emails-grid
         source:
             query:
                 where:
