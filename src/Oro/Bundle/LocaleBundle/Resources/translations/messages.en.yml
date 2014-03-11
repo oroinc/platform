@@ -21,3 +21,4 @@ oro.locale:
             language: "Select the system language you wish to use"
             timezone: "Select the timezone for displaying date and time"
             currency: "Select the default currency"
+            quarter_start: "Select start date of the first quarter in the year."
