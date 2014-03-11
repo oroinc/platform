@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
@@ -30,17 +30,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue(date_default_timezone_get()));
 
+        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
         $types = array(
             new FilterType($translator),
-            new DateRangeType($localeSettings),
+            new DateRangeType(),
             new DateTimeRangeType($localeSettings),
-            new DateRangeFilterType($translator)
+            new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber)
         );
 
         $this->formExtensions[] = new CustomFormExtension($types);
 
         parent::setUp();
-        $this->type = new DateTimeRangeFilterType($translator);
+        $this->type = new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber);
     }
 
     /**
@@ -61,23 +62,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     public function setDefaultOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => DateTimeRangeType::NAME,
-                    'date_parts' => array(
-                        AbstractDateFilterType::PART_VALUE   => 'oro.filter.form.label_date_part.value',
-                        AbstractDateFilterType::PART_DOW     => 'oro.filter.form.label_date_part.dayofweek',
-                        AbstractDateFilterType::PART_WEEK    => 'oro.filter.form.label_date_part.week',
-                        AbstractDateFilterType::PART_DAY     => 'oro.filter.form.label_date_part.day',
-                        AbstractDateFilterType::PART_MONTH   => 'oro.filter.form.label_date_part.month',
-                        AbstractDateFilterType::PART_QUARTER => 'oro.filter.form.label_date_part.quarter',
-                        AbstractDateFilterType::PART_DOY     => 'oro.filter.form.label_date_part.dayofyear',
-                        AbstractDateFilterType::PART_YEAR    => 'oro.filter.form.label_date_part.year',
-                    ),
-                )
-            )
-        );
+                    'widget_options' => [
+                        'showDatevariables' => true,
+                        'showTime'          => true,
+                        'showTimepicker'    => true,
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -85,18 +81,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                'viewData' => array(
-                    'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1)
-                ),
-                'customOptions' => array(
-                    'widget_options' => array('firstDay' => 1)
-                )
-            ),
-        );
+        return [
+            'empty' => [
+                'bindData'      => [],
+                'formData'      => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                'viewData'      => [
+                    'value'          => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                    'widget_options' => ['firstDay' => 1],
+                ],
+                'customOptions' => [
+                    'widget_options' => ['firstDay' => 1],
+                ]
+            ],
+        ];
     }
 }

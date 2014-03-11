@@ -3,10 +3,15 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
 abstract class AbstractDateFilterType extends AbstractType
 {
@@ -15,24 +20,34 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_MORE_THAN   = 3;
     const TYPE_LESS_THAN   = 4;
 
-    const PART_VALUE   = 'value';
-    const PART_DOW     = 'dayofweek';
-    const PART_WEEK    = 'week';
-    const PART_DAY     = 'day';
-    const PART_MONTH   = 'month';
-    const PART_QUARTER = 'quarter';
-    const PART_DOY     = 'dayofyear';
-    const PART_YEAR    = 'year';
-
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var DateModifierProvider */
+    protected $dateModifiers;
+
+    /** @var null|array */
+    protected $dateVarsChoices = null;
+
+    /** @var null|array */
+    protected $datePartsChoices = null;
+
+    /** @var DateFilterSubscriber */
+    protected $subscriber;
+
     /**
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface   $translator
+     * @param DateModifierInterface $dateModifiers
+     * @param DateFilterSubscriber  $subscriber
      */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        TranslatorInterface $translator,
+        DateModifierInterface $dateModifiers,
+        DateFilterSubscriber $subscriber
+    ) {
+        $this->translator    = $translator;
+        $this->dateModifiers = $dateModifiers;
+        $this->subscriber    = $subscriber;
     }
 
     /**
@@ -48,6 +63,9 @@ abstract class AbstractDateFilterType extends AbstractType
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getOperatorChoices()
     {
         return [
@@ -63,21 +81,53 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $t = $this->translator;
         $resolver->setDefaults(
             [
-                'date_parts' => [
-                    self::PART_VALUE   => $t->trans('oro.filter.form.label_date_part.value'),
-                    self::PART_DOW     => $t->trans('oro.filter.form.label_date_part.dayofweek'),
-                    self::PART_WEEK    => $t->trans('oro.filter.form.label_date_part.week'),
-                    self::PART_DAY     => $t->trans('oro.filter.form.label_date_part.day'),
-                    self::PART_MONTH   => $t->trans('oro.filter.form.label_date_part.month'),
-                    self::PART_QUARTER => $t->trans('oro.filter.form.label_date_part.quarter'),
-                    self::PART_DOY     => $t->trans('oro.filter.form.label_date_part.dayofyear'),
-                    self::PART_YEAR    => $t->trans('oro.filter.form.label_date_part.year'),
-                ],
+            'date_parts' => $this->getDateParts(),
+            'date_vars'  => $this->getDateVariables(),
             ]
         );
+    }
+
+    /**
+     * @return array|null
+     */
+    protected function getDateParts()
+    {
+        if (is_null($this->datePartsChoices)) {
+            $t                      = $this->translator;
+            $this->datePartsChoices = array_map(
+                function ($item) use ($t) {
+                    return $t->trans($item);
+                },
+                $this->dateModifiers->getDateParts()
+            );
+        }
+
+        return $this->datePartsChoices;
+    }
+
+    /**
+     * @return array|null
+     */
+    protected function getDateVariables()
+    {
+        if (is_null($this->dateVarsChoices)) {
+            $t      = $this->translator;
+            $result = $this->dateModifiers->getDateVariables();
+
+            foreach ($result as $part => $vars) {
+                $result[$part] = array_map(
+                    function ($item) use ($t) {
+                        return $t->trans($item);
+                    },
+                    $vars
+                );
+            }
+            $this->dateVarsChoices = $result;
+        }
+
+        return $this->dateVarsChoices;
     }
 
     /**
@@ -90,5 +140,19 @@ abstract class AbstractDateFilterType extends AbstractType
         $widgetOptions                = ['firstDay' => 0];
         $view->vars['widget_options'] = array_merge($widgetOptions, $options['widget_options']);
         $view->vars['date_parts']     = $options['date_parts'];
+        $view->vars['date_vars']      = $options['date_vars'];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if (!isset($options['date_parts'])) {
+            $options['date_parts'] = [];
+        }
+
+        $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
+        $builder->addEventSubscriber($this->subscriber);
     }
 }
