@@ -119,7 +119,19 @@ abstract class SoapController extends SoapGetController implements
      */
     protected function fixFormData(array &$data, $entity)
     {
-        return false;
+        $changed = false;
+
+        foreach ($data as $key => $property) {
+            if (is_array($property) && isset($property['date'], $property['timezone'])) {
+                $date = str_replace(' ', 'T', $property['date']);
+                $timezone = str_replace(':', '', $property['timezone']);
+                $data[$key] = $date . $timezone;
+
+                $changed = true;
+            }
+        }
+
+        return $changed;
     }
 
     /**
