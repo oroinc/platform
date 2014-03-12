@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/page-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
-    'oroui/js/layout'],
-function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, layout) {
+    'oroui/js/mediator'],
+function(_, __, Backbone, PageWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, mediator) {
     'use strict';
 
     var $ = Backbone.$;
@@ -27,6 +27,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
 
         options: {
             template: null,
+            workflowContainer: null,
             workflow: null,
             step_from: null,
             entity_select_el: null,
@@ -228,18 +229,15 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
 
             this.$el.append(form);
 
-            this.widget = new DialogWidget({
+            this.widget = new PageWidget({
                 'title': this.model.get('name') ? __('Edit transition') : __('Add new transition'),
                 'el': this.$el,
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'close': _.bind(this.removeHandler, this),
-                    'width': 800,
-                    'modal': true
-                }
+                'replacementEl': this.options.workflowContainer
             });
-            this.widget.on('renderComplete', layout.init, layout);
+            this.listenTo(this.widget, 'renderComplete', function(el) {
+                mediator.trigger('layout.init', el);
+            });
+            this.listenTo(this.widget, 'adoptedFormResetClick', this.removeHandler);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead

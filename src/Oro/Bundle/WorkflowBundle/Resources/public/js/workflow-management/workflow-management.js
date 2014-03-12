@@ -306,7 +306,8 @@ function(_, Backbone, messanger, __,
                 'workflow': this.model,
                 'step_from': step_from,
                 'entity_select_el': this.$entitySelectEl,
-                'entities': this.options.entities
+                'entities': this.options.entities,
+                'workflowContainer': this.$el
             });
             transitionEditView.on('transitionAdd', this.addTransition, this);
             transitionEditView.render();
@@ -337,7 +338,8 @@ function(_, Backbone, messanger, __,
 
             var stepEditView = new StepEditView({
                 'model': step,
-                'workflow': this.model
+                'workflow': this.model,
+                'workflowContainer': this.$el
             });
             stepEditView.on('stepAdd', this.addStep, this);
             stepEditView.render();
