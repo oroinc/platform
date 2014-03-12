@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/page-widget',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list',
     'oroworkflow/js/workflow-management/transition/model'
 ],
-function(_, __, Backbone, PageWidget, Helper, mediator, TransitionsListView, TransitionModel) {
+function(_, __, Backbone, DialogWidget, Helper, mediator, TransitionsListView, TransitionModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -26,8 +26,7 @@ function(_, __, Backbone, PageWidget, Helper, mediator, TransitionsListView, Tra
         options: {
             template: null,
             transitionListContainerEl: '.transitions-list-container',
-            workflow: null,
-            workflowContainer: null
+            workflow: null
         },
 
         initialize: function() {
@@ -67,7 +66,6 @@ function(_, __, Backbone, PageWidget, Helper, mediator, TransitionsListView, Tra
             _.each(this.addedTransitions, function(transition) {
                 transition.destroy();
             });
-            this.remove();
         },
 
         renderTransitions: function() {
@@ -93,15 +91,20 @@ function(_, __, Backbone, PageWidget, Helper, mediator, TransitionsListView, Tra
 
             this.renderTransitions();
 
-            this.widget = new PageWidget({
+            this.widget = new DialogWidget({
                 'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
                 'el': this.$el,
-                'replacementEl': this.options.workflowContainer
+                'stateEnabled': false,
+                'incrementalPosition': false,
+                'dialogOptions': {
+                    'close': _.bind(this.onCancel, this),
+                    'width': 600,
+                    'modal': true
+                }
             });
             this.listenTo(this.widget, 'renderComplete', function(el) {
                 mediator.trigger('layout.init', el);
             });
-            this.listenTo(this.widget, 'adoptedFormResetClick', this.onCancel);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead

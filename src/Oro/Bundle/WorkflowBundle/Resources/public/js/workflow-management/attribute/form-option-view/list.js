@@ -52,10 +52,18 @@ function(_, Backbone, AttributeFormOptionRowView) {
 
         addItem: function(data) {
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
+            data.isSystemLabel = !data.label;
             if (fieldId) {
                 var pathData = this.fieldUtil.splitFieldId(fieldId);
+                if (!data.label) {
+                    data.label = _.last(pathData).label;
+                }
                 data.entityField = this.entityFieldTemplate(pathData);
             } else {
+                if (!data.label && data.attribute_name) {
+                    var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
+                    data.label = attribute.get('translated_label');
+                }
                 data.entityField = data.property_path || data.attribute_name;
             }
 

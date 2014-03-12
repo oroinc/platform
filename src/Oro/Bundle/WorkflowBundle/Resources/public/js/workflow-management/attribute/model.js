@@ -12,6 +12,7 @@ function(Backbone) {
         defaults: {
             name: null,
             label: null,
+            translated_label: null,
             type: null,
             property_path: null,
             options: {}

@@ -70,102 +70,93 @@
     <script type="text/template" id="transition-form-template">
         <div class="form-container">
             <form action="#" class="form-horizontal container-fluid">
-                <div class="responsive-section">
-                    <div class="row-fluid row-fluid-divider">
-                        <div class="responsive-cell">
-                            <h5>{{ 'Transition information'|trans }}</h5>
-                            <div class="control-group">
-                                <label class="control-label required">{{ "Transition name"|trans }} <em>*</em></label>
-                                <div class="controls">
-                                    <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
-                                </div>
-                            </div>
+                <h5>{{ 'Transition information'|trans }}</h5>
+                <div class="control-group">
+                    <label class="control-label required">{{ "Transition name"|trans }} <em>*</em></label>
+                    <div class="controls">
+                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                    </div>
+                </div>
 
-                            <% if(!stepFrom || stepFrom.get('name')) {
-                                var stepFromName = stepFrom ? stepFrom.get('name') : '';
-                            %>
-                            <div class="control-group">
-                                <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
-                                <div class="controls">
-                                    <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
-                                        <% if (name) { %>disabled="disabled"<% } %>
-                                    >
-                                        <% _.each(allowedStepsFrom, function (step) { %>
-                                        <option
-                                            value="<%= step.get('name') %>"
-                                            <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
-                                        ><%= step.get('label') %></option>
-                                        <% }); %>
-                                    </select>
-                                </div>
-                            </div>
-                            <% } %>
+                <% if(!stepFrom || stepFrom.get('name')) {
+                    var stepFromName = stepFrom ? stepFrom.get('name') : '';
+                %>
+                <div class="control-group">
+                    <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
+                    <div class="controls">
+                        <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
+                            <% if (name) { %>disabled="disabled"<% } %>
+                        >
+                            <% _.each(allowedStepsFrom, function (step) { %>
+                            <option
+                                value="<%= step.get('name') %>"
+                                <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
+                            ><%= step.get('label') %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <% } %>
 
-                            <div class="control-group">
-                                <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
-                                <div class="controls">
-                                    <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
-                                        <option value=""></value>
-                                        <% _.each(allowedStepsTo, function (step) { %>
-                                        <option
-                                            value="<%= step.get('name') %>"
-                                            <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
-                                        ><%= step.get('label') %></option>
-                                        <% }); %>
-                                    </select>
-                                </div>
-                            </div>
+                <div class="control-group">
+                    <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
+                    <div class="controls">
+                        <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
+                            <option value=""></value>
+                            <% _.each(allowedStepsTo, function (step) { %>
+                            <option
+                                value="<%= step.get('name') %>"
+                                <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
+                            ><%= step.get('label') %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
 
-                            <div class="control-group">
-                                <label class="control-label required">{{ "View form"|trans }}  <em>*</em></label>
-                                <div class="controls">
-                                    <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
-                                        <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
-                                        <option value="page" <% if (display_type == 'page') { %>selected="selected"<% } %>>{{ "Separate page"|trans }}</value>
-                                    </select>
-                                </div>
-                            </div>
+                <div class="control-group">
+                    <label class="control-label required">{{ "View form"|trans }}  <em>*</em></label>
+                    <div class="controls">
+                        <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
+                            <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
+                            <option value="page" <% if (display_type == 'page') { %>selected="selected"<% } %>>{{ "Separate page"|trans }}</value>
+                        </select>
+                    </div>
+                </div>
 
-                            <div class="control-group">
-                                <label class="control-label">{{ "Warning message"|trans }}</label>
-                                <div class="controls">
-                                    <textarea name="message"><%= message %></textarea>
-                                </div>
-                            </div>
-                        </div>
+                <div class="control-group">
+                    <label class="control-label">{{ "Warning message"|trans }}</label>
+                    <div class="controls">
+                        <textarea name="message"><%= message %></textarea>
+                    </div>
+                </div>
 
-                        <div class="responsive-cell">
-                            <h5>{{ 'Button'|trans }}</h5>
-                            <div class="form-horizontal">
-                                {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
+                <h5>{{ 'Button'|trans }}</h5>
 
-                                <% print('<sc' + 'ript>'); %>
-                                    require(['jquery'], function($) {
-                                    $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
-                                    });
-                                <% print('</sc' + 'ript>'); %>
+                {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
 
-                                <div class="control-group">
-                                    <label class="control-label required">{{ "Button style"|trans }} </label>
-                                    <div class="controls">
-                                        <select name="button_color">
-                                            <% _.each(allowedButtonStyles, function (style) { %>
-                                            <option value="<%= style.name %>"
-                                            <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
-                                            ><%= style.label %></option>
-                                            <% }); %>
-                                        </select>
-                                    </div>
-                                </div>
+                <% print('<sc' + 'ript>'); %>
+                    require(['jquery'], function($) {
+                    $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                    });
+                <% print('</sc' + 'ript>'); %>
 
-                                <div class="control-group transition-example-container">
-                                    <label class="control-label required">{{ "Button preview"|trans }} </label>
-                                    <div class="controls">
-                                        <div class="transition-btn-example"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="control-group">
+                    <label class="control-label required">{{ "Button style"|trans }} </label>
+                    <div class="controls">
+                        <select name="button_color">
+                            <% _.each(allowedButtonStyles, function (style) { %>
+                            <option value="<%= style.name %>"
+                            <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
+                            ><%= style.label %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group transition-example-container">
+                    <label class="control-label">{{ "Button preview"|trans }}</label>
+                    <div class="controls">
+                        <div class="transition-btn-example"></div>
                     </div>
                 </div>
 
@@ -178,10 +169,8 @@
                 </div>
             </form>
 
-            <div class="container-fluid">
-                <div class="transition-attributes-form-container"></div>
-                <div class="transition-attributes-list-container" style="margin-top: 10px"></div>
-            </div>
+            <div class="transition-attributes-form-container"></div>
+            <div class="transition-attributes-list-container" style="margin-top: 10px"></div>
         </div>
     </script>
 
@@ -195,33 +184,30 @@
                 "max": null
             }
         }) %}
-        <div class="container-fluid form-container">
-            <form action="#">
-                <h5>{{ 'Step information'|trans }}</h5>
-                <div class="row-fluid">
-                    <div class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label required">{{ "Name"|trans }} <em>*</em></label>
-                            <div class="controls">
-                                <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
-                            </div>
-                        </div>
+        <div class="form-container">
+            <form action="#" class="form-horizontal">
 
-                        <div class="control-group">
-                            <label class="control-label">{{ "Order"|trans }}</label>
-                            <div class="controls">
-                                <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
-                            </div>
-                        </div>
-
-                        <div class="control-group">
-                            <label class="control-label">{{ "Final"|trans }}</label>
-                            <div class="controls">
-                                <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
-                            </div>
-                        </div>
+                <div class="control-group">
+                    <label class="control-label required">{{ "Name"|trans }} <em>*</em></label>
+                    <div class="controls">
+                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
                     </div>
                 </div>
+
+                <div class="control-group">
+                    <label class="control-label">{{ "Order"|trans }}</label>
+                    <div class="controls">
+                        <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">{{ "Final"|trans }}</label>
+                    <div class="controls">
+                        <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
+                    </div>
+                </div>
+
 
                 <div class="widget-actions">
                     <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
@@ -319,20 +305,17 @@
 
     <script type="text/template" id="attribute-form-option-row-template">
         <td>
-            <% if (!is_entity_attribute) { %>
-                <span class="badge">{{ 'system'|trans }}</span>
-            <% } %>
             <%= entityField %>
-        </td>
-        <td>
-            <% if (!label) { %>
-                <span class="badge">{{ 'system'|trans }}</span>
-            <% } else { %>
-                <%= label %>
+            <% if (!is_entity_attribute) { %>
+                <span class="muted">({{ 'System'|trans }})</span>
             <% } %>
         </td>
         <td>
-            <% if (required) { %><span class="badge badge-important">{{ "yes"|trans }}</span><% } %>
+            <%= label %>
+            <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
+        </td>
+        <td>
+            <% if (required) { %><span class="text-error">{{ "yes"|trans }}</span><% } %>
         </td>
         <td class="step-actions">
             <div class="pull-right">
@@ -395,13 +378,15 @@
     }] %}
 
     {% set stepsListWidget %}
-        <div class="workflow-definition-steps-list-container"></div>
-        <div class="workflow-definition-buttons">
-            <div class="pull-right">
-                <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
-                <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
+        <div class="clearfix">
+            <div class="workflow-definition-buttons" style="margin-top: -36px;">
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+                    <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
+                </div>
             </div>
         </div>
+        <div class="workflow-definition-steps-list-container"></div>
 
         <script type="text/javascript">
             require([
@@ -454,7 +439,7 @@
 
                 {% if entity.configuration.attributes is defined %}
                     {% for name, config in entity.configuration.attributes %}
-                        {% set config = config|merge({name: name}) %}
+                        {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
                         attributes.add(new AttributeModel({{ config|json_encode|raw }}));
                     {% endfor %}
                 {% endif %}

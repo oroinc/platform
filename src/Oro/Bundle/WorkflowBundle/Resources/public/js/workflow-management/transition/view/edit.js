@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/page-widget',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
     'oroui/js/mediator'],
-function(_, __, Backbone, PageWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, mediator) {
+function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, mediator) {
     'use strict';
 
     var $ = Backbone.$;
@@ -27,7 +27,6 @@ function(_, __, Backbone, PageWidget, Helper, AttributeFormOptionEditView, Attri
 
         options: {
             template: null,
-            workflowContainer: null,
             workflow: null,
             step_from: null,
             entity_select_el: null,
@@ -229,10 +228,16 @@ function(_, __, Backbone, PageWidget, Helper, AttributeFormOptionEditView, Attri
 
             this.$el.append(form);
 
-            this.widget = new PageWidget({
+            this.widget = new DialogWidget({
                 'title': this.model.get('name') ? __('Edit transition') : __('Add new transition'),
                 'el': this.$el,
-                'replacementEl': this.options.workflowContainer
+                'stateEnabled': false,
+                'incrementalPosition': false,
+                'dialogOptions': {
+                    'close': _.bind(this.removeHandler, this),
+                    'width': 800,
+                    'modal': true
+                }
             });
             this.listenTo(this.widget, 'renderComplete', function(el) {
                 mediator.trigger('layout.init', el);

@@ -131,6 +131,11 @@ function(_, Backbone, messanger, __,
                             + this.model.get('attributes').length) > 0;
                 }, this)
             });
+            this.$entitySelectEl.on('change', _.bind(function() {
+                if (!this.model.get('entity')) {
+                    this.model.set('entity', this.$entitySelectEl.val());
+                }
+            }, this));
 
             this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
                 this.createPathMapping($(e.target).data('fields'));
