@@ -7,7 +7,7 @@ define(['./abstract-listener'
      * Listener with custom callback to execute
      *
      * @export  orodatagrid/js/datagrid/listener/callback-listener
-     * @class   oro.datagrid.CallbackListener
+     * @class   orodatagrid.datagrid.listener.CallbackListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
     return AbstractListener.extend({

@@ -23,7 +23,7 @@ define(['jquery', 'underscore', 'backbone'
         /** @property {Boolean} */
         onClickReturnValue: true,
 
-        /** @property {oro.datagrid.AbstractAction} */
+        /** @property {orodatagrid.datagrid.action.AbstractAction} */
         action: undefined,
 
         /** @property {String} */
@@ -104,7 +104,7 @@ define(['jquery', 'underscore', 'backbone'
          * Initialize
          *
          * @param {Object} options
-         * @param {oro.datagrid.AbstractAction} options.action
+         * @param {orodatagrid.datagrid.action.AbstractAction} options.action
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]
