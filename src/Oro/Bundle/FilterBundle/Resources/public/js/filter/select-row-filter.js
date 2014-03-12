@@ -62,7 +62,7 @@ define(['underscore', 'backbone', './select-filter'
         /**
          * Fetches selection of grid rows
          * Triggers an event 'backgrid:getSelected' on collection to get selected rows.
-         * oro.datagrid.SelectAllHeaderCell is listening to this event and
+         * orodatagrid.datagrid.cell.SelectAllHeaderCell is listening to this event and
          * fills in a passes flat object with selection information
          *
          * @returns {Object}
