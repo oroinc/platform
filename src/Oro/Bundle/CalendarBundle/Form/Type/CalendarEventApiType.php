@@ -31,7 +31,7 @@ class CalendarEventApiType extends CalendarEventType
                 'text',
                 array(
                     'required' => true,
-                    'label' => 'oro.calendar.calendarevent.title.label'
+                    'label'    => 'oro.calendar.calendarevent.title.label'
                 )
             )
             ->add(
@@ -63,8 +63,16 @@ class CalendarEventApiType extends CalendarEventType
                 'checkbox',
                 array(
                     'required' => false,
-                    'label' => 'oro.calendar.calendarevent.all_day.label'
+                    'label'    => 'oro.calendar.calendarevent.all_day.label'
                 )
+            )
+            ->add(
+                'reminders',
+                'oro_reminder_collection',
+                [
+                    'required' => true,
+                    'label'    => 'oro.reminder.entity_plural_label'
+                ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
@@ -77,9 +85,9 @@ class CalendarEventApiType extends CalendarEventType
     {
         $resolver->setDefaults(
             array(
-                'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'            => 'calendar_event',
-                'csrf_protection'      => false,
+                'data_class'      => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                'intention'       => 'calendar_event',
+                'csrf_protection' => false,
             )
         );
     }

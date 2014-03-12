@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\CalendarBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Oro\Bundle\ReminderBundle\Model\ReminderData;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -26,7 +31,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *  }
  * )
  */
-class CalendarEvent
+class CalendarEvent implements RemindableInterface
 {
     /**
      * @ORM\Id
@@ -90,6 +95,16 @@ class CalendarEvent
      * )
      */
     protected $allDay;
+
+    /**
+     * @var Collection
+     */
+    protected $reminders;
+
+    public function __construct()
+    {
+        $this->reminders = new ArrayCollection();
+    }
 
     /**
      * Gets an calendar event id.
@@ -222,5 +237,35 @@ class CalendarEvent
         $this->allDay = $allDay;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReminders()
+    {
+        return $this->reminders;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setReminders(Collection $reminders)
+    {
+        $this->reminders = $reminders;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReminderData()
+    {
+        $result = new ReminderData();
+
+        $result->setSubject($this->getTitle());
+        $result->setExpireAt($this->getEnd());
+        $result->setRecipient($this->getCalendar()->getOwner());
+
+        return $result;
     }
 }
