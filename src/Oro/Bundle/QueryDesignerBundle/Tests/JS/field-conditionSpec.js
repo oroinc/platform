@@ -8,6 +8,7 @@ function ($, markup) {
 
         beforeEach(function () {
             $el = $('<div>');
+            $el.append($(markup));
             $('body').append($el);
         });
 
@@ -54,10 +55,6 @@ function ($, markup) {
         });
 
         it('renders none filter', function (done) {
-            var $noneFilterTemplate = $(markup);
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -98,10 +95,6 @@ function ($, markup) {
         });
 
         it('renders choice filter', function (done) {
-            var $noneFilterTemplate = $(markup);
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -204,10 +197,6 @@ function ($, markup) {
         });
 
         it('replaces filter', function (done) {
-            var $noneFilterTemplate = $(markup);
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
