@@ -592,7 +592,7 @@ a.button:hover {
     display: block
 }
 
-span.validation-faled:before {
+span.validation-failed:before {
     color: #C81717;
     content: "×";
     display: inline-block;
@@ -601,7 +601,7 @@ span.validation-faled:before {
     width: 14px
 }
 
-span.validation-faled {
+span.validation-failed {
     clear: both;
     color: #C81717;
     display: block;
