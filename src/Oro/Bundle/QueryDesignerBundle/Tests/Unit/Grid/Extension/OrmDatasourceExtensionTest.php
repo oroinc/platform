@@ -24,6 +24,8 @@ use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -41,23 +43,36 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
+        $subscriber = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
+            ->disableOriginalConstructor()
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+        $subscriberСlass = get_class($subscriber);
+
+        // Static stub method
+        $subscriberСlass::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue([]));
+
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(
                 array(
-                    new PreloadedExtension(
-                        array(
-                            'oro_type_text_filter'           => new TextFilterType($translator),
-                            'oro_type_datetime_range_filter' => new DateTimeRangeFilterType($translator),
-                            'oro_type_date_range_filter'     => new DateRangeFilterType($translator),
-                            'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
-                            'oro_type_date_range'            => new DateRangeType(),
-                            'oro_type_filter'                => new FilterType($translator),
-                        ),
-                        array()
-                    ),
-                    new CsrfExtension(
-                        $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
-                    )
+                     new PreloadedExtension(
+                         array(
+                              'oro_type_text_filter'           => new TextFilterType($translator),
+                              'oro_type_datetime_range_filter' =>
+                                  new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
+                              'oro_type_date_range_filter'     =>
+                                  new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
+                              'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
+                              'oro_type_date_range'            => new DateRangeType(),
+                              'oro_type_filter'                => new FilterType($translator),
+                         ),
+                         array()
+                     ),
+                     new CsrfExtension(
+                         $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                     )
                 )
             )
             ->getFormFactory();
@@ -96,61 +111,60 @@ class OrmDatasourceExtensionTest extends OrmTestCase
 
         $config = DatagridConfiguration::create(
             [
-                'source' => [
-                    'query_config' => [
-                        'filters' => [
+            'source' => [
+                'query_config' => [
+                    'filters' => [
+                        [
+                            'column'      => 'user_name',
+                            'filter'      => 'string',
+                            'filterData'  => [
+                                'type'  => '2',
+                                'value' => 'test_user_name'
+                            ],
+                            'columnAlias' => 'user_name'
+                        ],
+                        'AND',
+                        [
                             [
-                                'column'      => 'user_name',
-                                'filter'      => 'string',
-                                'filterData'  => [
+                                'column'     => 'user_status',
+                                'filter'     => 'datetime',
+                                'filterData' => [
                                     'type'  => '2',
-                                    'value' => 'test_user_name'
-                                ],
-                                'columnAlias' => 'user_name'
+                                    'value' => [
+                                        'start' => '2013-11-20 10:30',
+                                        'end'   => '2013-11-25 11:30',
+                                    ]
+                                ]
                             ],
                             'AND',
                             [
                                 [
-                                    'column'     => 'user_status',
-                                    'filter'     => 'datetime',
-                                    'filterData' => [
-                                        'type'  => '2',
-                                        'value' => [
-                                            'start' => '2013-11-20 10:30',
-                                            'end'   => '2013-11-25 11:30',
-                                        ]
-                                    ]
-                                ],
-                                'AND',
-                                [
                                     [
-                                        [
-                                            'column'      => 'address.country',
-                                            'filter'      => 'string',
-                                            'filterData'  => [
-                                                'type'  => '1',
-                                                'value' => 'test_address_country'
-                                            ],
-                                            'columnAlias' => 'address_country'
+                                        'column'      => 'address.country',
+                                        'filter'      => 'string',
+                                        'filterData'  => [
+                                            'type'  => '1',
+                                            'value' => 'test_address_country'
                                         ],
-                                        'OR',
-                                        [
-                                            'column'     => 'address.city',
-                                            'filter'     => 'string',
-                                            'filterData' => [
-                                                'type'  => '1',
-                                                'value' => 'test_address_city'
-                                            ]
-                                        ],
+                                        'columnAlias' => 'address_country'
                                     ],
                                     'OR',
                                     [
-                                        'column'     => 'address.zip',
+                                        'column'     => 'address.city',
                                         'filter'     => 'string',
                                         'filterData' => [
                                             'type'  => '1',
-                                            'value' => 'address_zip'
+                                            'value' => 'test_address_city'
                                         ]
+                                    ],
+                                ],
+                                'OR',
+                                [
+                                    'column'     => 'address.zip',
+                                    'filter'     => 'string',
+                                    'filterData' => [
+                                        'type'  => '1',
+                                        'value' => 'address_zip'
                                     ]
                                 ]
                             ]
@@ -158,12 +172,13 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     ]
                 ]
             ]
+            ]
         );
 
         $extension->visitDatasource($config, $datasource);
         $result  = $qb->getDQL();
         $counter = 0;
-        $result = preg_replace_callback(
+        $result  = preg_replace_callback(
             '/(:[a-z]+)(\d+)/',
             function ($matches) use (&$counter) {
                 return $matches[1] . (++$counter);
@@ -190,6 +205,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      *
      * @param string $name   A filter name
      * @param array  $params An additional parameters of a new filter
+     *
      * @return FilterInterface
      * @throws \Exception
      */
@@ -207,7 +223,15 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                 $filter = new StringFilter($this->formFactory, new FilterUtility());
                 break;
             case 'datetime':
-                $filter = new DateTimeRangeFilter($this->formFactory, new FilterUtility());
+                $localeSetting = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+                    ->disableOriginalConstructor()->getMock();
+                $localeSetting->expects($this->any())->method('getTimeZone')->will($this->returnValue('UTC'));
+
+                $filter = new DateTimeRangeFilter(
+                    $this->formFactory,
+                    new FilterUtility(),
+                    new DateFilterUtility($localeSetting)
+                );
                 break;
             default:
                 throw new \Exception(sprintf('Not implementer in this test filter: "%s".', $name));

@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
-    ], function ($, _, Backgrid, SelectRowCell) {
+define(['jquery', 'underscore', 'backgrid', 'backbone'
+    ], function ($, _, Backgrid, Backbone) {
     "use strict";
 
     /**
@@ -13,16 +13,23 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
      *
      * @export  orodatagrid/js/datagrid/header-cell/select-all-header-cell
      * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
-     * @extends orodatagrid.datagrid.cell.SelectRowCell
+     * @extends Backbone.View
      */
-    return SelectRowCell.extend({
+    return Backbone.View.extend({
         /** @property */
         className: "select-all-header-cell",
 
         /** @property */
         tagName: "th",
 
-        events: {},
+        events: {
+            'click [data-select]': 'onSelect',
+            'click [data-select-all]': 'onSelectAll',
+            'click [data-select-none]': 'onSelectNone',
+            'click [data-select-all-visible]': 'onSelectViable'
+        },
+
+        template: '#template-select-all-header-cell',
 
         /**
          * Initializer.
@@ -33,7 +40,7 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
          * @param {Backbone.Collection} options.collection
          */
         initialize: function (options) {
-            //Backgrid.requireOptions(options, ["column", "collection"]);
+            Backgrid.requireOptions(options, ["column", "collection"]);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
@@ -67,10 +74,26 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
          * Resets selection to initial conditions
          *  - clear selected models set
          *  - reset set type in-set/not-in-set
+         * @param {boolean=} inset flag of in-set/not-in-set mode
          */
-        initialState: function () {
+        initialState: function (inset) {
             this.selectedModels = {};
-            this.inset = true;
+            this.inset = _.isUndefined(inset) ? true : inset;
+            this.updateState();
+        },
+
+        /**
+         * Updates state of selection (three states a checkbox: checked, unchecked, or indeterminate)
+         */
+        updateState: function () {
+            var $checkbox = this.$('[type=checkbox]');
+            if (_.isEmpty(this.selectedModels)) {
+                $checkbox.prop('indeterminate', false);
+                $checkbox.prop('checked', !this.inset);
+            } else {
+                $checkbox.prop('indeterminate', true);
+                $checkbox.prop('checked', false);
+            }
         },
 
         /**
@@ -102,6 +125,7 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
          */
         removeModel: function (model) {
             delete this.selectedModels[model.id || model.cid];
+            this.updateState();
         },
 
         /**
@@ -113,6 +137,7 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
         selectModel: function (model, selected) {
             if (selected === this.inset) {
                 this.selectedModels[model.id || model.cid] = model;
+                this.updateState();
             } else {
                 this.removeModel(model);
             }
@@ -126,9 +151,8 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
          *  start to collect models which have to be excluded
          */
         selectAll: function () {
-            this.initialState();
-            this.inset = false;
-            this._selectAll();
+            this.initialState(false);
+            this._markSelected(true);
         },
 
         /**
@@ -140,8 +164,7 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
          */
         selectNone: function () {
             this.initialState();
-            this.inset = true;
-            this._selectNone();
+            this._markSelected(false);
         },
 
         /**
@@ -153,67 +176,72 @@ define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
             if (!this.inset) {
                 this.initialState();
             }
-            this._selectAll();
+            this._markSelected(true);
         },
 
         /**
-         * Marks all models in collection as selected
+         * Marks all models in collection as selected/not selected
          *
+         * @param {boolean} selected
          * @private
          */
-        _selectAll: function () {
+        _markSelected: function (selected) {
             this.collection.each(function (model) {
-                model.trigger("backgrid:select", model, true);
+                model.trigger("backgrid:select", model, selected);
             });
         },
 
         /**
-         * Marks all models in collection as not selected
+         * Renders view of the header cell
          *
-         * @private
-         */
-        _selectNone: function () {
-            this.collection.each(function (model) {
-                model.trigger("backgrid:select", model, false);
-            });
-        },
-
-        /**
-         *
-         *
-         * @returns {oro.datagrid.SelectAllHeaderCell}
+         * @returns {orodatagrid.datagrid.cell.SelectAllHeaderCell}
          */
         render: function () {
-            /*jshint multistr:true */
-            /*jslint es5: true */
-            /* temp solution: start */
-            // It's not clear for now, how mass selection will be designed,
-            // thus implementation is done just to check functionality.
-            // For future render method will depend on options or will be empty
-            this.$el.empty().append('<div class="btn-group">\
-                <button type="button" class="btn btn-default btn-small" data-select-all>All</button>\
-                <button type="button" class="btn btn-default btn-small dropdown-toggle" data-toggle="dropdown">\
-                    <i class="caret"></i>\
-                </button>\
-                <ul class="dropdown-menu">\
-                    <li><a href="#" data-select-all-visible>All visible</a></li>\
-                    <li><a href="#" data-select-none>None</a></li>\
-                </ul>\
-            </div>');
-            this.$el.find('[data-select-all]').on('click', _.bind(function (e) {
-                this.collection.trigger('backgrid:selectAll');
-                e.preventDefault();
-            }, this));
-            this.$el.find('[data-select-all-visible]').on('click', _.bind(function (e) {
-                this.collection.trigger('backgrid:selectAllVisible');
-                e.preventDefault();
-            }, this));
-            this.$el.find('[data-select-none]').on('click', _.bind(function (e) {
-                this.collection.trigger('backgrid:selectNone');
-                e.preventDefault();
-            }, this));
-            /* temp solution: end */
+            this.$el.html(_.template($(this.template).text()));
             return this;
+        },
+
+        /**
+         * Handles click on checkbox selectAll/selectNone
+         *
+         * @param {jQuery.Event} e
+         */
+        onSelect: function (e) {
+            if (this.inset && _.isEmpty(this.selectedModels) === this.inset) {
+                this.collection.trigger('backgrid:selectAll');
+            } else {
+                this.collection.trigger('backgrid:selectNone');
+            }
+        },
+
+        /**
+         * Handles click on selectAll button
+         *
+         * @param {jQuery.Event} e
+         */
+        onSelectAll: function (e) {
+            this.collection.trigger('backgrid:selectAll');
+            e.preventDefault();
+        },
+
+        /**
+         * Handles click on selectAllVisible button
+         *
+         * @param {jQuery.Event}e
+         */
+        onSelectViable: function (e) {
+            this.collection.trigger('backgrid:selectAllVisible');
+            e.preventDefault();
+        },
+
+        /**
+         * Handles click on selectNone button
+         *
+         * @param {jQuery.Event}e
+         */
+        onSelectNone: function (e) {
+            this.collection.trigger('backgrid:selectNone');
+            e.preventDefault();
         }
     });
 });
