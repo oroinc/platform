@@ -28,7 +28,7 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     /**
      * @var ReminderDataInterface[]
      */
-    protected $snapshot;
+    protected $snapshot = array();
 
     /**
      * @var bool
@@ -45,6 +45,18 @@ class RemindersPersistentCollection extends AbstractLazyCollection
         $this->repository = $repository;
         $this->className = $className;
         $this->identifier = $identifier;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doInitialize()
+    {
+        if (!$this->collection) {
+            $reminders = $this->repository->findRemindersByEntity($this->className, $this->identifier);
+            $this->snapshot = $reminders;
+            $this->collection = new ArrayCollection($reminders);
+        }
     }
 
     /**
@@ -98,26 +110,18 @@ class RemindersPersistentCollection extends AbstractLazyCollection
      */
     public function set($key, $value)
     {
-        parent::set($key, $value);
-        $this->changed();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doInitialize()
-    {
-        if (!$this->collection) {
-            $reminders = $this->repository->findRemindersByEntity($this->className, $this->identifier);
-            $this->snapshot = $reminders;
-            $this->collection = new ArrayCollection($reminders);
+        if (null === $key) {
+            parent::add($value);
+        } else {
+            parent::set($key, $value);
         }
+        $this->changed();
     }
 
     /**
      * Get elements of collection when it was loaded from storage.
      *
-     * @return \Oro\Bundle\ReminderBundle\Model\ReminderDataInterface[]
+     * @return ReminderDataInterface[]
      */
     public function getSnapshot()
     {
@@ -145,10 +149,6 @@ class RemindersPersistentCollection extends AbstractLazyCollection
      */
     public function offsetSet($offset, $value)
     {
-        if (!isset($offset)) {
-            $this->add($value);
-        }
-
         $this->set($offset, $value);
     }
 

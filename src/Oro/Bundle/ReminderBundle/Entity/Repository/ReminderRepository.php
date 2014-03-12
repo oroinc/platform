@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
 
 class ReminderRepository extends EntityRepository
 {
@@ -43,17 +44,31 @@ class ReminderRepository extends EntityRepository
             ->execute();
     }
 
-    public function findRemindersToShow($userId)
+    /**
+     * Find only requested reminders assigned to user
+     *
+     * @param $userId
+     * @return Reminder[]
+     */
+    public function findRequestedReminders($userId)
     {
         return $this->createQueryBuilder('reminder')
             ->where('reminder.state = :sent_state')
             ->andWhere('reminder.recipient = :userId')
+            ->andWhere('reminder.method = :method')
             ->setParameter('userId', $userId)
-            ->setParameter('sent_state', Reminder::STATE_IN_PROGRESS)
+            ->setParameter('method', WebSocketSendProcessor::NAME)
+            ->setParameter('sent_state', Reminder::STATE_REQUESTED)
             ->getQuery()
             ->execute();
     }
 
+    /**
+     * Find reminders by reminder ids
+     *
+     * @param array $reminderIds
+     * @return Reminder[]
+     */
     public function findReminders(array $reminderIds)
     {
         $qb = $this->createQueryBuilder('reminder');

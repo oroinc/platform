@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -19,14 +18,27 @@ class MessageParamsProvider
      */
     protected $translator;
 
-    public function __construct(
-        Translator $translator,
-        DateTimeFormatter $dateTimeFormatter
-    ) {
+    /**
+     * @var UrlProvider
+     */
+    protected $urlProvider;
+
+    /**
+     * @param Translator        $translator
+     * @param DateTimeFormatter $dateTimeFormatter
+     * @param UrlProvider       $urlProvider
+     */
+    public function __construct(Translator $translator, DateTimeFormatter $dateTimeFormatter, UrlProvider $urlProvider)
+    {
         $this->dateTimeFormatter = $dateTimeFormatter;
         $this->translator = $translator;
+        $this->urlProvider = $urlProvider;
     }
 
+    /**
+     * @param Reminder $reminder
+     * @return array
+     */
     public function getMessageParams(Reminder $reminder)
     {
         $translationParams = array(
@@ -36,16 +48,6 @@ class MessageParamsProvider
 
         $message = $this->translator->trans('oro.reminder.message', $translationParams);
 
-        return array('text' => $message, 'uri' => $this->getUrl($reminder), 'reminderId' => $reminder->getId());
-    }
-
-    /**
-     * @param Reminder $reminder
-     * @return string|null
-     */
-    protected function getUrl(Reminder $reminder)
-    {
-        // @todo replace with call to service responsible for generating url
-        return null;
+        return array('text' => $message, 'url' => $this->urlProvider->getUrl($reminder), 'id' => $reminder->getId());
     }
 }

@@ -1,8 +1,7 @@
+{% if check_ws() and app.user %}
 <script type="text/javascript">
-    require(['ororeminder/js/subscriber', 'orosync/js/sync/wamp'], function(subscriber, Wamp){
-        subscriber.init({{ app.user.id }}, new Wamp({
-            host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
-            port: {{ ws.port }}
-        }), '{{ getNotShownRemindersJson()|raw }}');
+    require(['ororeminder/js/subscriber'], function(subscriber){
+        subscriber.init({{ app.user.id }}, {{ oro_reminder_get_requested_reminders()|raw }});
     });
 </script>
+{% endif %}

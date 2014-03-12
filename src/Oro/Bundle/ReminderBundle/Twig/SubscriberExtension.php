@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ReminderBundle\Twig;
 
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Symfony\Component\Security\Core\SecurityContext;
 
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
 class SubscriberExtension extends \Twig_Extension
 {
@@ -36,28 +37,35 @@ class SubscriberExtension extends \Twig_Extension
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('getNotShownRemindersJson', function () {
-
-                $userId = $this->securityContext->getToken()->getUser()->getId();
-                $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
-                    ->findRemindersToShow($userId);
-                $result = array();
-
-                /**
-                 * @var Reminder $reminder
-                 */
-                foreach ($reminders as $reminder) {
-                    $result[] = $this->messageParamsProvider->getMessageParams($reminder);
-                }
-
-                return json_encode($result);
-            })
+            new \Twig_SimpleFunction('oro_reminder_get_requested_reminders', array($this, 'getRequestedReminders'))
         );
+    }
+
+    /**
+     * Twig function callback
+     *
+     * @return string
+     */
+    public function getRequestedReminders()
+    {
+        $userId = $this->securityContext->getToken()->getUser()->getId();
+        $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
+            ->findRequestedReminders($userId);
+        $result = array();
+
+        /**
+         * @var Reminder $reminder
+         */
+        foreach ($reminders as $reminder) {
+            $result[] = $this->messageParamsProvider->getMessageParams($reminder);
+        }
+
+        return json_encode($result);
     }
 
     /**

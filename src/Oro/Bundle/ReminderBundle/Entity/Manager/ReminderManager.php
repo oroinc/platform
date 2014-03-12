@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
@@ -36,10 +37,13 @@ class ReminderManager
     public function saveReminders(RemindableInterface $entity)
     {
         $reminders = $entity->getReminders();
+        $reminderData = $entity->getReminderData();
+        $entityClass = $this->getEntityClassName($entity);
+        $entityId = $this->getEntityIdentifier($entity);
 
         if (!$reminders instanceof RemindersPersistentCollection) {
             foreach ($reminders as $reminder) {
-                $this->syncEntityReminder($entity, $reminder);
+                $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
                 $this->entityManager->persist($reminder);
             }
         } else {
@@ -52,7 +56,7 @@ class ReminderManager
                 }
             }
             foreach ($reminders as $reminder) {
-                $this->syncEntityReminder($entity, $reminder);
+                $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
             }
         }
     }
@@ -60,14 +64,20 @@ class ReminderManager
     /**
      * Sync reminder with entity data
      *
-     * @param RemindableInterface $entity
      * @param Reminder $reminder
+     * @param ReminderDataInterface $reminderData
+     * @param string $entityClass
+     * @param mixed $entityId
      */
-    protected function syncEntityReminder(RemindableInterface $entity, Reminder $reminder)
-    {
-        $reminder->setReminderData($entity->getReminderData());
-        $reminder->setRelatedEntityClassName($this->getEntityClassName($entity));
-        $reminder->setRelatedEntityId($this->getEntityIdentifier($entity));
+    protected function syncEntityReminder(
+        Reminder $reminder,
+        ReminderDataInterface $reminderData,
+        $entityClass,
+        $entityId
+    ) {
+        $reminder->setReminderData($reminderData);
+        $reminder->setRelatedEntityClassName($entityClass);
+        $reminder->setRelatedEntityId($entityId);
     }
 
     /**

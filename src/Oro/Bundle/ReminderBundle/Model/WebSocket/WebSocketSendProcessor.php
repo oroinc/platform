@@ -20,6 +20,10 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected $messageParamsProvider;
 
+    /**
+     * @param TopicPublisher        $topicPublisher
+     * @param MessageParamsProvider $messageParamsProvider
+     */
     public function __construct(
         TopicPublisher $topicPublisher,
         MessageParamsProvider $messageParamsProvider
@@ -40,15 +44,15 @@ class WebSocketSendProcessor implements SendProcessorInterface
 
         $sentResult = $this->sendMessage($reminder, $message);
 
-        $reminder->setState($sentResult ? Reminder::STATE_IN_PROGRESS : Reminder::STATE_NOT_SENT);
+        $reminder->setState($sentResult ? Reminder::STATE_REQUESTED : Reminder::STATE_NOT_SENT);
     }
 
     /**
      * @param Reminder $reminder
-     * @param string   $message
+     * @param array    $messageParams
      * @return bool
      */
-    protected function sendMessage(Reminder $reminder, $message)
+    protected function sendMessage(Reminder $reminder, array $messageParams)
     {
         return $this->topicPublisher->send(
             sprintf(
@@ -56,7 +60,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
                 $reminder->getRecipient()
                     ->getId()
             ),
-            json_encode($message)
+            json_encode($messageParams)
         );
     }
 

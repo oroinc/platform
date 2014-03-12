@@ -34,7 +34,7 @@ class Reminder
     const STATE_SENT = 'sent';
     const STATE_NOT_SENT = 'not_sent';
     const STATE_FAIL = 'fail';
-    const STATE_IN_PROGRESS = 'in_progress';
+    const STATE_REQUESTED = 'requested';
 
     /**
      * @var integer
@@ -534,10 +534,10 @@ class Reminder
     public function setFailureException(\Exception $e)
     {
         $this->failureException = [
-            'class'             => get_class($e),
-            'message'           => $e->getMessage(),
-            'code'              => $e->getCode(),
-            'trace'             => $e->getTraceAsString()
+            'class'   => get_class($e),
+            'message' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'trace'   => $e->getTraceAsString()
         ];
 
         return $this;
@@ -564,6 +564,6 @@ class Reminder
      */
     public function __toString()
     {
-        return $this->subject;
+        return (string)$this->subject;
     }
 }
