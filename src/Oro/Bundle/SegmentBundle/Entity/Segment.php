@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Table(name="oro_segment")
  * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      routeName="oro_segment_index",
  *      defaultValues={
@@ -285,5 +286,25 @@ class Segment extends AbstractQueryDesigner
     public function getLastRun()
     {
         return $this->lastRun;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event handler
+     * @ORM\PreUpdate
+     */
+    public function doUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

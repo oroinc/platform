@@ -82,6 +82,24 @@ class SegmentController extends Controller
      */
     protected function update(Segment $entity)
     {
-        return $entity;
+        if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
+            $this->get('session')->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.segment.entity.saved')
+            );
+
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_segment_update', 'parameters' => ['id' => $entity->getId()]],
+                ['route' => 'oro_segment_view', 'parameters' => ['id' => $entity->getId()]],
+                $entity
+            );
+        }
+
+        return [
+            'entity'   => $entity,
+            'form'     => $this->get('oro_segment.form.segment')->createView(),
+            'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
+            'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('segment')
+        ];
     }
 }
