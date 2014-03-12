@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
-
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
