@@ -1,0 +1,26 @@
+oro:
+    segment:
+        entity_label:        Segment
+        entity_plural_label: Segments
+        id:
+            label:   Id
+        name:
+            label:   Name
+        definition:
+            label:   Definition
+        description:
+            label:   Description
+        entity:
+            label:   Entity
+        type:
+            label:   Type
+            dynamic: Dynamic
+            static:  Static
+        owner:
+            label:   Owner
+        created_at:
+            label:   Created At
+        updated_at:
+            label:   Updated At
+        last_run:
+            label:   Last run

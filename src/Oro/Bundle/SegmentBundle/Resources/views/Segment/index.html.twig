@@ -6,8 +6,8 @@
 {% block navButtons %}
     {% if resource_granted('oro_segment_create') %}
         {{ UI.addButton({
-        'path': path('oro_segment_create'),
-        'entity_label': 'oro.segment.entity_label'|trans
+            'path':          path('oro_segment_create'),
+            'entity_label': 'oro.segment.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock %}

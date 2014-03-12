@@ -1,6 +1,12 @@
 parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
+    oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
 
 services:
     oro_segment.entity_provider:
         alias: oro_entity.entity_provider
+
+    oro_segment.segment_manager:
+        class: %oro_segment.segment_manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager
