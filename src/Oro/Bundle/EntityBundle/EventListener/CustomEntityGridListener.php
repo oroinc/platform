@@ -17,7 +17,6 @@ use Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class CustomEntityGridListener extends AbstractConfigGridListener
 {
@@ -32,9 +31,6 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /** @var null original entity class */
     protected $entityClass = null;
-
-    /** @var array fields to be shown on grid */
-    protected $queryFields = [];
 
     /** @var  integer parent entity id */
     protected $parentId;
@@ -225,12 +221,10 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             );
 
             $label = $entityConfig->get('label') ?: $fieldConfigId->getFieldName();
-            $code  = $fieldConfigId->getFieldName();
+            $fieldName = $fieldConfigId->getFieldName();
 
-            $this->queryFields[] = $code;
-
-            $field = $this->createFieldArrayDefinition($code, $label, $fieldConfigId);
-            $select = $alias . '.' . $code;
+            $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfigId);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];

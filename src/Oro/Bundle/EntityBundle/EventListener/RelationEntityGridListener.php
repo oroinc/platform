@@ -8,8 +8,6 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityGridListener extends CustomEntityGridListener
 {
@@ -135,12 +133,9 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
             $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $fieldName;
 
-            $this->queryFields[] = $code;
-
-            $field = $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $field = $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfig);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];

@@ -10,7 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
