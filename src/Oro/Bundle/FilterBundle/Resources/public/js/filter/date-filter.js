@@ -100,7 +100,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             lessThan:   4
         },
 
-        tabs: [
+        defaultTabs: [
             {
                 name: 'calendar',
                 label: 'oro.filter.date.tab.calendar'
@@ -160,10 +160,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                     value: firstPart
                 };
             }
-
-            _.each(this.tabs, function(tab) {
-                tab.label = __(tab.label);
-            });
 
             ChoiceFilter.prototype.initialize.apply(this, arguments);
         },
@@ -270,8 +266,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                     $input.val(date);
                 }}, this.dateWidgetOptions);
 
+            var tabs = [];
+            _.each(widgetOptions.tabs || this.defaultTabs, function(tab) {
+                var currentTab   = _.clone(tab);
+                currentTab.label = __(currentTab.label);
+                tabs.push(currentTab);
+            });
             $input.after(template({
-                tabs: this.tabs,
+                tabs:   tabs,
                 suffix: tabSuffix
             }));
 
