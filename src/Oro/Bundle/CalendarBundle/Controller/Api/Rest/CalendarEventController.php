@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -84,7 +85,20 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate);
 
         $result = array();
-        foreach ($qb->getQuery()->getArrayResult() as $item) {
+
+        $items = $qb->getQuery()->getArrayResult();
+        $itemIds = array_map(
+            function ($item) {
+                return $item['id'];
+            },
+            $items
+        );
+        $reminders = $manager
+            ->getObjectManager()
+            ->getRepository('OroReminderBundle:Reminder')
+            ->findRemindersByEntities($itemIds, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        foreach ($items as $item) {
             $resultItem = array();
             foreach ($item as $field => $value) {
                 $this->transformEntityField($field, $value);
@@ -96,6 +110,26 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $resultItem['removable'] =
                 ($resultItem['calendar'] === $calendarId)
                 && $securityFacade->isGranted('oro_calendar_event_delete');
+            $resultReminders = array_filter(
+                $reminders,
+                function ($reminder) use ($resultItem) {
+                    /* @var Reminder $reminder */
+                    return $reminder->getRelatedEntityId() == $resultItem['id'];
+                }
+            );
+
+            $resultItem['reminders'] = [];
+            foreach ($resultReminders as $resultReminder) {
+                /* @var Reminder $resultReminder */
+                $resultItem['reminders'][$resultReminder->getId()] = [
+                    'method' => $resultReminder->getMethod(),
+                    'interval' => [
+                        'number' => $resultReminder->getInterval()->getNumber(),
+                        'unit' => $resultReminder->getInterval()->getUnit()
+                    ]
+                ];
+            }
+
             $result[] = $resultItem;
         }
 
