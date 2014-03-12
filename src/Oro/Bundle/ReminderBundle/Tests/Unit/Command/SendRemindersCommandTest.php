@@ -74,18 +74,23 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->setContainer($this->container);
     }
 
+    public function testGetDefaultDefinition()
+    {
+        $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
+    }
+
     public function testExecute()
     {
         $input = $this->getMock('Symfony\\Component\\Console\\Input\\InputInterface');
         $output = $this->getMock('Symfony\\Component\\Console\\Output\\OutputInterface');
 
-        $reminders = array($this->createReminder(), $this->createReminder());
+        $reminders = array($this->createReminder(), $this->createReminder(), $this->createReminder());
 
         $this->repository->expects($this->once())
             ->method('findRemindersToSend')
             ->will($this->returnValue($reminders));
 
-        $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 2');
+        $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 3');
 
         $this->entityManager->expects($this->at(0))->method('beginTransaction');
 
@@ -109,10 +114,54 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getState')
             ->will($this->returnValue(Reminder::STATE_NOT_SENT));
 
-        $output->expects($this->at(1))->method('writeln')->with('<info>Reminders sent:</info> 1');
+        $this->sender
+            ->expects($this->at(2))
+            ->method('send')
+            ->with($reminders[1]);
+
+        $reminders[2]
+            ->expects($this->exactly(2))
+            ->method('getState')
+            ->will($this->returnValue(Reminder::STATE_FAIL));
+
+        $failId = 100;
+        $reminders[2]
+            ->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($failId));
+
+        $failException = array('class' => 'ExceptionClass', 'message' => 'Exception message');
+        $reminders[2]
+            ->expects($this->once())
+            ->method('getFailureException')
+            ->will($this->returnValue($failException));
+
+        $output->expects($this->at(1))
+            ->method('writeln')
+            ->with("<error>Failed to send reminder with id=$failId</error>");
+
+        $output->expects($this->at(2))
+            ->method('writeln')
+            ->with("<info>{$failException['class']}</info>: {$failException['message']}");
+
+        $output->expects($this->at(3))->method('writeln')->with("<info>Reminders sent:</info> 1");
 
         $this->entityManager->expects($this->at(1))->method('flush');
         $this->entityManager->expects($this->at(2))->method('commit');
+
+        $this->command->execute($input, $output);
+    }
+
+    public function testExecuteNoRemindersToSend()
+    {
+        $input = $this->getMock('Symfony\\Component\\Console\\Input\\InputInterface');
+        $output = $this->getMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+
+        $this->repository->expects($this->once())
+            ->method('findRemindersToSend')
+            ->will($this->returnValue(array()));
+
+        $output->expects($this->at(0))->method('writeln')->with('<info>No reminders to sent</info>');
 
         $this->command->execute($input, $output);
     }
