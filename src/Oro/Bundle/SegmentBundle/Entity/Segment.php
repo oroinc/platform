@@ -79,7 +79,7 @@ class Segment extends AbstractQueryDesigner
     /**
      * @var \Datetime $lastRun
      *
-     * @ORM\Column(name="last_run", type="datetime")
+     * @ORM\Column(name="last_run", type="datetime", nullable=true)
      */
     protected $lastRun;
 
