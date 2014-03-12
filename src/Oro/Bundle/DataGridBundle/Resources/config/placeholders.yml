@@ -11,6 +11,8 @@ placeholders:
                 order: 50
             template_datagrid_select_all_header_cell:
                 order: 50
+            template_datagrid_action_header_cell:
+                order: 50
 
 items:
    template_datagrid_toolbar:
@@ -23,3 +25,5 @@ items:
        template: OroDataGridBundle:js:page-size.html.twig
    template_datagrid_select_all_header_cell:
        template: OroDataGridBundle:js:select-all-header-cell.html.twig
+   template_datagrid_action_header_cell:
+       template: OroDataGridBundle:js:action-header-cell.html.twig
