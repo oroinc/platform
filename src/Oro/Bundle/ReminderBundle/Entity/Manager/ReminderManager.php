@@ -126,7 +126,7 @@ class ReminderManager
                 sprintf(
                     'Entity "%s" with multiple identifiers "%s" is not supported by OroReminderBundle.',
                     $className,
-                    implode('", "', $identifiers)
+                    implode('", "', array_keys($identifiers))
                 )
             );
         }
