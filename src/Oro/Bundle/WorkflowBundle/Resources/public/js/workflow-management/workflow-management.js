@@ -338,7 +338,8 @@ function(_, Backbone, messanger, __,
 
             var stepEditView = new StepEditView({
                 'model': step,
-                'workflow': this.model
+                'workflow': this.model,
+                'workflowContainer': this.$el
             });
             stepEditView.on('stepAdd', this.addStep, this);
             stepEditView.render();

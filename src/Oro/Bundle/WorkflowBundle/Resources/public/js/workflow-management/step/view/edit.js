@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/page-widget',
     'oroworkflow/js/workflow-management/helper',
-    'oroui/js/layout', 'oroworkflow/js/workflow-management/transition/view/list',
+    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list',
     'oroworkflow/js/workflow-management/transition/model'
 ],
-function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
+function(_, __, Backbone, PageWidget, Helper, mediator, TransitionsListView, TransitionModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -26,7 +26,8 @@ function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, Tra
         options: {
             template: null,
             transitionListContainerEl: '.transitions-list-container',
-            workflow: null
+            workflow: null,
+            workflowContainer: null
         },
 
         initialize: function() {
@@ -66,6 +67,7 @@ function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, Tra
             _.each(this.addedTransitions, function(transition) {
                 transition.destroy();
             });
+            this.remove();
         },
 
         renderTransitions: function() {
@@ -91,20 +93,15 @@ function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, Tra
 
             this.renderTransitions();
 
-            this.widget = new DialogWidget({
+            this.widget = new PageWidget({
                 'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
                 'el': this.$el,
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'close': _.bind(this.remove, this),
-                    'width': 600,
-                    'modal': true
-                }
+                'replacementEl': this.options.workflowContainer
             });
-            this.widget.on('renderComplete', function(el) {
-                layout.init(el);
+            this.listenTo(this.widget, 'renderComplete', function(el) {
+                mediator.trigger('layout.init', el);
             });
+            this.listenTo(this.widget, 'adoptedFormResetClick', this.onCancel);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead
@@ -112,7 +109,6 @@ function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, Tra
             this.widget.form.validate({
                 'submitHandler': _.bind(this.onStepAdd, this)
             });
-            this.listenTo(this.widget, 'adoptedFormResetClick', this.onCancel);
 
             return this;
         }

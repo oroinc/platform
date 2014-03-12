@@ -233,18 +233,11 @@ function(_, __, Backbone, PageWidget, Helper, AttributeFormOptionEditView, Attri
                 'title': this.model.get('name') ? __('Edit transition') : __('Add new transition'),
                 'el': this.$el,
                 'replacementEl': this.options.workflowContainer
-//                'stateEnabled': false,
-//                'incrementalPosition': false,
-//                'dialogOptions': {
-//                    'close': _.bind(this.removeHandler, this),
-//                    'width': 800,
-//                    'modal': true
-//                }
             });
-            this.widget.on('renderComplete', function(el) {
+            this.listenTo(this.widget, 'renderComplete', function(el) {
                 mediator.trigger('layout.init', el);
-                mediator.trigger('hash_navigation_request:complete');
             });
+            this.listenTo(this.widget, 'adoptedFormResetClick', this.removeHandler);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead

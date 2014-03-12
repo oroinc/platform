@@ -34,8 +34,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
                         '</div>' +
                     '</div>' +
                     '</div>' +
-
-                '<div class="layout-content scrollable-container <%= contentClasses.join(\' \') %>"></div>' +
+                '<div class="scrollable-container layout-content <%= contentClasses.join(\' \') %>"></div>' +
             '</div>'),
             replacementEl: null
         }),
@@ -49,19 +48,28 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         },
 
         remove: function() {
-            this.$replacementEl.show();
-
             BlockWidget.prototype.remove.apply(this);
 
-            mediator.trigger('layout:adjustHeight');
+            var latestShownPageWidget = $('.page-widget').last();
+            latestShownPageWidget.show();
+            if (!latestShownPageWidget.length) {
+                this.$replacementEl.show();
+            }
+            mediator.trigger('layout:adjustReloaded');
         },
 
-        show: function() {
-            this.$replacementEl.hide();
+        _show: function() {
+            var latestShownPageWidget = $('.page-widget').last();
+            latestShownPageWidget.hide();
+            if (!latestShownPageWidget.length) {
+                this.$replacementEl.hide();
+            }
+            this.widget.addClass('page-widget');
 
-            BlockWidget.prototype.show.apply(this);
+            BlockWidget.prototype._show.apply(this);
+            this.getActionsElement().find('button').wrap('<div class="btn-group"/>');
 
-            mediator.trigger('layout:adjustHeight');
+            mediator.trigger('layout:adjustReloaded');
         }
     });
 });
