@@ -21,6 +21,9 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OrmTotalsExtension extends AbstractExtension
 {
     /** @var RequestParameters */
@@ -37,6 +40,11 @@ class OrmTotalsExtension extends AbstractExtension
 
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
+
+    /**
+     * @var array
+     */
+    protected $groupParts = [];
 
     public function __construct(
         Translator $translator,
@@ -63,10 +71,18 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $this->validateConfiguration(
+        $totalRows = $this->validateConfiguration(
             new Configuration(),
             ['totals' => $config->offsetGetByPath(Configuration::TOTALS_PATH)]
         );
+
+        if (!empty($totalRows)) {
+            foreach ($totalRows as $rowName => $rowConfig) {
+                $this->mergeTotals($totalRows, $rowName, $rowConfig, $config->getName());
+            }
+
+            $config->offsetSetByPath(Configuration::TOTALS_PATH, $totalRows);
+        }
     }
 
     /**
@@ -82,127 +98,29 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $onlyOnePage  = $result['options']['totalRecords'] == count($result['data']);
+        $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
+        $totalData = [];
         if (null != $totals && !empty($result['data'])) {
-            $totalQueries = [];
-            foreach ($totals as $field => $total) {
-                if (isset($total['query'])) {
-                    $totalQueries[] = $total['query'] . ' AS ' . $field;
+            foreach ($totals as $rowName => $rowConfig) {
+                if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
+                    unset($totals[$rowName]);
+                    continue;
                 }
-            };
 
-            $groupParts   = [];
-            $groupByParts = $this->masterQB->getDQLPart('groupBy');
-            if (!empty($groupByParts)) {
-                /** @var GroupBy $groupByPart */
-                foreach ($groupByParts as $groupByPart) {
-                    $groupParts = array_merge($groupParts, $groupByPart->getParts());
-                }
+                $totalData[$rowName] = $this->getTotalData(
+                    $rowConfig,
+                    $this->getData(
+                        $result,
+                        $rowConfig['columns'],
+                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
+                    )
+                );
             }
-
-            $data = $this->getData($result, $totalQueries, $groupParts);
-            if (!empty($data)) {
-                foreach ($totals as $field => &$total) {
-                    if (isset($data[0][$field])) {
-                        $totalValue = $data[0][$field];
-                        if (isset($total[Configuration::TOTALS_FORMATTER])) {
-                            $totalValue = $this->applyFrontendFormatting(
-                                $totalValue,
-                                $total[Configuration::TOTALS_FORMATTER]
-                            );
-                        }
-                        $total['total'] = $totalValue;
-                    }
-                    if (isset($total['label'])) {
-                        $total['label'] = $this->translator->trans($total['label']);
-                    }
-                };
-            }
-        } else {
-            $totals = [];
         }
-
-        $result->offsetAddToArray('options', ['totals' => $totals]);
+        $result->offsetAddToArray('options', ['totals' => $totalData]);
 
         return $result;
-    }
-
-    /**
-     * @param $result
-     * @param $totalQueries
-     * @param $groupParts
-     * @return array
-     */
-    protected function getData($result, $totalQueries, $groupParts)
-    {
-        $rootIdentifier = [];
-
-        if (empty($groupParts)) {
-            $rootIdentifiers = $this->masterQB->getEntityManager()
-                ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier();
-            $rootAlias = $this->masterQB->getRootAliases()[0];
-            foreach ($rootIdentifiers as $field) {
-                $rootIdentifier[] = [
-                    'fieldAlias'  => $field,
-                    'alias'       => $field,
-                    'entityAlias' => $rootAlias
-                ];
-            }
-        } else {
-            foreach ($groupParts as $groupPart) {
-                if (strpos($groupPart, '.')) {
-                    list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
-                    $rootIdentifier[] = [
-                        'fieldAlias'  => $rootIdentifierPart,
-                        'entityAlias' => $rootAlias,
-                        'alias'       => $rootIdentifierPart
-                    ];
-                } else {
-                    $selectParts = $this->masterQB->getDQLPart('select');
-                    /** @var Select $selectPart */
-                    foreach ($selectParts as $selectPart) {
-                        foreach ($selectPart->getParts() as $part) {
-                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
-                                if (count($matches) == 3 && $groupPart == $matches[2]) {
-                                    $rootIdentifier[] = [
-                                        'fieldAlias' => $matches[1],
-                                        'alias'      => $matches[2]
-                                    ];
-                                }
-                            } else {
-                                $rootIdentifier[] = [
-                                    'fieldAlias' => $groupPart,
-                                    'alias'      => $groupPart
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $dataQueryBuilder = $this->masterQB
-            ->select($totalQueries)
-            ->resetDQLPart('groupBy');
-
-        foreach ($rootIdentifier as $identifier) {
-            $ids = [];
-            foreach ($result['data'] as $res) {
-                $ids[] = $res[$identifier['alias']];
-            }
-
-            $field = isset($identifier['entityAlias'])
-                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
-                : $identifier['fieldAlias'];
-
-            $dataQueryBuilder->andWhere($this->masterQB->expr()->in($field, $ids));
-        }
-
-        return $dataQueryBuilder
-            ->getQuery()
-            ->setFirstResult(null)
-            ->setMaxResults(null)
-            ->getScalarResult();
     }
 
     /**
@@ -210,7 +128,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metaData)
     {
-        $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $totals = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $metaData
             ->offsetAddToArray('state', ['totals' => $totals])
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/totals-builder']);
@@ -226,6 +144,183 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
+     * Get Group by part of master query as array
+     *
+     * @return array
+     */
+    protected function getGroupParts()
+    {
+        if (empty($this->groupParts)) {
+            $groupParts   = [];
+            $groupByParts = $this->masterQB->getDQLPart('groupBy');
+            if (!empty($groupByParts)) {
+                /** @var GroupBy $groupByPart */
+                foreach ($groupByParts as $groupByPart) {
+                    $groupParts = array_merge($groupParts, $groupByPart->getParts());
+                }
+            }
+            $this->groupParts = $groupParts;
+        }
+
+        return $this->groupParts;
+
+    }
+
+    /**
+     * Get total row frontend data
+     *
+     * @param array $rowConfig Total row config
+     * @param array $data Db result data for current total row config
+     * @return array Array with array of columns total values and labels
+     */
+    protected function getTotalData($rowConfig, $data)
+    {
+        $totalData = [];
+        if (!empty($data)) {
+            $totalData['columns'] = [];
+            foreach ($rowConfig['columns'] as $field => $total) {
+                $totalData['columns'][$field] = [];
+                if (isset($data[$field])) {
+                    $totalValue = $data[$field];
+                    if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
+                        $totalValue = $this->applyFrontendFormatting(
+                            $totalValue,
+                            $total[Configuration::TOTALS_FORMATTER_KEY]
+                        );
+                    }
+                    $totalData['columns'][$field]['total'] = $totalValue;
+                }
+                if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
+                    $totalData['columns'][$field][Configuration::TOTALS_LABEL_KEY] = $this->
+                        translator
+                        ->trans($total[Configuration::TOTALS_LABEL_KEY]);
+                }
+            };
+        }
+
+        return $totalData;
+    }
+
+    /**
+     * Get root entities config data
+     *
+     * @param QueryBuilder $query
+     * @return array with root entities config
+     */
+    protected function getRootIds(QueryBuilder $query)
+    {
+        $groupParts = $this->getGroupParts();
+        $rootIds    = [];
+        if (empty($groupParts)) {
+            $rootIdentifiers = $query->getEntityManager()
+                ->getClassMetadata($query->getRootEntities()[0])->getIdentifier();
+            $rootAlias       = $query->getRootAliases()[0];
+            foreach ($rootIdentifiers as $field) {
+                $rootIds[] = [
+                    'fieldAlias'  => $field,
+                    'alias'       => $field,
+                    'entityAlias' => $rootAlias
+                ];
+            }
+        } else {
+            foreach ($groupParts as $groupPart) {
+                if (strpos($groupPart, '.')) {
+                    list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
+                    $rootIds[] = [
+                        'fieldAlias'  => $rootIdentifierPart,
+                        'entityAlias' => $rootAlias,
+                        'alias'       => $rootIdentifierPart
+                    ];
+                } else {
+                    $selectParts = $this->masterQB->getDQLPart('select');
+                    /** @var Select $selectPart */
+                    foreach ($selectParts as $selectPart) {
+                        foreach ($selectPart->getParts() as $part) {
+                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                                if (count($matches) == 3 && $groupPart == $matches[2]) {
+                                    $rootIds[] = [
+                                        'fieldAlias' => $matches[1],
+                                        'alias'      => $matches[2]
+                                    ];
+                                }
+                            } else {
+                                $rootIds[] = [
+                                    'fieldAlias' => $groupPart,
+                                    'alias'      => $groupPart
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $rootIds;
+    }
+
+    /**
+     * Get total row data from database
+     *
+     * @param ResultsObject $pageData Grid page data
+     * @param array $columnsConfig Total row columns config
+     * @param bool $perPage Get data only for page data or for all data
+     * @return array
+     */
+    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
+    {
+        $totalQueries = [];
+        foreach ($columnsConfig as $field => $totalData) {
+            if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
+                && $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY]
+            ) {
+                $totalQueries[] = $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY] . ' AS ' . $field;
+            }
+        };
+
+        $query = clone $this->masterQB;
+        $query
+            ->select($totalQueries)
+            ->resetDQLPart('groupBy');
+
+        if ($perPage) {
+            $this->addPageLimits($query, $pageData);
+        }
+
+        $resultData = $query
+            ->getQuery()
+            ->setFirstResult(null)
+            ->setMaxResults(null)
+            ->getScalarResult();
+
+        return array_shift($resultData);
+    }
+
+    /**
+     * Add "in" expression as page limit to query builder
+     *
+     * @param QueryBuilder $dataQueryBuilder
+     * @param $pageData
+     */
+    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData)
+    {
+        $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
+        foreach ($rootIdentifiers as $identifier) {
+            $ids = [];
+            foreach ($pageData['data'] as $res) {
+                $ids[] = $res[$identifier['alias']];
+            }
+
+            $field = isset($identifier['entityAlias'])
+                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
+                : $identifier['fieldAlias'];
+
+            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
+        }
+    }
+
+    /**
+     * Apply formatting to totals values
+     *
      * @param mixed|null $val
      * @param string|null $formatter
      * @return string|null
@@ -256,5 +351,46 @@ class OrmTotalsExtension extends AbstractExtension
         }
 
         return $val;
+    }
+
+    /**
+     * Merge total rows configs
+     *
+     * @param array $totalRows
+     * @param string $rowName
+     * @param array $rowConfig
+     * @param string $gridName
+     * @return array
+     * @throws \Exception
+     */
+    protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridName)
+    {
+        if (isset($rowConfig[Configuration::TOTALS_EXTEND_KEY]) && $rowConfig[Configuration::TOTALS_EXTEND_KEY]) {
+            if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]])) {
+                throw new \Exception(sprintf(
+                    'Total row "%s" definition in "%s" datagrid config does not exist',
+                    $rowConfig[Configuration::TOTALS_EXTEND_KEY],
+                    $gridName
+                ));
+            }
+
+            $parentConfig = $this->mergeTotals(
+                $totalRows,
+                $rowConfig[Configuration::TOTALS_EXTEND_KEY],
+                $totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]],
+                $gridName
+            );
+
+            $rowConfig = array_replace_recursive(
+                $parentConfig,
+                $totalRows[$rowName]
+            );
+            unset($totalRows[$rowName][Configuration::TOTALS_EXTEND_KEY]);
+
+            $totalRows[$rowName] = $rowConfig;
+
+        }
+
+        return $rowConfig;
     }
 }

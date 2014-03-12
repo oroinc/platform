@@ -1,7 +1,9 @@
 /*global define*/
-define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings', 'jquery-ui-timepicker'
-    ], function ($, _, DateFilter, localeSettings) {
+
+define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings', 'jquery-ui-timepicker'],
+function ($, _, DateFilter, localeSettings) {
     'use strict';
+
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      *
@@ -18,6 +20,20 @@ define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings',
         inputClass: 'datetime-visual-element',
 
         /**
+         * Selectors for filter data
+         *
+         * @property
+         */
+        criteriaValueSelectors: {
+            type: 'select[name!=datetime_part]',
+            part: 'select[name=datetime_part]',
+            value: {
+                start: 'input[name="start"]',
+                end:   'input[name="end"]'
+            }
+        },
+
+        /**
          * Datetime widget options
          *
          * @property
@@ -32,14 +48,8 @@ define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings',
         /**
          * @inheritDoc
          */
-        _initializeDateWidget: function(widgetSelector) {
-            this.$(widgetSelector).datetimepicker(this.dateWidgetOptions);
-            var widget = this.$(widgetSelector).datetimepicker('widget');
-            widget.addClass(this.dateWidgetOptions.className);
-            $(this.dateWidgetSelector).on('click', function(e) {
-                e.stopImmediatePropagation();
-            });
-            return widget;
+        _initializeDateWidget: function (widgetSelector, options) {
+            return this.$(widgetSelector).datetimepicker(options);
         },
 
         /**
@@ -50,6 +60,14 @@ define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings',
             var dateToFormat = this.dateWidgetOptions.dateFormat;
             var timeFromFormat = this.dateWidgetOptions.altTimeFormat;
             var timeToFormat = this.dateWidgetOptions.timeFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'display');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'display');
+            }
+
             return this._formatValueDatetimes(value, dateFromFormat, dateToFormat, timeFromFormat, timeToFormat);
         },
 
@@ -61,6 +79,14 @@ define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings',
             var dateToFormat = this.dateWidgetOptions.altFormat;
             var timeFromFormat = this.dateWidgetOptions.timeFormat;
             var timeToFormat = this.dateWidgetOptions.altTimeFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'raw');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'raw');
+            }
+
             return this._formatValueDatetimes(value, dateFromFormat, dateToFormat, timeFromFormat, timeToFormat);
         },
 
@@ -80,11 +106,15 @@ define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings',
                 value.value.start = this._formatDatetime(
                     value.value.start, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.start = value.value.start.replace(/^\s+|\s+$/g, '');
             }
             if (value.value && value.value.end) {
                 value.value.end = this._formatDatetime(
                     value.value.end, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.end = value.value.end.replace(/^\s+|\s+$/g, '');
             }
             return value;
         },

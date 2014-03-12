@@ -15,7 +15,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-acti
         /** @property oro.PageableCollection */
         collection: undefined,
 
-        /** @property {oro.datagrid.ActionLauncher} */
+        /** @property {orodatagrid.datagrid.ActionLauncher} */
         launcher: null,
 
         /**

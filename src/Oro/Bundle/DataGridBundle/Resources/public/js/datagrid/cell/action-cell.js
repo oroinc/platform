@@ -66,7 +66,7 @@ define(['jquery', 'underscore', 'backgrid'
         /**
          * Handle action run
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          */
         onActionRun: function(action) {
             this.$('.dropdown.open').removeClass('open');
@@ -185,7 +185,7 @@ define(['jquery', 'underscore', 'backgrid'
         /**
          * Render launcher
          *
-         * @param {oro.datagrid.ActionLauncher} launcher
+         * @param {orodatagrid.datagrid.ActionLauncher} launcher
          * @param {Object} [templateParameters]
          * @return {jQuery} Rendered element wrapped with jQuery
          */
