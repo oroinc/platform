@@ -1,13 +1,14 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Migration;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 
-class UpdateEntityConfigMigration implements Migration
+class RefreshExtendCacheMigration implements Migration
 {
     /**
      * @var CommandExecutor
@@ -27,8 +28,10 @@ class UpdateEntityConfigMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            new UpdateEntityConfigMigrationQuery($this->commandExecutor)
-        );
+        if ($schema instanceof ExtendSchema) {
+            $queries->addQuery(
+                new RefreshExtendCacheMigrationQuery($this->commandExecutor)
+            );
+        }
     }
 }

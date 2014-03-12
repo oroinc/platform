@@ -2,76 +2,54 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
-
-use Doctrine\DBAL\Schema\Table;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 
 class UpdateExtendConfigMigrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testUp()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $extendOptions = ['test'];
+
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var OroEntityManager $em */
-        $em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var ExtendOptionsManager $om */
-        $om = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $om
-            ->expects($this->once())
-            ->method('getExtendOptions')
-            ->will($this->returnValue([]));
-
-        $nameGenerator = new ExtendDbIdentifierNameGenerator();
-
-        /** @var UpdateExtendConfigMigration $postUpMigrationListener */
         $migration = new UpdateExtendConfigMigration(
-            new ExtendConfigProcessor($cm),
-            new ExtendConfigDumper($em, $nameGenerator, '')
+            $commandExecutor,
+            $optionsPath
         );
 
-        $table = new Table('table1');
-        $table->addColumn('id', 'integer');
-        $table->setPrimaryKey(['id']);
+        $schema = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $queries = $this->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\QueryBag')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        /** @var ExtendSchema $schema */
-        $schema  = new ExtendSchema($om, $nameGenerator, [$table], [], null);
-        $queries = new QueryBag();
+        $schema->expects($this->once())
+            ->method('getExtendOptions')
+            ->will($this->returnValue($extendOptions));
 
-        $queries->addQuery('ALTER TABLE table1 ADD field1 INT DEFAULT NULL');
-        $queries->addQuery('CREATE INDEX IDX_7166D3717272F2F0 ON table1 (field1)');
+        $queries->expects($this->at(0))
+            ->method('addQuery')
+            ->with(
+                new UpdateExtendConfigMigrationQuery(
+                    $extendOptions,
+                    $commandExecutor,
+                    $optionsPath
+                )
+            );
+        $queries->expects($this->at(1))
+            ->method('addQuery')
+            ->with(
+                new RefreshExtendCacheMigrationQuery(
+                    $commandExecutor
+                )
+            );
 
-        $this->assertCount(0, $queries->getPreQueries());
-        $this->assertCount(2, $queries->getPostQueries());
-
-        $this->assertEquals(
-            [],
-            $migration->up($schema, $queries)
-        );
-
-        $this->assertCount(0, $queries->getPreQueries());
-        $this->assertCount(3, $queries->getPostQueries());
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery',
-            $queries->getPostQueries()[2]
-        );
+        $migration->up($schema, $queries);
     }
 }

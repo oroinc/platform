@@ -8,8 +8,6 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityGridListener extends CustomEntityGridListener
 {
@@ -135,14 +133,9 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
             $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldName
-                : $fieldName;
 
-            $this->queryFields[] = $code;
-
-            $field = $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $field = $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfig);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];
@@ -159,7 +152,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $relations = $entityConfig->get('relation');
         $relation  = $relations[$this->relationConfig->get('relation_key')];
 
-        $fieldName = ExtendConfigDumper::FIELD_PREFIX . $relation['target_field_id']->getFieldName();
+        $fieldName = $relation['target_field_id']->getFieldName();
 
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';

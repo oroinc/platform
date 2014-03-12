@@ -14,7 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassResolver;
+    protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
@@ -24,10 +24,11 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassResolver->expects($this->any())
+        $this->entityMetadataHelper =
+            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassByTableName')
             ->will(
                 $this->returnValueMap(
@@ -36,7 +37,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
+        $this->extendOptionsManager = new ExtendOptionsManager($this->entityMetadataHelper);
         $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 
@@ -132,7 +133,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'column1 VARCHAR(100) NOT NULL, '
                 . 'configurable_column1 VARCHAR(100) NOT NULL, '
-                . 'field_extend_column1 VARCHAR(100) DEFAULT NULL) '
+                . 'extend_column1 VARCHAR(100) DEFAULT NULL) '
                 . 'COMMENT = \'test\' '
             ]
         );

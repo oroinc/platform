@@ -2,134 +2,92 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
-use Doctrine\DBAL\Connection;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Migration\ArrayLogger;
+use Psr\Log\NullLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationArrayLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-
 class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ConfigManager $cm */
-    protected $cm;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $commandExecutor;
 
-    /** @var OroEntityManager $em */
-    protected $em;
-
-    /** @var  ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
-
-    public function setUp()
+    protected function setUp()
     {
-        parent::setUp();
-
-        $this->cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
 
-    public function testProcessConfigs()
+    public function testGetDescription()
     {
-        $configProcessor = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor')
-            ->setConstructorArgs([$this->cm])
-            ->setMethods([])
-            ->getMock();
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $options     = ['test'];
 
-        $configProcessor
-            ->expects($this->once())
-            ->method('processConfigs')
-            ->with([], new UpdateExtendConfigMigrationArrayLogger(), true);
+        $this->commandExecutor->expects($this->once())
+            ->method('runCommand')
+            ->with(
+                'oro:entity-extend:migration:update-config',
+                ['--dry-run' => true, '--ignore-errors' => true]
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($command, $params, $logger) {
+                        if ($logger instanceof ArrayLogger) {
+                            $logger->notice('test message');
+                        }
 
-        /** @var ExtendConfigDumper $configDumper */
-        $configDumper = new ExtendConfigDumper($this->em, $this->nameGenerator, '');
+                        return 0;
+                    }
+                )
+            );
 
-        /** @var UpdateExtendConfigMigrationQuery $postUpMigrationListener */
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
-            [],
-            $configProcessor,
-            $configDumper
+            $options,
+            $this->commandExecutor,
+            $optionsPath
         );
 
-        $this->assertEquals(
-            [],
-            $migrationQuery->getDescription()
-        );
-    }
-
-    public function testProcessConfigs2()
-    {
-        $configProcessor = new ExtendConfigProcessor($this->cm);
-
-        /** @var ExtendConfigDumper $configDumper */
-        $configDumper = new ExtendConfigDumper($this->em, $this->nameGenerator, '');
-
-        /** @var UpdateExtendConfigMigrationQuery $postUpMigrationListener */
-        $migrationQuery = new UpdateExtendConfigMigrationQuery(
-            [],
-            $configProcessor,
-            $configDumper
-        );
-
-        $migrationQuery->getDescription();
-
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationArrayLogger',
-            'logger',
-            $configProcessor
-        );
-
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor',
-            'configProcessor',
-            $migrationQuery
-        );
+        $this->assertEquals(['test message'], $migrationQuery->getDescription());
     }
 
     public function testExecute()
     {
-        $configProcessor = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor')
-            ->setConstructorArgs([$this->cm])
-            ->getMock();
-        $configProcessor
-            ->expects($this->once())
-            ->method('processConfigs')
-            ->with([]);
+        $logger = new ArrayLogger();
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $options     = ['test'];
 
-        /** @ var ExtendConfigDumper $configDumper */
-        $configDumper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper')
-            ->setConstructorArgs([$this->em, $this->nameGenerator, ''])
-            ->getMock();
-        $configDumper
-            ->expects($this->once())
-            ->method('updateConfig');
-        $configDumper
-            ->expects($this->once())
-            ->method('dump');
+        $this->commandExecutor->expects($this->once())
+            ->method('runCommand')
+            ->with(
+                'oro:entity-extend:migration:update-config',
+                []
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($command, $params, $logger) {
+                        if ($logger instanceof ArrayLogger) {
+                            $logger->notice('test message');
+                        }
 
-        /** @var UpdateExtendConfigMigrationQuery $postUpMigrationListener */
-        $migrationQuery = new UpdateExtendConfigMigrationQuery(
-            [],
-            $configProcessor,
-            $configDumper
-        );
+                        return 0;
+                    }
+                )
+            );
 
-        /** @var Connection $connection */
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $migrationQuery->execute($connection);
+        $migrationQuery = new UpdateExtendConfigMigrationQuery(
+            $options,
+            $this->commandExecutor,
+            $optionsPath
+        );
+
+        $migrationQuery->execute($connection, $logger);
+
+        $this->assertEquals(['test message'], $logger->getMessages());
+
     }
 }

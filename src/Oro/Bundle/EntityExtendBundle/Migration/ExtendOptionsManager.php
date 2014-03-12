@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
 class ExtendOptionsManager
 {
-    const TYPE_OPTION   = '_type';
-    const MODE_OPTION   = '_mode';
-    const TARGET_OPTION = '_target';
+    const ENTITY_CLASS_OPTION = '_entity_class';
+    const TYPE_OPTION         = '_type';
+    const MODE_OPTION         = '_mode';
+    const TARGET_OPTION       = '_target';
 
     /**
-     * @var EntityClassResolver
+     * @var EntityMetadataHelper
      */
-    protected $entityClassResolver;
+    protected $entityMetadataHelper;
 
     /**
      * @var array key = [table name] or [table name!column name]
@@ -21,19 +20,11 @@ class ExtendOptionsManager
     protected $options = [];
 
     /**
-     * @param EntityClassResolver $entityClassResolver
+     * @param EntityMetadataHelper $entityMetadataHelper
      */
-    public function __construct(EntityClassResolver $entityClassResolver)
+    public function __construct(EntityMetadataHelper $entityMetadataHelper)
     {
-        $this->entityClassResolver = $entityClassResolver;
-    }
-
-    /**
-     * @return EntityClassResolver
-     */
-    public function getEntityClassResolver()
-    {
-        return $this->entityClassResolver;
+        $this->entityMetadataHelper = $entityMetadataHelper;
     }
 
     /**
@@ -101,7 +92,7 @@ class ExtendOptionsManager
      */
     public function getExtendOptions()
     {
-        $builder = new ExtendOptionsBuilder($this->entityClassResolver);
+        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper);
 
         $objectKeys = array_keys($this->options);
 

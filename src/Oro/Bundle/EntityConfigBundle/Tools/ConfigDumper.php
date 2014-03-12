@@ -116,6 +116,7 @@ class ConfigDumper
     }
 
     /**
+     * TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      * @param string $className
      * @param string $fieldName
      * @return bool|mixed|string
@@ -123,14 +124,6 @@ class ConfigDumper
     protected function checkField($className, $fieldName)
     {
         $realClass = ClassUtils::newReflectionClass($className);
-        /**
-         * possible field duplicates fix
-         */
-        if (strpos($fieldName, ExtendConfigDumper::FIELD_PREFIX) === 0
-            && !$realClass->hasMethod(Inflector::camelize('set_' . $fieldName))
-        ) {
-            return str_replace(ExtendConfigDumper::FIELD_PREFIX, '', $fieldName);
-        }
 
         /**
          * relation's default fields

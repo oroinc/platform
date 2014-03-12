@@ -479,9 +479,6 @@ class LoggableManager
 
             foreach ($reflection->getProperties() as $reflectionProperty) {
                 $fieldName = $reflectionProperty->getName();
-                if (strpos($fieldName, 'field_') === 0) {
-                    $fieldName = str_replace('field_', '', $fieldName);
-                }
 
                 if ($this->auditConfigProvider->hasConfig($entityClassName, $fieldName)
                     && ($fieldConfig = $this->auditConfigProvider->getConfig($entityClassName, $fieldName))

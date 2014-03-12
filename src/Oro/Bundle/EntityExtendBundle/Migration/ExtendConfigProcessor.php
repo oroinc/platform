@@ -63,30 +63,12 @@ class ExtendConfigProcessor
 
     /**
      * Removes some configs.
-     *  - removes configs for non custom entities if requested a change of table name only
      *  - removes configs for non configurable entities if requested a change of field type only
      *
      * @param array $configs
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterConfigs(array &$configs)
     {
-        // removes configs for non custom entities if requested a change of table name only
-        foreach ($configs as $className => $entityConfigs) {
-            if (!ExtendHelper::isCustomEntity($className)) {
-                if (isset($entityConfigs['configs']['extend']['table'])) {
-                    unset($configs[$className]['configs']['extend']['table']);
-                    if (empty($configs[$className]['configs']['extend'])
-                        && count($configs[$className]['configs']) === 1
-                        && count($configs[$className]) === 1
-                    ) {
-                        unset($configs[$className]);
-                    }
-                }
-            }
-        }
         // removes configs for non configurable entities if requested a change of field type only
         foreach ($configs as $className => $entityConfigs) {
             if (!ExtendHelper::isCustomEntity($className)) {
@@ -118,16 +100,16 @@ class ExtendConfigProcessor
      */
     protected function processEntityConfigs($className, array $configs)
     {
-        if ($this->configManager->hasConfig($className)) {
-            if (isset($configs['configs'])) {
+        if (isset($configs['configs'])) {
+            if ($this->configManager->hasConfig($className)) {
                 $this->updateEntityModel($className, $configs['configs']);
+            } else {
+                $this->createEntityModel(
+                    $className,
+                    isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    $configs['configs']
+                );
             }
-        } else {
-            $this->createEntityModel(
-                $className,
-                isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
-                isset($configs['configs']) ? $configs['configs'] : []
-            );
         }
 
         if (isset($configs['fields'])) {
@@ -174,7 +156,9 @@ class ExtendConfigProcessor
     protected function createEntityModel($className, $mode, array $configs)
     {
         if (!ExtendHelper::isCustomEntity($className)) {
-            throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
+            throw new \LogicException(
+                sprintf('A new model can be created for custom entity only. Class: %s.', $className)
+            );
         }
 
         if ($this->logger) {
@@ -201,12 +185,6 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
-        if (!ExtendHelper::isCustomEntity($className)) {
-            if (isset($configs['extend']['table'])) {
-                throw new \LogicException(sprintf('A table name cannot be set for "%s" entity.', $className));
-            }
-        }
-
         if ($this->logger) {
             $this->logger->notice(
                 sprintf('Update entity "%s".', $className),

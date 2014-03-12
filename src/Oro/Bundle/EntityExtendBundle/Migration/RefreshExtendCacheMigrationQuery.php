@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Migration;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Connection;
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigMigrationQuery implements MigrationQuery
+class RefreshExtendCacheMigrationQuery implements MigrationQuery
 {
     /**
      * @var CommandExecutor
@@ -27,7 +27,7 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return 'Update entity configs';
+        return 'Refresh extend entity cache';
     }
 
     /**
@@ -36,8 +36,13 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
     public function execute(Connection $connection, LoggerInterface $logger)
     {
         $this->commandExecutor->runCommand(
-            'oro:entity-config:update',
-            ['--process-timeout' => 300],
+            'oro:entity-extend:update-config',
+            [],
+            $logger
+        );
+        $this->commandExecutor->runCommand(
+            'oro:entity-extend:dump',
+            [],
             $logger
         );
     }
