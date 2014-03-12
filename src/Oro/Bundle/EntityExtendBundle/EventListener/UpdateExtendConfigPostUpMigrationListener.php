@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class UpdateExtendConfigPostUpMigrationListener
@@ -14,11 +15,20 @@ class UpdateExtendConfigPostUpMigrationListener
     protected $configProcessor;
 
     /**
-     * @param ExtendConfigProcessor $configProcessor
+     * @var ExtendConfigDumper
      */
-    public function __construct(ExtendConfigProcessor $configProcessor)
-    {
+    protected $configDumper;
+
+    /**
+     * @param ExtendConfigProcessor $configProcessor
+     * @param ExtendConfigDumper    $configDumper
+     */
+    public function __construct(
+        ExtendConfigProcessor $configProcessor,
+        ExtendConfigDumper $configDumper
+    ) {
         $this->configProcessor = $configProcessor;
+        $this->configDumper    = $configDumper;
     }
 
     /**
@@ -29,7 +39,10 @@ class UpdateExtendConfigPostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(
-            new UpdateExtendConfigMigration($this->configProcessor)
+            new UpdateExtendConfigMigration(
+                $this->configProcessor,
+                $this->configDumper
+            )
         );
     }
 }

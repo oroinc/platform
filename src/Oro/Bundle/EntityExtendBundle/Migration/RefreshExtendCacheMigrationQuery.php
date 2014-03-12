@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
@@ -12,31 +12,14 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
     /**
      * @var ExtendConfigDumper
      */
-    protected $extendConfigDumper;
+    protected $configDumper;
 
     /**
-     * @var ConfigDumper
+     * @param ExtendConfigDumper $configDumper
      */
-    protected $entityConfigDumper;
-
-    /**
-     * @var bool
-     */
-    protected $clearEntityConfigCache;
-
-    /**
-     * @param ExtendConfigDumper $extendConfigDumper
-     * @param ConfigDumper       $entityConfigDumper
-     * @param bool               $clearEntityConfigCache
-     */
-    public function __construct(
-        ExtendConfigDumper $extendConfigDumper,
-        ConfigDumper $entityConfigDumper = null,
-        $clearEntityConfigCache = false
-    ) {
-        $this->extendConfigDumper     = $extendConfigDumper;
-        $this->entityConfigDumper     = $entityConfigDumper;
-        $this->clearEntityConfigCache = $clearEntityConfigCache;
+    public function __construct(ExtendConfigDumper $configDumper)
+    {
+        $this->configDumper = $configDumper;
     }
 
     /**
@@ -44,18 +27,17 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return 'REFRESH EXTEND ENTITY CACHE';
+        return 'Refresh extend entity cache';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection)
+    public function execute(Connection $connection, LoggerInterface $logger)
     {
-        if ($this->clearEntityConfigCache) {
-            $this->entityConfigDumper->clearConfigCache();
-        }
-        $this->extendConfigDumper->updateConfig();
-        $this->extendConfigDumper->dump();
+        $logger->notice('Prepare extend entity configs');
+        $this->configDumper->updateConfig();
+        $logger->notice('Generate a cache');
+        $this->configDumper->dump();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
-use Oro\Bundle\EntityConfigBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;

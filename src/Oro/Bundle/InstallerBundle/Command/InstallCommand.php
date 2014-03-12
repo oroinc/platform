@@ -146,7 +146,13 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            ->runCommand('oro:migration:load')
+            ->runCommand(
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
+            )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)

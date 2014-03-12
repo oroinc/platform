@@ -110,15 +110,7 @@ class ConfigDumper
         }
 
         $this->configManager->flush();
-        $this->clearConfigCache();
 
-    }
-
-    /**
-     * Clears entity config cache
-     */
-    public function clearConfigCache()
-    {
         $this->configManager->clearConfigurableCache();
         $this->configManager->clearCacheAll();
     }

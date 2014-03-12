@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
+use Doctrine\DBAL\Connection;
+use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,23 +66,29 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 }
             } else {
                 $migrationQueryLoader = $this->getMigrationQueryLoader($input);
-                $queries               = $migrationQueryLoader->getQueries($migrations);
-                $connection            = $migrationQueryLoader->getConnection();
+                $queries              = $migrationQueryLoader->getQueries($migrations);
+                $connection           = $migrationQueryLoader->getConnection();
+                $queryLogger          = new OutputLogger(
+                    $output,
+                    true,
+                    $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
+                    '    '
+                );
                 foreach ($queries as $item) {
                     $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
                     foreach ($item['queries'] as $query) {
-                        if ($input->getOption('show-queries')) {
-                            $descriptions = $query instanceof MigrationQuery
-                                ? $query->getDescription()
-                                : $query;
-                            foreach ((array)$descriptions as $description) {
-                                $output->writeln(sprintf('    <info>%s</info>', $description));
-                            }
-                        }
-                        if (!$input->getOption('dry-run')) {
-                            if ($query instanceof MigrationQuery) {
-                                $query->execute($connection);
+                        if ($query instanceof MigrationQuery) {
+                            if ($input->getOption('dry-run')) {
+                                $descriptions = $query->getDescription();
+                                foreach ((array)$descriptions as $description) {
+                                    $queryLogger->notice($description);
+                                }
                             } else {
+                                $query->execute($connection, $queryLogger);
+                            }
+                        } else {
+                            $queryLogger->notice($query);
+                            if (!$input->getOption('dry-run')) {
                                 $connection->executeQuery($query);
                             }
                         }

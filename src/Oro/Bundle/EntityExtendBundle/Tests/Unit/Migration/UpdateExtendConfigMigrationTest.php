@@ -62,16 +62,17 @@ class UpdateExtendConfigMigrationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $queries->getPreQueries());
         $this->assertCount(2, $queries->getPostQueries());
 
-        $this->assertEquals(
-            [],
-            $migration->up($schema, $queries)
-        );
+        $migration->up($schema, $queries);
 
         $this->assertCount(0, $queries->getPreQueries());
-        $this->assertCount(3, $queries->getPostQueries());
+        $this->assertCount(4, $queries->getPostQueries());
         $this->assertInstanceOf(
             'Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery',
             $queries->getPostQueries()[2]
+        );
+        $this->assertInstanceOf(
+            'Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigrationQuery',
+            $queries->getPostQueries()[3]
         );
     }
 }

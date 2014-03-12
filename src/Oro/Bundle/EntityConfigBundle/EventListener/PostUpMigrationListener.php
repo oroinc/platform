@@ -3,29 +3,22 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class PostUpMigrationListener
 {
     /**
-     * @var ConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
     /**
-     * @var KernelInterface
+     * @param CommandExecutor $commandExecutor
      */
-    protected $kernel;
-
-    /**
-     * @param ConfigDumper $configDumper
-     */
-    public function __construct(ConfigDumper $configDumper, KernelInterface $kernel)
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
-        $this->kernel = $kernel;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -36,7 +29,7 @@ class PostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(
-            new UpdateEntityConfigMigration($this->configDumper, $this->kernel)
+            new UpdateEntityConfigMigration($this->commandExecutor)
         );
     }
 }

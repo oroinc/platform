@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-use Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener;
+use Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -16,7 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
-class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnPostUp()
     {
@@ -32,8 +32,8 @@ class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
 
         $nameGenerator = new ExtendDbIdentifierNameGenerator();
 
-        /** @var PostUpMigrationListener $postUpMigrationListener */
-        $postUpMigrationListener = new PostUpMigrationListener(
+        /** @var UpdateExtendConfigPostUpMigrationListener $postUpMigrationListener */
+        $postUpMigrationListener = new UpdateExtendConfigPostUpMigrationListener(
             new ExtendConfigProcessor($cm),
             new ExtendConfigDumper($em, $nameGenerator, '')
         );
