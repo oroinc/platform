@@ -177,7 +177,6 @@ class RenameExtendTablesAndColumns implements
         ConfigManager $configManager,
         EntityMetadataHelper $entityMetadataHelper
     ) {
-        var_dump($fieldConfigId->getClassName() . ' - ' . $fieldConfigId->getFieldName());
         switch ($fieldConfigId->getFieldType()) {
             case 'manyToOne':
                 $this->renameManyToOneExtendField(
@@ -258,12 +257,44 @@ class RenameExtendTablesAndColumns implements
             if ($targetTable->hasColumn($oldTargetColumnName)) {
                 $newTargetColumnName = $this->nameGenerator
                     ->generateOneToManyRelationColumnName($entityClassName, $associationName);
+                $oldIndexName = $this->nameGenerator->generateIndexName(
+                    $targetTableName,
+                    [$oldTargetColumnName],
+                    false,
+                    true
+                );
+                if ($targetTable->hasIndex($oldIndexName)) {
+                    $targetTable->dropIndex($oldIndexName);
+                }
+                $oldForeignKeyName = $this->nameGenerator->generateForeignKeyConstraintName(
+                    $targetTableName,
+                    [$oldTargetColumnName],
+                    true
+                );
+                if ($targetTable->hasForeignKey($oldForeignKeyName)) {
+                    $targetTable->removeForeignKey($oldForeignKeyName);
+                }
                 $this->renameExtension->renameColumn(
                     $schema,
                     $queries,
                     $targetTable,
                     $oldTargetColumnName,
                     $newTargetColumnName
+                );
+                $this->renameExtension->addIndex(
+                    $schema,
+                    $queries,
+                    $targetTable->getName(),
+                    [$newTargetColumnName]
+                );
+                $this->renameExtension->addForeignKeyConstraint(
+                    $schema,
+                    $queries,
+                    $targetTable->getName(),
+                    $table->getName(),
+                    [$newTargetColumnName],
+                    $table->getPrimaryKeyColumns(),
+                    ['onDelete' => 'SET NULL']
                 );
             }
         }
