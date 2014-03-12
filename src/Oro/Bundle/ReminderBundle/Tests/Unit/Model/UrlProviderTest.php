@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
+namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ReminderBundle\Model\WebSocket\UrlProvider;
+use Oro\Bundle\ReminderBundle\Model\UrlProvider;
 
 class UrlProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,9 +27,8 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
+            ->getMockForAbstractClass();
 
         $this->urlProvider = new UrlProvider($this->configManager, $this->router);
     }

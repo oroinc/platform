@@ -43,14 +43,7 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
          */
         changeRemindersState: function ($reminderIds) {
             var url = routing.generate('oro_reminder_change_reminder_state');
-            $.post(url, { 'ids': $reminderIds }, function (result) {
-                if (!result.result && console && (typeof console.log === 'function')) {
-                    console.log('Reminder chane state error: ' +
-                        '\r\n rout: oro_reminder_change_reminder_state' +
-                        '\r\n reason: unexpected response' +
-                        '\r\n result.object: \r\n' + result.result);
-                }
-            }, 'json');
+            $.post(url, { 'ids': $reminderIds }, function () {});
         }
     };
 });

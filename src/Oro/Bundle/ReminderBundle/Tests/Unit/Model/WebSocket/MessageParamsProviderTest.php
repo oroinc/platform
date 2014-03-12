@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
-use DateTime;
-
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
 class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
@@ -38,7 +36,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->urlProvider = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Model\WebSocket\UrlProvider')
+        $this->urlProvider = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Model\UrlProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,49 +47,38 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetMessageParamsSendToTranslatorCorrectTimeAndSubject()
-    {
-        $subject = 'testSubject';
-        $time = new DateTime();
-        $expectedTime = 'formatted date time';
-
-        $reminder = $this->setUpReminder(null, $subject, $time);
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->with($time)
-            ->will($this->returnValue($expectedTime));
-        $expected = $subject.$expectedTime;
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with(
-                'oro.reminder.message',
-                $this->callback(
-                    function ($params) use ($expected) {
-                        return $params['%subject%'].$params['%time%'] == $expected;
-                    }
-                )
-            );
-
-        $this->messageParamsProvider->getMessageParams($reminder);
-    }
-
     public function testGetMessageParamsSetupCorrectParams()
     {
         $expectedMessage = 'some expected message';
         $expectedId = 42;
-        $expectedSubject = '';
-        $expectedExpireAt = new DateTime();
-        $expectedRouteParams = array('foo' => 'bar');
+        $expectedSubject = 'testSubject';
+        $expectedExpireAt = new \DateTime();
+        $expectedTime = 'formatted date time';
         $expectedUrl = 'www.tests.com';
 
-        $reminder = $this->setUpReminder(
-            $expectedId,
-            $expectedSubject,
-            $expectedExpireAt,
-            $expectedRouteParams
-        );
+        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($expectedId));
+        $reminder->expects($this->once())
+            ->method('getSubject')
+            ->will($this->returnValue($expectedSubject));
+        $reminder->expects($this->once())
+            ->method('getExpireAt')
+            ->will($this->returnValue($expectedExpireAt));
 
-        $this->translator->expects($this->once())->method('trans')->will($this->returnValue($expectedMessage));
+        $this->dateTimeFormatter->expects($this->once())
+            ->method('format')
+            ->with($expectedExpireAt)
+            ->will($this->returnValue($expectedTime));
+
+        $translatorExpected = array('%time%'=>$expectedTime, '%subject%'=>$expectedSubject);
+
+        $this->translator
+            ->expects($this->once())
+            ->method('trans')
+            ->with('oro.reminder.message', $this->equalTo($translatorExpected))
+            ->will($this->returnValue($expectedMessage));
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
 
         $params = $this->messageParamsProvider->getMessageParams($reminder);
@@ -99,25 +86,5 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedId, $params['id']);
         $this->assertEquals($expectedUrl, $params['url']);
         $this->assertEquals($expectedMessage, $params['text']);
-    }
-
-    protected function setUpReminder($id, $subject, $expireAt, $routeParameters = null)
-    {
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($id));
-        $reminder->expects($this->any())
-            ->method('getSubject')
-            ->will($this->returnValue($subject));
-        $reminder->expects($this->any())
-            ->method('getExpireAt')
-            ->will($this->returnValue($expireAt));
-
-        $reminder->expects($this->any())
-            ->method('getRelatedRouteParameters')
-            ->will($this->returnValue($routeParameters));
-
-        return $reminder;
     }
 }

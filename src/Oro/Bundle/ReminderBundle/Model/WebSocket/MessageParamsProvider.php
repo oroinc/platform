@@ -4,8 +4,9 @@ namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
 use Symfony\Component\Translation\Translator;
 
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\UrlProvider;
 
 class MessageParamsProvider
 {

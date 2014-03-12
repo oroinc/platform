@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
+namespace Oro\Bundle\ReminderBundle\Model;
 
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -15,15 +15,15 @@ class UrlProvider
     protected $manager;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
     /**
-     * @param ConfigManager $manager
-     * @param Router        $router
+     * @param ConfigManager   $manager
+     * @param RouterInterface $router
      */
-    public function __construct(ConfigManager $manager, Router $router)
+    public function __construct(ConfigManager $manager, RouterInterface $router)
     {
         $this->manager = $manager;
         $this->router = $router;

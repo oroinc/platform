@@ -8,7 +8,7 @@ parameters:
     oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
     oro_reminder.twig.subscriber_extension.class: Oro\Bundle\ReminderBundle\Twig\SubscriberExtension
     oro_reminder.web_socket.message_params_provider.class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
-    oro_reminder.web_socket.url_provider.class:   Oro\Bundle\ReminderBundle\Model\WebSocket\UrlProvider
+    oro_reminder.url_provider.class:              Oro\Bundle\ReminderBundle\Model\UrlProvider
 
 services:
     oro_reminder.entity.manager:
@@ -54,10 +54,10 @@ services:
         arguments:
             - @translator
             - @oro_locale.formatter.date_time
-            - @oro_reminder.web_socket.url_provider
+            - @oro_reminder.url_provider
 
-    oro_reminder.web_socket.url_provider:
-        class: %oro_reminder.web_socket.url_provider.class%
+    oro_reminder.url_provider:
+        class: %oro_reminder.url_provider.class%
         arguments:
             - @oro_entity_config.config_manager
             - @router

@@ -22,6 +22,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $messageParamsProvider;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $reminder;
+
     public function setUp()
     {
         $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
@@ -34,14 +39,17 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+
         $this->processor = new WebSocketSendProcessor($this->topicPublisher, $this->messageParamsProvider);
     }
 
     public function testProcessSendMessageIntoCorrectChannel()
     {
         $userId = 9876;
-        $reminder = $this->setUpReminder($userId);
-        $expectedParams = array('text'=>'simple text', 'uri'=>'test.org', 'reminderId'=>42);
+        $user = $this->getUser($userId);
+        $this->reminder->expects($this->once())->method('getRecipient')->will($this->returnValue($user));
+        $expectedParams = array('text'=>'simple text', 'url'=>'test.org', 'reminderId'=>42);
         $this->messageParamsProvider->expects($this->any())
             ->method('getMessageParams')
             ->will($this ->returnValue($expectedParams));
@@ -53,13 +61,15 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo(json_encode($expectedParams))
             );
 
-        $this->processor->process($reminder);
+        $this->processor->process($this->reminder);
     }
 
     public function testProcessChangeReminderStateIntoCorrectOne()
     {
-        $reminder = $this->setUpReminder(1);
-
+        $user = $this->getUser(1);
+        $this->reminder->expects($this->exactly(2))
+            ->method('getRecipient')
+            ->will($this->returnValue($user));
         $this->topicPublisher
             ->expects($this->at(0))
             ->method('send')
@@ -68,34 +78,25 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('send')
             ->will($this->returnValue(false));
-        $expected = Reminder::STATE_REQUESTED;
 
         $this->messageParamsProvider->expects($this->any())
             ->method('getMessageParams')
             ->will($this->returnValue(array()));
 
-        $reminder->expects($this->exactly(2))
+        $this->reminder->expects($this->at(1))
             ->method('setState')
-            ->with(
-                $this->callback(
-                    function ($param) use (&$expected) {
-                        return $param == $expected;
-                    }
-                )
-            );
-        $this->processor->process($reminder);
-        // i try "at" but it is not work correctly
-        $expected = Reminder::STATE_NOT_SENT;
-        $this->processor->process($reminder);
+            ->with($this->equalTo(Reminder::STATE_REQUESTED));
+        $this->reminder->expects($this->at(3))
+            ->method('setState')
+            ->with($this->equalTo(Reminder::STATE_NOT_SENT));
+        $this->processor->process($this->reminder);
+        $this->processor->process($this->reminder);
     }
 
-    protected function setUpReminder($userId)
+    protected function getUser($userId)
     {
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())->method('getId')->will($this->returnValue($userId));
-
-        $reminder->expects($this->any())->method('getRecipient')->will($this->returnValue($user));
-        return $reminder;
+        return $user;
     }
 }
