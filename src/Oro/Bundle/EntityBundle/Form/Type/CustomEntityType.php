@@ -38,6 +38,8 @@ class CustomEntityType extends AbstractType
         'bigint'     => 'integer',
         'boolean'    => 'choice',
         'decimal'    => 'number',
+        'money'      => 'oro_money',
+        'percent'    => 'oro_percent',
         'date'       => 'oro_date',
         'datetime'   => 'oro_datetime',
         'text'       => 'textarea',

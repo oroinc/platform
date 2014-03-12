@@ -72,6 +72,14 @@ class ExtendExtension extends AbstractExtension
                 case 'date':
                     $type = $filterType = PropertyInterface::TYPE_DATE;
                     break;
+                case 'money':
+                    $filterType = 'number';
+                    $type = PropertyInterface::TYPE_CURRENCY;
+                    break;
+                case 'percent':
+                    $filterType = 'number';
+                    $type = PropertyInterface::TYPE_PERCENT;
+                    break;
                 default:
                     $type = $filterType = PropertyInterface::TYPE_STRING;
             }

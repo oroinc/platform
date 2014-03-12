@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -55,6 +56,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'range',
         'text'     => 'string',
         'float'    => 'number',
+        'money'    => 'number',
+        'percent'  => 'number'
     );
 
     protected $typeMap = array(
@@ -67,6 +70,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'datetime',
         'text'     => 'string',
         'float'    => 'decimal',
+        'money'    => 'number',
+        'percent'  => 'number'
     );
 
     /**
@@ -257,8 +262,40 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 'sortable'    => true,
                 'filterable'  => true,
                 'show_filter' => true,
+                'frontend_type' => $this->getFrontendFieldType($fieldConfig->getFieldType())
             ]
         ];
+    }
+
+    /**
+     * Gets a datagrid column frontend type for the given field type
+     *
+     * @param string $fieldType
+     * @return string
+     */
+    protected function getFrontendFieldType($fieldType)
+    {
+        switch ($fieldType) {
+            case 'integer':
+            case 'smallint':
+            case 'bigint':
+                return PropertyInterface::TYPE_INTEGER;
+            case 'decimal':
+            case 'float':
+                return PropertyInterface::TYPE_DECIMAL;
+            case 'boolean':
+                return PropertyInterface::TYPE_BOOLEAN;
+            case 'date':
+                return PropertyInterface::TYPE_DATE;
+            case 'datetime':
+                return PropertyInterface::TYPE_DATETIME;
+            case 'money':
+                return PropertyInterface::TYPE_CURRENCY;
+            case 'percent':
+                return PropertyInterface::TYPE_PERCENT;
+        }
+
+        return PropertyInterface::TYPE_STRING;
     }
 
     /**

@@ -23,6 +23,10 @@
                 {% set itemValue = itemValue|nl2br %}
             {% elseif item.type == 'boolean' %}
                 {% set itemValue = itemValue ? 'Yes'|trans : 'No'|trans %}
+            {% elseif item.type == 'money' %}
+                {% set itemValue = itemValue | oro_format_currency %}
+            {% elseif item.type == 'percent' %}
+                {% set itemValue = itemValue | oro_format_percent %}
             {% endif %}
 
             {{ ui.renderProperty(item.label|trans, itemValue) }}
