@@ -3,10 +3,9 @@ parameters:
     oro_segment.form.type.segment.class:                Oro\Bundle\SegmentBundle\Form\Type\SegmentType
     oro_segment.form.type.entity_choice.class:          Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType
     oro_segment.form.handler.segment.class:             Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler
-    oro_segment.report.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
 services:
-    oro_segment.form.type.report:
+    oro_segment.form.type.segment:
         class: %oro_segment.form.type.segment.class%
         tags:
             - { name: form.type, alias: oro_segment }

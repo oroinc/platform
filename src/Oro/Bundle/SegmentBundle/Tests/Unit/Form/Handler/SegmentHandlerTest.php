@@ -53,6 +53,11 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler = new SegmentHandler($this->form, $this->request, $this->manager);
     }
 
+    public function tearDown()
+    {
+        unset($this->form, $this->request, $this->manager, $this->handler, $this->entity);
+    }
+
     public function testProcessUnsupportedRequest()
     {
         $this->form->expects($this->once())
@@ -90,4 +95,33 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->handler->process($this->entity));
     }
-} 
+
+    /**
+     * @dataProvider supportedMethods
+     *
+     * @param string $method
+     */
+    public function testProcessSupportedRequest($method)
+    {
+        $this->form->expects($this->once())->method('setData')
+            ->with($this->entity);
+
+        $this->request->setMethod($method);
+
+        $this->form->expects($this->once())->method('submit')
+            ->with($this->request);
+
+        $this->assertFalse($this->handler->process($this->entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function supportedMethods()
+    {
+        return [
+            ['POST'],
+            ['PUT']
+        ];
+    }
+}

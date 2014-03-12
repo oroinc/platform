@@ -24,10 +24,10 @@ oro:
             label:   Updated At
         last_run:
             label:   Last run
-
+        entity:
+            saved:   Segment saved
         form:
-            choose_segment_type: Choose segment type
+            choose_segment_type:    Choose segment type
             designer:               Designer
             columns:                Columns
             filters:                Filters
-            choose_segment_type:    Choose a segment type...

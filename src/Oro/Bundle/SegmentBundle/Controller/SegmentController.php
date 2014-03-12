@@ -85,7 +85,7 @@ class SegmentController extends Controller
         if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('Segment saved')
+                $this->get('translator')->trans('oro.segment.entity.saved')
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
@@ -101,7 +101,5 @@ class SegmentController extends Controller
             'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
             'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('segment')
         ];
-
-        return $entity;
     }
 }
