@@ -18,6 +18,9 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
         row: FooterRow,
 
         /** @property */
+        rows: [],
+
+        /** @property */
         footerCell: FooterCell,
 
         renderable: false,
@@ -26,6 +29,7 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
          * @inheritDoc
          */
         initialize: function (options) {
+            this.rows = [];
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
@@ -41,11 +45,15 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
             var state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
-                this.row = new this.row({
-                    columns: this.columns,
-                    collection: this.collection,
-                    footerCell: this.footerCell
-                });
+                _.each(state.totals, function (total, rowName) {
+                    this.rows[this.rows.length] = new this.row({
+                        columns: this.columns,
+                        collection: this.collection,
+                        footerCell: this.footerCell,
+                        rowName: rowName
+                    });
+                }, this);
+
             }
         },
 
@@ -54,7 +62,9 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
          */
         render: function () {
             if (this.renderable) {
-                this.$el.append(this.row.render().$el);
+                _.each(this.rows, function (row) {
+                    this.$el.append(row.render().$el);
+                }, this);
             }
             this.delegateEvents();
             return this;

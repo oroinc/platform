@@ -1,5 +1,9 @@
 parameters:
-    oro_filter.extension.orm_filter.class: Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
+    oro_filter.extension.orm_filter.class:      Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
+    oro_filter.provider.datevarsprovider.class: Oro\Bundle\FilterBundle\Provider\DateModifierProvider
+    oro_filter.expression.date.compiler.class:  Oro\Bundle\FilterBundle\Expression\Date\Compiler
+    oro_filter.expression.date.lexer.class:     Oro\Bundle\FilterBundle\Expression\Date\Lexer
+    oro_filter.expression.date.parser.class:    Oro\Bundle\FilterBundle\Expression\Date\Parser
 
 services:
     oro_filter.extension.orm_filter:
@@ -9,3 +13,23 @@ services:
             - @translator
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_filter.provider.datemodifierprovider:
+        class: %oro_filter.provider.datevarsprovider.class%
+
+    oro_filter.expression.date.parser:
+        arguments:
+            - @oro_locale.settings
+        class: %oro_filter.expression.date.parser.class%
+
+    oro_filter.expression.date.lexer:
+        class: %oro_filter.expression.date.lexer.class%
+        arguments:
+            - @translator
+            - @oro_filter.provider.datemodifierprovider
+
+    oro_filter.expression.date.compiler:
+        class: %oro_filter.expression.date.compiler.class%
+        arguments:
+            - @oro_filter.expression.date.lexer
+            - @oro_filter.expression.date.parser

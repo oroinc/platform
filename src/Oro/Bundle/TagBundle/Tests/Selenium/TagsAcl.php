@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Selenium;
 
+use Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class TagsAcl extends Selenium2TestCase
 {
@@ -10,7 +13,7 @@ class TagsAcl extends Selenium2TestCase
     {
         $randomPrefix = mt_rand();
         $login = $this->login();
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
@@ -43,7 +46,7 @@ class TagsAcl extends Selenium2TestCase
         $userName = 'User_'.mt_rand();
 
         $login = $this->login();
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users $login*/
+        /** @var Users $login*/
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->assertTitle('Create User - Users - Users Management - System')
@@ -74,7 +77,7 @@ class TagsAcl extends Selenium2TestCase
         $tagName = 'Tag_'.mt_rand();
 
         $login = $this->login();
-        /** @var \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags $login*/
+        /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
             ->add()
             ->assertTitle('Create Tag - Tags - System')
@@ -126,7 +129,7 @@ class TagsAcl extends Selenium2TestCase
 
     public function deleteAcl($login, $role, $username, $tagName)
     {
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
@@ -142,7 +145,7 @@ class TagsAcl extends Selenium2TestCase
 
     public function updateAcl($login, $role, $username, $tagName)
     {
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
@@ -158,7 +161,7 @@ class TagsAcl extends Selenium2TestCase
 
     public function createAcl($login, $role, $username)
     {
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
@@ -174,7 +177,7 @@ class TagsAcl extends Selenium2TestCase
 
     public function viewListAcl($login, $role, $username)
     {
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
@@ -191,13 +194,14 @@ class TagsAcl extends Selenium2TestCase
     public function unassignGlobalAcl($login, $roleName, $tagName)
     {
         $username = 'user' . mt_rand();
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
-        $login->openRoles('Oro\Bundle\UserBundle')
+        /** @var Roles $login*/
+        $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
             ->setCapability(array('Unassign all tags from entities'), 'None')
-            ->save()
-            ->openUsers('Oro\Bundle\UserBundle')
+            ->save();
+        /** @var Users $login*/
+        $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->setUsername($username)
             ->enable()
@@ -213,8 +217,9 @@ class TagsAcl extends Selenium2TestCase
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
-            ->submit()
-            ->openUsers('Oro\Bundle\UserBundle')
+            ->submit();
+
+        $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', $username)
             ->open(array($username))
             ->edit()
@@ -226,7 +231,7 @@ class TagsAcl extends Selenium2TestCase
 
     public function assignAcl($login, $role, $username)
     {
-        /** @var \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles $login*/
+        /** @var Roles $login*/
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))

@@ -4,7 +4,11 @@ table.grid thead th > span {
 }
 
 table.grid tfoot th {
-    background-color: #f2f2f2;
+    background-color: #f5f5f5;
+    background: -webkit-linear-gradient(top, #ffffff, #f5f5f5);
+    background: -o-linear-gradient(top, #ffffff,#f5f5f5);
+    background: -ms-linear-gradient(top, #ffffff,#f5f5f5);
+    background: linear-gradient(to bottom, #ffffff,#f5f5f5 );
     padding: 4px 10px;
 }
 
@@ -62,13 +66,4 @@ table.grid tbody tr.row-click-action {
     border: 1px solid #ddd;
     background:#f9f9f9;
     margin:10px 0;
-}
-
-.loading-mask .loading-frame .box {
-    margin: 20px 0;
-}
-
-.loading-mask .loading-frame .box .loading-content {
-    background: #ffffff url('../img/loader.gif') no-repeat center left;
-    padding-left: 30px;
 }
