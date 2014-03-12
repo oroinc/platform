@@ -1,7 +1,9 @@
 /*global define*/
-define(['jquery', 'underscore', 'backgrid', 'backbone'
-    ], function ($, _, Backgrid, Backbone) {
+define(['underscore', 'backgrid', 'backbone'
+    ], function (_, Backgrid, Backbone) {
     "use strict";
+
+    var $ = Backbone.$;
 
     /**
      * Contains mass-selection logic
@@ -211,6 +213,9 @@ define(['jquery', 'underscore', 'backgrid', 'backbone'
                 this.collection.trigger('backgrid:selectAll');
             } else {
                 this.collection.trigger('backgrid:selectNone');
+            }
+            if ($(e.target).is(':checkbox')) {
+                e.stopPropagation();
             }
         },
 

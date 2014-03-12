@@ -76,38 +76,43 @@
       input[type='radio'] { margin-top:0; }
     }
   }
-  .select-all-header-cell {
-    .btn-small {
+}
+#header-cell-dropdown {
+  >.dropdown {
+    margin-left: -5px;
+    >.dropdown-toggle {
       padding-left: 4px;
       padding-right: 4px;
-      [type=checkbox] {
-        margin: 0;
-        vertical-align: text-bottom;
-      }
+    }
+    .dropdown-menu {
+      min-width: 60px;
+      padding-bottom: 5px;
     }
   }
 }
 .grid {
   margin-bottom: 50px;
-
+  .select-all-header-cell {
+    #header-cell-dropdown();
+    [type=checkbox] {
+      margin: 0;
+      vertical-align: text-bottom;
+    }
+  }
   .action-cell {
     vertical-align: bottom;
-    width: 60px;
+    width: 50px;
   }
   .action-column {
-    width: 60px;
-    .dropdown>.dropdown-toggle {
-      padding-left: 3px;
-      padding-right: 5px;
-      [class^="icon-"], [class*=" icon-"]{
-        font-size: @baseFontSize;
-      }
+    width: 50px;
+    #header-cell-dropdown();
+    [class^="icon-"], [class*=" icon-"]{
+      font-size: @baseFontSize;
+      margin:0 2px 0 0
     }
     .dropdown-menu {
       right: 0;
       left: auto;
-      padding-bottom: 5px;
-      min-width: 60px;
     }
   }
   thead th {
