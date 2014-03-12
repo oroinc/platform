@@ -19,19 +19,12 @@ class MessageParamsProvider
      */
     protected $translator;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGenerator;
-
     public function __construct(
         Translator $translator,
-        DateTimeFormatter $dateTimeFormatter,
-        UrlGeneratorInterface $urlGenerator
+        DateTimeFormatter $dateTimeFormatter
     ) {
         $this->dateTimeFormatter = $dateTimeFormatter;
         $this->translator = $translator;
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function getMessageParams(Reminder $reminder)
@@ -52,13 +45,7 @@ class MessageParamsProvider
      */
     protected function getUrl(Reminder $reminder)
     {
-        if (!$reminder->getRelatedRouteName()) {
-            return null;
-        }
-
-        return $this->urlGenerator->generate(
-            $reminder->getRelatedRouteName(),
-            $reminder->getRelatedRouteParameters()
-        );
+        // @todo replace with call to service responsible for generating url
+        return null;
     }
 }

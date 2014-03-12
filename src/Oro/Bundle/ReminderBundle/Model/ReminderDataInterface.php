@@ -23,14 +23,4 @@ interface ReminderDataInterface
      * @return User
      */
     public function getRecipient();
-
-    /**
-     * @return string
-     */
-    public function getRelatedRouteName();
-
-    /**
-     * @return array
-     */
-    public function getRelatedRouteParameters();
 }

@@ -168,32 +168,6 @@ class Reminder
     protected $relatedEntityClassName;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="related_route_name", type="string", length=255, nullable=true)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
-     */
-    protected $relatedRouteName;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="related_route_parameters", type="array", nullable=true)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
-     */
-    protected $relatedRouteParameters;
-
-    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
@@ -434,52 +408,6 @@ class Reminder
     public function getRelatedEntityClassName()
     {
         return $this->relatedEntityClassName;
-    }
-
-    /**
-     * Get related route name
-     *
-     * @return string
-     */
-    public function getRelatedRouteName()
-    {
-        return $this->relatedRouteName;
-    }
-
-    /**
-     * Set related route name
-     *
-     * @param string $relatedRouteName
-     * @return Reminder
-     */
-    public function setRelatedRouteName($relatedRouteName)
-    {
-        $this->relatedRouteName = $relatedRouteName;
-
-        return $this;
-    }
-
-    /**
-     * Set related route parameters
-     *
-     * @param array $relatedRouteParameters
-     * @return Reminder
-     */
-    public function setRelatedRouteParameters(array $relatedRouteParameters)
-    {
-        $this->relatedRouteParameters = $relatedRouteParameters;
-
-        return $this;
-    }
-
-    /**
-     * Get related route parameters
-     *
-     * @return string
-     */
-    public function getRelatedRouteParameters()
-    {
-        return $this->relatedRouteParameters;
     }
 
     /**

@@ -25,16 +25,6 @@ class ReminderData implements ReminderDataInterface
     protected $recipient;
 
     /**
-     * @var string
-     */
-    protected $relatedRouteName;
-
-    /**
-     * @var array
-     */
-    protected $relatedRouteParameters;
-
-    /**
      * @param string $subject
      * @return ReminderData
      */
@@ -89,43 +79,5 @@ class ReminderData implements ReminderDataInterface
     public function getRecipient()
     {
         return $this->recipient;
-    }
-
-    /**
-     * @param string $relatedRouteName
-     * @return ReminderData
-     */
-    public function setRelatedRouteName($relatedRouteName)
-    {
-        $this->relatedRouteName = $relatedRouteName;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRelatedRouteName()
-    {
-        return $this->relatedRouteName;
-    }
-
-    /**
-     * @param array $relatedRouteParameters
-     * @return ReminderData
-     */
-    public function setRelatedRouteParameters($relatedRouteParameters)
-    {
-        $this->relatedRouteParameters = $relatedRouteParameters;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRelatedRouteParameters()
-    {
-        return $this->relatedRouteParameters;
     }
 }
