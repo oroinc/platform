@@ -94,6 +94,43 @@
 
     <div class="layout-content scrollable-container">
         {% block content_data %}
+            {% if data is defined and data.dataBlocks is defined %}
+                {% set dataBlocks = data.dataBlocks %}
+
+                {%- set communicationsData -%}
+                    {% placeholder view_content_data_communications with {entity: entity} %}
+                {%- endset -%}
+
+                {% if communicationsData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Communications'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [communicationsData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
+                {%- set additionalInformationData -%}
+                    {% placeholder view_content_data_additional_information with {entity: entity} %}
+                {%- endset -%}
+
+                {% if additionalInformationData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Additional Information'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [additionalInformationData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
+                {% set data = data|merge({'dataBlocks': dataBlocks}) %}
+            {% endif %}
             {{ UI.scrollData(id, data) }}
         {% endblock content_data %}
     </div>

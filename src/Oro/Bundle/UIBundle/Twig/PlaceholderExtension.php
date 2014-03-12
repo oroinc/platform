@@ -4,10 +4,10 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 
+use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+
 class PlaceholderExtension extends \Twig_Extension
 {
-    const HTTP_KERNEL_EXTENSION_NAME = 'http_kernel';
-
     const EXTENSION_NAME = 'oro_placeholder';
 
     /**
@@ -16,20 +16,28 @@ class PlaceholderExtension extends \Twig_Extension
     protected $environment;
 
     /**
-     * @var array
+     * @var PlaceholderProvider
      */
-    protected $placeholders = [];
+    protected $placeholder;
+
+    /**
+     * @var HttpKernelExtension
+     */
+    protected $kernelExtension;
 
     /**
      * @param \Twig_Environment $environment
-     * @param array $placeholders
+     * @param PlaceholderProvider $placeholder
+     * @param HttpKernelExtension $kernelExtension
      */
     public function __construct(
         \Twig_Environment $environment,
-        array $placeholders
+        PlaceholderProvider $placeholder,
+        HttpKernelExtension $kernelExtension
     ) {
         $this->environment = $environment;
-        $this->placeholders = $placeholders;
+        $this->placeholder = $placeholder;
+        $this->kernelExtension = $kernelExtension;
     }
 
     /**
@@ -62,41 +70,24 @@ class PlaceholderExtension extends \Twig_Extension
     public function renderPlaceholder($name, array $variables = array(), $delimiter = '')
     {
         $renderedBlocks = [];
-        if (isset($this->placeholders[$name]['items'])) {
 
-            /**
-             * Compare function to order blocks using ascending sorting
-             *
-             * @param array $firstBlock
-             * @param array $secondBlock
-             * @return int
-             */
-            $compareFunction = function ($firstBlock, $secondBlock) {
-                $firstBlockOrder = isset($firstBlock['order']) ? (int)$firstBlock['order'] : 0;
-                $secondBlockOrder = isset($secondBlock['order']) ? (int)$secondBlock['order'] : 0;
-                return $firstBlockOrder - $secondBlockOrder;
-            };
+        $items = $this->placeholder->getPlaceholderItems($name, $variables);
 
-            $items = $this->placeholders[$name]['items'];
-            usort($items, $compareFunction);
-
-            foreach ($items as $block) {
-                if (isset($block['template'])) {
-                    $renderedBlocks[] = $this->environment->render($block['template'], $variables);
-                } elseif (isset($block['action'])) {
-                    /** @var HttpKernelExtension $kernelExtension */
-                    $kernelExtension = $this->environment->getExtension(self::HTTP_KERNEL_EXTENSION_NAME);
-                    $renderedBlocks[] = $kernelExtension->renderFragment(
-                        $kernelExtension->controller($block['action'], $variables)
-                    );
-                } else {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
-                            implode('", "', $block)
-                        )
-                    );
-                }
+        foreach ($items as $block) {
+            if (isset($block['template'])) {
+                $renderedBlocks[] = $this->environment->render($block['template'], $variables);
+            } elseif (isset($block['action'])) {
+                /** @var HttpKernelExtension $kernelExtension */
+                $renderedBlocks[] = $this->kernelExtension->renderFragment(
+                    $this->kernelExtension->controller($block['action'], $variables)
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
+                        implode('", "', $block)
+                    )
+                );
             }
         }
 
