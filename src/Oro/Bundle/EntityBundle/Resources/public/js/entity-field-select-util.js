@@ -92,17 +92,24 @@ define(['underscore'
         },
 
         _getFieldLabel: function (fieldName, data) {
-            return this._getFieldData(fieldName, data).text;
+            var fieldData = this._getFieldData(fieldName, data);
+            return fieldData ? fieldData.text : null;
         },
 
         _getFieldGroupLabel: function (fieldName, data) {
-            return this._getField(fieldName, data).text;
+            var field = this._getField(fieldName, data);
+            return field ? field.text : null;
         },
 
         _getField: function (fieldName, data) {
-            return _.find(data, function (val) {
-                return val.name === fieldName;
+            var field = null;
+            // can't use _.find because it returns first level clone of element
+            _.each(data, function(element) {
+                if (element.name === fieldName) {
+                    field = element;
+                }
             });
+            return field;
         },
 
         _getFieldData: function (fieldName, data) {
