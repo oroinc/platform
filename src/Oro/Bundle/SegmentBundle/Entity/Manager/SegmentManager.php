@@ -6,9 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 class SegmentManager
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
     /**
