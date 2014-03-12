@@ -129,7 +129,7 @@
                             <div class="control-group">
                                 <label class="control-label">{{ "Warning message"|trans }}</label>
                                 <div class="controls">
-                                    <input type="text" name="message" value="<%= message %>">
+                                    <textarea name="message"><%= message %></textarea>
                                 </div>
                             </div>
                         </div>
@@ -159,6 +159,7 @@
                                 </div>
 
                                 <div class="control-group transition-example-container">
+                                    <label class="control-label required">{{ "Button preview"|trans }} </label>
                                     <div class="controls">
                                         <div class="transition-btn-example"></div>
                                     </div>
