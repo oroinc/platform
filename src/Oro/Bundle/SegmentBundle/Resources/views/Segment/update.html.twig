@@ -89,7 +89,7 @@
 
     {% set dataBlocks = dataBlocks|merge( [{
         'title' : 'oro.segment.form.designer'|trans,
-        'content_attr': {'id': 'report-designer'},
+        'content_attr': {'id': 'segment-designer'},
         'subblocks': [
             {
                 'title': 'oro.segment.form.columns'|trans,
@@ -133,7 +133,7 @@
 
     {{ UI.scrollData(id, data, form) }}
 
-    {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
+    {{ QD.query_designer_column_chain_template('segment-column-chain-template') }}
 
     {% set entityFieldsRouteParams = {
         'with-relations': 1,
@@ -144,7 +144,7 @@
         require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
             'oroui/js/delete-confirmation', 'ororeport/js/report', 'oroentity/js/fields-loader'],
             function ($, _, __, LoadingMask, DeleteConfirmation, reportManagerInit) {
-                var $entityChoice = $('#oro_report_form_entity');
+                var $entityChoice = $('#oro_segment_form_entity');
                 var loadingMask = new LoadingMask();
                 var confirm = new DeleteConfirmation({
                     title: __('Change Entity Confirmation'),
@@ -152,7 +152,7 @@
                     content: __('Are you sure you want to change entity?')
                 });
 
-                $('#report-designer').append(loadingMask.render().$el);
+                $('#segment-designer').append(loadingMask.render().$el);
 
                 $entityChoice
                     .fieldsLoader({
@@ -160,7 +160,7 @@
                         routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
                         confirm: confirm,
                         requireConfirm: function () {
-                            var data = $('#oro_report_form_definition').val();
+                            var data = $('#oro_segment_form_definition').val();
                             if (!data) {
                                 return false;
                             }
@@ -185,31 +185,31 @@
                 {% endif %}
 
                 reportManagerInit({
-                    entityChoice: '#oro_report_form_entity',
-                    valueSource: '#oro_report_form_definition',
+                    entityChoice: '#oro_segment_form_entity',
+                    valueSource: '#oro_segment_form_definition',
                     filters: {
                         criteriaList: '#filter-criteria-list',
-                        conditionBuilder: '#report-condition-builder'
+                        conditionBuilder: '#segment-condition-builder'
                     },
                     grouping: {
                         editor: {
                             mapping: {
-                                name: 'oro_report_form[grouping][columnNames]'
+                                name: 'oro_segment_form[grouping][columnNames]'
                             }
                         },
-                        form: '#report-grouping-form',
-                        itemContainer: '#report-grouping-list .grouping-item-container',
-                        itemTemplate: '#report-grouping-item-row'
+                        form: '#segment-grouping-form',
+                        itemContainer: '#segment-grouping-list .grouping-item-container',
+                        itemTemplate: '#segment-grouping-item-row'
                     },
                     column: {
                         editor: {
-                            namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/
+                            namePattern:  /^oro_segment_form\[column\]\[([\w\W]*)\]$/
                         },
-                        form: '#report-column-form',
-                        itemContainer: '#report-column-list .item-container',
-                        itemTemplate: '#report-column-row'
+                        form: '#segment-column-form',
+                        itemContainer: '#segment-column-list .item-container',
+                        itemTemplate: '#segment-column-row'
                     },
-                    select2FieldChoiceTemplate: '#report-column-chain-template',
+                    select2FieldChoiceTemplate: '#segment-column-chain-template',
                     entities: {{ entities|json_encode|raw }},
                     metadata: {{ metadata|json_encode|raw }}
                 });
