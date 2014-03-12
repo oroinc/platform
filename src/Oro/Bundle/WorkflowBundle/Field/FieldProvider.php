@@ -24,6 +24,7 @@ class FieldProvider extends EntityFieldProvider
             $this->workflowFields = array(
                 FieldGenerator::PROPERTY_WORKFLOW_ITEM,
                 FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                // TODO: Remove in scope of https://magecore.atlassian.net/browse/BAP-2907
                 ExtendConfigDumper::FIELD_PREFIX . FieldGenerator::PROPERTY_WORKFLOW_ITEM,
                 ExtendConfigDumper::FIELD_PREFIX.  FieldGenerator::PROPERTY_WORKFLOW_STEP,
             );
