@@ -177,14 +177,14 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
                 $localColumnNames
             );
         }
-        $constraint         = new ForeignKeyConstraint(
+        $constraint             = new ForeignKeyConstraint(
             $localColumnNames,
             $foreignTable,
             $foreignColumnNames,
             $constraintName,
             $options
         );
-        $diff               = new TableDiff($tableName);
+        $diff                   = new TableDiff($tableName);
         $diff->addedForeignKeys = [$constraintName => $constraint];
 
         $renameQuery = new SqlMigrationQuery(
