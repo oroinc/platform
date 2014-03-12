@@ -59,6 +59,14 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('subject', (string)$this->entity);
     }
 
+    public function testSetSentState()
+    {
+        $this->entity->setState(Reminder::STATE_SENT);
+
+        $this->assertEquals(Reminder::STATE_SENT, $this->entity->getState());
+        $this->assertInstanceOf('DateTime', $this->entity->getSentAt());
+    }
+
     public function testSetReminderData()
     {
         $expectedSubject = 'subject';

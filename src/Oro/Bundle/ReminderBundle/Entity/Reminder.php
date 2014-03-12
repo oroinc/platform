@@ -349,6 +349,10 @@ class Reminder
      */
     public function setState($state)
     {
+        if (Reminder::STATE_SENT == $state && $state != $this->state) {
+            $this->setSentAt(new \DateTime());
+        }
+
         $this->state = $state;
 
         return $this;
