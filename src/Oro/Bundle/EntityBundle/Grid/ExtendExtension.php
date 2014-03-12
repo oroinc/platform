@@ -14,7 +14,6 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
@@ -48,7 +47,6 @@ class ExtendExtension extends AbstractExtension
 
         $entityProvider = $this->cm->getProvider('entity');
         $fields         = $this->getDynamicFields($entityName);
-        /** @var $field FieldConfigId */
         foreach ($fields as $field) {
             $fieldName     = $field->getFieldName();
             $fieldConfig   = $entityProvider->getConfigById($field);
@@ -93,9 +91,9 @@ class ExtendExtension extends AbstractExtension
             $config->offsetSetByPath(
                 sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
                 [
-                    FilterUtility::TYPE_KEY     => $filterType,
+                    FilterUtility::TYPE_KEY         => $filterType,
                     FilterUtility::DATA_NAME_KEY    => $fieldName,
-                    FilterUtility::ENABLED_KEY  => false,
+                    FilterUtility::ENABLED_KEY      => false,
                     FilterUtility::FORM_OPTIONS_KEY => $filterOptions
                 ]
             );
@@ -129,17 +127,27 @@ class ExtendExtension extends AbstractExtension
             }
 
             foreach ($fields as $field) {
-                $fn = $field->getFieldName();
-                $qb->addSelect(sprintf('%s.%s', $alias, $fn));
+                $fieldName = $field->getFieldName();
+                $qb->addSelect(sprintf('%s.%s', $alias, $fieldName));
 
                 // set real "data name" for filters and sorters
                 $config->offsetSetByPath(
-                    sprintf('%s[%s][%s]', OrmSorterConfiguration::COLUMNS_PATH, $fn, PropertyInterface::DATA_NAME_KEY),
-                    sprintf('%s.%s', $alias, $fn)
+                    sprintf(
+                        '%s[%s][%s]',
+                        OrmSorterConfiguration::COLUMNS_PATH,
+                        $fieldName,
+                        PropertyInterface::DATA_NAME_KEY
+                    ),
+                    sprintf('%s.%s', $alias, $fieldName)
                 );
                 $config->offsetSetByPath(
-                    sprintf('%s[%s][%s]', FilterConfiguration::COLUMNS_PATH, $fn, FilterUtility::DATA_NAME_KEY),
-                    sprintf('%s.%s', $alias, $fn)
+                    sprintf(
+                        '%s[%s][%s]',
+                        FilterConfiguration::COLUMNS_PATH,
+                        $fieldName,
+                        FilterUtility::DATA_NAME_KEY
+                    ),
+                    sprintf('%s.%s', $alias, $fieldName)
                 );
             }
         }
@@ -158,7 +166,7 @@ class ExtendExtension extends AbstractExtension
      *
      * @param string $entityName
      *
-     * @return array
+     * @return FieldConfigId[]
      */
     protected function getDynamicFields($entityName)
     {
