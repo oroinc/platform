@@ -24,10 +24,8 @@ class WebSocketSendProcessor implements SendProcessorInterface
      * @param TopicPublisher        $topicPublisher
      * @param MessageParamsProvider $messageParamsProvider
      */
-    public function __construct(
-        TopicPublisher $topicPublisher,
-        MessageParamsProvider $messageParamsProvider
-    ) {
+    public function __construct(TopicPublisher $topicPublisher, MessageParamsProvider $messageParamsProvider)
+    {
         $this->topicPublisher = $topicPublisher;
         $this->messageParamsProvider = $messageParamsProvider;
     }

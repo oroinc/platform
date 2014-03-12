@@ -6,10 +6,9 @@ use Symfony\Component\Security\Core\SecurityContext;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
-class SubscriberExtension extends \Twig_Extension
+class ReminderExtension extends \Twig_Extension
 {
     /**
      * @var EntityManager
@@ -26,6 +25,11 @@ class SubscriberExtension extends \Twig_Extension
      */
     protected $messageParamsProvider;
 
+    /**
+     * @param EntityManager $entityManager
+     * @param SecurityContext $securityContext
+     * @param MessageParamsProvider $messageParamsProvider
+     */
     public function __construct(
         EntityManager $entityManager,
         SecurityContext $securityContext,
@@ -42,36 +46,38 @@ class SubscriberExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('oro_reminder_get_requested_reminders', array($this, 'getRequestedReminders'))
+            new \Twig_SimpleFunction(
+                'oro_reminder_get_requested_reminders_data',
+                array($this, 'getRequestedRemindersData')
+            )
         );
     }
 
     /**
-     * Twig function callback
+     * Get requested reminders
      *
      * @return string
      */
-    public function getRequestedReminders()
+    public function getRequestedRemindersData()
     {
-        $userId = $this->securityContext->getToken()->getUser()->getId();
-        $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
-            ->findRequestedReminders($userId);
         $result = array();
+        $user = $this->securityContext->getToken()->getUser();
 
-        /**
-         * @var Reminder $reminder
-         */
-        foreach ($reminders as $reminder) {
-            $result[] = $this->messageParamsProvider->getMessageParams($reminder);
+        if ($user) {
+            $userId = $user->getId();
+            $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
+                ->findRequestedReminders($userId);
+
+            foreach ($reminders as $reminder) {
+                $result[] = $this->messageParamsProvider->getMessageParams($reminder);
+            }
         }
 
-        return json_encode($result);
+        return $result;
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {
