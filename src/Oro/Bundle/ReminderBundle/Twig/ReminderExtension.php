@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
-class SubscriberExtension extends \Twig_Extension
+class ReminderExtension extends \Twig_Extension
 {
     /**
      * @var EntityManager
