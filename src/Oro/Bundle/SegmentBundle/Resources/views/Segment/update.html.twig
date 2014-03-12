@@ -95,13 +95,6 @@
                 'title': 'oro.segment.form.columns'|trans,
                 'spanClass': 'segment-columns responsive-cell',
                 'data': [
-                    QD.query_designer_grouping_form(
-                        form.grouping,
-                        {'id': 'segment-grouping-form'},
-                        {'entity_choice_id': 'oro_segment_form_entity'}
-                    ),
-                    QD.query_designer_grouping_list({'id': 'segment-grouping-list'}),
-                    QD.query_designer_grouping_item_template('segment-grouping-item-row'),
                     QD.query_designer_column_form(
                         form.column,
                         {'id': 'segment-column-form'},
@@ -142,8 +135,8 @@
     } %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
-            'oroui/js/delete-confirmation', 'ororeport/js/report', 'oroentity/js/fields-loader'],
-            function ($, _, __, LoadingMask, DeleteConfirmation, reportManagerInit) {
+            'oroui/js/delete-confirmation', 'orosegment/js/segment', 'oroentity/js/fields-loader'],
+            function ($, _, __, LoadingMask, DeleteConfirmation, segmentManagerInit) {
                 var $entityChoice = $('#oro_segment_form_entity');
                 var loadingMask = new LoadingMask();
                 var confirm = new DeleteConfirmation({
@@ -184,22 +177,12 @@
                 $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
                 {% endif %}
 
-                reportManagerInit({
+                segmentManagerInit({
                     entityChoice: '#oro_segment_form_entity',
                     valueSource: '#oro_segment_form_definition',
                     filters: {
                         criteriaList: '#filter-criteria-list',
                         conditionBuilder: '#segment-condition-builder'
-                    },
-                    grouping: {
-                        editor: {
-                            mapping: {
-                                name: 'oro_segment_form[grouping][columnNames]'
-                            }
-                        },
-                        form: '#segment-grouping-form',
-                        itemContainer: '#segment-grouping-list .grouping-item-container',
-                        itemTemplate: '#segment-grouping-item-row'
                     },
                     column: {
                         editor: {
