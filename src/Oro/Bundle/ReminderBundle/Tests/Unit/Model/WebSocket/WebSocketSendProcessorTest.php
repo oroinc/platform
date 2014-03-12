@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
-use \DateTime;
-
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
 
@@ -70,7 +68,12 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('send')
             ->will($this->returnValue(false));
-        $expected = Reminder::STATE_IN_PROGRESS;
+        $expected = Reminder::STATE_REQUESTED;
+
+        $this->messageParamsProvider->expects($this->any())
+            ->method('getMessageParams')
+            ->will($this->returnValue(array()));
+
         $reminder->expects($this->exactly(2))
             ->method('setState')
             ->with(

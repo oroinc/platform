@@ -6,17 +6,15 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
     return {
         /**
          * @param {integer} id Current user id
-         * @param {object} Wamp
          * @param {string} oldReminders object[] in JSON
          */
-        init: function (id, Wamp, oldReminders) {
+        init: function (id, oldReminders) {
             var that = this;
-            sync(Wamp);
             sync.subscribe('oro/reminder/remind_user_' + id, function (messageParams) {
                 messageParams = JSON.parse(messageParams);
                 that.showReminders([messageParams]);
             });
-            that.showReminders(JSON.parse(oldReminders));
+            that.showReminders(oldReminders);
         },
 
         /**
@@ -26,8 +24,12 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
             var reminderIds = [];
             for (var i = 0; i < messageParamsArray.length; i++) {
                 var messageObject = messageParamsArray[i];
-                reminderIds.push(messageObject.reminderId);
-                var message = '<a href="' + messageObject.uri + '">' + messageObject.text + '</a>';
+                reminderIds.push(messageObject.id);
+
+                var message = messageObject.url != ''
+                    ? '<a href="' + messageObject.url + '">' + messageObject.text + '</a>'
+                    : '<span>' + messageObject.text + '</span>';
+
                 messenger.notificationFlashMessage(false, message, {delay: false, flash: false});
             }
             if (reminderIds.length > 0) {
@@ -40,12 +42,15 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
          * @param {array} $reminderIds
          */
         changeRemindersState: function ($reminderIds) {
-            var url = routing.generate('oro_reminder_change_reminder_state', { 'ids': $reminderIds });
-            $.post(url, {}, function (result) {
-                if (!result.result) {
-                    console.log('result.object: \r\n' + result.result);
+            var url = routing.generate('oro_reminder_change_reminder_state');
+            $.post(url, { 'ids': $reminderIds }, function (result) {
+                if (!result.result && console && (typeof console.log === 'function')) {
+                    console.log('Reminder chane state error: ' +
+                        '\r\n rout: oro_reminder_change_reminder_state' +
+                        '\r\n reason: unexpected response' +
+                        '\r\n result.object: \r\n' + result.result);
                 }
-            });
+            }, 'json');
         }
     };
 });

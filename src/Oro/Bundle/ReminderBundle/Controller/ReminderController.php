@@ -41,7 +41,7 @@ class ReminderController extends Controller
          * @var Reminder $reminder
          */
         foreach ($reminders as $reminder) {
-            if ($reminder->getState() == Reminder::STATE_IN_PROGRESS && $reminder->getRecipient()
+            if ($reminder->getState() == Reminder::STATE_REQUESTED && $reminder->getRecipient()
                     ->getId() == $userId
             ) {
                 $reminder->setState(Reminder::STATE_SENT);
