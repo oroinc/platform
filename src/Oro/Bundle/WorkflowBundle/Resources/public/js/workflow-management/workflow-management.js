@@ -121,7 +121,7 @@ function(_, Backbone, messanger, __,
             }, this));
 
             this.$entitySelectEl.fieldsLoader({
-                router: 'oro_api_get_entity_fields',
+                router: 'oro_workflow_api_rest_entity_get',
                 routingParams: {"with-relations": 1, "with-entity-details": 1, "deep-level": 2},
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
@@ -163,12 +163,12 @@ function(_, Backbone, messanger, __,
             var rootAttributeName = this.model.get('entity_attribute');
             var mapping = {};
 
-            var addMapping = _.bind(function(field, parent) {
-                var propertyPath = parent + '.' + field.name;
+            var addMapping = _.bind(function(field, parentPropertyPath, parentFieldId) {
+                var propertyPath = parentPropertyPath + '.' + field.name;
                 var fieldIdParts = [];
 
-                if (mapping.hasOwnProperty(parent)) {
-                    fieldIdParts.push(mapping[parent]);
+                if (parentFieldId) {
+                    fieldIdParts.push(parentFieldId);
                 }
 
                 var fieldIdName = field.name;
@@ -177,17 +177,19 @@ function(_, Backbone, messanger, __,
                 }
                 fieldIdParts.push(fieldIdName);
 
-                mapping[propertyPath] = fieldIdParts.join('::');
+                if (!field.hasOwnProperty('related_entity_name')) {
+                    mapping[propertyPath] = fieldIdParts.join('::');
+                }
 
                 if (field.hasOwnProperty('related_entity_fields')) {
                     _.each(field.related_entity_fields, function(relatedField) {
-                        addMapping(relatedField, propertyPath);
+                        addMapping(relatedField, propertyPath, fieldIdParts.join('::'));
                     });
                 }
             });
 
             _.each(fields, function(field) {
-                addMapping(field, rootAttributeName);
+                addMapping(field, rootAttributeName, "");
             });
 
             this.model.setPropertyPathToFieldIdMapping(mapping);

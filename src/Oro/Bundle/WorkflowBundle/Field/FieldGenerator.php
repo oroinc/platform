@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Generator;
+namespace Oro\Bundle\WorkflowBundle\Field;
 
 use Symfony\Component\Translation\TranslatorInterface;
 

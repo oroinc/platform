@@ -5,3 +5,7 @@ oro_workflow_api:
 oro_workflow_definition_api:
     resource: "@OroWorkflowBundle/Controller/Api/Rest/WorkflowDefinitionController.php"
     type:     rest
+
+oro_workflow_entity_api:
+    resource: "@OroWorkflowBundle/Controller/Api/Rest/EntityController.php"
+    type:     rest

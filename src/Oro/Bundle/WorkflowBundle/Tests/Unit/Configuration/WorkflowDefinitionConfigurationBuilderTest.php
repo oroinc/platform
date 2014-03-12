@@ -98,7 +98,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
             ->will($this->returnValue($workflow));
 
-        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Generator\FieldGenerator')
+        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Field\FieldGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generateWorkflowFields'))
             ->getMock();
@@ -241,7 +241,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Generator\FieldGenerator')
+        $fieldGenerator = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Field\FieldGenerator')
             ->disableOriginalConstructor()
             ->getMock();
 

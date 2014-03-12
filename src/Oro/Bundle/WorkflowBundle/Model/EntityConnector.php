@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Generator\FieldGenerator;
+use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 /**
  * Connects related entities with workflow entities

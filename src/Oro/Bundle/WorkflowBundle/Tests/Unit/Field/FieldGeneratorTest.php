@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\FieldGenerator;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\WorkflowBundle\Generator\FieldGenerator;
+use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
 {
