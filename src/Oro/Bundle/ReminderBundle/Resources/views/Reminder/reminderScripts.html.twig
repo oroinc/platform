@@ -1,7 +1,7 @@
 {% if check_ws() and app.user %}
 <script type="text/javascript">
     require(['ororeminder/js/subscriber'], function(subscriber){
-        subscriber.init({{ app.user.id }}, {{ oro_reminder_get_requested_reminders()|raw }});
+        subscriber.init({{ app.user.id }}, {{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
     });
 </script>
 {% endif %}

@@ -42,7 +42,7 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
          * @param {array} $reminderIds
          */
         changeRemindersState: function ($reminderIds) {
-            var url = routing.generate('oro_reminder_change_reminder_state');
+            var url = routing.generate('oro_reminder_shown');
             $.post(url, { 'ids': $reminderIds }, function () {});
         }
     };

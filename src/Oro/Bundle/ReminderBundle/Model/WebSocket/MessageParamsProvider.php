@@ -43,7 +43,7 @@ class MessageParamsProvider
     public function getMessageParams(Reminder $reminder)
     {
         $translationParams = array(
-            '%time%'   => $this->dateTimeFormatter->format($reminder->getExpireAt()),
+            '%expireAt%'   => $this->dateTimeFormatter->format($reminder->getExpireAt()),
             '%subject%' => $reminder->getSubject()
         );
 
