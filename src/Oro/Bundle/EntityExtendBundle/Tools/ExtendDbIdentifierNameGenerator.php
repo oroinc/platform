@@ -130,11 +130,8 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      */
     public function generateManyToManyJoinTableName($entityClassName, $fieldName, $targetEntityClassName)
     {
-        $prefix = substr(
-            self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX,
-            0,
-            strlen(self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX) - 1
-        );
+        // remove ending underscore (_) char
+        $prefix = substr(self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX, 0, -1);
 
         return $this->generateIdentifierName(
             [$this->getShortClassName($entityClassName), $this->getShortClassName($targetEntityClassName)],
