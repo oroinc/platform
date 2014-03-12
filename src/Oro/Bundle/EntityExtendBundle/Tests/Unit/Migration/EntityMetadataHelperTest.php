@@ -58,7 +58,6 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('default'))
             ->will($this->returnValue($em));
 
-
         $this->assertEquals(
             'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity',
             $this->helper->getEntityClassByTableName('acme_test')
@@ -98,7 +97,6 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->with($this->equalTo('default'))
             ->will($this->returnValue($em));
-
 
         $this->assertEquals(
             'acme_test',
@@ -140,7 +138,6 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity')
             ->will($this->returnValue($metadata));
 
-
         $this->doctrine->expects($this->once())
             ->method('getManagers')
             ->will($this->returnValue(array('default' => $em)));
@@ -152,7 +149,6 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->with('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity')
             ->will($this->returnValue($em));
-
 
         $this->assertEquals(
             'name_field',
