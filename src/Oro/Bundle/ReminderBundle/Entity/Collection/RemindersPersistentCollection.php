@@ -149,10 +149,6 @@ class RemindersPersistentCollection extends AbstractLazyCollection
      */
     public function offsetSet($offset, $value)
     {
-        if (!isset($offset)) {
-            $this->add($value);
-        }
-
         $this->set($offset, $value);
     }
 
