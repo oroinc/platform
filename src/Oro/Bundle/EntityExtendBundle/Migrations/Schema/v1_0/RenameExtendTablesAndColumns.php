@@ -140,11 +140,14 @@ class RenameExtendTablesAndColumns implements
         QueryBag $queries,
         ConfigManager $configManager
     ) {
+        /** @var EntityMetadataHelper $entityMetadataHelper */
+        $entityMetadataHelper = $this->container->get('oro_entity_extend.migration.entity_metadata_helper');
+
         /** @var EntityConfigId[] $entityConfigIds */
         $entityConfigIds = $configManager->getIds('extend');
         foreach ($entityConfigIds as $entityConfigId) {
             if ($configManager->getConfig($entityConfigId)->is('is_extend')) {
-                $tableName = $this->getTableNameByEntityClass($entityConfigId->getClassName());
+                $tableName = $entityMetadataHelper->getTableNameByEntityClass($entityConfigId->getClassName());
                 if ($tableName && $schema->hasTable($tableName)) {
                     $table = $schema->getTable($tableName);
                     /** @var FieldConfigId[] $fieldConfigIds */
@@ -156,7 +159,8 @@ class RenameExtendTablesAndColumns implements
                                 $queries,
                                 $table,
                                 $fieldConfigId,
-                                $configManager
+                                $configManager,
+                                $entityMetadataHelper
                             );
                         }
                     }
@@ -170,7 +174,8 @@ class RenameExtendTablesAndColumns implements
         QueryBag $queries,
         Table $table,
         FieldConfigId $fieldConfigId,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        EntityMetadataHelper $entityMetadataHelper
     ) {
         var_dump($fieldConfigId->getClassName() . ' - ' . $fieldConfigId->getFieldName());
         switch ($fieldConfigId->getFieldType()) {
@@ -190,7 +195,8 @@ class RenameExtendTablesAndColumns implements
                     $queries,
                     $table,
                     $fieldConfigId->getFieldName(),
-                    $targetEntityClassName
+                    $targetEntityClassName,
+                    $entityMetadataHelper
                 );
                 break;
             case 'manyToMany':
@@ -237,10 +243,11 @@ class RenameExtendTablesAndColumns implements
         QueryBag $queries,
         Table $table,
         $associationName,
-        $targetEntityClassName
+        $targetEntityClassName,
+        EntityMetadataHelper $entityMetadataHelper
     ) {
-        $entityClassName = $this->getTableNameByEntityClass($table->getName());
-        $targetTableName = $this->getTableNameByEntityClass($targetEntityClassName);
+        $entityClassName = $entityMetadataHelper->getEntityClassByTableName($table->getName());
+        $targetTableName = $entityMetadataHelper->getTableNameByEntityClass($targetEntityClassName);
         if ($schema->hasTable($targetTableName)) {
             $targetTable = $schema->getTable($targetTableName);
             $oldTargetColumnName = sprintf(
@@ -254,7 +261,7 @@ class RenameExtendTablesAndColumns implements
                 $this->renameExtension->renameColumn(
                     $schema,
                     $queries,
-                    $table,
+                    $targetTable,
                     $oldTargetColumnName,
                     $newTargetColumnName
                 );
@@ -279,20 +286,6 @@ class RenameExtendTablesAndColumns implements
         $targetClassName = array_pop($targetParts);
 
         return strtolower('oro_' . $className . '_' . $targetClassName . '_' . $fieldName);
-    }
-
-    /**
-     * Gets an entity table name by entity full class name
-     *
-     * @param string $className
-     * @return string|null
-     */
-    protected function getTableNameByEntityClass($className)
-    {
-        /** @var EntityMetadataHelper $entityMetadataHelper */
-        $entityMetadataHelper = $this->container->get('oro_entity_extend.migration.entity_metadata_helper');
-
-        return $entityMetadataHelper->getTableNameByEntityClass($className);
     }
 
     /**
