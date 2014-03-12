@@ -8,8 +8,14 @@
 
 {% block oro_reminder_widget %}
     <div {{ block('widget_container_attributes') }}>
-        {{ form_widget(form.method) }}
-        {{ form_widget(form.interval.number) }}
-        {{ form_widget(form.interval.unit) }}
+        <div class="method inline-field">
+            {{ form_widget(form.method) }}
+        </div>
+        <div class="number inline-field">
+            {{ form_widget(form.interval.number) }}
+        </div>
+        <div class="unit inline-field">
+            {{ form_widget(form.interval.unit) }}
+        </div>
     </div>
 {% endblock %}

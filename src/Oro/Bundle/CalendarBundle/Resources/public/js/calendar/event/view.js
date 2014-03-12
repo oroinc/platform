@@ -176,7 +176,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         getEventFormData: function () {
-            var fieldNameRegex = /\[(\w+)\]$/,
+            var self = this;
+            var fieldNameRegex = /\[(\w+)\]/g,
                 data = {},
                 formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
@@ -184,13 +185,32 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                     return {"name": this.name, "value": false};
                 }).get());
             _.each(formData, function (dataItem) {
-                var fieldNameData = fieldNameRegex.exec(dataItem.name);
-                if (fieldNameData && fieldNameData.length === 2) {
-                    data[fieldNameData[1]] = dataItem.value;
+                var matches = [], match;
+                while ((match = fieldNameRegex.exec(dataItem.name)) !== null) {
+                    matches.push(match[1]);
+                }
+
+                if (matches.length) {
+                    self.setValueByPath(data, dataItem.value, matches);
                 }
             });
 
             return data;
+        },
+
+        setValueByPath: function (obj, value, path) {
+            var parent = obj, candidate;
+
+            for (var i = 0; i < path.length - 1; i += 1) {
+                candidate = parent[path[i]];
+                if (candidate === undefined) {
+                    parent[path[i]] = {};
+                }
+
+                parent = parent[path[i]];
+            }
+
+            parent[path[path.length - 1]] = value;
         }
     });
 });

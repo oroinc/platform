@@ -54,10 +54,54 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
 
     public function testToString()
     {
-        $entity = new Reminder();
-        $entity->setSubject('subject');
+        $this->entity->setSubject('subject');
 
-        $this->assertEquals('subject', $entity);
+        $this->assertEquals('subject', (string)$this->entity);
+    }
+
+    public function testSetReminderData()
+    {
+        $expectedSubject = 'subject';
+        $expectedExpireAt = new \DateTime();
+        $expectedRecipient = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
+        $reminderData = $this->getMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
+
+        $reminderData->expects($this->once())
+            ->method('getSubject')
+            ->will($this->returnValue($expectedSubject));
+
+        $reminderData->expects($this->once())
+            ->method('getExpireAt')
+            ->will($this->returnValue($expectedExpireAt));
+
+        $reminderData->expects($this->once())
+            ->method('getRecipient')
+            ->will($this->returnValue($expectedRecipient));
+
+        $this->entity->setReminderData($reminderData);
+
+        $this->assertEquals($expectedSubject, $this->entity->getSubject());
+        $this->assertEquals($expectedExpireAt, $this->entity->getExpireAt());
+        $this->assertEquals($expectedRecipient, $this->entity->getRecipient());
+    }
+
+    public function testSetFailureException()
+    {
+        $expectedMessage = 'Expected message';
+        $expectedCode = 100;
+        $exception = new \Exception($expectedMessage, $expectedCode);
+
+        $expected = array(
+            'class' => get_class($exception),
+            'message' => $expectedMessage,
+            'code' => $expectedCode,
+            'trace' => $exception->getTraceAsString(),
+        );
+
+        $this->entity->setFailureException($exception);
+
+        $this->assertEquals($expected, $this->entity->getFailureException());
     }
 
     /**

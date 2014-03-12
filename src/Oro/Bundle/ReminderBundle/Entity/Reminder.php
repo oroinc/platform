@@ -534,10 +534,10 @@ class Reminder
     public function setFailureException(\Exception $e)
     {
         $this->failureException = [
-            'class'             => get_class($e),
-            'message'           => $e->getMessage(),
-            'code'              => $e->getCode(),
-            'trace'             => $e->getTraceAsString()
+            'class'   => get_class($e),
+            'message' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'trace'   => $e->getTraceAsString()
         ];
 
         return $this;
@@ -564,6 +564,6 @@ class Reminder
      */
     public function __toString()
     {
-        return $this->subject;
+        return (string)$this->subject;
     }
 }

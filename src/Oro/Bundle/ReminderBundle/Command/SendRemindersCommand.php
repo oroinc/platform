@@ -90,9 +90,8 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
 
             if (Reminder::STATE_FAIL == $reminder->getState()) {
                 $exception = $reminder->getFailureException();
-                $output->write(sprintf('<error>Failed to send:</error> #%d; ', $reminder->getId()));
-                $output->write(sprintf('Class: %s; ', $exception['class']));
-                $output->writeln(sprintf('Message: %s;', $exception['message']));
+                $output->writeln(sprintf('<error>Failed to send reminder with id=%d</error>', $reminder->getId()));
+                $output->writeln(sprintf('<info>%s</info>: %s', $exception['class'], $exception['message']));
             }
         }
 
