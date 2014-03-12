@@ -31,6 +31,11 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
         unset($this->entityManager, $this->repository);
     }
 
+    /**
+     * @dataProvider channelsTypeProvider
+     *
+     * @param null|string $type
+     */
     public function testGetConfiguredChannelsForSync($type = null)
     {
         $expectedResult = [];
@@ -45,21 +50,21 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $qb->expects($this->once())
+        $qb->expects($this->at(0))
             ->method('select')->with('c')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->at(1))
             ->method('from')->with('Oro\Bundle\IntegrationBundle\Entity\Channel')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->at(2))
             ->method('where')->with('c.transport is NOT NULL')
             ->will($this->returnSelf());
 
         if (null !== $type) {
-            $qb->expects($this->once())
+            $qb->expects($this->at(3))
                 ->method('where')->with('c.type = :type')
                 ->will($this->returnSelf());
-            $qb->expects($this->once())
+            $qb->expects($this->at(4))
                 ->method('setParameter')->with('type', $type)
                 ->will($this->returnSelf());
         }
@@ -73,5 +78,16 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->repository->getConfiguredChannelsForSync($type);
         $this->assertSame($expectedResult, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function channelsTypeProvider()
+    {
+        return [
+            [null],
+            ['simple']
+        ];
     }
 }
