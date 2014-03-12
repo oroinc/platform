@@ -2,17 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
-use Doctrine\DBAL\Connection;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
@@ -20,43 +12,37 @@ class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_T
 {
     public function testOnPostUp()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var OroEntityManager $em */
-        $em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $nameGenerator = new ExtendDbIdentifierNameGenerator();
-
-        /** @var UpdateExtendConfigPostUpMigrationListener $postUpMigrationListener */
         $postUpMigrationListener = new UpdateExtendConfigPostUpMigrationListener(
-            new ExtendConfigProcessor($cm),
-            new ExtendConfigDumper($em, $nameGenerator, '')
+            $commandExecutor,
+            $optionsPath
         );
 
-        /** @var Connection $connection */
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-
-        /** @var PostMigrationEvent $event */
         $event = new PostMigrationEvent($connection);
+
         $event->addMigration(new TestMigration());
 
         $postUpMigrationListener->onPostUp($event);
 
-        $this->assertNotEmpty($event);
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration',
-            $event->getMigrations()[0]
+        $migrations = $event->getMigrations();
+        $this->assertCount(2, $migrations);
+        $this->assertEquals(
+            new TestMigration(),
+            $migrations[0]
         );
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration',
-            $event->getMigrations()[1]
+        $this->assertEquals(
+            new UpdateExtendConfigMigration(
+                $commandExecutor,
+                $optionsPath
+            ),
+            $migrations[1]
         );
     }
 }

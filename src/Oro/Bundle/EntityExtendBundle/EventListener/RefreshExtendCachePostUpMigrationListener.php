@@ -3,15 +3,15 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigration;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class RefreshExtendCachePostUpMigrationListener
 {
     /**
-     * @var ExtendConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
     /**
      * @var mixed
@@ -19,13 +19,13 @@ class RefreshExtendCachePostUpMigrationListener
     protected $installed;
 
     /**
-     * @param ExtendConfigDumper $configDumper
-     * @param mixed              $installed
+     * @param CommandExecutor $commandExecutor
+     * @param mixed           $installed
      */
-    public function __construct(ExtendConfigDumper $configDumper, $installed)
+    public function __construct(CommandExecutor $commandExecutor, $installed)
     {
-        $this->configDumper = $configDumper;
-        $this->installed    = $installed;
+        $this->commandExecutor = $commandExecutor;
+        $this->installed       = $installed;
     }
 
     /**
@@ -37,7 +37,7 @@ class RefreshExtendCachePostUpMigrationListener
     {
         if ($this->installed) {
             $event->addMigration(
-                new RefreshExtendCacheMigration($this->configDumper)
+                new RefreshExtendCacheMigration($this->commandExecutor)
             );
         }
     }

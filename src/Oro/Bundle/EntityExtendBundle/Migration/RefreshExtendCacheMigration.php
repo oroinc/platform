@@ -6,21 +6,21 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 
 class RefreshExtendCacheMigration implements Migration
 {
     /**
-     * @var ExtendConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
     /**
-     * @param ExtendConfigDumper $configDumper
+     * @param CommandExecutor $commandExecutor
      */
-    public function __construct(ExtendConfigDumper $configDumper)
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -30,7 +30,7 @@ class RefreshExtendCacheMigration implements Migration
     {
         if ($schema instanceof ExtendSchema) {
             $queries->addQuery(
-                new RefreshExtendCacheMigrationQuery($this->configDumper)
+                new RefreshExtendCacheMigrationQuery($this->commandExecutor)
             );
         }
     }

@@ -4,22 +4,22 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
 class RefreshExtendCacheMigrationQuery implements MigrationQuery
 {
     /**
-     * @var ExtendConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
     /**
-     * @param ExtendConfigDumper $configDumper
+     * @param CommandExecutor $commandExecutor
      */
-    public function __construct(ExtendConfigDumper $configDumper)
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -35,9 +35,15 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
      */
     public function execute(Connection $connection, LoggerInterface $logger)
     {
-        $logger->notice('Prepare extend entity configs');
-        $this->configDumper->updateConfig();
-        $logger->notice('Generate a cache');
-        $this->configDumper->dump();
+        $this->commandExecutor->runCommand(
+            'oro:entity-extend:update-config',
+            [],
+            $logger
+        );
+        $this->commandExecutor->runCommand(
+            'oro:entity-extend:dump',
+            [],
+            $logger
+        );
     }
 }

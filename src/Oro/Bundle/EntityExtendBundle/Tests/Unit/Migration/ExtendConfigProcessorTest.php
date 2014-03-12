@@ -39,12 +39,14 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Class "Test\ExtendConfigProcessorTestBundle\Entity\SomeClass" is not configurable.
+     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
      */
     public function testModificationOfNonConfigurableEntity()
     {
         $configs = [
-            self::CLASS_NAME => []
+            self::CLASS_NAME => [
+                'configs' => ['entity' => ['icon' => 'icon1']]
+            ]
         ];
 
         $this->configManager->expects($this->any())
@@ -90,7 +92,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Class "Test\ExtendConfigProcessorTestBundle\Entity\SomeClass" is not configurable.
+     * @expectedExceptionMessage A new model can be created for custom entity only. Class:
      */
     public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs()
     {

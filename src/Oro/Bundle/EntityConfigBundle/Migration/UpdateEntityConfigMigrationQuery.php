@@ -35,15 +35,10 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
      */
     public function execute(Connection $connection, LoggerInterface $logger)
     {
-        $exitCode = $this->commandExecutor->runCommand(
+        $this->commandExecutor->runCommand(
             'oro:entity-config:update',
             ['--process-timeout' => 300],
             $logger
         );
-        if (0 !== $exitCode) {
-            throw new \RuntimeException(
-                sprintf('The command terminated with an exit code: %u.', $exitCode)
-            );
-        }
     }
 }

@@ -1,4 +1,5 @@
 parameters:
+    oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
@@ -61,7 +62,7 @@ services:
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
         arguments:
-            - @oro_entity_extend.tools.dumper
+            - @oro_entity_config.tools.command_executor
             - %installed%
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
@@ -69,8 +70,8 @@ services:
     oro_entity_extend.migration.update_config.post_up.listener:
         class: %oro_entity_extend.migration.update_config.post_up.listener.class%
         arguments:
-            - @oro_entity_extend.migration.config_processor
-            - @oro_entity_extend.tools.dumper
+            - @oro_entity_config.tools.command_executor
+            - %oro_entity_extend.migration.config_processor.options.path%
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
 

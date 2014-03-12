@@ -100,16 +100,16 @@ class ExtendConfigProcessor
      */
     protected function processEntityConfigs($className, array $configs)
     {
-        if ($this->configManager->hasConfig($className)) {
-            if (isset($configs['configs'])) {
+        if (isset($configs['configs'])) {
+            if ($this->configManager->hasConfig($className)) {
                 $this->updateEntityModel($className, $configs['configs']);
+            } else {
+                $this->createEntityModel(
+                    $className,
+                    isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    $configs['configs']
+                );
             }
-        } else {
-            $this->createEntityModel(
-                $className,
-                isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
-                isset($configs['configs']) ? $configs['configs'] : []
-            );
         }
 
         if (isset($configs['fields'])) {
@@ -156,7 +156,9 @@ class ExtendConfigProcessor
     protected function createEntityModel($className, $mode, array $configs)
     {
         if (!ExtendHelper::isCustomEntity($className)) {
-            throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
+            throw new \LogicException(
+                sprintf('A new model can be created for custom entity only. Class: %s.', $className)
+            );
         }
 
         if ($this->logger) {

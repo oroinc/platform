@@ -38,12 +38,17 @@ class CommandExecutor
      *
      * The '--process-timeout' parameter can be used to set the process timeout
      * in seconds. Default timeout is 60 seconds.
+     * If '--ignore-errors' parameter is specified any errors are ignored;
+     * otherwise, an exception is raises if an error happened.
      *
      * @param string               $command
      * @param array                $params
      * @param LoggerInterface|null $logger
      *
      * @return integer The exit status code
+     * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function runCommand($command, $params = [], LoggerInterface $logger = null)
     {
@@ -56,6 +61,11 @@ class CommandExecutor
         );
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
+        }
+        $ignoreErrors = false;
+        if (array_key_exists('--ignore-errors', $params)) {
+            $ignoreErrors = true;
+            unset($params['--ignore-errors']);
         }
 
         $pb = new ProcessBuilder();
@@ -94,6 +104,13 @@ class CommandExecutor
                 }
             }
         );
+        if (0 !== $exitCode) {
+            if ($ignoreErrors) {
+                $logger->warning(sprintf('The command terminated with an exit code: %u.', $exitCode));
+            } else {
+                throw new \RuntimeException(sprintf('The command terminated with an exit code: %u.', $exitCode));
+            }
+        }
 
         return $exitCode;
     }

@@ -6,30 +6,28 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 
 class UpdateExtendConfigMigration implements Migration
 {
     /**
-     * @var ExtendConfigProcessor
+     * @var CommandExecutor
      */
-    protected $configProcessor;
+    protected $commandExecutor;
 
     /**
-     * @var ExtendConfigDumper
+     * @var string
      */
-    protected $configDumper;
+    protected $configProcessorOptionsPath;
 
     /**
-     * @param ExtendConfigProcessor $configProcessor
-     * @param ExtendConfigDumper    $configDumper
+     * @param CommandExecutor $commandExecutor
+     * @param string          $configProcessorOptionsPath
      */
-    public function __construct(
-        ExtendConfigProcessor $configProcessor,
-        ExtendConfigDumper $configDumper
-    ) {
-        $this->configProcessor = $configProcessor;
-        $this->configDumper    = $configDumper;
+    public function __construct(CommandExecutor $commandExecutor, $configProcessorOptionsPath)
+    {
+        $this->commandExecutor            = $commandExecutor;
+        $this->configProcessorOptionsPath = $configProcessorOptionsPath;
     }
 
     /**
@@ -41,12 +39,13 @@ class UpdateExtendConfigMigration implements Migration
             $queries->addQuery(
                 new UpdateExtendConfigMigrationQuery(
                     $schema->getExtendOptions(),
-                    $this->configProcessor
+                    $this->commandExecutor,
+                    $this->configProcessorOptionsPath
                 )
             );
             $queries->addQuery(
                 new RefreshExtendCacheMigrationQuery(
-                    $this->configDumper
+                    $this->commandExecutor
                 )
             );
         }

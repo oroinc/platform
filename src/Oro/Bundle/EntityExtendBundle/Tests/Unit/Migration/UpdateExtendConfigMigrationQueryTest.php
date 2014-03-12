@@ -2,47 +2,92 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Migration\ArrayLogger;
 use Psr\Log\NullLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationArrayLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 
 class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetDescription()
-    {
-        $options = ['test'];
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $commandExecutor;
 
-        $configProcessor = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor')
+    protected function setUp()
+    {
+        $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
-        $configProcessor
-            ->expects($this->once())
-            ->method('processConfigs')
-            ->with($options, new UpdateExtendConfigMigrationArrayLogger(), true);
+    }
 
-        $migrationQuery = new UpdateExtendConfigMigrationQuery($options, $configProcessor);
+    public function testGetDescription()
+    {
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $options     = ['test'];
 
-        $this->assertEquals([], $migrationQuery->getDescription());
+        $this->commandExecutor->expects($this->once())
+            ->method('runCommand')
+            ->with(
+                'oro:entity-extend:migration:update-config',
+                ['--dry-run' => true, '--ignore-errors' => true]
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($command, $params, $logger) {
+                        if ($logger instanceof ArrayLogger) {
+                            $logger->notice('test message');
+                        }
+
+                        return 0;
+                    }
+                )
+            );
+
+        $migrationQuery = new UpdateExtendConfigMigrationQuery(
+            $options,
+            $this->commandExecutor,
+            $optionsPath
+        );
+
+        $this->assertEquals(['test message'], $migrationQuery->getDescription());
     }
 
     public function testExecute()
     {
-        $logger = new NullLogger();
+        $logger = new ArrayLogger();
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $options     = ['test'];
 
-        $configProcessor = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProcessor
-            ->expects($this->once())
-            ->method('processConfigs')
-            ->with([], $logger);
+        $this->commandExecutor->expects($this->once())
+            ->method('runCommand')
+            ->with(
+                'oro:entity-extend:migration:update-config',
+                []
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($command, $params, $logger) {
+                        if ($logger instanceof ArrayLogger) {
+                            $logger->notice('test message');
+                        }
+
+                        return 0;
+                    }
+                )
+            );
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $migrationQuery = new UpdateExtendConfigMigrationQuery([], $configProcessor);
+        $migrationQuery = new UpdateExtendConfigMigrationQuery(
+            $options,
+            $this->commandExecutor,
+            $optionsPath
+        );
 
         $migrationQuery->execute($connection, $logger);
+
+        $this->assertEquals(['test message'], $logger->getMessages());
+
     }
 }
