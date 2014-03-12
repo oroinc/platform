@@ -1,7 +1,8 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
-    ], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model',
+    'oroui/js/layout'
+], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel, layout) {
     'use strict';
 
     var $ = Backbone.$;
@@ -160,10 +161,26 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         fillForm: function (form, modelData) {
+            var self = this;
             form = $(form);
-            _.each(modelData, function (value, key) {
-                var input = form.find('[name$="[' + key + ']"]');
-                if (input.length) {
+
+            self.buildForm(form, modelData);
+
+            var inputs = form.find('[name]');
+            var fieldNameRegex = /\[(\w+)\]/g;
+
+            _.each(inputs, function (input) {
+                var name = $(input).attr('name'),
+                    matches = [],
+                    match;
+
+                while ((match = fieldNameRegex.exec(name)) !== null) {
+                    matches.push(match[1]);
+                }
+
+                if (matches.length) {
+                    input = $(input);
+                    var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
                         input.prop('checked', value);
                     } else {
@@ -172,7 +189,30 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                     input.change();
                 }
             });
+
             return form;
+        },
+
+        buildForm: function (form, modelData) {
+            var self = this;
+            form = $(form);
+            _.each(modelData, function (value, key) {
+                if (typeof value === 'object') {
+                    var container = form.find('.' + key + '-collection');
+                    if (container) {
+                        var prototype = container.data('prototype');
+                        if (prototype) {
+                            _.each(value, function (collectionValue, collectionKey) {
+                                var collectionContent = prototype.replace(/__name__/g, collectionKey);
+
+                                container.append(collectionContent);
+                            }, prototype);
+                        }
+                    }
+
+                    self.buildForm(form, value);
+                }
+            });
         },
 
         getEventFormData: function () {
@@ -199,19 +239,30 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         setValueByPath: function (obj, value, path) {
-            var parent = obj, candidate;
+            var parent = obj;
 
             for (var i = 0; i < path.length - 1; i += 1) {
-                candidate = parent[path[i]];
-                if (candidate === undefined) {
-                    candidate = {};
-                    parent[path[i]] = candidate;
+                if (parent[path[i]] === undefined) {
+                    parent[path[i]] = {};
                 }
 
-                parent = candidate;
+                parent = parent[path[i]];
             }
 
             parent[path[path.length - 1]] = value;
+        },
+
+        getValueByPath: function (obj, path) {
+            var current = obj;
+
+            for (var i = 0; i < path.length; ++i) {
+                if (current[path[i]] == undefined) {
+                    return undefined;
+                } else {
+                    current = current[path[i]];
+                }
+            }
+            return current;
         }
     });
 });

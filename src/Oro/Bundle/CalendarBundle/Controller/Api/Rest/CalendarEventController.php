@@ -121,7 +121,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $resultItem['reminders'] = [];
             foreach ($resultReminders as $resultReminder) {
                 /* @var Reminder $resultReminder */
-                $resultItem['reminders'][$resultReminder->getId()] = [
+                $resultItem['reminders'][] = [
                     'method' => $resultReminder->getMethod(),
                     'interval' => [
                         'number' => $resultReminder->getInterval()->getNumber(),
