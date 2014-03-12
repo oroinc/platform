@@ -28,9 +28,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
         /** @property */
         extraActionsPanel: ActionsPanel,
 
-        /** @property */
-        massActionsPanel: ActionsPanel,
-
         /**
          * Initializer.
          *
@@ -63,11 +60,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
                 this.extraActionsPanel.setActions(options.extraActions);
             }
 
-            this.massActionsPanel = new this.massActionsPanel();
-            if (options.massActions) {
-                this.massActionsPanel.setActions(options.massActions);
-            }
-
             if (_.has(options, 'enable') && !options.enable) {
                 this.disable();
             }
@@ -90,7 +82,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
             this.pageSize.enable();
             this.actionsPanel.enable();
             this.extraActionsPanel.enable();
-            this.massActionsPanel.enable();
             return this;
         },
 
@@ -104,7 +95,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
             this.pageSize.disable();
             this.actionsPanel.disable();
             this.extraActionsPanel.disable();
-            this.massActionsPanel.disable();
             return this;
         },
 
@@ -133,11 +123,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
                 this.$('.extra-actions-panel').append(this.extraActionsPanel.render().$el);
             } else {
                 this.$('.extra-actions-panel').hide();
-            }
-            if (this.massActionsPanel.haveActions()) {
-                this.$('.mass-actions-panel').append(this.massActionsPanel.render().$el);
-            } else {
-                this.$('.mass-actions-panel').hide();
             }
 
             return this;

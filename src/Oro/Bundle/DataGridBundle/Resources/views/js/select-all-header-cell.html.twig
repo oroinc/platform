@@ -1,0 +1,13 @@
+<script type="text/template" id="template-select-all-header-cell">
+    <div class="btn-group">
+        <button class="btn btn-default btn-small btn-checkbox" data-select><input type="checkbox" /></button>
+        <button type="button" class="btn btn-default btn-small dropdown-toggle" data-toggle="dropdown">
+            <i class="caret"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" data-select-all><%- _.__("All") %></a></li>
+            <li><a href="#" data-select-all-visible><%- _.__("All visible") %></a></li>
+            <li><a href="#" data-select-none><%- _.__("None") %></a></li>
+        </ul>
+    </div>
+</script>

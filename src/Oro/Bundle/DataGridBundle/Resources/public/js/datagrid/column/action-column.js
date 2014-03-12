@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backgrid', '../cell/action-cell'
-    ], function (_, Backgrid, ActionCell) {
+define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-header-cell'
+    ], function (_, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
 
     /**
@@ -16,13 +16,13 @@ define(['underscore', 'backgrid', '../cell/action-cell'
         defaults: _.extend({}, Backgrid.Column.prototype.defaults, {
             name: '',
             label: '',
+            sortable: false,
             editable: false,
             cell: ActionCell,
-            headerCell: Backgrid.HeaderCell.extend({
-                className: 'action-column'
-            }),
-            sortable: false,
-            actions: []
+            headerCell: ActionHeaderCell,
+            datagrid: null,
+            actions: [],
+            massActions: []
         }),
 
         /**
@@ -36,7 +36,7 @@ define(['underscore', 'backgrid', '../cell/action-cell'
             if (!attrs.name) {
                 attrs.name = this.defaults.name;
             }
-            if (!attrs.actions || _.isEmpty(attrs.actions)) {
+            if (_.isEmpty(attrs.actions) && _.isEmpty(attrs.massActions)) {
                 this.set('renderable', false);
             }
             Backgrid.Column.prototype.initialize.apply(this, arguments);
