@@ -51,7 +51,7 @@ class CalendarEventType extends AbstractType
                 'reminders',
                 'oro_reminder_collection',
                 [
-                    'required' => true,
+                    'required' => false,
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
             );
