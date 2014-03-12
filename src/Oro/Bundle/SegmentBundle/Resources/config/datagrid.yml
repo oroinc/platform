@@ -8,6 +8,7 @@ datagrid:
                     - s.id
                     - s.name
                     - s.entity
+                    - s.lastRun
                     - type.label as segmentType
                 from:
                     - { table: %oro_segment.segment.entity.class%, alias: s }
@@ -24,28 +25,33 @@ datagrid:
                 type:       url
                 route:      oro_segment_update
                 params:     [ id ]
-            delete_link:
-                type:       url
-                route:      oro_api_delete_segment
-                params:     [ id ]
+#            delete_link:
+#                type:       url
+#                route:      oro_api_delete_segment
+#                params:     [ id ]
         columns:
             name:
-                label: oro.segment.name.label
+                label:          oro.segment.name.label
             entity:
-                label: oro.segment.entity.label
-                type: twig
-                template: OroEntityBundle:Datagrid:Property/entity.html.twig
-                frontend_type: html
+                label:          oro.segment.entity.label
+                type:           twig
+                template:       OroEntityBundle:Datagrid:Property/entity.html.twig
+                frontend_type:  html
                 context:
                     entity_provider: @oro_segment.entity_provider
             segmentType:
-                label: oro.segment.type.label
-                type: translatable
-                choices: @oro_segment.report_manager->getReportTypeChoices
+                label:          oro.segment.type.label
+                type:           translatable
+                choices:        @oro_segment.segment_manager->getSegmentTypeChoices
+            lastRun:
+                label:          oro.segment.last_run.label
+                frontend_type:  datetime
         sorters:
             columns:
                 name:
                     data_name: s.name
+                lastRun:
+                    data_name: s.lastRun
         filters:
             columns:
                 name:
@@ -57,14 +63,18 @@ datagrid:
                     options:
                         is_translated_choices: true
                         field_options:
-                            multiple:       true
-                            choices:        @oro_entity.datagrid_helper->getEntityNames
-                reportType:
-                    type: choice
-                    data_name: s.type
+                            multiple:          true
+                            choices:           @oro_entity.datagrid_helper->getEntityNames
+                segmentType:
+                    type:               choice
+                    data_name:          s.type
                     options:
                         field_options:
-                            choices: @oro_segment.report_manager->getReportTypeChoices
+                            choices:    @oro_segment.segment_manager->getSegmentTypeChoices
+                lastRun:
+                    type:       datetime
+                    data_name:  s.lastRun
+                    enabled:    false
         actions:
             view:
                 type:          navigate
@@ -79,11 +89,11 @@ datagrid:
                 label:         Update
                 icon:          edit
                 link:          update_link
-            delete:
-                type:          delete
-                acl_resource:  oro_segment_delete
-                label:         Delete
-                icon:          trash
-                link:          delete_link
+#            delete:
+#                type:          delete
+#                acl_resource:  oro_segment_delete
+#                label:         Delete
+#                icon:          trash
+#                link:          delete_link
         options:
             entityHint: segment

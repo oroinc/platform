@@ -27,7 +27,7 @@ class OroSegmentBundle implements Migration
         $table->addColumn('definition', 'text', []);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
-        $table->addColumn('last_run', 'datetime', []);
+        $table->addColumn('last_run', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['type'], 'IDX_D02603B38CDE5729', []);
         $table->addIndex(['business_unit_owner_id'], 'IDX_D02603B359294170', []);
