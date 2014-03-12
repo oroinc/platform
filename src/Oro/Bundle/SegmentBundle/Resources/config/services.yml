@@ -1,6 +1,7 @@
 parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
     oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
+    oro_segment.segment_manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
 services:
     oro_segment.entity_provider:
@@ -9,4 +10,10 @@ services:
     oro_segment.segment_manager:
         class: %oro_segment.segment_manager.class%
         arguments:
+            - @doctrine.orm.entity_manager
+
+    oro_segment.segment_manager.api:
+        class: %oro_segment.segment_manager.api.class%
+        arguments:
+            - %oro_segment.segment.entity.class%
             - @doctrine.orm.entity_manager
