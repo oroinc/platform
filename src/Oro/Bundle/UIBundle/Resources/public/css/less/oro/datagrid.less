@@ -3,12 +3,13 @@
   /* FE */
   position: relative;
   margin: 0 0 -15px;
+  padding: 9px 20px;
   .actions-panel {
     margin-left: 5px;
     margin-bottom: 14px;
   }
   .pagination {
-    margin: 0 0 20px;
+    margin: 0;
     > ul {
       > li {
         a {
@@ -20,7 +21,13 @@
         .icon-chevron-right:before {
           margin:7px 5px;
           font-size:12px;
-          color:#eee;
+          color: @gray;
+        }
+      }
+      > .disabled {
+        .icon-chevron-left:before,
+        .icon-chevron-right:before {
+          color: #eee;
         }
       }
     }
@@ -28,6 +35,20 @@
       width: 23px;
       height: 17px;
     }
+  }
+  .pagination-centered {
+    width: 375px;
+    margin: 0 auto;
+    padding: 0 5px;
+    .icons-holder {
+      margin-left: 5px;
+    }
+    & .dib+.dib {
+      padding-left: 0;
+    }
+  }
+  .page-size {
+    .control-label { text-align:right; }
   }
   .btn-group {
     .btn {
@@ -209,22 +230,6 @@
   .selected-row td {
     background-color: #3b6fe5 !important;
     color: #fff !important;
-  }
-}
-.grid-toolbar {
-  padding: 9px 20px;
-  .pagination {
-    margin: 0;
-  }
-  .pagination-centered {
-    width: 375px;
-    margin: 0 auto;
-    .icons-holder {
-      margin-left: 5px;
-    }
-  }
-  .page-size {
-    .control-label { text-align:right; }
   }
 }
 .grid .dropdown-menu {
