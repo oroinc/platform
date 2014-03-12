@@ -49,11 +49,9 @@ class NavigationListener
             $segments = $this->em->getRepository('OroSegmentBundle:Segment')
                 ->findBy([], ['name' => 'ASC']);
 
-            if (!empty($segments)) {
-                foreach ($segments as $key => $segment) {
-                    if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $segment->getEntity()))) {
-                        unset($segments[$key]);
-                    }
+            foreach ($segments as $key => $segment) {
+                if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $segment->getEntity()))) {
+                    unset($segments[$key]);
                 }
             }
 
