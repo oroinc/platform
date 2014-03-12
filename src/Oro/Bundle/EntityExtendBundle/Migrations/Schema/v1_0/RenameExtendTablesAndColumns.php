@@ -84,8 +84,11 @@ class RenameExtendTablesAndColumns implements
         foreach ($tables as $table) {
             if (strpos($table->getName(), self::OLD_CUSTOM_TABLE_PREFIX) === 0) {
                 $oldTableName = $table->getName();
+                $oldTablePrefix = strpos($oldTableName, self::OLD_CUSTOM_TABLE_PREFIX . 'extendentity') === 0
+                    ? self::OLD_CUSTOM_TABLE_PREFIX . 'extendentity'
+                    : self::OLD_CUSTOM_TABLE_PREFIX;
                 $newTableName = ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                    . substr($oldTableName, strlen(self::OLD_CUSTOM_TABLE_PREFIX));
+                    . substr($oldTableName, strlen($oldTablePrefix));
                 $this->renameExtension->renameTable(
                     $schema,
                     $queries,
