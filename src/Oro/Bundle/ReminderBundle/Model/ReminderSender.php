@@ -31,11 +31,5 @@ class ReminderSender implements ReminderSenderInterface
     {
         $processor = $this->registry->getProcessor($reminder->getMethod());
         $processor->process($reminder);
-
-        $state = $reminder->getState();
-
-        if (Reminder::STATE_SENT == $state) {
-            $reminder->setSentAt(new \DateTime());
-        }
     }
 }

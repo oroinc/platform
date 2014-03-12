@@ -204,10 +204,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             for (var i = 0; i < path.length - 1; i += 1) {
                 candidate = parent[path[i]];
                 if (candidate === undefined) {
-                    parent[path[i]] = {};
+                    candidate = {};
+                    parent[path[i]] = candidate;
                 }
 
-                parent = parent[path[i]];
+                parent = candidate;
             }
 
             parent[path[path.length - 1]] = value;

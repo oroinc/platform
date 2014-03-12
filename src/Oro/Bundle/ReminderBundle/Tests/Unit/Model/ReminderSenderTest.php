@@ -47,14 +47,6 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
             ->method('process')
             ->with($reminder);
 
-        $reminder->expects($this->at(1))
-            ->method('getState')
-            ->will($this->returnValue(Reminder::STATE_SENT));
-
-        $reminder->expects($this->at(2))
-            ->method('setSentAt')
-            ->with($this->isInstanceOf('DateTime'));
-
         $this->sender->send($reminder);
     }
 }
