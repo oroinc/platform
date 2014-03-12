@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Controller\Api\Rest;
+namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -18,25 +18,25 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
 /**
- * @RouteResource("report")
+ * @RouteResource("segment")
  * @NamePrefix("oro_api_")
  */
-class ReportController extends RestController implements ClassResourceInterface
+class SegmentController extends RestController implements ClassResourceInterface
 {
     /**
-     * Remove report.
+     * Remove segment.
      *
      * @param int $id
      *
      * @ApiDoc(
-     *      description="Delete Report",
+     *      description="Delete Segment",
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_report_delete",
+     *      id="oro_segment_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroReportBundle:Report"
+     *      class="OroSegmentBundle:Segment"
      * )
      * @return Response
      */
@@ -52,7 +52,7 @@ class ReportController extends RestController implements ClassResourceInterface
      */
     public function getManager()
     {
-        return $this->get('oro_report.report.manager.api');
+        return $this->get('oro_segment.segment_manager.api');
     }
 
     /**
