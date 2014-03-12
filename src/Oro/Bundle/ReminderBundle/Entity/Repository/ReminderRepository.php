@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
 
@@ -74,5 +75,21 @@ class ReminderRepository extends EntityRepository
         $qb = $this->createQueryBuilder('reminder');
 
         return $qb->where($qb->expr()->in('reminder.id', $reminderIds))->getQuery()->execute();
+    }
+
+    /**
+     * @param array $entityIds
+     * @param string $entityClassName
+     * @return Reminder[]
+     */
+    public function findRemindersByEntities(array $entityIds, $entityClassName)
+    {
+        $qb = $this->createQueryBuilder('reminder')
+            ->where('reminder.relatedEntityClassName = :entityClassName')
+            ->andWhere('reminder.relatedEntityId IN (:entityIds)')
+            ->setParameter('entityClassName', $entityClassName)
+            ->setParameter('entityIds', $entityIds);
+
+        return $qb->getQuery()->execute();
     }
 }
