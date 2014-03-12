@@ -53,11 +53,9 @@ class NavigationListener
             $reports = $this->em->getRepository('OroReportBundle:Report')
                 ->findBy([], ['name' => 'ASC']);
 
-            if (!empty($reports)) {
-                foreach ($reports as $key => $report) {
-                    if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
-                        unset($reports[$key]);
-                    }
+            foreach ($reports as $key => $report) {
+                if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
+                    unset($reports[$key]);
                 }
             }
 
