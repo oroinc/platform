@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Migration;
+namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
-class ExtendConfigProcessorLogger extends AbstractLogger
+class ConfigLogger extends AbstractLogger
 {
     /**
      * @var LoggerInterface

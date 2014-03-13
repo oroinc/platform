@@ -252,10 +252,7 @@ class ConfigManager
         }
 
         if (!$this->modelManager->checkDatabase()) {
-            throw new LogicException(
-                'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
-                . ' check it by ConfigManager::modelManager::checkDatabase'
-            );
+            throw $this->createDatabaseNotSyncedException();
         }
 
         if (!$this->hasConfig($configId->getClassName())) {
@@ -299,9 +296,9 @@ class ConfigManager
         }
 
         if ($withHidden) {
-            $entityModels = $this->modelManager->getModels($className);
+            $models = $this->modelManager->getModels($className);
         } else {
-            $entityModels = array_filter(
+            $models = array_filter(
                 $this->modelManager->getModels($className),
                 function (AbstractConfigModel $model) {
                     return $model->getMode() != ConfigModelManager::MODE_HIDDEN;
@@ -313,34 +310,65 @@ class ConfigManager
             function ($model) use ($scope) {
                 return $this->getConfigIdByModel($model, $scope);
             },
-            $entityModels
+            $models
         );
     }
 
     /**
-     * @param ConfigIdInterface $configId
+     * @param      $scope
+     * @param      $className
+     * @param null $fieldName
+     * @return array
+     * @throws LogicException if a database is not synced
+     * @throws RuntimeException if a model was not found
      */
-    public function clearCache(ConfigIdInterface $configId)
+    public function getId($scope, $className, $fieldName = null)
     {
-        if ($this->cache) {
-            $this->cache->removeConfigFromCache($configId);
+        if (!$this->modelManager->checkDatabase()) {
+            throw $this->createDatabaseNotSyncedException();
         }
-        unset($this->localCache[$this->buildConfigKey($configId)]);
+
+        if ($fieldName) {
+            $fieldModel = $this->modelManager->getFieldModel($className, $fieldName);
+
+            return new FieldConfigId(
+                $scope,
+                $className,
+                $fieldModel->getFieldName(),
+                $fieldModel->getType()
+            );
+        } else {
+            $entityModel = $this->modelManager->getEntityModel($className);
+
+            return new EntityConfigId(
+                $scope,
+                $entityModel->getClassName()
+            );
+        }
     }
 
     /**
-     * Remove All cache
+     * Clears entity config cache
+     *
+     * @param ConfigIdInterface|null $configId
      */
-    public function clearCacheAll()
+    public function clearCache(ConfigIdInterface $configId = null)
     {
-        if ($this->cache) {
-            $this->cache->removeAll();
+        if ($configId) {
+            if ($this->cache) {
+                $this->cache->removeConfigFromCache($configId);
+            }
+            unset($this->localCache[$this->buildConfigKey($configId)]);
+        } else {
+            if ($this->cache) {
+                $this->cache->removeAll();
+            }
+            $this->localCache = [];
         }
-        $this->localCache = [];
     }
 
     /**
-     * Remove All Configurable cache
+     * Clears a cache of configurable entity flags
      */
     public function clearConfigurableCache()
     {
@@ -376,11 +404,15 @@ class ConfigManager
         return $config;
     }
 
+    /**
+     * Discards all unsaved changes and clears all related caches.
+     */
     public function clear()
     {
+        $this->clearCache();
+        $this->clearConfigurableCache();
+
         $this->modelManager->clearCache();
-        $this->cache->removeAllConfigurable();
-        $this->cache->removeAll();
         $this->getEntityManager()->clear();
     }
 
@@ -903,5 +935,16 @@ class ConfigManager
         }
 
         return $result;
+    }
+
+    /**
+     * @return LogicException
+     */
+    protected function createDatabaseNotSyncedException()
+    {
+        return new LogicException(
+            'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
+            . ' check it by ConfigManager::modelManager::checkDatabase'
+        );
     }
 }

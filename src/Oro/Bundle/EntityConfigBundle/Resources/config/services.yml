@@ -3,7 +3,7 @@ parameters:
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.config_audit_mamanger.class:              Oro\Bundle\EntityConfigBundle\Audit\AuditManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
-    oro_entity_config.tools.dumper.class:                       Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper
+    oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
     oro_entity_config.cache.cache.class:                        Oro\Bundle\EntityConfigBundle\Config\ConfigCache
     oro_entity_config.provider_bag.class:                       Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag
     oro_entity_config.event_listener.option_set_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener
@@ -60,8 +60,8 @@ services:
             - %kernel.root_dir%/console
             - %kernel.environment%
 
-    oro_entity_config.tools.dumper:
-        class: %oro_entity_config.tools.dumper.class%
+    oro_entity_config.config_loader:
+        class: %oro_entity_config.config_loader.class%
         arguments:
             - @oro_entity_config.config_manager
 

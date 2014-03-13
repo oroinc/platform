@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessorLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 
@@ -45,7 +45,7 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
 
             $options = Yaml::parse(file_get_contents($optionsPath));
 
-            $logger = new ExtendConfigProcessorLogger(new OutputLogger($output));
+            $logger = new ConfigLogger(new OutputLogger($output));
             /** @var ExtendConfigProcessor $processor */
             $processor = $this->getContainer()->get('oro_entity_extend.migration.config_processor');
             $processor->processConfigs(

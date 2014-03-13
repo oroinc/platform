@@ -46,4 +46,17 @@ class ExtendHelper
     {
         return strpos($className, ExtendConfigDumper::ENTITY) === 0;
     }
+
+    /**
+     * Gets the short name of the class, the part without the namespace.
+     *
+     * @param string $className The full name of a class
+     * @return string
+     */
+    public static function getShortClassName($className)
+    {
+        $parts = explode('\\', $className);
+
+        return array_pop($parts);
+    }
 }
