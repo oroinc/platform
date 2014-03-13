@@ -1,18 +1,15 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Migration;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class UpdateEntityIndexMigration implements Migration
+class UpdateExtendIndexMigration implements Migration
 {
     /**
      * @var EntityMetadataHelper
@@ -48,7 +45,7 @@ class UpdateEntityIndexMigration implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(
-            new UpdateEntityIndexMigrationQuery(
+            new UpdateExtendIndexMigrationQuery(
                 $this->entityMetadataHelper,
                 $this->extendConfigProvider,
                 $this->nameGenerator,

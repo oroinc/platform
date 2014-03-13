@@ -1,24 +1,20 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Migration;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\EntityExtendBundle\Migration\ArrayLogger;
-use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class UpdateEntityIndexMigrationQuery implements MigrationQuery
+class UpdateExtendIndexMigrationQuery implements MigrationQuery
 {
     /** @var  EntityMetadataHelper */
     protected $entityMetadataHelper;
@@ -81,7 +77,7 @@ class UpdateEntityIndexMigrationQuery implements MigrationQuery
     /**
      * @param LoggerInterface $logger
      * @param bool $dryRun
-     * @return \Doctrine\DBAL\Schema\Schema
+     * @return Schema
      */
     protected function collectIndexQueries(LoggerInterface $logger, $dryRun = false)
     {

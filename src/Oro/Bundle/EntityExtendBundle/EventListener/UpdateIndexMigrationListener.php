@@ -1,13 +1,14 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\EventListener;
+namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\Migration\UpdateEntityIndexMigration;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+
+use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendIndexMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
-class PostUpMigrationListener
+class UpdateIndexMigrationListener
 {
     /**
      * @var EntityMetadataHelper
@@ -39,7 +40,7 @@ class PostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(
-            new UpdateEntityIndexMigration(
+            new UpdateExtendIndexMigration(
                 $this->entityMetadataHelper,
                 $this->extendConfigProvider
             )

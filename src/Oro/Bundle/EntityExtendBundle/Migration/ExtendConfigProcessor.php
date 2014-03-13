@@ -54,6 +54,7 @@ class ExtendConfigProcessor
                         $this->configManager->clear();
                     } else {
                         $this->configManager->flush();
+                        $this->configManager->clearCache();
                     }
                 }
             }
