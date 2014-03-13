@@ -306,19 +306,21 @@
         <td><%= order %></td>
         <td class="step-actions">
             <div class="pull-right">
-                <% if (!_is_start) { %>
-                <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}" class="action"><i class="icon-copy hide-text"/></a>
-                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
-                <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}" class="action"><i class="icon-trash hide-text"/></a>
-                <% } %>
                 <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
+                <% if (!_is_start) { %>
+                    <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
+                    <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}" class="action"><i class="icon-copy hide-text"/></a>
+                    <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}" class="action"><i class="icon-trash hide-text"/></a>
+                <% } %>
             </div>
         </td>
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#" class="delete-transition action" title="{{ 'Remove transition'|trans }}"><i class="icon-trash hide-text"></i></a>
-        <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
+        <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a>
+        <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"></i></a>
+        <i class="icon-long-arrow-right"/>
+        <span><%= stepToLabel %></span>
     </script>
 
     <script type="text/template" id="attribute-form-option-edit-template">
@@ -388,7 +390,7 @@
                 <% if (is_entity_attribute) { %>
                 <a href="#" class="edit-form-option action" title="{{ 'Edit field'|trans }}"><i class="icon-edit hide-text"/></a>
                 <% } %>
-                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-remove hide-text"/></a>
+                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-trash hide-text"/></a>
             </div>
         </td>
     </script>
@@ -421,9 +423,9 @@
         <td><%= stepToLabel %></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"/></a>
                 <a href="#" class="edit-transition action" title="{{ 'Edit transition'|trans }}"><i class="icon-edit hide-text"/></a>
-                <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-remove hide-text"/></a>
+                <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"/></a>
+                <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"/></a>
             </div>
         </td>
     </script>
