@@ -16,7 +16,7 @@ class LoadSegmentTypes extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $types = ['static', 'dynamic'];
+        $types = [SegmentType::TYPE_DYNAMIC, SegmentType::TYPE_STATIC];
 
         foreach ($types as $typeCode) {
             $type = new SegmentType($typeCode);

@@ -4,12 +4,13 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
-class SegmentFilter extends AbstractFilter
+class SegmentFilter extends EntityFilter
 {
     /**
      * Constructor
@@ -23,11 +24,27 @@ class SegmentFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    public function getForm()
     {
-        return SegmentFilterType::NAME;
+        if (!$this->form) {
+            // hard coded field, do not allow to pass any option
+            $this->form = $this->formFactory->create(
+                $this->getFormType(),
+                [],
+                [
+                    'csrf_protection' => false,
+                    'field_options'   => [
+                        'class'    => 'OroSegmentBundle:Segment',
+                        'property' => 'name',
+                        'required' => true,
+                    ]
+                ]
+            );
+        }
+
+        return $this->form;
     }
 
     /**
@@ -35,6 +52,27 @@ class SegmentFilter extends AbstractFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        // TODO: Implement apply() method.
+        if (!(isset($data['value']) && $data['value'] instanceof Segment)) {
+            return false;
+        }
+
+        /** @var Segment $segment */
+        $segment = $data['value'];
+        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
+            $this->processDynamicSegment($ds, $segment);
+        } else {
+            // @TODO process static here
+        }
+    }
+
+    /**
+     * Converts definition of
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param Segment                          $segment
+     */
+    protected function processDynamicSegment(FilterDatasourceAdapterInterface $ds, Segment $segment)
+    {
+
     }
 }

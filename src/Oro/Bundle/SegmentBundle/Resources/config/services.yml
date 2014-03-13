@@ -2,8 +2,8 @@ parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
     oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
     oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_segment.listener.navigation_listener.class:          Oro\Bundle\SegmentBundle\EventListener\NavigationListener
     oro_segment.datagrid.configuration.provider.class:       Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
+    oro_segment.filter.segment.class:                        Oro\Bundle\SegmentBundle\Filter\SegmentFilter
 
 services:
     oro_segment.entity_provider:
@@ -20,15 +20,6 @@ services:
             - %oro_segment.segment.entity.class%
             - @doctrine.orm.entity_manager
 
-    oro_segment.listener.navigation_listener:
-        class: %oro_segment.listener.navigation_listener.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity_config.provider.entity
-            - @oro_security.security_facade
-        tags:
-            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-
     oro_segment.datagrid.configuration.provider:
         class: %oro_segment.datagrid.configuration.provider.class%
         arguments:
@@ -36,3 +27,11 @@ services:
             - @doctrine
         tags:
             - { name: oro_datagrid.configuration.provider }
+
+    oro_segment.filter.segment:
+        class: %oro_segment.filter.segment.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: segment }
