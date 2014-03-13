@@ -86,6 +86,8 @@ class ExtendConfigProcessor
      *    for example: field type, length, precision or scale
      *
      * @param array $configs
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterConfigs(array &$configs)
     {
