@@ -53,7 +53,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedId = 42;
         $expectedSubject = 'testSubject';
         $expectedExpireAt = new \DateTime();
-        $expectedTime = 'formatted date time';
+        $expectedFormattedExpireAt = 'formatted date time';
         $expectedUrl = 'www.tests.com';
 
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
@@ -70,15 +70,15 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
             ->with($expectedExpireAt)
-            ->will($this->returnValue($expectedTime));
+            ->will($this->returnValue($expectedFormattedExpireAt));
 
-        $translatorExpected = array('%time%'=>$expectedTime, '%subject%'=>$expectedSubject);
+        $translatorExpected = array('%expireAt%' => $expectedFormattedExpireAt, '%subject%' => $expectedSubject);
 
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.reminder.message', $this->equalTo($translatorExpected))
             ->will($this->returnValue($expectedMessage));
+
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
 
         $params = $this->messageParamsProvider->getMessageParams($reminder);

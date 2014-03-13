@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ReminderBundle\Twig\SubscriberExtension;
 
-class SubscriberExtensionTest extends \PHPUnit_Framework_TestCase
+class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var SubscriberExtension

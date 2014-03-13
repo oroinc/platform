@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
-class SubscriberExtension extends \Twig_Extension
+class ReminderExtension extends \Twig_Extension
 {
     /**
      * @var EntityManager
@@ -27,6 +27,11 @@ class SubscriberExtension extends \Twig_Extension
      */
     protected $messageParamsProvider;
 
+    /**
+     * @param EntityManager $entityManager
+     * @param SecurityContext $securityContext
+     * @param MessageParamsProvider $messageParamsProvider
+     */
     public function __construct(
         EntityManager $entityManager,
         SecurityContext $securityContext,
@@ -43,16 +48,19 @@ class SubscriberExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('oro_reminder_get_requested_reminders', array($this, 'getRequestedReminders'))
+            new \Twig_SimpleFunction(
+                'oro_reminder_get_requested_reminders_data',
+                array($this, 'getRequestedRemindersData')
+            )
         );
     }
 
     /**
-     * Twig function callback
+     * Get requested reminders
      *
      * @return string
      */
-    public function getRequestedReminders()
+    public function getRequestedRemindersData()
     {
         /**
          * @var User|null
@@ -77,9 +85,7 @@ class SubscriberExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

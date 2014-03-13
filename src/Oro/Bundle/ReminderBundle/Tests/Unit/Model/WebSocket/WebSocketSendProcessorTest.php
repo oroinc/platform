@@ -33,11 +33,10 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->messageParamsProvider = $this->getMockBuilder(
-            'Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->messageParamsProvider =
+            $this->getMockBuilder('Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
 
@@ -47,26 +46,23 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessSendMessageIntoCorrectChannel()
     {
         $userId = 9876;
-        $user = $this->getUser($userId);
+        $user = $this->createUser($userId);
         $this->reminder->expects($this->once())->method('getRecipient')->will($this->returnValue($user));
-        $expectedParams = array('text'=>'simple text', 'url'=>'test.org', 'reminderId'=>42);
+        $expectedParams = array('text' => 'simple text', 'url' => 'test.org', 'reminderId' => 42);
         $this->messageParamsProvider->expects($this->any())
             ->method('getMessageParams')
             ->will($this ->returnValue($expectedParams));
         $this->topicPublisher
             ->expects($this->once())
             ->method('send')
-            ->with(
-                "oro/reminder/remind_user_{$userId}",
-                $this->equalTo(json_encode($expectedParams))
-            );
+            ->with("oro/reminder/remind_user_{$userId}", json_encode($expectedParams));
 
         $this->processor->process($this->reminder);
     }
 
     public function testProcessChangeReminderStateIntoCorrectOne()
     {
-        $user = $this->getUser(1);
+        $user = $this->createUser(1);
         $this->reminder->expects($this->exactly(2))
             ->method('getRecipient')
             ->will($this->returnValue($user));
@@ -93,7 +89,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($this->reminder);
     }
 
-    protected function getUser($userId)
+    protected function createUser($userId)
     {
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())->method('getId')->will($this->returnValue($userId));

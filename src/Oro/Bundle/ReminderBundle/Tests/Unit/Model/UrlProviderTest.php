@@ -35,25 +35,14 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUrlReturnEmptyStringIfMetadataNotExist()
     {
-        $reminder = $this->getMock('\Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $expected = '';
-        $actual = $this->urlProvider->getUrl($reminder);
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testGetUrlReturnUrlGeneratedByRoute()
-    {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $expected = '/fake/path/for/view';
-        $metadata = new \StdClass();
-        $metadata->routeName = $expected;
-        $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue($metadata));
-        $this->router->expects($this->once())->method('generate')->will($this->returnValue($expected));
+        $expected = '';
+        $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue(null));
         $actual = $this->urlProvider->getUrl($reminder);
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetUrlShouldGenerateUrlForViewPageIfPossible()
+    public function testGetUrlForView()
     {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $expected = '/fake/path/for/view';
@@ -61,18 +50,17 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
         $metadata = new \StdClass();
         $metadata->routeView = $expected;
         $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue($metadata));
-        $expectedParams = array('id'=> $expectedId);
+        $expectedParams = array('id' => $expectedId);
         $reminder->expects($this->once())->method('getRelatedEntityId')->will($this->returnValue($expectedId));
         $this->router->expects($this->once())->method('generate')->with($expected, $this->equalTo($expectedParams));
         $this->urlProvider->getUrl($reminder);
     }
 
-    public function testGetUrlShouldGenerateUrlForIndexPageIfPossibleAndViewPathNotDefined()
+    public function testGetUrlForIndex()
     {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $expected = '/fake/path/for/view';
         $metadata = new \StdClass();
-        $metadata->routeView = '';
         $metadata->routeName = $expected;
         $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue($metadata));
         $this->router->expects($this->once())->method('generate')->with($expected);
