@@ -29,8 +29,9 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
                 var message = messageObject.url != ''
                     ? '<a href="' + messageObject.url + '">' + messageObject.text + '</a>'
                     : '<span>' + messageObject.text + '</span>';
+                message = '<i class="icon-bell"></i>'+message;
 
-                messenger.notificationFlashMessage(false, message, {delay: false, flash: false});
+                messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
             }
             if (reminderIds.length > 0) {
                 this.changeRemindersState(reminderIds);
