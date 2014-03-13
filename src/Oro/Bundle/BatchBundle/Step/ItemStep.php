@@ -38,9 +38,9 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
     /**
      * {@inheritdoc}
      */
-    public function handleWarning($element, $name, $reason, $item)
+    public function handleWarning($element, $name, $reason, array $reasonParameters, $item)
     {
-        $this->stepExecution->addWarning($name, $reason, $item);
-        $this->dispatchInvalidItemEvent(get_class($element), $reason, $item);
+        $this->stepExecution->addWarning($name, $reason, $reasonParameters, $item);
+        $this->dispatchInvalidItemEvent(get_class($element), $reason, $reasonParameters, $item);
     }
 }
