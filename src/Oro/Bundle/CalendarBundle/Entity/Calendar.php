@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -33,6 +34,12 @@ class Calendar
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true},
+     *      "email"={"available_in_template"=true}
+     *  }
+     * )
      */
     protected $id;
 

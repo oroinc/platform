@@ -83,6 +83,12 @@ class User extends ExtendUser implements
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true},
+     *      "email"={"available_in_template"=true}
+     *  }
+     * )
      */
     protected $id;
 
