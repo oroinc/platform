@@ -190,7 +190,7 @@
 
                                 <div class="widget-actions">
                                     <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
-                                    <button type="submit" class="btn btn-success">{{ "Save"|trans }}</button>
+                                    <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
                                 </div>
                             </form>
                         </div>
@@ -253,7 +253,7 @@
 
                                 <div class="widget-actions">
                                     <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
-                                    <button type="submit" class="btn btn-success">{{ "Save"|trans }}</button>
+                                    <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
                                 </div>
                             </form>
                         </div>
@@ -262,15 +262,7 @@
                     <% if (transitionsAllowed) { %>
                     <div class="tab-pane" id="step-transitions">
                         <div class="tab-data">
-                            <div class="clearfix">
-                                <div class="pull-right">
-                                    <button type="button" class="btn btn-primary add-transition">
-                                        <i class="icon-plus"></i> {{ 'Add transition'|trans }}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="transitions-list-container" style="margin-top: 10px;"></div>
+                            <div class="transitions-list-container"></div>
                         </div>
                     </div>
                     <% } %>
@@ -300,7 +292,7 @@
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update step'|trans}}"><%= label %></a>
             <% } %>
-            <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
+            <% if (is_final) { %>&nbsp;<strong>({{ "Final"|trans }})</strong><% } %>
         </td>
         <td class="step-transitions"></td>
         <td><%= order %></td>
@@ -318,6 +310,7 @@
 
     <script type="text/template" id="transition-row-short-template">
         <a href="#" class="edit-transition" title="{{ 'Update transition'|trans }}"><%= label %></a>
+        <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"></i></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"></i></a>
         <i class="icon-long-arrow-right"/>
         <span><%= stepToLabel %></span>
@@ -383,7 +376,11 @@
             <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
         </td>
         <td>
-            <% if (required) { %><span class="badge badge-important">{{ "yes"|trans }}</span><% } %>
+            <% if (required) { %>
+                {{ "Yes"|trans }}
+            <% } else { %>
+                {{ 'No'|trans }}
+            <% } %>
         </td>
         <td class="step-actions">
             <div class="pull-right">
@@ -423,8 +420,6 @@
         <td><%= stepToLabel %></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="edit-transition action" title="{{ 'Update transition'|trans }}"><i class="icon-edit hide-text"/></a>
-                <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"/></a>
                 <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"/></a>
             </div>
         </td>

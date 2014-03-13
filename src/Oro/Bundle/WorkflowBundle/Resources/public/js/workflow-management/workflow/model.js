@@ -72,7 +72,7 @@ function(_, $, Backbone, Helper, __,
             return clonedModel;
         },
 
-        cloneTransition: function(transition) {
+        cloneTransition: function(transition, doNotAddToCollection) {
             if (_.isString(transition)) {
                 transition = this.getTransitionByName(transition);
             }
@@ -84,14 +84,22 @@ function(_, $, Backbone, Helper, __,
             cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
             cloned.form_options = Helper.deepClone(cloned.form_options);
             cloned.label = __('Copy of') + ' ' + cloned.label;
+            if (doNotAddToCollection) {
+                cloned._is_clone = true;
+            }
 
             var clonedModel = new TransitionModel(cloned);
+            clonedModel.setWorkflow(this);
             this.get('transitions').add(clonedModel);
+
+            if (!doNotAddToCollection) {
+                this.get('steps').add(clonedModel);
+            }
 
             return clonedModel;
         },
 
-        cloneStep: function(step) {
+        cloneStep: function(step, doNotAddToCollection) {
             if (_.isString(step)) {
                 step = this.getStepByName(step);
             }
@@ -104,9 +112,18 @@ function(_, $, Backbone, Helper, __,
             }, this);
             cloned.allowed_transitions = clonedAllowedTransitions;
             cloned.label = __('Copy of') + ' ' + cloned.label;
-            cloned._is_clone = true;
+            if (doNotAddToCollection) {
+                cloned._is_clone = true;
+            }
 
-            return new StepModel(cloned);
+            var clonedModel = new StepModel(cloned);
+            clonedModel.setWorkflow(this);
+
+            if (!doNotAddToCollection) {
+                this.get('steps').add(clonedModel);
+            }
+
+            return clonedModel;
         },
 
         _getClonedItem: function(item) {

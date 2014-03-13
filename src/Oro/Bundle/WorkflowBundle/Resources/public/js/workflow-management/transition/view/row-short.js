@@ -15,6 +15,7 @@ function(_, Backbone) {
 
         events: {
             'click .edit-transition': 'triggerEditTransition',
+            'click .clone-transition': 'triggerCloneTransition',
             'click .delete-transition': 'deleteTransition'
         },
 
@@ -40,6 +41,11 @@ function(_, Backbone) {
         triggerEditTransition: function (e) {
             e.preventDefault();
             this.options.workflow.trigger('requestEditTransition', this.model, this.options.stepFrom);
+        },
+
+        triggerCloneTransition: function(e) {
+            e.preventDefault();
+            this.options.workflow.trigger('requestCloneTransition', this.model, this.options.stepFrom);
         },
 
         render: function() {
