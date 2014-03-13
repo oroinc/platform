@@ -46,6 +46,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));
             this.model.set('label', formData.label);
+            this.model.set('_is_clone', false);
 
             this.trigger('stepAdd', this.model);
 
@@ -66,6 +67,22 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             this.options.workflow.trigger('requestEditTransition', transition, this.model);
         },
 
+        onCancel: function() {
+            if (this.model.get('_is_clone')) {
+                var removeTransitions = function (models) {
+                    if (models.length) {
+                        for (var i = models.length - 1; i > -1; i--) {
+                            models[i].destroy();
+                        }
+                    }
+                };
+                removeTransitions(this.model.getAllowedTransitions(this.model).models);
+
+                this.model.destroy();
+            }
+            this.remove();
+        },
+
         remove: function() {
             this.transitionsListView.remove();
             Backbone.View.prototype.remove.call(this);
@@ -83,13 +100,18 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
 
         renderWidget: function() {
             if (!this.widget) {
+                var title = this.model.get('name') ? __('Edit step') : __('Add new step');
+                if (this.model.get('_is_clone')) {
+                    title = __('Clone step');
+                }
+
                 this.widget = new DialogWidget({
-                    'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
+                    'title': title,
                     'el': this.$el,
                     'stateEnabled': false,
                     'incrementalPosition': false,
                     'dialogOptions': {
-                        'close': _.bind(this.remove, this),
+                        'close': _.bind(this.onCancel, this),
                         'width': 800,
                         'modal': true
                     }

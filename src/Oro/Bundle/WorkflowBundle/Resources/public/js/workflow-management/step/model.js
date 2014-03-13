@@ -15,7 +15,8 @@ function(_, Backbone, TransitionCollection) {
             is_final: false,
             order: 0,
             allowed_transitions: null,
-            _is_start: false
+            _is_start: false,
+            _is_clone: false
         },
 
         initialize: function() {
