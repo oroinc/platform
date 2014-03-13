@@ -85,11 +85,8 @@ class TranslationRepository extends EntityRepository
      * @param string $domain
      * @return bool if a translation key exists and it was renamed
      */
-    public function renameKey(
-        $oldKey,
-        $newKey,
-        $domain = self::DEFAULT_DOMAIN
-    ) {
+    public function renameKey($oldKey, $newKey, $domain = self::DEFAULT_DOMAIN)
+    {
         /** @var Translation[] $translationValues */
         $translationValues = $this->findBy(
             [
