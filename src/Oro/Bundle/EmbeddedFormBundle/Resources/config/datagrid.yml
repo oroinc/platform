@@ -85,3 +85,5 @@ datagrid:
                 label: Delete
                 icon: trash
                 link: delete_link
+        options:
+            entityHint: embedded form

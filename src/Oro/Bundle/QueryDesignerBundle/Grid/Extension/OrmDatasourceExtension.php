@@ -95,8 +95,10 @@ class OrmDatasourceExtension implements ExtensionVisitorInterface
                 $ds->endRestrictionGroup();
             } else {
                 $operator = array_pop($operatorStack);
+
                 /** @var FilterInterface $filter */
                 $filter = $this->getFilterObject($item['filter'], $item['column']);
+
                 $form   = $filter->getForm();
                 if (!$form->isSubmitted()) {
                     $form->submit($item['filterData']);
