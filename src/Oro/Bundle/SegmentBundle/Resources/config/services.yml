@@ -3,6 +3,7 @@ parameters:
     oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
     oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_segment.listener.navigation_listener.class:          Oro\Bundle\SegmentBundle\EventListener\NavigationListener
+    oro_segment.datagrid.configuration.provider.class:       Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
 
 services:
     oro_segment.entity_provider:
@@ -27,3 +28,11 @@ services:
             - @oro_security.security_facade
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_segment.datagrid.configuration.provider:
+        class: %oro_segment.datagrid.configuration.provider.class%
+        arguments:
+            - @oro_query_designer.query_designer.manager
+            - @doctrine
+        tags:
+            - { name: oro_datagrid.configuration.provider }

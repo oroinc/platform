@@ -59,7 +59,7 @@ class Segment extends AbstractQueryDesigner
      * @var SegmentType
      *
      * @ORM\ManyToOne(targetEntity="SegmentType")
-     * @ORM\JoinColumn(name="type", referencedColumnName="name")
+     * @ORM\JoinColumn(name="type", referencedColumnName="name", nullable=false)
      **/
     protected $type;
 

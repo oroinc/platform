@@ -1,0 +1,12 @@
+Oro\Bundle\SegmentBundle\Entity\Segment:
+    properties:
+        name:
+            - NotBlank:     ~
+            - Length:
+                max: 255
+        type:
+            - NotBlank:     ~
+        entity:
+            - NotBlank:     ~
+            - Length:
+                max: 255
