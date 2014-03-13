@@ -43,14 +43,14 @@ class BaseOrderItem
     protected $qty;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="cost", type="currency", nullable=true)
      */
     protected $cost;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="price", type="currency", nullable=true)
      */
@@ -71,7 +71,7 @@ class BaseOrderItem
     protected $taxPercent;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="tax_amount", type="currency", nullable=true)
      */
@@ -85,14 +85,14 @@ class BaseOrderItem
     protected $discountPercent;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="discount_amount", type="currency", nullable=true)
      */
     protected $discountAmount;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="row_total", type="currency", nullable=true)
      */

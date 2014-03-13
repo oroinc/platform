@@ -51,14 +51,14 @@ class BaseCartItem
     protected $qty;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="price", type="currency")
      */
     protected $price;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="discount_amount", type="currency")
      */

@@ -43,14 +43,14 @@ class BaseProduct
     protected $type;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="cost", type="currency", nullable=true)
      */
     protected $cost;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="price", type="currency", nullable=true)
      */

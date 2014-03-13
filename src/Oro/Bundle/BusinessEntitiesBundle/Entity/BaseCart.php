@@ -23,21 +23,21 @@ class BaseCart
     protected $id;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="sub_total", type="currency", nullable=true)
      */
     protected $subTotal;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="grand_total", type="currency", nullable=true)
      */
     protected $grandTotal;
 
     /**
-     * @var float
+     * @var double
      *
      * @ORM\Column(name="tax_amount", type="currency", nullable=true)
      */
