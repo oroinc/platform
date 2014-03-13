@@ -353,7 +353,8 @@ function(_, Backbone, messanger, __,
         },
 
         cloneStep: function(step) {
-            this.model.cloneStep(step);
+            var clonedStep = this.model.cloneStep(step);
+            this.openManageStepForm(clonedStep);
         },
 
         addStep: function(step) {

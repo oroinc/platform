@@ -46,6 +46,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));
             this.model.set('label', formData.label);
+            this.model.set('_is_clone', false);
 
             this.trigger('stepAdd', this.model);
 
@@ -64,6 +65,22 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
         addStepTransition: function() {
             var transition = new TransitionModel();
             this.options.workflow.trigger('requestEditTransition', transition, this.model);
+        },
+
+        onCancel: function() {
+            if (this.model.get('_is_clone')) {
+                var removeTransitions = function (models) {
+                    if (models.length) {
+                        for (var i = models.length - 1; i > -1; i--) {
+                            models[i].destroy();
+                        }
+                    }
+                };
+                removeTransitions(this.model.getAllowedTransitions(this.model).models);
+
+                this.model.destroy();
+            }
+            this.remove();
         },
 
         remove: function() {
@@ -89,7 +106,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
                     'stateEnabled': false,
                     'incrementalPosition': false,
                     'dialogOptions': {
-                        'close': _.bind(this.remove, this),
+                        'close': _.bind(this.onCancel, this),
                         'width': 800,
                         'modal': true
                     }

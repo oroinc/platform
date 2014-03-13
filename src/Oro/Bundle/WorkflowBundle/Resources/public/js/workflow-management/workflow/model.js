@@ -1,5 +1,6 @@
 /* global define */
 define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/helper',
+    'orotranslation/js/translator',
     'oroworkflow/js/workflow-management/step/collection',
     'oroworkflow/js/workflow-management/transition/collection',
     'oroworkflow/js/workflow-management/transition-definition/collection',
@@ -10,7 +11,7 @@ define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/
     'oroworkflow/js/workflow-management/attribute/model'
 
 ],
-function(_, $, Backbone, Helper,
+function(_, $, Backbone, Helper, __,
      StepCollection,
      TransitionCollection,
      TransitionDefinitionCollection,
@@ -82,7 +83,8 @@ function(_, $, Backbone, Helper,
             cloned.transition_definition = transitionDefinition.get('name');
             cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
             cloned.form_options = Helper.deepClone(cloned.form_options);
-            cloned.label = 'Copy of ' + cloned.label;
+            cloned.label = __('Copy of') + ' ' + cloned.label;
+            cloned._is_clone = true;
 
             var clonedModel = new TransitionModel(cloned);
             this.get('transitions').add(clonedModel);
@@ -102,12 +104,9 @@ function(_, $, Backbone, Helper,
                 clonedAllowedTransitions.push(clonedTransition.get('name'));
             }, this);
             cloned.allowed_transitions = clonedAllowedTransitions;
-            cloned.label = 'Copy of ' + cloned.label;
+            cloned.label = __('Copy of') + ' ' + cloned.label;
 
-            var clonedModel = new StepModel(cloned);
-            this.get('steps').add(clonedModel);
-
-            return clonedModel;
+            return new StepModel(cloned);
         },
 
         _getClonedItem: function(item) {
