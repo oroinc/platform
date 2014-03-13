@@ -22,12 +22,18 @@ class ExtendColumn extends Column
     protected $tableName;
 
     /**
+     * @var ExtendSchema
+     */
+    protected $schema;
+
+    /**
      * @param array $args
      */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];
         $this->tableName            = $args['tableName'];
+        $this->schema               = $args['schema'];
 
         parent::__construct($args);
     }

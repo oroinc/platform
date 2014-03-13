@@ -16,11 +16,17 @@ class ExtendTable extends TableWithNameGenerator
     protected $extendOptionsManager;
 
     /**
+     * @var ExtendSchema
+     */
+    protected $schema;
+
+    /**
      * @param array $args
      */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];
+        $this->schema               = $args['schema'];
 
         parent::__construct($args);
     }
@@ -32,8 +38,19 @@ class ExtendTable extends TableWithNameGenerator
     {
         $args['tableName']            = $this->getName();
         $args['extendOptionsManager'] = $this->extendOptionsManager;
+        $args['schema']               = $this->schema;
 
         return parent::createColumnObject($args);
+    }
+
+    /**
+     * Sets a schema this table belongs
+     *
+     * @param ExtendSchema $schema
+     */
+    public function setSchema(ExtendSchema $schema)
+    {
+        $this->schema = $schema;
     }
 
     /**
@@ -73,9 +90,13 @@ class ExtendTable extends TableWithNameGenerator
 
         if (null !== $oroOptions) {
             $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
-            $column->setOptions([ExtendColumn::ORO_OPTIONS_NAME => $oroOptions]);
+            $column->setOptions([
+                ExtendColumn::ORO_OPTIONS_NAME => $oroOptions
+            ]);
         }
 
         return $column;
     }
+
+    //public function __clone(){}
 }
