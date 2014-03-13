@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
@@ -53,19 +54,26 @@ class SubscriberExtension extends \Twig_Extension
      */
     public function getRequestedReminders()
     {
-        $userId = $this->securityContext->getToken()->getUser()->getId();
-        $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
-            ->findRequestedReminders($userId);
-        $result = array();
-
         /**
-         * @var Reminder $reminder
+         * @var User|null
          */
-        foreach ($reminders as $reminder) {
-            $result[] = $this->messageParamsProvider->getMessageParams($reminder);
+        $user = $this->securityContext->getToken()->getUser();
+
+        $remindersList = array();
+
+        if (is_object($user) && $user instanceof User) {
+            $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
+                ->findRequestedReminders($user);
+
+            /**
+             * @var Reminder $reminder
+             */
+            foreach ($reminders as $reminder) {
+                $remindersList[] = $this->messageParamsProvider->getMessageParams($reminder);
+            }
         }
 
-        return json_encode($result);
+        return json_encode($remindersList);
     }
 
     /**
