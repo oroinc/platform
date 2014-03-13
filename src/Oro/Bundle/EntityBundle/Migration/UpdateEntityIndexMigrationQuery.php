@@ -16,6 +16,7 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class UpdateEntityIndexMigrationQuery implements MigrationQuery
 {
@@ -66,7 +67,9 @@ class UpdateEntityIndexMigrationQuery implements MigrationQuery
      */
     public function execute(Connection $connection, LoggerInterface $logger)
     {
-        $toSchema = $this->collectIndexQueries($logger);
+        $logger->info('Update indexes for extend fields');
+
+        $toSchema = $this->collectIndexQueries(new NullLogger());
         $queries  = $toSchema->getMigrateFromSql($this->schema, $connection->getDatabasePlatform());
 
         foreach ($queries as $query){
