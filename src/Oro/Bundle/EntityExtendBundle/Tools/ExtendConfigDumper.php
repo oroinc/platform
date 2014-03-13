@@ -14,7 +14,6 @@ use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 class ExtendConfigDumper
 {
     const ENTITY         = 'Extend\\Entity\\';
-    const FIELD_PREFIX   = 'field_';
     const DEFAULT_PREFIX = 'default_';
 
     /**
@@ -151,7 +150,7 @@ class ExtendConfigDumper
         $fieldConfigs = $extendProvider->getConfigs($className);
         foreach ($fieldConfigs as $fieldConfig) {
             if ($fieldConfig->is('extend')) {
-                $fieldName = self::FIELD_PREFIX . $fieldConfig->getId()->getFieldName();
+                $fieldName = $fieldConfig->getId()->getFieldName();
 
                 // TODO: getting a field type from a model here is a temporary solution.
                 // We need to use $fieldType = $fieldConfig->getId()->getFieldType();
@@ -214,7 +213,7 @@ class ExtendConfigDumper
                 if ($relation['field_id']->getFieldType() != 'manyToOne'
                     && $relation['target_field_id']
                 ) {
-                    $fieldName = self::FIELD_PREFIX . $relation['field_id']->getFieldName();
+                    $fieldName = $relation['field_id']->getFieldName();
 
                     $addRemoveMethods[$fieldName]['self']
                         = $relation['field_id']->getFieldName();
@@ -269,7 +268,7 @@ class ExtendConfigDumper
                 $relationFieldId    = $relation['field_id'];
 
                 if ($relationFieldId && count($schema)) {
-                    $schema['relation'][self::FIELD_PREFIX . $relationFieldId->getFieldName()] =
+                    $schema['relation'][$relationFieldId->getFieldName()] =
                         $relationFieldId->getFieldName();
                 }
             }

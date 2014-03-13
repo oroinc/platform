@@ -381,7 +381,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configCache->expects($this->once())
             ->method('removeAll');
-        $this->configManager->clearCacheAll();
+        $this->configManager->clearCache();
     }
 
     public function testClearConfigurableCache()

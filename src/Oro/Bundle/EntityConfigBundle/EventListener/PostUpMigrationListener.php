@@ -3,22 +3,22 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class PostUpMigrationListener
 {
     /**
-     * @var ConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
     /**
-     * @param ConfigDumper $configDumper
+     * @param CommandExecutor $commandExecutor
      */
-    public function __construct(ConfigDumper $configDumper)
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -29,7 +29,7 @@ class PostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(
-            new UpdateEntityConfigMigration($this->configDumper)
+            new UpdateEntityConfigMigration($this->commandExecutor)
         );
     }
 }

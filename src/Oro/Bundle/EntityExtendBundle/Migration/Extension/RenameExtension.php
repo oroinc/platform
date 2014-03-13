@@ -8,14 +8,4 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RenameExtension extends BaseRenameExtension
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function renameTable(Schema $schema, QueryBag $queries, $oldTableName, $newTableName)
-    {
-        $table = $schema->getTable($oldTableName);
-        $table->addOption('oro_options', ['extend' => ['table' => $newTableName]]);
-
-        parent::renameTable($schema, $queries, $oldTableName, $newTableName);
-    }
 }

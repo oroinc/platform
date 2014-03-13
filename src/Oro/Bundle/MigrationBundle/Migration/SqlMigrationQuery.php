@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Connection;
+use Psr\Log\LoggerInterface;
 
 class SqlMigrationQuery implements MigrationQuery
 {
@@ -39,9 +40,10 @@ class SqlMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection)
+    public function execute(Connection $connection, LoggerInterface $logger)
     {
         foreach ((array)$this->sql as $sql) {
+            $logger->notice($sql);
             $connection->executeQuery($sql);
         }
     }

@@ -44,13 +44,9 @@ class ExtendColumn extends Column
     public function setOptions(array $options)
     {
         if (isset($options[ExtendColumn::ORO_OPTIONS_NAME])) {
-            $columnName = $this->getName();
-            if (strpos($columnName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
-                $columnName = substr($columnName, strlen(ExtendConfigDumper::FIELD_PREFIX));
-            }
             $this->extendOptionsManager->setColumnOptions(
                 $this->tableName,
-                $columnName,
+                $this->getName(),
                 $options[ExtendColumn::ORO_OPTIONS_NAME]
             );
             unset($options[ExtendColumn::ORO_OPTIONS_NAME]);

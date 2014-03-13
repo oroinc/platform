@@ -17,17 +17,18 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassResolver;
+    protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
 
     protected function setUp()
     {
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassResolver->expects($this->any())
+        $this->entityMetadataHelper =
+            $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassByTableName')
             ->will(
                 $this->returnValueMap(
@@ -37,7 +38,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->entityClassResolver->expects($this->any())
+        $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
             ->will(
                 $this->returnValueMap(
@@ -47,7 +48,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
+        $this->extendOptionsManager = new ExtendOptionsManager($this->entityMetadataHelper);
     }
 
     /**
@@ -63,7 +64,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExtendExtension()
     {
-        $result = new ExtendExtension($this->extendOptionsManager);
+        $result = new ExtendExtension(
+            $this->extendOptionsManager,
+            $this->entityMetadataHelper
+        );
         $result->setNameGenerator(new ExtendDbIdentifierNameGenerator());
 
         return $result;
@@ -243,36 +247,24 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity_1' => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf(
-                                '%sentity_1',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
-                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]
                     ],
                 ],
-                ExtendConfigDumper::ENTITY . 'Entity2' => [
+                ExtendConfigDumper::ENTITY . 'Entity2'  => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf(
-                                '%sentity2',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
-                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ],
                         'entity' => ['icon' => 'icon2'],
                     ],
                 ],
-                ExtendConfigDumper::ENTITY . 'Entity3' => [
+                ExtendConfigDumper::ENTITY . 'Entity3'  => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf(
-                                '%sentity3',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
-                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]
                     ],
@@ -506,14 +498,14 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
-                . 'field_entity1_relation_column1_id INT DEFAULT NULL, '
+                . 'entity1_relation_column1_id INT DEFAULT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
-                . 'INDEX IDX_859C73277462FC4 (field_entity1_relation_column1_id), '
+                . 'INDEX IDX_859C7327B0E6CF0B (entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
-                . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
+                'ALTER TABLE table2 ADD CONSTRAINT FK_859C7327B0E6CF0B '
+                . 'FOREIGN KEY (entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
         $this->assertExtendOptions(
@@ -579,14 +571,14 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
-                . 'field_entity1_relation_column1_id INT DEFAULT NULL, '
+                . 'entity1_relation_column1_id INT DEFAULT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
-                . 'INDEX IDX_859C73277462FC4 (field_entity1_relation_column1_id), '
+                . 'INDEX IDX_859C7327B0E6CF0B (entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
-                . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
+                'ALTER TABLE table2 ADD CONSTRAINT FK_859C7327B0E6CF0B '
+                . 'FOREIGN KEY (entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
         $this->assertExtendOptions(
@@ -1030,11 +1022,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
-                . 'field_relation_column1_id INT DEFAULT NULL, '
-                . 'INDEX IDX_1C95229DF1043101 (field_relation_column1_id), PRIMARY KEY(id))',
+                . 'relation_column1_id INT DEFAULT NULL, '
+                . 'INDEX idx_table1_relation_column1_id (relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
-                . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_relation_column1_id '
+                . 'FOREIGN KEY (relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );
         $this->assertExtendOptions(
@@ -1091,11 +1083,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
-                . 'field_relation_column1_id INT DEFAULT NULL, '
-                . 'INDEX IDX_1C95229DF1043101 (field_relation_column1_id), PRIMARY KEY(id))',
+                . 'relation_column1_id INT DEFAULT NULL, '
+                . 'INDEX idx_table1_relation_column1_id (relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
-                . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_relation_column1_id '
+                . 'FOREIGN KEY (relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );
         $this->assertExtendOptions(

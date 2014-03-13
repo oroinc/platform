@@ -23,7 +23,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -310,10 +309,11 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
+        // TODO: property_exists works only for regular fields, not for relations and option sets. Need better approach
         $isFieldExist = class_exists($field->getEntity()->getClassName())
             && property_exists(
                 $field->getEntity()->getClassName(),
-                ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName()
+                $field->getFieldName()
             );
         $fieldConfig->set(
             'state',

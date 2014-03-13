@@ -1,5 +1,6 @@
 /*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
+define(['jquery', 'text!./Fixture/field-condition/markup.html', 'oroquerydesigner/js/field-condition'],
+function ($, markup) {
     'use strict';
 
     describe('oroquerydesigner/js/field-condition', function () {
@@ -7,6 +8,7 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
 
         beforeEach(function () {
             $el = $('<div>');
+            $el.append($(markup));
             $('body').append($el);
         });
 
@@ -53,12 +55,6 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
         });
 
         it('renders none filter', function (done) {
-            var $noneFilterTemplate = $('\
-<script type="text/template" id="none-filter-template">\
-</script>');
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -90,59 +86,7 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
                     "util": {},
                     "fieldsLoaderSelector": "#fields_loader"
                 },
-                "filters": [
-                    {
-                        "name": "string",
-                        "label": "String",
-                        "choices": [
-                            {
-                                "data": 1,
-                                "value": "1",
-                                "label": "contains"
-                            },
-                            {
-                                "data": 2,
-                                "value": "2",
-                                "label": "does not contain"
-                            },
-                            {
-                                "data": 3,
-                                "value": "3",
-                                "label": "is equal to"
-                            },
-                            {
-                                "data": 4,
-                                "value": "4",
-                                "label": "starts with"
-                            },
-                            {
-                                "data": 5,
-                                "value": "5",
-                                "label": "ends with"
-                            },
-                            {
-                                "data": 6,
-                                "value": "6",
-                                "label": "is any of"
-                            },
-                            {
-                                "data": 7,
-                                "value": "7",
-                                "label": "is not any of"
-                            }
-                        ],
-                        "applicable": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "text"
-                            }
-                        ],
-                        "type": "string",
-                        "templateTheme": "embedded"
-                    }
-                ]
+                "filters": []
             });
             waitForFilter(function (timeout) {
                 expect($el.find('.active-filter')).toContainHtml('<div></div>');
@@ -151,26 +95,6 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
         });
 
         it('renders choice filter', function (done) {
-            var $noneFilterTemplate = $('\
-<script type="text/template" id="choice-filter-template-embedded">\
-    <span> field value </span>\
-    <div class="dropdown">\
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:\
-        <ul class="dropdown-menu">\
-            <% _.each(choices, function (option) { %>\
-            <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>\
-                <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>\
-            </li>\
-            <% }); %>\
-        </ul>\
-        <input type="text" name="value" value="<%- value %>">\
-        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%- selectedChoice %>"/>\
-    </div>\
-</script>\
-');
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -273,47 +197,6 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
         });
 
         it('replaces filter', function (done) {
-            var $noneFilterTemplate = $('\
-<script type="text/template" id="choice-filter-template-embedded">\
-    <span> field value </span>\
-    <div class="dropdown">\
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:\
-        <ul class="dropdown-menu">\
-            <% _.each(choices, function (option) { %>\
-            <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>\
-                <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>\
-            </li>\
-            <% }); %>\
-        </ul>\
-        <input type="text" name="value" value="<%- value %>">\
-        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%- selectedChoice %>"/>\
-    </div>\
-</script>\
-<script type="text/template" id="date-filter-template-embedded">\
-    <span> field value </span>\
-    <div class="dropdown">\
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:\
-        <ul class="dropdown-menu">\
-            <% _.each(choices, function (option) { %>\
-            <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>\
-                <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>\
-            </li>\
-            <% }); %>\
-        </ul>\
-        <select name="<%= name %>" class="filter-select-oro name_input" style="display:none">\
-            <% _.each(choices, function (option) { %>\
-            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>\
-            <% }); %>\
-        </select>\
-    </div>\
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">\
-    <span class="filter-separator">-</span>\
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="to">\
-</script>\
-');
-
-            $el.append($noneFilterTemplate);
-
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -438,8 +321,56 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
                             "moreThan": 3,
                             "lessThan": 4
                         },
-                        "externalWidgetOptions": {
-                            "firstDay": 0
+                        "dateParts": {
+                            "value": "value",
+                            "dayofweek": "day of week",
+                            "week": "week",
+                            "day": "day",
+                            "month": "month",
+                            "quarter": "quarter",
+                            "dayofyear": "day of year",
+                            "year": "year"
+                        },
+                        "externalWidgetOptions":{
+                            "firstDay":0,
+                            "showDatevariables":true,
+                            "showTime":true,
+                            "showTimepicker":true,
+                            "dateVars":{
+                                "value":{
+                                    "1":"now",
+                                    "2":"today",
+                                    "3":"start of the week",
+                                    "4":"start of the month",
+                                    "5":"start of the quarter",
+                                    "6":"start of the year"
+                                },
+                                "dayofweek":{
+                                    "10":"current day",
+                                    "15":"first day of quarter"
+                                },
+                                "week":{
+                                    "11":"current week"
+                                },
+                                "day":{
+                                    "10":"current day",
+                                    "15":"first day of quarter"
+                                },
+                                "month":{
+                                    "12":"current month",
+                                    "16":"first month of quarter"
+                                },
+                                "quarter":{
+                                    "13":"current quarter"
+                                },
+                                "dayofyear":{
+                                    "10":"current day",
+                                    "15":"first day of quarter"
+                                },
+                                "year":{
+                                    "14":"current year"
+                                }
+                            }
                         }
                     },
                 ]
@@ -448,6 +379,7 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
                 $el.fieldCondition('selectField', 'createdAt');
                 waitForFilter(function (timeout) {
                     var $f = $el.find('.active-filter');
+
                     expect($f).toContainText('between');
                     expect($f).toContainText('not between');
                     expect($f).toContainText('more than');

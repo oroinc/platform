@@ -36,7 +36,13 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         );
         $commandExecutor
             ->runCommand('cache:clear')
-            ->runCommand('oro:migration:load')
+            ->runCommand(
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
+            )
             ->runCommand('oro:navigation:init')
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')

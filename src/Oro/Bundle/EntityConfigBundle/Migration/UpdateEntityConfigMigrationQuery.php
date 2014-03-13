@@ -3,19 +3,23 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigMigrationQuery implements MigrationQuery
 {
     /**
-     * @var ConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
-    public function __construct(ConfigDumper $configDumper)
+    /**
+     * @param CommandExecutor $commandExecutor
+     */
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -23,14 +27,18 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return 'UPDATE ENTITY CONFIG';
+        return 'Update entity configs';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection)
+    public function execute(Connection $connection, LoggerInterface $logger)
     {
-        $this->configDumper->updateConfigs();
+        $this->commandExecutor->runCommand(
+            'oro:entity-config:update',
+            ['--process-timeout' => 300],
+            $logger
+        );
     }
 }

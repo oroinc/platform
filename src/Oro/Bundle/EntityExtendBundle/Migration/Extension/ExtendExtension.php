@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -26,16 +27,25 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected $extendOptionsManager;
 
     /**
+     * @var EntityMetadataHelper
+     */
+    protected $entityMetadataHelper;
+
+    /**
      * @var ExtendDbIdentifierNameGenerator
      */
     protected $nameGenerator;
 
     /**
      * @param ExtendOptionsManager $extendOptionsManager
+     * @param EntityMetadataHelper $entityMetadataHelper
      */
-    public function __construct(ExtendOptionsManager $extendOptionsManager)
-    {
+    public function __construct(
+        ExtendOptionsManager $extendOptionsManager,
+        EntityMetadataHelper $entityMetadataHelper
+    ) {
         $this->extendOptionsManager = $extendOptionsManager;
+        $this->entityMetadataHelper = $entityMetadataHelper;
     }
 
     /**
@@ -70,8 +80,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        $options['_entity_class']   = $className;
-        $options['extend']['table'] = $tableName;
+        $options[ExtendOptionsManager::ENTITY_CLASS_OPTION] = $className;
         if (isset($options['extend']['owner'])) {
             if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
                 throw new \InvalidArgumentException(
@@ -150,18 +159,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $associationName);
+        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
         $targetTableName            = $this->getTableName($targetTable);
         $targetTable                = $this->getTable($targetTable, $schema);
-        $targetColumnName           = sprintf(
-            '%s%s_%s_id',
-            ExtendConfigDumper::FIELD_PREFIX,
-            strtolower($this->getShortClassName($selfClassName)),
-            $associationName
-        );
+        $targetColumnName           = $this->nameGenerator
+            ->generateOneToManyRelationColumnName($selfClassName, $associationName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
@@ -232,15 +237,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $associationName);
-        $selfRelationName         = sprintf('%s_id', strtolower($this->getShortClassName($selfClassName)));
+        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
+        $selfRelationName         = $this->nameGenerator->generateManyToManyRelationColumnName($selfClassName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
         $targetTableName            = $this->getTableName($targetTable);
         $targetTable                = $this->getTable($targetTable, $schema);
         $targetClassName            = $this->getEntityClassByTableName($targetTableName);
-        $targetRelationName         = sprintf('%s_id', strtolower($this->getShortClassName($targetClassName)));
+        $targetRelationName         = $this->nameGenerator->generateManyToManyRelationColumnName($targetClassName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
 
@@ -321,7 +326,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $selfTableName  = $this->getTableName($table);
         $selfTable      = $this->getTable($table, $schema);
-        $selfColumnName = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $associationName);
+        $selfColumnName = $this->nameGenerator->generateManyToOneRelationColumnName($associationName);
 
         $targetTableName            = $this->getTableName($targetTable);
         $targetTable                = $this->getTable($targetTable, $schema);
@@ -378,9 +383,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function getEntityClassByTableName($tableName)
     {
-        return $this->extendOptionsManager
-            ->getEntityClassResolver()
-            ->getEntityClassByTableName($tableName);
+        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
     }
 
     /**
@@ -438,17 +441,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
 
         $table->addColumn($columnName, $columnTypeName, $options);
-    }
-
-    /**
-     * @param string $className The full name of a class
-     * @return string
-     */
-    protected function getShortClassName($className)
-    {
-        $parts = explode('\\', $className);
-
-        return array_pop($parts);
     }
 
     /**

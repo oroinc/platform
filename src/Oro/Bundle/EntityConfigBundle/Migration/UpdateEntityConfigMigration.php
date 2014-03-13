@@ -3,22 +3,23 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 
 class UpdateEntityConfigMigration implements Migration
 {
     /**
-     * @var ConfigDumper
+     * @var CommandExecutor
      */
-    protected $configDumper;
+    protected $commandExecutor;
 
-    public function __construct(ConfigDumper $configDumper)
+    /**
+     * @param CommandExecutor $commandExecutor
+     */
+    public function __construct(CommandExecutor $commandExecutor)
     {
-        $this->configDumper = $configDumper;
+        $this->commandExecutor = $commandExecutor;
     }
 
     /**
@@ -26,6 +27,8 @@ class UpdateEntityConfigMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new UpdateEntityConfigMigrationQuery($this->configDumper));
+        $queries->addQuery(
+            new UpdateEntityConfigMigrationQuery($this->commandExecutor)
+        );
     }
 }

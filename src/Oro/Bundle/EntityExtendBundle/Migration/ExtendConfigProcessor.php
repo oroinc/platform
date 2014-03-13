@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -34,12 +36,12 @@ class ExtendConfigProcessor
     /**
      * @param array                $configs
      * @param LoggerInterface|null $logger
-     * @param bool                 $dryRun
+     * @param bool                 $dryRun Log modifications without apply them
      * @throws \Exception
      */
     public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ? : new NullLogger();
         try {
             if (!empty($configs)) {
                 $this->filterConfigs($configs);
@@ -63,30 +65,12 @@ class ExtendConfigProcessor
 
     /**
      * Removes some configs.
-     *  - removes configs for non custom entities if requested a change of table name only
      *  - removes configs for non configurable entities if requested a change of field type only
      *
      * @param array $configs
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterConfigs(array &$configs)
     {
-        // removes configs for non custom entities if requested a change of table name only
-        foreach ($configs as $className => $entityConfigs) {
-            if (!ExtendHelper::isCustomEntity($className)) {
-                if (isset($entityConfigs['configs']['extend']['table'])) {
-                    unset($configs[$className]['configs']['extend']['table']);
-                    if (empty($configs[$className]['configs']['extend'])
-                        && count($configs[$className]['configs']) === 1
-                        && count($configs[$className]) === 1
-                    ) {
-                        unset($configs[$className]);
-                    }
-                }
-            }
-        }
         // removes configs for non configurable entities if requested a change of field type only
         foreach ($configs as $className => $entityConfigs) {
             if (!ExtendHelper::isCustomEntity($className)) {
@@ -118,16 +102,16 @@ class ExtendConfigProcessor
      */
     protected function processEntityConfigs($className, array $configs)
     {
-        if ($this->configManager->hasConfig($className)) {
-            if (isset($configs['configs'])) {
+        if (isset($configs['configs'])) {
+            if ($this->configManager->hasConfig($className)) {
                 $this->updateEntityModel($className, $configs['configs']);
+            } else {
+                $this->createEntityModel(
+                    $className,
+                    isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    $configs['configs']
+                );
             }
-        } else {
-            $this->createEntityModel(
-                $className,
-                isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
-                isset($configs['configs']) ? $configs['configs'] : []
-            );
         }
 
         if (isset($configs['fields'])) {
@@ -174,15 +158,15 @@ class ExtendConfigProcessor
     protected function createEntityModel($className, $mode, array $configs)
     {
         if (!ExtendHelper::isCustomEntity($className)) {
-            throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
-        }
-
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Create entity "%s".', $className),
-                ['configs' => $configs]
+            throw new \LogicException(
+                sprintf('A new model can be created for custom entity only. Class: %s.', $className)
             );
         }
+
+        $this->logger->notice(
+            sprintf('Create entity "%s".', $className),
+            ['configs' => $configs]
+        );
 
         $this->configManager->createConfigEntityModel($className, $mode);
 
@@ -201,18 +185,10 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
-        if (!ExtendHelper::isCustomEntity($className)) {
-            if (isset($configs['extend']['table'])) {
-                throw new \LogicException(sprintf('A table name cannot be set for "%s" entity.', $className));
-            }
-        }
-
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Update entity "%s".', $className),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf('Update entity "%s".', $className),
+            ['configs' => $configs]
+        );
 
         $haveChanges = $this->updateConfigs($configs, $className);
 
@@ -243,18 +219,16 @@ class ExtendConfigProcessor
             );
         }
 
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf(
-                    'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
-                    $fieldName,
-                    $fieldType,
-                    $mode,
-                    $className
-                ),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf(
+                'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
+                $fieldName,
+                $fieldType,
+                $mode,
+                $className
+            ),
+            ['configs' => $configs]
+        );
 
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
 
@@ -273,12 +247,10 @@ class ExtendConfigProcessor
      */
     protected function updateFieldModel($className, $fieldName, array $configs)
     {
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
+            ['configs' => $configs]
+        );
 
         $haveChanges = $this->updateConfigs($configs, $className, $fieldName);
 
@@ -300,11 +272,9 @@ class ExtendConfigProcessor
     protected function changeFieldType($className, $fieldName, $fieldType)
     {
         if ($this->configManager->getConfigFieldModel($className, $fieldName)->getType() !== $fieldType) {
-            if ($this->logger) {
-                $this->logger->notice(
-                    sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
-                );
-            }
+            $this->logger->notice(
+                sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
+            );
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
         }
     }
