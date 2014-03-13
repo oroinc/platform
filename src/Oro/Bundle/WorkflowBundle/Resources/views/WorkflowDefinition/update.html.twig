@@ -71,6 +71,22 @@
         .tab-data {
             padding: 20px;
         }
+
+        .transition-list .action-column {
+            width: 90px;
+        }
+
+        .steps-list .action-column {
+            width: 110px;
+        }
+
+        .transitions-list-short {
+            margin-left: 0px;
+        }
+
+        .transitions-list-short li {
+            list-style: none;
+        }
     </style>
 
     <script type="text/template" id="transition-form-template">
@@ -264,15 +280,17 @@
     </script>
 
     <script type="text/template" id="step-list-template">
-        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
-            <thead>
-            <th>{{ "Step name"|trans }}</th>
-            <th>{{ "Transitions"|trans }}</th>
-            <th>{{ "Poisition"|trans }}</th>
-            <th>{{ "Actions"|trans }}</th>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="grid-container steps-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                    <th class="label-column"><span>{{ "Step name"|trans }}</span></th>
+                    <th><span>{{ "Transitions"|trans }}</span></th>
+                    <th><span>{{ "Poisition"|trans }}</span></th>
+                    <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
     </script>
 
     <script type="text/template" id="step-row-template">
@@ -289,17 +307,18 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (!_is_start) { %>
-                <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}"><i class="icon-copy"/></a>
-                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><i class="icon-edit"/></a>
-                <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}"><i class="icon-remove"/></a>
+                <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}" class="action"><i class="icon-copy hide-text"/></a>
+                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
+                <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}" class="action"><i class="icon-trash hide-text"/></a>
                 <% } %>
-                <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}"><i class="icon-plus-sign"/></a>
+                <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
             </div>
         </td>
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#" class="delete-transition" title="Remove transition"><i class="icon-trash"></i></a> <a href="#" class="edit-transition" title="Edit transition"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
+        <a href="#" class="delete-transition action" title="{{ 'Remove transition'|trans }}"><i class="icon-trash hide-text"></i></a>
+        <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
     </script>
 
     <script type="text/template" id="attribute-form-option-edit-template">
@@ -337,15 +356,17 @@
     </script>
 
     <script type="text/template" id="attribute-form-option-list-template">
-        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
-            <thead>
-            <th>{{ "Entity field"|trans }}</th>
-            <th>{{ "Label"|trans }}</th>
-            <th>{{ "Required"|trans }}</th>
-            <th>{{ "Actions"|trans }}</th>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="grid-container form-options-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                <th><span>{{ "Entity field"|trans }}</span></th>
+                <th><span>{{ "Label"|trans }}</span></th>
+                <th><span>{{ "Required"|trans }}</span></th>
+                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
     </script>
 
     <script type="text/template" id="attribute-form-option-row-template">
@@ -360,35 +381,37 @@
             <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
         </td>
         <td>
-            <% if (required) { %><span class="text-error">{{ "yes"|trans }}</span><% } %>
+            <% if (required) { %><span class="badge badge-important">{{ "yes"|trans }}</span><% } %>
         </td>
         <td class="step-actions">
             <div class="pull-right">
                 <% if (is_entity_attribute) { %>
-                <a href="#" class="edit-form-option" title="{{ 'Edit field'|trans }}"><i class="icon-edit"/></a>
+                <a href="#" class="edit-form-option action" title="{{ 'Edit field'|trans }}"><i class="icon-edit hide-text"/></a>
                 <% } %>
-                <a href="#" class="delete-form-option" title="{{ 'Delete field'|trans }}"><i class="icon-remove"/></a>
+                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-remove hide-text"/></a>
             </div>
         </td>
     </script>
 
     <script type="text/template" id="transition-list-template">
-        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
-            <thead>
-            <th>{{ "Transition name"|trans }}</th>
-            <th>{{ "Step to"|trans }}</th>
-            <th>{{ "Actions"|trans }}</th>
-            </thead>
-            <tbody>
-            <tr class="no-rows-message">
-                <td colspan="3">
-                    <div style="padding: 10px 0;text-align: center">
+        <div class="grid-container transition-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                <th><span>{{ "Transition name"|trans }}</span></th>
+                <th><span>{{ "Step to"|trans }}</span></th>
+                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container">
+                <tr class="no-rows-message">
+                    <td colspan="3">
+                        <div style="padding: 10px 0;text-align: center">
                             {{ 'There are no transitions yet.'|trans }}
                         </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </script>
 
     <script type="text/template" id="transition-row-template">
@@ -398,9 +421,9 @@
         <td><%= stepToLabel %></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="clone-transition" title="{{ 'Clone transition'|trans }}"><i class="icon-copy"/></a>
-                <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><i class="icon-edit"/></a>
-                <a href="#" class="delete-transition" title="{{ 'Delete transition'|trans }}"><i class="icon-remove"/></a>
+                <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"/></a>
+                <a href="#" class="edit-transition action" title="{{ 'Edit transition'|trans }}"><i class="icon-edit hide-text"/></a>
+                <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-remove hide-text"/></a>
             </div>
         </td>
     </script>

@@ -11,6 +11,10 @@ function(_, Backbone, TransitionsShortRowView) {
     return Backbone.View.extend({
         tagName: 'ul',
 
+        attributes: {
+            'class': 'transitions-list-short'
+        },
+
         options: {
             collection: null,
             workflow: null,
