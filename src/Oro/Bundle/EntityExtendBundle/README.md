@@ -36,13 +36,6 @@ Country:
                 length:             200
 ```
 
-Initializing entity extend functionality
-----------------------------------------
-Before entity extend functionality can be user you need to load all necessary data into the database. To achieve this the following command can be used:
-```bash
-php app/console oro:entity-extend:init
-```
-
 Warming up the cache
 --------------------
 The following command prepares extended entities cache:

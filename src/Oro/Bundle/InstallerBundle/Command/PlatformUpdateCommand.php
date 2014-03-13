@@ -36,9 +36,14 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         );
         $commandExecutor
             ->runCommand('cache:clear')
-            ->runCommand('oro:entity-config:update')
-            ->runCommand('oro:entity-extend:update')
-            ->runCommand('oro:navigation:init')
+            ->runCommand(
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
+            )
+            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))

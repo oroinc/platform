@@ -6,14 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigHelper
 {
     const EXTEND_CONFIG_SCOPE = 'extend';
-    const EXTEND_FIELD_PREFIX = ExtendConfigDumper::FIELD_PREFIX;
 
     /**
      * @var ConfigManager
@@ -38,10 +35,6 @@ class EntityConfigHelper
      */
     public function getConfig($scope, $className, $fieldName)
     {
-        if ($fieldName && $this->isExtendField($className, $fieldName)) {
-            $fieldName = $this->getExtendFieldName($fieldName);
-        }
-
         $provider = $this->configManager->getProvider($scope);
 
         $result = null;
@@ -79,7 +72,6 @@ class EntityConfigHelper
         $fieldName = $fieldMetadata->getSourceFieldName();
 
         if ($this->isExtendField($className, $fieldName)) {
-            $fieldName = $this->getExtendFieldName($fieldName);
             $fieldMetadata->set('property_path', $fieldName);
         }
     }
@@ -93,30 +85,10 @@ class EntityConfigHelper
      */
     protected function isExtendField($className, $fieldName)
     {
-        $extendFieldName = $this->getExtendFieldName($fieldName);
+        $extendConfig = $this->getExtendConfigProvider();
 
-        if ($extendFieldName) {
-            $extendConfig = $this->getExtendConfigProvider();
-            return $extendConfig->hasConfig($className, $extendFieldName) &&
-                $extendConfig->getConfig($className, $extendFieldName)->is('is_extend');
-        }
-
-        return false;
-    }
-
-    /**
-     * Removes prefix ExtendConfigDumper::FIELD_PREFIX from the name of field.
-     *
-     * @param string $fieldName
-     * @return string|null
-     */
-    protected function getExtendFieldName($fieldName)
-    {
-        if (0 !== strpos($fieldName, self::EXTEND_FIELD_PREFIX)) {
-            return null;
-        }
-
-        return substr($fieldName, strlen(self::EXTEND_FIELD_PREFIX));
+        return $extendConfig->hasConfig($className, $fieldName) &&
+            $extendConfig->getConfig($className, $fieldName)->is('is_extend');
     }
 
     /**
