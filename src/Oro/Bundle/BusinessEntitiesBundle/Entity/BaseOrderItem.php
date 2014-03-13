@@ -45,14 +45,14 @@ class BaseOrderItem
     /**
      * @var float
      *
-     * @ORM\Column(name="cost", type="money", nullable=true)
+     * @ORM\Column(name="cost", type="currency", nullable=true)
      */
     protected $cost;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="price", type="money", nullable=true)
+     * @ORM\Column(name="price", type="currency", nullable=true)
      */
     protected $price;
 
@@ -73,7 +73,7 @@ class BaseOrderItem
     /**
      * @var float
      *
-     * @ORM\Column(name="tax_amount", type="money", nullable=true)
+     * @ORM\Column(name="tax_amount", type="currency", nullable=true)
      */
     protected $taxAmount;
 
@@ -87,14 +87,14 @@ class BaseOrderItem
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_amount", type="money", nullable=true)
+     * @ORM\Column(name="discount_amount", type="currency", nullable=true)
      */
     protected $discountAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="row_total", type="money", nullable=true)
+     * @ORM\Column(name="row_total", type="currency", nullable=true)
      */
     protected $rowTotal;
 

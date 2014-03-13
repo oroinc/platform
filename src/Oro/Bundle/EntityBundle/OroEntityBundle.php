@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 
-use Oro\Bundle\EntityBundle\Entity\Type\MoneyType;
+use Oro\Bundle\EntityBundle\Entity\Type\CurrencyType;
 use Oro\Bundle\EntityBundle\Entity\Type\PercentType;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
@@ -31,20 +31,20 @@ class OroEntityBundle extends Bundle
      */
     public function boot()
     {
-        if (!Type::hasType(MoneyType::MONEY_TYPE)) {
-            Type::addType(MoneyType::MONEY_TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\MoneyType');
+        if (!Type::hasType(CurrencyType::TYPE)) {
+            Type::addType(CurrencyType::TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\CurrencyType');
         }
 
-        if (!Type::hasType(PercentType::PERCENT_TYPE)) {
-            Type::addType(PercentType::PERCENT_TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\PercentType');
+        if (!Type::hasType(PercentType::TYPE)) {
+            Type::addType(PercentType::TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\PercentType');
         }
 
         /** @var ManagerRegistry $registry */
         $registry = $this->container->get('doctrine');
         foreach ($registry->getConnections() as $con) {
             if ($con instanceof Connection) {
-                $con->getDatabasePlatform()->markDoctrineTypeCommented(MoneyType::MONEY_TYPE);
-                $con->getDatabasePlatform()->markDoctrineTypeCommented(PercentType::PERCENT_TYPE);
+                $con->getDatabasePlatform()->markDoctrineTypeCommented(CurrencyType::TYPE);
+                $con->getDatabasePlatform()->markDoctrineTypeCommented(PercentType::TYPE);
             }
         }
     }

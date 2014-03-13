@@ -7,14 +7,14 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class PercentType extends Type
 {
-    const PERCENT_TYPE   = 'percent';
+    const TYPE = 'percent';
 
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return self::PERCENT_TYPE;
+        return self::TYPE;
     }
 
     /**

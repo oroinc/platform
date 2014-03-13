@@ -53,14 +53,14 @@ class BaseCartItem
     /**
      * @var float
      *
-     * @ORM\Column(name="price", type="money")
+     * @ORM\Column(name="price", type="currency")
      */
     protected $price;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_amount", type="money")
+     * @ORM\Column(name="discount_amount", type="currency")
      */
     protected $discountAmount;
 

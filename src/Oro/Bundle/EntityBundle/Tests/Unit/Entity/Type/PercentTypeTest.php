@@ -15,10 +15,10 @@ class PercentTypeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        if (!Type::hasType(PercentType::PERCENT_TYPE)) {
-            Type::addType(PercentType::PERCENT_TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\PercentType');
+        if (!Type::hasType(PercentType::TYPE)) {
+            Type::addType(PercentType::TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\PercentType');
         }
-        $this->percentType = Type::getType(PercentType::PERCENT_TYPE);
+        $this->percentType = Type::getType(PercentType::TYPE);
     }
 
     public function testGetName()

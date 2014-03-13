@@ -11,7 +11,7 @@ query_designer:
                 - { name: Count, expr: COUNT($column), return_type: integer }
             query_type: [report]
         number:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: currency}, {type: percent}]
             functions:
                 - { name: Count, expr: COUNT($column), return_type: integer }
                 - { name: Sum,   expr: SUM(CASE WHEN ($column IS NOT NULL) THEN $column ELSE 0 END) }

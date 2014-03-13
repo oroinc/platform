@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityBundle\Entity\Type;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class MoneyType extends Type
+class CurrencyType extends Type
 {
-    const MONEY_TYPE     = 'money';
+    const TYPE           = 'currency';
     const TYPE_PRECISION = 19;
     const TYPE_SCALE     = 4;
 
@@ -16,7 +16,7 @@ class MoneyType extends Type
      */
     public function getName()
     {
-        return self::MONEY_TYPE;
+        return self::TYPE;
     }
 
     /**

@@ -56,7 +56,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'range',
         'text'     => 'string',
         'float'    => 'number',
-        'money'    => 'number',
+        'currency' => 'number',
         'percent'  => 'percent'
     );
 
@@ -70,7 +70,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'datetime',
         'text'     => 'string',
         'float'    => 'decimal',
-        'money'    => 'number',
+        'currency' => 'number',
         'percent'  => 'number'
     );
 
@@ -289,7 +289,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 return PropertyInterface::TYPE_DATE;
             case 'datetime':
                 return PropertyInterface::TYPE_DATETIME;
-            case 'money':
+            case 'currency':
                 return PropertyInterface::TYPE_CURRENCY;
             case 'percent':
                 return PropertyInterface::TYPE_PERCENT;

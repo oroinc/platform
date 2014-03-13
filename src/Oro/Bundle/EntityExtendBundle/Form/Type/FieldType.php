@@ -24,7 +24,7 @@ class FieldType extends AbstractType
         'date'       => 'Date',
         'text'       => 'Text',
         'float'      => 'Float',
-        'money'      => 'Money',
+        'currency'   => 'Currency',
         'percent'    => 'Percent',
         'oneToMany'  => 'Relation one to many',
         'manyToOne'  => 'Relation many to one',
