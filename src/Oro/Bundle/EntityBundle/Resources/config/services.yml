@@ -101,8 +101,7 @@ services:
     oro_entity.event_listener.migration.post_up.listener:
         class: %oro_entity.event_listener.migration.post_up.listener.class%
         arguments:
-            - @oro_entity.orm.entity_class_resolver
-            #- @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_entity_extend.migration.entity_metadata_helper
             - @oro_entity_config.provider.extend
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }

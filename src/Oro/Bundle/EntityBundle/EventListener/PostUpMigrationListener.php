@@ -3,16 +3,16 @@
 namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Oro\Bundle\EntityBundle\Migration\UpdateEntityIndexMigration;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class PostUpMigrationListener
 {
     /**
-     * @var EntityClassResolver
+     * @var EntityMetadataHelper
      */
-    protected $entityClassResolver;
+    protected $entityMetadataHelper;
 
     /**
      * @var ConfigProvider
@@ -20,12 +20,14 @@ class PostUpMigrationListener
     protected $extendConfigProvider;
 
     /**
-     * @param EntityClassResolver $entityClassResolver
+     * @param EntityMetadataHelper $entityMetadataHelper
      * @param ConfigProvider $extendConfigProvider
      */
-    public function __construct(EntityClassResolver $entityClassResolver, ConfigProvider $extendConfigProvider)
-    {
-        $this->entityClassResolver  = $entityClassResolver;
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        ConfigProvider $extendConfigProvider
+    ) {
+        $this->entityMetadataHelper = $entityMetadataHelper;
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
@@ -38,7 +40,7 @@ class PostUpMigrationListener
     {
         $event->addMigration(
             new UpdateEntityIndexMigration(
-                $this->entityClassResolver,
+                $this->entityMetadataHelper,
                 $this->extendConfigProvider
             )
         );
