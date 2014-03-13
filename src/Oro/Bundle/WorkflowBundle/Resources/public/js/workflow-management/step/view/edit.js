@@ -69,27 +69,23 @@ function(_, __, Backbone, DialogWidget, Helper, mediator, TransitionsListView, T
         },
 
         renderTransitions: function() {
-            var transitionsContainer = this.$('.transitions-section');
-            if (this.options.workflow.get('steps').length > 1 && this.model.get('name')) {
-                transitionsContainer.show();
-                this.transitionsListView = new TransitionsListView({
-                    el: this.$el.find(this.options.transitionListContainerEl),
-                    workflow: this.options.workflow,
-                    collection: this.model.getAllowedTransitions(this.options.workflow),
-                    stepFrom: this.model
-                });
-                this.transitionsListView.render();
-            } else {
-                transitionsContainer.hide();
-            }
+            this.transitionsListView = new TransitionsListView({
+                el: this.$el.find(this.options.transitionListContainerEl),
+                workflow: this.options.workflow,
+                collection: this.model.getAllowedTransitions(this.options.workflow),
+                stepFrom: this.model
+            });
+            this.transitionsListView.render();
         },
 
         render: function() {
-            this.$el.append(
-                this.template(this.model.toJSON())
-            );
+            var data = this.model.toJSON();
+            data.transitionsAllowed = (this.options.workflow.get('steps').length > 1 && this.model.get('name'));
+            this.$el.append(this.template(data));
 
-            this.renderTransitions();
+            if (data.transitionsAllowed) {
+                this.renderTransitions();
+            }
 
             this.widget = new DialogWidget({
                 'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
@@ -98,7 +94,7 @@ function(_, __, Backbone, DialogWidget, Helper, mediator, TransitionsListView, T
                 'incrementalPosition': false,
                 'dialogOptions': {
                     'close': _.bind(this.onCancel, this),
-                    'width': 600,
+                    'width': 800,
                     'modal': true
                 }
             });

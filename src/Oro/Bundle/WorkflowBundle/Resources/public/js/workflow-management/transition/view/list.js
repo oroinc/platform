@@ -26,6 +26,7 @@ function(_, Backbone, TransitionRowView) {
 
             this.$listEl = $(this.template());
             this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
+            this.$emptyMessage = this.$listElBody.find('.no-rows-message');
             this.$el.html(this.$listEl);
 
             this.listenTo(this.getCollection(), 'change', this.render);
@@ -66,11 +67,11 @@ function(_, Backbone, TransitionRowView) {
 
         render: function() {
             if (this.getCollection().models.length) {
-                this.$el.show();
+                this.$emptyMessage.hide();
                 this.resetView();
                 this.addAllItems(this.getCollection().models);
             } else {
-                this.$el.hide();
+                this.$emptyMessage.show();
             }
 
             return this;
