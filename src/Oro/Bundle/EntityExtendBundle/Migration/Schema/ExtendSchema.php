@@ -48,8 +48,6 @@ class ExtendSchema extends SchemaWithNameGenerator
     protected function createTableObject(array $args)
     {
         $args['extendOptionsManager'] = $this->extendOptionsManager;
-        $args['schema']               = $this;
-
         return parent::createTableObject($args);
     }
 
@@ -59,18 +57,5 @@ class ExtendSchema extends SchemaWithNameGenerator
     public function getExtendOptions()
     {
         return $this->extendOptionsManager->getExtendOptions();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __clone()
-    {
-        parent::__clone();
-
-        /** @var ExtendTable $table */
-        foreach ($this->_tables as $table) {
-            $table->setSchema($this);
-        }
     }
 }

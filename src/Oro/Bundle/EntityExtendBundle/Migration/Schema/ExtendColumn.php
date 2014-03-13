@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
 
 class ExtendColumn extends Column
@@ -22,18 +21,12 @@ class ExtendColumn extends Column
     protected $tableName;
 
     /**
-     * @var ExtendSchema
-     */
-    protected $schema;
-
-    /**
      * @param array $args
      */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];
         $this->tableName            = $args['tableName'];
-        $this->schema               = $args['schema'];
 
         parent::__construct($args);
     }
