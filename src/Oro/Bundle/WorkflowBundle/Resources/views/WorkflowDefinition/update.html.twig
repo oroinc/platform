@@ -4,8 +4,8 @@
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 {% set title = entity.name
-? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
-: 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+    ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
 %}
 {% set formAction = entity.name ? path('oro_workflow_definition_update', { 'name': entity.name }) : path('oro_workflow_definition_create')  %}
 
@@ -19,13 +19,13 @@
 
 {% block navButtons %}
     {% if entity.name and resource_granted('DELETE', entity) %}
-        {{ UI.deleteButton({
-        'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
-        'dataRedirect': path('oro_workflow_definition_index'),
-        'aCss': 'no-hash remove-button',
-        'id': 'btn-remove-workflow',
-        'dataId': entity.name,
-        'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+            {{ UI.deleteButton({
+            'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
+            'dataRedirect': path('oro_workflow_definition_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-workflow',
+            'dataId': entity.name,
+            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -45,10 +45,10 @@
 {% block pageHeader %}
     {% if entity.name %}
         {% set breadcrumbs = {
-        'entity':      entity,
-        'indexPath':   path('oro_workflow_definition_index'),
-        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
-        'entityTitle': entity.label
+            'entity':      entity,
+            'indexPath':   path('oro_workflow_definition_index'),
+            'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+            'entityTitle': entity.label
         } %}
         {{ parent() }}
     {% else %}
@@ -328,6 +328,7 @@
 
                 <div class="clearfix">
                     <div class="pull-right" style="margin-top: -35px;">
+                        <button type="reset" class="btn hide"><i class="icon-undo"></i> {{ 'Reset'|trans }}</button>
                         <button type="submit" class="btn btn-success"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
                     </div>
                 </div>
