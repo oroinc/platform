@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\ReminderBundle\Twig\SubscriberExtension;
+use Oro\Bundle\ReminderBundle\Twig\ReminderExtension;
 
 class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var SubscriberExtension
+     * @var ReminderExtension
      */
     protected $target;
 
@@ -38,7 +38,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->target = new SubscriberExtension($this->entityManager, $this->securityContext, $this->paramsProvider);
+        $this->target = new ReminderExtension($this->entityManager, $this->securityContext, $this->paramsProvider);
     }
 
     public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotExist()
@@ -48,8 +48,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->once())->method('getUser')->will($this->returnValue(null));
         $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
 
-        $result = $this->target->getRequestedReminders();
-        $actual = json_decode($result);
+        $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals(array(), $actual);
     }
 
@@ -60,8 +59,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->once())->method('getUser')->will($this->returnValue(new \stdClass()));
         $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
 
-        $result = $this->target->getRequestedReminders();
-        $actual = json_decode($result);
+        $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals(array(), $actual);
     }
 
@@ -110,8 +108,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($reminder2))
             ->will($this->returnValue($expectedReminder2));
 
-        $result = $this->target->getRequestedReminders();
-        $actual = json_decode($result);
+        $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals($expectedReminders, $actual);
     }
 }

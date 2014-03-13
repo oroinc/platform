@@ -81,7 +81,7 @@ class ReminderExtension extends \Twig_Extension
             }
         }
 
-        return json_encode($remindersList);
+        return $remindersList;
     }
 
     /**
