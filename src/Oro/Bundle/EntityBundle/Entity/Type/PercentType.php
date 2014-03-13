@@ -8,8 +8,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 class PercentType extends Type
 {
     const PERCENT_TYPE   = 'percent';
-    const TYPE_PRECISION = 5;
-    const TYPE_SCALE     = 2;
 
     /**
      * {@inheritdoc}
@@ -24,10 +22,7 @@ class PercentType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        $fieldDeclaration['precision'] = self::TYPE_PRECISION;
-        $fieldDeclaration['scale']     = self::TYPE_SCALE;
-
-        return $platform->getDecimalTypeDeclarationSQL($fieldDeclaration);
+        return $platform->getFloatDeclarationSQL($fieldDeclaration);
     }
 
     /**

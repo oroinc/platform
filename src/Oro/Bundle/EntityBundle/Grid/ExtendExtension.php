@@ -77,7 +77,7 @@ class ExtendExtension extends AbstractExtension
                     $type = PropertyInterface::TYPE_CURRENCY;
                     break;
                 case 'percent':
-                    $filterType = 'number';
+                    $filterType = 'percent';
                     $type = PropertyInterface::TYPE_PERCENT;
                     break;
                 default:

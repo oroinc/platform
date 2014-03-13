@@ -413,8 +413,9 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
             case 'decimal':
             case 'float':
             case 'money':
-            case 'percent':
                 return 'number';
+            case 'percent':
+                return 'percent';
             case 'boolean':
                 return PropertyInterface::TYPE_BOOLEAN;
             case 'date':

@@ -57,7 +57,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'text'     => 'string',
         'float'    => 'number',
         'money'    => 'number',
-        'percent'  => 'number'
+        'percent'  => 'percent'
     );
 
     protected $typeMap = array(
