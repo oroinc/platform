@@ -36,7 +36,7 @@ Transitions: Transitions
 'Add transition': 'Add transition'
 'Step name': 'Step name'
 Poisition: Poisition
-'Edit step': 'Edit step'
+'Update step': 'Update step'
 'Clone step': 'Clone step'
 'Delete step': 'Delete step'
 'Entity field': 'Entity field'
@@ -47,10 +47,10 @@ Add: Add
 Reset: Reset
 system: system
 yes: yes
-'Edit field': 'Edit field'
+'Update field': 'Update field'
 'Delete field': 'Delete field'
 'Step to': 'Step to'
-'Edit transition': 'Edit transition'
+'Update transition': 'Update transition'
 'Clone transition': 'Clone transition'
 'Delete transition': 'Delete transition'
 General: General

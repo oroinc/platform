@@ -147,6 +147,7 @@ function(_, Backbone, messanger, __,
         },
 
         resetWorkflow: function() {
+            //Need to manually destroy collection elements to trigger all appropriate events
             var resetCollection = function(collection) {
                 if (collection.length) {
                     for (var i = collection.length -1; i > -1; i--) {
@@ -203,7 +204,7 @@ function(_, Backbone, messanger, __,
         saveConfiguration: function(e) {
             e.preventDefault();
 
-            if (this.model.get('steps').length == 1 || this.model.get('transitions').length == 0) {
+            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
                 messanger.notificationFlashMessage(
                     'error',
                     __('Could not save workflow. Please add steps and transitions.')
@@ -372,6 +373,7 @@ function(_, Backbone, messanger, __,
                 this.$startStepEl.select2('val', '');
             }
 
+            //Need to manually destroy collection elements to trigger all appropriate events
             var removeTransitions = function (models) {
                 if (models.length) {
                     for (var i = models.length - 1; i > -1; i--) {

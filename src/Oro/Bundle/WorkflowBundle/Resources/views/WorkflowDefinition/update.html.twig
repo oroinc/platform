@@ -298,7 +298,7 @@
             <% if (_is_start) { %>
             <%= label %>
             <% } else { %>
-            <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><%= label %></a>
+            <a href="#" class="edit-step" title="{{ 'Update step'|trans}}"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -308,7 +308,7 @@
             <div class="pull-right">
                 <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
+                    <a href="#" class="edit-step" title="{{ 'Update step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
                     <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}" class="action"><i class="icon-copy hide-text"/></a>
                     <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}" class="action"><i class="icon-trash hide-text"/></a>
                 <% } %>
@@ -317,7 +317,7 @@
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a>
+        <a href="#" class="edit-transition" title="{{ 'Update transition'|trans }}"><%= label %></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"></i></a>
         <i class="icon-long-arrow-right"/>
         <span><%= stepToLabel %></span>
@@ -388,7 +388,7 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (is_entity_attribute) { %>
-                <a href="#" class="edit-form-option action" title="{{ 'Edit field'|trans }}"><i class="icon-edit hide-text"/></a>
+                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="icon-edit hide-text"/></a>
                 <% } %>
                 <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-trash hide-text"/></a>
             </div>
@@ -418,12 +418,12 @@
 
     <script type="text/template" id="transition-row-template">
         <td class="transition-name">
-            <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a>
+            <a href="#" class="edit-transition" title="{{ 'Update transition'|trans }}"><%= label %></a>
         </td>
         <td><%= stepToLabel %></td>
         <td class="transition-actions">
             <div class="pull-right">
-                <a href="#" class="edit-transition action" title="{{ 'Edit transition'|trans }}"><i class="icon-edit hide-text"/></a>
+                <a href="#" class="edit-transition action" title="{{ 'Update transition'|trans }}"><i class="icon-edit hide-text"/></a>
                 <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"/></a>
                 <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"/></a>
             </div>
@@ -441,18 +441,18 @@
     {% endset %}
 
     {% set dataBlocks = [{
-    'title': 'General'|trans,
-    'class': 'active',
-    'subblocks': [
-    {
-    'data': [
-    form_row(form.label),
-    form_row(form.related_entity),
-    startStepSelector,
-    form_row(form.steps_display_ordered)
-    ]
-    }
-    ]
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'data': [
+                    form_row(form.label),
+                    form_row(form.related_entity),
+                    startStepSelector,
+                    form_row(form.steps_display_ordered)
+                ]
+            }
+        ]
     }] %}
 
     {% set stepsListWidget %}
@@ -479,89 +479,89 @@
             'oroworkflow/js/workflow-management/transition-definition/collection',
             'oroworkflow/js/workflow-management/attribute/collection'
         ],
-                function(WorkflowManagement, WorkflowModel,
-                         StepModel,
-                         TransitionModel,
-                         TransitionDefinitionModel,
-                         AttributeModel,
-                         StepCollection,
-                         TransitionCollection,
-                         TransitionDefinitionCollection,
-                         AttributeCollection
-                        ) {
-                    var steps = new StepCollection(),
-                            transitions = new TransitionCollection(),
-                            transitionDefinitions = new TransitionDefinitionCollection(),
-                            attributes = new AttributeCollection();
+        function(WorkflowManagement, WorkflowModel,
+             StepModel,
+             TransitionModel,
+             TransitionDefinitionModel,
+             AttributeModel,
+             StepCollection,
+             TransitionCollection,
+             TransitionDefinitionCollection,
+             AttributeCollection
+        ) {
+            var steps = new StepCollection(),
+                    transitions = new TransitionCollection(),
+                    transitionDefinitions = new TransitionDefinitionCollection(),
+                    attributes = new AttributeCollection();
 
-                    {% if entity.configuration.steps is defined %}
-                    {% for name, config in entity.configuration.steps %}
-                    {% set config = config|merge({name: name}) %}
-                    steps.add(new StepModel({{ config|json_encode|raw }}));
-                    {% endfor %}
-                    {% endif %}
+            {% if entity.configuration.steps is defined %}
+            {% for name, config in entity.configuration.steps %}
+            {% set config = config|merge({name: name}) %}
+            steps.add(new StepModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
 
-                    {% if entity.configuration.transition_definitions is defined %}
-                    {% for name, config in entity.configuration.transition_definitions %}
-                    {% set config = config|merge({name: name}) %}
-                    transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
-                    {% endfor %}
-                    {% endif %}
+            {% if entity.configuration.transition_definitions is defined %}
+            {% for name, config in entity.configuration.transition_definitions %}
+            {% set config = config|merge({name: name}) %}
+            transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
 
-                    {% if entity.configuration.transitions is defined %}
-                    {% for name, config in entity.configuration.transitions %}
-                    {% set config = config|merge({name: name}) %}
-                    transitions.add(new TransitionModel({{ config|json_encode|raw }}));
-                    {% endfor %}
-                    {% endif %}
+            {% if entity.configuration.transitions is defined %}
+            {% for name, config in entity.configuration.transitions %}
+            {% set config = config|merge({name: name}) %}
+            transitions.add(new TransitionModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
 
-                    {% if entity.configuration.attributes is defined %}
-                    {% for name, config in entity.configuration.attributes %}
-                    {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
-                    attributes.add(new AttributeModel({{ config|json_encode|raw }}));
-                    {% endfor %}
-                    {% endif %}
+            {% if entity.configuration.attributes is defined %}
+            {% for name, config in entity.configuration.attributes %}
+            {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
+            attributes.add(new AttributeModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
 
-                    var configuration = {{ entity.configuration|json_encode|raw }};
-                    configuration.name = {{ entity.name|json_encode|raw }};
-                    configuration.label = {{ entity.label|json_encode|raw }};
-                    configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
-                    configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
-                    configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
-                    configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
-                    configuration.steps = steps;
-                    configuration.transition_definitions = transitionDefinitions;
-                    configuration.transitions = transitions;
-                    configuration.attributes = attributes;
+            var configuration = {{ entity.configuration|json_encode|raw }};
+            configuration.name = {{ entity.name|json_encode|raw }};
+            configuration.label = {{ entity.label|json_encode|raw }};
+            configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
+            configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
+            configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
+            configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
+            configuration.steps = steps;
+            configuration.transition_definitions = transitionDefinitions;
+            configuration.transitions = transitions;
+            configuration.attributes = attributes;
 
-                    var workflowModel = new WorkflowModel(configuration);
-                    workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
+            var workflowModel = new WorkflowModel(configuration);
+            workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
 
-                    var workflowManagement = new WorkflowManagement({
-                        el: '#{{ form.vars.id }}',
-                        stepsEl: '.workflow-definition-steps-list-container',
-                        saveBtnEl: '#save-btn',
-                        model: workflowModel
-                    });
+            var workflowManagement = new WorkflowManagement({
+                el: '#{{ form.vars.id }}',
+                stepsEl: '.workflow-definition-steps-list-container',
+                saveBtnEl: '#save-btn',
+                model: workflowModel
+            });
 
-                    workflowManagement.render();
-                });
+            workflowManagement.render();
+        });
     </script>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{
-    'title' : 'Designer'|trans,
-    'subblocks': [
-    {
-    'title': 'Workflow steps and transitions'|trans,
-    'data': [stepsListWidget]
-    }
-    ]
+        'title' : 'Designer'|trans,
+        'subblocks': [
+            {
+                'title': 'Workflow steps and transitions'|trans,
+                'data': [stepsListWidget]
+            }
+        ]
     }] ) %}
 
     {% set id = 'workflow-designer' %}
     {% set data = {
-    'dataBlocks': dataBlocks,
+        'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
 {% endblock content_data %}
