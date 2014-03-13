@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
 
 {% oro_title_set({params : {"%segment.name%": entity.name} }) %}
 {% set formAction = form.vars.value.id ? path('oro_segment_update', { 'id': form.vars.value.id }) : path('oro_segment_create')  %}
@@ -88,6 +89,23 @@
     %}
 
     {% set dataBlocks = dataBlocks|merge( [{
+        'title' : 'oro.segment.form.filters'|trans,
+        'content_attr': {'id': 'segment-filters'},
+        'subblocks': [
+            {
+                'title': 'oro.segment.form.filters'|trans,
+                'spanClass': 'segment-filters responsive-cell',
+                'data': [
+                    segmentQD.query_designer_condition_builder({
+                        'id': 'segment-condition-builder',
+                        'criteria_list_id': 'filter-criteria-list',
+                        'entity_choice_id': 'oro_segment_form_entity',
+                    })
+                ]
+            },
+        ]
+    },
+    {
         'title' : 'oro.segment.form.designer'|trans,
         'content_attr': {'id': 'segment-designer'},
         'subblocks': [
@@ -102,17 +120,6 @@
                     ),
                     QD.query_designer_column_list({'id': 'segment-column-list'}),
                     QD.query_designer_column_template('segment-column-row')
-                ]
-            },
-            {
-                'title': 'oro.segment.form.filters'|trans,
-                'spanClass': 'segment-filters responsive-cell',
-                'data': [
-                    QD.query_designer_condition_builder({
-                        'id': 'segment-condition-builder',
-                        'criteria_list_id': 'filter-criteria-list',
-                        'entity_choice_id': 'oro_segment_form_entity'
-                    })
                 ]
             },
         ]

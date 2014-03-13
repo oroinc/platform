@@ -78,19 +78,24 @@ abstract class AbstractQueryDesignerType extends AbstractType
      */
     protected function addFields($form, $factory, $entity = null)
     {
-        $form->add(
-            $factory->createNamed(
-                'grouping',
-                'oro_query_designer_grouping',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('grouping_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+        $config = $form->getConfig();
+
+        if ($config->getOption('grouping_column_choice_type')) {
+            $form->add(
+                $factory->createNamed(
+                    'grouping',
+                    'oro_query_designer_grouping',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $config->getOption('grouping_column_choice_type'),
+                        'entity'             => $entity ? $entity : null,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
+            );
+        }
+
         $form->add(
             $factory->createNamed(
                 'column',

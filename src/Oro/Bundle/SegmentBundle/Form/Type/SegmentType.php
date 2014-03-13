@@ -33,6 +33,19 @@ class SegmentType extends AbstractQueryDesignerType
     }
 
     /**
+     * Gets the default options for this type.
+     *
+     * @return array
+     */
+    public function getDefaultOptions()
+    {
+        return [
+            'column_column_choice_type'   => 'hidden',
+            'filter_column_choice_type'   => 'oro_entity_field_select'
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
