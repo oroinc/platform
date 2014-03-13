@@ -55,9 +55,9 @@ class OutputLogger extends AbstractLogger
      */
     public function log($level, $message, array $context = array())
     {
-        $verbosity = null === $this->verbosity
-            ? $this->output->getVerbosity()
-            : min($this->verbosity, $this->output->getVerbosity());
+        $verbosity = null !== $this->verbosity
+            ? $this->verbosity
+            : $this->output->getVerbosity();
         switch ($level) {
             case LogLevel::EMERGENCY:
             case LogLevel::ALERT:

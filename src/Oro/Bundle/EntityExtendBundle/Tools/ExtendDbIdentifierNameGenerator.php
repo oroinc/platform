@@ -34,7 +34,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     {
         return sprintf(
             '%s_%s%s',
-            strtolower($this->getShortClassName($entityClassName)),
+            strtolower(ExtendHelper::getShortClassName($entityClassName)),
             $associationName,
             self::RELATION_COLUMN_SUFFIX
         );
@@ -50,7 +50,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     {
         return sprintf(
             '%s%s',
-            strtolower($this->getShortClassName($entityClassName)),
+            strtolower(ExtendHelper::getShortClassName($entityClassName)),
             self::RELATION_COLUMN_SUFFIX
         );
     }
@@ -134,23 +134,13 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
         $prefix = substr(self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX, 0, -1);
 
         return $this->generateIdentifierName(
-            [$this->getShortClassName($entityClassName), $this->getShortClassName($targetEntityClassName)],
+            [
+                ExtendHelper::getShortClassName($entityClassName),
+                ExtendHelper::getShortClassName($targetEntityClassName)
+            ],
             [$fieldName],
             $prefix,
             false
         );
-    }
-
-    /**
-     * Extracts a class name (last part) from the given full class name
-     *
-     * @param string $className The full name of a class
-     * @return string
-     */
-    protected function getShortClassName($className)
-    {
-        $parts = explode('\\', $className);
-
-        return array_pop($parts);
     }
 }

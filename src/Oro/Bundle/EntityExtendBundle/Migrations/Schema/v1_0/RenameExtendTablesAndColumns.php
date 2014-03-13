@@ -4,12 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -254,7 +255,7 @@ class RenameExtendTablesAndColumns implements
             $targetTable = $schema->getTable($targetTableName);
             $oldTargetColumnName = sprintf(
                 'field_%s_%s_id',
-                strtolower($this->getShortClassName($entityClassName)),
+                strtolower(ExtendHelper::getShortClassName($entityClassName)),
                 $associationName
             );
             if ($targetTable->hasColumn($oldTargetColumnName)) {
@@ -320,18 +321,5 @@ class RenameExtendTablesAndColumns implements
         $targetClassName = array_pop($targetParts);
 
         return strtolower('oro_' . $className . '_' . $targetClassName . '_' . $fieldName);
-    }
-
-    /**
-     * Extracts a class name (last part) from the given full class name
-     *
-     * @param string $className The full name of a class
-     * @return string
-     */
-    protected function getShortClassName($className)
-    {
-        $parts = explode('\\', $className);
-
-        return array_pop($parts);
     }
 }

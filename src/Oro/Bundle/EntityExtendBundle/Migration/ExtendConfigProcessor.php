@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -34,12 +36,12 @@ class ExtendConfigProcessor
     /**
      * @param array                $configs
      * @param LoggerInterface|null $logger
-     * @param bool                 $dryRun
+     * @param bool                 $dryRun Log modifications without apply them
      * @throws \Exception
      */
     public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ? : new NullLogger();
         try {
             if (!empty($configs)) {
                 $this->filterConfigs($configs);
@@ -161,12 +163,10 @@ class ExtendConfigProcessor
             );
         }
 
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Create entity "%s".', $className),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf('Create entity "%s".', $className),
+            ['configs' => $configs]
+        );
 
         $this->configManager->createConfigEntityModel($className, $mode);
 
@@ -185,12 +185,10 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Update entity "%s".', $className),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf('Update entity "%s".', $className),
+            ['configs' => $configs]
+        );
 
         $haveChanges = $this->updateConfigs($configs, $className);
 
@@ -221,18 +219,16 @@ class ExtendConfigProcessor
             );
         }
 
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf(
-                    'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
-                    $fieldName,
-                    $fieldType,
-                    $mode,
-                    $className
-                ),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf(
+                'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
+                $fieldName,
+                $fieldType,
+                $mode,
+                $className
+            ),
+            ['configs' => $configs]
+        );
 
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
 
@@ -251,12 +247,10 @@ class ExtendConfigProcessor
      */
     protected function updateFieldModel($className, $fieldName, array $configs)
     {
-        if ($this->logger) {
-            $this->logger->notice(
-                sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
-                ['configs' => $configs]
-            );
-        }
+        $this->logger->notice(
+            sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
+            ['configs' => $configs]
+        );
 
         $haveChanges = $this->updateConfigs($configs, $className, $fieldName);
 
@@ -278,11 +272,9 @@ class ExtendConfigProcessor
     protected function changeFieldType($className, $fieldName, $fieldType)
     {
         if ($this->configManager->getConfigFieldModel($className, $fieldName)->getType() !== $fieldType) {
-            if ($this->logger) {
-                $this->logger->notice(
-                    sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
-                );
-            }
+            $this->logger->notice(
+                sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
+            );
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
         }
     }

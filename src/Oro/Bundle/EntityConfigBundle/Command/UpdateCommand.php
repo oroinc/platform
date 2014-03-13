@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
+use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
 class UpdateCommand extends BaseCommand
 {
@@ -18,30 +20,29 @@ class UpdateCommand extends BaseCommand
     {
         $this
             ->setName('oro:entity-config:update')
-            ->setDescription('Update configuration data for entities.')
+            ->setDescription('Updates configuration data for entities.')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overwrite config\'s option values')
             ->addOption(
                 'filter',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Entity class name filter(regExp), for example: \'Oro\\\\Bundle\\\\User*\', \'^Oro\\\\(.*)\\\\Region$\''
+                'Entity class name filter(regExp)'
+                . ', for example: \'Oro\\\\Bundle\\\\User*\', \'^Oro\\\\(.*)\\\\Region$\''
+            )
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Outputs modifications without apply them'
             );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @TODO: add --dry-run option to show diff about what will be changed
-     *
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getDescription());
-
-        /** @var ConfigDumper $configDumper */
-        $configDumper = $this->getContainer()->get('oro_entity_config.tools.dumper');
-
-        $configDumper->setLogger(new OutputLogger($output));
+        $output->writeln('Update configuration data for entities');
 
         $filter = $input->getOption('filter');
         if ($filter) {
@@ -49,14 +50,25 @@ class UpdateCommand extends BaseCommand
                 return array_filter(
                     $doctrineAllMetadata,
                     function ($item) use ($filter) {
-                        return preg_match('/'. str_replace('\\', '\\\\', $filter) . '/', $item->getName());
+                        /** @var ClassMetadataInfo $item */
+                        return preg_match('/' . str_replace('\\', '\\\\', $filter) . '/', $item->getName());
                     }
                 );
             };
         }
 
-        $configDumper->updateConfigs($input->getOption('force'), $filter);
-
-        $output->writeln('Completed');
+        $verbosity = $output->getVerbosity();
+        if (!$input->getOption('dry-run')) {
+            $verbosity--;
+        }
+        $logger = new ConfigLogger(new OutputLogger($output, true, $verbosity));
+        /** @var ConfigLoader $loader */
+        $loader = $this->getContainer()->get('oro_entity_config.config_loader');
+        $loader->load(
+            $input->getOption('force'),
+            $filter,
+            $logger,
+            $input->getOption('dry-run')
+        );
     }
 }
