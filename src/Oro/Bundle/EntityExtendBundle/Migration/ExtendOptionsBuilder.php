@@ -77,6 +77,20 @@ class ExtendOptionsBuilder
             return;
         }
 
+        $newColumnName = $this->getAndRemoveOption($options, ExtendOptionsManager::NEW_NAME_OPTION);
+        if ($newColumnName) {
+            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS])) {
+                $this->result[ExtendConfigProcessor::RENAME_CONFIGS] = [];
+            }
+            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName])) {
+                $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName] = [];
+            }
+            $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName][$columnName] = $newColumnName;
+            if (empty($options)) {
+                return;
+            };
+        }
+
         $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
         $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 

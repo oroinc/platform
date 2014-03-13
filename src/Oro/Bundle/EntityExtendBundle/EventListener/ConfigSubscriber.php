@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -46,6 +47,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             Events::NEW_ENTITY_CONFIG      => 'updateEntityConfig',
             Events::UPDATE_ENTITY_CONFIG   => 'updateEntityConfig',
             Events::NEW_FIELD_CONFIG       => 'newFieldConfig',
+            Events::RENAME_FIELD           => 'renameField',
         ];
     }
 
@@ -150,6 +152,23 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($entityConfig->is('upgradeable', false)) {
             $entityConfig->set('upgradeable', true);
             $configProvider->persist($entityConfig);
+        }
+    }
+
+    /**
+     * @param RenameFieldEvent $event
+     */
+    public function renameField(RenameFieldEvent $event)
+    {
+        $extendEntityConfig = $event->getConfigManager()->getProvider('extend')->getConfig($event->getClassName());
+        if ($extendEntityConfig->has('index')) {
+            $index = $extendEntityConfig->get('index');
+            if (isset($index[$event->getFieldName()])) {
+                $index[$event->getNewFieldName()] = $index[$event->getFieldName()];
+                unset($index[$event->getFieldName()]);
+                $extendEntityConfig->set('index', $index);
+                $event->getConfigManager()->persist($extendEntityConfig);
+            }
         }
     }
 

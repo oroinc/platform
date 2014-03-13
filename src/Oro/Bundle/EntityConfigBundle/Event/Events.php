@@ -12,4 +12,5 @@ final class Events
     const NEW_FIELD_CONFIG     = 'entity_config.new.field.config';
     const UPDATE_FIELD_CONFIG  = 'entity_config.update.field.config';
     const PRE_PERSIST_CONFIG   = 'entity_config.persist.config';
+    const RENAME_FIELD         = 'entity_config.rename.field';
 }

@@ -95,5 +95,7 @@ services:
 
     oro_entity_extend.migration.extension.rename:
         class: %oro_entity_extend.migration.extension.rename.class%
+        arguments:
+            - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: rename, priority: -10 }
