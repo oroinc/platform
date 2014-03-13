@@ -27,6 +27,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 Events::NEW_ENTITY_CONFIG    => 'updateEntityConfig',
                 Events::UPDATE_ENTITY_CONFIG => 'updateEntityConfig',
                 Events::NEW_FIELD_CONFIG     => 'newFieldConfig',
+                Events::RENAME_FIELD         => 'renameField',
             ],
             ConfigSubscriber::getSubscribedEvents()
         );
