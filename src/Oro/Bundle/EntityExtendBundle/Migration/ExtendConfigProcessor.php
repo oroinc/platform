@@ -15,6 +15,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class ExtendConfigProcessor
 {
+    const RENAME_CONFIGS = '_rename_configs';
+
     /**
      * @var ConfigManager
      */
@@ -44,16 +46,31 @@ class ExtendConfigProcessor
         $this->logger = $logger ? : new NullLogger();
         try {
             if (!empty($configs)) {
+                $renameConfigs = [];
+                if (isset($configs[self::RENAME_CONFIGS])) {
+                    $renameConfigs = $configs[self::RENAME_CONFIGS];
+                    unset($configs[self::RENAME_CONFIGS]);
+                }
+
                 $this->filterConfigs($configs);
+
+                $hasChanges = false;
                 if (!empty($configs)) {
                     foreach ($configs as $className => $entityConfigs) {
                         $this->processEntityConfigs($className, $entityConfigs);
                     }
+                    $hasChanges = true;
+                }
+                if ($this->renameFields($renameConfigs)) {
+                    $hasChanges = true;
+                }
 
+                if ($hasChanges) {
                     if ($dryRun) {
                         $this->configManager->clear();
                     } else {
                         $this->configManager->flush();
+                        $this->configManager->clearCache();
                     }
                 }
             }
@@ -65,13 +82,15 @@ class ExtendConfigProcessor
 
     /**
      * Removes some configs.
-     *  - removes configs for non configurable entities if requested a change of field type only
+     *  - removes configs for non configurable entities if requested only doctrine related changes,
+     *    for example: field type, length, precision or scale
      *
      * @param array $configs
      */
     protected function filterConfigs(array &$configs)
     {
-        // removes configs for non configurable entities if requested a change of field type only
+        // removes configs for non configurable entities if requested only doctrine related changes
+        $doctrineFieldAttributes = ['length', 'precision', 'scale'];
         foreach ($configs as $className => $entityConfigs) {
             if (!ExtendHelper::isCustomEntity($className)) {
                 if (!$this->configManager->hasConfig($className)) {
@@ -79,9 +98,29 @@ class ExtendConfigProcessor
                     if (isset($entityConfigs['fields'])) {
                         $fieldsCanBeRemoved = true;
                         foreach ($entityConfigs['fields'] as $fieldConfigs) {
-                            if (!(isset($fieldConfigs['type']) && count($fieldConfigs) === 1)) {
-                                $fieldsCanBeRemoved = false;
-                                break;
+                            // check doctrine related attributes
+                            if (isset($fieldConfigs['configs']['extend'])) {
+                                $doctrineAttrModificationCount = 0;
+                                foreach ($doctrineFieldAttributes as $attrName) {
+                                    if (isset($fieldConfigs['configs']['extend'][$attrName])) {
+                                        $doctrineAttrModificationCount++;
+                                    }
+                                }
+                                if ($doctrineAttrModificationCount !== count($fieldConfigs['configs']['extend'])) {
+                                    $fieldsCanBeRemoved = false;
+                                    break;
+                                }
+                                // check type attribute
+                                if (isset($fieldConfigs['type']) && count($fieldConfigs) !== 2) {
+                                    $fieldsCanBeRemoved = false;
+                                    break;
+                                }
+                            } else {
+                                // check type attribute
+                                if (isset($fieldConfigs['type']) && count($fieldConfigs) !== 1) {
+                                    $fieldsCanBeRemoved = false;
+                                    break;
+                                }
                             }
                         }
                         if ($fieldsCanBeRemoved) {
@@ -303,5 +342,45 @@ class ExtendConfigProcessor
         }
 
         return $result;
+    }
+
+    /**
+     * Renames configurable fields
+     *
+     * @param array $renameConfigs
+     * @return bool TRUE if at least one field was renamed; otherwise, FALSE
+     */
+    protected function renameFields($renameConfigs)
+    {
+        $hasChanges = false;
+        foreach ($renameConfigs as $className => $renameConfig) {
+            foreach ($renameConfig as $fieldName => $newFieldName) {
+                if ($this->configManager->hasConfig($className, $fieldName)) {
+                    $renamed = $this->renameField($className, $fieldName, $newFieldName);
+                    if ($renamed && !$hasChanges) {
+                        $hasChanges = true;
+                    }
+                }
+            }
+        }
+
+        return $hasChanges;
+    }
+
+    /**
+     * Renames configurable field
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $newFieldName
+     * @return bool TRUE if a field was renamed; otherwise, FALSE
+     */
+    protected function renameField($className, $fieldName, $newFieldName)
+    {
+        $this->logger->notice(
+            sprintf('Rename field "%s" to "%s". Entity: %s.', $fieldName, $newFieldName, $className)
+        );
+
+        return $this->configManager->changeFieldName($className, $fieldName, $newFieldName);
     }
 }

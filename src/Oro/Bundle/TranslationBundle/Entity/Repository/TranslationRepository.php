@@ -76,4 +76,34 @@ class TranslationRepository extends EntityRepository
         }
         $this->getEntityManager()->persist($translationValue);
     }
+
+    /**
+     * Renames a translation key
+     *
+     * @param string $oldKey
+     * @param string $newKey
+     * @param string $domain
+     * @return bool if a translation key exists and it was renamed
+     */
+    public function renameKey(
+        $oldKey,
+        $newKey,
+        $domain = self::DEFAULT_DOMAIN
+    ) {
+        /** @var Translation[] $translationValues */
+        $translationValues = $this->findBy(
+            [
+                'key' => $oldKey,
+                'domain' => $domain
+            ]
+        );
+        $result = false;
+        foreach ($translationValues as $translationValue) {
+            $translationValue->setKey($newKey);
+            $this->getEntityManager()->persist($translationValue);
+            $result = true;
+        }
+
+        return $result;
+    }
 }
