@@ -98,7 +98,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($scope == 'datagrid'
             && $event->getConfig()->getId() instanceof FieldConfigId
             && !in_array($event->getConfig()->getId()->getFieldType(), ['text'])
-            && $extendFieldConfig->is('is_extend')
+            && ($extendFieldConfig->is('is_extend') || $extendFieldConfig->is('extend'))
             && isset($change['is_visible'])
         ) {
             $index        = [];
@@ -110,6 +110,15 @@ class ConfigSubscriber implements EventSubscriberInterface
             $index[$event->getConfig()->getId()->getFieldName()] = $event->getConfig()->get('is_visible');
 
             $extendConfig->set('index', $index);
+
+            if (!$extendConfig->is('state', ExtendScope::STATE_NEW)) {
+                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+            }
+
+            if (!$extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                $extendFieldConfig->set('state', ExtendScope::STATE_UPDATED);
+                $event->getConfigManager()->persist($extendFieldConfig);
+            }
 
             $event->getConfigManager()->persist($extendConfig);
         }

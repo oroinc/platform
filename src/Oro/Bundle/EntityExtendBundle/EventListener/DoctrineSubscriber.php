@@ -62,6 +62,11 @@ class DoctrineSubscriber implements EventSubscriber
                         $fieldConfig = $configProvider->getConfig($className, $columnName);
 
                         if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+
+                            /**
+                             * TODO: use index name generator
+                             */
+
                             $cmBuilder->addIndex(
                                 array(ExtendConfigDumper::FIELD_PREFIX . $columnName),
                                 'oro_idx_' . $columnName
