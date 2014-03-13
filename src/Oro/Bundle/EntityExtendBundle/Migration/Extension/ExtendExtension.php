@@ -219,8 +219,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
      * @param array        $options
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function addManyToManyRelation(
         Schema $schema,
