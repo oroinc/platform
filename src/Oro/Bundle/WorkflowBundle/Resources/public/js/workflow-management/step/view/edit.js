@@ -100,8 +100,13 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
 
         renderWidget: function() {
             if (!this.widget) {
+                var title = this.model.get('name') ? __('Edit step') : __('Add new step');
+                if (this.model.get('_is_clone')) {
+                    title = __('Clone step');
+                }
+
                 this.widget = new DialogWidget({
-                    'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
+                    'title': title,
                     'el': this.$el,
                     'stateEnabled': false,
                     'incrementalPosition': false,

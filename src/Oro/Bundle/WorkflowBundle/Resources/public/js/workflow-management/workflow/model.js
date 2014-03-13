@@ -84,7 +84,6 @@ function(_, $, Backbone, Helper, __,
             cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
             cloned.form_options = Helper.deepClone(cloned.form_options);
             cloned.label = __('Copy of') + ' ' + cloned.label;
-            cloned._is_clone = true;
 
             var clonedModel = new TransitionModel(cloned);
             this.get('transitions').add(clonedModel);
@@ -105,6 +104,7 @@ function(_, $, Backbone, Helper, __,
             }, this);
             cloned.allowed_transitions = clonedAllowedTransitions;
             cloned.label = __('Copy of') + ' ' + cloned.label;
+            cloned._is_clone = true;
 
             return new StepModel(cloned);
         },

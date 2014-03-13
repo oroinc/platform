@@ -62,6 +62,7 @@ function(_, Backbone, messanger, __,
             this.listenTo(this.model, 'requestCloneStep', this.cloneStep);
             this.listenTo(this.model, 'requestRemoveStep', this.removeStep);
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
+            this.listenTo(this.model.get('transitions'), 'destroy', this.onTransitionRemove);
 
             this.listenTo(this.model, 'requestRemoveTransition', this.removeTransition);
             this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
@@ -365,6 +366,10 @@ function(_, Backbone, messanger, __,
 
         removeStep: function(model) {
             this._removeHandler(model, __('Are you sure you want to delete this step?'));
+        },
+
+        onTransitionRemove: function(transition) {
+            transition.getTransitionDefinition(this.model).destroy();
         },
 
         onStepRemove: function(step) {
