@@ -59,14 +59,13 @@ define(['backbone', 'backgrid', '../actions-panel'
 
         render: function () {
             var panel = this.actionsPanel;
-
-            this.$el.empty().append($(this.template).text());
+            this.$el.empty();
             if (panel.haveActions()) {
+                this.$el.append($(this.template).text());
                 panel.setElement(this.$('[data-action-panel]'));
                 panel.render();
                 panel.$el.children().wrap('<li/>');
             }
-
             return this;
         },
 
