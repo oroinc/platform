@@ -43,6 +43,9 @@
 .ui-widget-content{
     overflow: auto;
 }
+.ui-dialog.ui-widget-content{
+    overflow: visible;
+}
 .ui-dialog .ui-dialog-titlebar{
     position: relative;
     padding-right: 30px;

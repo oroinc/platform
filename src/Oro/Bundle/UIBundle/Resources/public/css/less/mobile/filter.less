@@ -5,7 +5,8 @@
   & > .dropdown {
     margin-left: auto;
     margin-right: auto;
-    width: 300px;
+    /* width: 300px; was need recheck for ipad1*/
+    width: 100%;
   }
   .dropdown > .dropdown-toggle {
     text-align: center;
@@ -19,7 +20,9 @@
     display: inline-block;
   }
   .dropdown > .dropdown-menu {
-    margin: 10px -10px 0 -10px;
+    margin: 10px auto 0;
+    max-width: 460px;
+    width: 100%;
   }
   .dropdown > .dropdown-menu:before {
     border-bottom: 8px solid rgba(0, 0, 0, 0.2);
@@ -27,7 +30,7 @@
     border-right: 8px solid transparent;
     content: "";
     display: inline-block;
-    left: 149px;
+    left: 47.8%;
     position: absolute;
     top: -8px;
   }
@@ -37,7 +40,7 @@
     border-right: 7px solid transparent;
     content: "";
     display: inline-block;
-    left: 150px;
+    left: 48%;
     position: absolute;
     top: -7px;
   }
@@ -72,7 +75,7 @@
   }
   .filter-criteria-selector {
     text-align: left;
-    width: 275px;
+    width: 93%;
   }
   .filter-list {
     margin: 0 0 5px -5px;

@@ -20,7 +20,7 @@
                 var $chart = $('#{{ widgetId }}-chart');
                 var $chartLegend = $('#{{ widgetId }}-legend');
                 var setChartSize = function () {
-                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.35), 350);
+                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.9), 350);
                     if (chartWidth != $chart.width()) {
                         $chart.width(chartWidth);
                         $chart.height(chartWidth);
