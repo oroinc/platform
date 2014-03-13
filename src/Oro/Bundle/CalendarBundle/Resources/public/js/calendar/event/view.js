@@ -92,6 +92,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 deleteAction.on('click', onDelete);
             });
 
+            eventForm.find('[name]').uniform('update');
+
             // init loading mask control
             this.loadingMask = new LoadingMask();
             this.eventDialog.$el.closest('.ui-dialog').append(this.loadingMask.render().$el);
@@ -170,7 +172,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             var fieldNameRegex = /\[(\w+)\]/g;
 
             _.each(inputs, function (input) {
-                var name = $(input).attr('name'),
+                input = $(input);
+                var name = input.attr('name'),
                     matches = [],
                     match;
 
@@ -179,7 +182,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 }
 
                 if (matches.length) {
-                    input = $(input);
                     var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
                         input.prop('checked', value);
@@ -206,7 +208,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                                 var collectionContent = prototype.replace(/__name__/g, collectionKey);
 
                                 container.append(collectionContent);
-                                collectionContent.uniform({selectAutoWidth : false});
                             }, prototype);
                         }
                     }
