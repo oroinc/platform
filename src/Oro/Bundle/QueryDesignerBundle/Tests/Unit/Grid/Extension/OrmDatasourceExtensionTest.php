@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -101,7 +102,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                 )
             );
 
-        $extension  = new OrmDatasourceExtension($manager);
+        $extension  = new OrmDatasourceExtension(new RestrictionBuilder($manager));
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
