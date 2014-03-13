@@ -20,15 +20,15 @@ function(_, Backbone, TransitionCollection) {
         },
 
         initialize: function() {
+            this.workflow = null;
             this.allowedTransitions = null;
             if (this.get('allowed_transitions') === null) {
                 this.set('allowed_transitions', []);
             }
         },
 
-        resetAllowedTransitions: function() {
-            this.allowedTransitions = null;
-            this.set('allowed_transitions', []);
+        setWorkflow: function(workflow) {
+            this.workflow = workflow;
         },
 
         getAllowedTransitions: function(workflowModel) {
@@ -69,6 +69,26 @@ function(_, Backbone, TransitionCollection) {
             }
 
             return this.allowedTransitions;
+        },
+
+        destroy: function(options) {
+            if (this.workflow) {
+                //Need to manually destroy collection elements to trigger all appropriate events
+                var removeTransitions = function (models) {
+                    if (models.length) {
+                        for (var i = models.length - 1; i > -1; i--) {
+                            models[i].destroy();
+                        }
+                    }
+                };
+
+                //Remove step transitions
+                removeTransitions(this.getAllowedTransitions(this.workflow).models);
+                //Remove transitions which lead into removed step
+                removeTransitions(this.workflow.get('transitions').where({'step_to': this.get('name')}));
+            }
+
+            Backbone.Model.prototype.destroy.call(this, options);
         }
     });
 });

@@ -46,6 +46,11 @@ function(_, Backbone, messanger, __,
         },
 
         initialize: function() {
+            _.each(this.model.get('steps').models, this.setWorkflow, this);
+            _.each(this.model.get('transitions').models, this.setWorkflow, this);
+            this.listenTo(this.model.get('steps'), 'add', this.setWorkflow);
+            this.listenTo(this.model.get('transitions'), 'add', this.setWorkflow);
+
             this.addStartStep();
             this.initStartStepSelector();
 
@@ -73,6 +78,10 @@ function(_, Backbone, messanger, __,
             this.$saveBtn = $(this.options.saveBtnEl);
             this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
             this.model.url = this.$saveBtn.data('url');
+        },
+
+        setWorkflow: function(item) {
+            item.setWorkflow(this.model);
         },
 
         initStartStepSelector: function() {
@@ -268,7 +277,8 @@ function(_, Backbone, messanger, __,
         },
 
         addNewStep: function() {
-            this.openManageStepForm(new StepModel());
+            var step = new StepModel();
+            this.openManageStepForm(step);
         },
 
         addNewTransition: function() {
@@ -276,10 +286,8 @@ function(_, Backbone, messanger, __,
         },
 
         cloneTransition: function(transition, step) {
-            var clonedTransition = this.model.cloneTransition(transition);
-            if (!_.isUndefined(step)) {
-                step.getAllowedTransitions(this.model).add(clonedTransition);
-            }
+            var clonedTransition = this.model.cloneTransition(transition, true);
+            this.openManageTransitionForm(clonedTransition, step);
         },
 
         removeTransition: function(model) {
@@ -297,7 +305,8 @@ function(_, Backbone, messanger, __,
         },
 
         addNewStepTransition: function(step) {
-            this.openManageTransitionForm(new TransitionModel(), step);
+            var transition = new TransitionModel();
+            this.openManageTransitionForm(transition, step);
         },
 
         openManageTransitionForm: function(transition, step_from) {
@@ -355,7 +364,7 @@ function(_, Backbone, messanger, __,
         },
 
         cloneStep: function(step) {
-            var clonedStep = this.model.cloneStep(step);
+            var clonedStep = this.model.cloneStep(step, true);
             this.openManageStepForm(clonedStep);
         },
 
@@ -369,29 +378,11 @@ function(_, Backbone, messanger, __,
             this._removeHandler(model, __('Are you sure you want to delete this step?'));
         },
 
-        onTransitionRemove: function(transition) {
-            transition.getTransitionDefinition(this.model).destroy();
-        },
-
         onStepRemove: function(step) {
             //Deselect start_step if it was removed
             if (this.$startStepEl.val() == step.get('name')) {
                 this.$startStepEl.select2('val', '');
             }
-
-            //Need to manually destroy collection elements to trigger all appropriate events
-            var removeTransitions = function (models) {
-                if (models.length) {
-                    for (var i = models.length - 1; i > -1; i--) {
-                        models[i].destroy();
-                    }
-                }
-            };
-
-            //Remove step transitions
-            removeTransitions(step.getAllowedTransitions(this.model).models);
-            //Remove transitions which lead into removed step
-            removeTransitions(this.model.get('transitions').where({'step_to': step.get('name')}));
         },
 
         render: function() {

@@ -70,6 +70,8 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
         },
 
         initialize: function() {
+            this.listenTo(this.model, 'destroy', this.remove);
+
             var template = this.options.template || $('#transition-form-template').html();
             this.template = _.template(template);
             this.button_example_template = _.template(this.options.button_example_template);
@@ -90,7 +92,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             }
         },
 
-        onStepAdd: function() {
+        onTransitionAdd: function() {
             var formData = Helper.getFormData(this.widget.form);
             if (!this.model.get('name')) {
                 this.model.set('name', Helper.getNameByString(formData.label, 'transition_'));
@@ -106,6 +108,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                 'class': formData.button_color
             });
             this.model.set('frontend_options', frontendOptions);
+            this.model.set('_is_clone', false);
 
             var stepFrom = formData.step_from ? formData.step_from : this.options.step_from;
             this.trigger('transitionAdd', this.model, stepFrom);
@@ -207,10 +210,22 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             return result;
         },
 
-        removeHandler: function() {
-            this.attributesFormView.remove();
-            this.attributesList.remove();
-            this.remove();
+        onCancel: function() {
+            if (this.model.get('_is_clone')) {
+                this.model.destroy();
+            } else {
+                this.remove();
+            }
+        },
+
+        remove: function() {
+            if (this.attributesFormView) {
+                this.attributesFormView.remove();
+            }
+            if (this.attributesList) {
+                this.attributesList.remove();
+            }
+            Backbone.View.prototype.remove.call(this);
         },
 
         render: function() {
@@ -236,7 +251,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                 'stateEnabled': false,
                 'incrementalPosition': false,
                 'dialogOptions': {
-                    'close': _.bind(this.removeHandler, this),
+                    'close': _.bind(this.onCancel, this),
                     'width': 800,
                     'modal': true
                 }
@@ -244,13 +259,12 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             this.listenTo(this.widget, 'renderComplete', function(el) {
                 mediator.trigger('layout.init', el);
             });
-            this.listenTo(this.widget, 'adoptedFormResetClick', this.removeHandler);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onStepAdd, this)
+                'submitHandler': _.bind(this.onTransitionAdd, this)
             });
 
             this.$exampleContainer = this.$('.transition-example-container');

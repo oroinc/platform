@@ -1,10 +1,9 @@
 /* global define */
 define(['underscore', 'orotranslation/js/translator', 'backbone', 'oroui/js/messenger', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
-    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list',
-    'oroworkflow/js/workflow-management/transition/model'
+    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list'
 ],
-function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, TransitionsListView, TransitionModel) {
+function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
     'use strict';
 
     var $ = Backbone.$;
@@ -19,10 +18,6 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             'class': 'widget-content'
         },
 
-        events: {
-            'click .add-transition': 'addStepTransition'
-        },
-
         options: {
             template: null,
             transitionListContainerEl: '.transitions-list-container',
@@ -30,6 +25,8 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
         },
 
         initialize: function() {
+            this.listenTo(this.model, 'destroy', this.remove);
+
             var template = this.options.template || $('#step-form-template').html();
             this.template = _.template(template);
             this.widget = null;
@@ -39,8 +36,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             var formData = Helper.getFormData(this.widget.form);
             var order = parseInt(formData.order);
 
-            var isNew = !this.model.get('name');
-            if (isNew) {
+            if (!this.model.get('name')) {
                 this.model.set('name', Helper.getNameByString(formData.label, 'step_'));
             }
             this.model.set('order', order > 0 ? order : 0);
@@ -50,41 +46,21 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
 
             this.trigger('stepAdd', this.model);
 
-            if (isNew) {
-                this.render();
-                messenger.notificationFlashMessage(
-                    'success',
-                    __('Step saved.'),
-                    {container: this.$el, insertMethod: 'prependTo'}
-                );
-            } else {
-                this.widget.remove();
-            }
-        },
-
-        addStepTransition: function() {
-            var transition = new TransitionModel();
-            this.options.workflow.trigger('requestEditTransition', transition, this.model);
+            this.widget.remove();
         },
 
         onCancel: function() {
             if (this.model.get('_is_clone')) {
-                var removeTransitions = function (models) {
-                    if (models.length) {
-                        for (var i = models.length - 1; i > -1; i--) {
-                            models[i].destroy();
-                        }
-                    }
-                };
-                removeTransitions(this.model.getAllowedTransitions(this.model).models);
-
                 this.model.destroy();
+            } else {
+                this.remove();
             }
-            this.remove();
         },
 
         remove: function() {
-            this.transitionsListView.remove();
+            if (this.transitionsListView) {
+                this.transitionsListView.remove();
+            }
             Backbone.View.prototype.remove.call(this);
         },
 

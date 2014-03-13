@@ -14,9 +14,7 @@ function(_, Backbone) {
         tagName: 'tr',
 
         events: {
-            'click .edit-transition': 'triggerEditTransition',
-            'click .delete-transition': 'triggerRemoveTransition',
-            'click .clone-transition': 'triggerCloneTransition'
+            'click .delete-transition': 'triggerRemoveTransition'
         },
 
         options: {
@@ -33,19 +31,9 @@ function(_, Backbone) {
             this.listenTo(this.model, 'destroy', this.remove);
         },
 
-        triggerEditTransition: function(e) {
-            e.preventDefault();
-            this.options.workflow.trigger('requestEditTransition', this.model, this.options.stepFrom);
-        },
-
         triggerRemoveTransition: function(e) {
             e.preventDefault();
             this.options.workflow.trigger('requestRemoveTransition', this.model);
-        },
-
-        triggerCloneTransition: function(e) {
-            e.preventDefault();
-            this.options.workflow.trigger('requestCloneTransition', this.model, this.options.stepFrom);
         },
 
         render: function() {
