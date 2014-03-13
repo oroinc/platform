@@ -103,7 +103,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     protected function removeConfigProcessorOptionsFile()
     {
         if (is_file($this->configProcessorOptionsPath)) {
-            //!!!!!!!unlink($this->configProcessorOptionsPath);
+            unlink($this->configProcessorOptionsPath);
         }
     }
 
