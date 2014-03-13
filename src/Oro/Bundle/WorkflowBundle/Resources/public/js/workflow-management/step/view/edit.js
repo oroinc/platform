@@ -70,7 +70,7 @@ function(_, __, Backbone, DialogWidget, Helper, mediator, TransitionsListView, T
 
         renderTransitions: function() {
             var transitionsContainer = this.$('.transitions-section');
-            if (this.options.workflow.get('steps').length > 1) {
+            if (this.options.workflow.get('steps').length > 1 && this.model.get('name')) {
                 transitionsContainer.show();
                 this.transitionsListView = new TransitionsListView({
                     el: this.$el.find(this.options.transitionListContainerEl),
