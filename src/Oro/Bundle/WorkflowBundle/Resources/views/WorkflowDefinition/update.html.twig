@@ -208,7 +208,6 @@
                     </div>
                 </div>
 
-
                 <div class="widget-actions">
                     <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
                     <button type="submit" class="btn btn-success">{{ "Save"|trans }}</button>
@@ -216,9 +215,13 @@
             </form>
 
             <div class="transitions-section">
-                <h5>{{ 'Transitions'|trans }}</h5>
+                <div style="height: 36px">
+                    <h5 style="display: inline">{{ 'Transitions'|trans }}</h5>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary add-transition"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+                    </div>
+                </div>
                 <div class="transitions-list-container"></div>
-                <button type="button" class="btn btn-primary add-transition"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
             </div>
         </div>
     </script>
