@@ -1,6 +1,6 @@
 /* global define */
-define(['backbone'],
-function(Backbone) {
+define(['underscore', 'backbone'],
+function(_, Backbone) {
     'use strict';
 
     /**
@@ -22,8 +22,12 @@ function(Backbone) {
         },
 
         initialize: function() {
-            if (this.get('form_options') === null) {
+            if (_.isEmpty(this.get('form_options'))) {
                 this.set('form_options', {'attribute_fields': {}});
+            }
+
+            if (_.isEmpty(this.get('form_options').attribute_fields)) {
+                this.get('form_options').attribute_fields = {};
             }
         },
 

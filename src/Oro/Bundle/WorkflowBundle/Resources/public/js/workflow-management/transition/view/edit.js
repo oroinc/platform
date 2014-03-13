@@ -141,7 +141,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
 
             var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName)
                 ? formOptions.attribute_fields[attributeName]
-                : null;
+                : {};
             if (!formOptionsData && (data.required || data.label)) {
                 formOptionsData = {};
             }
