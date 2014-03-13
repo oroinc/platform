@@ -67,21 +67,14 @@ class ReminderExtension extends \Twig_Extension
          */
         $user = $this->securityContext->getToken()->getUser();
 
-        $remindersList = array();
-
         if (is_object($user) && $user instanceof User) {
-            $reminders = $this->entityManager->getRepository('Oro\Bundle\ReminderBundle\Entity\Reminder')
+            $reminders = $this->entityManager->getRepository('OroReminderBundle:Reminder')
                 ->findRequestedReminders($user);
 
-            /**
-             * @var Reminder $reminder
-             */
-            foreach ($reminders as $reminder) {
-                $remindersList[] = $this->messageParamsProvider->getMessageParams($reminder);
-            }
+            return $this->messageParamsProvider->getMessageParamsForReminders($reminders);
         }
 
-        return $remindersList;
+        return array();
     }
 
     /**

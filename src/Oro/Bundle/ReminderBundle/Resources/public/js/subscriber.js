@@ -1,5 +1,5 @@
 /*global define*/
-define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, messenger, routing) {
+define(['jquery','orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore'], function ($, sync, messenger, routing, _) {
     /**
      * @export ororeminder/js/subscriber
      */
@@ -10,10 +10,12 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
          */
         init: function (id, oldReminders) {
             var that = this;
+
             sync.subscribe('oro/reminder/remind_user_' + id, function (messageParams) {
                 messageParams = JSON.parse(messageParams);
                 that.showReminders([messageParams]);
             });
+
             that.showReminders(oldReminders);
         },
 
@@ -21,30 +23,49 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
          * @param {array} messageParamsArray
          */
         showReminders: function (messageParamsArray) {
-            var reminderIds = [];
             for (var i = 0; i < messageParamsArray.length; i++) {
                 var messageObject = messageParamsArray[i];
-                reminderIds.push(messageObject.id);
-
-                var message = messageObject.url != ''
-                    ? '<a href="' + messageObject.url + '">' + messageObject.text + '</a>'
-                    : '<span>' + messageObject.text + '</span>';
-                message = '<i class="icon-bell"></i>'+message;
-
-                messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
+                var message = this.reminderTextConstructor(messageObject);
+                message += '(<a class="reminders_dismiss_link" data-id="'+messageObject.id+'" href="javascript:void(0);">dismiss</a>)';
+                var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
+                $('.reminders_dismiss_link[data-id="'+messageObject.id+'"]').click(actions, function(eventObject){
+                    var url = routing.generate('oro_reminder_shown');
+                    var reminderId = $(this).data('id');
+                    eventObject.data.close();
+                    $.post(url, { 'id': reminderId }, function () {});
+                });
             }
-            if (reminderIds.length > 0) {
-                this.changeRemindersState(reminderIds);
-            }
+
+            $('.alert-reminder .close').unbind('click').click(function() {
+                $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
+            });
         },
 
         /**
-         * Change reminder state to sent one
-         * @param {array} $reminderIds
+         * @param {object} messageObject
+         * @returns {string}
          */
-        changeRemindersState: function ($reminderIds) {
-            var url = routing.generate('oro_reminder_shown');
-            $.post(url, { 'ids': $reminderIds }, function () {});
+        reminderTextConstructor: function(messageObject){
+
+            var message = '<i class="icon-bell"></i>';
+            var template = $('.reminder_templates[data-identifier="' + messageObject.templateId + '"]').html();
+            if ($.trim(template) == '') {
+                template = $('.reminder_templates[data-identifier="default"]').html();
+            }
+            message += _.template(template, messageObject);
+            return message;
+        },
+        /**
+         * Reloads reminders from server
+         * It need for actualisation data
+         */
+        reloadReminders: function(){
+            var url = routing.generate('oro_reminder_requested')+'#'+Math.random();
+            var that = this;
+            require(['text!'+url], function(messageParams){
+                messageParams = JSON.parse(messageParams);
+                that.showReminders(messageParams);
+            });
         }
     };
 });

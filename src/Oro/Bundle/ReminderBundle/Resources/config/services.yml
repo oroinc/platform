@@ -55,6 +55,7 @@ services:
             - @translator
             - @oro_locale.formatter.date_time
             - @oro_reminder.url_provider
+            - @oro_entity_config.provider.reminder
 
     oro_reminder.url_provider:
         class: %oro_reminder.url_provider.class%

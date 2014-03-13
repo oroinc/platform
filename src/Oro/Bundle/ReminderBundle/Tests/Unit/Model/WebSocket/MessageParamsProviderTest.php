@@ -14,6 +14,11 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $configProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $dateTimeFormatter;
 
     /**
@@ -40,16 +45,20 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->messageParamsProvider = new MessageParamsProvider(
             $this->translator,
             $this->dateTimeFormatter,
-            $this->urlProvider
+            $this->urlProvider,
+            $this->configProvider
         );
     }
 
     public function testGetMessageParamsSetupCorrectParams()
     {
-        $expectedMessage = 'some expected message';
         $expectedId = 42;
         $expectedSubject = 'testSubject';
         $expectedExpireAt = new \DateTime();
@@ -72,19 +81,77 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
             ->with($expectedExpireAt)
             ->will($this->returnValue($expectedFormattedExpireAt));
 
-        $translatorExpected = array('%expireAt%' => $expectedFormattedExpireAt, '%subject%' => $expectedSubject);
-
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('oro.reminder.message', $this->equalTo($translatorExpected))
-            ->will($this->returnValue($expectedMessage));
-
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
+
+        $expectedIdentifier = 'test_template_identifier';
+        $expectedRelatedClassName = 'Tasks';
+
+        $reminder->expects($this->once())
+            ->method('getRelatedEntityClassName')
+            ->will($this->returnValue($expectedRelatedClassName));
+
+        $configInterface = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configInterface->expects($this->once())->method('get')->will($this->returnValue($expectedIdentifier));
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($expectedRelatedClassName)
+            ->will($this->returnValue($configInterface));
 
         $params = $this->messageParamsProvider->getMessageParams($reminder);
 
         $this->assertEquals($expectedId, $params['id']);
         $this->assertEquals($expectedUrl, $params['url']);
-        $this->assertEquals($expectedMessage, $params['text']);
+        $this->assertEquals($expectedSubject, $params['subject']);
+        $this->assertEquals($expectedFormattedExpireAt, $params['expireAt']);
+        $this->assertEquals($expectedIdentifier, $params['templateId']);
+    }
+
+    public function testGetMessageParamsForRemindersSetupCorrectParams()
+    {
+        $expectedId = 42;
+        $expectedSubject = 'testSubject';
+        $expectedExpireAt = new \DateTime();
+        $expectedFormattedExpireAt = 'formatted date time';
+        $expectedUrl = 'www.tests.com';
+
+        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($expectedId));
+        $reminder->expects($this->once())
+            ->method('getSubject')
+            ->will($this->returnValue($expectedSubject));
+        $reminder->expects($this->once())
+            ->method('getExpireAt')
+            ->will($this->returnValue($expectedExpireAt));
+
+        $this->dateTimeFormatter->expects($this->once())
+            ->method('format')
+            ->with($expectedExpireAt)
+            ->will($this->returnValue($expectedFormattedExpireAt));
+
+        $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
+
+        $expectedIdentifier = 'test_template_identifier';
+        $expectedRelatedClassName = 'Tasks';
+
+        $reminder->expects($this->once())
+            ->method('getRelatedEntityClassName')
+            ->will($this->returnValue($expectedRelatedClassName));
+
+        $configInterface = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configInterface->expects($this->once())->method('get')->will($this->returnValue($expectedIdentifier));
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($expectedRelatedClassName)
+            ->will($this->returnValue($configInterface));
+
+        $params = $this->messageParamsProvider->getMessageParamsForReminders(array($reminder));
+        $this->assertCount(1, $params);
+        $this->assertEquals($expectedId, $params[0]['id']);
+        $this->assertEquals($expectedUrl, $params[0]['url']);
+        $this->assertEquals($expectedSubject, $params[0]['subject']);
+        $this->assertEquals($expectedFormattedExpireAt, $params[0]['expireAt']);
+        $this->assertEquals($expectedIdentifier, $params[0]['templateId']);
     }
 }

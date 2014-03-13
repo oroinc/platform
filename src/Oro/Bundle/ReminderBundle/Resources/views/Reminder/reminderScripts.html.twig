@@ -1,7 +1,13 @@
 {% if check_ws() and app.user %}
-<script type="text/javascript">
-    require(['ororeminder/js/subscriber'], function(subscriber){
-        subscriber.init({{ app.user.id }}, {{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
-    });
-</script>
+    {% placeholder orocrm_reminder_reminder_templates %}
+    <script type="text/javascript">
+        require(['ororeminder/js/subscriber', 'oroui/js/mediator'], function(subscriber, mediator){
+            mediator.once('page-rendered', function () {
+                subscriber.init({{ app.user.id }}, {{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
+                mediator.on('hash_navigation_request:complete', function(){
+                    subscriber.reloadReminders();
+                });
+            });
+        });
+    </script>
 {% endif %}

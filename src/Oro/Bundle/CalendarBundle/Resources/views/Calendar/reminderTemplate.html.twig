@@ -1,0 +1,7 @@
+<script type="text/html" class="reminder_templates" data-identifier="calendar_event_template">
+    <% if (url != '') { %>
+    <span><a href="<%= url %>"><%= subject %></a> is due on <%= expireAt %></span>
+    <% } else { %>
+    <span><%= subject %>is starting at <%= expireAt %></span>
+    <% } %>
+</script>

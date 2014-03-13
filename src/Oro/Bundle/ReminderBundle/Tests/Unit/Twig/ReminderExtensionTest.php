@@ -93,20 +93,10 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')->will($this->returnValue($repository));
         $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
 
-        $this->paramsProvider->expects($this->at(0))
-            ->method('getMessageParams')
-            ->with($this->identicalTo($reminder))
-            ->will($this->returnValue($expectedReminder));
-
-        $this->paramsProvider->expects($this->at(1))
-            ->method('getMessageParams')
-            ->with($this->identicalTo($reminder1))
-            ->will($this->returnValue($expectedReminder1));
-
-        $this->paramsProvider->expects($this->at(2))
-            ->method('getMessageParams')
-            ->with($this->identicalTo($reminder2))
-            ->will($this->returnValue($expectedReminder2));
+        $this->paramsProvider->expects($this->once())
+            ->method('getMessageParamsForReminders')
+            ->with($reminders)
+            ->will($this->returnValue($expectedReminders));
 
         $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals($expectedReminders, $actual);
