@@ -370,6 +370,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                 self.setTimeline();
             };
 
+            options.eventAfterRender = function(event, element) {
+                var reminders = self.getCollection().get(event.id).get('reminders');
+                if (reminders && Object.keys(reminders).length) {
+                    element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
+                } else {
+                    element.find('.icon').remove();
+                }
+            };
+
             // create jQuery FullCalendar control
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;

@@ -47,6 +47,12 @@ class CalendarEvent implements RemindableInterface
      *
      * @ORM\ManyToOne(targetEntity="Calendar", inversedBy="events")
      * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true},
+     *      "email"={"available_in_template"=true}
+     *  }
+     * )
      */
     protected $calendar;
 
