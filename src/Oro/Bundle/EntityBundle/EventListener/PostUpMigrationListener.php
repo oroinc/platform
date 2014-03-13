@@ -2,23 +2,31 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Oro\Bundle\EntityBundle\Migration\UpdateEntityIndexMigration;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class PostUpMigrationListener
 {
     /**
-     * @var ConfigDumper
+     * @var EntityClassResolver
      */
-    protected $configDumper;
+    protected $entityClassResolver;
 
     /**
-     * @param ConfigDumper $configDumper
+     * @var ConfigProvider
      */
-    public function __construct(ConfigDumper $configDumper)
+    protected $extendConfigProvider;
+
+    /**
+     * @param EntityClassResolver $entityClassResolver
+     * @param ConfigProvider $extendConfigProvider
+     */
+    public function __construct(EntityClassResolver $entityClassResolver, ConfigProvider $extendConfigProvider)
     {
-        $this->configDumper = $configDumper;
+        $this->entityClassResolver  = $entityClassResolver;
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -28,9 +36,11 @@ class PostUpMigrationListener
      */
     public function onPostUp(PostMigrationEvent $event)
     {
-        var_dump('EntityBundle postUp migration');
-        /*$event->addMigration(
-            new UpdateEntityConfigMigration($this->configDumper)
-        );*/
+        $event->addMigration(
+            new UpdateEntityIndexMigration(
+                $this->entityClassResolver,
+                $this->extendConfigProvider
+            )
+        );
     }
 }
