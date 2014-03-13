@@ -206,6 +206,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                                 var collectionContent = prototype.replace(/__name__/g, collectionKey);
 
                                 container.append(collectionContent);
+                                collectionContent.uniform({selectAutoWidth : false});
                             }, prototype);
                         }
                     }
