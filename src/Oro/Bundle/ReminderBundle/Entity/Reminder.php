@@ -23,7 +23,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  * @Config(
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-bell-o"
+ *          "icon"="icon-bell"
  *      },
  *      "dataaudit"={"auditable"=true}
  *  }
