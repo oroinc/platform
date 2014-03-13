@@ -4,8 +4,8 @@
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 {% set title = entity.name
-    ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
-    : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+: 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
 %}
 {% set formAction = entity.name ? path('oro_workflow_definition_update', { 'name': entity.name }) : path('oro_workflow_definition_create')  %}
 
@@ -20,12 +20,12 @@
 {% block navButtons %}
     {% if entity.name and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
-            'dataRedirect': path('oro_workflow_definition_index'),
-            'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-workflow',
-            'dataId': entity.name,
-            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+        'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
+        'dataRedirect': path('oro_workflow_definition_index'),
+        'aCss': 'no-hash remove-button',
+        'id': 'btn-remove-workflow',
+        'dataId': entity.name,
+        'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -45,10 +45,10 @@
 {% block pageHeader %}
     {% if entity.name %}
         {% set breadcrumbs = {
-            'entity':      entity,
-            'indexPath':   path('oro_workflow_definition_index'),
-            'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
-            'entityTitle': entity.label
+        'entity':      entity,
+        'indexPath':   path('oro_workflow_definition_index'),
+        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
         } %}
         {{ parent() }}
     {% else %}
@@ -65,7 +65,7 @@
     {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
 
     {% set requiredConstraint = {
-        "NotBlank": null
+    "NotBlank": null
     } %}
     <style type="text/css">
         .tab-data {
@@ -93,20 +93,20 @@
                                 </div>
 
                                 <% if(!stepFrom || stepFrom.get('name')) {
-                                    var stepFromName = stepFrom ? stepFrom.get('name') : '';
+                                var stepFromName = stepFrom ? stepFrom.get('name') : '';
                                 %>
                                 <div class="control-group">
                                     <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
                                     <div class="controls">
                                         <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
-                                            <% if (name) { %>disabled="disabled"<% } %>
+                                        <% if (name) { %>disabled="disabled"<% } %>
                                         >
-                                            <% _.each(allowedStepsFrom, function (step) { %>
-                                            <option
+                                        <% _.each(allowedStepsFrom, function (step) { %>
+                                        <option
                                                 value="<%= step.get('name') %>"
-                                                <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
-                                            ><%= step.get('label') %></option>
-                                            <% }); %>
+                                        <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
+                                        ><%= step.get('label') %></option>
+                                        <% }); %>
                                         </select>
                                     </div>
                                 </div>
@@ -117,10 +117,10 @@
                                     <div class="controls">
                                         <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
                                             <option value=""></value>
-                                            <% _.each(allowedStepsTo, function (step) { %>
+                                                <% _.each(allowedStepsTo, function (step) { %>
                                             <option
-                                                value="<%= step.get('name') %>"
-                                                <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
+                                                    value="<%= step.get('name') %>"
+                                            <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
                                             ><%= step.get('label') %></option>
                                             <% }); %>
                                         </select>
@@ -147,9 +147,9 @@
                                 {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
 
                                 <% print('<sc' + 'ript>'); %>
-                                    require(['jquery'], function($) {
-                                    $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
-                                    });
+                                require(['jquery'], function($) {
+                                $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                                });
                                 <% print('</sc' + 'ript>'); %>
 
                                 <div class="control-group">
@@ -206,7 +206,7 @@
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#step-form" data-toggle="tab">{{ 'Info'|trans }}</a></li>
                     <% if (transitionsAllowed) { %>
-                        <li><a href="#step-transitions" data-toggle="tab">{{ 'Transitions'|trans }}</a></li>
+                    <li><a href="#step-transitions" data-toggle="tab">{{ 'Transitions'|trans }}</a></li>
                     <% } %>
                 </ul>
 
@@ -266,10 +266,10 @@
     <script type="text/template" id="step-list-template">
         <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
             <thead>
-                <th>{{ "Step name"|trans }}</th>
-                <th>{{ "Transitions"|trans }}</th>
-                <th>{{ "Poisition"|trans }}</th>
-                <th>{{ "Actions"|trans }}</th>
+            <th>{{ "Step name"|trans }}</th>
+            <th>{{ "Transitions"|trans }}</th>
+            <th>{{ "Poisition"|trans }}</th>
+            <th>{{ "Actions"|trans }}</th>
             </thead>
             <tbody></tbody>
         </table>
@@ -278,9 +278,9 @@
     <script type="text/template" id="step-row-template">
         <td class="step-name">
             <% if (_is_start) { %>
-                <%= label %>
+            <%= label %>
             <% } else { %>
-                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><%= label %></a>
+            <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -289,9 +289,9 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (!_is_start) { %>
-                    <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}"><i class="icon-copy"/></a>
-                    <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><i class="icon-edit"/></a>
-                    <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}"><i class="icon-remove"/></a>
+                <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}"><i class="icon-copy"/></a>
+                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><i class="icon-edit"/></a>
+                <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}"><i class="icon-remove"/></a>
                 <% } %>
                 <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}"><i class="icon-plus-sign"/></a>
             </div>
@@ -351,7 +351,7 @@
         <td>
             <%= entityField %>
             <% if (!is_entity_attribute) { %>
-                <span class="muted">({{ 'System'|trans }})</span>
+            <span class="muted">({{ 'System'|trans }})</span>
             <% } %>
         </td>
         <td>
@@ -379,13 +379,13 @@
             <th>{{ "Actions"|trans }}</th>
             </thead>
             <tbody>
-                <tr class="no-rows-message">
-                    <td colspan="3">
-                        <div style="padding: 10px 0;text-align: center">
+            <tr class="no-rows-message">
+                <td colspan="3">
+                    <div style="padding: 10px 0;text-align: center">
                             {{ 'There are no transitions yet.'|trans }}
                         </div>
-                    </td>
-                </tr>
+                </td>
+            </tr>
             </tbody>
         </table>
     </script>
@@ -405,137 +405,137 @@
     </script>
 
     {% set startStepSelector %}
-        {% set startStep = entity.startStep ? entity.startStep.name : '' %}
-        <div class="control-group">
-            <label class="control-label">{{ "Default step"|trans }} <em></em></label>
-            <div class="controls">
-                <input type="hidden" name="start_step" value="{{ startStep }}"/>
-            </div>
+    {% set startStep = entity.startStep ? entity.startStep.name : '' %}
+    <div class="control-group">
+        <label class="control-label">{{ "Default step"|trans }} <em></em></label>
+        <div class="controls">
+            <input type="hidden" name="start_step" value="{{ startStep }}"/>
         </div>
+    </div>
     {% endset %}
 
     {% set dataBlocks = [{
-        'title': 'General'|trans,
-        'class': 'active',
-        'subblocks': [
-            {
-            'data': [
-                    form_row(form.label),
-                    form_row(form.related_entity),
-                    startStepSelector,
-                    form_row(form.steps_display_ordered)
-                ]
-            }
-        ]
+    'title': 'General'|trans,
+    'class': 'active',
+    'subblocks': [
+    {
+    'data': [
+    form_row(form.label),
+    form_row(form.related_entity),
+    startStepSelector,
+    form_row(form.steps_display_ordered)
+    ]
+    }
+    ]
     }] %}
 
     {% set stepsListWidget %}
-        <div class="clearfix">
-            <div class="workflow-definition-buttons" style="margin-top: -36px;">
-                <div class="pull-right">
-                    <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
-                    <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
-                </div>
+    <div class="clearfix">
+        <div class="workflow-definition-buttons" style="margin-top: -36px;">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+                <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
             </div>
         </div>
-        <div class="workflow-definition-steps-list-container"></div>
+    </div>
+    <div class="workflow-definition-steps-list-container"></div>
 
-        <script type="text/javascript">
-            require([
-                'oroworkflow/js/workflow-management',
-                'oroworkflow/js/workflow-management/workflow/model',
-                'oroworkflow/js/workflow-management/step/model',
-                'oroworkflow/js/workflow-management/transition/model',
-                'oroworkflow/js/workflow-management/transition-definition/model',
-                'oroworkflow/js/workflow-management/attribute/model',
-                'oroworkflow/js/workflow-management/step/collection',
-                'oroworkflow/js/workflow-management/transition/collection',
-                'oroworkflow/js/workflow-management/transition-definition/collection',
-                'oroworkflow/js/workflow-management/attribute/collection'
-            ],
-            function(WorkflowManagement, WorkflowModel,
-                StepModel,
-                TransitionModel,
-                TransitionDefinitionModel,
-                AttributeModel,
-                StepCollection,
-                TransitionCollection,
-                TransitionDefinitionCollection,
-                AttributeCollection
-            ) {
-                var steps = new StepCollection(),
-                    transitions = new TransitionCollection(),
-                    transitionDefinitions = new TransitionDefinitionCollection(),
-                    attributes = new AttributeCollection();
+    <script type="text/javascript">
+        require([
+            'oroworkflow/js/workflow-management',
+            'oroworkflow/js/workflow-management/workflow/model',
+            'oroworkflow/js/workflow-management/step/model',
+            'oroworkflow/js/workflow-management/transition/model',
+            'oroworkflow/js/workflow-management/transition-definition/model',
+            'oroworkflow/js/workflow-management/attribute/model',
+            'oroworkflow/js/workflow-management/step/collection',
+            'oroworkflow/js/workflow-management/transition/collection',
+            'oroworkflow/js/workflow-management/transition-definition/collection',
+            'oroworkflow/js/workflow-management/attribute/collection'
+        ],
+                function(WorkflowManagement, WorkflowModel,
+                         StepModel,
+                         TransitionModel,
+                         TransitionDefinitionModel,
+                         AttributeModel,
+                         StepCollection,
+                         TransitionCollection,
+                         TransitionDefinitionCollection,
+                         AttributeCollection
+                        ) {
+                    var steps = new StepCollection(),
+                            transitions = new TransitionCollection(),
+                            transitionDefinitions = new TransitionDefinitionCollection(),
+                            attributes = new AttributeCollection();
 
-                {% if entity.configuration.steps is defined %}
+                    {% if entity.configuration.steps is defined %}
                     {% for name, config in entity.configuration.steps %}
-                        {% set config = config|merge({name: name}) %}
-                        steps.add(new StepModel({{ config|json_encode|raw }}));
+                    {% set config = config|merge({name: name}) %}
+                    steps.add(new StepModel({{ config|json_encode|raw }}));
                     {% endfor %}
-                {% endif %}
+                    {% endif %}
 
-                {% if entity.configuration.transition_definitions is defined %}
+                    {% if entity.configuration.transition_definitions is defined %}
                     {% for name, config in entity.configuration.transition_definitions %}
-                        {% set config = config|merge({name: name}) %}
-                        transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
+                    {% set config = config|merge({name: name}) %}
+                    transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
                     {% endfor %}
-                {% endif %}
+                    {% endif %}
 
-                {% if entity.configuration.transitions is defined %}
+                    {% if entity.configuration.transitions is defined %}
                     {% for name, config in entity.configuration.transitions %}
-                        {% set config = config|merge({name: name}) %}
-                        transitions.add(new TransitionModel({{ config|json_encode|raw }}));
+                    {% set config = config|merge({name: name}) %}
+                    transitions.add(new TransitionModel({{ config|json_encode|raw }}));
                     {% endfor %}
-                {% endif %}
+                    {% endif %}
 
-                {% if entity.configuration.attributes is defined %}
+                    {% if entity.configuration.attributes is defined %}
                     {% for name, config in entity.configuration.attributes %}
-                        {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
-                        attributes.add(new AttributeModel({{ config|json_encode|raw }}));
+                    {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
+                    attributes.add(new AttributeModel({{ config|json_encode|raw }}));
                     {% endfor %}
-                {% endif %}
+                    {% endif %}
 
-                var configuration = {{ entity.configuration|json_encode|raw }};
-                configuration.name = {{ entity.name|json_encode|raw }};
-                configuration.label = {{ entity.label|json_encode|raw }};
-                configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
-                configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
-                configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
-                configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
-                configuration.steps = steps;
-                configuration.transition_definitions = transitionDefinitions;
-                configuration.transitions = transitions;
-                configuration.attributes = attributes;
+                    var configuration = {{ entity.configuration|json_encode|raw }};
+                    configuration.name = {{ entity.name|json_encode|raw }};
+                    configuration.label = {{ entity.label|json_encode|raw }};
+                    configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
+                    configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
+                    configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
+                    configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
+                    configuration.steps = steps;
+                    configuration.transition_definitions = transitionDefinitions;
+                    configuration.transitions = transitions;
+                    configuration.attributes = attributes;
 
-                var workflowModel = new WorkflowModel(configuration);
-                workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
+                    var workflowModel = new WorkflowModel(configuration);
+                    workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
 
-                var workflowManagement = new WorkflowManagement({
-                    el: '#{{ form.vars.id }}',
-                    stepsEl: '.workflow-definition-steps-list-container',
-                    saveBtnEl: '#save-btn',
-                    model: workflowModel
+                    var workflowManagement = new WorkflowManagement({
+                        el: '#{{ form.vars.id }}',
+                        stepsEl: '.workflow-definition-steps-list-container',
+                        saveBtnEl: '#save-btn',
+                        model: workflowModel
+                    });
+
+                    workflowManagement.render();
                 });
-
-                workflowManagement.render();
-            });
-        </script>
+    </script>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'Designer'|trans,
-            'subblocks': [
-                {
-                    'title': 'Workflow steps and transitions'|trans,
-                    'data': [stepsListWidget]
-                }
-        ]
+    'title' : 'Designer'|trans,
+    'subblocks': [
+    {
+    'title': 'Workflow steps and transitions'|trans,
+    'data': [stepsListWidget]
+    }
+    ]
     }] ) %}
 
     {% set id = 'workflow-designer' %}
     {% set data = {
-        'dataBlocks': dataBlocks,
+    'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
 {% endblock content_data %}
