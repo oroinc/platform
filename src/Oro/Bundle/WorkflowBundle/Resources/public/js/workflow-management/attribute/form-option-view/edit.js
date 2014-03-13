@@ -93,7 +93,7 @@ function(_, Backbone, Helper, __) {
                 'val',
                 this.options.workflow.getFieldIdByPropertyPath(data.property_path)
             );
-            this.labelEl.val(data.label);
+            this.labelEl.val(data.isSystemLabel ? '' : data.label);
             this.requiredEl.get(0).checked = data.required;
             this.submitBtn.html('<i class="icon-edit"></i> ' + __('Update'));
         },
