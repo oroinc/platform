@@ -67,6 +67,7 @@ function(_, Backbone, Helper, __) {
             this.entityFieldSelectEl.select2('val', '');
             this.form.get(0).reset();
             this.submitBtn.html('<i class="icon-plus"></i> ' + __('Add'));
+            this.resetBtn.addClass('hide');
         },
 
         initFieldChoice: function(container) {
@@ -96,6 +97,7 @@ function(_, Backbone, Helper, __) {
             this.labelEl.val(data.isSystemLabel ? '' : data.label);
             this.requiredEl.get(0).checked = data.required;
             this.submitBtn.html('<i class="icon-edit"></i> ' + __('Update'));
+            this.resetBtn.removeClass('hide');
         },
 
         render: function() {
@@ -107,9 +109,12 @@ function(_, Backbone, Helper, __) {
             this.initFieldChoice(this.form);
 
             this.submitBtn = this.form.find('[type=submit]');
+            this.resetBtn = this.form.find('[type=reset]');
             this.fieldSelectorEl = this.form.find('[name=property_path]');
             this.labelEl = this.form.find('[name=label]');
             this.requiredEl = this.form.find('[name=required]');
+
+            this.resetBtn.click(_.bind(this.resetForm, this));
 
             this.$el.append(this.form);
 

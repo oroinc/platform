@@ -44,6 +44,7 @@ Label: Label
 'Leave empty for system value': 'Leave empty for system value'
 Required: Required
 Add: Add
+Reset: Reset
 system: system
 yes: yes
 'Edit field': 'Edit field'

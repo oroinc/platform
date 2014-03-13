@@ -137,6 +137,8 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             var attributeName = attribute.get('name');
             var formOptions = this.model.get('form_options');
 
+            formOptions.attribute_fields = formOptions.attribute_fields || {};
+
             var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName)
                 ? formOptions.attribute_fields[attributeName]
                 : null;
