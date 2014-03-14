@@ -56,11 +56,12 @@ class MessageParamsProvider
     {
 
         return array(
-            'templateId' => $this->getTemplateId($reminder),
-            'expireAt'   => $this->dateTimeFormatter->format($reminder->getExpireAt()),
-            'subject'    => $reminder->getSubject(),
-            'url'        => $this->urlProvider->getUrl($reminder),
-            'id'         => $reminder->getId()
+            'templateId'   => $this->getTemplateId($reminder),
+            'expireAt'     => $this->dateTimeFormatter->format($reminder->getExpireAt()),
+            'subject'      => $reminder->getSubject(),
+            'url'          => $this->urlProvider->getUrl($reminder),
+            'id'           => $reminder->getId(),
+            'uniqueId'     => md5($reminder->getRelatedEntityClassName().$reminder->getRelatedEntityId())
         );
     }
 

@@ -32,13 +32,7 @@ class ReminderController extends Controller
 
         $userId = $user->getId();
 
-        $reminderId = $this->getRequest()->get('id', null);
-
-        if (!$reminderId) {
-            return new Response('', 200);
-        }
-
-        $reminders = $this->getReminderRepository()->findReminders(array($reminderId));
+        $reminders = $this->getReminderRepository()->findReminders($this->getRequest()->get('ids', array()));
 
         foreach ($reminders as $reminder) {
             if ($reminder->getState() == Reminder::STATE_REQUESTED &&

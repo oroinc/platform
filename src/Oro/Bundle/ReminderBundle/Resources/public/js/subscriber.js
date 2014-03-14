@@ -13,6 +13,7 @@ define(['jquery','orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore
 
             sync.subscribe('oro/reminder/remind_user_' + id, function (messageParams) {
                 messageParams = JSON.parse(messageParams);
+                $('.reminders_dismiss_link[data-unique-id="'+messageParams.uniqueId+'"]').click();
                 that.showReminders([messageParams]);
             });
 
@@ -21,20 +22,42 @@ define(['jquery','orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore
 
         /**
          * @param {array} messageParamsArray
+         * @return {object}
+         */
+        removeDuplicate: function(messageParamsArray){
+            var url = routing.generate('oro_reminder_shown');
+            var reminderIds = [];
+            var uniqueReminders = {};
+            messageParamsArray.reduce(function(previouse, current){
+                if (previouse[current.uniqueId]) {
+                    reminderIds.push(uniqueReminders[current.uniqueId].id);
+                }
+                previouse[current.uniqueId] = current;
+
+                return previouse;
+            }, uniqueReminders);
+            if(reminderIds.length>0){
+                $.post(url, { 'ids': reminderIds }, function () {});
+            }
+            return uniqueReminders;
+        },
+
+        /**
+         * @param {array} messageParamsArray
          */
         showReminders: function (messageParamsArray) {
-            for (var i = 0; i < messageParamsArray.length; i++) {
-                var messageObject = messageParamsArray[i];
+            $.each(this.removeDuplicate(messageParamsArray), function(key, messageObject){
                 var message = this.reminderTextConstructor(messageObject);
-                message += '(<a class="reminders_dismiss_link" data-id="'+messageObject.id+'" href="javascript:void(0);">dismiss</a>)';
+                message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
+                    + messageObject.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
                 var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
                 $('.reminders_dismiss_link[data-id="'+messageObject.id+'"]').click(actions, function(eventObject){
                     var url = routing.generate('oro_reminder_shown');
                     var reminderId = $(this).data('id');
                     eventObject.data.close();
-                    $.post(url, { 'id': reminderId }, function () {});
+                    $.post(url, { 'ids': [reminderId] }, function () {});
                 });
-            }
+            }.bind(this));
 
             $('.alert-reminder .close').unbind('click').click(function() {
                 $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
