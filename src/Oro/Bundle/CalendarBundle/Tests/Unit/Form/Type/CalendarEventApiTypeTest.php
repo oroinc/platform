@@ -2,8 +2,14 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
@@ -16,10 +22,6 @@ use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderType;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 
 class CalendarEventApiTypeTest extends TypeTestCase
