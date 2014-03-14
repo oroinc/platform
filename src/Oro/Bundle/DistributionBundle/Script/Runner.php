@@ -115,6 +115,16 @@ class Runner
     }
 
     /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function removeApplicationCache()
+    {
+        return $this->runCommand('cache:clear --no-warmup');
+    }
+
+    /**
+     * Removes dependency container an bundles definitions from the main application cache.
      * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
      */
     public function removeCachedFiles()
