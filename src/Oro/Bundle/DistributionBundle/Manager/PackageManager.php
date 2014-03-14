@@ -305,7 +305,6 @@ class PackageManager
                     },
                     $justInstalledPackages
                 );
-                $this->scriptRunner->updateDBSchema();
                 $this->scriptRunner->updateWorkflow($justInstalledPackages);
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
                 if ($loadDemoData) {

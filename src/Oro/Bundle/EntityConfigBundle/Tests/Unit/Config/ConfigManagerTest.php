@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -381,7 +381,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configCache->expects($this->once())
             ->method('removeAll');
-        $this->configManager->clearCacheAll();
+        $this->configManager->clearCache();
     }
 
     public function testClearConfigurableCache()
@@ -807,7 +807,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with(Events::UPDATE_ENTITY_CONFIG);
 
         $extendConfig = new Config(new EntityConfigId('extend', self::ENTITY_CLASS));
-        $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
+        $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -830,7 +830,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['owner' => ExtendManager::OWNER_SYSTEM]));
+            ->will($this->returnValue(['owner' => ExtendScope::OWNER_SYSTEM]));
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
@@ -1028,7 +1028,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($config));
 
         $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, 'id'));
-        $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
+        $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -1051,7 +1051,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['owner' => ExtendManager::OWNER_SYSTEM]));
+            ->will($this->returnValue(['owner' => ExtendScope::OWNER_SYSTEM]));
         $extendPropertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)

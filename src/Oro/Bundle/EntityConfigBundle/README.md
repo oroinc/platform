@@ -116,6 +116,9 @@ $configProvider = $this->get('oro_entity_config.provider.extend');
 ### ConfigManager
 This class is the central access point to entity configuration functionality. It allows to load/save configuration data from/into the database, manage configuration data, manage configuration data cache, retrieve the configuration provider for particular scope, and other.
 
+### EntityConfigAwareRepositoryInterface
+If you need to use the entity configuration in your entity repository you can just implement `EntityConfigAwareRepositoryInterface` interface. This interface has only one method `setEntityConfigManager` which is called each time when you get a repository from a Doctrine entity manager.
+
 ### Events
  - Events::NEW_ENTITY_CONFIG    - This event is raised when a new configurable entity is found and we are going to add its metadata to the database.
  - Events::UPDATE_ENTITY_CONFIG - This event is raised when we are going to update configurable entity metadata in the database.

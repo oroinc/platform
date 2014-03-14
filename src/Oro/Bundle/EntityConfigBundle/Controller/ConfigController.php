@@ -20,7 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
@@ -157,7 +157,7 @@ class ConfigController extends Controller
                 $link = $this->generateUrl($metadata->routeName);
             }
 
-            if ($extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
                     ['id' => str_replace('\\', '_', $entity->getClassName())]
