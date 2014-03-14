@@ -17,10 +17,14 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 // Exceptions
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
@@ -233,7 +237,6 @@ class WorkflowController extends FOSRestController
      *
      * Returns
      * - HTTP_OK (200)
-     * - HTTP_INTERNAL_SERVER_ERROR (500)
      *
      * @Rest\Get(
      *      "/api/rest/{version}/workflow/activate/{workflowDefinition}",
@@ -248,15 +251,19 @@ class WorkflowController extends FOSRestController
      */
     public function activateAction(WorkflowDefinition $workflowDefinition)
     {
-        return $this->handleView($this->view(null, Codes::HTTP_OK));
+        $workflowName = $workflowDefinition->getName();
+        $entityConfig = $this->getEntityConfig($workflowDefinition->getRelatedEntity());
+        $entityConfig->set('active_workflow', $workflowName);
+        $this->persistEntityConfig($entityConfig);
+
+        return $this->handleView($this->view($workflowName, Codes::HTTP_OK));
     }
 
     /**
      * Deactivate workflow
      *
      * Returns
-     * - HTTP_OK (200)
-     * - HTTP_INTERNAL_SERVER_ERROR (500)
+     * - HTTP_OK (204)
      *
      * @Rest\Get(
      *      "/api/rest/{version}/workflow/deactivate/{entityClass}",
@@ -271,7 +278,11 @@ class WorkflowController extends FOSRestController
      */
     public function deactivateAction($entityClass)
     {
-        return $this->handleView($this->view(null, Codes::HTTP_OK));
+        $entityConfig = $this->getEntityConfig($entityClass);
+        $entityConfig->set('active_workflow', null);
+        $this->persistEntityConfig($entityConfig);
+
+        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 
     /**
@@ -296,5 +307,32 @@ class WorkflowController extends FOSRestController
     protected function formatErrorResponse($message)
     {
         return array('message' => $message);
+    }
+
+    /**
+     * @param string $entityClass
+     * @return ConfigInterface
+     * @throws WorkflowException
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        /** @var ConfigProviderInterface $workflowConfigProvider */
+        $workflowConfigProvider = $this->get('oro_entity_config.provider.workflow');
+        if (!$workflowConfigProvider->hasConfig($entityClass)) {
+            throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+        }
+
+        return $workflowConfigProvider->getConfig($entityClass);
+    }
+
+    /**
+     * @param ConfigInterface $entityConfig
+     */
+    protected function persistEntityConfig(ConfigInterface $entityConfig)
+    {
+        /** @var ConfigManager $configManager */
+        $configManager = $this->get('oro_entity_config.config_manager');
+        $configManager->persist($entityConfig);
+        $configManager->flush();
     }
 }
