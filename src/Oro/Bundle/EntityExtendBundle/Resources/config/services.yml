@@ -3,7 +3,6 @@ parameters:
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
-    oro_entity_extend.tools.index_update.class:               Oro\Bundle\EntityExtendBundle\Tools\ExtendIndexUpdate
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
@@ -105,13 +104,6 @@ services:
         class: %oro_entity_extend.migration.update_index.post_up.listener.class%
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
-            - @oro_entity_config.provider.extend
+            - @doctrine
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }
-
-    oro_entity_extend.tools.index_update:
-        class: %oro_entity_extend.tools.index_update.class%
-        arguments:
-            - @oro_entity_extend.migration.entity_metadata_helper
-            - @oro_entity_config.provider.extend
-            - @oro_migration.db_id_name_generator

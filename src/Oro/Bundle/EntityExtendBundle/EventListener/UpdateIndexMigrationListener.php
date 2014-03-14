@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Doctrine\DBAL\Driver\Connection;
+
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendIndexMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
@@ -16,20 +18,20 @@ class UpdateIndexMigrationListener
     protected $entityMetadataHelper;
 
     /**
-     * @var ConfigProvider
+     * @var Connection
      */
-    protected $extendConfigProvider;
+    protected $connection;
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
-     * @param ConfigProvider $extendConfigProvider
+     * @param \Symfony\Bridge\Doctrine\ManagerRegistry $doctrine
      */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
-        ConfigProvider $extendConfigProvider
+        ManagerRegistry $doctrine
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
-        $this->extendConfigProvider = $extendConfigProvider;
+        $this->connection           = $doctrine->getConnection();
     }
 
     /**
@@ -42,7 +44,7 @@ class UpdateIndexMigrationListener
         $event->addMigration(
             new UpdateExtendIndexMigration(
                 $this->entityMetadataHelper,
-                $this->extendConfigProvider
+                $this->connection
             )
         );
     }
