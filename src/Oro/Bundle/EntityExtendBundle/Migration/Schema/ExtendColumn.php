@@ -21,6 +21,11 @@ class ExtendColumn extends Column
     protected $tableName;
 
     /**
+     * @var bool
+     */
+    protected $constructed = false;
+
+    /**
      * @param array $args
      */
     public function __construct(array $args)
@@ -29,6 +34,8 @@ class ExtendColumn extends Column
         $this->tableName            = $args['tableName'];
 
         parent::__construct($args);
+
+        $this->constructed = true;
     }
 
     /**
@@ -57,14 +64,52 @@ class ExtendColumn extends Column
      */
     public function setType(Type $type)
     {
-        $this->setOptions(
-            [
-                ExtendColumn::ORO_OPTIONS_NAME => [
-                    ExtendOptionsManager::TYPE_OPTION => $type->getName()
+        if ($this->constructed) {
+            $this->setOptions(
+                [
+                    ExtendColumn::ORO_OPTIONS_NAME => [
+                        ExtendOptionsManager::TYPE_OPTION => $type->getName()
+                    ]
                 ]
-            ]
-        );
+            );
+        }
 
         return parent::setType($type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLength($length)
+    {
+        if ($this->constructed) {
+            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['length' => $length]]]);
+        }
+
+        return parent::setLength($length);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPrecision($precision)
+    {
+        if ($this->constructed) {
+            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['precision' => $precision]]]);
+        }
+
+        return parent::setPrecision($precision);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setScale($scale)
+    {
+        if ($this->constructed) {
+            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['scale' => $scale]]]);
+        }
+
+        return parent::setScale($scale);
     }
 }

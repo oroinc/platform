@@ -34,6 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -318,7 +319,7 @@ class ConfigManager
      * @param      $scope
      * @param      $className
      * @param null $fieldName
-     * @return array
+     * @return ConfigIdInterface
      * @throws LogicException if a database is not synced
      * @throws RuntimeException if a model was not found
      */
@@ -744,11 +745,62 @@ class ConfigManager
      *
      * @param string $className
      * @param string $fieldName
+     * @param string $newFieldName
+     * @return bool TRUE if the name was changed; otherwise, FALSE
+     */
+    public function changeFieldName($className, $fieldName, $newFieldName)
+    {
+        $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
+        if ($result) {
+            $this->eventDispatcher->dispatch(
+                Events::RENAME_FIELD,
+                new RenameFieldEvent($className, $fieldName, $newFieldName, $this)
+            );
+            $providers = $this->getProviders();
+            foreach ($providers as $provider) {
+                /** @var FieldConfigId $configId */
+                $newConfigId = $this->getId($provider->getScope(), $className, $newFieldName);
+                $newConfigKey = $this->buildConfigKey($newConfigId);
+                $configId = new FieldConfigId(
+                    $newConfigId->getScope(),
+                    $newConfigId->getClassName(),
+                    $fieldName,
+                    $newConfigId->getFieldType()
+                );
+                $configKey = $this->buildConfigKey($configId);
+                if (isset($this->localCache[$configKey])) {
+                    $this->localCache[$newConfigKey] = $this->localCache[$configKey];
+                    unset($this->localCache[$configKey]);
+                }
+                if (isset($this->persistConfigs[$configKey])) {
+                    $this->persistConfigs[$newConfigKey] = $this->persistConfigs[$configKey];
+                    unset($this->persistConfigs[$configKey]);
+                }
+                if (isset($this->originalConfigs[$configKey])) {
+                    $this->originalConfigs[$newConfigKey] = $this->originalConfigs[$configKey];
+                    unset($this->originalConfigs[$configKey]);
+                }
+                if (isset($this->configChangeSets[$configKey])) {
+                    $this->configChangeSets[$newConfigKey] = $this->configChangeSets[$configKey];
+                    unset($this->configChangeSets[$configKey]);
+                }
+            }
+        };
+
+        return $result;
+    }
+
+    /**
+     * Changes a type of a field
+     *
+     * @param string $className
+     * @param string $fieldName
      * @param string $fieldType
+     * @return bool TRUE if the type was changed; otherwise, FALSE
      */
     public function changeFieldType($className, $fieldName, $fieldType)
     {
-        $this->modelManager->changeFieldType($className, $fieldName, $fieldType);
+        return $this->modelManager->changeFieldType($className, $fieldName, $fieldType);
     }
 
     /**

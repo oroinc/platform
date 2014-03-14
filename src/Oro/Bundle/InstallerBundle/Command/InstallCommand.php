@@ -282,7 +282,7 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:navigation:init')
+            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install')

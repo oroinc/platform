@@ -8,6 +8,7 @@ class ExtendOptionsManager
     const TYPE_OPTION         = '_type';
     const MODE_OPTION         = '_mode';
     const TARGET_OPTION       = '_target';
+    const NEW_NAME_OPTION     = '_new_name';
 
     /**
      * @var EntityMetadataHelper
