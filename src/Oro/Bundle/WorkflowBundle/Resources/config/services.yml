@@ -7,6 +7,7 @@ parameters:
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
     oro_workflow.datagrid.action_permission_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+    oro_workflow.datagrid.workflow_definition_entity_name_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDefinitionGridEntityNameProvider
     oro_workflow.field_generator.class: Oro\Bundle\WorkflowBundle\Field\FieldGenerator
     oro_workflow.field_provider.class: Oro\Bundle\WorkflowBundle\Field\FieldProvider
 
@@ -66,6 +67,13 @@ services:
 
     oro_workflow.datagrid.action_permission_provider:
         class: %oro_workflow.datagrid.action_permission_provider.class%
+
+    oro_workflow.datagrid.workflow_definition_entity_name_provider:
+        class: %oro_workflow.datagrid.workflow_definition_entity_name_provider.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @doctrine.orm.entity_manager
+            - @translator
 
     oro_workflow.field_generator:
         class: %oro_workflow.field_generator.class%
