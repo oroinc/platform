@@ -56,7 +56,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'range',
         'text'     => 'string',
         'float'    => 'number',
-        'money' => 'number',
+        'money'    => 'number',
         'percent'  => 'percent'
     );
 
