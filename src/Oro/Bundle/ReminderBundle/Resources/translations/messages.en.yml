@@ -14,3 +14,6 @@ oro:
         processor:
             email.label:      Email
             web_socket.label: Flash message
+
+        reminder_template:
+            due_message: is starting at
