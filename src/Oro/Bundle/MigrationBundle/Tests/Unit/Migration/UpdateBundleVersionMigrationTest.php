@@ -31,8 +31,8 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit_Framework_TestCase
             );
         }
 
-        $this->assertEmpty($queryBag->getPreSqls());
-        $postSqls = $queryBag->getPostSqls();
+        $this->assertEmpty($queryBag->getPreQueries());
+        $postSqls = $queryBag->getPostQueries();
         foreach ($assertQueries as $index => $query) {
             $this->assertTrue(strpos($postSqls[$index], $query) === 0);
         }

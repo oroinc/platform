@@ -262,7 +262,7 @@ class StepExecutor
                 ? $e->getItem()
                 : null;
 
-            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $item);
+            $warningHandler->handleWarning($element, $warningName, $e->getMessage(), $e->getMessageParameters(), $item);
         }
     }
 }

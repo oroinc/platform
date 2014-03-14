@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -57,10 +57,10 @@ class NavigationListener
 
             foreach ($extendConfigs as $extendConfig) {
                 if ($extendConfig->is('is_extend')
-                    && $extendConfig->get('owner') == ExtendManager::OWNER_CUSTOM
+                    && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
                     && $extendConfig->in(
                         'state',
-                        [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
+                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
