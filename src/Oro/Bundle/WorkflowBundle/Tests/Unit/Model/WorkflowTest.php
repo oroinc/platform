@@ -49,20 +49,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testEnabled()
-    {
-        $workflow = $this->createWorkflow();
-        $this->assertTrue($workflow->isEnabled());
-
-        $workflow->setEnabled(false);
-        $this->assertFalse($workflow->isEnabled());
-
-        $workflow->setEnabled(true);
-        $this->assertTrue($workflow->isEnabled());
-    }
-
-
-
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected transition argument type is string or Transition

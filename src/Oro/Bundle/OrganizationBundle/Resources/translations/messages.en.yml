@@ -26,6 +26,8 @@ oro:
             entity_label:        Business Unit
             entity_plural_label: Business Units
             entity_description:  Represent business unit
+            edit_entity:         Update Business Unit
+            new_entity:          New Business Unit
             id.label:           Id
             website.label:      Website
             users.label:        Users

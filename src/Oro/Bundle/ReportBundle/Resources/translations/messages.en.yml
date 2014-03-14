@@ -37,6 +37,7 @@ oro:
         form:
             designer:               Designer
             columns:                Columns
+            grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
 
