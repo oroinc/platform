@@ -11,10 +11,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class MessageParamsProvider
 {
+    const DEFAULT_IDENTIFIER = 'default';
+
     /**
      * @var DateTimeFormatter
      */
     protected $dateTimeFormatter;
+
     /**
      * @var Translator
      */
@@ -34,7 +37,7 @@ class MessageParamsProvider
      * @param Translator        $translator
      * @param DateTimeFormatter $dateTimeFormatter
      * @param UrlProvider       $urlProvider
-     * @param ConfigProvider     $provider
+     * @param ConfigProvider    $provider
      */
     public function __construct(
         Translator $translator,
@@ -43,9 +46,9 @@ class MessageParamsProvider
         ConfigProvider $provider
     ) {
         $this->dateTimeFormatter = $dateTimeFormatter;
-        $this->translator = $translator;
-        $this->urlProvider = $urlProvider;
-        $this->configProvider = $provider;
+        $this->translator        = $translator;
+        $this->urlProvider       = $urlProvider;
+        $this->configProvider    = $provider;
     }
 
     /**
@@ -54,7 +57,6 @@ class MessageParamsProvider
      */
     public function getMessageParams(Reminder $reminder)
     {
-
         return array(
             'templateId'   => $this->getTemplateId($reminder),
             'expireAt'     => $this->dateTimeFormatter->format($reminder->getExpireAt()),
@@ -82,12 +84,15 @@ class MessageParamsProvider
 
     /**
      * @param Reminder $reminder
-     * @return mixed|null|string
+     * @return string
      */
     protected function getTemplateId(Reminder $reminder)
     {
-        $className = $reminder->getRelatedEntityClassName();
-        $identifier = $this->configProvider->getConfig($className)->get('reminder_flash_template_identifier');
-        return empty($identifier) ? 'default' : $identifier;
+        $className  = $reminder->getRelatedEntityClassName();
+        $identifier = $this->configProvider
+            ->getConfig($className)
+            ->get('reminder_flash_template_identifier');
+
+        return $identifier ?: self::DEFAULT_IDENTIFIER;
     }
 }
