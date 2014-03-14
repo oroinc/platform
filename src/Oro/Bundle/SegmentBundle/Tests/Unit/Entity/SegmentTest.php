@@ -67,4 +67,20 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->entity->setLastRun($testData);
         $this->assertSame($testData, $this->entity->getLastRun());
     }
+
+    public function testLifecycleCallbacks()
+    {
+        $segment = new Segment();
+
+        $segment->beforeSave();
+        $this->assertNotNull($segment->getCreatedAt());
+        $this->assertNotNull($segment->getUpdatedAt());
+        $this->assertEquals($segment->getCreatedAt(), $segment->getUpdatedAt());
+
+        $segment = new Segment();
+        $segment->doUpdate();
+        $this->assertNull($segment->getCreatedAt());
+        $this->assertNotNull($segment->getUpdatedAt());
+        $this->assertNotEquals($segment->getCreatedAt(), $segment->getUpdatedAt());
+    }
 }

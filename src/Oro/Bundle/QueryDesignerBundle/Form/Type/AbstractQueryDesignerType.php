@@ -4,11 +4,11 @@ namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class AbstractQueryDesignerType extends AbstractType
@@ -80,7 +80,8 @@ abstract class AbstractQueryDesignerType extends AbstractType
     {
         $config = $form->getConfig();
 
-        if ($config->getOption('grouping_column_choice_type')) {
+        $groupingColumnChoiceType = $config->getOption('grouping_column_choice_type');
+        if ($groupingColumnChoiceType) {
             $form->add(
                 $factory->createNamed(
                     'grouping',
@@ -88,7 +89,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     null,
                     array(
                         'mapped'             => false,
-                        'column_choice_type' => $config->getOption('grouping_column_choice_type'),
+                        'column_choice_type' => $groupingColumnChoiceType,
                         'entity'             => $entity ? $entity : null,
                         'auto_initialize'    => false
                     )
@@ -96,31 +97,39 @@ abstract class AbstractQueryDesignerType extends AbstractType
             );
         }
 
-        $form->add(
-            $factory->createNamed(
-                'column',
-                'oro_query_designer_column',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('column_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+        $columnChoiceType = $config->getOption('column_column_choice_type');
+        if ($columnChoiceType)
+        {
+            $form->add(
+                $factory->createNamed(
+                    'column',
+                    'oro_query_designer_column',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $columnChoiceType,
+                        'entity'             => $entity ? $entity : null,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
-        $form->add(
-            $factory->createNamed(
-                'filter',
-                'oro_query_designer_filter',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('filter_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+            );
+        }
+
+        $filterColumnChoiceType = $config->getOption('filter_column_choice_type');
+        if ($filterColumnChoiceType) {
+            $form->add(
+                $factory->createNamed(
+                    'filter',
+                    'oro_query_designer_filter',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $filterColumnChoiceType,
+                        'entity'             => $entity ? $entity : null,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
+            );
+        }
     }
 }
