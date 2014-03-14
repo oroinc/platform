@@ -86,9 +86,6 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                 this.$exampleBtnContainer.html(
                     this.button_example_template(formData)
                 );
-                this.$exampleContainer.show();
-            } else {
-                this.$exampleContainer.hide();
             }
         },
 
