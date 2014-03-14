@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -64,10 +63,9 @@ class VariablesValidator extends ConstraintValidator
             foreach ($metadata->getAssociationMappings() as $mapping) {
                 $targetEntity = new $mapping['targetEntity'];
                 $fieldName    = $mapping['fieldName'];
-                if ($mapping['type'] == ClassMetadataInfo::ONE_TO_MANY) {
-                    $targetEntity = new ArrayCollection([$targetEntity]);
+                if (!in_array($mapping['type'], [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::MANY_TO_MANY])) {
+                    $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
                 }
-                $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
             }
         }
 

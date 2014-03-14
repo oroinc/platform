@@ -83,7 +83,8 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
                     [
                         'stdClass' => [
                             'targetEntity' => '\stdClass',
-                            'fieldName'    => 'stdClass'
+                            'fieldName'    => 'stdClass',
+                            'type' => 1
                         ]
                     ]
                 )
