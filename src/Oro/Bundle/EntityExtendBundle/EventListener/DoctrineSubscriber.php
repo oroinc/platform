@@ -64,10 +64,11 @@ class DoctrineSubscriber implements EventSubscriber
                         $fieldConfig = $configProvider->getConfig($className, $columnName);
 
                         if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
-                            /**
-                             * TODO: use index name generator
-                             */
-                            $cmBuilder->addIndex([$columnName], 'oro_idx_' . $columnName);
+                            $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
+                                $className,
+                                $columnName
+                            );
+                            $cmBuilder->addIndex([$columnName], $indexName);
                         }
                     }
                 }
