@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**

@@ -16,8 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class CustomEntityGridListener extends AbstractConfigGridListener
 {
@@ -32,9 +31,6 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /** @var null original entity class */
     protected $entityClass = null;
-
-    /** @var array fields to be shown on grid */
-    protected $queryFields = [];
 
     /** @var  integer parent entity id */
     protected $parentId;
@@ -157,7 +153,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         $extendConfigs        = $extendConfigProvider->getConfigs($this->entityClass);
 
         foreach ($extendConfigs as $extendConfig) {
-            if (!$extendConfig->is('state', ExtendManager::STATE_NEW) && !$extendConfig->get('is_deleted')) {
+            if (!$extendConfig->is('state', ExtendScope::STATE_NEW) && !$extendConfig->get('is_deleted')) {
                 list($field, $selectField) = $this->getDynamicFieldItem($alias, $extendConfig);
 
                 if (!empty($field)) {
@@ -204,14 +200,14 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function getDynamicFieldItem($alias, ConfigInterface $extendConfig)
     {
-        /** @var FieldConfigId $fieldConfig */
-        $fieldConfig = $extendConfig->getId();
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $extendConfig->getId();
 
         /** @var ConfigProvider $datagridProvider */
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
         $datagridConfig         = $datagridConfigProvider->getConfig(
             $this->entityClass,
-            $fieldConfig->getFieldName()
+            $fieldConfigId->getFieldName()
         );
 
         $select = '';
@@ -221,18 +217,14 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             $entityConfigProvider = $this->configManager->getProvider('entity');
             $entityConfig         = $entityConfigProvider->getConfig(
                 $this->entityClass,
-                $fieldConfig->getFieldName()
+                $fieldConfigId->getFieldName()
             );
 
-            $label = $entityConfig->get('label') ?: $fieldConfig->getFieldName();
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfig->getFieldName()
-                : $fieldConfig->getFieldName();
+            $label = $entityConfig->get('label') ?: $fieldConfigId->getFieldName();
+            $fieldName = $fieldConfigId->getFieldName();
 
-            $this->queryFields[] = $code;
-
-            $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfigId);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];
@@ -241,18 +233,25 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /**
      * @param string $code
      * @param $label
-     * @param FieldConfigId $fieldConfig
+     * @param FieldConfigId $fieldConfigId
      *
      * @return array
      */
-    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfig)
+    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId)
     {
+        // TODO: getting a field type from a model here is a temporary solution.
+        // We need to use $fieldConfigId->getFieldType()
+        $fieldType = $this->configManager->getConfigFieldModel(
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName()
+        )->getType();
+
         return [
             $code => [
                 'type'        => 'field',
                 'label'       => $label,
                 'field_name'  => $code,
-                'filter_type' => $this->filterMap[$fieldConfig->getFieldType()],
+                'filter_type' => $this->filterMap[$fieldType],
                 'required'    => false,
                 'sortable'    => true,
                 'filterable'  => true,
