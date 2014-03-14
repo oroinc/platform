@@ -179,18 +179,12 @@
 #}
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
-        {% set id = 'pinned-dropdown-button-' ~ parameters.groupKey|default('group') %}
-        <div class="pull-right" id="{{ id }}">
+        {% set options = parameters.options|default({})|merge({
+            groupKey: parameters.groupKey
+        }) %}
+        <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
             {{ parameters.html|raw }}
         </div>
-        <script type="text/javascript">
-            {% set options = parameters.options|default({})|merge({
-                groupKey: parameters.groupKey
-            }) %}
-            require(['oroui/js/content-processor/pinned-dropdown-button'], function ($) {
-                $('#{{ id }}').pinnedDropdownButtonProcessor({{ options|json_encode|raw }});
-            });
-        </script>
     {% else %}
         {{ parameters.html|raw }}
     {% endif %}
