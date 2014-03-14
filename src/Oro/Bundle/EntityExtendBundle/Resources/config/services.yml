@@ -63,7 +63,6 @@ services:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
         arguments:
             - @oro_entity_config.tools.command_executor
-            - %installed%
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
 
