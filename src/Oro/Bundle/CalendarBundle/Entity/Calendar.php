@@ -35,12 +35,6 @@ class Calendar
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true},
-     *      "email"={"available_in_template"=true}
-     *  }
-     * )
      */
     protected $id;
 

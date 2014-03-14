@@ -1,17 +1,13 @@
 @name = calendar_reminder
 @entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
-@subject = {{ entity.title }} is starting at {{ entity.start|oro_format_datetime }}
+@subject = {{ entity.title }} is starting at {{ entity.start|date('F j, Y, g:i A') }}
 @isSystem = 1
 @isEditable = 1
 
 <h1>{{ entity.title }}</h1>
 <div>
     <p>
-        <i>When:</i> {{ calendar_date_range(entity.start, entity.end, entity.allDay) }}
+        <i>When:</i> {{ calendar_date_range(entity.start, entity.end, entity.allDay, 'F j, Y', 1) }}
     </p>
-    <p>
-        <a href="http://demo.orocrm.com/calendar/view/{{ entity.calendar.id }}">
-            Open calendar
-        </a>
-    </p>
+    <p><i>Calendar:</i> {{ entity.calendar }}</p>
 </div>
