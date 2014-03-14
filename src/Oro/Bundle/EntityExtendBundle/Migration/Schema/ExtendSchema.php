@@ -48,6 +48,7 @@ class ExtendSchema extends SchemaWithNameGenerator
     protected function createTableObject(array $args)
     {
         $args['extendOptionsManager'] = $this->extendOptionsManager;
+
         return parent::createTableObject($args);
     }
 
