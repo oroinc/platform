@@ -799,24 +799,6 @@ class ConfigManager
         return $result;
     }
 
-    protected function changeConfigFieldName(ConfigInterface $config, $newFieldName)
-    {
-        $configId = $config->getId();
-        if ($configId instanceof FieldConfigId) {
-            $newConfigId = new FieldConfigId(
-                $configId->getScope(),
-                $configId->getClassName(),
-                $newFieldName,
-                $configId->getFieldType()
-            );
-            $newConfig = new Config($newConfigId);
-            $newConfig->setValues($config->all());
-            $config = $newConfig;
-        }
-
-        return $config;
-    }
-
     /**
      * Changes a type of a field
      *
@@ -849,6 +831,31 @@ class ConfigManager
         } else {
             return new EntityConfigId($scope, $model->getClassName());
         }
+    }
+
+    /**
+     * In case of FieldConfigId replaces OLD field name with given NEW one
+     *
+     * @param ConfigInterface $config
+     * @param $newFieldName
+     * @return Config|ConfigInterface
+     */
+    protected function changeConfigFieldName(ConfigInterface $config, $newFieldName)
+    {
+        $configId = $config->getId();
+        if ($configId instanceof FieldConfigId) {
+            $newConfigId = new FieldConfigId(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $newFieldName,
+                $configId->getFieldType()
+            );
+            $newConfig = new Config($newConfigId);
+            $newConfig->setValues($config->all());
+            $config = $newConfig;
+        }
+
+        return $config;
     }
 
     /**
