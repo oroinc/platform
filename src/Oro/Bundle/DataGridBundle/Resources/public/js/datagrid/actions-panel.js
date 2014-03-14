@@ -14,10 +14,10 @@ define(['underscore', 'backbone'
         /** @property String */
         className: 'btn-group',
 
-        /** @property {Array.<oro.datagrid.AbstractAction>} */
+        /** @property {Array.<orodatagrid.datagrid.action.AbstractAction>} */
         actions: [],
 
-        /** @property {Array.<oro.datagrid.ActionLauncher>} */
+        /** @property {Array.<orodatagrid.datagrid.ActionLauncher>} */
         launchers: [],
 
         /**
@@ -61,7 +61,7 @@ define(['underscore', 'backbone'
         /**
          * Set actions
          *
-         * @param {Array.<oro.datagrid.AbstractAction>} actions
+         * @param {Array.<orodatagrid.datagrid.action.AbstractAction>} actions
          */
         setActions: function (actions) {
             this.actions = [];
@@ -74,7 +74,7 @@ define(['underscore', 'backbone'
         /**
          * Adds action to toolbar
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          */
         addAction: function (action) {
             this.actions.push(action);

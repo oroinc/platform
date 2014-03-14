@@ -115,15 +115,6 @@ class Runner
     }
 
     /**
-     * @return string
-     * @throws ProcessFailedException
-     */
-    public function updateDBSchema()
-    {
-        return $this->runCommand('doctrine:schema:update --force');
-    }
-
-    /**
      * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
      */
     public function removeCachedFiles()

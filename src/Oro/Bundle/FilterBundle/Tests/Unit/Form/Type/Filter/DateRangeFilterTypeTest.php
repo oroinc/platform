@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
 
-class DateRangeFilterTypeTest extends AbstractTypeTestCase
+class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
 {
     /**
      * @var DateRangeFilterType
@@ -17,25 +18,19 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
 
     protected function setUp()
     {
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getTimezone'))
-            ->getMock();
-        $localeSettings->expects($this->any())
-            ->method('getTimezone')
-            ->will($this->returnValue(date_default_timezone_get()));
-
         $translator = $this->createMockTranslator();
 
+        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
+
         $types = array(
-            new DateRangeType($localeSettings),
+            new DateRangeType(),
             new FilterType($translator)
         );
 
         $this->formExtensions[] = new CustomFormExtension($types);
 
         parent::setUp();
-        $this->type = new DateRangeFilterType($translator);
+        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
     }
 
     /**
@@ -66,7 +61,11 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
                         DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
                         DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
                     ),
-                    'widget_options' => array(),
+                    'widget_options' => array(
+                        'showDatevariables' => true,
+                        'showTime'          => false,
+                        'showTimepicker'    => false,
+                    ),
                     'type_values' => array(
                         'between'    => DateRangeFilterType::TYPE_BETWEEN,
                         'notBetween' => DateRangeFilterType::TYPE_NOT_BETWEEN,
@@ -83,18 +82,22 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                'viewData' => array(
-                    'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1)
-                ),
-                'customOptions' => array(
-                    'widget_options' => array('firstDay' => 1)
-                )
-            ),
-        );
+        return [
+            'empty' => [
+                'bindData'      => [],
+                'formData'      => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                'viewData'      => [
+                    'value'          => [
+                        'type'  => null,
+                        'value' => array('start' => '', 'end' => ''),
+                        'part'  => null
+                    ],
+                    'widget_options' => ['firstDay' => 1],
+                ],
+                'customOptions' => [
+                    'widget_options' => ['firstDay' => 1]
+                ]
+            ],
+        ];
     }
 }

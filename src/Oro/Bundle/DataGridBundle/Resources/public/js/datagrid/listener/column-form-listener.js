@@ -165,7 +165,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms refresh action that before it will be executed
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -179,7 +179,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms reset action that before it will be executed
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -193,7 +193,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Asks user a confirmation if there are local changes, if user confirms then clears state and runs action
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          * @param {Object} actionOptions
          * @param {String} type "reset" or "refresh"
          * @param {Object} confirmModalOptions Options for confirm dialog

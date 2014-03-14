@@ -217,6 +217,75 @@ class ConfigModelManager
     }
 
     /**
+     * Renames a field
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $newFieldName
+     * @throws \InvalidArgumentException if $className, $fieldName or $newFieldName is empty
+     * @return bool TRUE if the name was changed; otherwise, FALSE
+     */
+    public function changeFieldName($className, $fieldName, $newFieldName)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+        if (empty($newFieldName)) {
+            throw new \InvalidArgumentException('$newFieldName must not be empty');
+        }
+
+        $fieldModel = $this->findFieldModel($className, $fieldName);
+        if ($fieldModel && $fieldModel->getFieldName() !== $newFieldName) {
+            $fieldModel->setFieldName($newFieldName);
+            $this->getEntityManager()->persist($fieldModel);
+            $this->localCache->remove($this->buildFieldLocalCacheKey($className, $fieldName));
+            $this->localCache->set($this->buildFieldLocalCacheKey($className, $newFieldName), $fieldModel);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Changes a type of a field
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeFieldType($className, $fieldName, $fieldType)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+        if (empty($fieldType)) {
+            throw new \InvalidArgumentException('$fieldType must not be empty');
+        }
+
+        $fieldModel = $this->findFieldModel($className, $fieldName);
+        if ($fieldModel && $fieldModel->getType() !== $fieldType) {
+            $fieldModel->setType($fieldType);
+            $this->getEntityManager()->persist($fieldModel);
+            $this->localCache->set($this->buildFieldLocalCacheKey($className, $fieldName), $fieldModel);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param ConfigIdInterface $configId
      * @return AbstractConfigModel
      */
@@ -289,6 +358,14 @@ class ConfigModelManager
         }
 
         return $fieldModel;
+    }
+
+    /**
+     * Removes all cached data
+     */
+    public function clearCache()
+    {
+        $this->localCache->clear();
     }
 
     /**
