@@ -93,23 +93,37 @@
         'content_attr': {'id': 'report-designer'},
         'subblocks': [
             {
-                'title': 'oro.report.form.columns'|trans,
-                'spanClass': 'report-columns responsive-cell',
                 'data': [
-                    QD.query_designer_grouping_form(
-                        form.grouping,
-                        {'id': 'report-grouping-form'},
-                        {'entity_choice_id': 'oro_report_form_entity'}
+                    UI.scrollSubblock(
+                        'oro.report.form.columns'|trans,
+                        [
+                            QD.query_designer_column_form(
+                                form.column,
+                                {'id': 'report-column-form'},
+                                {'entity_choice_id': 'oro_report_form_entity'}
+                            ),
+                            QD.query_designer_column_list({'id': 'report-column-list'}),
+                            QD.query_designer_column_template('report-column-row'),
+                        ],
+                        '',
+                        '',
+                        'report-columns'
                     ),
-                    QD.query_designer_grouping_list({'id': 'report-grouping-list'}),
-                    QD.query_designer_grouping_item_template('report-grouping-item-row'),
-                    QD.query_designer_column_form(
-                        form.column,
-                        {'id': 'report-column-form'},
-                        {'entity_choice_id': 'oro_report_form_entity'}
-                    ),
-                    QD.query_designer_column_list({'id': 'report-column-list'}),
-                    QD.query_designer_column_template('report-column-row')
+                    UI.scrollSubblock(
+                        'oro.report.form.grouping'|trans,
+                        [
+                            QD.query_designer_grouping_form(
+                                form.grouping,
+                                {'id': 'report-grouping-form'},
+                                {'entity_choice_id': 'oro_report_form_entity'}
+                            ),
+                            QD.query_designer_grouping_list({'id': 'report-grouping-list'}),
+                            QD.query_designer_grouping_item_template('report-grouping-item-row'),
+                        ],
+                        '',
+                        '',
+                        'report-columns'
+                    )
                 ]
             },
             {

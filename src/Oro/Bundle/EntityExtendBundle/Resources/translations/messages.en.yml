@@ -2,6 +2,23 @@
 "It may take few minutes...": "It may take few minutes..."
 oro:
     entity_extend:
+        form:
+            data_type:
+                string:             String
+                integer:            Integer
+                smallint:           SmallInt
+                bigint:             BigInt
+                boolean:            Boolean
+                decimal:            Decimal
+                date:               SmallInt
+                text:               Text
+                float:              Float
+                money:              Currency
+                percent:            Percent
+                oneToMany:          Relation one to many
+                manyToOne:          Relation many to one
+                manyToMany:         Relation many to many
+                optionSet:          Option set
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
