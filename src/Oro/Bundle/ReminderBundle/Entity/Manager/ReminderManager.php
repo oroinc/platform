@@ -36,7 +36,7 @@ class ReminderManager
      */
     public function saveReminders(RemindableInterface $entity)
     {
-        // Persist and flush new property to get id
+        // Persist and flush new entity to get id
         if (!$entityId = $this->getEntityIdentifier($entity)) {
             $this->entityManager->persist($entity);
             $this->entityManager->flush($entity);
@@ -44,9 +44,9 @@ class ReminderManager
             $entityId = $this->getEntityIdentifier($entity);
         }
 
-        $reminders = $entity->getReminders();
+        $reminders    = $entity->getReminders();
         $reminderData = $entity->getReminderData();
-        $entityClass = $this->getEntityClassName($entity);
+        $entityClass  = $this->getEntityClassName($entity);
 
         if (!$reminders instanceof RemindersPersistentCollection) {
             foreach ($reminders as $reminder) {
@@ -71,10 +71,10 @@ class ReminderManager
     /**
      * Sync reminder with entity data
      *
-     * @param Reminder $reminder
+     * @param Reminder              $reminder
      * @param ReminderDataInterface $reminderData
-     * @param string $entityClass
-     * @param mixed $entityId
+     * @param string                $entityClass
+     * @param mixed                 $entityId
      */
     protected function syncEntityReminder(
         Reminder $reminder,
@@ -125,7 +125,7 @@ class ReminderManager
      */
     protected function getEntityIdentifier(RemindableInterface $entity)
     {
-        $className = $this->getEntityClassName($entity);
+        $className   = $this->getEntityClassName($entity);
         $identifiers = $this->entityManager->getClassMetadata($className)->getIdentifierValues($entity);
 
         if (count($identifiers) > 1) {

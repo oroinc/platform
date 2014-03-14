@@ -26,7 +26,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     public function __construct(TopicPublisher $topicPublisher, MessageParamsProvider $messageParamsProvider)
     {
-        $this->topicPublisher = $topicPublisher;
+        $this->topicPublisher        = $topicPublisher;
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
@@ -55,8 +55,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
         return $this->topicPublisher->send(
             sprintf(
                 'oro/reminder/remind_user_%s',
-                $reminder->getRecipient()
-                    ->getId()
+                $reminder->getRecipient()->getId()
             ),
             json_encode($messageParams)
         );

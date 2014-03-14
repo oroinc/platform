@@ -16,7 +16,7 @@ class UnitType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices' => array(
+                'choices'  => array(
                     ReminderInterval::UNIT_MINUTE => 'oro.reminder.interval.unit.minute.label',
                     ReminderInterval::UNIT_HOUR   => 'oro.reminder.interval.unit.hour.label',
                     ReminderInterval::UNIT_DAY    => 'oro.reminder.interval.unit.day.label',

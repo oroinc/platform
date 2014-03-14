@@ -14,10 +14,10 @@ class ReminderCollectionType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'type' => 'oro_reminder',
-                'required' => false,
+                'type'                 => 'oro_reminder',
+                'required'             => false,
                 'show_form_when_empty' => false,
-                'options' => array(
+                'options'              => array(
                     'data_class' => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder'
                 )
             )

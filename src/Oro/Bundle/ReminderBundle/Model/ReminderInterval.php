@@ -8,9 +8,9 @@ namespace Oro\Bundle\ReminderBundle\Model;
 class ReminderInterval
 {
     const UNIT_MINUTE = 'M';
-    const UNIT_HOUR = 'H';
-    const UNIT_DAY = 'D';
-    const UNIT_WEEK = 'W';
+    const UNIT_HOUR   = 'H';
+    const UNIT_DAY    = 'D';
+    const UNIT_WEEK   = 'W';
 
     /**
      * @var int
@@ -23,7 +23,7 @@ class ReminderInterval
     protected $unit;
 
     /**
-     * @param int $number
+     * @param int    $number
      * @param string $unit
      */
     public function __construct($number = null, $unit = null)

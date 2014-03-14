@@ -29,7 +29,7 @@ class MethodType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices' => $this->sendProcessorRegistry->getProcessorLabels(),
+                'choices'  => $this->sendProcessorRegistry->getProcessorLabels(),
                 'expanded' => false,
                 'multiple' => false
             )

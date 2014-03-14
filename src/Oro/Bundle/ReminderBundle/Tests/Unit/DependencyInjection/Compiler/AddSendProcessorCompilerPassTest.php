@@ -23,7 +23,7 @@ class AddSendProcessorCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->container = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->compiler = new AddSendProcessorCompilerPass();
+        $this->compiler  = new AddSendProcessorCompilerPass();
     }
 
     public function testProcess()
@@ -37,9 +37,9 @@ class AddSendProcessorCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->with(AddSendProcessorCompilerPass::SEND_PROCESSOR_REGISTRY_SERVICE)
             ->will($this->returnValue($senderDefinition));
 
-        $fooProcessorId = 'foo';
-        $barProcessorId = 'bar';
-        $expectedProcessorTags = array($fooProcessorId => array(), $barProcessorId => array());
+        $fooProcessorId              = 'foo';
+        $barProcessorId              = 'bar';
+        $expectedProcessorTags       = array($fooProcessorId => array(), $barProcessorId => array());
         $expectedProcessorReferences = array(new Reference($fooProcessorId), new Reference($barProcessorId));
 
         $this->container->expects($this->once())

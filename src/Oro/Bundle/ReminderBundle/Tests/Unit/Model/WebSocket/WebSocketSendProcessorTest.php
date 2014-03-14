@@ -46,12 +46,12 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessSendMessageIntoCorrectChannel()
     {
         $userId = 9876;
-        $user = $this->createUser($userId);
+        $user   = $this->createUser($userId);
         $this->reminder->expects($this->once())->method('getRecipient')->will($this->returnValue($user));
         $expectedParams = array('text' => 'simple text', 'url' => 'test.org', 'reminderId' => 42);
         $this->messageParamsProvider->expects($this->any())
             ->method('getMessageParams')
-            ->will($this ->returnValue($expectedParams));
+            ->will($this->returnValue($expectedParams));
         $this->topicPublisher
             ->expects($this->once())
             ->method('send')
