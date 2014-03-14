@@ -12,7 +12,10 @@ class FieldProvider extends EntityFieldProvider
     /**
      * @var array
      */
-    protected $workflowFields;
+    protected $workflowFields = array(
+        FieldGenerator::PROPERTY_WORKFLOW_ITEM,
+        FieldGenerator::PROPERTY_WORKFLOW_STEP,
+    );
 
     /**
      * @param string $field
@@ -20,16 +23,6 @@ class FieldProvider extends EntityFieldProvider
      */
     protected function isWorkflowField($field)
     {
-        if (!$this->workflowFields) {
-            $this->workflowFields = array(
-                FieldGenerator::PROPERTY_WORKFLOW_ITEM,
-                FieldGenerator::PROPERTY_WORKFLOW_STEP,
-                // TODO: Remove in scope of https://magecore.atlassian.net/browse/BAP-2907
-                ExtendConfigDumper::FIELD_PREFIX . FieldGenerator::PROPERTY_WORKFLOW_ITEM,
-                ExtendConfigDumper::FIELD_PREFIX.  FieldGenerator::PROPERTY_WORKFLOW_STEP,
-            );
-        }
-
         return in_array($field, $this->workflowFields);
     }
 

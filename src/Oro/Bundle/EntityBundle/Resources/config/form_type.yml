@@ -79,6 +79,7 @@ services:
             - @doctrine
             - @oro_entity_config.provider.entity
         calls:
+            # default types
             - [addDoctrineTypeMapping, ["string", "text"]]
             - [addDoctrineTypeMapping, ["integer", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
@@ -92,6 +93,9 @@ services:
             - [addDoctrineTypeMapping, ["text", "textarea"]]
             - [addDoctrineTypeMapping, ["float", "number"]]
             - [addDoctrineTypeMapping, ["guid", "text"]]
+            # custom types
+            - [addDoctrineTypeMapping, ["percent", "oro_percent"]]
+            - [addDoctrineTypeMapping, ["money", "oro_money"]]
             # cannot set default form types for compound and binary types (array, object, blob)
         tags:
             - { name: form.type_guesser, priority: 10 }

@@ -103,7 +103,7 @@ datagrid:
                 type:          ajax
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.deactivate
-                icon:          minus
+                icon:          remove
                 link:          deactivate_link
         action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getWorkflowDefinitionPermissions"]
         filters:
