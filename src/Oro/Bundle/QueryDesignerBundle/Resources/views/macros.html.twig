@@ -173,20 +173,22 @@
                 'data-purpose': 'sorting-selector'
             }
         }) }}
-        {{ UI.clientButton({
-            'aCss': 'no-hash cancel-button column-form-button',
-            'label' : 'oro.query_designer.form.action.cancel'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-success save-button column-form-button',
-            'label' : 'oro.query_designer.form.action.save'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-primary add-button column-form-button',
-            'label' : 'oro.query_designer.form.action.add'|trans
-        }) }}
+        <div class="pull-right">
+            {{ UI.clientButton({
+                'aCss': 'no-hash cancel-button column-form-button',
+                'label' : 'oro.query_designer.form.action.cancel'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-success save-button column-form-button',
+                'label' : 'oro.query_designer.form.action.save'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-primary add-button column-form-button',
+                'label' : 'oro.query_designer.form.action.add'|trans
+            }) }}
+        </div>
     </div>
     <script type="text/javascript">
         require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
@@ -222,20 +224,22 @@
                 'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
-        {{ UI.clientButton({
-            'aCss': 'no-hash cancel-button',
-            'label' : 'oro.query_designer.form.action.cancel'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-success save-button',
-            'label' : 'oro.query_designer.form.action.save'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-primary add-button',
-            'label' : 'oro.query_designer.form.action.add'|trans
-        }) }}
+        <div class="pull-right">
+            {{ UI.clientButton({
+                'aCss': 'no-hash cancel-button',
+                'label' : 'oro.query_designer.form.action.cancel'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-success save-button',
+                'label' : 'oro.query_designer.form.action.save'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-primary add-button',
+                'label' : 'oro.query_designer.form.action.add'|trans
+            }) }}
+        </div>
     </div>
 {% endmacro %}
 
