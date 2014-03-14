@@ -77,10 +77,12 @@ function(_, $, Backbone, Helper, __,
                 transition = this.getTransitionByName(transition);
             }
 
-            var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
-
             var cloned = this._getClonedItem(transition);
-            cloned.transition_definition = transitionDefinition.get('name');
+            if (transition.get('transition_definition')) {
+                var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
+                cloned.transition_definition = transitionDefinition.get('name');
+            }
+
             cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
             cloned.form_options = Helper.deepClone(cloned.form_options);
             cloned.label = __('Copy of') + ' ' + cloned.label;
