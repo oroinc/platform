@@ -115,7 +115,7 @@
                                     <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
                                     <div class="controls">
                                         <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
-                                        <% if (name) { %>disabled="disabled"<% } %>
+                                        <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
                                         >
                                         <% _.each(allowedStepsFrom, function (step) { %>
                                         <option

@@ -225,6 +225,38 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             Backbone.View.prototype.remove.call(this);
         },
 
+        renderWidget: function() {
+            if (!this.widget) {
+                var title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
+                if (this.model.get('_is_clone')) {
+                    title = __('Clone transition');
+                }
+                this.widget = new DialogWidget({
+                    'title': title,
+                    'el': this.$el,
+                    'stateEnabled': false,
+                    'incrementalPosition': false,
+                    'dialogOptions': {
+                        'close': _.bind(this.onCancel, this),
+                        'width': 800,
+                        'modal': true
+                    }
+                });
+                this.listenTo(this.widget, 'renderComplete', function(el) {
+                    mediator.trigger('layout.init', el);
+                });
+                this.widget.render();
+            } else {
+                this.widget._adoptWidgetActions();
+            }
+
+            // Disable widget submit handler and set our own instead
+            this.widget.form.off('submit');
+            this.widget.form.validate({
+                'submitHandler': _.bind(this.onTransitionAdd, this)
+            });
+        },
+
         render: function() {
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
@@ -242,27 +274,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
 
             this.$el.append(form);
 
-            this.widget = new DialogWidget({
-                'title': this.model.get('name') ? __('Edit transition') : __('Add new transition'),
-                'el': this.$el,
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'close': _.bind(this.onCancel, this),
-                    'width': 800,
-                    'modal': true
-                }
-            });
-            this.listenTo(this.widget, 'renderComplete', function(el) {
-                mediator.trigger('layout.init', el);
-            });
-            this.widget.render();
-
-            // Disable widget submit handler and set our own instead
-            this.widget.form.off('submit');
-            this.widget.form.validate({
-                'submitHandler': _.bind(this.onTransitionAdd, this)
-            });
+            this.renderWidget();
 
             this.$exampleContainer = this.$('.transition-example-container');
             this.$exampleBtnContainer = this.$exampleContainer.find('.transition-btn-example');
