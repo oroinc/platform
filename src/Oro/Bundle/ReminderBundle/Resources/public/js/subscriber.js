@@ -48,7 +48,7 @@ define(
              * @param {array} messageParamsArray
              */
             showReminders: function (messageParamsArray) {
-                _.each(this.removeDuplicate(messageParamsArray), function (key, messageObject) {
+                _.each(this.removeDuplicate(messageParamsArray), function (messageObject) {
                     var message = this.reminderTextConstructor(messageObject);
                     //todo: remove html to templates
                     message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
