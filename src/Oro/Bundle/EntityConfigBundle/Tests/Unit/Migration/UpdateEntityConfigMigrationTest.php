@@ -2,50 +2,37 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
-
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
 
 class UpdateEntityConfigMigrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testUp()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var UpdateEntityConfigMigration $postUpMigrationListener */
         $migration = new UpdateEntityConfigMigration(
-            new ConfigDumper($cm)
+            $commandExecutor
         );
 
-        $table = new Table('table1');
-        $table->addColumn('id', 'integer');
-        $table->setPrimaryKey(['id']);
+        $schema = $this->getMockBuilder('Doctrine\DBAL\Schema\Schema')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        /** @var Schema $schema */
-        $schema  = new Schema([$table], [], null);
-        $queries = new QueryBag();
+        $queries = $this->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\QueryBag')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $queries->addQuery('ALTER TABLE table1 ADD field1 INT DEFAULT NULL');
-        $queries->addQuery('CREATE INDEX IDX_7166D3717272F2F0 ON table1 (field1)');
-
-        $this->assertCount(0, $queries->getPreQueries());
-        $this->assertCount(2, $queries->getPostQueries());
+        $queries->expects($this->at(0))
+            ->method('addQuery')
+            ->with(
+                new UpdateEntityConfigMigrationQuery(
+                    $commandExecutor
+                )
+            );
 
         $migration->up($schema, $queries);
-
-        $this->assertCount(0, $queries->getPreQueries());
-        $this->assertCount(3, $queries->getPostQueries());
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery',
-            $queries->getPostQueries()[2]
-        );
     }
 }
