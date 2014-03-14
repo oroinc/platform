@@ -2,65 +2,65 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
-use Doctrine\DBAL\Connection;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Oro\Bundle\EntityExtendBundle\Migration\ArrayLogger;
+
+use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ConfigManager $cm
-     */
-    protected $cm;
+    /** @var  CommandExecutor */
+    protected $commandExecutor;
 
-    /**
-     * @var ConfigDumper
-     */
-    protected $configDumper;
-
-    /**
-     * @var UpdateEntityConfigMigrationQuery
-     */
-    protected $migrationQuery;
-
-    public function setUp()
+    protected function setUp()
     {
-        parent::setUp();
-
-        $this->cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->configDumper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper')
-            ->setConstructorArgs([$this->cm])
-            ->getMock();
-        $this->configDumper
-            ->expects($this->once())
-            ->method('updateConfigs');
-
-        $this->migrationQuery = new UpdateEntityConfigMigrationQuery($this->configDumper);
     }
 
-    public function testMigration()
+    public function testGetDescription()
     {
-        /** @var Connection $connection */
+        $migrationQuery = new UpdateEntityConfigMigrationQuery(
+            $this->commandExecutor
+        );
+
+        $this->assertEquals('Update entity configs', $migrationQuery->getDescription());
+    }
+
+    public function testExecute()
+    {
+        $logger = new ArrayLogger();
+
+        $this->commandExecutor
+            ->expects($this->once())
+            ->method('runCommand')
+            ->with(
+                'oro:entity-config:update',
+                ['--process-timeout' => 300],
+                $logger
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($command, $params, $logger) {
+                        if ($logger instanceof LoggerInterface) {
+                            $logger->notice('ok');
+                        }
+
+                        return 0;
+                    }
+                )
+            );
+
+        $migrationQuery = new UpdateEntityConfigMigrationQuery($this->commandExecutor);
+
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->migrationQuery->execute($connection);
+        $migrationQuery->execute($connection, $logger);
 
-        $this->assertEquals(
-            'UPDATE ENTITY CONFIG',
-            $this->migrationQuery->getDescription()
-        );
-
-        $this->assertAttributeInstanceOf(
-            'Psr\Log\NullLogger',
-            'logger',
-            $this->configDumper
-        );
+        $this->assertEquals(['ok'], $logger->getMessages());
     }
 }
