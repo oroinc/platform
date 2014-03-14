@@ -27,4 +27,4 @@ class SegmentEntityChoiceTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_segment_entity_choice', $this->type->getName());
         $this->assertTrue($this->type instanceof EntityChoiceType);
     }
-} 
+}

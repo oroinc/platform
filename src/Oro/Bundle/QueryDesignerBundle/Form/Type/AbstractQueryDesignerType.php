@@ -90,7 +90,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     array(
                         'mapped'             => false,
                         'column_choice_type' => $groupingColumnChoiceType,
-                        'entity'             => $entity ? $entity : null,
+                        'entity'             => $entity,
                         'auto_initialize'    => false
                     )
                 )
@@ -98,8 +98,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
         }
 
         $columnChoiceType = $config->getOption('column_column_choice_type');
-        if ($columnChoiceType)
-        {
+        if ($columnChoiceType) {
             $form->add(
                 $factory->createNamed(
                     'column',
@@ -108,7 +107,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     array(
                         'mapped'             => false,
                         'column_choice_type' => $columnChoiceType,
-                        'entity'             => $entity ? $entity : null,
+                        'entity'             => $entity,
                         'auto_initialize'    => false
                     )
                 )
@@ -125,7 +124,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     array(
                         'mapped'             => false,
                         'column_choice_type' => $filterColumnChoiceType,
-                        'entity'             => $entity ? $entity : null,
+                        'entity'             => $entity,
                         'auto_initialize'    => false
                     )
                 )
