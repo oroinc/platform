@@ -1,0 +1,150 @@
+/*global define, require*/
+/*jslint nomen: true*/
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
+    './segment-choice', 'jquery-ui'
+], function ($, _, __, mapFilterModuleName) {
+    'use strict';
+
+    /**
+     * Apply segment widget
+     */
+    $.widget('orosegment.segmentCondition', {
+        options: {
+            segmentChoice: {},
+            segmentChoiceClass: 'select',
+            filters: [],
+            filterContainerClass: 'active-filter'
+        },
+
+        _create: function () {
+            var data = this.element.data('value');
+
+            this.$segmentChoice = $('<input>').addClass(this.options.segmentChoiceClass);
+            this.$filterContainer = $('<span>').addClass(this.options.filterContainerClass);
+            this.element.append(this.$segmentChoice, this.$filterContainer);
+
+            this.$segmentChoice.segmentChoice(this.options.segmentChoice);
+
+            if (data && data.columnName) {
+                this.selectField(data.columnName);
+                this._renderFilter(data.columnName);
+            }
+
+            this.$segmentChoice.on('changed', _.bind(function (e, fieldId) {
+                $(':focus').blur();
+                // reset current value on segment change
+                this.element.data('value', {});
+                this._renderFilter(fieldId);
+                e.stopPropagation();
+            }, this));
+
+            this.$filterContainer.on('change', _.bind(function () {
+                if (this.filter) {
+                    this.filter.applyValue();
+                }
+            }, this));
+        },
+
+        _getCreateOptions: function () {
+            return $.extend(true, {}, this.options);
+        },
+
+        _renderFilter: function (fieldId) {
+            var conditions = this.$segmentChoice.fieldChoice('getApplicableConditions', fieldId),
+                filterId = this._getApplicableFilterId(conditions);
+            this._createFilter(this.options.filters[filterId]);
+        },
+
+        _getApplicableFilterId: function (conditions) {
+            var filterId = null,
+                matchedBy = null,
+                self = this;
+
+            if (!_.isUndefined(conditions.filter)) {
+                // the criteria parameter represents a filter
+                return conditions.filter;
+            }
+
+            _.each(this.options.filters, function (filter, id) {
+                var matched;
+
+                if (!_.isEmpty(filter.applicable)) {
+                    // check if a filter conforms the given criteria
+                    matched = self._matchApplicable(filter.applicable, conditions);
+                    if (matched && (
+                        _.isNull(matchedBy) ||
+                            // new rule is more exact
+                            _.size(matchedBy) < _.size(matched) ||
+                            // 'type' rule is most low level one, so any other rule can override it
+                            (_.size(matchedBy) === 1 && _.has(matchedBy, 'type'))
+                        )) {
+                        matchedBy = matched;
+                        filterId = id;
+                    }
+                } else if (_.isNull(filterId)) {
+                    // if a filter was not found so far, use a default filter
+                    filterId = id;
+                }
+            });
+
+            return filterId;
+        },
+
+        _matchApplicable: function (applicable, criteria) {
+            return _.find(applicable, function (item) {
+                return _.every(item, function (value, key) {
+                    return criteria[key] === value;
+                });
+            });
+        },
+
+        _createFilter: function (options) {
+            var moduleName = mapFilterModuleName(options.type);
+
+            require([moduleName], _.bind(function (Filter) {
+                var filter = new (Filter.extend(options))();
+                this._appendFilter(filter);
+            }, this));
+        },
+
+        _appendFilter: function (filter) {
+            var value = this.element.data('value');
+            this.filter = filter;
+
+            if (value && value.criterion) {
+                this.filter.value = value.criterion.data;
+            }
+
+            this.filter.render();
+            this.$filterContainer.empty().append(this.filter.$el);
+
+            this.filter.on('update', _.bind(this._onUpdate, this));
+            this._onUpdate();
+        },
+
+        _onUpdate: function () {
+            var value;
+
+            if (!this.filter.isEmptyValue()) {
+                value = {
+                    columnName: this.element.find('input.select').select2('val'),
+                    criterion: {
+                        filter: this.filter.type,
+                        data: this.filter.getValue()
+                    }
+                };
+            } else {
+                value = {};
+            }
+
+            this.element.data('value', value);
+            this.element.trigger('changed');
+        },
+
+        selectField: function (name) {
+            this.$segmentChoice.fieldChoice('setValue', name);
+        }
+    });
+
+    return $;
+});
