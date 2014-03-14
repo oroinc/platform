@@ -45,7 +45,7 @@ services:
             - [addDoctrineTypeMapping, ["integer", "integer"]]
             - [addDoctrineTypeMapping, ["smallint", "integer"]]
             - [addDoctrineTypeMapping, ["bigint", "integer"]]
-            - [addDoctrineTypeMapping, ["boolean", "checkbox"]]
+            - [addDoctrineTypeMapping, ["boolean", "boolean"]]
             - [addDoctrineTypeMapping, ["decimal", "float"]]
             - [addDoctrineTypeMapping, ["date", "object", { class: "DateTime" }]]
             - [addDoctrineTypeMapping, ["time", "object", { class: "DateTime" }]]
@@ -57,6 +57,9 @@ services:
             - [addDoctrineTypeMapping, ["json_array", "array"]]
             - [addDoctrineTypeMapping, ["float", "float"]]
             - [addDoctrineTypeMapping, ["guid", "string"]]
+            # custom types
+            - [addDoctrineTypeMapping, ["percent", "float"]]
+            - [addDoctrineTypeMapping, ["money", "float"]]
             # mapping from attribute type to form parameters
             - [addFormTypeMapping, ["string", "text"]]
             - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]

@@ -286,9 +286,6 @@ class AttributeGuesser
      */
     protected function getLabel($class, $field, $multiple = false)
     {
-        // TODO: Remove in scope of https://magecore.atlassian.net/browse/BAP-2907
-        $field = $this->fixPropertyPath($field);
-
         if (!$this->entityConfigProvider->hasConfig($class, $field)) {
             return null;
         }
@@ -312,24 +309,5 @@ class AttributeGuesser
         }
 
         return $this->formTypeGuesser;
-    }
-
-    /**
-     * Remove "field_" prefix from property path for extended fields
-     * TODO: Remove in scope of https://magecore.atlassian.net/browse/BAP-2907
-     *
-     * @param string $propertyPath
-     * @return string
-     */
-    public function fixPropertyPath($propertyPath)
-    {
-        $parts = explode('.', $propertyPath);
-        foreach ($parts as $key => $part) {
-            if (strpos($part, ExtendConfigDumper::FIELD_PREFIX) === 0) {
-                $parts[$key] = substr($part, strlen(ExtendConfigDumper::FIELD_PREFIX));
-            }
-        }
-
-        return implode('.', $parts);
     }
 }

@@ -6,7 +6,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 
@@ -92,7 +92,7 @@ class FieldGenerator
         }
 
         // update entity config
-        $entityConfig->set('state', ExtendManager::STATE_UPDATED);
+        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
         $entityConfig->set('upgradeable', true);
 
         $this->configManager->persist($entityConfig);
@@ -113,8 +113,8 @@ class FieldGenerator
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $extendFieldConfig = $extendConfigProvider->getConfig($entityClass, $fieldName);
-        $extendFieldConfig->set('owner', ExtendManager::OWNER_CUSTOM);
-        $extendFieldConfig->set('state', ExtendManager::STATE_NEW);
+        $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
         $extendFieldConfig->set('extend', true);
         $extendFieldConfig->set('target_entity', $targetEntity);
         $extendFieldConfig->set('target_field', $targetField);

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
@@ -163,7 +163,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             1
         );
 
-        $entityConfig->expects($this->at(1))->method('set')->with('state', ExtendManager::STATE_UPDATED);
+        $entityConfig->expects($this->at(1))->method('set')->with('state', ExtendScope::STATE_UPDATED);
         $entityConfig->expects($this->at(2))->method('set')->with('upgradeable', true);
 
         $this->configManager->expects($this->at(13))->method('persist')->with($entityConfig);
@@ -216,8 +216,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityFieldConfig));
 
         $extendFieldConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $extendFieldConfig->expects($this->at(0))->method('set')->with('owner', ExtendManager::OWNER_CUSTOM);
-        $extendFieldConfig->expects($this->at(1))->method('set')->with('state', ExtendManager::STATE_NEW);
+        $extendFieldConfig->expects($this->at(0))->method('set')->with('owner', ExtendScope::OWNER_CUSTOM);
+        $extendFieldConfig->expects($this->at(1))->method('set')->with('state', ExtendScope::STATE_NEW);
         $extendFieldConfig->expects($this->at(2))->method('set')->with('extend', true);
         $extendFieldConfig->expects($this->at(3))->method('set')->with('target_entity', $targetEntity);
         $extendFieldConfig->expects($this->at(4))->method('set')->with('target_field', $targetField);
