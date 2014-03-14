@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntitySecurityMetadataProvider
 {
@@ -162,7 +162,7 @@ class EntitySecurityMetadataProvider
                     if ($securityConfig->get('type') === $securityType
                         && $this->extendConfigProvider->getConfig($className)->in(
                             'state',
-                            [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
+                            [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
                         )
                     ) {
                         $label = '';

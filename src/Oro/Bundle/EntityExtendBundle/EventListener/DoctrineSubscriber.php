@@ -11,12 +11,28 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class DoctrineSubscriber implements EventSubscriber
 {
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     *
+     * TODO: remove ' = null' in the next release. It is related to https://magecore.atlassian.net/browse/BAP-3543
+     */
+    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator = null)
+    {
+        $this->nameGenerator = $nameGenerator;
+    }
+
     /**
      * @return array
      */
@@ -35,7 +51,7 @@ class DoctrineSubscriber implements EventSubscriber
         /** @var OroEntityManager $em */
         $em = $event->getEntityManager();
 
-        $configProvider = $em->getExtendManager()->getConfigProvider();
+        $configProvider = $em->getExtendConfigProvider();
         $className      = $event->getClassMetadata()->getName();
 
         if ($configProvider->hasConfig($className)) {
@@ -47,11 +63,8 @@ class DoctrineSubscriber implements EventSubscriber
                     foreach ($config->get('index') as $columnName => $enabled) {
                         $fieldConfig = $configProvider->getConfig($className, $columnName);
 
-                        if ($enabled && !$fieldConfig->is('state', ExtendManager::STATE_NEW)) {
-                            $cmBuilder->addIndex(
-                                array(ExtendConfigDumper::FIELD_PREFIX . $columnName),
-                                'oro_idx_' . $columnName
-                            );
+                        if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                            $cmBuilder->addIndex([$columnName], 'oro_idx_' . $columnName);
                         }
                     }
                 }
@@ -77,10 +90,10 @@ class DoctrineSubscriber implements EventSubscriber
                     $targetFieldId = $relation['target_field_id'];
 
                     $targetFieldName = $targetFieldId
-                        ? ExtendConfigDumper::FIELD_PREFIX . $targetFieldId->getFieldName()
+                        ? $targetFieldId->getFieldName()
                         : null;
 
-                    $fieldName   = ExtendConfigDumper::FIELD_PREFIX . $fieldId->getFieldName();
+                    $fieldName   = $fieldId->getFieldName();
                     $defaultName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName();
 
                     switch ($fieldId->getFieldType()) {
@@ -120,8 +133,9 @@ class DoctrineSubscriber implements EventSubscriber
                                 }
 
                                 $builder->setJoinTable(
-                                    ExtendHelper::generateManyToManyJoinTableName(
-                                        $fieldId,
+                                    $this->nameGenerator->generateManyToManyJoinTableName(
+                                        $fieldId->getClassName(),
+                                        $fieldId->getFieldName(),
                                         $relation['target_entity']
                                     )
                                 );

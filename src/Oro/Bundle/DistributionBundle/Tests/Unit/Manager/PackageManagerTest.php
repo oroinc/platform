@@ -327,8 +327,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->once())
             ->method('runPlatformUpdate');
         $runner->expects($this->once())
-            ->method('updateDBSchema');
-        $runner->expects($this->once())
             ->method('install')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
 

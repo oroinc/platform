@@ -289,6 +289,7 @@ class PackageManager
         $this->updateComposerJsonFile($package, $packageVersion);
         $justInstalledPackages = [];
         try {
+            $this->scriptRunner->removeApplicationCache();
             if ($this->doInstall($package->getName())) {
                 $installedPackages = $this->getInstalled();
                 $justInstalledPackages = array_filter(
@@ -305,7 +306,6 @@ class PackageManager
                     },
                     $justInstalledPackages
                 );
-                $this->scriptRunner->updateDBSchema();
                 $this->scriptRunner->updateWorkflow($justInstalledPackages);
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
                 if ($loadDemoData) {
@@ -411,6 +411,7 @@ class PackageManager
             $packageNames
         );
         $this->scriptRunner->removeCachedFiles();
+        $this->scriptRunner->clearApplicationCache();
         $this->scriptRunner->runPlatformUpdate();
         $this->scriptRunner->clearDistApplicationCache();
         $this->logger->info('Packages uninstalled', $packageNames);
@@ -487,6 +488,7 @@ class PackageManager
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
+        $this->scriptRunner->removeApplicationCache();
         if ($this->doInstall($packageName)) {
             $currentlyInstalled = $this->getInstalled();
             $changeSetBuilder = new ChangeSetBuilder();
@@ -512,6 +514,7 @@ class PackageManager
 
                 return '';
             };
+            $this->scriptRunner->clearApplicationCache();
             $this->scriptRunner->runPlatformUpdate();
             array_map(
                 function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
@@ -526,6 +529,7 @@ class PackageManager
                 },
                 $uninstalledPackages
             );
+            $this->scriptRunner->clearApplicationCache();
             $this->scriptRunner->runPlatformUpdate();
             $this->scriptRunner->clearDistApplicationCache();
             $justInstalledPackage = $this->findInstalledPackage($packageName);

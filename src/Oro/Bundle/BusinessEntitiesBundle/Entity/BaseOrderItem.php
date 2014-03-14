@@ -43,16 +43,16 @@ class BaseOrderItem
     protected $qty;
 
     /**
-     * @var float
+     * @var double
      *
-     * @ORM\Column(name="cost", type="float", nullable=true)
+     * @ORM\Column(name="cost", type="money", nullable=true)
      */
     protected $cost;
 
     /**
-     * @var float
+     * @var double
      *
-     * @ORM\Column(name="price", type="float", nullable=true)
+     * @ORM\Column(name="price", type="money", nullable=true)
      */
     protected $price;
 
@@ -66,35 +66,35 @@ class BaseOrderItem
     /**
      * @var float
      *
-     * @ORM\Column(name="tax_percent", type="float", nullable=true)
+     * @ORM\Column(name="tax_percent", type="percent", nullable=true)
      */
     protected $taxPercent;
 
     /**
-     * @var float
+     * @var double
      *
-     * @ORM\Column(name="tax_amount", type="float", nullable=true)
+     * @ORM\Column(name="tax_amount", type="money", nullable=true)
      */
     protected $taxAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_percent", type="float", nullable=true)
+     * @ORM\Column(name="discount_percent", type="percent", nullable=true)
      */
     protected $discountPercent;
 
     /**
-     * @var float
+     * @var double
      *
-     * @ORM\Column(name="discount_amount", type="float", nullable=true)
+     * @ORM\Column(name="discount_amount", type="money", nullable=true)
      */
     protected $discountAmount;
 
     /**
-     * @var float
+     * @var double
      *
-     * @ORM\Column(name="row_total", type="float", nullable=true)
+     * @ORM\Column(name="row_total", type="money", nullable=true)
      */
     protected $rowTotal;
 
