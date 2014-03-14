@@ -45,11 +45,16 @@ class DynamicTranslationMetadataCache
     /**
      * Renews the timestamp of the last update of database translations for the given locale
      *
-     * @param string $locale
+     * @param string|null $locale
      */
-    public function updateTimestamp($locale)
+    public function updateTimestamp($locale = null)
     {
-        $this->localCache[$locale] = (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
-        $this->cacheImpl->save($locale, $this->localCache[$locale]);
+        if ($locale) {
+            $this->localCache[$locale] = (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
+            $this->cacheImpl->save($locale, $this->localCache[$locale]);
+        } else {
+            $this->localCache = [];
+            $this->cacheImpl->deleteAll();
+        }
     }
 }

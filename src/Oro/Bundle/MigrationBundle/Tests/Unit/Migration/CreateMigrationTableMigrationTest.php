@@ -15,8 +15,8 @@ class CreateMigrationTableMigrationTest extends \PHPUnit_Framework_TestCase
         $createMigration = new CreateMigrationTableMigration();
         $createMigration->up($schema, $queryBag);
 
-        $this->assertEmpty($queryBag->getPreSqls());
-        $this->assertEmpty($queryBag->getPostSqls());
+        $this->assertEmpty($queryBag->getPreQueries());
+        $this->assertEmpty($queryBag->getPostQueries());
 
         $table = $schema->getTable(CreateMigrationTableMigration::MIGRATION_TABLE);
         $this->assertTrue($table->hasColumn('id'));

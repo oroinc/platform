@@ -34,7 +34,5 @@ class DumpCommand extends ContainerAwareCommand
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
 
         $dumper->dump();
-
-        $output->writeln('Done');
     }
 }

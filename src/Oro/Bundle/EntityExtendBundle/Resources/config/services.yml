@@ -1,48 +1,101 @@
 parameters:
-    oro_entity_extend.entity.cache.warmer.class:            Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
-    oro_entity_extend.extend.extend_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\ExtendManager
-    oro_entity_extend.extension.extend_entity.class:        Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
-    oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
-    oro_entity_extend.listener.config_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
-    oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
-    oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
+    oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
+    oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
+    oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
+    oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
+    oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
+    oro_entity_extend.listener.entity_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
+    oro_entity_extend.twig.view_extension.class:              Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
+    oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
+    oro_entity_extend.migration.refresh_cache.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
+    oro_entity_extend.migration.update_config.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
+    oro_entity_extend.migration.entity_metadata_helper.class: Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper
+    oro_entity_extend.migration.options_manager.class:        Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
+    oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
+    oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
 
 services:
     oro_entity_extend.entity.cache.warmer:
         public: false
-        class:                                              %oro_entity_extend.entity.cache.warmer.class%
+        class: %oro_entity_extend.entity.cache.warmer.class%
         arguments:
             - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
 
-    oro_entity_extend.extend.extend_manager:
-        class:                                              %oro_entity_extend.extend.extend_manager.class%
-        arguments:
-            - @oro_entity_config.provider.extend
-
     oro_entity_extend.extension.extend_entity:
-        class:                                              %oro_entity_extend.extension.extend_entity.class%
+        class: %oro_entity_extend.extension.extend_entity.class%
         arguments:
-            - @oro_entity_extend.extend.extend_manager
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_entity_extend.tools.dumper:
-        class:                                              %oro_entity_extend.tools.dumper.class%
+        class: %oro_entity_extend.tools.dumper.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity_extend.db_id_name_generator
             - %kernel.cache_dir%
 
     oro_entity_extend.listener.config_subscriber:
-        class:                                              %oro_entity_extend.listener.config_subscriber.class%
+        class: %oro_entity_extend.listener.config_subscriber.class%
         arguments:
-            - @oro_entity_extend.extend.extend_manager
+            - @oro_entity_config.provider.extend
         tags:
             - { name: kernel.event_subscriber}
 
     oro_entity_extend.listener.entity_subscriber:
-        class:                                              %oro_entity_extend.listener.entity_subscriber.class%
+        class: %oro_entity_extend.listener.entity_subscriber.class%
+        arguments:
+            - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    oro_entity_extend.db_id_name_generator:
+        alias: oro_migration.db_id_name_generator
+
+    oro_entity_extend.migration.config_processor:
+        class: %oro_entity_extend.migration.config_processor.class%
+        arguments:
+            - @oro_entity_config.config_manager
+
+    oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
+        class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
+        arguments:
+            - @oro_entity_config.tools.command_executor
+            - %installed%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
+
+    oro_entity_extend.migration.update_config.post_up.listener:
+        class: %oro_entity_extend.migration.update_config.post_up.listener.class%
+        arguments:
+            - @oro_entity_config.tools.command_executor
+            - %oro_entity_extend.migration.config_processor.options.path%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
+
+    oro_entity_extend.migration.entity_metadata_helper:
+        class: %oro_entity_extend.migration.entity_metadata_helper.class%
+        arguments:
+            - @doctrine
+
+    oro_entity_extend.migration.options_manager:
+        class: %oro_entity_extend.migration.options_manager.class%
+        arguments:
+            - @oro_entity_extend.migration.entity_metadata_helper
+
+    oro_entity_extend.migration.extension.extend:
+        class: %oro_entity_extend.migration.extension.extend.class%
+        arguments:
+            - @oro_entity_extend.migration.options_manager
+            - @oro_entity_extend.migration.entity_metadata_helper
+        tags:
+            - { name: oro_migration.extension, extension_name: extend }
+
+    oro_entity_extend.migration.extension.rename:
+        class: %oro_entity_extend.migration.extension.rename.class%
+        arguments:
+            - @oro_entity_extend.migration.options_manager
+        tags:
+            - { name: oro_migration.extension, extension_name: rename, priority: -10 }
