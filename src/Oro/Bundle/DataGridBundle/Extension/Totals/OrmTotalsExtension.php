@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\GroupBy;
-use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
@@ -21,9 +21,6 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class OrmTotalsExtension extends AbstractExtension
 {
     /** @var RequestParameters */
@@ -202,60 +199,17 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * Get root entities config data
+     * Get root entitiy id
      *
-     * @param QueryBuilder $query
      * @return array with root entities config
      */
-    protected function getRootIds(QueryBuilder $query)
+    protected function getRootId()
     {
-        $groupParts = $this->getGroupParts();
-        $rootIds    = [];
-        if (empty($groupParts)) {
-            $rootIdentifiers = $query->getEntityManager()
-                ->getClassMetadata($query->getRootEntities()[0])->getIdentifier();
-            $rootAlias       = $query->getRootAliases()[0];
-            foreach ($rootIdentifiers as $field) {
-                $rootIds[] = [
-                    'fieldAlias'  => $field,
-                    'alias'       => $field,
-                    'entityAlias' => $rootAlias
-                ];
-            }
-        } else {
-            foreach ($groupParts as $groupPart) {
-                if (strpos($groupPart, '.')) {
-                    list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
-                    $rootIds[] = [
-                        'fieldAlias'  => $rootIdentifierPart,
-                        'entityAlias' => $rootAlias,
-                        'alias'       => $rootIdentifierPart
-                    ];
-                } else {
-                    $selectParts = $this->masterQB->getDQLPart('select');
-                    /** @var Select $selectPart */
-                    foreach ($selectParts as $selectPart) {
-                        foreach ($selectPart->getParts() as $part) {
-                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
-                                if (count($matches) == 3 && $groupPart == $matches[2]) {
-                                    $rootIds[] = [
-                                        'fieldAlias' => $matches[1],
-                                        'alias'      => $matches[2]
-                                    ];
-                                }
-                            } else {
-                                $rootIds[] = [
-                                    'fieldAlias' => $groupPart,
-                                    'alias'      => $groupPart
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $rootIds;
+        return [
+            'field'  => $this->masterQB->getEntityManager()
+                    ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier()[0],
+            'entityAlias' => $this->masterQB->getRootAliases()[0],
+        ];
     }
 
     /**
@@ -280,16 +234,17 @@ class OrmTotalsExtension extends AbstractExtension
         $query = clone $this->masterQB;
         $query
             ->select($totalQueries)
-            ->resetDQLPart('groupBy');
+            ->resetDQLPart('having')
+            ->resetDQLPart('where')
+            ->resetDQLPart('groupBy')
+            ->setParameters(new ArrayCollection());
 
-        if ($perPage) {
-            $this->addPageLimits($query, $pageData);
-        }
+        $this->addPageLimits($query, $pageData, $perPage);
 
         $resultData = $query
             ->getQuery()
             ->setFirstResult(null)
-            ->setMaxResults(null)
+            ->setMaxResults(1)
             ->getScalarResult();
 
         return array_shift($resultData);
@@ -299,23 +254,28 @@ class OrmTotalsExtension extends AbstractExtension
      * Add "in" expression as page limit to query builder
      *
      * @param QueryBuilder $dataQueryBuilder
-     * @param $pageData
+     * @param ResultsObject $pageData
+     * @param bool $perPage
      */
-    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData)
+    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData, $perPage)
     {
-        $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
-        foreach ($rootIdentifiers as $identifier) {
-            $ids = [];
-            foreach ($pageData['data'] as $res) {
-                $ids[] = $res[$identifier['alias']];
-            }
-
-            $field = isset($identifier['entityAlias'])
-                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
-                : $identifier['fieldAlias'];
-
-            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
+        $rootId = $this->getRootId();
+        if (!$perPage) {
+            $query = clone $this->masterQB;
+            $data = $query
+                ->getQuery()
+                ->setFirstResult(null)
+                ->setMaxResults(null)
+                ->getScalarResult();
+        } else {
+            $data = $pageData['data'];
         }
+        $ids = [];
+        foreach ($data as $res) {
+            $ids[] = $res[$rootId['field']];
+        }
+        $field = $rootId['entityAlias'] . '.' . $rootId['field'];
+        $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
     }
 
     /**
