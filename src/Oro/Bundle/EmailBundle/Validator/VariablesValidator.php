@@ -64,10 +64,13 @@ class VariablesValidator extends ConstraintValidator
             foreach ($metadata->getAssociationMappings() as $mapping) {
                 $targetEntity = new $mapping['targetEntity'];
                 $fieldName    = $mapping['fieldName'];
-                if ($mapping['type'] == ClassMetadataInfo::ONE_TO_MANY) {
-                    $targetEntity = new ArrayCollection([$targetEntity]);
+                if (in_array($mapping['type'], [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::MANY_TO_MANY])) {
+                    $relatedEntity->{'add' . ucfirst(rtrim($fieldName, 's'))}(
+                        new ArrayCollection([$targetEntity])
+                    );
+                } else {
+                    $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
                 }
-                $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
             }
         }
 
