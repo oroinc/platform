@@ -86,7 +86,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedIdentifier = 'test_template_identifier';
         $expectedRelatedClassName = 'Tasks';
 
-        $reminder->expects($this->once())
+        $reminder->expects($this->exactly(2))
             ->method('getRelatedEntityClassName')
             ->will($this->returnValue($expectedRelatedClassName));
 
@@ -135,7 +135,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedIdentifier = 'test_template_identifier';
         $expectedRelatedClassName = 'Tasks';
 
-        $reminder->expects($this->once())
+        $reminder->expects($this->exactly(2))
             ->method('getRelatedEntityClassName')
             ->will($this->returnValue($expectedRelatedClassName));
 
