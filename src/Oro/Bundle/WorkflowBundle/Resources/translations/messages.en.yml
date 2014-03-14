@@ -105,6 +105,7 @@ oro:
             start_step.label:             Start step
             steps.label:                  Steps
             steps_display_ordered.label:  Display steps ordered
+            active.label:                 Active
             clone_label_prefix:           'Copy of '
 
             datagrid:

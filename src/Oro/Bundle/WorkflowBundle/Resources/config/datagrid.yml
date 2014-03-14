@@ -11,7 +11,8 @@ datagrid:
                     - w.name as id
                     - w.name
                     - w.name as workflowDefinition
-                    - w.relatedEntity as className
+                    - w.relatedEntity
+                    - w.relatedEntity as active
                     - w.label
                     - w.system
                     - w.createdAt
@@ -21,10 +22,15 @@ datagrid:
             label:
                 label: oro.workflow.workflowdefinition.name.label
             relatedEntity:
-                label: Related entity
-                data_name: className
+                label: oro.workflow.workflowdefinition.related_entity.label
+                data_name: relatedEntity
                 frontend_type: select
                 choices: @oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice
+            active:
+                label:  oro.workflow.workflowdefinition.active.label
+                type: twig
+                template: OroWorkflowBundle:Datagrid:Column/active.html.twig
+                frontend_type: html
             system:
                 label: oro.workflow.workflowdefinition.system.label
                 frontend_type: boolean
@@ -85,7 +91,7 @@ datagrid:
                     data_name: w.label
                 relatedEntity:
                     type: choice
-                    data_name: w.className
+                    data_name: w.relatedEntity
                     options:
                         field_options:
                             multiple: true

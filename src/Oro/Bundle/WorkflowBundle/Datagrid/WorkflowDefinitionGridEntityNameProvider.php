@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowDefinitionGridEntityNameProvider
@@ -65,11 +64,6 @@ class WorkflowDefinitionGridEntityNameProvider
                 if ($this->configProvider->hasConfig($className)) {
                     $config = $this->configProvider->getConfig($className);
                     $label = $this->translator->trans($config->get('label'));
-                } else {
-                    $nameData = ConfigHelper::getModuleAndEntityNames($className);
-                    if (count($nameData) > 1 && $nameData[1]) {
-                        $label = $nameData[1];
-                    }
                 }
 
                 $this->relatedEntities[$className] = $label;

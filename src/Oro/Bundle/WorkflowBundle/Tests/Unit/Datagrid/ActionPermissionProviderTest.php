@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
