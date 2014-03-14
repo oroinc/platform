@@ -13,11 +13,6 @@ class ActionPermissionProvider
     protected $configProvider;
 
     /**
-     * @var array
-     */
-    protected $activeWorkflows = array();
-
-    /**
      * @param ConfigProviderInterface $configProvider
      */
     public function __construct(ConfigProviderInterface $configProvider)
