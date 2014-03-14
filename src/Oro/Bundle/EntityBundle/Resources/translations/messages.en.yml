@@ -9,3 +9,20 @@ oro:
             choose_entity_fields:   Choose fields...
             entity_fields:          Fields
             entity_related:         Related
+            data_type:
+                string:             String
+                integer:            Integer
+                smallint:           SmallInt
+                bigint:             BigInt
+                boolean:            Boolean
+                decimal:            Decimal
+                date:               SmallInt
+                text:               Text
+                float:              Float
+                currency:           Currency
+                percent:            Percent
+                oneToMany:          Relation one to many
+                manyToOne:          Relation many to one
+                manyToMany:         Relation many to many
+                optionSet:          Option set
+

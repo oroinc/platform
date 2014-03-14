@@ -30,6 +30,6 @@ class PercentType extends Type
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return (null === $value) ? null : $value;
+        return (null === $value) ? null : (double) $value;
     }
 }

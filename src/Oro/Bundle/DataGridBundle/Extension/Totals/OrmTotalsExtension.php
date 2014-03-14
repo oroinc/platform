@@ -107,8 +107,7 @@ class OrmTotalsExtension extends AbstractExtension
                     unset($totals[$rowName]);
                     continue;
                 }
-
-                $totalData[$rowName] = $this->getTotalData(
+                $data = $this->getTotalData(
                     $rowConfig,
                     $this->getData(
                         $result,
@@ -116,6 +115,10 @@ class OrmTotalsExtension extends AbstractExtension
                         $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
                     )
                 );
+
+                if (!empty($data)) {
+                    $totalData[$rowName] = $data;
+                }
             }
         }
         $result->offsetAddToArray('options', ['totals' => $totalData]);
