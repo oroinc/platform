@@ -96,7 +96,6 @@ class ReminderInterval
         try {
             return new \DateInterval(sprintf($format, $this->getNumber(), $this->getUnit()));
         } catch (\Exception $e) {
-            throw $e;
             return new \DateInterval('P0D');
         }
     }
