@@ -90,10 +90,9 @@ function(_, $, Backbone, Helper, __,
 
             var clonedModel = new TransitionModel(cloned);
             clonedModel.setWorkflow(this);
-            this.get('transitions').add(clonedModel);
 
             if (!doNotAddToCollection) {
-                this.get('steps').add(clonedModel);
+                this.get('transitions').add(clonedModel);
             }
 
             return clonedModel;
