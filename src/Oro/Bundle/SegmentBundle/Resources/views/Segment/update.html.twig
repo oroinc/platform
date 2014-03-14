@@ -178,10 +178,10 @@
                     .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
 
                 {% if not form.entity.vars.value is empty %}
-                {% set fieldsData = render(path('oro_api_get_entity_fields', {
-                        'entityName': form.entity.vars.value|replace({'\\': '_'})
-                    }|merge(entityFieldsRouteParams))) %};
-                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                    {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                            'entityName': form.entity.vars.value|replace({'\\': '_'})
+                        }|merge(entityFieldsRouteParams))) %};
+                    $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
                 {% endif %}
 
                 segmentManagerInit({

@@ -34,6 +34,5 @@ oro:
             criteria:
                 drag_hint: drag to select
                 field_condition:   Field Condition
-                segment_condition: Apply Segment
                 conditions_group:  Conditions Group
             choose_entity_field: Choose a field...

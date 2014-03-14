@@ -21,14 +21,12 @@
                                 data-options="{{ fieldConditionOptions|json_encode }}">
                                 {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
                             </li>
-                            {% if params.id == 'segment-condition-builder' %}
                             <li class="option" data-criteria="condition-segment"
                                 data-module="orosegment/js/segment-condition"
                                 data-widget="segmentCondition"
                                 data-options="{{ fieldConditionOptions|json_encode }}">
-                                {{ 'oro.query_designer.condition_builder.criteria.segment_condition'|trans }}
+                                {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
                             </li>
-                            {% endif %}
                             <li class="option" data-criteria="conditions-group">
                                 {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
                             </li>
