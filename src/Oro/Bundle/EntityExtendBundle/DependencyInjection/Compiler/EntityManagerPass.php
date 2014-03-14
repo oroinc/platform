@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EntityManagerPass implements CompilerPassInterface
 {
-    const EXTEND_MANAGER_SERVICE_KEY = 'oro_entity_extend.extend.extend_manager';
+    const EXTEND_CONFIG_PROVIDER_SERVICE_KEY = 'oro_entity_config.provider.extend';
 
     /**
      * {@inheritdoc}
@@ -16,6 +16,6 @@ class EntityManagerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $em = $container->findDefinition('doctrine.orm.entity_manager');
-        $em->addMethodCall('setExtendManager', array(new Reference(self::EXTEND_MANAGER_SERVICE_KEY)));
+        $em->addMethodCall('setExtendConfigProvider', [new Reference(self::EXTEND_CONFIG_PROVIDER_SERVICE_KEY)]);
     }
 }

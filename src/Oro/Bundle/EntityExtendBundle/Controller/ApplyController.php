@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 
 /**
  * EntityExtendBundle controller.

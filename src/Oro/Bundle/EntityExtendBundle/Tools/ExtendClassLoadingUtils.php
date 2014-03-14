@@ -80,4 +80,25 @@ class ExtendClassLoadingUtils
             }
         }
     }
+
+    /**
+     * Gets class aliases for extended entities.
+     *
+     * @param string $cacheDir
+     * @return array
+     */
+    public static function getAliases($cacheDir)
+    {
+        $aliasesPath = self::getAliasesPath($cacheDir);
+        if (file_exists($aliasesPath)) {
+            $aliases = Yaml::parse(
+                file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
+            );
+            if (is_array($aliases)) {
+                return $aliases;
+            }
+        }
+
+        return [];
+    }
 }
