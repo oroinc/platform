@@ -12,6 +12,7 @@ datagrid:
                     - w.name
                     - w.name as workflowDefinition
                     - w.relatedEntity
+                    - w.relatedEntity as entityClass
                     - w.relatedEntity as active
                     - w.label
                     - w.system
@@ -41,6 +42,7 @@ datagrid:
             id: ~
             name: ~
             workflowDefinition: ~
+            entityClass: ~
             update_link:
                 type:       url
                 route:      oro_workflow_definition_update
@@ -53,6 +55,14 @@ datagrid:
                 type:       url
                 route:      oro_api_workflow_definition_delete
                 params:     [ workflowDefinition ]
+            activate_link:
+                type:       url
+                route:      oro_workflow_api_rest_workflow_activate
+                params:     [ workflowDefinition ]
+            deactivate_link:
+                type:       url
+                route:      oro_workflow_api_rest_workflow_deactivate
+                params:     [ entityClass ]
         sorters:
             columns:
                 label:
@@ -83,6 +93,18 @@ datagrid:
                 label:         oro.workflow.workflowdefinition.datagrid.delete
                 icon:          trash
                 link:          delete_link
+            activate:
+                type:          ajax
+                acl_resource:  oro_workflow_definition_update
+                label:         oro.workflow.workflowdefinition.datagrid.activate
+                icon:          ok
+                link:          activate_link
+            deactivate:
+                type:          ajax
+                acl_resource:  oro_workflow_definition_update
+                label:         oro.workflow.workflowdefinition.datagrid.deactivate
+                icon:          minus
+                link:          deactivate_link
         action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getWorkflowDefinitionPermissions"]
         filters:
             columns:

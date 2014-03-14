@@ -61,6 +61,8 @@ Designer: Designer
 Submit: Submit
 'General Information': 'General Information'
 'Create Workflow': 'Create Workflow'
+'Workflow activated': 'Workflow activated'
+'Workflow deactivated': 'Workflow deactivated'
 
 oro:
     workflow:
@@ -112,5 +114,7 @@ oro:
                 update: Update
                 clone:  Clone
                 delete: Delete
+                activate: Activate
+                deactivate: Deactivate
         action:
             general: "Workflow manipulations"

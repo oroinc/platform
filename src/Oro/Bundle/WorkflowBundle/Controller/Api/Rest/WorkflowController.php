@@ -256,7 +256,15 @@ class WorkflowController extends FOSRestController
         $entityConfig->set('active_workflow', $workflowName);
         $this->persistEntityConfig($entityConfig);
 
-        return $this->handleView($this->view($workflowName, Codes::HTTP_OK));
+        return $this->handleView(
+            $this->view(
+                array(
+                    'successful' => true,
+                    'message' => $this->get('translator')->trans('Workflow activated')
+                ),
+                Codes::HTTP_OK
+            )
+        );
     }
 
     /**
@@ -282,7 +290,15 @@ class WorkflowController extends FOSRestController
         $entityConfig->set('active_workflow', null);
         $this->persistEntityConfig($entityConfig);
 
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        return $this->handleView(
+            $this->view(
+                array(
+                    'successful' => true,
+                    'message' => $this->get('translator')->trans('Workflow deactivated')
+                ),
+                Codes::HTTP_OK
+            )
+        );
     }
 
     /**
