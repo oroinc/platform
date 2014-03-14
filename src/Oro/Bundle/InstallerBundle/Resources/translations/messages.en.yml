@@ -54,12 +54,8 @@ process:
             cache:         Clear cache before database initialization
             clear:         Clear extended entities data
             schema-drop:   Drop current schema
-            schema-create: Create schema
             schema-update: Schema update
             fixtures:      Load fixtures
-            init-config:   Init entities config
-            init-extend:   Init extended entities
-            update-config: Update extended entities config
             workflows:     Load workflow definitions
         setup:
             header:        Administration setup

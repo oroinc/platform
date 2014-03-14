@@ -7,62 +7,62 @@ class QueryBag
     /**
      * @var array
      */
-    protected $preSqls = [];
+    protected $preQueries = [];
 
     /**
      * @var array
      */
-    protected $postSqls = [];
+    protected $postQueries = [];
 
     /**
      * Gets a list of SQL queries should be executed before UP migrations defined in this class
      *
-     * @return array
+     * @return array An SQL query can be a string or an instance of MigrationQuery
      */
-    public function getPreSqls()
+    public function getPreQueries()
     {
-        return $this->preSqls;
+        return $this->preQueries;
     }
 
     /**
      * Gets a list of SQL queries should be executed after UP migrations defined in this class
      *
-     * @return array
+     * @return array An SQL query can be a string or an instance of MigrationQuery
      */
-    public function getPostSqls()
+    public function getPostQueries()
     {
-        return $this->postSqls;
+        return $this->postQueries;
     }
 
     /**
      * Register a SQL query should be executed before UP migrations defined in this class
      *
-     * @param string $sql
+     * @param string|MigrationQuery $query
      */
-    public function addPreSql($sql)
+    public function addPreQuery($query)
     {
-        $this->preSqls[] = $sql;
+        $this->preQueries[] = $query;
     }
 
     /**
      * Register a SQL query should be executed after UP migrations defined in this class
      *
-     * @param string $sql
+     * @param string|MigrationQuery $query
      */
-    public function addPostSql($sql)
+    public function addPostQuery($query)
     {
-        $this->postSqls[] = $sql;
+        $this->postQueries[] = $query;
     }
 
     /**
      * Register a SQL query should be executed after UP migrations defined in this class
-     * This method is just an alias for addPostSql
+     * This method is just an alias for addPostQuery
      *
-     * @param string $sql
+     * @param string|MigrationQuery $query
      */
-    public function addSql($sql)
+    public function addQuery($query)
     {
-        $this->postSqls[] = $sql;
+        $this->postQueries[] = $query;
     }
 
     /**
@@ -70,27 +70,11 @@ class QueryBag
      */
     public function clear()
     {
-        if (!empty($this->preSqls)) {
-            $this->preSqls = [];
+        if (!empty($this->preQueries)) {
+            $this->preQueries = [];
         }
-        if (!empty($this->postSqls)) {
-            $this->postSqls = [];
+        if (!empty($this->postQueries)) {
+            $this->postQueries = [];
         }
-    }
-
-    /**
-     * Gets a SQL query can be used to rename a table
-     *
-     * @param string $oldTableName
-     * @param string $newTableName
-     * @return string
-     */
-    public function getRenameTableSql($oldTableName, $newTableName)
-    {
-        return sprintf(
-            'ALTER TABLE %s RENAME TO %s;',
-            $oldTableName,
-            $newTableName
-        );
     }
 }

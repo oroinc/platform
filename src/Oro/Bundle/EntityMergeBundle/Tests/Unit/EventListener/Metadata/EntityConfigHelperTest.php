@@ -37,34 +37,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     {
         $scope = 'merge';
         $className = 'Namespace\\Entity';
-        $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . 'test';
         $fieldName = 'test';
-
-        $this->configManager->expects($this->at(0))
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
-
-        $this->extendConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($className, $fieldName)
-            ->will($this->returnValue(true));
-
-        $extendConfig = $this->createConfig();
-
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className, $fieldName)
-            ->will($this->returnValue($extendConfig));
-
-        $extendConfig->expects($this->once())
-            ->method('is')
-            ->with('is_extend')
-            ->will($this->returnValue(true));
 
         $mergeConfigProvider = $this->createConfigProvider();
 
-        $this->configManager->expects($this->at(1))
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
             ->will($this->returnValue($mergeConfigProvider));
@@ -81,7 +58,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->with($className, $fieldName)
             ->will($this->returnValue($mergeConfig));
 
-        $this->assertEquals($mergeConfig, $this->helper->getConfig($scope, $className, $extendFieldName));
+        $this->assertSame($mergeConfig, $this->helper->getConfig($scope, $className, $fieldName));
     }
 
     public function testGetConfigByFieldMetadataForNotExtendField()
@@ -89,12 +66,6 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $scope = 'merge';
         $className = 'Namespace\\Entity';
         $fieldName = 'test';
-        $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . $fieldName;
-
-        $this->configManager->expects($this->at(0))
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
 
         $fieldMetadata = $this->createFieldMetadata();
         $fieldMetadata->expects($this->once())
@@ -102,28 +73,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($className));
         $fieldMetadata->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($extendFieldName));
-
-        $this->extendConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($className, $fieldName)
-            ->will($this->returnValue(true));
-
-        $extendConfig = $this->createConfig();
-
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($className, $fieldName)
-            ->will($this->returnValue($extendConfig));
-
-        $extendConfig->expects($this->once())
-            ->method('is')
-            ->with('is_extend')
-            ->will($this->returnValue(true));
+            ->will($this->returnValue($fieldName));
 
         $mergeConfigProvider = $this->createConfigProvider();
 
-        $this->configManager->expects($this->at(1))
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
             ->will($this->returnValue($mergeConfigProvider));
@@ -140,14 +94,13 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->with($className, $fieldName)
             ->will($this->returnValue($mergeConfig));
 
-        $this->assertEquals($mergeConfig, $this->helper->getConfigByFieldMetadata($scope, $fieldMetadata));
+        $this->assertSame($mergeConfig, $this->helper->getConfigByFieldMetadata($scope, $fieldMetadata));
     }
 
     public function testPrepareFieldMetadataPropertyPathWithExtendField()
     {
         $className = 'Namespace\\Entity';
         $fieldName = 'test';
-        $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . $fieldName;
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -160,7 +113,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($className));
         $fieldMetadata->expects($this->once())
             ->method('getSourceFieldName')
-            ->will($this->returnValue($extendFieldName));
+            ->will($this->returnValue($fieldName));
 
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -191,6 +144,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Namespace\\Entity';
         $fieldName = 'test';
 
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($this->extendConfigProvider));
+
         $fieldMetadata = $this->createFieldMetadata();
         $fieldMetadata->expects($this->once())
             ->method('getSourceClassName')
@@ -199,7 +157,10 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getSourceFieldName')
             ->will($this->returnValue($fieldName));
 
-        $this->extendConfigProvider->expects($this->never())->method($this->anything());
+        $this->extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(false));
 
         $fieldMetadata->expects($this->never())->method('set');
 

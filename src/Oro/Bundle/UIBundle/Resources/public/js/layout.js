@@ -6,6 +6,7 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var bootstrap = require('bootstrap');
 
     var scrollspy = require('oroui/js/scrollspy');
     var widgetControlInitializer = require('oroui/js/widget-control-initializer');
