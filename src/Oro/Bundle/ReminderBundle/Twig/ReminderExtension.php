@@ -28,8 +28,8 @@ class ReminderExtension extends \Twig_Extension
     protected $messageParamsProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param SecurityContext $securityContext
+     * @param EntityManager         $entityManager
+     * @param SecurityContext       $securityContext
      * @param MessageParamsProvider $messageParamsProvider
      */
     public function __construct(
@@ -37,8 +37,8 @@ class ReminderExtension extends \Twig_Extension
         SecurityContext $securityContext,
         MessageParamsProvider $messageParamsProvider
     ) {
-        $this->entityManager = $entityManager;
-        $this->securityContext = $securityContext;
+        $this->entityManager         = $entityManager;
+        $this->securityContext       = $securityContext;
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
@@ -68,7 +68,8 @@ class ReminderExtension extends \Twig_Extension
         $user = $this->securityContext->getToken()->getUser();
 
         if (is_object($user) && $user instanceof User) {
-            $reminders = $this->entityManager->getRepository('OroReminderBundle:Reminder')
+            $reminders = $this->entityManager
+                ->getRepository('OroReminderBundle:Reminder')
                 ->findRequestedReminders($user);
 
             return $this->messageParamsProvider->getMessageParamsForReminders($reminders);

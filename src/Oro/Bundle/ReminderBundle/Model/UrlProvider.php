@@ -26,11 +26,11 @@ class UrlProvider
     public function __construct(ConfigManager $manager, RouterInterface $router)
     {
         $this->manager = $manager;
-        $this->router = $router;
+        $this->router  = $router;
     }
 
     /**
-     * Generate rout for entity (use entity config)
+     * Generate rout for entity (using entity config)
      *
      * @param Reminder $reminder
      * @return string
