@@ -45,14 +45,14 @@ class BaseProduct
     /**
      * @var double
      *
-     * @ORM\Column(name="cost", type="currency", nullable=true)
+     * @ORM\Column(name="cost", type="money", nullable=true)
      */
     protected $cost;
 
     /**
      * @var double
      *
-     * @ORM\Column(name="price", type="currency", nullable=true)
+     * @ORM\Column(name="price", type="money", nullable=true)
      */
     protected $price;
 

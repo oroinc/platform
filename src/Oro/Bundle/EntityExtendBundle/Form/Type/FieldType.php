@@ -15,21 +15,21 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 class FieldType extends AbstractType
 {
     protected $types = array(
-        'string'     => 'oro.entity.form.data_type.string',
-        'integer'    => 'oro.entity.form.data_type.integer',
-        'smallint'   => 'oro.entity.form.data_type.smallint',
-        'bigint'     => 'oro.entity.form.data_type.bigint',
-        'boolean'    => 'oro.entity.form.data_type.boolean',
-        'decimal'    => 'oro.entity.form.data_type.decimal',
-        'date'       => 'oro.entity.form.data_type.date',
-        'text'       => 'oro.entity.form.data_type.text',
-        'float'      => 'oro.entity.form.data_type.float',
-        'currency'   => 'oro.entity.form.data_type.currency',
-        'percent'    => 'oro.entity.form.data_type.percent',
-        'oneToMany'  => 'oro.entity.form.data_type.oneToMany',
-        'manyToOne'  => 'oro.entity.form.data_type.manyToOne',
-        'manyToMany' => 'oro.entity.form.data_type.manyToMany',
-        'optionSet'  => 'oro.entity.form.data_type.optionSet'
+        'string'     => 'oro.entity_extend.form.data_type.string',
+        'integer'    => 'oro.entity_extend.form.data_type.integer',
+        'smallint'   => 'oro.entity_extend.form.data_type.smallint',
+        'bigint'     => 'oro.entity_extend.form.data_type.bigint',
+        'boolean'    => 'oro.entity_extend.form.data_type.boolean',
+        'decimal'    => 'oro.entity_extend.form.data_type.decimal',
+        'date'       => 'oro.entity_extend.form.data_type.date',
+        'text'       => 'oro.entity_extend.form.data_type.text',
+        'float'      => 'oro.entity_extend.form.data_type.float',
+        'money'   => 'oro.entity_extend.form.data_type.money',
+        'percent'    => 'oro.entity_extend.form.data_type.percent',
+        'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
+        'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
+        'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
+        'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     );
 
     /**

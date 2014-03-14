@@ -63,14 +63,14 @@ class BaseOrder
     /**
      * @var double
      *
-     * @ORM\Column(name="subtotal_amount", type="currency", nullable=true)
+     * @ORM\Column(name="subtotal_amount", type="money", nullable=true)
      */
     protected $subtotalAmount;
 
     /**
      * @var double
      *
-     * @ORM\Column(name="shipping_amount", type="currency", nullable=true)
+     * @ORM\Column(name="shipping_amount", type="money", nullable=true)
      */
     protected $shippingAmount;
 
@@ -84,14 +84,14 @@ class BaseOrder
     /**
      * @var double
      *
-     * @ORM\Column(name="tax_amount", type="currency", nullable=true)
+     * @ORM\Column(name="tax_amount", type="money", nullable=true)
      */
     protected $taxAmount;
 
     /**
      * @var double
      *
-     * @ORM\Column(name="discount_amount", type="currency", nullable=true)
+     * @ORM\Column(name="discount_amount", type="money", nullable=true)
      */
     protected $discountAmount;
 
@@ -105,7 +105,7 @@ class BaseOrder
     /**
      * @var double
      *
-     * @ORM\Column(name="total_amount", type="currency", nullable=true)
+     * @ORM\Column(name="total_amount", type="money", nullable=true)
      */
     protected $totalAmount;
 

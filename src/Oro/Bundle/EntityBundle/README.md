@@ -70,7 +70,7 @@ Some entities have fields witch data is money or percents.
 
 For this data was created new field types - currency and percent.
 
-**currency** field type allow to store currency data. It's an alias to decimal(19,4)type.
+**money** field type allow to store money data. It's an alias to decimal(19,4) type.
 
 You can use this field type like:
 
@@ -78,7 +78,7 @@ You can use this field type like:
     /**
      * @var decimal
      *
-     * @ORM\Column(name="tax_amount", type="currency")
+     * @ORM\Column(name="tax_amount", type="money")
      */
     protected $taxAmount;
 ```
