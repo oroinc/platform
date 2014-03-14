@@ -27,7 +27,12 @@ class FieldProvider extends EntityFieldProvider
     }
 
     /**
-     * {@inheritDoc}
+     * Adds entity fields to $result
+     *
+     * @param array         $result
+     * @param string        $className
+     * @param EntityManager $em
+     * @param bool          $translate
      */
     protected function addFields(array &$result, $className, EntityManager $em, $translate)
     {
@@ -37,10 +42,7 @@ class FieldProvider extends EntityFieldProvider
 
             // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
-                $fieldLabel = $this->getFieldLabel(
-                    $className,
-                    $this->getFieldNameToTranslate($className, $fieldName)
-                );
+                $fieldLabel = $this->getFieldLabel($className, $fieldName);
                 $this->addField(
                     $result,
                     $fieldName,
@@ -51,15 +53,12 @@ class FieldProvider extends EntityFieldProvider
                 );
             }
 
-            // add single association field
+            // add single association fields
             foreach ($metadata->getAssociationNames() as $associationName) {
                 if (!$this->isWorkflowField($associationName)
                     && $metadata->isSingleValuedAssociation($associationName)
                 ) {
-                    $fieldLabel = $this->getFieldLabel(
-                        $className,
-                        $this->getFieldNameToTranslate($className, $associationName)
-                    );
+                    $fieldLabel = $this->getFieldLabel($className, $associationName);
                     $this->addField(
                         $result,
                         $associationName,
@@ -105,10 +104,7 @@ class FieldProvider extends EntityFieldProvider
 
                     $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                     $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel      = $this->getFieldLabel(
-                        $className,
-                        $this->getFieldNameToTranslate($className, $associationName)
-                    );
+                    $fieldLabel      = $this->getFieldLabel($className, $associationName);
                     $relationData    = array(
                         'name'                => $associationName,
                         'type'                => $targetMetadata->getTypeOfField($targetFieldName),
