@@ -7,15 +7,12 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
- * Class DatagridSourceSegmentProxy
+ * Class RestrictionSegmentProxy
  *
  * @package Oro\Bundle\SegmentBundle\Model
  *
- *  This class is used by SegmentDatagridConfigurationBuilder to prevent converting definition for filters.
- *  It replaces all existing filters by "segment" filter, all segment restrictions will be applied there.
- *  It's only used when need to build segment's datagrid representation
  */
-class DatagridSourceSegmentProxy extends AbstractSegmentProxy
+class RestrictionSegmentProxy extends AbstractSegmentProxy
 {
     /** @var \Doctrine\ORM\EntityManager */
     protected $em;
@@ -51,15 +48,8 @@ class DatagridSourceSegmentProxy extends AbstractSegmentProxy
             $this->preparedDefinition = array_merge(
                 $decoded,
                 [
-                    'filters' => [
-                        [
-                            'columnName' => $identifier,
-                            'criterion'  =>
-                                [
-                                    'filter' => 'segment',
-                                    'data'   => ['value' => $this->segment->getId()]
-                                ],
-                        ]
+                    'columns' => [
+                        ['name' => $identifier]
                     ]
                 ]
             );

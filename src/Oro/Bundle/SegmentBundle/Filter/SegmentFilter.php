@@ -2,30 +2,36 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
+use Doctrine\ORM\Query\Parameter;
+
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class SegmentFilter extends EntityFilter
 {
-    /** @var QueryProcessor */
-    protected $processor;
+    /** @var DynamicSegmentQueryBuilder */
+    protected $dynamicSegmentQueryBuilder;
 
     /**
      * Constructor
      *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param QueryProcessor       $processor
+     * @param FormFactoryInterface       $factory
+     * @param FilterUtility              $util
+     * @param DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder
      */
-    public function __construct(FormFactoryInterface $factory, FilterUtility $util, QueryProcessor $processor)
-    {
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder
+    ) {
         parent::__construct($factory, $util);
-        $this->processor = $processor;
+        $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
     }
 
     /**
@@ -64,26 +70,18 @@ class SegmentFilter extends EntityFilter
         /** @var Segment $segment */
         $segment = $data['value'];
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
-            $query = $this->getDynamicSegmentRestriction($segment);
+            $query = $this->dynamicSegmentQueryBuilder->build($segment);
         } else {
             // @TODO process static here
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
-        $expr  = $ds->expr()->in($field, $query);
+        $expr  = $ds->expr()->in($field, $query->getDQL());
         $this->applyFilterToClause($ds, $expr);
-    }
 
-    /**
-     * Converts definition of
-     *
-     * @param Segment $segment
-     *
-     * @return \Doctrine\ORM\Query
-     */
-    protected function getDynamicSegmentRestriction(Segment $segment)
-    {
-        $qb = $this->processor->process($segment->getEntity(), $segment);
-
-        return $qb->getQuery()->getDQL();
+        $params = $query->getParameters();
+        /** @var Parameter $param */
+        foreach ($params as $param) {
+            $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
+        }
     }
 }

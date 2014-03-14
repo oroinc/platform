@@ -84,29 +84,4 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 
         return $classMetadata;
     }
-
-    /**
-     * Get filter type for given field type
-     *
-     * @param string $fieldType
-     * @return string
-     */
-    protected function getFilterType($fieldType)
-    {
-        switch ($fieldType) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-            case 'decimal':
-            case 'float':
-                return 'number';
-            case 'boolean':
-                return 'boolean';
-            case 'date':
-            case 'datetime':
-                return 'datetime';
-        }
-
-        return 'string';
-    }
 }

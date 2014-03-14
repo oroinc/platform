@@ -2,27 +2,68 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractOrmQueryConverter;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionInterface;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 
-class SegmentQueryConverter extends AbstractOrmQueryConverter
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
+use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
+
+class SegmentQueryConverter extends GroupingOrmQueryConverter
 {
-    public function convert(Segment $segment)
-    {
+    /*
+     * Override to prevent naming conflicts
+     */
+    const COLUMN_ALIAS_TEMPLATE = 'cs%d';
+    const TABLE_ALIAS_TEMPLATE  = 'ts%d';
 
+    /** @var QueryBuilder */
+    protected $qb;
+
+    /** @var EntityManager */
+    protected $em;
+
+    /** @var RestrictionBuilder */
+    protected $restrictionBuilder;
+
+    /**
+     * Constructor
+     *
+     * @param FunctionProviderInterface $functionProvider
+     * @param ManagerRegistry           $doctrine
+     * @param RestrictionBuilder        $restrictionBuilder
+     */
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        ManagerRegistry $doctrine,
+        RestrictionBuilder $restrictionBuilder
+    ) {
+        $this->em                 = $doctrine->getManager();
+        $this->restrictionBuilder = $restrictionBuilder;
+        parent::__construct($functionProvider, $doctrine);
     }
 
     /**
-     * Performs conversion of a single column of SELECT statement
+     * Process convert
      *
-     * @param string                        $entityClassName
-     * @param string                        $tableAlias
-     * @param string                        $fieldName
-     * @param string                        $columnAlias
-     * @param string                        $columnLabel
-     * @param string|FunctionInterface|null $functionExpr
-     * @param string|null                   $functionReturnType
+     * @param AbstractQueryDesigner $source
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function convert(AbstractQueryDesigner $source)
+    {
+        $this->qb = $this->em->createQueryBuilder();
+        $this->doConvert($source);
+
+        return $this->qb;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function addSelectColumn(
         $entityClassName,
@@ -33,84 +74,59 @@ class SegmentQueryConverter extends AbstractOrmQueryConverter
         $functionExpr,
         $functionReturnType
     ) {
-        // TODO: Implement addSelectColumn() method.
+        $columnName = sprintf('%s.%s', $tableAlias, $fieldName);
+        if ($functionExpr !== null) {
+            $functionExpr = $this->prepareFunctionExpression(
+                $functionExpr,
+                $tableAlias,
+                $fieldName,
+                $columnName,
+                $columnAlias
+            );
+        }
+
+        // @TODO find solution for aliases
+        // column aliases are not used here, because of parser error
+        $select = $functionExpr !== null ? $functionExpr : $columnName;
+        $this->qb->addSelect($select);
     }
 
     /**
-     * Performs conversion of a single table of FROM statement
-     *
-     * @param string $entityClassName
-     * @param string $tableAlias
+     * {@inheritdoc}
      */
     protected function addFromStatement($entityClassName, $tableAlias)
     {
-        // TODO: Implement addFromStatement() method.
+        $this->qb->from($entityClassName, $tableAlias);
     }
 
     /**
-     * Performs conversion of a single JOIN statement
-     *
-     * @param string $joinTableAlias
-     * @param string $joinFieldName
-     * @param string $joinAlias
+     * {@inheritdoc}
      */
     protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
     {
-        // TODO: Implement addJoinStatement() method.
+        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
+            $this->qb->innerJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+        } else {
+            $this->qb->leftJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+        }
     }
 
     /**
-     * Opens new group in WHERE statement
+     * {@inheritdoc}
      */
-    protected function beginWhereGroup()
+    protected function addWhereStatement()
     {
-        // TODO: Implement beginWhereGroup() method.
+        parent::addWhereStatement();
+        if (!empty($this->filters)) {
+            $this->restrictionBuilder->buildRestrictions(
+                $this->filters,
+                new GroupingOrmFilterDatasourceAdapter($this->qb)
+            );
+        }
     }
 
     /**
-     * Closes current group in WHERE statement
-     */
-    protected function endWhereGroup()
-    {
-        // TODO: Implement endWhereGroup() method.
-    }
-
-    /**
-     * Adds an operator to WHERE condition
-     *
-     * @param string $operator An operator. Can be AND or OR
-     */
-    protected function addWhereOperator($operator)
-    {
-        // TODO: Implement addWhereOperator() method.
-    }
-
-    /**
-     * Performs conversion of a single WHERE condition
-     *
-     * @param string $entityClassName
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnAlias
-     * @param string $filterName
-     * @param array  $filterData
-     */
-    protected function addWhereCondition(
-        $entityClassName,
-        $tableAlias,
-        $fieldName,
-        $columnAlias,
-        $filterName,
-        array $filterData
-    ) {
-        // TODO: Implement addWhereCondition() method.
-    }
-
-    /**
-     * Performs conversion of a single column of GROUP BY statement
-     *
-     * @param string $tableAlias
-     * @param string $fieldName
+     * {@inheritdoc}
      */
     protected function addGroupByColumn($tableAlias, $fieldName)
     {
