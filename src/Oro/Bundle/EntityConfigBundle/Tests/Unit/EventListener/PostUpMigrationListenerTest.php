@@ -6,6 +6,8 @@ use Doctrine\DBAL\Connection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener;
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
 
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
@@ -16,14 +18,13 @@ class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnPostUp()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
 
         /** @var PostUpMigrationListener $postUpMigrationListener */
         $postUpMigrationListener = new PostUpMigrationListener(
-            new ConfigDumper($cm)
+            $commandExecutor
         );
 
         /** @var Connection $connection */
@@ -37,14 +38,27 @@ class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
 
         $postUpMigrationListener->onPostUp($event);
 
+        $migrations = $event->getMigrations();
+
         $this->assertNotEmpty($event);
+        $this->assertCount(2, $migrations);
+
         $this->assertInstanceOf(
             'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration',
-            $event->getMigrations()[0]
+            $migrations[0]
         );
         $this->assertInstanceOf(
             'Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration',
-            $event->getMigrations()[1]
+            $migrations[1]
         );
+        $this->assertEquals(
+            new TestMigration(),
+            $migrations[0]
+        );
+        $this->assertEquals(
+            new UpdateEntityConfigMigration($commandExecutor),
+            $migrations[1]
+        );
+
     }
 }
