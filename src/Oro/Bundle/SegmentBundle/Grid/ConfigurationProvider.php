@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Grid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
@@ -13,19 +13,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 {
     const GRID_PREFIX = 'oro_segment_grid_';
 
-    /**
-     * @var FunctionProviderInterface
-     */
+    /** @var FunctionProviderInterface */
     protected $functionProvider;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var DatagridConfiguration
-     */
+    /** @var DatagridConfiguration */
     private $configuration = null;
 
     /**
@@ -56,7 +50,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         if ($this->configuration === null) {
             $id                = intval(substr($gridName, strlen(self::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
-            $segment            = $segmentRepository->find($id);
+            $segment           = $segmentRepository->find($id);
             $builder           = new SegmentDatagridConfigurationBuilder(
                 $gridName,
                 $segment,

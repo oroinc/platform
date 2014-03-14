@@ -11,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 
 class SegmentController extends Controller
 {
@@ -47,7 +48,7 @@ class SegmentController extends Controller
             ->getConfig($entity->getEntity())
             ->get('plural_label');
 
-        $gridName = sprintf('oro_segment_grid_%d', $entity->getId());
+        $gridName = ConfigurationProvider::GRID_PREFIX . $entity->getId();
         if (!$this->get('oro_segment.datagrid.configuration.provider')->isConfigurationValid($gridName)) {
             // unset grid name if invalid
             $gridName = false;

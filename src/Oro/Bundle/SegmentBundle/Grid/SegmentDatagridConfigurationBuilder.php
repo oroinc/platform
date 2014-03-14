@@ -12,6 +12,14 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
 class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
 {
+    /**
+     * Constructor
+     *
+     * @param string                    $gridName
+     * @param Segment                   $segment
+     * @param FunctionProviderInterface $functionProvider
+     * @param ManagerRegistry           $doctrine
+     */
     public function __construct(
         $gridName,
         Segment $segment,

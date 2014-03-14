@@ -4,6 +4,7 @@ parameters:
     oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_segment.datagrid.configuration.provider.class:       Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
     oro_segment.filter.segment.class:                        Oro\Bundle\SegmentBundle\Filter\SegmentFilter
+    oro_segment.filter.query_processor.class:                Oro\Bundle\SegmentBundle\Filter\QueryProcessor
 
 services:
     oro_segment.entity_provider:
@@ -33,5 +34,14 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @oro_segment.filter.query_processor
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: segment }
+
+    oro_segment.filter.query_processor:
+        class: %oro_segment.filter.query_processor.class%
+        arguments:
+            - @oro_query_designer.query_designer.restriction_builder
+            - @oro_query_designer.query_designer.manager
+            - @doctrine
+
