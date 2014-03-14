@@ -51,6 +51,9 @@ function(_, Backbone, AttributeFormOptionRowView) {
         },
 
         addItem: function(data) {
+            if (_.indexOf(this.getCollection(), data) == -1) {
+                this.getCollection().push(data);
+            }
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
             data.isSystemLabel = !data.label;
             if (fieldId) {

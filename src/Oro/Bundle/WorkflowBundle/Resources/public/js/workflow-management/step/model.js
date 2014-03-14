@@ -50,7 +50,7 @@ function(_, Backbone, TransitionCollection) {
 
                 var onTransitionAdd = _.bind(function(transition) {
                     var transitionName = transition.get('name');
-                    if (allowedTransitionsAttr.indexOf(transitionName) === -1) {
+                    if (_.indexOf(allowedTransitionsAttr, transitionName) === -1) {
                         this.get('allowed_transitions').push(transitionName);
                     }
                 }, this);

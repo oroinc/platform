@@ -88,7 +88,7 @@ function(_, Backbone, messanger, __,
             var getSteps = _.bind(function(query) {
                 var steps = [];
                 _.each(this.model.get('steps').models, function(step) {
-                    if (!step.get('_is_start') && step.get('label').indexOf(query.term) !== -1) {
+                    if (!step.get('_is_start') && _.indexOf(step.get('label'), query.term) !== -1) {
                         steps.push({
                             'id': step.get('name'),
                             'text': step.get('label')

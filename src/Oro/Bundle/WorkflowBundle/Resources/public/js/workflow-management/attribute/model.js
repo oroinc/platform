@@ -15,7 +15,13 @@ function(Backbone) {
             translated_label: null,
             type: null,
             property_path: null,
-            options: {}
+            options: null
+        },
+
+        initialize: function() {
+            if (this.get('options') === null) {
+                this.set('options', {});
+            }
         }
     });
 });
