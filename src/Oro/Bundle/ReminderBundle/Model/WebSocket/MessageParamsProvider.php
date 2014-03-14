@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
+use BeSimple\SoapCommon\Type\KeyValue\DateTime;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
@@ -57,9 +58,19 @@ class MessageParamsProvider
      */
     public function getMessageParams(Reminder $reminder)
     {
+        $now = new \DateTime();
+        $expiredDate = $this->dateTimeFormatter->formatDate($reminder->getExpireAt(), \IntlDateFormatter::SHORT);
+        $nowDate = $this->dateTimeFormatter->formatDate($now, \IntlDateFormatter::SHORT);
+
+        if ($expiredDate === $nowDate) {
+            $expireAt = $this->dateTimeFormatter->formatTime($reminder->getExpireAt());
+        } else {
+            $expireAt = $this->dateTimeFormatter->format($reminder->getExpireAt());
+        }
+
         return array(
             'templateId'   => $this->getTemplateId($reminder),
-            'expireAt'     => $this->dateTimeFormatter->format($reminder->getExpireAt()),
+            'expireAt'     => $expireAt,
             'subject'      => $reminder->getSubject(),
             'url'          => $this->urlProvider->getUrl($reminder),
             'id'           => $reminder->getId(),
