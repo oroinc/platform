@@ -66,15 +66,21 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedUrl               = 'www.tests.com';
 
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder->expects($this->any())->method('getExpireAt')->will($this->returnValue(new \DateTime()));
         $reminder->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($expectedId));
         $reminder->expects($this->once())
             ->method('getSubject')
             ->will($this->returnValue($expectedSubject));
-        $reminder->expects($this->once())
+        $reminder->expects($this->exactly(2))
             ->method('getExpireAt')
             ->will($this->returnValue($expectedExpireAt));
+
+        $this->dateTimeFormatter
+            ->expects($this->at(0))
+            ->method('formatDate')
+            ->will($this->returnValue(new \DateTime()));
 
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
@@ -118,12 +124,17 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $reminder->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($expectedId));
+        $reminder->expects($this->exactly(2))
+            ->method('getExpireAt')
+            ->will($this->returnValue($expectedExpireAt));
         $reminder->expects($this->once())
             ->method('getSubject')
             ->will($this->returnValue($expectedSubject));
-        $reminder->expects($this->once())
-            ->method('getExpireAt')
-            ->will($this->returnValue($expectedExpireAt));
+
+        $this->dateTimeFormatter
+            ->expects($this->at(0))
+            ->method('formatDate')
+            ->will($this->returnValue(new \DateTime()));
 
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
