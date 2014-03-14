@@ -147,7 +147,15 @@ class ConfigSubscriber implements EventSubscriberInterface
                         ) {
                             $locale = $this->translator->getLocale();
                             // save into translation table
-                            $this->saveTranslationValue($key, $value, $locale);
+                            /** @var TranslationRepository $translationRepo */
+                            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
+                            $translationRepo->saveValue(
+                                $key,
+                                $value,
+                                $locale,
+                                TranslationRepository::DEFAULT_DOMAIN,
+                                Translation::SCOPE_UI
+                            );
                             // mark translation cache dirty
                             $this->dbTranslationMetadataCache->updateTimestamp($locale);
                         }
@@ -168,37 +176,5 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($event->getForm()->isValid()) {
             $this->configManager->flush();
         }
-    }
-
-    /**
-     * Update existing translation value or create new one if it is not exist
-     *
-     * @param string $key
-     * @param string $value
-     * @param string $locale
-     */
-    protected function saveTranslationValue($key, $value, $locale)
-    {
-        /** @var TranslationRepository $translationRepo */
-        $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
-        /** @var Translation $translationValue */
-        $translationValue = $translationRepo->findValue(
-            $key,
-            $locale,
-            TranslationRepository::DEFAULT_DOMAIN,
-            Translation::SCOPE_UI
-        );
-        if (!$translationValue) {
-            $translationValue = new Translation();
-            $translationValue
-                ->setKey($key)
-                ->setValue($value)
-                ->setLocale($locale)
-                ->setDomain(TranslationRepository::DEFAULT_DOMAIN)
-                ->setScope(Translation::SCOPE_UI);
-        } else {
-            $translationValue->setValue($value);
-        }
-        $this->em->persist($translationValue);
     }
 }

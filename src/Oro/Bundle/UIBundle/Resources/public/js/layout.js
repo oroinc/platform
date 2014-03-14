@@ -6,6 +6,7 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var bootstrap = require('bootstrap');
 
     var scrollspy = require('oroui/js/scrollspy');
     var widgetControlInitializer = require('oroui/js/widget-control-initializer');
@@ -25,6 +26,16 @@ define(function (require) {
 
         container.find('[data-toggle="tooltip"]').tooltip();
 
+        this.initPopover($('form label'));
+        widgetControlInitializer.init(container);
+
+//        @todo: BAP-3374
+//        layout.onPageRendered(function () {
+//            scrollspy.top();
+//        });
+    };
+
+    layout.initPopover = function (container) {
         var handlePopoverMouseout = function (e, popover) {
             var popoverHandler = $(e.relatedTarget).closest('.popover');
             if (!popoverHandler.length) {
@@ -39,7 +50,7 @@ define(function (require) {
                 });
             }
         };
-        $('form label [data-toggle="popover"]')
+        container.find('[data-toggle="popover"]')
             .popover({
                 animation: true,
                 delay: { show: 0, hide: 0 },
@@ -60,8 +71,6 @@ define(function (require) {
                     handlePopoverMouseout(e, popover);
                 }, 500);
             });
-
-        widgetControlInitializer.init(container);
     };
 
     layout.hideProgressBar = function () {

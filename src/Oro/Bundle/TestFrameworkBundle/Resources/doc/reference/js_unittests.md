@@ -9,13 +9,16 @@ For running JS tests following software required:
 How to install **Node.js** you can find on [official website](http://nodejs.org/download/). After `node` is installed, you need to install several modules using **[Node Packaged Modules](https://npmjs.org/)** manager:
 
 ```bash
-npm install -g karma
-npm install -g karma-jasmine@2_0 --save-dev
-npm install -g karma-junit-reporter --save-dev
-npm install -g karma-coverage --save-dev
+npm install -g karma@0.12
+npm install -g karma-requirejs@0.2 --save-dev
+npm install -g karma-junit-reporter@0.2 --save-dev
+npm install -g karma-phantomjs-launcher@0.1 --save-dev
+npm install -g karma-chrome-launcher@0.1 --save-dev
+npm install -g karma-firefox-launcher@0.1 --save-dev
+npm install -g karma-jasmine@0.2 --save-dev
+npm install -g karma-coverage@0.2 --save-dev
 npm install -g git://github.com/laboro/karma-requirejs-exposure.git --save-dev
 ```
-**Karma** goes with **Jasmine** plugin from a box, some other plugins as well. But to make sure that we use proper version of `karama-jasmine` it's better to install it manually.
 
 You can see that in installation command used `-g` flag, means to install modules globally. But you might have a reason to install them locally (into `./node_modules` of current dir), then execute same command without `-g` flag. Just keep in mind, **Karma** module and all plugins have to be installed on same level (all globally or all locally).
 

@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -76,7 +76,7 @@ class FieldType extends AbstractType
 
                 if ($fieldId
                     && $extendProvider->hasConfigById($fieldId)
-                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendManager::STATE_DELETED)
+                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
                 ) {
                     continue;
                 }

@@ -16,6 +16,13 @@ class AbstractMassAction extends AbstractAction implements MassActionInterface
             $options['frontend_type'] = 'mass';
         }
 
+        if (!empty($options['icon'])) {
+            $options['launcherOptions'] = [
+                'iconClassName' => 'icon-' . $options['icon']
+            ];
+            unset($options['icon']);
+        }
+
         return parent::setOptions($options);
     }
 }

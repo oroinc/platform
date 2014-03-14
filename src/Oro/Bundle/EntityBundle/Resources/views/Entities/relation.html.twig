@@ -52,7 +52,7 @@
             var gridName = {{ gridName|json_encode|raw }};
 
             $(function() {
-                /** @type {oro.datagrid.CallbackListener} */
+                /** @type {orodatagrid.datagrid.listener.CallbackListener} */
                 new CallbackListener({
                     $gridContainer: $('#grid-' + gridName),
                     gridName: gridName,
@@ -65,14 +65,8 @@
                             var label = '';
 
                             {% set label = '' %}
-                            {% for title in relation.get('target_title') %}
-                                {% set is_extend = extend_provider.getConfig(relation.get('target_entity'), title).is('owner', 'Custom') %}
-                                {% set field_label = title %}
-                                {% if is_extend == true %}
-                                    {% set field_label = 'field_' ~ title %}
-                                {% endif %}
-
-                                label += model.get('{{ field_label }}') + ' ';
+                            {% for fieldName in relation.get('target_title') %}
+                                label += model.get('{{ fieldName }}') + ' ';
                             {% endfor %}
 
                             addedModels[id] = new MultipleEntityModel({
@@ -88,15 +82,10 @@
                                 'label': label,
                                 'extraData':
                                 [
-                                    {% for field in relation.get('target_grid') %}
-                                        {% set is_extend = extend_provider.getConfig(relation.get('target_entity'), field).is('owner', 'Custom') %}
-                                        {% set field_name = field %}
-                                        {% if is_extend == true %}
-                                            {% set field_name = 'field_' ~ field %}
-                                        {% endif %}
+                                    {% for fieldName in relation.get('target_grid') %}
                                     {
-                                        'label': '{{ entity_provider.getConfig(relation.get('target_entity'), field).get('label')|trans }}',
-                                        'value': model.get('{{ field_name }}')
+                                        'label': '{{ entity_provider.getConfig(relation.get('target_entity'), fieldName).get('label')|trans }}',
+                                        'value': model.get('{{ fieldName }}')
                                     },
                                     {% endfor %}
                                 ]
