@@ -57,7 +57,7 @@ class EntityProcessor
 
         $commands = array(
             'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
-            'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
+            'schemaUpdate' => new Process($console . ' oro:entity-extend:update-schema --env ' . $env),
         );
 
         // put system in maintenance mode
