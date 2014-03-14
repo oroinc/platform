@@ -72,7 +72,7 @@ class FormOptionsAssembler extends AbstractAssembler
             }
             foreach (array_keys($value) as $attributeName) {
                 $this->assertAttributeExists($attributeName, $owner, $ownerName);
-                if (!isset($attributeFields[$attributeName])) {
+                if (!array_key_exists($attributeName, $attributeFields)) {
                     throw new InvalidParameterException(
                         sprintf(
                             'Form options of %s "%s" doesn\'t have attribute "%s" which is referenced in ' .

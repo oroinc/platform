@@ -2,22 +2,37 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(
- *      name="oro_workflow_definition", indexes={
- *          @ORM\Index(name="oro_workflow_definition_enabled_idx", columns={"enabled"})
- *      }
- * )
+ * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
+ * @Config(
+ *  routeName="oro_workflow_definition_index",
+ *  routeView="oro_workflow_definition_update",
+ *  defaultValues={
+ *      "entity"={
+ *          "label"="Workflow",
+ *          "plural_label"="Workflows",
+ *          "icon"="icon-exchange"
+ *      },
+ *      "security"={
+ *          "type"="ACL",
+ *          "group_name"=""
+ *      }
+ *  }
+ * )
  * @ORM\HasLifecycleCallbacks()
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class WorkflowDefinition
+class WorkflowDefinition implements DomainObjectInterface
 {
     /**
      * @var string
@@ -57,16 +72,16 @@ class WorkflowDefinition
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(name="system", type="boolean")
      */
-    protected $enabled;
+    protected $system = false;
 
     /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
      */
-    protected $configuration;
+    protected $configuration = array();
 
     /**
      * @var WorkflowStep[]|Collection
@@ -101,12 +116,24 @@ class WorkflowDefinition
     protected $entityAcls;
 
     /**
+     * @var \DateTime $created
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime $updated
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     */
+    protected $updatedAt;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
-        $this->enabled = false;
-        $this->configuration = array();
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
     }
@@ -193,29 +220,6 @@ class WorkflowDefinition
     public function getEntityAttributeName()
     {
         return $this->entityAttributeName;
-    }
-
-    /**
-     * Set enabled
-     *
-     * @param boolean $enabled
-     * @return WorkflowDefinition
-     */
-    public function setEnabled($enabled)
-    {
-        $this->enabled = (bool)$enabled;
-
-        return $this;
-    }
-
-    /**
-     * Is enabled
-     *
-     * @return boolean
-     */
-    public function isEnabled()
-    {
-        return $this->enabled;
     }
 
     /**
@@ -479,7 +483,6 @@ class WorkflowDefinition
      */
     public function import(WorkflowDefinition $definition)
     {
-        // enabled flag should not be imported
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
@@ -488,8 +491,100 @@ class WorkflowDefinition
             ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
-            ->setEntityAcls($definition->getEntityAcls());
+            ->setEntityAcls($definition->getEntityAcls())
+            ->setSystem($definition->isSystem());
 
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSystem()
+    {
+        return $this->system;
+    }
+
+    /**
+     * @param boolean $system
+     * @return WorkflowDefinition
+     */
+    public function setSystem($system)
+    {
+        $this->system = $system;
+
+        return $this;
+    }
+
+    /**
+     * Get created date/time
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $created
+     * @return WorkflowDefinition
+     */
+    public function setCreatedAt($created)
+    {
+        $this->createdAt = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get last update date/time
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updated
+     * @return WorkflowDefinition
+     */
+    public function setUpdatedAt($updated)
+    {
+        $this->updatedAt = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event handler
+     * @ORM\PreUpdate
+     */
+    public function beforeUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Returns a unique identifier for this domain object.
+     *
+     * @return string
+     */
+    public function getObjectIdentifier()
+    {
+        return $this->getName();
     }
 }

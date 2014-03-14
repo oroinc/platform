@@ -5,22 +5,20 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 /**
  * Connects related entities with workflow entities
  */
 class EntityConnector
 {
-    const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
-    const PROPERTY_WORKFLOW_STEP = 'workflowStep';
-
     /**
      * @param object $entity
      * @param WorkflowItem $workflowItem
      */
     public function setWorkflowItem($entity, WorkflowItem $workflowItem)
     {
-        $this->setProperty($entity, self::PROPERTY_WORKFLOW_ITEM, $workflowItem);
+        $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM, $workflowItem);
     }
 
     /**
@@ -29,7 +27,7 @@ class EntityConnector
      */
     public function setWorkflowStep($entity, WorkflowStep $workflowStep)
     {
-        $this->setProperty($entity, self::PROPERTY_WORKFLOW_STEP, $workflowStep);
+        $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP, $workflowStep);
     }
 
     /**
@@ -38,7 +36,7 @@ class EntityConnector
      */
     public function getWorkflowItem($entity)
     {
-        return $this->getProperty($entity, self::PROPERTY_WORKFLOW_ITEM);
+        return $this->getProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM);
     }
 
     /**
@@ -47,7 +45,7 @@ class EntityConnector
      */
     public function getWorkflowStep($entity)
     {
-        return $this->getProperty($entity, self::PROPERTY_WORKFLOW_STEP);
+        return $this->getProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP);
     }
 
     /**
@@ -83,36 +81,36 @@ class EntityConnector
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entityOrClass
      * @param string $property
      * @return null|string
      */
-    protected function getSetter($entity, $property)
+    protected function getSetter($entityOrClass, $property)
     {
         $setter = 'set' . ucfirst($property);
-        return method_exists($entity, $setter) ? $setter : null;
+        return method_exists($entityOrClass, $setter) ? $setter : null;
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entityOrClass
      * @param string $property
      * @return null|string
      */
-    protected function getGetter($entity, $property)
+    protected function getGetter($entityOrClass, $property)
     {
         $getter = 'get' . ucfirst($property);
-        return method_exists($entity, $getter) ? $getter : null;
+        return method_exists($entityOrClass, $getter) ? $getter : null;
     }
 
     /**
-     * @param object $entity
+     * @param object|string $entityOrClass
      * @return bool
      */
-    public function isWorkflowAware($entity)
+    public function isWorkflowAware($entityOrClass)
     {
-        return $this->getGetter($entity, self::PROPERTY_WORKFLOW_ITEM)
-            && $this->getSetter($entity, self::PROPERTY_WORKFLOW_ITEM)
-            && $this->getGetter($entity, self::PROPERTY_WORKFLOW_STEP)
-            && $this->getSetter($entity, self::PROPERTY_WORKFLOW_STEP);
+        return $this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM)
+            && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM)
+            && $this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP)
+            && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP);
     }
 }
