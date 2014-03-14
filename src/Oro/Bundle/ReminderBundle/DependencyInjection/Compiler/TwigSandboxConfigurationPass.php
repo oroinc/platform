@@ -25,7 +25,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             $functions = $securityPolicyDef->getArgument(4);
             $functions = array_merge(
                 $functions,
-                array('url')
+                array('url', 'path')
             );
             $securityPolicyDef->replaceArgument(4, $functions);
             // register an twig extension implements this function

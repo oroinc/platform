@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,10 +20,17 @@ class VariablesValidator extends ConstraintValidator
     /** @var SecurityContextInterface */
     protected $securityContext;
 
-    public function __construct(\Twig_Environment $twig, SecurityContextInterface $securityContext)
-    {
-        $this->twig = $twig;
+    /** @var EntityManager */
+    protected $entityManager;
+
+    public function __construct(
+        \Twig_Environment $twig,
+        SecurityContextInterface $securityContext,
+        EntityManager $entityManager
+    ) {
+        $this->twig            = $twig;
         $this->securityContext = $securityContext;
+        $this->entityManager   = $entityManager;
     }
 
     /**
@@ -45,8 +54,16 @@ class VariablesValidator extends ConstraintValidator
 
         $relatedEntity = false;
         if (class_exists($emailTemplate->getEntityName())) {
-            $className = $emailTemplate->getEntityName();
+            $className     = $emailTemplate->getEntityName();
             $relatedEntity = new $className;
+
+            $metadata = $this->entityManager->getClassMetadata($className);
+
+            foreach ($metadata->getAssociationMappings() as $mapping) {
+                $targetEntity = new $mapping['targetEntity'];
+                $fieldName    = $mapping['fieldName'];
+                $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
+            }
         }
 
         $errors = array();
