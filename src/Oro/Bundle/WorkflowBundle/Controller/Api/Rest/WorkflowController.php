@@ -20,6 +20,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 // Exceptions
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
@@ -225,6 +226,52 @@ class WorkflowController extends FOSRestController
         $em->remove($workflowItem);
         $em->flush();
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * Activate workflow
+     *
+     * Returns
+     * - HTTP_OK (200)
+     * - HTTP_INTERNAL_SERVER_ERROR (500)
+     *
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/activate/{workflowDefinition}",
+     *      requirements={"version"="latest|v1"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Activate workflow", resource=true)
+     * @AclAncestor("oro_workflow")
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return Response
+     */
+    public function activateAction(WorkflowDefinition $workflowDefinition)
+    {
+        return $this->handleView($this->view(null, Codes::HTTP_OK));
+    }
+
+    /**
+     * Deactivate workflow
+     *
+     * Returns
+     * - HTTP_OK (200)
+     * - HTTP_INTERNAL_SERVER_ERROR (500)
+     *
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/deactivate/{entityClass}",
+     *      requirements={"version"="latest|v1"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Deactivate workflow", resource=true)
+     * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass
+     * @return Response
+     */
+    public function deactivateAction($entityClass)
+    {
+        return $this->handleView($this->view(null, Codes::HTTP_OK));
     }
 
     /**
