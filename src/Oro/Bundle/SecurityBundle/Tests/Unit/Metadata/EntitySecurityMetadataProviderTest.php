@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
 
@@ -42,7 +42,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->extendConfig = new Config(new EntityConfigId('extend', 'SomeClass'));
-        $this->extendConfig->set('state', ExtendManager::STATE_ACTIVE);
+        $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $this->cache = $this->getMockForAbstractClass(
             'Doctrine\Common\Cache\CacheProvider',
             array(),

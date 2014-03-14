@@ -8,8 +8,6 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityGridListener extends CustomEntityGridListener
 {
@@ -75,11 +73,8 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $fieldName = $this->getRequestParam('field_name');
         $entityId = $this->getRequestParam('id');
 
-        /** @var ConfigProvider $entityConfigProvider */
-        //$entityConfigProvider = $this->configManager->getProvider('entity');
+        /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
-
-        //$entityConfig = $entityConfigProvider->getConfig($extendEntityName);
         $fieldConfig  = $extendConfigProvider->getConfig($extendEntityName, $fieldName);
 
         $this->entityClass = $fieldConfig->get('target_entity');
@@ -138,14 +133,9 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
             $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldName
-                : $fieldName;
 
-            $this->queryFields[] = $code;
-
-            $field = $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $field = $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfig);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];
@@ -162,14 +152,19 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $relations = $entityConfig->get('relation');
         $relation  = $relations[$this->relationConfig->get('relation_key')];
 
-        $fieldName = ExtendConfigDumper::FIELD_PREFIX . $relation['target_field_id']->getFieldName();
+        $fieldName = $relation['target_field_id']->getFieldName();
 
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';
 
-            $compOperator = $this->relationConfig->getId()->getFieldType() == 'oneToMany'
-                ? '='
-                : 'MEMBER OF';
+            // TODO: getting a field type from a model here is a temporary solution.
+            // We need to use $this->relationConfig->getId()->getFieldType()
+            $fieldType = $this->configManager->getConfigFieldModel(
+                $this->relationConfig->getId()->getClassName(),
+                $this->relationConfig->getId()->getFieldName()
+            )->getType();
+
+            $compOperator = $fieldType == 'oneToMany' ? '=' : 'MEMBER OF';
 
             if ($this->getRelation()->getId()) {
                 $this->hasAssignedExpression =
