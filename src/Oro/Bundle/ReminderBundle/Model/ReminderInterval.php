@@ -88,7 +88,7 @@ class ReminderInterval
         $unit = $this->getUnit();
 
         if ($unit == self::UNIT_MINUTE || $unit == self::UNIT_HOUR) {
-            $format = 'T%d%s';
+            $format = 'PT%d%s';
         } else {
             $format = 'P%d%s';
         }
@@ -96,6 +96,7 @@ class ReminderInterval
         try {
             return new \DateInterval(sprintf($format, $this->getNumber(), $this->getUnit()));
         } catch (\Exception $e) {
+            throw $e;
             return new \DateInterval('P0D');
         }
     }
