@@ -12,9 +12,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 {
-    const LOCALE = 'locale';
-    const EMAIL = 'test@example.com';
-    const ENTITY = 'Namespace\Entity';
+    const LOCALE   = 'locale';
+    const EMAIL    = 'test@example.com';
+    const ENTITY   = 'Namespace\Entity';
     const TEMPLATE = 'template_reminder';
 
     /**
@@ -69,13 +69,13 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     public function templateProvider()
     {
         return [
-            'one' => [
+            'one'      => [
                 'exceptionMessage' => 'Template with name "template_reminder" for "Namespace\Entity" not found',
-                'templates' => []
+                'templates'        => []
             ],
             'multiple' => [
                 'exceptionMessage' => 'Multiple templates with name "template_reminder" for "Namespace\Entity" found',
-                'templates' => [$this->createTemplate(), $this->createTemplate()]
+                'templates'        => [$this->createTemplate(), $this->createTemplate()]
             ]
         ];
     }
@@ -89,7 +89,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     public function testGetTemplateByConfig()
     {
         $notification = $this->createNotification(true);
-        $template = $notification->getTemplate(self::LOCALE);
+        $template     = $notification->getTemplate(self::LOCALE);
         $this->assertEquals(self::LOCALE, $template->getLocale());
     }
 
@@ -209,7 +209,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      */
     protected function createTemplate()
     {
-        $template = new EmailTemplate();
+        $template    = new EmailTemplate();
         $translation = new EmailTemplateTranslation();
         $translation
             ->setLocale(self::LOCALE)

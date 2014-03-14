@@ -37,13 +37,13 @@ class RemindersPersistentCollection extends AbstractLazyCollection
 
     /**
      * @param ReminderRepository $repository
-     * @param string $className
-     * @param mixed $identifier
+     * @param string             $className
+     * @param mixed              $identifier
      */
     public function __construct(ReminderRepository $repository, $className, $identifier)
     {
         $this->repository = $repository;
-        $this->className = $className;
+        $this->className  = $className;
         $this->identifier = $identifier;
     }
 
@@ -53,8 +53,8 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     protected function doInitialize()
     {
         if (!$this->collection) {
-            $reminders = $this->repository->findRemindersByEntity($this->className, $this->identifier);
-            $this->snapshot = $reminders;
+            $reminders        = $this->repository->findRemindersByEntity($this->className, $this->identifier);
+            $this->snapshot   = $reminders;
             $this->collection = new ArrayCollection($reminders);
         }
     }

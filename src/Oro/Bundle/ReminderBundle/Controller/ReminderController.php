@@ -64,7 +64,7 @@ class ReminderController extends Controller
          * @var MessageParamsProvider
          */
         $paramsProvider = $this->get('oro_reminder.web_socket.message_params_provider');
-        $reminders = $this->getReminderRepository()->findRequestedReminders($user);
+        $reminders      = $this->getReminderRepository()->findRequestedReminders($user);
 
         return new JsonResponse($paramsProvider->getMessageParamsForReminders($reminders));
     }

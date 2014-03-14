@@ -31,10 +31,12 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->paramsProvider = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider')
+        $this->paramsProvider  = $this->getMockBuilder(
+            'Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -65,22 +67,23 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequestedRemindersReturnCorrectData()
     {
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder  = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder1 = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder2 = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
 
-        $expectedReminder = new \stdClass();
-        $expectedReminder->id = 42;
-        $expectedReminder1 = new \stdClass();
+        $expectedReminder      = new \stdClass();
+        $expectedReminder->id  = 42;
+        $expectedReminder1     = new \stdClass();
         $expectedReminder1->id = 12;
-        $expectedReminder2 = new \stdClass();
+        $expectedReminder2     = new \stdClass();
         $expectedReminder2->id = 22;
-        $expectedReminders = array($expectedReminder, $expectedReminder1, $expectedReminder2);
+        $expectedReminders     = array($expectedReminder, $expectedReminder1, $expectedReminder2);
 
         $reminders = array($reminder, $reminder1, $reminder2);
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+        $token     = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->getMockForAbstractClass();
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
+        $user      = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock(
+        );
         $token->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $repository = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
             ->disableOriginalConstructor()

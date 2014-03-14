@@ -18,7 +18,7 @@ class ReminderType extends AbstractType
             'oro_reminder_method',
             array(
                 'required' => true,
-                'attr' => array('class' => 'method'),
+                'attr'     => array('class' => 'method'),
             )
         );
 
@@ -36,10 +36,10 @@ class ReminderType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder',
-                'intention' => 'reminder',
+                'data_class'           => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder',
+                'intention'            => 'reminder',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation' => true,
+                'cascade_validation'   => true,
             )
         );
     }

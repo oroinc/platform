@@ -26,8 +26,8 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
     public function testIntervalAndStartAt()
     {
         $expireAt = new \DateTime('2014-01-15');
-        $number = 3;
-        $unit = ReminderInterval::UNIT_DAY;
+        $number   = 3;
+        $unit     = ReminderInterval::UNIT_DAY;
         $interval = new ReminderInterval($number, $unit);
 
         $this->assertNull($this->entity->getStartAt());
@@ -69,8 +69,8 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetReminderData()
     {
-        $expectedSubject = 'subject';
-        $expectedExpireAt = new \DateTime();
+        $expectedSubject   = 'subject';
+        $expectedExpireAt  = new \DateTime();
         $expectedRecipient = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         $reminderData = $this->getMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
@@ -97,14 +97,14 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
     public function testSetFailureException()
     {
         $expectedMessage = 'Expected message';
-        $expectedCode = 100;
-        $exception = new \Exception($expectedMessage, $expectedCode);
+        $expectedCode    = 100;
+        $exception       = new \Exception($expectedMessage, $expectedCode);
 
         $expected = array(
-            'class' => get_class($exception),
+            'class'   => get_class($exception),
             'message' => $expectedMessage,
-            'code' => $expectedCode,
-            'trace' => $exception->getTraceAsString(),
+            'code'    => $expectedCode,
+            'trace'   => $exception->getTraceAsString(),
         );
 
         $this->entity->setFailureException($exception);
@@ -117,8 +117,8 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSettersAndGetters($value, $property, $getter = null, $setter = null)
     {
-        $getter = $getter ?: 'get' . ucfirst($property);
-        $setter = $setter ?: 'set' . ucfirst($property);
+        $getter = $getter ? : 'get' . ucfirst($property);
+        $setter = $setter ? : 'set' . ucfirst($property);
 
         $this->assertEquals($this->entity, $this->entity->$setter($value));
         $this->assertEquals($value, $this->entity->$getter());
@@ -127,48 +127,48 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
     public function settersAndGettersDataProvider()
     {
         return [
-            'subject' => [
-                'value' => 'value',
+            'subject'                => [
+                'value'    => 'value',
                 'property' => 'subject',
             ],
-            'expireAt' => [
-                'value' => new \DateTime(),
+            'expireAt'               => [
+                'value'    => new \DateTime(),
                 'property' => 'expireAt',
             ],
-            'method' => [
-                'value' => 'email',
+            'method'                 => [
+                'value'    => 'email',
                 'property' => 'method',
             ],
-            'interval' => [
-                'value' => new ReminderInterval(1, ReminderInterval::UNIT_DAY),
+            'interval'               => [
+                'value'    => new ReminderInterval(1, ReminderInterval::UNIT_DAY),
                 'property' => 'interval',
             ],
-            'state' => [
-                'value' => Reminder::STATE_NOT_SENT,
+            'state'                  => [
+                'value'    => Reminder::STATE_NOT_SENT,
                 'property' => 'state',
             ],
-            'relatedEntityId' => [
-                'value' => 1,
+            'relatedEntityId'        => [
+                'value'    => 1,
                 'property' => 'relatedEntityId',
             ],
             'relatedEntityClassName' => [
-                'value' => 'Namespace\\Entity',
+                'value'    => 'Namespace\\Entity',
                 'property' => 'relatedEntityClassName',
             ],
-            'recipient' => [
-                'value' => $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
+            'recipient'              => [
+                'value'    => $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
                 'property' => 'recipient',
             ],
-            'createdAt' => [
-                'value' => new \DateTime(),
+            'createdAt'              => [
+                'value'    => new \DateTime(),
                 'property' => 'createdAt',
             ],
-            'updatedAt' => [
-                'value' => new \DateTime(),
+            'updatedAt'              => [
+                'value'    => new \DateTime(),
                 'property' => 'updatedAt',
             ],
-            'sentAt' => [
-                'value' => new \DateTime(),
+            'sentAt'                 => [
+                'value'    => new \DateTime(),
                 'property' => 'sentAt',
             ],
         ];

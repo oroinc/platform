@@ -18,7 +18,7 @@ class ReminderIntervalType extends AbstractType
             'integer',
             array(
                 'required' => true,
-                'attr' => array('class' => 'number'),
+                'attr'     => array('class' => 'number'),
             )
         );
 
@@ -27,7 +27,7 @@ class ReminderIntervalType extends AbstractType
             'oro_reminder_interval_unit',
             array(
                 'required' => true,
-                'attr' => array('class' => 'unit'),
+                'attr'     => array('class' => 'unit'),
             )
         );
     }
@@ -39,7 +39,7 @@ class ReminderIntervalType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\\Bundle\\ReminderBundle\\Model\\ReminderInterval',
+                'data_class'         => 'Oro\\Bundle\\ReminderBundle\\Model\\ReminderInterval',
                 'cascade_validation' => true,
             )
         );

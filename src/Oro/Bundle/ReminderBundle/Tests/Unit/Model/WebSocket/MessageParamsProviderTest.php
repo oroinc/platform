@@ -59,11 +59,11 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMessageParamsSetupCorrectParams()
     {
-        $expectedId = 42;
-        $expectedSubject = 'testSubject';
-        $expectedExpireAt = new \DateTime();
+        $expectedId                = 42;
+        $expectedSubject           = 'testSubject';
+        $expectedExpireAt          = new \DateTime();
         $expectedFormattedExpireAt = 'formatted date time';
-        $expectedUrl = 'www.tests.com';
+        $expectedUrl               = 'www.tests.com';
 
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder->expects($this->once())
@@ -83,7 +83,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
 
-        $expectedIdentifier = 'test_template_identifier';
+        $expectedIdentifier       = 'test_template_identifier';
         $expectedRelatedClassName = 'Tasks';
 
         $reminder->expects($this->exactly(2))
@@ -108,11 +108,11 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMessageParamsForRemindersSetupCorrectParams()
     {
-        $expectedId = 42;
-        $expectedSubject = 'testSubject';
-        $expectedExpireAt = new \DateTime();
+        $expectedId                = 42;
+        $expectedSubject           = 'testSubject';
+        $expectedExpireAt          = new \DateTime();
         $expectedFormattedExpireAt = 'formatted date time';
-        $expectedUrl = 'www.tests.com';
+        $expectedUrl               = 'www.tests.com';
 
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder->expects($this->once())
@@ -132,7 +132,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
 
-        $expectedIdentifier = 'test_template_identifier';
+        $expectedIdentifier       = 'test_template_identifier';
         $expectedRelatedClassName = 'Tasks';
 
         $reminder->expects($this->exactly(2))
