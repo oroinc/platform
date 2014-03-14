@@ -32,6 +32,8 @@ oro:
         connections.label:   Connection
         owner.label:         Owner
 
+        my_calendar:         My Calendar
+
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
         #
