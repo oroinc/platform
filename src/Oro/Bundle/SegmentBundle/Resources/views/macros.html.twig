@@ -8,6 +8,19 @@
             fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
+    {% set segmentConditionOptions = {
+        segmentChoice: {
+            select2: {
+                placeholder: 'oro.segment.condition_builder.choose_entity_segment'|trans,
+                ajax: {
+                    url: 'oro_api_get_segment_items',
+                    quietMillis: 100,
+                }
+            },
+            util: {},
+            segmentsLoaderSelector: '#' ~ params.entity_choice_id
+        }
+    } %}
     <div class="condition-builder left-panel-container">
         <div class="panel-placeholder">
             <div>
@@ -21,12 +34,12 @@
                                 data-options="{{ fieldConditionOptions|json_encode }}">
                                 {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
                             </li>
-                            {# <li class="option" data-criteria="condition-segment"
+                            <li class="option" data-criteria="condition-segment"
                                 data-module="orosegment/js/segment-condition"
                                 data-widget="segmentCondition"
-                                data-options="{{ fieldConditionOptions|json_encode }}">
+                                data-options="{{ segmentConditionOptions|json_encode }}">
                                 {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
-                            </li>#}
+                            </li>
                             <li class="option" data-criteria="conditions-group">
                                 {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
                             </li>

@@ -1,8 +1,8 @@
 /*global define*/
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroentity/js/entity-field-view',
-    'jquery-ui', 'jquery.select2'
-], function ($, _, EntityFieldUtil, EntityFieldView) {
+    'jquery-ui', 'jquery.select2', 'routing'
+], function ($, _, EntityFieldUtil, EntityFieldView, ui, select2, routing) {
     'use strict';
 
     function filterFields(fields, exclude) {
@@ -32,7 +32,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 dropdownAutoWidth: true
             },
             exclude: [],
-            fieldsLoaderSelector: ''
+            segmentsLoaderSelector: ''
         },
 
         _create: function () {
@@ -79,19 +79,38 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                     return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
                 };
             }
+
+            this.options.select2.ajax = _.extend(
+                {},
+                this.options.select2.ajax,
+                {
+                    url: routing.generate(
+                        this.options.select2.ajax.url,
+                        {
+                            entityName: this.options.entity.replace(/\\/g, '_'),
+                            _format: 'json'
+                        }
+                    ),
+                    data: function (term, page) {
+                        return {
+                            term: term
+                        };
+                    }
+                }
+            );
         },
 
         _bindFieldsLoader: function () {
             var self = this, $fieldsLoader;
-            if (!this.options.fieldsLoaderSelector) {
+            if (!this.options.segmentsLoaderSelector) {
                 return;
             }
-            $fieldsLoader = $(this.options.fieldsLoaderSelector);
-            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
+            $fieldsLoader = $(this.options.segmentsLoaderSelector);
+            $fieldsLoader.on('segmentsloaderupdate', function (e, fields) {
                 self.setValue('');
                 self._updateData($(e.target).val(), fields);
             });
-            this._updateData($fieldsLoader.val(), $fieldsLoader.data('fields'));
+            this._updateData($fieldsLoader.val(), $fieldsLoader.data('segments'));
         },
 
         _updateData: function (entity, fields) {

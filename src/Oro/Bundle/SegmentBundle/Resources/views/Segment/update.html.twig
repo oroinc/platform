@@ -177,11 +177,41 @@
                     .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
                     .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
 
+                {#$entityChoice#}
+                    {#.segmentsLoader({#}
+                        {#router: 'oro_api_get_entity_segments',#}
+                        {#routingParams: {{ entityFieldsRouteParams|json_encode|raw }},#}
+                        {#confirm: confirm,#}
+                        {#requireConfirm: function () {#}
+                            {#var data = $('#oro_segment_form_definition').val();#}
+                            {#if (!data) {#}
+                                {#return false;#}
+                            {#}#}
+                            {#try {#}
+                                {#data = JSON.parse(data);#}
+                            {#} catch (e) {#}
+                                {#return false;#}
+                            {#}#}
+                            {#return _.some(data, function (value) {#}
+                                {#return !_.isEmpty(value);#}
+                            {#});#}
+                        {#}#}
+                    {#})#}
+                    {#.on('segmentsloaderstart', $.proxy(loadingMask.show, loadingMask))#}
+                    {#.on('segmentsloadercomplete', $.proxy(loadingMask.hide, loadingMask));#}
+
                 {% if not form.entity.vars.value is empty %}
                     {% set fieldsData = render(path('oro_api_get_entity_fields', {
                             'entityName': form.entity.vars.value|replace({'\\': '_'})
                         }|merge(entityFieldsRouteParams))) %};
+
+                    {#{% set segmentsData = render(path('oro_api_get_entity_segments', {#}
+                            {#'entityName': form.entity.vars.value|replace({'\\': '_'})#}
+                        {#}|merge(entityFieldsRouteParams))) %};#}
+                    {% set segmentsData = [] %}
+
                     $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                    {#$entityChoice.segmentsLoader('setSegmentsData', {{ segmentsData|raw }});#}
                 {% endif %}
 
                 segmentManagerInit({

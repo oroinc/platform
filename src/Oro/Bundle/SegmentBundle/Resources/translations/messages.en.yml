@@ -34,3 +34,4 @@ oro:
         condition_builder:
             criteria:
                 segment_condition: Apply segment
+            choose_entity_segment: Choose segment

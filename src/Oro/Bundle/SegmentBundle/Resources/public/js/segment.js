@@ -58,19 +58,6 @@ define(function (require) {
         $storage.val(JSON.stringify(data));
     }
 
-    function getFieldChoiceOptions(options) {
-        return {
-            select2: {
-                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
-            },
-            util: {
-                findEntity:  function (entityName) {
-                    return _.findWhere(options.entities, {name: entityName});
-                }
-            }
-        };
-    }
-
     function deleteHandler(collection, model, data) {
         var confirm = new DeleteConfirmation({
             content: data.message
@@ -162,25 +149,33 @@ define(function (require) {
     }
 
     return function (options) {
-        var fieldChoiceOptions;
+        var segmentChoiceOptions;
         options = $.extend(true, {}, defaults, options);
 
         $storage = $(options.valueSource);
 
-        // common extra options for all field-choice inputs
-        fieldChoiceOptions = getFieldChoiceOptions(options);
+        // common extra options for all segment-choice inputs
+        segmentChoiceOptions = {
+            select2: {
+                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
+            },
+            util: {
+                findEntity:  function (entityName) {
+                    return _.findWhere(options.entities, {name: entityName});
+                }
+            }
+        };
 
-        initColumn(options.column, options.metadata, fieldChoiceOptions);
-        configureFilters(options.filters, options.metadata, fieldChoiceOptions);
+        initColumn(options.column, options.metadata, segmentChoiceOptions);
+        configureFilters(options.filters, options.metadata, segmentChoiceOptions);
 
         $(options.entityChoice)
-            .on('fieldsloadercomplete', function () {
+            .on('segmentsloadercomplete', function () {
                 var data = {columns: [], filters: []};
                 save(data);
                 $(options.column.itemContainer).itemsManagerTable('reset');
                 $(options.column.form).itemsManagerEditor('reset');
                 $(options.filters.conditionBuilder).conditionBuilder('setValue', data.filters);
             });
-
     };
 });

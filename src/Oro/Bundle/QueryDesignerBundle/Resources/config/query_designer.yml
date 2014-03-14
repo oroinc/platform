@@ -23,3 +23,24 @@ query_designer:
             applicable: [{type: boolean}]
             type:       boolean
             query_type: [all]
+
+    aggregates:
+        identifier:
+            applicable: [{identifier: true}]
+            functions:
+                - { name: Count, expr: COUNT($column), return_type: integer }
+            query_type: [all]
+        string:
+            applicable: [{type: string}]
+            functions:
+                - { name: Count, expr: COUNT($column), return_type: integer }
+            query_type: [all]
+        number:
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
+            functions:
+                - { name: Count, expr: COUNT($column), return_type: integer }
+                - { name: Sum,   expr: SUM(CASE WHEN ($column IS NOT NULL) THEN $column ELSE 0 END) }
+                - { name: Avg,   expr: AVG(CASE WHEN ($column IS NOT NULL) THEN $column ELSE 0 END) }
+                - { name: Min,   expr: MIN($column) }
+                - { name: Max,   expr: MAX($column) }
+            query_type: [all]
