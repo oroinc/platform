@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -211,7 +211,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             }
 
             $relationExtendConfig = $this->extendProvider->getConfig($targetEntity);
-            if ($relationExtendConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $route = $this->entityViewRoute;
                 $routeParams = array(
                     'entity_id' => str_replace('\\', '_', $targetEntity),
@@ -256,8 +256,8 @@ class DynamicFieldsExtension extends \Twig_Extension
         $fieldConfigId = $extendConfig->getId();
 
         return
-            $config->is('owner', ExtendManager::OWNER_CUSTOM)
-            && !$config->is('state', ExtendManager::STATE_NEW)
+            $config->is('owner', ExtendScope::OWNER_CUSTOM)
+            && !$config->is('state', ExtendScope::STATE_NEW)
             && !$config->is('is_deleted')
             && $this->viewProvider->getConfigById($config->getId())->is('is_displayable')
             && !(

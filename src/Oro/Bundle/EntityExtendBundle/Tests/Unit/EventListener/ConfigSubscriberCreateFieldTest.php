@@ -43,13 +43,13 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             ->with('extend')
             ->will($this->returnValue($configProvider));
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
 
-        $configSubscriber = new ConfigSubscriber($extendManager);
+        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $configSubscriber->newFieldConfig($event);
 
         /** @var ConfigManager $cm */
@@ -94,13 +94,13 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             ->with('extend')
             ->will($this->returnValue($configProvider));
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
 
-        $configSubscriber = new ConfigSubscriber($extendManager);
+        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $configSubscriber->newFieldConfig($event);
 
         /** @var ConfigManager $cm */
