@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
-use BeSimple\SoapCommon\Type\KeyValue\DateTime;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
