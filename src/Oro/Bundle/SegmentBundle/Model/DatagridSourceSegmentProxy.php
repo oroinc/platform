@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Model;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
 /**
  * Class DatagridSourceSegmentProxy
@@ -39,7 +40,7 @@ class DatagridSourceSegmentProxy extends AbstractSegmentProxy
 
             $decoded = json_decode($definition, true);
             if (null === $decoded) {
-                throw new \LogicException('Invalid definition given');
+                throw new InvalidConfigurationException('Invalid definition given');
             }
 
             $classMetadata = $this->em->getClassMetadata($this->getEntity());

@@ -47,7 +47,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function getConfiguration($gridName)
     {
-        if ($this->configuration === null) {
+        if (null === $this->configuration) {
             $id                = intval(substr($gridName, strlen(self::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
             $segment           = $segmentRepository->find($id);

@@ -53,7 +53,9 @@ class DynamicSegmentQueryBuilder
         }
 
         $converter = new SegmentQueryConverter($this->manager, $this->doctrine, $this->restrictionBuilder);
-        $qb        = $converter->convert(new RestrictionSegmentProxy($segment, $this->doctrine->getManager()));
+        $qb        = $converter->convert(
+            new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))
+        );
 
         return $qb->getQuery();
     }

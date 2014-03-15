@@ -28,7 +28,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     ) {
         parent::__construct(
             $gridName,
-            new DatagridSourceSegmentProxy($segment, $doctrine->getManager()),
+            new DatagridSourceSegmentProxy($segment, $doctrine->getManagerForClass($segment->getEntity())),
             $functionProvider,
             $doctrine
         );

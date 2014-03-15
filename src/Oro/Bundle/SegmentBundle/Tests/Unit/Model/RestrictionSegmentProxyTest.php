@@ -2,15 +2,11 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Model;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
+use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
-class RestrictionSegmentProxyTest extends \PHPUnit_Framework_TestCase
+class RestrictionSegmentProxyTest extends SegmentDefinitionTestCase
 {
-    const TEST_ENTITY          = 'AcmeBundle:UserEntity';
-    const TEST_IDENTIFIER_NAME = 'id';
-    const TEST_IDENTIFIER      = 32;
-
     /**
      * @dataProvider definitionProvider
      *
@@ -24,12 +20,8 @@ class RestrictionSegmentProxyTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException($expectedException);
         }
 
-        $segment            = new Segment();
+        $segment            = $this->getSegment(false, $definition);
         $expectedDefinition = json_encode($expectedDefinition);
-
-        $refProperty = new \ReflectionProperty(get_class($segment), 'id');
-        $refProperty->setAccessible(true);
-        $refProperty->setValue($segment, self::TEST_IDENTIFIER);
 
         $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()->getMock();
@@ -45,10 +37,12 @@ class RestrictionSegmentProxyTest extends \PHPUnit_Framework_TestCase
         $proxy->setDefinition(json_encode($definition));
 
         $this->assertSame($proxy->getEntity(), $segment->getEntity());
-
         $this->assertEquals($expectedDefinition, $proxy->getDefinition());
     }
 
+    /**
+     * @return array
+     */
     public function definitionProvider()
     {
         return [
@@ -102,7 +96,7 @@ class RestrictionSegmentProxyTest extends \PHPUnit_Framework_TestCase
             'bad definition given, expected exception'                                    => [
                 null,
                 null,
-                '\LogicException'
+                'Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException'
             ]
         ];
     }

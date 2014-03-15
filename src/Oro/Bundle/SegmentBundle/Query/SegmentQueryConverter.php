@@ -24,9 +24,6 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /** @var QueryBuilder */
     protected $qb;
 
-    /** @var EntityManager */
-    protected $em;
-
     /** @var RestrictionBuilder */
     protected $restrictionBuilder;
 
@@ -42,7 +39,6 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         ManagerRegistry $doctrine,
         RestrictionBuilder $restrictionBuilder
     ) {
-        $this->em                 = $doctrine->getManager();
         $this->restrictionBuilder = $restrictionBuilder;
         parent::__construct($functionProvider, $doctrine);
     }
@@ -56,7 +52,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     public function convert(AbstractQueryDesigner $source)
     {
-        $this->qb = $this->em->createQueryBuilder();
+        $this->qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
         $this->doConvert($source);
 
         return $this->qb;
@@ -99,7 +95,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
             );
         }
 
-        // @TODO find solution for aliases
+        // @TODO find solution for aliases before generalizing this converter
         // column aliases are not used here, because of parser error
         $select = $functionExpr !== null ? $functionExpr : $columnName;
         $this->qb->addSelect($select);
