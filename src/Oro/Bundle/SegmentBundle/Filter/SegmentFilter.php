@@ -52,12 +52,12 @@ class SegmentFilter extends EntityFilter
                 $this->getFormType(),
                 [],
                 [
-                'csrf_protection' => false,
-                'field_options'   => [
-                    'class'    => 'OroSegmentBundle:Segment',
-                    'property' => 'name',
-                    'required' => true,
-                ]
+                    'csrf_protection' => false,
+                    'field_options'   => [
+                        'class'    => 'OroSegmentBundle:Segment',
+                        'property' => 'name',
+                        'required' => true,
+                    ]
                 ]
             );
         }
