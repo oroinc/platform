@@ -121,7 +121,6 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
      * Get filter type for given field type
      *
      * @param string $fieldType
-     *
      * @return string
      */
     protected function getFilterType($fieldType)
@@ -132,7 +131,10 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
             case 'bigint':
             case 'decimal':
             case 'float':
+            case 'money':
                 return 'number';
+            case 'percent':
+                return 'percent';
             case 'boolean':
                 return 'boolean';
             case 'date':
