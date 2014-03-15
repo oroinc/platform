@@ -7,7 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Snapshot of static segment
  *
- * @ORM\Table(name="oro_segment_snapshot")
+ * @ORM\Table(name="oro_segment_snapshot",  uniqueConstraints={
+ *      @ORM\UniqueConstraint(columns={"segment_id", "entity_id"})
+ * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository")
  * @ORM\HasLifecycleCallbacks
  */
@@ -17,7 +19,7 @@ class SegmentSnapshot
      * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;

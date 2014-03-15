@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\Get as GetRoute;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,10 +59,9 @@ class SegmentController extends RestController implements ClassResourceInterface
      *      resource=true
      * )
      * @AclAncestor("oro_segment_update")
-     * @GetRoute(requirements={"id"="(\d*)"})
      * @return Response
      */
-    public function runAction($id)
+    public function postRunAction($id)
     {
         /** @var Segment $segment */
         $segment = $this->getManager()->find($id);

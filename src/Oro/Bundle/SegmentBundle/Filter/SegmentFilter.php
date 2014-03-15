@@ -6,10 +6,11 @@ use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
@@ -18,20 +19,26 @@ class SegmentFilter extends EntityFilter
     /** @var DynamicSegmentQueryBuilder */
     protected $dynamicSegmentQueryBuilder;
 
+    /** @var StaticSegmentQueryBuilder */
+    protected $staticSegmentQueryBuilder;
+
     /**
      * Constructor
      *
      * @param FormFactoryInterface       $factory
      * @param FilterUtility              $util
      * @param DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder
+     * @param StaticSegmentQueryBuilder  $staticSegmentQueryBuilder
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder
+        DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder,
+        StaticSegmentQueryBuilder $staticSegmentQueryBuilder
     ) {
         parent::__construct($factory, $util);
         $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
+        $this->staticSegmentQueryBuilder  = $staticSegmentQueryBuilder;
     }
 
     /**
@@ -45,12 +52,12 @@ class SegmentFilter extends EntityFilter
                 $this->getFormType(),
                 [],
                 [
-                    'csrf_protection' => false,
-                    'field_options'   => [
-                        'class'    => 'OroSegmentBundle:Segment',
-                        'property' => 'name',
-                        'required' => true,
-                    ]
+                'csrf_protection' => false,
+                'field_options'   => [
+                    'class'    => 'OroSegmentBundle:Segment',
+                    'property' => 'name',
+                    'required' => true,
+                ]
                 ]
             );
         }
@@ -72,7 +79,7 @@ class SegmentFilter extends EntityFilter
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
             $query = $this->dynamicSegmentQueryBuilder->build($segment);
         } else {
-            // @TODO process static here
+            $query = $this->staticSegmentQueryBuilder->build($segment);
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
         $expr  = $ds->expr()->in($field, $query->getDQL());

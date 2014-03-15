@@ -62,15 +62,16 @@
     Renders run button for static segment if allowed
 
     @param Segment entity
+    @param bool    reloadRequired - is page reload required after run
 #}
-{% macro runButton(entity) %}
+{% macro runButton(entity, reloadRequired = false) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     {% if entity.id and resource_granted('EDIT', entity)
         and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
     %}
         {{ UI.clientButton({
-            'dataUrl': path('oro_api_run_segment', { 'id': entity.id }) ,
+            'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
             'aCss':   'no-hash run-button btn',
             'title' : 'Re-run',
             'label' : 'Re-run',
@@ -79,8 +80,8 @@
 
         <script type="text/javascript">
             require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger',
-                     'oronavigation/js/navigation', 'oroui/js/delete-confirmation'],
-            function ($, __, routing, messenger, Navigation, DeleteConfirmation) {
+                     'oronavigation/js/navigation', 'oroui/js/delete-confirmation', 'oroui/js/mediator'],
+            function ($, __, routing, messenger, Navigation, DeleteConfirmation, mediator) {
                 $(function () {
                     $('.run-button').click(function (e) {
                         e.preventDefault();
@@ -98,15 +99,26 @@
                                         navigation.loadingMask.show();
                                     }
 
-                                    $.get(url,function () {
-                                        var successMessage = __('Segment successfully processed.');
-
-                                        messenger.notificationFlashMessage('success', successMessage);
+                                    var success = false;
+                                    $.post(url,function () {
+                                        success = true;
                                     }).error(function () {
                                         messenger.notificationFlashMessage('error', __('Error was occurred, please contact administrator.'));
                                     }).always(function () {
                                         if (navigation) {
                                             navigation.loadingMask.hide();
+                                        }
+                                        if (success) {
+                                            var successMessage = __('Segment successfully processed.');
+
+                                            {% if reloadRequired %}
+                                                mediator.once("hash_navigation_request:refresh", function() {
+                                                    messenger.notificationFlashMessage('success', successMessage);
+                                                });
+                                                navigation.refreshPage();
+                                            {% else %}
+                                                messenger.notificationFlashMessage('success', successMessage);
+                                            {% endif %}
                                         }
                                     });
                                 };

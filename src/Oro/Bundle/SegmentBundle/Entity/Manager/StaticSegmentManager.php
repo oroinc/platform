@@ -5,8 +5,10 @@ namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class StaticSegmentManager
 {
@@ -15,6 +17,12 @@ class StaticSegmentManager
 
     /** @var DynamicSegmentQueryBuilder */
     protected $dynamicSegmentQB;
+
+    /** @var array */
+    private $toWrite;
+
+    /** @var int */
+    private $batchSize = 100;
 
     /**
      * @param EntityManager              $em
@@ -32,6 +40,7 @@ class StaticSegmentManager
      * @param Segment $segment
      *
      * @throws \LogicException
+     * @throws \Exception
      */
     public function run(Segment $segment)
     {
@@ -41,8 +50,55 @@ class StaticSegmentManager
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
 
-        $query = $this->dynamicSegmentQB->build($segment);
+        $qb       = $this->dynamicSegmentQB->build($segment);
+        $iterator = new BufferedQueryResultIterator($qb);
 
-        var_dump($query->getSQL());die;
+        $writeCount = 0;
+        try {
+            $this->em->beginTransaction();
+            foreach ($iterator as $data) {
+                // only not composite identifiers are supported
+                $id = reset($data);
+
+                $writeCount++;
+                $snapshot = new SegmentSnapshot($segment);
+                $snapshot->setEntityId($id);
+                $this->toWrite[] = $snapshot;
+                if (0 === $writeCount % $this->batchSize) {
+                    $this->write($this->toWrite);
+
+                    $this->toWrite = [];
+                }
+            }
+
+            if (count($this->toWrite) > 0) {
+                $this->write($this->toWrite);
+            }
+
+            $this->em->commit();
+        } catch (\Exception $exception) {
+            $this->em->rollback();
+
+            throw $exception;
+        }
+
+        $segment = $this->em->merge($segment);
+        $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->em->persist($segment);
+        $this->em->flush();
+    }
+
+    /**
+     * Do persist into EntityManager
+     *
+     * @param array $items
+     */
+    private function write(array $items)
+    {
+        foreach ($items as $item) {
+            $this->em->persist($item);
+        }
+        $this->em->flush();
+        $this->em->clear();
     }
 }

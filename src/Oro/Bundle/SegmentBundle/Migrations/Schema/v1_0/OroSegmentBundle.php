@@ -49,6 +49,7 @@ class OroSegmentBundle implements Migration
         $table->addColumn('segment_id', 'integer', ['notnull' => true]);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addIndex(['segment_id'], 'IDX_43B8BB67DB296AAD');
+        $table->addUniqueIndex(['segment_id', 'entity_id'], 'UNIQ_43B8BB67DB296AAD81257D5D');
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_segment_snapshot **/
 
