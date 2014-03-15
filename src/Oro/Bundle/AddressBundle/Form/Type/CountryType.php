@@ -19,7 +19,9 @@ class CountryType extends AbstractType
                 },
                 'configs' => array(
                     'placeholder'   => 'oro.address.form.choose_country',
-                    'extra_modules' => array('country_select2_handler'=>'oroaddress/js/country/select2_handler'),
+                    'extra_modules' => array(
+                        'country_select2_handler' => 'oroaddress/js/country/select2_handler'
+                    ),
                     'extra_config'  => 'country_select'
                 ),
                 'empty_value' => '',
