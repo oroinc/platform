@@ -70,28 +70,28 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         },
 
         _processSelect2Options: function () {
-            var template, entityFieldUtil,
+            var template,
                 options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
-                entityFieldUtil = this.entityFieldUtil;
                 template = _.template(options.formatSelectionTemplate);
                 options.formatSelection = function (item) {
-                    return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
+                    return item.id ? template(item) : '';
                 };
             }
 
+            var url = this.options.select2.ajax && routing.generate(
+                this.options.select2.ajax.url,
+                {
+                    entityName: this.options.entity.replace(/\\/g, '_'),
+                    _format: 'json'
+                }
+            );
             this.options.select2.ajax = _.extend(
                 {},
                 this.options.select2.ajax,
                 {
-                    url: routing.generate(
-                        this.options.select2.ajax.url,
-                        {
-                            entityName: this.options.entity.replace(/\\/g, '_'),
-                            _format: 'json'
-                        }
-                    ),
+                    url: url,
                     data: function (term, page) {
                         return {
                             term: term
@@ -110,7 +110,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 return;
             }
             $fieldsLoader = $(this.options.segmentsLoaderSelector);
-            $fieldsLoader.on('segmentsloaderupdate', function (e, fields) {
+            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
                 self.setValue('');
                 self._updateData($(e.target).val(), fields);
             });

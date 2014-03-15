@@ -56,7 +56,11 @@ class SegmentManager
             ->getResult();
 
         foreach ($segments as $segment) {
-            $result[] = ['id' => $segment->getId(), 'text' => $segment->getName()];
+            $result[] = [
+                'id'   => 'segment_'.$segment->getId(),
+                'text' => $segment->getName(),
+                'type' => 'segment',
+            ];
         }
 
         return $result;

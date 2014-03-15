@@ -133,6 +133,7 @@
 
     {{ UI.scrollData(id, data, form) }}
 
+    {{ QD.query_designer_column_chain_template('column-chain-template') }}
     {{ segmentQD.query_designer_segment_template('segment-template') }}
 
     {% set entityFieldsRouteParams = {
@@ -177,41 +178,12 @@
                     .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
                     .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
 
-                {#$entityChoice#}
-                    {#.segmentsLoader({#}
-                        {#router: 'oro_api_get_entity_segments',#}
-                        {#routingParams: {{ entityFieldsRouteParams|json_encode|raw }},#}
-                        {#confirm: confirm,#}
-                        {#requireConfirm: function () {#}
-                            {#var data = $('#oro_segment_form_definition').val();#}
-                            {#if (!data) {#}
-                                {#return false;#}
-                            {#}#}
-                            {#try {#}
-                                {#data = JSON.parse(data);#}
-                            {#} catch (e) {#}
-                                {#return false;#}
-                            {#}#}
-                            {#return _.some(data, function (value) {#}
-                                {#return !_.isEmpty(value);#}
-                            {#});#}
-                        {#}#}
-                    {#})#}
-                    {#.on('segmentsloaderstart', $.proxy(loadingMask.show, loadingMask))#}
-                    {#.on('segmentsloadercomplete', $.proxy(loadingMask.hide, loadingMask));#}
-
                 {% if not form.entity.vars.value is empty %}
                     {% set fieldsData = render(path('oro_api_get_entity_fields', {
                             'entityName': form.entity.vars.value|replace({'\\': '_'})
                         }|merge(entityFieldsRouteParams))) %};
 
-                    {#{% set segmentsData = render(path('oro_api_get_entity_segments', {#}
-                            {#'entityName': form.entity.vars.value|replace({'\\': '_'})#}
-                        {#}|merge(entityFieldsRouteParams))) %};#}
-                    {% set segmentsData = [] %}
-
                     $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
-                    {#$entityChoice.segmentsLoader('setSegmentsData', {{ segmentsData|raw }});#}
                 {% endif %}
 
                 segmentManagerInit({
@@ -229,7 +201,10 @@
                         itemContainer: '#segment-column-list .item-container',
                         itemTemplate: '#segment-column-row'
                     },
-                    select2FieldChoiceTemplate: '#segment-template',
+                    select2FieldChoiceTemplate: {
+                        segment: '#segment-template',
+                        field:   '#column-chain-template'
+                    },
                     entities: {{ entities|json_encode|raw }},
                     metadata: {{ metadata|json_encode|raw }}
                 });

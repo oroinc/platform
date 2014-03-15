@@ -9,6 +9,7 @@ define(function (require) {
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
     require('oroentity/js/field-choice');
+    require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
     require('oroquerydesigner/js/condition-builder');
@@ -68,12 +69,12 @@ define(function (require) {
         confirm.open();
     }
 
-    function initColumn(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, util, template, sortingLabels;
+    function initColumn(options, metadata, segmentChoiceOptions) {
+        var $editor, $segmentChoice, collection, util, template, sortingLabels;
 
         $editor = $(options.form);
-        $fieldChoice = $editor.find('[data-purpose=column-selector]');
-        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, {select2: {}}));
+        $segmentChoice = $editor.find('[data-purpose=column-selector]');
+        $segmentChoice.segmentChoice(_.extend({}, segmentChoiceOptions, {select2: {}}));
 
         $editor.find('[data-purpose=function-selector]').functionChoice({
             converters: metadata.converters,
@@ -108,8 +109,8 @@ define(function (require) {
             sortingLabels[this.value] = $(this).text();
         });
 
-        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+        util = $segmentChoice.data('oroentity-fieldChoice').entityFieldUtil;
+        template = _.template(segmentChoiceOptions.select2.formatSelectionTemplate);
 
         $(options.itemContainer).itemsManagerTable({
             collection: collection,
@@ -130,14 +131,22 @@ define(function (require) {
         });
     }
 
-    function configureFilters(options, metadata, fieldChoiceOptions) {
-        var $fieldCondition, $builder;
+    function configureFilters(options, metadata, fieldChoiceOptions, segmentChoiceOptions) {
+        var $fieldCondition, $segmentCondition, $builder;
+
         // mixin extra options to condition-builder's field choice
         $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
         $.extend(true, $fieldCondition.data('options'), {
             fieldChoice: fieldChoiceOptions,
             filters: metadata.filters
         });
+
+        $segmentCondition = $(options.criteriaList).find('[data-criteria=condition-segment]');
+        $.extend(true, $segmentCondition.data('options'), {
+            segmentChoice: segmentChoiceOptions,
+            filters: metadata.filters
+        });
+
         $builder = $(options.conditionBuilder);
         $builder.conditionBuilder({
             criteriaListSelector: options.criteriaList
@@ -149,15 +158,15 @@ define(function (require) {
     }
 
     return function (options) {
-        var segmentChoiceOptions;
+        var fieldChoiceOptions, segmentChoiceOptions;
         options = $.extend(true, {}, defaults, options);
 
         $storage = $(options.valueSource);
 
         // common extra options for all segment-choice inputs
-        segmentChoiceOptions = {
+        fieldChoiceOptions = {
             select2: {
-                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
+                formatSelectionTemplate: $(options.select2FieldChoiceTemplate.field).text()
             },
             util: {
                 findEntity:  function (entityName) {
@@ -165,12 +174,17 @@ define(function (require) {
                 }
             }
         };
+        segmentChoiceOptions = _.extend(fieldChoiceOptions, {
+            select2: {
+                formatSelectionTemplate: $(options.select2FieldChoiceTemplate.segment).text()
+            }
+        });
 
         initColumn(options.column, options.metadata, segmentChoiceOptions);
-        configureFilters(options.filters, options.metadata, segmentChoiceOptions);
+        configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
         $(options.entityChoice)
-            .on('segmentsloadercomplete', function () {
+            .on('fieldsloadercomplete', function () {
                 var data = {columns: [], filters: []};
                 save(data);
                 $(options.column.itemContainer).itemsManagerTable('reset');
