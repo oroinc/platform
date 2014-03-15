@@ -34,3 +34,6 @@
 "oro.datagrid.noentities": "No records found"
 "oro.datagrid.noresults": "No {{ entityHint }} was found to match your search. Try modifying your search criteria..."
 "oro.datagrid.nocolumns": "No columns configured for this grid"
+"oro.datagrid.pagination.label": "Page"
+"oro.datagrid.pagination.totalPages": "of {{ totalPages }}"
+"oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"

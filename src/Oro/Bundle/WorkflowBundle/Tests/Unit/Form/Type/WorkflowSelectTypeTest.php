@@ -20,11 +20,6 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     protected $workflowRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $translator;
-
-    /**
      * @var WorkflowSelectType
      */
     protected $type;
@@ -37,13 +32,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->getMockForAbstractClass();
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will($this->returnArgument(0));
-
-        $this->type = new WorkflowSelectType($this->workflowRegistry, $this->translator);
+        $this->type = new WorkflowSelectType($this->workflowRegistry);
     }
 
     protected function tearDown()
@@ -57,10 +46,9 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @param array $inputOptions
      * @param array $expectedOptions
-     * @param bool $enabled
      * @dataProvider setDefaultOptionsDataProvider
      */
-    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions, $enabled = true)
+    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions)
     {
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
@@ -70,8 +58,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
         $testWorkflow = new Workflow($entityConnector, $aclManager);
         $testWorkflow->setName(self::TEST_WORKFLOW_NAME)
-            ->setLabel(self::TEST_WORKFLOW_LABEL)
-            ->setEnabled($enabled);
+            ->setLabel(self::TEST_WORKFLOW_LABEL);
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflowsByEntityClass')
             ->with(self::TEST_ENTITY_CLASS)
@@ -123,17 +110,6 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => array(
                     'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
                 )
-            ),
-            'disabled workflow' => array(
-                'inputOptions' => array(
-                    'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
-                ),
-                'expectedOptions' => array(
-                    'choices' => array(
-                        self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL . ' (oro.workflow.disabled)'
-                    ),
-                ),
-                'enabled' => false
             ),
         );
     }
