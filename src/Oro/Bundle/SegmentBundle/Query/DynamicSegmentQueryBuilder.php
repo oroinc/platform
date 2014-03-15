@@ -47,11 +47,6 @@ class DynamicSegmentQueryBuilder
      */
     public function build(Segment $segment)
     {
-        $type = $segment->getType()->getName();
-        if ($type !== SegmentType::TYPE_DYNAMIC) {
-            throw new \LogicException(sprintf('Expected segment of "dynamic" type. Given "%s"', $type));
-        }
-
         $converter = new SegmentQueryConverter($this->manager, $this->doctrine, $this->restrictionBuilder);
         $qb        = $converter->convert(
             new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))
