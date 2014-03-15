@@ -372,7 +372,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
             options.eventAfterRender = function(event, element) {
                 var reminders = self.getCollection().get(event.id).get('reminders');
-                if (reminders && Object.keys(reminders).length) {
+                if (reminders && _.keys(reminders).length) {
                     element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
                 } else {
                     element.find('.icon').remove();

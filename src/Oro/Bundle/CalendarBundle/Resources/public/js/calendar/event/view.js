@@ -2,7 +2,7 @@
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
     'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model',
     'oroui/js/layout'
-], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel, layout) {
+], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -106,7 +106,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             try {
                 var data = this.getEventFormData();
                 data.calendar = this.options.calendar;
-
+                this.model.set(
+                    {reminders: {}}
+                );
                 this.model.save(data, {
                     wait: true,
                     error: _.bind(this._handleResponseError, this)
