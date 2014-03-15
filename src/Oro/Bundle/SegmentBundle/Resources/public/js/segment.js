@@ -74,7 +74,7 @@ define(function (require) {
 
         $editor = $(options.form);
         $segmentChoice = $editor.find('[data-purpose=column-selector]');
-        $segmentChoice.segmentChoice(_.extend({}, segmentChoiceOptions, {select2: {}}));
+        $segmentChoice.fieldChoice(_.extend({}, segmentChoiceOptions, {select2: {}}));
 
         $editor.find('[data-purpose=function-selector]').functionChoice({
             converters: metadata.converters,
@@ -174,13 +174,13 @@ define(function (require) {
                 }
             }
         };
-        segmentChoiceOptions = _.extend(fieldChoiceOptions, {
+        segmentChoiceOptions = _.extend(_.clone(fieldChoiceOptions), {
             select2: {
                 formatSelectionTemplate: $(options.select2FieldChoiceTemplate.segment).text()
             }
         });
 
-        initColumn(options.column, options.metadata, segmentChoiceOptions);
+        initColumn(options.column, options.metadata, fieldChoiceOptions);
         configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
         $(options.entityChoice)
