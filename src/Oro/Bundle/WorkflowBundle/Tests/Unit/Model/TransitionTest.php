@@ -285,15 +285,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->method('setCurrentStep')
             ->with($currentStepEntity);
 
-        if ($isFinal || !$hasAllowedTransition) {
-            $workflowItem->expects($this->once())
-                ->method('setClosed')
-                ->with(true);
-        } else {
-            $workflowItem->expects($this->never())
-                ->method('setClosed');
-        }
-
         $preCondition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface');
         $preCondition->expects($this->once())
             ->method('isAllowed')
@@ -377,6 +368,12 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($obj->hasForm()); // by default transition has form
 
         $obj->setFormOptions(array('key' => 'value'));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array()));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array('key' => 'value')));
         $this->assertTrue($obj->hasForm());
     }
 }

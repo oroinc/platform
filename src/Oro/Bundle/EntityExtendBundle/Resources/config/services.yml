@@ -6,6 +6,7 @@ parameters:
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.twig.view_extension.class:              Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
+    oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.refresh_cache.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
     oro_entity_extend.migration.update_config.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
@@ -57,6 +58,13 @@ services:
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
         arguments:
+            - @oro_entity_config.config_manager
+
+    oro_entity_extend.extend.entity_processor:
+        class:                                              %oro_entity_extend.extend.entity_processor.class%
+        arguments:
+            - @kernel
+            - @oro_platform.maintenance
             - @oro_entity_config.config_manager
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:

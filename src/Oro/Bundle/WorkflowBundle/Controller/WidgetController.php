@@ -25,6 +25,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
+/**
+ * @Route("/workflowwidget")
+ */
 class WidgetController extends Controller
 {
     /**
@@ -83,7 +86,7 @@ class WidgetController extends Controller
 
     /**
      * @Route(
-     *      "/transition/create/attributes/{transitionName}/{workflowName}",
+     *      "/transition/create/attributes/{workflowName}/{transitionName}",
      *      name="oro_workflow_widget_start_transition_form"
      * )
      * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
@@ -117,10 +120,6 @@ class WidgetController extends Controller
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
-                /** @var WorkflowAwareSerializer $serializer */
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflow->getName());
-
                 // Create new WorkflowData instance with all data required to start.
                 // Original WorkflowData can not be used, as some attributes may be set by reference
                 // So, serialized data will not contain all required data.
@@ -144,6 +143,9 @@ class WidgetController extends Controller
                     }
                 }
 
+                /** @var WorkflowAwareSerializer $serializer */
+                $serializer = $this->get('oro_workflow.serializer.data.serializer');
+                $serializer->setWorkflowName($workflow->getName());
                 $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
                 $saved = true;
             }
@@ -160,7 +162,7 @@ class WidgetController extends Controller
 
     /**
      * @Route(
-     *      "/transition/edit/attributes/{transitionName}/{workflowItemId}",
+     *      "/transition/edit/attributes/{workflowItemId}/{transitionName}",
      *      name="oro_workflow_widget_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})

@@ -28,8 +28,6 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             '</div>')
         }),
 
-        widgetContentContainer: null,
-
         initialize: function(options) {
             options = options || {};
 
@@ -64,6 +62,14 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
                 this.titleContainer = this.widget.find(this.options.titleContainer);
             }
             return this.titleContainer;
+        },
+
+        /**
+         * Remove widget
+         */
+        remove: function() {
+            AbstractWidget.prototype.remove.call(this);
+            this.widget.remove();
         },
 
         show: function() {
