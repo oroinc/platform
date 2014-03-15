@@ -34,7 +34,7 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% if gridName is defined %}
+    {% if gridName is defined and gridName %}
         {{ dataGrid.renderGrid(gridName) }}
     {% else %}
         <div class="container-fluid">

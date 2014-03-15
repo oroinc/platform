@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 
 class DynamicSegmentQueryBuilder

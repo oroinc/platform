@@ -63,6 +63,20 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
+     * Generates and saves aliases for the given joins
+     *
+     * @param string[] $joinIds
+     */
+    protected function addTableAliasesForJoinIdentifiers(array $joinIds)
+    {
+        foreach ($joinIds as $joinId) {
+            if (!isset($this->tableAliases[$joinId])) {
+                $this->tableAliases[$joinId] = sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function addSelectColumn(
