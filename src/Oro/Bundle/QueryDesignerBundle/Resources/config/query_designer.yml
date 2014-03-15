@@ -8,7 +8,7 @@ query_designer:
             type:       string
             query_type: [all]
         number:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}]
             type:       number
             query_type: [all]
         date:
@@ -23,6 +23,10 @@ query_designer:
             applicable: [{type: boolean}]
             type:       boolean
             query_type: [all]
+        percent:
+            applicable: [{type: percent}]
+            type:       percent
+            query_type: [all]
 
     aggregates:
         identifier:
@@ -36,7 +40,7 @@ query_designer:
                 - { name: Count, expr: COUNT($column), return_type: integer }
             query_type: [all]
         number:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
             functions:
                 - { name: Count, expr: COUNT($column), return_type: integer }
                 - { name: Sum,   expr: SUM(CASE WHEN ($column IS NOT NULL) THEN $column ELSE 0 END) }

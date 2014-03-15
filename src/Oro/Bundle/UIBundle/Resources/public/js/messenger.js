@@ -6,7 +6,8 @@ function($, _) {
     var defaults = {
             container: '',
             delay: false,
-            template: $.noop
+            template: $.noop,
+            insertMethod: 'appendTo'
         },
         queue = [],
         storageKey = 'flash',
@@ -16,7 +17,7 @@ function($, _) {
          */
         showMessage = function(type, message, options) {
             var opt = _.extend({}, defaults, options || {}),
-                $el = $(opt.template({type: type, message: message})).appendTo(opt.container),
+                $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container),
                 delay = opt.delay || (opt.flash && 5000),
                 actions = {close: _.bind($el.alert, $el, 'close')};
             if (delay) {

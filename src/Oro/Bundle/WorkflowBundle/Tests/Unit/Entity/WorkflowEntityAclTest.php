@@ -73,7 +73,7 @@ class WorkflowEntityAclTest extends \PHPUnit_Framework_TestCase
 
         $newEntityAcl = new WorkflowEntityAcl();
         $newEntityAcl->setDefinition($definition);
-        $newEntityAcl->import($this->entityAcl);
+        $this->assertEquals($newEntityAcl, $newEntityAcl->import($this->entityAcl));
 
         $this->assertEquals('attribute', $newEntityAcl->getAttribute());
         $this->assertEquals($step, $newEntityAcl->getStep());

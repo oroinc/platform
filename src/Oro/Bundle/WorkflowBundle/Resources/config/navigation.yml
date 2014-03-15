@@ -1,3 +1,23 @@
+oro_menu_config:
+    items:
+        workflow_definition_list:
+            label: 'oro.workflow.workflowdefinition.entity_plural_label'
+            extras:
+                description: 'Workflow management UI'
+                routes: ['/^oro_workflow_definition/']
+            route: 'oro_workflow_definition_index'
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        workflow_definition_list: ~
+
 oro_titles:
+    oro_workflow_definition_index: ~
+    oro_workflow_definition_create: Create Workflow
+    oro_workflow_definition_update: %%workflow_definition.label%% - Edit
+    oro_workflow_definition_clone: %%workflow_definition.label%% - Clone
     oro_workflow_start_transition_form: %%workflow_title%%
     oro_workflow_transition_form: %%workflow_title%%

@@ -11,6 +11,9 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
 {
     /**
@@ -389,6 +392,10 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
                 return PropertyInterface::TYPE_DATE;
             case 'datetime':
                 return PropertyInterface::TYPE_DATETIME;
+            case 'money':
+                return PropertyInterface::TYPE_CURRENCY;
+            case 'percent':
+                return PropertyInterface::TYPE_PERCENT;
         }
 
         return PropertyInterface::TYPE_STRING;
@@ -408,7 +415,10 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
             case 'bigint':
             case 'decimal':
             case 'float':
+            case 'money':
                 return 'number';
+            case 'percent':
+                return 'percent';
             case 'boolean':
                 return PropertyInterface::TYPE_BOOLEAN;
             case 'date':

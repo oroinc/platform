@@ -31,6 +31,8 @@ class CustomEntityType extends AbstractType
      */
     protected $configManager;
 
+    // TODO: Replace manual mapping with form type guessing,
+    // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3351
     protected $typeMap = [
         'string'     => 'text',
         'integer'    => 'integer',
@@ -38,6 +40,8 @@ class CustomEntityType extends AbstractType
         'bigint'     => 'integer',
         'boolean'    => 'choice',
         'decimal'    => 'number',
+        'money'      => 'oro_money',
+        'percent'    => 'oro_percent',
         'date'       => 'oro_date',
         'datetime'   => 'oro_datetime',
         'text'       => 'textarea',
