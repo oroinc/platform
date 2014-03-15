@@ -54,13 +54,15 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         unset($this->formFactory);
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testBuildBadSegmentGiven()
     {
         $builder = $this->getQueryBuilder();
         $segment = $this->getSegment();
         $segment->setType(new SegmentType('DIFFERENT'));
 
-        $this->setExpectedException('\LogicException');
         $builder->build($segment);
     }
 
