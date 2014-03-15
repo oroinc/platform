@@ -133,7 +133,7 @@
 
     {{ UI.scrollData(id, data, form) }}
 
-    {{ QD.query_designer_column_chain_template('segment-column-chain-template') }}
+    {{ segmentQD.query_designer_segment_template('segment-template') }}
 
     {% set entityFieldsRouteParams = {
         'with-relations': 1,
@@ -229,7 +229,7 @@
                         itemContainer: '#segment-column-list .item-container',
                         itemTemplate: '#segment-column-row'
                     },
-                    select2FieldChoiceTemplate: '#segment-column-chain-template',
+                    select2FieldChoiceTemplate: '#segment-template',
                     entities: {{ entities|json_encode|raw }},
                     metadata: {{ metadata|json_encode|raw }}
                 });

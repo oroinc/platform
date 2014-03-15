@@ -50,13 +50,13 @@ class SegmentManager
             ->where('s.entity = :entity')
             ->andWhere('s.name LIKE :segmentName')
             ->setParameter('entity', $entityName)
-            ->setParameter('segmentName', $term)
+            ->setParameter('segmentName', sprintf('%%%s%%', $term))
             ->setMaxResults(20)
             ->getQuery()
             ->getResult();
 
         foreach ($segments as $segment) {
-            $result[$segment->getId()] = $segment->getName();
+            $result[] = ['id' => $segment->getId(), 'text' => $segment->getName()];
         }
 
         return $result;

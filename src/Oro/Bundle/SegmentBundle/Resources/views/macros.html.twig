@@ -70,3 +70,12 @@
         });
     </script>
 {% endmacro %}
+
+{% macro query_designer_segment_template(id) %}
+    <script type="text/html" id="{{ id }}">
+        <% _.each(obj, function (column, index, list) { %>
+            &#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b>
+            <% if (index < list.length - 1) { %>&nbsp;><% } %>
+        <% }) %>
+    </script>
+{% endmacro %}

@@ -26,15 +26,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.$segmentChoice.segmentChoice(this.options.segmentChoice);
 
             if (data && data.columnName) {
-                this.selectField(data.columnName);
-                this._renderFilter(data.columnName);
+                this.selectSegment(data.columnName);
+                this._renderSegment(data.columnName);
             }
 
             this.$segmentChoice.on('changed', _.bind(function (e, fieldId) {
                 $(':focus').blur();
                 // reset current value on segment change
                 this.element.data('value', {});
-                this._renderFilter(fieldId);
+                this._renderSegment(fieldId);
                 e.stopPropagation();
             }, this));
 
@@ -49,45 +49,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return $.extend(true, {}, this.options);
         },
 
-        _renderFilter: function (fieldId) {
-            var conditions = this.$segmentChoice.fieldChoice('getApplicableConditions', fieldId),
-                filterId = this._getApplicableFilterId(conditions);
-            this._createFilter(this.options.filters[filterId]);
-        },
-
-        _getApplicableFilterId: function (conditions) {
-            var filterId = null,
-                matchedBy = null,
-                self = this;
-
-            if (!_.isUndefined(conditions.filter)) {
-                // the criteria parameter represents a filter
-                return conditions.filter;
-            }
-
-            _.each(this.options.filters, function (filter, id) {
-                var matched;
-
-                if (!_.isEmpty(filter.applicable)) {
-                    // check if a filter conforms the given criteria
-                    matched = self._matchApplicable(filter.applicable, conditions);
-                    if (matched && (
-                        _.isNull(matchedBy) ||
-                            // new rule is more exact
-                            _.size(matchedBy) < _.size(matched) ||
-                            // 'type' rule is most low level one, so any other rule can override it
-                            (_.size(matchedBy) === 1 && _.has(matchedBy, 'type'))
-                        )) {
-                        matchedBy = matched;
-                        filterId = id;
-                    }
-                } else if (_.isNull(filterId)) {
-                    // if a filter was not found so far, use a default filter
-                    filterId = id;
-                }
-            });
-
-            return filterId;
+        _renderSegment: function (segmentId) {
+            //this._createSegment(this.options.filters[filterId]);
         },
 
         _matchApplicable: function (applicable, criteria) {
@@ -97,15 +60,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 });
             });
         },
-
-        _createFilter: function (options) {
-            var moduleName = mapFilterModuleName(options.type);
-
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
-                this._appendFilter(filter);
-            }, this));
-        },
+//
+//        _createSegment: function (options) {
+//            var moduleName = mapFilterModuleName(options.type);
+//
+//            require([moduleName], _.bind(function (Filter) {
+//                var filter = new (Filter.extend(options))();
+//                this._appendFilter(filter);
+//            }, this));
+//        },
 
         _appendFilter: function (filter) {
             var value = this.element.data('value');
@@ -141,8 +104,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.element.trigger('changed');
         },
 
-        selectField: function (name) {
-            this.$segmentChoice.fieldChoice('setValue', name);
+        selectSegment: function (name) {
+            this.$segmentChoice.segmentChoice('setValue', name);
         }
     });
 

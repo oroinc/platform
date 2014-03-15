@@ -29,7 +29,8 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
             util: {},
             select2: {
                 collapsibleResults: true,
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                minimumInputLength: 3
             },
             exclude: [],
             segmentsLoaderSelector: ''
@@ -95,6 +96,9 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                         return {
                             term: term
                         };
+                    },
+                    results: function (data, page) {
+                        return {results: data};
                     }
                 }
             );
@@ -124,10 +128,6 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 .data('entity', entity)
                 .data('data', fields);
             this.element.select2($.extend({data: fields}, this.options.select2));
-        },
-
-        getApplicableConditions: function (fieldId) {
-            return EntityFieldView.prototype.getFieldApplicableConditions.call(this.entityFieldUtil, fieldId);
         },
 
         setValue: function (value) {
