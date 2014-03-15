@@ -1,0 +1,6 @@
+query_designer:
+    filters:
+        segment:
+            applicable: [{type: entity}]
+            type:       segment
+            query_type: [segment]
