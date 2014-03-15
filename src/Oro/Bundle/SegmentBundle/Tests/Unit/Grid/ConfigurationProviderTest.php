@@ -8,9 +8,6 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
     const TEST_GRID_NAME       = 'test';
-    const TEST_ENTITY          = 'AcmeBundle:UserEntity';
-    const TEST_IDENTIFIER_NAME = 'id';
-    const TEST_IDENTIFIER      = 32;
 
     /** @var ConfigurationProvider */
     protected $provider;
