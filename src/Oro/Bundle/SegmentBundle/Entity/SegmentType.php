@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SegmentType
 {
+    const TYPE_DYNAMIC = 'dynamic';
+    const TYPE_STATIC  = 'static';
+
     /**
      * @var string
      *

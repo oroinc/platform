@@ -7,9 +7,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 
 class SegmentController extends Controller
 {
@@ -38,10 +40,25 @@ class SegmentController extends Controller
      *      permission="VIEW",
      *      class="OroSegmentBundle:Segment"
      * )
+     * @Template
      */
     public function viewAction(Segment $entity)
     {
+        $segmentGroup = $this->get('oro_entity_config.provider.entity')
+            ->getConfig($entity->getEntity())
+            ->get('plural_label');
 
+        $gridName = ConfigurationProvider::GRID_PREFIX . $entity->getId();
+        if (!$this->get('oro_segment.datagrid.configuration.provider')->isConfigurationValid($gridName)) {
+            // unset grid name if invalid
+            $gridName = false;
+        }
+
+        return [
+            'entity'       => $entity,
+            'segmentGroup' => $segmentGroup,
+            'gridName'     => $gridName
+        ];
     }
 
     /**

@@ -3,6 +3,8 @@ oro_menu_config:
         reports_tab:
             label: Reports & Segments
             uri: '#'
+            extras:
+                routes: ['oro_segment_view']
 
         segments_divider:
             label: ''
@@ -16,7 +18,7 @@ oro_menu_config:
             route: 'oro_segment_index'
             extras:
                 position: 105
-                routes: ['oro_segment_*']
+                routes: ['oro_segment_index', 'oro_segment_update']
 
     tree:
         application_menu:
@@ -28,6 +30,6 @@ oro_menu_config:
 
 oro_titles:
     oro_segment_index:  ~
-    oro_segment_view:   %%segment.name%% - Segments
+    oro_segment_view:   %%segment.name%% - %%segment.group%%
     oro_segment_create: Create segment
     oro_segment_update: %%segment.name%% - Edit

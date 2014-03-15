@@ -20,7 +20,7 @@ class OroSegmentBundle implements Migration
         $table = $schema->createTable('oro_segment');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('type', 'string', ['notnull' => false, 'length' => 32]);
+        $table->addColumn('type', 'string', ['notnull' => true, 'length' => 32]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('entity', 'string', ['length' => 255]);
