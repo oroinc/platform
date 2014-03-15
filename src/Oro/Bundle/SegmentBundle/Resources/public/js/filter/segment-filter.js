@@ -90,6 +90,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         initialize: function (options) {
             _.extend(this, options);
 
+            // init empty value object if it was not initialized so far
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {
+                    value: ''
+                };
+            }
+
             AbstractFilter.prototype.initialize.apply(this, arguments);
         },
 
