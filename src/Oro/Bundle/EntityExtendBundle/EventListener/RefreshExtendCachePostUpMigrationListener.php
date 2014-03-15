@@ -14,18 +14,11 @@ class RefreshExtendCachePostUpMigrationListener
     protected $commandExecutor;
 
     /**
-     * @var mixed
-     */
-    protected $installed;
-
-    /**
      * @param CommandExecutor $commandExecutor
-     * @param mixed           $installed
      */
-    public function __construct(CommandExecutor $commandExecutor, $installed)
+    public function __construct(CommandExecutor $commandExecutor)
     {
         $this->commandExecutor = $commandExecutor;
-        $this->installed       = $installed;
     }
 
     /**
@@ -35,10 +28,8 @@ class RefreshExtendCachePostUpMigrationListener
      */
     public function onPostUp(PostMigrationEvent $event)
     {
-        if ($this->installed) {
-            $event->addMigration(
-                new RefreshExtendCacheMigration($this->commandExecutor)
-            );
-        }
+        $event->addMigration(
+            new RefreshExtendCacheMigration($this->commandExecutor)
+        );
     }
 }

@@ -282,6 +282,38 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
                 return PropertyInterface::TYPE_DATE;
             case 'datetime':
                 return PropertyInterface::TYPE_DATETIME;
+            case 'money':
+                return PropertyInterface::TYPE_CURRENCY;
+            case 'percent':
+                return PropertyInterface::TYPE_PERCENT;
+        }
+
+        return PropertyInterface::TYPE_STRING;
+    }
+
+    /**
+     * Get filter type for given field type
+     *
+     * @param string $fieldType
+     * @return string
+     */
+    protected function getFilterType($fieldType)
+    {
+        switch ($fieldType) {
+            case 'integer':
+            case 'smallint':
+            case 'bigint':
+            case 'decimal':
+            case 'float':
+            case 'money':
+                return 'number';
+            case 'percent':
+                return 'percent';
+            case 'boolean':
+                return PropertyInterface::TYPE_BOOLEAN;
+            case 'date':
+            case 'datetime':
+                return PropertyInterface::TYPE_DATETIME;
         }
 
         return PropertyInterface::TYPE_STRING;

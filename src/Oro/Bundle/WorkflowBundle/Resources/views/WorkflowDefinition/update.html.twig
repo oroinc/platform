@@ -1,0 +1,562 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+
+{% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
+{% set title = entity.name
+    ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
+%}
+{% set formAction = entity.name ? path('oro_workflow_definition_update', { 'name': entity.name }) : path('oro_workflow_definition_create')  %}
+
+{% block head_script %}
+    {{ parent() }}
+
+    {% block stylesheets %}
+        {{ form_stylesheet(form) }}
+    {% endblock %}
+{% endblock %}
+
+{% block navButtons %}
+    {% if entity.name and resource_granted('DELETE', entity) %}
+            {{ UI.deleteButton({
+            'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
+            'dataRedirect': path('oro_workflow_definition_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-workflow',
+            'dataId': entity.name,
+            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+    {{ UI.cancelButton(path('oro_workflow_definition_index')) }}
+
+    {# API REST route for POST used both for create and update #}
+    {% if entity.name %}
+        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
+    {% else %}
+        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post') %}
+    {% endif %}
+    <div class="btn-group">
+        <button type="button" class="btn btn-success" id="save-btn" data-url="{{ apiPath }}">{{ 'Save'|trans }}</button>
+    </div>
+{% endblock %}
+
+{% block pageHeader %}
+    {% if entity.name %}
+        {% set breadcrumbs = {
+            'entity':      entity,
+            'indexPath':   path('oro_workflow_definition_index'),
+            'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+            'entityTitle': entity.label
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% include 'OroUIBundle::page_title_block.html.twig' %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block stats %}
+    <li>{{ 'oro.workflow.workflowdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflowdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block content_data %}
+    {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
+
+    {% set requiredConstraint = {
+    "NotBlank": null
+    } %}
+    <style type="text/css">
+        .tab-data {
+            padding: 20px;
+        }
+
+        .transition-list .action-column {
+            width: 90px;
+        }
+
+        .steps-list .action-column {
+            width: 110px;
+        }
+
+        .transitions-list-short {
+            margin-left: 0px;
+        }
+
+        .transitions-list-short li {
+            list-style: none;
+        }
+    </style>
+
+    <script type="text/template" id="transition-form-template">
+        <div class="oro-tabs">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#transition-form" data-toggle="tab">{{ 'Info'|trans }}</a></li>
+                <li><a href="#transition-attributes" data-toggle="tab">{{ 'Attributes'|trans }}</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="transition-form">
+                    <div class="tab-data">
+                        <div class="form-container">
+                            <form action="#" class="form-horizontal">
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "Transition name"|trans }} <em>*</em></label>
+                                    <div class="controls">
+                                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                    </div>
+                                </div>
+
+                                <% if(!stepFrom || stepFrom.get('name')) {
+                                var stepFromName = stepFrom ? stepFrom.get('name') : '';
+                                %>
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
+                                    <div class="controls">
+                                        <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
+                                        <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
+                                        >
+                                        <% _.each(allowedStepsFrom, function (step) { %>
+                                        <option
+                                                value="<%= step.get('name') %>"
+                                        <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
+                                        ><%= step.get('label') %></option>
+                                        <% }); %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
+                                    <div class="controls">
+                                        <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
+                                            <option value=""></value>
+                                                <% _.each(allowedStepsTo, function (step) { %>
+                                            <option
+                                                    value="<%= step.get('name') %>"
+                                            <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
+                                            ><%= step.get('label') %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "View form"|trans }}  <em>*</em></label>
+                                    <div class="controls">
+                                        <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
+                                            <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
+                                            <option value="page" <% if (display_type == 'page') { %>selected="selected"<% } %>>{{ "Separate page"|trans }}</value>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label">{{ "Warning message"|trans }}</label>
+                                    <div class="controls">
+                                        <textarea name="message"><%= message %></textarea>
+                                    </div>
+                                </div>
+
+                                {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
+
+                                <% print('<sc' + 'ript>'); %>
+                                require(['jquery'], function($) {
+                                $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                                });
+                                <% print('</sc' + 'ript>'); %>
+
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "Button style"|trans }} </label>
+                                    <div class="controls">
+                                        <select name="button_color">
+                                            <% _.each(allowedButtonStyles, function (style) { %>
+                                            <option value="<%= style.name %>"
+                                            <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
+                                            ><%= style.label %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="control-group transition-example-container">
+                                    <label class="control-label">{{ "Button preview"|trans }}</label>
+                                    <div class="controls">
+                                        <div class="transition-btn-example"></div>
+                                    </div>
+                                </div>
+
+                                <div class="widget-actions">
+                                    <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                                    <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="transition-attributes">
+                    <div class="tab-data">
+                        <div class="transition-attributes-form-container form-container"></div>
+                        <div class="transition-attributes-list-container" style="margin-top: 10px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="step-form-template">
+        {% set orderConstraints = requiredConstraint|merge({
+            "Range": {
+                "minMessage": "This value should be {{ limit }} or more."|trans,
+                "maxMessage": "This value should be {{ limit }} or less."|trans,
+                "invalidMessage": "This value should be a valid number."|trans,
+                "min": 0,
+                "max": null
+            }
+        }) %}
+        <div class="form-container">
+            <div class="oro-tabs">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#step-form" data-toggle="tab">{{ 'Info'|trans }}</a></li>
+                    <% if (transitionsAllowed) { %>
+                    <li><a href="#step-transitions" data-toggle="tab">{{ 'Transitions'|trans }}</a></li>
+                    <% } %>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="step-form">
+                        <div class="tab-data">
+                            <form action="#" class="form-horizontal">
+                                <div class="control-group">
+                                    <label class="control-label required">{{ "Name"|trans }} <em>*</em></label>
+                                    <div class="controls">
+                                        <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label">{{ "Order"|trans }}</label>
+                                    <div class="controls">
+                                        <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label class="control-label">{{ "Final"|trans }}</label>
+                                    <div class="controls">
+                                        <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
+                                    </div>
+                                </div>
+
+                                <div class="widget-actions">
+                                    <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                                    <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <% if (transitionsAllowed) { %>
+                    <div class="tab-pane" id="step-transitions">
+                        <div class="tab-data">
+                            <div class="transitions-list-container"></div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="step-list-template">
+        <div class="grid-container steps-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                    <th class="label-column"><span>{{ "Step name"|trans }}</span></th>
+                    <th><span>{{ "Transitions"|trans }}</span></th>
+                    <th><span>{{ "Poisition"|trans }}</span></th>
+                    <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
+    </script>
+
+    <script type="text/template" id="step-row-template">
+        <td class="step-name">
+            <% if (_is_start) { %>
+            <%= label %>
+            <% } else { %>
+            <a href="#" class="edit-step" title="{{ 'Update step'|trans}}"><%= label %></a>
+            <% } %>
+            <% if (is_final) { %>&nbsp;<strong>({{ "Final"|trans }})</strong><% } %>
+        </td>
+        <td class="step-transitions"></td>
+        <td><%= order %></td>
+        <td class="step-actions">
+            <div class="pull-right">
+                <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
+                <% if (!_is_start) { %>
+                    <a href="#" class="edit-step" title="{{ 'Update step'|trans}}" class="action"><i class="icon-edit hide-text"/></a>
+                    <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}" class="action"><i class="icon-copy hide-text"/></a>
+                    <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}" class="action"><i class="icon-trash hide-text"/></a>
+                <% } %>
+            </div>
+        </td>
+    </script>
+
+    <script type="text/template" id="transition-row-short-template">
+        <a href="#" class="edit-transition" title="{{ 'Update transition'|trans }}"><%= label %></a>
+        <a href="#" class="clone-transition action" title="{{ 'Clone transition'|trans }}"><i class="icon-copy hide-text"></i></a>
+        <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"></i></a>
+        <i class="icon-long-arrow-right"/>
+        <span><%= stepToLabel %></span>
+    </script>
+
+    <script type="text/template" id="attribute-form-option-edit-template">
+        <form action="#">
+            <div class="form-horizontal" style="width: 436px;">
+                <div class="control-group">
+                    <label class="control-label required">{{ "Entity field"|trans }} <em>*</em></label>
+                    <div class="controls">
+                        <input type="hidden" name="property_path" data-validation="{{ requiredConstraint|json_encode }}"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">{{ "Label"|trans }}</label>
+                    <div class="controls">
+                        <input type="text" name="label" value="<%= label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">{{ "Required"|trans }}</label>
+                    <div class="controls">
+                        <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>
+                    </div>
+                </div>
+
+                <div class="clearfix">
+                    <div class="pull-right" style="margin-top: -35px;">
+                        <button type="reset" class="btn hide"><i class="icon-undo"></i> {{ 'Reset'|trans }}</button>
+                        <button type="submit" class="btn btn-success"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/template" id="attribute-form-option-list-template">
+        <div class="grid-container form-options-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                <th><span>{{ "Entity field"|trans }}</span></th>
+                <th><span>{{ "Label"|trans }}</span></th>
+                <th><span>{{ "Required"|trans }}</span></th>
+                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
+    </script>
+
+    <script type="text/template" id="attribute-form-option-row-template">
+        <td>
+            <%= entityField %>
+            <% if (!is_entity_attribute) { %>
+            <span class="muted">({{ 'System'|trans }})</span>
+            <% } %>
+        </td>
+        <td>
+            <%= label %>
+            <% if (isSystemLabel) { %><span class="muted">({{ 'System'|trans }})</span><% } %>
+        </td>
+        <td>
+            <% if (required) { %>
+                {{ "Yes"|trans }}
+            <% } else { %>
+                {{ 'No'|trans }}
+            <% } %>
+        </td>
+        <td class="step-actions">
+            <div class="pull-right">
+                <% if (is_entity_attribute) { %>
+                <a href="#" class="edit-form-option action" title="{{ 'Update field'|trans }}"><i class="icon-edit hide-text"/></a>
+                <% } %>
+                <a href="#" class="delete-form-option action" title="{{ 'Delete field'|trans }}"><i class="icon-trash hide-text"/></a>
+            </div>
+        </td>
+    </script>
+
+    <script type="text/template" id="transition-list-template">
+        <div class="grid-container transition-list">
+            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                <thead>
+                <th><span>{{ "Transition name"|trans }}</span></th>
+                <th><span>{{ "Step to"|trans }}</span></th>
+                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                </thead>
+                <tbody class="item-container">
+                <tr class="no-rows-message">
+                    <td colspan="3">
+                        <div style="padding: 10px 0;text-align: center">
+                            {{ 'There are no transitions yet.'|trans }}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </script>
+
+    <script type="text/template" id="transition-row-template">
+        <td class="transition-name">
+            <a href="#" class="edit-transition" title="{{ 'Update transition'|trans }}"><%= label %></a>
+        </td>
+        <td><%= stepToLabel %></td>
+        <td class="transition-actions">
+            <div class="pull-right">
+                <a href="#" class="delete-transition action" title="{{ 'Delete transition'|trans }}"><i class="icon-trash hide-text"/></a>
+            </div>
+        </td>
+    </script>
+
+    {% set startStepSelector %}
+    {% set startStep = entity.startStep ? entity.startStep.name : '' %}
+    <div class="control-group">
+        <label class="control-label">{{ "Default step"|trans }} <em></em></label>
+        <div class="controls">
+            <input type="hidden" name="start_step" value="{{ startStep }}"/>
+        </div>
+    </div>
+    {% endset %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'data': [
+                    form_row(form.label),
+                    form_row(form.related_entity),
+                    startStepSelector,
+                    form_row(form.steps_display_ordered)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set stepsListWidget %}
+    <div class="clearfix">
+        <div class="workflow-definition-buttons" style="margin-top: -36px;">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+                <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
+            </div>
+        </div>
+    </div>
+    <div class="workflow-definition-steps-list-container"></div>
+
+    <script type="text/javascript">
+        require([
+            'oroworkflow/js/workflow-management',
+            'oroworkflow/js/workflow-management/workflow/model',
+            'oroworkflow/js/workflow-management/step/model',
+            'oroworkflow/js/workflow-management/transition/model',
+            'oroworkflow/js/workflow-management/transition-definition/model',
+            'oroworkflow/js/workflow-management/attribute/model',
+            'oroworkflow/js/workflow-management/step/collection',
+            'oroworkflow/js/workflow-management/transition/collection',
+            'oroworkflow/js/workflow-management/transition-definition/collection',
+            'oroworkflow/js/workflow-management/attribute/collection'
+        ],
+        function(WorkflowManagement, WorkflowModel,
+             StepModel,
+             TransitionModel,
+             TransitionDefinitionModel,
+             AttributeModel,
+             StepCollection,
+             TransitionCollection,
+             TransitionDefinitionCollection,
+             AttributeCollection
+        ) {
+            var steps = new StepCollection(),
+                    transitions = new TransitionCollection(),
+                    transitionDefinitions = new TransitionDefinitionCollection(),
+                    attributes = new AttributeCollection();
+
+            {% if entity.configuration.steps is defined %}
+            {% for name, config in entity.configuration.steps %}
+            {% set config = config|merge({name: name}) %}
+            steps.add(new StepModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
+
+            {% if entity.configuration.transition_definitions is defined %}
+            {% for name, config in entity.configuration.transition_definitions %}
+            {% set config = config|merge({name: name}) %}
+            transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
+
+            {% if entity.configuration.transitions is defined %}
+            {% for name, config in entity.configuration.transitions %}
+            {% set config = config|merge({name: name}) %}
+            transitions.add(new TransitionModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
+
+            {% if entity.configuration.attributes is defined %}
+            {% for name, config in entity.configuration.attributes %}
+            {% set config = config|merge({name: name, translated_label: config.label|trans }) %}
+            attributes.add(new AttributeModel({{ config|json_encode|raw }}));
+            {% endfor %}
+            {% endif %}
+
+            var configuration = {{ entity.configuration|json_encode|raw }};
+            configuration.name = {{ entity.name|json_encode|raw }};
+            configuration.label = {{ entity.label|json_encode|raw }};
+            configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
+            configuration.entity_attribute = {{ entity.entityAttributeName|default('entity')|json_encode|raw }};
+            configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
+            configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
+            configuration.steps = steps;
+            configuration.transition_definitions = transitionDefinitions;
+            configuration.transitions = transitions;
+            configuration.attributes = attributes;
+
+            var workflowModel = new WorkflowModel(configuration);
+            workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
+
+            var workflowManagement = new WorkflowManagement({
+                el: '#{{ form.vars.id }}',
+                stepsEl: '.workflow-definition-steps-list-container',
+                saveBtnEl: '#save-btn',
+                model: workflowModel
+            });
+
+            workflowManagement.render();
+        });
+    </script>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'Designer'|trans,
+        'subblocks': [
+            {
+                'title': 'Workflow steps and transitions'|trans,
+                'data': [stepsListWidget]
+            }
+        ]
+    }] ) %}
+
+    {% set id = 'workflow-designer' %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}

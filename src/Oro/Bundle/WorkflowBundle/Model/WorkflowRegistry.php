@@ -96,7 +96,7 @@ class WorkflowRegistry
             $activeWorkflowName = $entityConfig->get('active_workflow');
 
             if ($activeWorkflowName) {
-                $workflows = $this->getWorkflowsByEntityClass($entityClass, $activeWorkflowName, true);
+                $workflows = $this->getWorkflowsByEntityClass($entityClass, $activeWorkflowName);
 
                 if (array_key_exists($activeWorkflowName, $workflows)) {
                     return $workflows[$activeWorkflowName];
@@ -123,14 +123,13 @@ class WorkflowRegistry
      *
      * @param string $entityClass
      * @param string|null $workflowName
-     * @param bool|null $enabled
      * @return Workflow[]
      */
-    public function getWorkflowsByEntityClass($entityClass, $workflowName = null, $enabled = null)
+    public function getWorkflowsByEntityClass($entityClass, $workflowName = null)
     {
         $result = array();
         $workflowDefinitions = $this->getWorkflowDefinitionRepository()
-            ->findByEntityClass($entityClass, $workflowName, $enabled);
+            ->findByEntityClass($entityClass, $workflowName);
 
         foreach ($workflowDefinitions as $workflowDefinition) {
             $result[$workflowDefinition->getName()] = $this->getAssembledWorkflow($workflowDefinition);

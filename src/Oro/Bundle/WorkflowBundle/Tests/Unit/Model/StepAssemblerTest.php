@@ -104,7 +104,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                 $this->createStep('step_one')
                     ->setLabel('label')
                     ->setOrder(0)
-                    ->setIsFinal(false),
+                    ->setFinal(false),
             ),
             'full' => array(
                 array(
@@ -124,7 +124,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                 ),
                 $this->createStep('step_two')
                     ->setLabel('label')
-                    ->setIsFinal(true)
+                    ->setFinal(true)
                     ->setOrder(10)
                     ->setAllowedTransitions(array('transition_one'))
                     ->setEntityAcls(array('attribute_one' => array('update' => false)))

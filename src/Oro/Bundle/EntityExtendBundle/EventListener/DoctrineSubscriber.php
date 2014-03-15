@@ -25,8 +25,10 @@ class DoctrineSubscriber implements EventSubscriber
 
     /**
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     *
+     * TODO: remove ' = null' in the next release. It is related to https://magecore.atlassian.net/browse/BAP-3543
      */
-    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
+    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator = null)
     {
         $this->nameGenerator = $nameGenerator;
     }
