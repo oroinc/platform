@@ -11,22 +11,9 @@ class ExtendOptionsManager
     const NEW_NAME_OPTION     = '_new_name';
 
     /**
-     * @var EntityMetadataHelper
-     */
-    protected $entityMetadataHelper;
-
-    /**
      * @var array key = [table name] or [table name!column name]
      */
     protected $options = [];
-
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
-        $this->entityMetadataHelper = $entityMetadataHelper;
-    }
 
     /**
      * Sets table options
@@ -93,27 +80,7 @@ class ExtendOptionsManager
      */
     public function getExtendOptions()
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper);
-
-        $objectKeys = array_keys($this->options);
-
-        // at first all table's options should be processed,
-        // because it is possible that a reference to new table is created
-        foreach ($objectKeys as $objectKey) {
-            if (!strpos($objectKey, '!')) {
-                $builder->addTableOptions($objectKey, $this->options[$objectKey]);
-            }
-        }
-
-        // next column's options for all tables can be processed
-        foreach ($objectKeys as $objectKey) {
-            if (strpos($objectKey, '!')) {
-                $keyParts = explode('!', $objectKey);
-                $builder->addColumnOptions($keyParts[0], $keyParts[1], $this->options[$objectKey]);
-            }
-        }
-
-        return $builder->getOptions();
+        return $this->options;
     }
 
     /**
