@@ -11,6 +11,7 @@ parameters:
     oro_entity_extend.migration.update_config.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
     oro_entity_extend.migration.entity_metadata_helper.class: Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper
     oro_entity_extend.migration.options_manager.class:        Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
+    oro_entity_extend.migration.options_parser.class:         Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
 
@@ -81,6 +82,9 @@ services:
 
     oro_entity_extend.migration.options_manager:
         class: %oro_entity_extend.migration.options_manager.class%
+
+    oro_entity_extend.migration.options_parser:
+        class: %oro_entity_extend.migration.options_parser.class%
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
 
