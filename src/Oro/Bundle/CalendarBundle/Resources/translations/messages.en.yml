@@ -44,9 +44,6 @@ oro:
             id.label:        Id
             title.label:     Title
             start.label:     Start
-            reminder.label:  Reminder
-            reminded.label:  Reminded
-            remind_at.label: Remind at
             end.label:       End
             calendar.label:  Calendar
             all_day.label:   All day event
@@ -64,3 +61,6 @@ oro:
             color.label:              Color
             calendar.label:           Calendar
             background_color.label:   Background
+
+        reminder_template:
+            due_message: is starting at

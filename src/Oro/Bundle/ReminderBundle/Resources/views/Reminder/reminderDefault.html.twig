@@ -1,0 +1,7 @@
+<script type="text/html" class="reminder_templates" data-identifier="default">
+    <% if (url != '') { %>
+    <span><a href="<%= url %>"><%= subject %></a> {{ "oro.reminder.reminder_template.due_message"|trans }} <%= expireAt %></span>
+    <% } else { %>
+    <span><%= subject %>{{ "oro.reminder.reminder_template.due_message"|trans }} <%= expireAt %></span>
+    <% } %>
+</script>

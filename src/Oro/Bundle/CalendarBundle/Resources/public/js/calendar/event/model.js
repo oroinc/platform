@@ -17,8 +17,8 @@ define(['backbone', 'routing'], function (Backbone, routing) {
             start: null,
             end: null,
             allDay: false,
-            reminder: false,
             editable: false,
+            reminders: {},
             removable: false
         },
 

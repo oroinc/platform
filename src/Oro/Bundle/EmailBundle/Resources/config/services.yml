@@ -198,6 +198,7 @@ services:
         arguments:
             - @oro_email.email_renderer
             - @security.context
+            - @doctrine.orm.entity_manager
         tags:
             - { name: validator.constraint_validator, alias: oro_email.variables_validator }
 

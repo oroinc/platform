@@ -37,8 +37,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             array('title', 'testTitle'),
             array('start', new \DateTime()),
             array('end', new \DateTime()),
-            array('allDay', true),
-            array('reminder', true),
+            array('allDay', true)
         );
     }
 }
