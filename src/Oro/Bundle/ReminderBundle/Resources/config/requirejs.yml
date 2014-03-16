@@ -1,0 +1,3 @@
+config:
+    paths:
+        'ororeminder/js/subscriber': 'bundles/ororeminder/js/subscriber.js'

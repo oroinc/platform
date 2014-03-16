@@ -50,8 +50,7 @@ class RestCalendarEventTest extends WebTestCase
             "title" => "Test Event",
             "start" => date(DATE_RFC3339),
             "end" => date(DATE_RFC3339),
-            "allDay" => true,
-            "reminder" => true
+            "allDay" => true
         );
         $this->client->request('POST', $this->client->generate('oro_api_post_calendarevent'), $request);
         $result = $this->client->getResponse();
@@ -76,8 +75,7 @@ class RestCalendarEventTest extends WebTestCase
             "title" => "Test Event Updated",
             "start" => date(DATE_RFC3339),
             "end" => date(DATE_RFC3339),
-            "allDay" => true,
-            "reminder" => true
+            "allDay" => true
         );
         $this->client->request(
             'PUT',

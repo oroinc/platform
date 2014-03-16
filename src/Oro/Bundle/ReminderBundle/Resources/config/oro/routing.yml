@@ -1,0 +1,4 @@
+oro_reminder_bundle:
+    resource:     "@OroReminderBundle/Controller"
+    type:         annotation
+    prefix:       /

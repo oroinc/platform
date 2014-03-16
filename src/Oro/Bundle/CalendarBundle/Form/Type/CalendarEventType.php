@@ -15,14 +15,45 @@ class CalendarEventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', 'textarea', ['required' => true, 'label' => 'oro.calendar.calendarevent.title.label'])
-            ->add('start', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.start.label'])
-            ->add('end', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.end.label'])
-            ->add('allDay', 'checkbox', ['required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label'])
             ->add(
-                'reminder',
+                'title',
+                'textarea',
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.title.label'
+                ]
+            )
+            ->add(
+                'start',
+                'oro_datetime',
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.start.label'
+                ]
+            )
+            ->add(
+                'end',
+                'oro_datetime',
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.end.label'
+                ]
+            )
+            ->add(
+                'allDay',
                 'checkbox',
-                ['required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label']
+                [
+                    'required' => false,
+                    'label'    => 'oro.calendar.calendarevent.all_day.label'
+                ]
+            )
+            ->add(
+                'reminders',
+                'oro_reminder_collection',
+                [
+                    'required' => false,
+                    'label'    => 'oro.reminder.entity_plural_label'
+                ]
             );
     }
 
