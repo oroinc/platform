@@ -33,7 +33,7 @@ class Segment extends AbstractQueryDesigner
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
@@ -51,7 +51,7 @@ class Segment extends AbstractQueryDesigner
     protected $description;
 
     /**
-     * @ORM\Column(name="entity", type="string", unique=false, length=100, nullable=false)
+     * @ORM\Column(name="entity", type="string", unique=false, length=255, nullable=false)
      */
     protected $entity;
 

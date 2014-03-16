@@ -57,3 +57,77 @@
         });
     </script>
 {% endmacro %}
+
+{#
+    Renders run button for static segment if allowed
+
+    @param Segment entity
+    @param bool    reloadRequired - is page reload required after run
+#}
+{% macro runButton(entity, reloadRequired = false) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% if entity.id and resource_granted('EDIT', entity)
+        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
+    %}
+        {{ UI.clientButton({
+            'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
+            'aCss':   'no-hash run-button btn',
+            'title' : 'Re-run',
+            'label' : 'Re-run',
+            'iCss': 'icon-refresh'
+        }) }}
+
+        <script type="text/javascript">
+            require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger',
+                     'oronavigation/js/navigation', 'oroui/js/delete-confirmation', 'oroui/js/mediator'],
+            function ($, __, routing, messenger, Navigation, DeleteConfirmation, mediator) {
+                $(function () {
+                    $('.run-button').click(function (e) {
+                        e.preventDefault();
+
+                        var confirm = new DeleteConfirmation({
+                            title:    __('Run confirmation'),
+                            okText:   __('Yes, I Agree'),
+                            content:  __('Are you sure you want to run this static segment?')
+                        });
+
+                        var url = $(this).data('url'),
+                            navigation = Navigation.getInstance(),
+                                run = function () {
+                                    if (navigation) {
+                                        navigation.loadingMask.show();
+                                    }
+
+                                    var success = false;
+                                    $.post(url,function () {
+                                        success = true;
+                                    }).error(function () {
+                                        messenger.notificationFlashMessage('error', __('Error was occurred, please contact administrator.'));
+                                    }).always(function () {
+                                        if (navigation) {
+                                            navigation.loadingMask.hide();
+                                        }
+                                        if (success) {
+                                            var successMessage = __('Segment successfully processed.');
+
+                                            {% if reloadRequired %}
+                                                mediator.once("hash_navigation_request:refresh", function() {
+                                                    messenger.notificationFlashMessage('success', successMessage);
+                                                });
+                                                navigation.refreshPage();
+                                            {% else %}
+                                                messenger.notificationFlashMessage('success', successMessage);
+                                            {% endif %}
+                                        }
+                                    });
+                                };
+
+                        confirm.on('ok', run);
+                        confirm.open();
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}

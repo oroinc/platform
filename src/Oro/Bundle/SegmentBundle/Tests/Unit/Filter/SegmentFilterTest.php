@@ -12,6 +12,7 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Filter\SegmentFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -27,6 +28,9 @@ class SegmentFilterTest extends OrmTestCase
     /** @var DynamicSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $dynamicSegmentQueryBuilder;
 
+    /** @var StaticSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    protected $staticSegmentQueryBuilder;
+
     /** @var SegmentFilter */
     protected $filter;
 
@@ -36,10 +40,14 @@ class SegmentFilterTest extends OrmTestCase
         $this->dynamicSegmentQueryBuilder = $this
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder')
             ->disableOriginalConstructor()->getMock();
+        $this->staticSegmentQueryBuilder  = $this
+            ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder')
+            ->disableOriginalConstructor()->getMock();
         $this->filter                     = new SegmentFilter(
             $this->formFactory,
             new FilterUtility(),
-            $this->dynamicSegmentQueryBuilder
+            $this->dynamicSegmentQueryBuilder,
+            $this->staticSegmentQueryBuilder
         );
     }
 
@@ -56,12 +64,12 @@ class SegmentFilterTest extends OrmTestCase
                 EntityFilterType::NAME,
                 [],
                 [
-                    'csrf_protection' => false,
-                    'field_options'   => [
-                        'class'    => 'OroSegmentBundle:Segment',
-                        'property' => 'name',
-                        'required' => true,
-                    ]
+                'csrf_protection' => false,
+                'field_options'   => [
+                    'class'    => 'OroSegmentBundle:Segment',
+                    'property' => 'name',
+                    'required' => true,
+                ]
                 ]
             )
             ->will($this->returnValue($formMock));
@@ -118,5 +126,44 @@ class SegmentFilterTest extends OrmTestCase
         $params = $ds->getQueryBuilder()->getParameters();
         $this->assertCount(1, $params, 'Should pass params to main query builder');
         $this->assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
+    }
+
+    public function testStaticApply()
+    {
+        $staticSegmentStub = new Segment();
+        $staticSegmentStub->setType(new SegmentType(SegmentType::TYPE_STATIC));
+
+        $filterData = ['value' => $staticSegmentStub];
+        $subquery   = 'SELECT ts1.entity_id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment';
+
+        $em = $this->getTestEntityManager();
+        $qb = new QueryBuilder($em);
+        $qb->select(['t1.name'])
+            ->from('OroSegmentBundle:CmsUser', 't1');
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+
+        $query = new Query($em);
+        $query->setDQL($subquery);
+        $query->setParameter('segment', $staticSegmentStub);
+
+        $this->staticSegmentQueryBuilder->expects($this->once())->method('build')
+            ->with($staticSegmentStub)
+            ->will($this->returnValue($query));
+
+        $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
+        $this->filter->apply($ds, $filterData);
+
+        $expectedResult = [
+            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE t1.id',
+            'IN(SELECT ts1.entity_id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
+        ];
+        $expectedResult = implode(' ', $expectedResult);
+
+        $this->assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
+
+        $params = $ds->getQueryBuilder()->getParameters();
+        $this->assertCount(1, $params, 'Should pass params to main query builder');
+        $this->assertEquals($staticSegmentStub, $params[0]->getValue());
     }
 }

@@ -1,14 +1,23 @@
 parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
     oro_segment.segment_manager.class:                       Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager
+    oro_segment.static_segment_manager.class:                Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
     oro_segment.segment_manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_segment.datagrid.configuration.provider.class:       Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider
     oro_segment.filter.segment.class:                        Oro\Bundle\SegmentBundle\Filter\SegmentFilter
     oro_segment.query.dynamic_segment.query_builder.class:   Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
+    oro_segment.query.static_segment.query_builder.class:    Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
+    oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
 
 services:
     oro_segment.entity_provider:
         alias: oro_entity.entity_provider
+
+    oro_segment.static_segment_manager:
+        class: %oro_segment.static_segment_manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_segment.query.dynamic_segment.query_builder
 
     oro_segment.segment_manager:
         class: %oro_segment.segment_manager.class%
@@ -35,6 +44,7 @@ services:
             - @form.factory
             - @oro_filter.filter_utility
             - @oro_segment.query.dynamic_segment.query_builder
+            - @oro_segment.query.static_segment.query_builder
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: segment }
 
@@ -45,3 +55,14 @@ services:
             - @oro_query_designer.query_designer.manager
             - @doctrine
 
+    oro_segment.query.static_segment.query_builder:
+        class: %oro_segment.query.static_segment.query_builder.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+
+    oro_segment.event_listener.doctrine_pre_remove:
+        class: %oro_segment.event_listener.doctrine_pre_remove.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: doctrine.event_listener, event: preRemove }
