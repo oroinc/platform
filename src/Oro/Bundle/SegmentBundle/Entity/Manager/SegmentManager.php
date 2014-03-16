@@ -46,14 +46,16 @@ class SegmentManager
     {
         $result = [];
 
-        $segments = $this->em->getRepository("OroSegmentBundle:Segment")->createQueryBuilder('s')
-            ->where('s.entity = :entity')
-            ->andWhere('s.name LIKE :segmentName')
-            ->setParameter('entity', $entityName)
-            ->setParameter('segmentName', sprintf('%%%s%%', $term))
-            ->setMaxResults(20)
-            ->getQuery()
-            ->getResult();
+        if (!empty($term)) {
+            $segments = $this->em->getRepository("OroSegmentBundle:Segment")->createQueryBuilder('s')
+                ->where('s.entity = :entity')
+                ->andWhere('s.name LIKE :segmentName')
+                ->setParameter('entity', $entityName)
+                ->setParameter('segmentName', sprintf('%%%s%%', $term))
+                ->setMaxResults(20)
+                ->getQuery()
+                ->getResult();
+        }
 
         foreach ($segments as $segment) {
             $result[] = [

@@ -106,6 +106,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
          * @return {*}
          */
         render: function () {
+            //this.$segmentChoice.segmentChoice(this.options.segmentChoice);
+
             return this;
         },
 

@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.$segmentChoice.segmentChoice(this.options.segmentChoice);
 
             if (data && data.columnName) {
-                this.selectSegment(data.columnName);
+                this.selectSegment(data);
                 this._renderFilter(data.columnName);
             }
 
@@ -55,15 +55,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 filterId;
 
             filterId = this._getApplicableFilterId(segmentType);
-            this.element.data('value', {
-                columnName: 'id',
-                criterion: {
-                    filter: 'segment',
-                    data: {
-                        value: segmentId
+
+            var data = this.element.find('input.select').select2('data');
+            if (_.has(data, 'id')) {
+                data.value = segmentId;
+                this.element.data('value', {
+                    criterion: {
+                        data: data
                     }
-                }
-            });
+                });
+            }
 
             var options = this.options.filters[filterId];
             this._createFilter(options);
@@ -132,8 +133,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.element.trigger('changed');
         },
 
-        selectSegment: function (name) {
-            this.$segmentChoice.segmentChoice('setValue', name);
+        selectSegment: function (data) {
+            this.$segmentChoice.segmentChoice('setValue', data.columnName);
+            this.$segmentChoice.segmentChoice('setSelectedData', data.criterion.data);
         }
     });
 

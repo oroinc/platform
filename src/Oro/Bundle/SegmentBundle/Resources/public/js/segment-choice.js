@@ -26,6 +26,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         options: {
             entity: null,
             fields: [],
+            segmentData: {},
             util: {},
             select2: {
                 collapsibleResults: true,
@@ -53,7 +54,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         _init: function () {
             $.extend(this.entityFieldUtil, this.options.util);
             this._processSelect2Options();
-            this._updateData(this.options.entity, this.options.fields);
+            this._updateData(this.options.entity, this.options.segmentData);
         },
 
         _setOption: function (key, value) {
@@ -76,7 +77,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
                 options.formatSelection = function (item) {
-                    return item.id ? template(item) : '';
+                    return item && item.id ? template(item) : '';
                 };
             }
 
@@ -110,28 +111,28 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 return;
             }
             $fieldsLoader = $(this.options.segmentsLoaderSelector);
-            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
-                self.setValue('');
-                self._updateData($(e.target).val(), fields);
-            });
-            this._updateData($fieldsLoader.val(), $fieldsLoader.data('segments'));
+//            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
+//                self.setValue('');
+//                self._updateData($(e.target).val(), fields);
+//            });
+
+            this._updateData($fieldsLoader.val(), this.options.segmentData);
         },
 
-        _updateData: function (entity, fields) {
+        _updateData: function (entity, segmentData) {
             this.options.entity = entity;
-            this.options.fields = fields;
-            fields = this.entityFieldUtil._convertData(fields, entity, null);
-            if (!_.isEmpty(this.options.exclude)) {
-                fields = filterFields(fields, this.options.exclude);
-            }
             this.element
                 .data('entity', entity)
-                .data('data', fields);
-            this.element.select2($.extend({data: fields}, this.options.select2));
+                .data('data', segmentData);
+            this.element.select2($.extend({data: segmentData}, this.options.select2));
         },
 
         setValue: function (value) {
             this.element.select2('val', value, true);
+        },
+
+        setSelectedData: function (data) {
+            this.element.select2('data', data);
         }
     });
 
