@@ -93,7 +93,7 @@ function($, _, __, app) {
             if (target.parent().filter('.error').length) {
                 target = target.parent();
             }
-            target.siblings('.validation-faled').remove();
+            target.siblings('.validation-failed').remove();
             target.removeClass('error').parent().filter('.controls').removeClass('validation-error');
         },
 
@@ -108,10 +108,10 @@ function($, _, __, app) {
             if (target.parent().filter('.selector').length || target.parent().filter('.uploader').length) {
                 target = target.parent();
             }
-            if (!target.siblings('.validation-faled').length) {
-                $('<span class="validation-faled"></span>').insertAfter(target);
+            if (!target.siblings('.validation-failed').length) {
+                $('<span class="validation-failed"></span>').insertAfter(target);
             }
-            target.siblings('.validation-faled').text(
+            target.siblings('.validation-failed').text(
                 _.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages);
             target.addClass('error').parent().filter('.controls').addClass('validation-error');
         },

@@ -3113,7 +3113,7 @@ iframe.email-body {
   width: 120px;
 }
 
-span.validation-faled {
+span.validation-failed {
   color: @errorText;
   display: block;
   margin: 5px 0 5px 14px;
@@ -3252,4 +3252,12 @@ i.pin-status {
   .tab-pane {
     min-height: 104px;
   }
+}
+
+// capitalize buttons, labels, titles, breadcrumb
+.btn, .btn-group a,
+#main label,
+.oro-subtitle, .title,
+.breadcrumb li {
+  text-transform: capitalize;
 }

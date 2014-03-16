@@ -11,6 +11,9 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
 {
     /**

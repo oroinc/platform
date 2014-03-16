@@ -1,7 +1,8 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
-    ], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model',
+    'oroui/js/layout'
+], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -91,6 +92,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 deleteAction.on('click', onDelete);
             });
 
+            eventForm.find('[name]').uniform('update');
+
             // init loading mask control
             this.loadingMask = new LoadingMask();
             this.eventDialog.$el.closest('.ui-dialog').append(this.loadingMask.render().$el);
@@ -103,7 +106,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             try {
                 var data = this.getEventFormData();
                 data.calendar = this.options.calendar;
-
+                this.model.set(
+                    {reminders: {}}
+                );
                 this.model.save(data, {
                     wait: true,
                     error: _.bind(this._handleResponseError, this)
@@ -160,10 +165,26 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         fillForm: function (form, modelData) {
+            var self = this;
             form = $(form);
-            _.each(modelData, function (value, key) {
-                var input = form.find('[name$="[' + key + ']"]');
-                if (input.length) {
+
+            self.buildForm(form, modelData);
+
+            var inputs = form.find('[name]');
+            var fieldNameRegex = /\[(\w+)\]/g;
+
+            _.each(inputs, function (input) {
+                input = $(input);
+                var name = input.attr('name'),
+                    matches = [],
+                    match;
+
+                while ((match = fieldNameRegex.exec(name)) !== null) {
+                    matches.push(match[1]);
+                }
+
+                if (matches.length) {
+                    var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
                         input.prop('checked', value);
                     } else {
@@ -172,11 +193,35 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                     input.change();
                 }
             });
+
             return form;
         },
 
+        buildForm: function (form, modelData) {
+            var self = this;
+            form = $(form);
+            _.each(modelData, function (value, key) {
+                if (typeof value === 'object') {
+                    var container = form.find('.' + key + '-collection');
+                    if (container) {
+                        var prototype = container.data('prototype');
+                        if (prototype) {
+                            _.each(value, function (collectionValue, collectionKey) {
+                                var collectionContent = prototype.replace(/__name__/g, collectionKey);
+
+                                container.append(collectionContent);
+                            }, prototype);
+                        }
+                    }
+
+                    self.buildForm(form, value);
+                }
+            });
+        },
+
         getEventFormData: function () {
-            var fieldNameRegex = /\[(\w+)\]$/,
+            var self = this;
+            var fieldNameRegex = /\[(\w+)\]/g,
                 data = {},
                 formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
@@ -184,13 +229,44 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                     return {"name": this.name, "value": false};
                 }).get());
             _.each(formData, function (dataItem) {
-                var fieldNameData = fieldNameRegex.exec(dataItem.name);
-                if (fieldNameData && fieldNameData.length === 2) {
-                    data[fieldNameData[1]] = dataItem.value;
+                var matches = [], match;
+                while ((match = fieldNameRegex.exec(dataItem.name)) !== null) {
+                    matches.push(match[1]);
+                }
+
+                if (matches.length) {
+                    self.setValueByPath(data, dataItem.value, matches);
                 }
             });
 
             return data;
+        },
+
+        setValueByPath: function (obj, value, path) {
+            var parent = obj;
+
+            for (var i = 0; i < path.length - 1; i += 1) {
+                if (parent[path[i]] === undefined) {
+                    parent[path[i]] = {};
+                }
+
+                parent = parent[path[i]];
+            }
+
+            parent[path[path.length - 1]] = value;
+        },
+
+        getValueByPath: function (obj, path) {
+            var current = obj;
+
+            for (var i = 0; i < path.length; ++i) {
+                if (current[path[i]] == undefined) {
+                    return undefined;
+                } else {
+                    current = current[path[i]];
+                }
+            }
+            return current;
         }
     });
 });

@@ -2,26 +2,38 @@
 
 namespace Oro\Bundle\CalendarBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Oro\Bundle\ReminderBundle\Model\ReminderData;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
  * @ORM\Table(name="oro_calendar_event",
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
  * @Config(
+ *  routeName="oro_calendar_view_default",
  *  defaultValues={
- *      "entity"={"icon"="icon-time"},
+ *      "entity"={
+ *          "icon"="icon-time"
+ *      },
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE;EDIT;DELETE",
  *          "group_name"=""
- *      }
+ *      },
+ *      "reminder"={
+ *          "reminder_template_name"="calendar_reminder",
+ *          "reminder_flash_template_identifier"="calendar_event_template"
+ *      },
  *  }
  * )
  */
-class CalendarEvent
+class CalendarEvent implements RemindableInterface
 {
     /**
      * @ORM\Id
@@ -35,6 +47,12 @@ class CalendarEvent
      *
      * @ORM\ManyToOne(targetEntity="Calendar", inversedBy="events")
      * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true},
+     *      "email"={"available_in_template"=true}
+     *  }
+     * )
      */
     protected $calendar;
 
@@ -87,25 +105,14 @@ class CalendarEvent
     protected $allDay;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="reminder", type="boolean")
+     * @var Collection
      */
-    protected $reminder;
+    protected $reminders;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="remind_at", type="datetime", nullable=true)
-     */
-    protected $remindAt;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="reminded", type="boolean", options={"default":false})
-     */
-    protected $reminded;
+    public function __construct()
+    {
+        $this->reminders = new ArrayCollection();
+    }
 
     /**
      * Gets an calendar event id.
@@ -241,71 +248,32 @@ class CalendarEvent
     }
 
     /**
-     * Indicates whether an remind notification need to be send for an event.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function getReminder()
+    public function getReminders()
     {
-        return $this->reminder;
+        return $this->reminders;
     }
 
     /**
-     * Sets a flag indicates whether an remind notification need to be send for an event.
-     *
-     * @param bool $reminder
-     * @return CalendarEvent
+     * {@inheritdoc}
      */
-    public function setReminder($reminder)
+    public function setReminders(Collection $reminders)
     {
-        $this->reminder = $reminder;
-
-        return $this;
+        $this->reminders = $reminders;
     }
 
     /**
-     * Gets date/time an remind notification should occurs.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
-    public function getRemindAt()
+    public function getReminderData()
     {
-        return $this->remindAt;
-    }
+        $result = new ReminderData();
 
-    /**
-     * Sets date/time an remind notification should occurs.
-     *
-     * @param \DateTime $remindAt
-     * @return CalendarEvent
-     */
-    public function setRemindAt($remindAt)
-    {
-        $this->remindAt = $remindAt;
+        $result->setSubject($this->getTitle());
+        $result->setExpireAt($this->getEnd());
+        $result->setRecipient($this->getCalendar()->getOwner());
 
-        return $this;
-    }
-
-    /**
-     * Gets a flag indicates whether an remind notification has already occurred or not.
-     *
-     * @return bool
-     */
-    public function getReminded()
-    {
-        return $this->reminded;
-    }
-
-    /**
-     * Sets a flag indicates whether an remind notification has already occurred or not.
-     *
-     * @param bool $reminded
-     * @return CalendarEvent
-     */
-    public function setReminded($reminded)
-    {
-        $this->reminded = $reminded;
-
-        return $this;
+        return $result;
     }
 }

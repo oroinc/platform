@@ -128,8 +128,25 @@ oro_entity_config:
                             label:          'Show on grid'
 
     form:
+        entity:
+            items:
+                # form type for specific entity
+                form_type:
+                    options: []
+                # form options for specific entity
+                form_options:
+                    options:
+                        serializable: true
         field:
             items:
+                # form type for specific field
+                form_type:
+                    options: []
+                # form options for specific field
+                form_options:
+                    options:
+                        serializable: true
+                # is form enabled for specific field
                 is_enabled:
                     options:
                         default_value:      true

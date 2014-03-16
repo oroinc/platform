@@ -13,14 +13,20 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
     const TEST_TRANS_SUBJECT = 'testTransSubject';
     const TEST_CONTENT       = 'testContent';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $twig;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityContext;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $user;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $classMetadata;
 
     /** @var EmailTemplate */
     protected $template;
@@ -31,29 +37,72 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var VariablesConstraint */
     protected $variablesConstraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $context;
 
     public function setUp()
     {
-        $this->twig = $this->getMockBuilder('\Twig_Environment')
+        $this->twig            = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()->getMock();
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $token = $this->getMockForAbstractClass(
+        $token                 = $this->getMockForAbstractClass(
             'Symfony\Component\Security\Core\Authentication\Token\TokenInterface'
         );
-        $this->user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()->getMock();
-        $token->expects($this->any())->method('getUser')
-            ->will($this->returnValue($this->user));
-        $this->securityContext->expects($this->any())->method('getToken')
-            ->will($this->returnValue($token));
-        $this->context = $this->getMockForAbstractClass('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->user            = $this
+            ->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->template = new EmailTemplate();
+        $token->expects($this->any())
+            ->method('getUser')
+            ->will($this->returnValue($this->user));
+
+        $this->securityContext
+            ->expects($this->any())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $this->context = $this
+            ->getMockForAbstractClass('Symfony\Component\Validator\ExecutionContextInterface');
+
+        $this->entityManager = $this
+            ->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->classMetadata = $this
+            ->getMockBuilder('Doctrine\\ORM\\Mapping\\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->classMetadata
+            ->expects($this->any())
+            ->method('getAssociationMappings')
+            ->will(
+                $this->returnValue(
+                    [
+                        'stdClass' => [
+                            'targetEntity' => '\stdClass',
+                            'fieldName'    => 'stdClass',
+                            'type' => 1
+                        ]
+                    ]
+                )
+            );
+
+        $this->entityManager
+            ->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($this->classMetadata));
+
+        $this->template            = new EmailTemplate();
         $this->variablesConstraint = new VariablesConstraint();
 
-        $this->validator = new VariablesValidator($this->twig, $this->securityContext);
+        $this->validator = new VariablesValidator(
+            $this->twig,
+            $this->securityContext,
+            $this->entityManager
+        );
         $this->validator->initialize($this->context);
     }
 
@@ -74,8 +123,8 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->setSubject(self::TEST_SUBJECT);
         $this->template->setEntityName('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity');
 
-        $phpUnit = $this;
-        $user = $this->user;
+        $phpUnit  = $this;
+        $user     = $this->user;
         $callback = function ($template, $params) use ($phpUnit, $user) {
             $phpUnit->assertInternalType('string', $template);
 
