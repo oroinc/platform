@@ -1,0 +1,19 @@
+oro:
+    reminder:
+        entity_label:        Reminder
+        entity_plural_label: Reminders
+        entity_description:  Represent reminder
+
+        interval:
+            unit:
+                minute.label: minutes
+                hour.label:   hours
+                day.label:    days
+                week.label:   weeks
+
+        processor:
+            email.label:      Email
+            web_socket.label: Flash message
+
+        reminder_template:
+            due_message: is starting at
