@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -18,6 +19,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
+
+    /** @var ExtendOptionsParser */
+    protected $extendOptionsParser;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
@@ -37,7 +41,8 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->extendOptionsManager = new ExtendOptionsManager($this->entityMetadataHelper);
+        $this->extendOptionsManager = new ExtendOptionsManager();
+        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper);
         $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 
@@ -197,6 +202,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
     protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
         $extendOptions = $schema->getExtendOptions();
+        $extendOptions = $this->extendOptionsParser->parseOptions($extendOptions);
         $this->assertEquals($expectedOptions, $extendOptions);
     }
 }
