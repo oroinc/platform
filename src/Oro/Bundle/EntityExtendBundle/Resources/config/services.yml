@@ -7,9 +7,9 @@ parameters:
     oro_entity_extend.listener.entity_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
-    oro_entity_extend.migration.refresh_cache.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
-    oro_entity_extend.migration.update_config.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
-    oro_entity_extend.migration.update_index.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateIndexMigrationListener
+    oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
+    oro_entity_extend.migration.update_config.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
+    oro_entity_extend.migration.update_indices.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendIndicesPostUpMigrationListener
     oro_entity_extend.migration.entity_metadata_helper.class: Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper
     oro_entity_extend.migration.options_manager.class:        Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
     oro_entity_extend.migration.options_parser.class:         Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser
@@ -83,6 +83,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
 
+    oro_entity_extend.migration.update_indices.post_up.listener:
+        class: %oro_entity_extend.migration.update_indices.post_up.listener.class%
+        arguments:
+            - @oro_entity_extend.migration.entity_metadata_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }
+
     oro_entity_extend.migration.entity_metadata_helper:
         class: %oro_entity_extend.migration.entity_metadata_helper.class%
         arguments:
@@ -110,11 +117,3 @@ services:
             - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: rename, priority: -10 }
-
-    oro_entity_extend.migration.update_index.post_up.listener:
-        class: %oro_entity_extend.migration.update_index.post_up.listener.class%
-        arguments:
-            - @oro_entity_extend.migration.entity_metadata_helper
-            - @doctrine
-        tags:
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }

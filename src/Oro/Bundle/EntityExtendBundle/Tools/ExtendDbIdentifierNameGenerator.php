@@ -154,6 +154,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     public function generateIndexNameForExtendFieldVisibleInGrid($entityClassName, $fieldName)
     {
         $entityClassName = ExtendHelper::getShortClassName($entityClassName);
+        // remove ending underscore (_) char
         $prefix = substr(self::CUSTOM_INDEX_PREFIX, 0, -1);
 
         return $this->generateIdentifierName(

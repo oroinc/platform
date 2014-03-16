@@ -261,7 +261,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 'sortable'    => true,
                 'filterable'  => true,
                 'show_filter' => true,
-                'frontend_type' => $this->getFrontendFieldType($fieldConfig->getFieldType())
+                'frontend_type' => $this->getFrontendFieldType($fieldConfigId->getFieldType())
             ]
         ];
     }
