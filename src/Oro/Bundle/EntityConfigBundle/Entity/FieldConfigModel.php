@@ -38,7 +38,7 @@ class FieldConfigModel extends AbstractConfigModel
      * @var ConfigModelIndexValue[]|PersistentCollection
      * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
      */
-    protected $indexValues;
+    protected $indexedValues;
 
     /**
      * @var OptionSet[]|PersistentCollection
