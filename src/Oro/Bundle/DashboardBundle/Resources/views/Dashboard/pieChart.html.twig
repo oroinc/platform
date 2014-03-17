@@ -16,7 +16,7 @@
     <script type="text/javascript">
         require(['jquery', 'flotr2', 'oroui/js/layout'], function ($, Flotr, layout) {
             layout.onPageRendered(function () {
-                var ratio = {{ isMobileVersion() ? '0.9' : '0.35' }};
+                var ratio = {{ isMobileVersion() ? '0.8' : '0.35' }};
                 var $widgetContent = $('#{{ widgetContentId }}');
                 var $chart = $('#{{ widgetId }}-chart');
                 var $chartLegend = $('#{{ widgetId }}-legend');
