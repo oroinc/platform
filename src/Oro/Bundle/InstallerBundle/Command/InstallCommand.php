@@ -135,8 +135,6 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:entity-config:clear')
-            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
                 array(
@@ -146,6 +144,8 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
+            ->runCommand('oro:entity-config:clear')
+            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'oro:migration:load',
                 array(
