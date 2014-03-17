@@ -108,9 +108,9 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         _updateData: function (entity, segmentData) {
             this.options.entity = entity;
             this.element
-                .data('entity', entity)
-                .data('data', segmentData);
-            this.element.select2($.extend({data: segmentData}, this.options.select2));
+                .data('entity', entity);
+//                .data('data', segmentData);
+            this.element.select2($.extend({data: {}}, this.options.select2));
         },
 
         setValue: function (value) {

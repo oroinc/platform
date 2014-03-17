@@ -1,8 +1,6 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
-    './segment-choice', 'jquery-ui'
-], function ($, _) {
+define(['jquery', 'underscore', './filter/segment-filter', './segment-choice', 'jquery-ui'], function ($, _, SegmentFilter) {
     'use strict';
 
     /**
@@ -27,14 +25,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             if (data && data.columnName) {
                 this.selectSegment(data);
-                this._renderFilter(data.columnName);
+                this._renderFilter();
             }
 
-            this.$segmentChoice.on('changed', _.bind(function (e, filterId) {
+            this.$segmentChoice.on('changed', _.bind(function (e) {
                 $(':focus').blur();
                 // reset current value on segment change
                 this.element.data('value', {});
-                this._renderFilter(filterId);
+                this._renderFilter();
                 e.stopPropagation();
             }, this));
 
@@ -49,33 +47,34 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return $.extend(true, {}, this.options);
         },
 
-        _renderFilter: function (fieldId) {
-            var segmentId = fieldId.split('_')[1],
-                filterId;
-
-            filterId = this._getApplicableFilterId('segment', segmentId);
+        _renderFilter: function () {
+            var filterId = this._getSegmentFilterId();
 
             var data = this.element.find('input.select').select2('data');
             if (_.has(data, 'id')) {
-                data.value = segmentId;
                 // pre-set data
                 this.element.data('value', {
                     criterion: {
                         filter: 'segment',
-                        data: data
+                        data:    data
                     }
                 });
             }
 
-            var options = this.options.filters[filterId];
-            this._createFilter(options);
+            this._createFilter(this.options.filters[filterId]);
         },
 
-        _getApplicableFilterId: function (segmentType, segmentId) {
+        /**
+         * Find filter in metadata array and return it's index there
+         *
+         * @returns {*}
+         * @private
+         */
+        _getSegmentFilterId: function () {
             var filterId = null;
 
             _.each(this.options.filters, function (filter, id) {
-                if (filter.type == segmentType) {
+                if ('segment' === filter.type) {
                     filterId = id;
                 }
             });
@@ -83,13 +82,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
+        /**
+         * Creates instance of segment filter
+         *
+         * @param options {Object}
+         * @private
+         */
         _createFilter: function (options) {
-            var moduleName = 'orosegment/js/filter/segment-filter';
-
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
-                this._appendFilter(filter);
-            }, this));
+            var filter = new (SegmentFilter.extend(options))();
+            this._appendFilter(filter);
         },
 
         _appendFilter: function (filter) {
@@ -107,6 +108,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this._onUpdate();
         },
 
+        /**
+         * On update evebt handler
+         * @private
+         */
         _onUpdate: function () {
             var value;
 
