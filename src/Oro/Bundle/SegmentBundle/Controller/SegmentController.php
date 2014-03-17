@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller;
 
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -104,6 +105,10 @@ class SegmentController extends Controller
                 'success',
                 $this->get('translator')->trans('oro.segment.entity.saved')
             );
+
+            if ($this->getRequest()->get(Router::ACTION_PARAMETER) === 'save_and_refresh') {
+                $this->get('oro_segment.static_segment_manager')->run($entity);
+            }
 
             return $this->get('oro_ui.router')->redirectAfterSave(
                 ['route' => 'oro_segment_update', 'parameters' => ['id' => $entity->getId()]],
