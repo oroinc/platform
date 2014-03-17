@@ -39,7 +39,7 @@ security:
                 csrf_provider:                  form.csrf_provider
             remember_me:
                 key:                        %secret%
-                name:                       CRMRM_DIST
+                name:                       BAPRM_DIST
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
             anonymous:                        ~
