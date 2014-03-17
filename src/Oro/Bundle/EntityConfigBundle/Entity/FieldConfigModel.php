@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
@@ -40,13 +38,7 @@ class FieldConfigModel extends AbstractConfigModel
      * @var ConfigModelIndexValue[]|PersistentCollection
      * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
      */
-    protected $indexedValues;
-
-    /**
-     * @var string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $values;
+    protected $indexValues;
 
     /**
      * @var OptionSet[]|PersistentCollection
@@ -68,11 +60,11 @@ class FieldConfigModel extends AbstractConfigModel
 
     public function __construct($fieldName = null, $type = null)
     {
-        $this->type          = $type;
-        $this->mode          = ConfigModelManager::MODE_DEFAULT;
-        $this->indexedValues = new ArrayCollection;
-        $this->options       = new ArrayCollection;
-        $this->fieldName     = $fieldName;
+        $this->type      = $type;
+        $this->mode      = ConfigModelManager::MODE_DEFAULT;
+        $this->values    = new ArrayCollection;
+        $this->options   = new ArrayCollection;
+        $this->fieldName = $fieldName;
     }
 
     /**

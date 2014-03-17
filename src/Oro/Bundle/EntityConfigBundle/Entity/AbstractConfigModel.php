@@ -30,9 +30,15 @@ abstract class AbstractConfigModel
     protected $mode;
 
     /**
-     * @var ConfigModelValue[]|ArrayCollection
+     * @var ArrayCollection $values
+     * @ORM\Column(name="values", type="text", nullable=true)
      */
     protected $values;
+
+    /**
+     * @var ConfigModelIndexValue[]|ArrayCollection
+     */
+    protected $indexedValues;
 
     /**
      * @param ConfigModelValue[] $values

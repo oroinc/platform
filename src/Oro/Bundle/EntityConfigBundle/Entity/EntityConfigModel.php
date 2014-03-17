@@ -32,12 +32,6 @@ class EntityConfigModel extends AbstractConfigModel
     protected $indexedValues;
 
     /**
-     * @var string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $values;
-
-    /**
      * @var FieldConfigModel[]|ArrayCollection
      * @ORM\OneToMany(targetEntity="FieldConfigModel", mappedBy="entity", cascade={"all"})
      */

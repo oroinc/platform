@@ -22,18 +22,18 @@ class ConfigModelIndexValue
 
     /**
      * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="values", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="indexedValues", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
      * })
      */
     protected $entity;
 
     /**
      * @var FieldConfigModel
-     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="values", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="indexedValues", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="field_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="field_id", referencedColumnName="id")
      * })
      */
     protected $field;
@@ -52,7 +52,7 @@ class ConfigModelIndexValue
 
     /**
      * @var string
-     * @ORM\Column(name="value" type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     protected $value;
 
