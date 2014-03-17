@@ -1,12 +1,12 @@
 parameters:
-    oro_migration.db_id_name_generator.class:         Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
-    oro_migration.data_fixtures.loader.class:         Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
-    oro_migration.migrations.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
-    oro_migration.migrations.query_loader.class:      Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator
-    oro_migration.migration.pre_up.listener.class:    Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
-    oro_migration.migrations.extension_manager.class: Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
-    oro_migration.migration.extension.rename.class:   Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
-
+    oro_migration.db_id_name_generator.class:            Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
+    oro_migration.data_fixtures.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
+    oro_migration.migrations.loader.class:               Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
+    oro_migration.migrations.query_loader.class:         Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator
+    oro_migration.migration.pre_up.listener.class:       Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
+    oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
+    oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
+    oro_migration.migration.extension.index_limit.class: Oro\Bundle\MigrationBundle\Migration\Extension\IndexLimitExtension
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
@@ -45,3 +45,8 @@ services:
         class: %oro_migration.migration.extension.rename.class%
         tags:
             - { name: oro_migration.extension, extension_name: rename }
+
+    oro_migration.migration.extension.index_limit:
+        class: %oro_migration.migration.extension.index_limit.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: index_limit }
