@@ -97,7 +97,9 @@ define(function (require) {
             getter: function ($el, name, value) {
                 if (name === 'func') {
                     value = value && {
-                        name: value
+                        name: value,
+                        group_type: $el.find(":selected").data('group_type'),
+                        group_name: $el.find(":selected").data('group_name')
                     };
                 }
                 return value;
@@ -116,10 +118,22 @@ define(function (require) {
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                var name = util.splitFieldId(data.name);
+                var name = util.splitFieldId(data.name),
+                    func = data.func,
+                    item, itemFunc;
 
                 data.name = template(name);
-                data.func = '';
+                if (func && func.name) {
+                    item = metadata[func.group_type][func.group_name];
+                    if (item) {
+                        itemFunc = _.findWhere(item.functions, {name: func.name});
+                        if (itemFunc) {
+                            data.func = itemFunc.label;
+                        }
+                    }
+                } else {
+                    data.func = '';
+                }
 
                 if (data.sorting && sortingLabels[data.sorting]) {
                     data.sorting = sortingLabels[data.sorting];

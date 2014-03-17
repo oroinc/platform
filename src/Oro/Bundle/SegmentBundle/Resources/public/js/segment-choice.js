@@ -89,15 +89,11 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         },
 
         _bindFieldsLoader: function () {
-            var self = this, $fieldsLoader;
+            var $fieldsLoader;
             if (!this.options.segmentsLoaderSelector) {
                 return;
             }
             $fieldsLoader = $(this.options.segmentsLoaderSelector);
-//            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
-//                self.setValue('');
-//                self._updateData($(e.target).val(), fields);
-//            });
 
             this._updateData($fieldsLoader.val(), this.options.segmentData);
         },

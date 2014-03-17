@@ -83,14 +83,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
-        _matchApplicable: function (applicable, criteria) {
-            return _.find(applicable, function (item) {
-                return _.every(item, function (value, key) {
-                    return criteria[key] === value;
-                });
-            });
-        },
-
         _createFilter: function (options) {
             var moduleName = 'orosegment/js/filter/segment-filter';
 

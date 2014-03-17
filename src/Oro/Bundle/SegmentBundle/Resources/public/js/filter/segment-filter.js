@@ -40,22 +40,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         inputSelector: 'select',
 
         /**
-         * Select widget object
-         *
-         * @property
-         */
-        selectWidget: null,
-
-        /**
-         * Select widget options
-         *
-         * @property
-         */
-        widgetOptions: {
-            classes: 'segment-filter-widget'
-        },
-
-        /**
          * Filter events
          *
          * @property
