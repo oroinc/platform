@@ -129,7 +129,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][3]")
             ->text();
         preg_match('/of\s+(\d+)/i', $pager, $result);
-        return intval($result[2]);
+        return intval($result[1]);
     }
 
     /**
