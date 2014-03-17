@@ -1,8 +1,7 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
-    './segment-choice', 'jquery-ui'
-], function ($, _) {
+define(['jquery', 'underscore', './filter/segment-filter', './segment-choice', 'jquery-ui'],
+function ($, _, SegmentFilter) {
     'use strict';
 
     /**
@@ -51,9 +50,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
         _renderFilter: function (fieldId) {
             var segmentId = fieldId.split('_')[1],
-                filterId;
-
-            filterId = this._getApplicableFilterId('segment', segmentId);
+                filterId = this._getSegmentFilterId();
 
             var data = this.element.find('input.select').select2('data');
             if (_.has(data, 'id')) {
@@ -71,11 +68,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this._createFilter(options);
         },
 
-        _getApplicableFilterId: function (segmentType, segmentId) {
+        /**
+         * Find filter in metadata array and return it's index there
+         *
+         * @returns {*}
+         * @private
+         */
+        _getSegmentFilterId: function () {
             var filterId = null;
 
             _.each(this.options.filters, function (filter, id) {
-                if (filter.type == segmentType) {
+                if ('segment' === filter.type) {
                     filterId = id;
                 }
             });
@@ -83,13 +86,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
+        /**
+         * Creates filter instance
+         *
+         * @param options {Object}
+         * @private
+         */
         _createFilter: function (options) {
-            var moduleName = 'orosegment/js/filter/segment-filter';
-
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
-                this._appendFilter(filter);
-            }, this));
+            var filter = new (SegmentFilter.extend(options))();
+            this._appendFilter(filter);
         },
 
         _appendFilter: function (filter) {

@@ -28,7 +28,7 @@ class SegmentManager
     public function getSegmentTypeChoices()
     {
         $result = [];
-        $types = $this->em->getRepository('OroSegmentBundle:SegmentType')->findAll();
+        $types  = $this->em->getRepository('OroSegmentBundle:SegmentType')->findAll();
         foreach ($types as $type) {
             $result[$type->getName()] = $type->getLabel();
         }
@@ -55,15 +55,15 @@ class SegmentManager
                 ->setMaxResults(20)
                 ->getQuery()
                 ->getResult();
-        }
+
             foreach ($segments as $segment) {
                 $result[] = [
-                    'id'   => 'segment_'.$segment->getId(),
+                    'id'   => 'segment_' . $segment->getId(),
                     'text' => $segment->getName(),
                     'type' => 'segment',
                 ];
             }
-
+        }
 
         return $result;
     }
