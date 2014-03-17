@@ -8,8 +8,10 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
     const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
     const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
+    const CUSTOM_INDEX_PREFIX              = 'oro_idx_';
     const RELATION_COLUMN_SUFFIX           = '_id';
     const RELATION_DEFAULT_COLUMN_PREFIX   = ExtendConfigDumper::DEFAULT_PREFIX;
+
 
     /**
      * Gets the max size of an custom entity name
@@ -138,6 +140,25 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
                 ExtendHelper::getShortClassName($entityClassName),
                 ExtendHelper::getShortClassName($targetEntityClassName)
             ],
+            [$fieldName],
+            $prefix,
+            false
+        );
+    }
+
+    /**
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @return string
+     */
+    public function generateIndexNameForExtendFieldVisibleInGrid($entityClassName, $fieldName)
+    {
+        $entityClassName = ExtendHelper::getShortClassName($entityClassName);
+        // remove ending underscore (_) char
+        $prefix = substr(self::CUSTOM_INDEX_PREFIX, 0, -1);
+
+        return $this->generateIdentifierName(
+            $entityClassName,
             [$fieldName],
             $prefix,
             false

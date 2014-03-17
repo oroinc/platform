@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator;
 
 class ExtendTable extends TableWithNameGenerator

@@ -15,10 +15,12 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 
 /**
@@ -81,6 +83,34 @@ class SegmentController extends RestController implements ClassResourceInterface
     public function deleteAction($id)
     {
         return $this->handleDeleteRequest($id);
+    }
+
+    /**
+     * Run static segment.
+     *
+     * @param int $id
+     *
+     * @ApiDoc(
+     *      description="Run Static Segment",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_segment_update")
+     * @return Response
+     */
+    public function postRunAction($id)
+    {
+        /** @var Segment $segment */
+        $segment = $this->getManager()->find($id);
+        if (!$segment) {
+            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        }
+
+        try {
+            $this->get('oro_segment.static_segment_manager')->run($segment);
+            return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        } catch (\LogicException $e) {
+            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+        }
     }
 
     /**

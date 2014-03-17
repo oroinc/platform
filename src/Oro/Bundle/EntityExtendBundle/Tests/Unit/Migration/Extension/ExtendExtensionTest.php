@@ -6,6 +6,7 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -21,6 +22,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
+
+    /** @var ExtendOptionsParser */
+    protected $extendOptionsParser;
 
     protected function setUp()
     {
@@ -40,15 +44,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             );
         $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
-                        ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
-                    ]
-                )
-            );
-        $this->extendOptionsManager = new ExtendOptionsManager($this->entityMetadataHelper);
+            ->will($this->returnArgument(1));
+        $this->extendOptionsManager = new ExtendOptionsManager();
+        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper);
     }
 
     /**
@@ -1131,6 +1129,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
         $extendOptions = $schema->getExtendOptions();
+        $extendOptions = $this->extendOptionsParser->parseOptions($extendOptions);
         $this->assertEquals($expectedOptions, $extendOptions);
     }
 }
