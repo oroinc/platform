@@ -10,7 +10,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -23,9 +22,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OrmTotalsExtension extends AbstractExtension
 {
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var  Translator */
     protected $translator;
 
@@ -46,10 +42,8 @@ class OrmTotalsExtension extends AbstractExtension
     public function __construct(
         Translator $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter,
-        RequestParameters $requestParams = null
+        DateTimeFormatter $dateTimeFormatter
     ) {
-        $this->requestParams     = $requestParams;
         $this->translator        = $translator;
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
