@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class IndexLimitExtension implements DatabasePlatformAwareInterface
+class IndexLimitExtension implements DatabasePlatformAwareInterface, NameGeneratorAwareInterface
 {
     const MAX_INDEX_SIZE = 767;
 
