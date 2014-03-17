@@ -226,26 +226,19 @@ class InstallCommand extends ContainerAwareCommand
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
         // create an administrator
-        $user = $container->get('oro_user.manager')->createUser();
-        $role = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-        $businessUnit = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(array('name' => 'Main'));
-        $user
-            ->setUsername($userName)
-            ->setEmail($userEmail)
-            ->setFirstName($userFirstName)
-            ->setLastName($userLastName)
-            ->setPlainPassword($userPassword)
-            ->setEnabled(true)
-            ->addRole($role)
-            ->setOwner($businessUnit)
-            ->addBusinessUnit($businessUnit);
-        $container->get('oro_user.manager')->updateUser($user);
+        $commandExecutor->runCommand(
+            'oro:user:create',
+            array(
+                '--process-isolation' => true,
+                '--user-name' => $userName,
+                '--user-email' => $userEmail,
+                '--user-firstname' => $userFirstName,
+                '--user-lastname' => $userLastName,
+                '--user-password' => $userPassword,
+                '--user-role' => 'ROLE_ADMINISTRATOR',
+                '--user-business-unit' => 'Main'
+            )
+        );
 
         // update company name and title if specified
         if (!empty($companyName) && $companyName !== $defaultCompanyName) {
