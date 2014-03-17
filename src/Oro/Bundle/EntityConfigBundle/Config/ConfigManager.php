@@ -461,10 +461,10 @@ class ConfigManager
                 $model->setOptions($config->get('set_options'));
             }
 
-            $serializableValues = $this->getProvider($config->getId()->getScope())
+            $indexedValues = $this->getProvider($config->getId()->getScope())
                 ->getPropertyConfig()
-                ->getSerializableValues($config->getId());
-            $model->fromArray($config->getId()->getScope(), $config->all(), $serializableValues);
+                ->getIndexedValues($config->getId());
+            $model->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
 
             if ($this->cache) {
                 $this->cache->removeConfigFromCache($config->getId());

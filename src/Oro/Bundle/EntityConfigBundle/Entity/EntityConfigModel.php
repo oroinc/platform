@@ -124,4 +124,15 @@ class EntityConfigModel extends AbstractConfigModel
 
         return $fields->first();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createIndexedValue($scope, $code, $value)
+    {
+        $result = new ConfigModelValue($code, $scope, $value);
+        $result->setEntity($this);
+
+        return $result;
+    }
 }

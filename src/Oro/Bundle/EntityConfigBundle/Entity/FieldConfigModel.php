@@ -151,4 +151,15 @@ class FieldConfigModel extends AbstractConfigModel
         $this->options = $options;
         return $this;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createIndexedValue($scope, $code, $value)
+    {
+        $result = new ConfigModelValue($code, $scope, $value);
+        $result->setField($this);
+
+        return $result;
+    }
 }

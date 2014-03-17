@@ -30,35 +30,15 @@ abstract class AbstractConfigModel
     protected $mode;
 
     /**
-     * @var ConfigModelValue[]|ArrayCollection
+     * @var array key = scope!code
+     * @ORM\Column(type="array", nullable=true)
      */
     protected $values;
 
     /**
-     * @param ConfigModelValue[] $values
-     * @return $this
+     * @var ConfigModelValue[]|ArrayCollection
      */
-    public function setValues($values)
-    {
-        $this->values->clear();
-
-        foreach ($values as $value) {
-            $this->addValue($value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ConfigModelValue $value
-     * @return $this
-     */
-    public function addValue($value)
-    {
-        $this->values->add($value);
-
-        return $this;
-    }
+    protected $indexedValues;
 
     /**
      * @param string $mode
@@ -77,31 +57,6 @@ abstract class AbstractConfigModel
     public function getMode()
     {
         return $this->mode;
-    }
-
-    /**
-     * @param  callable $filter
-     * @return array|ArrayCollection|ConfigModelValue[]
-     */
-    public function getValues(\Closure $filter = null)
-    {
-        return $filter ? $this->values->filter($filter) : $this->values;
-    }
-
-    /**
-     * @param $code
-     * @param $scope
-     * @return ConfigModelValue
-     */
-    public function getValue($code, $scope)
-    {
-        $values = $this->getValues(
-            function (ConfigModelValue $value) use ($code, $scope) {
-                return ($value->getScope() == $scope && $value->getCode() == $code);
-            }
-        );
-
-        return $values->first();
     }
 
     /**
@@ -145,73 +100,95 @@ abstract class AbstractConfigModel
     /**
      * @param       $scope
      * @param array $values
-     * @param array $serializableValues
-     * @throws \RuntimeException
+     * @param array $indexedValues
      */
-    public function fromArray($scope, array $values, array $serializableValues = array())
+    public function fromArray($scope, array $values, array $indexedValues)
     {
+        // add new and update existing values
         foreach ($values as $code => $value) {
-            $serializable = isset($serializableValues[$code]) && (bool)$serializableValues[$code];
-
-            if (!$serializable) {
-                if (is_bool($value)) {
-                    $value = (int)$value;
-                }
-                if (!is_string($value)) {
-                    if (null !== $value && !is_scalar($value)) {
-                        // TODO: this is a temporary solution. Should be removed after a possibility
-                        // to remove obsolete config attributes to oro:entity-config:update command
-                        continue;
-                        /*
-                        throw new \RuntimeException(
-                            sprintf(
-                                'The value of "%s" (scope: %s) must be a scalar type. Actual type is "%s".',
-                                $code,
-                                $scope,
-                                is_object($value) ? get_class($value) : gettype($value)
-                            )
-                        );
-                        */
-                    }
-                    $value = (string)$value;
-                }
-            }
-
-            $configValue = $this->getValue($code, $scope);
-            if ($configValue) {
-                $configValue->setValue($value);
+            $this->values[sprintf('%s!%s', $scope, $code)] = $value;
+            if (isset($indexedValues[$code])) {
+                $this->addToIndex($scope, $code, $value);
             } else {
-                $configValue = new ConfigModelValue($code, $scope, $value, $serializable);
-
-                if ($this instanceof EntityConfigModel) {
-                    $configValue->setEntity($this);
-                } else {
-                    $configValue->setField($this);
-                }
-
-                $this->addValue($configValue);
+                $this->removeFromIndex($scope, $code);
+            }
+        }
+        // remove obsolete values
+        foreach ($this->values as $key => $value) {
+            $pair = explode('!', $key);
+            if ($scope === $pair[0] && !isset($values[$pair[1]])) {
+                unset($this->values[$key]);
+                $this->removeFromIndex($scope, $pair[1]);
             }
         }
     }
 
     /**
-     * @param $scope
+     * @param string $scope
      * @return array
      */
     public function toArray($scope)
     {
-        $values = $this->getValues(
-            function (ConfigModelValue $value) use ($scope) {
-                return $value->getScope() == $scope;
+        $result = [];
+        foreach ($this->values as $key => $value) {
+            $pair = explode('!', $key);
+            if ($scope === $pair[0]) {
+                $result[$pair[1]] = $value;
             }
-        );
-
-        $result = array();
-        foreach ($values as $value) {
-            $result[$value->getCode()] = $value->getValue();
         }
 
         return $result;
+    }
+
+    /**
+     * Makes a value indexed
+     *
+     * @param string $scope
+     * @param string $code
+     * @param mixed  $value
+     * @return $this
+     */
+    public function addToIndex($scope, $code, $value)
+    {
+        if (is_bool($value)) {
+            $value = (int)$value;
+        }
+
+        $existingIndexedValue = null;
+        foreach ($this->indexedValues as $indexedValue) {
+            if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
+                $existingIndexedValue = $indexedValue;
+                break;
+            }
+        }
+        if ($existingIndexedValue) {
+            if ($existingIndexedValue->getValue() !== $value) {
+                $existingIndexedValue->setValue($value);
+            }
+        } else {
+            $this->indexedValues->add($this->createIndexedValue($scope, $code, $value));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Makes a value un-indexed
+     *
+     * @param string $scope
+     * @param string $code
+     * @return $this
+     */
+    public function removeFromIndex($scope, $code)
+    {
+        foreach ($this->indexedValues as $key => $indexedValue) {
+            if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
+                $this->indexedValues->remove($key);
+                break;
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -229,4 +206,14 @@ abstract class AbstractConfigModel
     {
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * Creates an instance of ConfigModelValue
+     *
+     * @param string $scope
+     * @param string $code
+     * @param mixed  $value
+     * @return ConfigModelValue
+     */
+    abstract protected function createIndexedValue($scope, $code, $value);
 }

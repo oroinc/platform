@@ -126,17 +126,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getSerializableValuesProvider
-     */
-    public function testgetSerializableValues($type, $config, $expectedValues)
-    {
-        $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getSerializableValues($type);
-
-        $this->assertEquals($expectedValues, $result);
-    }
-
-    /**
      * @dataProvider getTranslatableValuesProvider
      */
     public function testGetTranslatableValues($type, $config, $expectedValues)
@@ -643,57 +632,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 'item4' => [
                 ],
             ]
-        ];
-    }
-
-    public function getSerializableValuesProvider()
-    {
-        return [
-            'no entity config'      => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [],
-                [],
-            ],
-            'entity config'         => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [
-                    'entity' => $this->getItemsForSerializableValuesTest()
-                ],
-                [
-                    'item1' => true,
-                    'item2' => false,
-                ]
-            ],
-            'entity config (by id)' => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                [
-                    'entity' => $this->getItemsForSerializableValuesTest()
-                ],
-                [
-                    'item1' => true,
-                    'item2' => false,
-                ]
-            ],
-            'field config'          => [
-                PropertyConfigContainer::TYPE_FIELD,
-                [
-                    'field' => $this->getItemsForSerializableValuesTest()
-                ],
-                [
-                    'item1' => true,
-                    'item2' => false,
-                ]
-            ],
-            'field config (by id)'  => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                [
-                    'field' => $this->getItemsForSerializableValuesTest()
-                ],
-                [
-                    'item1' => true,
-                    'item2' => false,
-                ]
-            ],
         ];
     }
 

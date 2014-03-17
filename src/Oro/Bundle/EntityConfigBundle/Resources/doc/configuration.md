@@ -42,7 +42,7 @@ oro_entity_config:
                 auditable:
                     options:
                         priority:           60
-                        serializable:       true
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Auditable'
