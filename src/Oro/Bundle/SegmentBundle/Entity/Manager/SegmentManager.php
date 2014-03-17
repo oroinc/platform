@@ -55,7 +55,7 @@ class SegmentManager
                 ->setMaxResults(20)
                 ->getQuery()
                 ->getResult();
-
+        }
             foreach ($segments as $segment) {
                 $result[] = [
                     'id'   => 'segment_'.$segment->getId(),
@@ -63,7 +63,7 @@ class SegmentManager
                     'type' => 'segment',
                 ];
             }
-        }
+
 
         return $result;
     }

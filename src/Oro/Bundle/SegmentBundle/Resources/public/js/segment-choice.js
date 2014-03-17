@@ -71,6 +71,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                     _format: 'json'
                 }
             );
+
             this.options.select2.ajax = _.extend(
                 {},
                 this.options.select2.ajax,
@@ -81,9 +82,15 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                             term: term
                         };
                     },
-                    results: function (data, page) {
+                    results: _.bind(function (data, page) {
+                        var currentId = this.options.currentSegment;
+                        var data = _.filter(data, function (item) {
+                            if (item.id != 'segment_'+currentId) {
+                                return true;
+                            }
+                        });
                         return {results: data};
-                    }
+                    }, this)
                 }
             );
         },
