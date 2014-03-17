@@ -31,8 +31,8 @@
     {% if form.vars.value.id or resource_granted('oro_segment_update') %}
         {{ UI.saveAndStayButton() }}
     {% endif %}
-    {{ segmentQD.runButton(entity) }}
     {{ UI.saveAndCloseButton() }}
+    {{ segmentQD.saveAndRefreshButton(entity) }}
 {% endblock %}
 
 {% block pageHeader %}

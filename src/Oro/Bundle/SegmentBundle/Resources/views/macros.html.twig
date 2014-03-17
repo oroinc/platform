@@ -93,9 +93,9 @@
         {{ UI.clientButton({
             'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
             'aCss':   'no-hash run-button btn',
-            'title' : 'Re-run',
-            'label' : 'Re-run',
-            'iCss': 'icon-refresh'
+            'title' : 'Refresh segment',
+            'label' : 'Refresh segment',
+            'iCss':   'icon-refresh'
         }) }}
 
         <script type="text/javascript">
@@ -109,7 +109,7 @@
                         var confirm = new DeleteConfirmation({
                             title:    __('Run confirmation'),
                             okText:   __('Yes, I Agree'),
-                            content:  __('Are you sure you want to run this static segment?')
+                            content:  __('Are you sure you want to refresh this segment?')
                         });
 
                         var url = $(this).data('url'),
@@ -149,5 +149,20 @@
                 });
             });
         </script>
+    {% endif %}
+{% endmacro %}
+
+{#
+    Renders save and refresh button
+
+    @param Segment entity
+#}
+{% macro saveAndRefreshButton(entity) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% if entity.id and resource_granted('EDIT', entity)
+        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
+    %}
+        {{ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save and refresh', 'action': 'save_and_refresh'}) }}
     {% endif %}
 {% endmacro %}
