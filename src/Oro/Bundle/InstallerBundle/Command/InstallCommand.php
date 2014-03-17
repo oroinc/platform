@@ -227,14 +227,16 @@ class InstallCommand extends ContainerAwareCommand
 
         // create an administrator
         $commandExecutor->runCommand(
-            'oro:user:create-admin',
+            'oro:user:create',
             array(
                 '--process-isolation' => true,
                 '--user-name' => $userName,
                 '--user-email' => $userEmail,
                 '--user-firstname' => $userFirstName,
                 '--user-lastname' => $userLastName,
-                '--user-password' => $userPassword
+                '--user-password' => $userPassword,
+                '--user-role' => 'ROLE_ADMINISTRATOR',
+                '--user-business-unit' => 'Main'
             )
         );
 
