@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups;
 
 /**
  * Class GroupsTest
@@ -24,6 +25,7 @@ class GroupsTest extends Selenium2TestCase
     public function testGroupsGrid()
     {
         $login = $this->login();
+        /** @var Groups $login */
         $login->openGroups('Oro\Bundle\UserBundle')
             ->assertTitle('Groups - Users Management - System');
     }
@@ -31,6 +33,7 @@ class GroupsTest extends Selenium2TestCase
     public function testGroupsGridDefaultContent()
     {
         $login = $this->login();
+        /** @var Groups $login */
         $groups = $login->openGroups('Oro\Bundle\UserBundle');
         //get grid content
         $records = $groups->getRows();
@@ -67,6 +70,7 @@ class GroupsTest extends Selenium2TestCase
         $randomPrefix = ToolsAPI::randomGen(5);
 
         $login = $this->login();
+        /** @var Groups $login */
         $groups = $login->openGroups('Oro\Bundle\UserBundle')
             ->add()
             ->setName($this->newGroup['NAME'] . $randomPrefix)
@@ -88,6 +92,7 @@ class GroupsTest extends Selenium2TestCase
     public function testGroupDelete($randomPrefix)
     {
         $login = $this->login();
+        /** @var Groups $login */
         $groups = $login->openGroups('Oro\Bundle\UserBundle');
         $groups->deleteEntity(array('name' => $this->newGroup['NAME'] . $randomPrefix));
         $this->assertFalse($groups->entityExists(array('name' => $this->newGroup['NAME'] . $randomPrefix)));

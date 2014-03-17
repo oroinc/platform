@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 
@@ -149,8 +149,8 @@ class ConfigEntityGridController extends Controller
 
             $entityModel  = $configManager->createConfigEntityModel($className);
             $extendConfig = $configManager->getProvider('extend')->getConfig($className);
-            $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
-            $extendConfig->set('state', ExtendManager::STATE_NEW);
+            $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
+            $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
             $extendConfig->set('is_extend', true);
 
@@ -222,18 +222,16 @@ class ConfigEntityGridController extends Controller
             throw $this->createNotFoundException('Unable to find EntityConfigModel entity.');
         }
 
-        /** @var ExtendManager $extendManager */
-        $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 
-        $entityConfig = $extendManager->getConfigProvider()->getConfig($entity->getClassName());
+        $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
-        if ($entityConfig->get('owner') == ExtendManager::OWNER_SYSTEM) {
+        if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $entityConfig->set('state', ExtendManager::STATE_DELETED);
+        $entityConfig->set('state', ExtendScope::STATE_DELETED);
 
         $configManager->persist($entityConfig);
         $configManager->flush();
@@ -261,20 +259,18 @@ class ConfigEntityGridController extends Controller
             throw $this->createNotFoundException('Unable to find EntityConfigModel entity.');
         }
 
-        /** @var ExtendManager $extendManager */
-        $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 
-        $entityConfig = $extendManager->getConfigProvider()->getConfig($entity->getClassName());
+        $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
-        if ($entityConfig->get('owner') == ExtendManager::OWNER_SYSTEM) {
+        if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
         $entityConfig->set(
             'state',
-            class_exists($entity->getClassName()) ? ExtendManager::STATE_UPDATED : ExtendManager::STATE_NEW
+            class_exists($entity->getClassName()) ? ExtendScope::STATE_UPDATED : ExtendScope::STATE_NEW
         );
 
         $configManager->persist($entityConfig);

@@ -16,7 +16,11 @@ class PlatformUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:platform:update')
-            ->setDescription('Execute platform application update commands and init platform assets.');
+            ->setDescription(
+                'Execute platform application update commands and init platform assets.'
+                . ' Please make sure that application cache is up-to-date before run this command.'
+                . ' Use cache:clear if needed.'
+            );
     }
 
     /**
@@ -24,21 +28,20 @@ class PlatformUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundlesFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/bundles.php';
-        if (is_file($bundlesFile)) {
-            unlink($bundlesFile);
-        }
-
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
             $this->getApplication()
         );
         $commandExecutor
-            ->runCommand('cache:clear')
-            ->runCommand('oro:entity-config:update')
-            ->runCommand('oro:entity-extend:update')
-            ->runCommand('oro:navigation:init')
+            ->runCommand(
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
+            )
+            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))

@@ -61,7 +61,7 @@
 
                 {% if entity.dependencies|length > 0 %}
                 <tr>
-                    <th>{{ 'oro.cron.view.deps'|trans }}</th>
+                    <th>{{ 'oro.cron.view.dependencies'|trans }}</th>
                     <td>
                         {%- for dep in entity.dependencies -%}
                         <a href="{{ path('oro_cron_job_view', { id: dep.id }) }}" title="{{ dep.command }}{% for arg in dep.args %} {{ arg }}{% endfor %} (ID {{ dep.id }})">{{ dep.command }}</a> {{ macros.state(dep) }}

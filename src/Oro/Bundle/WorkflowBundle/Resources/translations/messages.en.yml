@@ -1,6 +1,5 @@
 "No workflow items are available": "No workflow items are available"
 "Disabled": "Disabled"
-"Closed": "Closed"
 "Active": "Active"
 "Current Step": "Current Step"
 "Status": "Status"
@@ -11,14 +10,111 @@
 "Delete workflow item": "Delete workflow item"
 "Actions": "Actions"
 "Step information saved": "Step information saved"
+Update: Update
+New: New
+Save: Save
+'Transition name': 'Transition name'
+'From step': 'From step'
+'To step': 'To step'
+'Warning message': 'Warning message'
+Button: Button
+'Button style': 'Button style'
+'Button preview': 'Button preview'
+Attributes: Attributes
+'View form': 'View form'
+'Popup window': 'Popup window'
+'Separate page': 'Separate page'
+Cancel: Cancel
+Ok: Ok
+'This value should be {{ limit }} or more.': 'This value should be {{ limit }} or more.'
+'This value should be {{ limit }} or less.': 'This value should be {{ limit }} or less.'
+'This value should be a valid number.': 'This value should be a valid number.'
+Name: Name
+Order: Order
+Final: Final
+Transitions: Transitions
+'Add transition': 'Add transition'
+'Step name': 'Step name'
+Poisition: Poisition
+'Update step': 'Update step'
+'Clone step': 'Clone step'
+'Delete step': 'Delete step'
+'Entity field': 'Entity field'
+Label: Label
+'Leave empty for system value': 'Leave empty for system value'
+Required: Required
+Add: Add
+Reset: Reset
+system: system
+yes: yes
+'Update field': 'Update field'
+'Delete field': 'Delete field'
+'Step to': 'Step to'
+'Update transition': 'Update transition'
+'Clone transition': 'Clone transition'
+'Delete transition': 'Delete transition'
+General: General
+'Add step': 'Add step'
+Designer: Designer
+'Workflow steps and transitions': 'Workflow steps and transitions'
+'Unmet conditions': 'Unmet conditions'
+Submit: Submit
+'General Information': 'General Information'
+'Create Workflow': 'Create Workflow'
+'Workflow activated': 'Workflow activated'
+'Workflow deactivated': 'Workflow deactivated'
 
 oro:
     workflow:
         workflowitem:
-            entity_label:        Workflow Item
-            entity_plural_label: Workflow Items
-            entity_description:  Represent workflow item
+            entity_label:             Workflow Item
+            entity_plural_label:      Workflow Items
+            entity_description:       Represents workflow item
+            id.label:                 ID
+            acl_identities.label:     ACL identities
+            current_step.label:       Current step
+            definition.label:         Workflow definition
+            entity_id.label:          Entity identifier
+            serialized_data.label:    Serialized data
+            transition_records.label: Transition records
+            workflow_name.label:      Workflow name
+            created.label:            Created
+            updated.label:            Updated
+
+        workflowstep:
+            entity_label:         Workflow Step
+            entity_plural_label:  Workflow Steps
+            entity_description:   Represents workflow step
+            id.label:             ID
+            definition.label:     Workflow definition
+            final.label:          Is final
+            label.label:          Label
+            name.label:           Name
+            step_order.label:     Step order
+
+        workflowdefinition:
+            entity_label:                 Workflow
+            entity_plural_label:          Workflows
+            created_at.label:             Created
+            updated_at.label:             Updated
+            label.label:                  Label
+            system.label:                 System
+            configuration.label:          Configuration
+            entity_acls.label:            Entity ACLs
+            entity_attribute_name.label:  Entity attribute name
+            name.label:                   Name
+            related_entity.label:         Related entity
+            start_step.label:             Start step
+            steps.label:                  Steps
+            steps_display_ordered.label:  Display steps ordered
+            active.label:                 Active
+            clone_label_prefix:           'Copy of '
+
+            datagrid:
+                update: Update
+                clone:  Clone
+                delete: Delete
+                activate: Activate
+                deactivate: Deactivate
         action:
             general: "Workflow manipulations"
-        enabled: enabled
-        disabled: disabled

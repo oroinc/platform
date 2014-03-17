@@ -26,3 +26,6 @@ Second: Second
 Millisecond: Millisecond
 Microsecond: Microsecond
 "Time Zone": "Time Zone"
+"Server error": "Server error"
+"User input error": "User input error"
+"Error! Incorrect server response.": "Error! Incorrect server response."

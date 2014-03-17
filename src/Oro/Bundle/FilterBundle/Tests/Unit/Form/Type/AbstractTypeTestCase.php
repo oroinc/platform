@@ -159,4 +159,26 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     {
         return $this->formExtensions;
     }
+
+    /**
+     * @param string  $class
+     * @param array $events
+     *
+     * @return mixed
+     */
+    public function getMockSubscriber($class, array $events = [])
+    {
+        $mock = $this->getMockBuilder($class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+        $class = get_class($mock);
+
+        // Static stub method
+        $class::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue($events));
+
+        return $mock;
+    }
 }

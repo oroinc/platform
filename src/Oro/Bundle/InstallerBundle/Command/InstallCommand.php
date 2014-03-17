@@ -135,8 +135,6 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:entity-config:clear')
-            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
                 array(
@@ -146,17 +144,14 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            //->runCommand('doctrine:schema:create')
-            ->runCommand('oro:migration:load')
-            ->runCommand('oro:entity-config:init')
-            ->runCommand('oro:entity-extend:init')
+            ->runCommand('oro:entity-config:clear')
+            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
-                'oro:entity-extend:update-config',
-                array('--process-isolation' => true)
-            )
-            ->runCommand(
-                'doctrine:schema:update',
-                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
@@ -287,7 +282,7 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:navigation:init')
+            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install')

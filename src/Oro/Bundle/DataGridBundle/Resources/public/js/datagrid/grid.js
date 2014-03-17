@@ -67,22 +67,22 @@ define(function (require) {
             filterBox:   '.filter-box'
         },
 
-        /** @property {oro.datagrid.Header} */
+        /** @property {orodatagrid.datagrid.Header} */
         header: GridHeader,
 
-        /** @property {oro.datagrid.Body} */
+        /** @property {orodatagrid.datagrid.Body} */
         body: GridBody,
 
-        /** @property {oro.datagrid.Footer} */
+        /** @property {orodatagrid.datagrid.Footer} */
         footer: GridFooter,
 
-        /** @property {oro.datagrid.Toolbar} */
+        /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
 
         /** @property {oro.LoadingMask} */
         loadingMask: LoadingMask,
 
-        /** @property {oro.datagrid.ActionColumn} */
+        /** @property {orodatagrid.datagrid.column.ActionColumn} */
         actionsColumn: ActionColumn,
 
         /** @property true when no one column configured to be shown in th grid */
@@ -111,9 +111,9 @@ define(function (require) {
          * @param {String} [options.rowClassName] CSS class for row
          * @param {Object} [options.toolbarOptions] Options for toolbar
          * @param {Object} [options.exportOptions] Options for export
-         * @param {Array<oro.datagrid.AbstractAction>} [options.rowActions] Array of row actions prototypes
-         * @param {Array<oro.datagrid.AbstractAction>} [options.massActions] Array of mass actions prototypes
-         * @param {oro.datagrid.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
+         * @param {Array<orodatagrid.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
+         * @param {Array<orodatagrid.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
+         * @param {orodatagrid.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
          * @throws {TypeError} If mandatory options are undefined
          */
         initialize: function (options) {
@@ -145,12 +145,12 @@ define(function (require) {
             this._initRowActions();
 
             if (this.rowClickAction) {
-                // This option property is used in oro.datagrid.Body
+                // This option property is used in orodatagrid.datagrid.Body
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
             opts.columns.push(this._createActionsColumn());
-            opts.columns.unshift(this._getMassActionsColumn());
+            opts.columns.unshift(this._getSelectRowColumn());
 
             this.loadingMask = this._createLoadingMask();
             this.toolbar = this._createToolbar(this.toolbarOptions);
@@ -184,8 +184,9 @@ define(function (require) {
          */
         _createActionsColumn: function () {
             return new this.actionsColumn({
+                datagrid: this,
                 actions:  this.rowActions,
-                datagrid: this
+                massActions: this.massActions
             });
         },
 
@@ -195,9 +196,9 @@ define(function (require) {
          * @return {Backgrid.Column}
          * @private
          */
-        _getMassActionsColumn: function () {
-            if (!this.massActionsColumn) {
-                this.massActionsColumn = new Backgrid.Column({
+        _getSelectRowColumn: function () {
+            if (!this.selectRowColumn) {
+                this.selectRowColumn = new Backgrid.Column({
                     name:       "massAction",
                     label:      __("Selected Rows"),
                     renderable: !_.isEmpty(this.massActions),
@@ -208,7 +209,7 @@ define(function (require) {
                 });
             }
 
-            return this.massActionsColumn;
+            return this.selectRowColumn;
         },
 
         /**
@@ -242,15 +243,14 @@ define(function (require) {
         /**
          * Creates instance of toolbar
          *
-         * @return {oro.datagrid.Toolbar}
+         * @return {orodatagrid.datagrid.Toolbar}
          * @private
          */
         _createToolbar: function (toolbarOptions) {
             return new this.toolbar(_.extend({}, toolbarOptions, {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
-                extraActions: this._getToolbarExtraActions(),
-                massActions:  this._getToolbarMassActions()
+                extraActions: this._getToolbarExtraActions()
             }));
         },
 
@@ -286,39 +286,9 @@ define(function (require) {
         },
 
         /**
-         * Get mass actions of toolbar
-         *
-         * @return {Array}
-         * @private
-         */
-        _getToolbarMassActions: function () {
-            var result = [];
-            _.each(this.massActions, function (action) {
-                result.push(this.createMassAction(action));
-            }, this);
-
-            return result;
-        },
-
-        /**
-         * Creates action
-         *
-         * @param {Function} ActionPrototype
-         * @protected
-         */
-        createMassAction: function (ActionPrototype) {
-            return new ActionPrototype({
-                datagrid:        this,
-                launcherOptions: {
-                    className: 'btn'
-                }
-            });
-        },
-
-        /**
          * Get action that refreshes grid's collection
          *
-         * @return oro.datagrid.RefreshCollectionAction
+         * @return orodatagrid.datagrid.action.RefreshCollectionAction
          */
         getRefreshAction: function () {
             var grid = this;
@@ -348,7 +318,7 @@ define(function (require) {
         /**
          * Get action that resets grid's collection
          *
-         * @return oro.datagrid.ResetCollectionAction
+         * @return orodatagrid.datagrid.action.ResetCollectionAction
          */
         getResetAction: function () {
             var grid = this;
@@ -378,7 +348,7 @@ define(function (require) {
         /**
          * Get action that exports grid's data
          *
-         * @return oro.datagrid.ExportAction
+         * @return orodatagrid.datagrid.action.ExportAction
          */
         getExportAction: function () {
             var grid = this;
@@ -445,7 +415,7 @@ define(function (require) {
         /**
          * Create row click action
          *
-         * @param {oro.datagrid.Row} row
+         * @param {orodatagrid.datagrid.Row} row
          * @private
          */
         _runRowClickAction: function (row) {
@@ -591,6 +561,7 @@ define(function (require) {
         showLoading: function () {
             this.loadingMask.show();
             this.toolbar.disable();
+            this.trigger('disable');
         },
 
         /**
@@ -599,6 +570,7 @@ define(function (require) {
         hideLoading: function () {
             this.loadingMask.hide();
             this.toolbar.enable();
+            this.trigger('enable');
         },
 
         /**

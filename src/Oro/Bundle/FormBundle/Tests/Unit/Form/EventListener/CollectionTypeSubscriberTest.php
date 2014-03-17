@@ -111,6 +111,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testPreSubmit(array $data, array $expected, $checkIsNew = false, $parentDataId = null)
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+
         if ($checkIsNew) {
             $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
             $parentFormData = $this->getMock('SomeClass', array('getId'));
@@ -123,8 +124,6 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 
             $parentFormData->expects($this->once())->method('getId')
                 ->will($this->returnValue($parentDataId));
-        } else {
-            $form->expects($this->never())->method($this->anything());
         }
 
         $event = $this->createEvent($data, $form);
