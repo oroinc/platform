@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 
@@ -104,6 +105,10 @@ class SegmentController extends Controller
                 'success',
                 $this->get('translator')->trans('oro.segment.entity.saved')
             );
+
+            if ($this->getRequest()->get(Router::ACTION_PARAMETER) === 'save_and_refresh') {
+                $this->get('oro_segment.static_segment_manager')->run($entity);
+            }
 
             return $this->get('oro_ui.router')->redirectAfterSave(
                 ['route' => 'oro_segment_update', 'parameters' => ['id' => $entity->getId()]],

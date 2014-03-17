@@ -16,7 +16,7 @@ oro:
         type:
             label:   Type
             dynamic: Dynamic
-            static:  Static
+            static:  On demand
         owner:
             label:   Owner
         created_at:
