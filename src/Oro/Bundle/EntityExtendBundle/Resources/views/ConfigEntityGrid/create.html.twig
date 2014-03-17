@@ -6,8 +6,9 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_index')) }}
-    {{ UI.saveAndStayButton() }}
-    {{ UI.saveAndCloseButton() }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% set html = html ~ UI.saveAndStayButton() %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

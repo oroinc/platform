@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
@@ -31,16 +29,16 @@ class FieldConfigModel extends AbstractConfigModel
      * @var EntityConfigModel
      * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
      * })
      */
     protected $entity;
 
     /**
-     * @var ConfigModelValue[]|PersistentCollection
-     * @ORM\OneToMany(targetEntity="ConfigModelValue", mappedBy="field", cascade={"all"})
+     * @var ConfigModelIndexValue[]|PersistentCollection
+     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
      */
-    protected $values;
+    protected $indexedValues;
 
     /**
      * @var OptionSet[]|PersistentCollection
@@ -157,7 +155,7 @@ class FieldConfigModel extends AbstractConfigModel
      */
     protected function createIndexedValue($scope, $code, $value)
     {
-        $result = new ConfigModelValue($code, $scope, $value);
+        $result = new ConfigModelIndexValue($code, $scope, $value);
         $result->setField($this);
 
         return $result;

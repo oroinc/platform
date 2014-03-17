@@ -31,12 +31,12 @@ abstract class AbstractConfigModel
 
     /**
      * @var array key = scope!code
-     * @ORM\Column(type="array", nullable=true)
+     * @ORM\Column(name="values", type="array", nullable=true)
      */
     protected $values;
 
     /**
-     * @var ConfigModelValue[]|ArrayCollection
+     * @var ConfigModelIndexValue[]|ArrayCollection
      */
     protected $indexedValues;
 
@@ -213,7 +213,7 @@ abstract class AbstractConfigModel
      * @param string $scope
      * @param string $code
      * @param mixed  $value
-     * @return ConfigModelValue
+     * @return ConfigModelIndexValue
      */
     abstract protected function createIndexedValue($scope, $code, $value);
 }

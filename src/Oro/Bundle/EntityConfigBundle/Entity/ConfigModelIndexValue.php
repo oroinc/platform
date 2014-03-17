@@ -5,12 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="oro_entity_config_value")
+ * @ORM\Table(name="oro_entity_config_index_value")
  * @ORM\Entity
  */
-class ConfigModelValue
+class ConfigModelIndexValue
 {
-    const ENTITY_NAME = 'OroEntityConfigBundle:ConfigModelValue';
+    const ENTITY_NAME = 'OroEntityConfigBundle:ConfigModelIndexValue';
 
     /**
      * @var integer
@@ -22,51 +22,44 @@ class ConfigModelValue
 
     /**
      * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="values", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="indexedValues", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
      * })
      */
     protected $entity;
 
     /**
      * @var FieldConfigModel
-     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="values", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="indexedValues", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="field_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="field_id", referencedColumnName="id")
      * })
      */
     protected $field;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="code", type="string", length=255)
      */
     protected $code;
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="scope", type="string", length=255)
      */
     protected $scope;
 
     /**
      * @var string
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     protected $value;
 
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean")
-     */
-    protected $serializable;
-
-    public function __construct($code = null, $scope = null, $value = null, $serializable = false)
+    public function __construct($code = null, $scope = null, $value = null)
     {
         $this->code         = $code;
         $this->scope        = $scope;
-        $this->serializable = $serializable;
 
         $this->setValue($value);
     }
@@ -85,7 +78,7 @@ class ConfigModelValue
      * Set code
      *
      * @param string $code
-     * @return ConfigModelValue
+     * @return ConfigModelIndexValue
      */
     public function setCode($code)
     {
@@ -106,7 +99,7 @@ class ConfigModelValue
 
     /**
      * @param string $scope
-     * @return ConfigModelValue
+     * @return ConfigModelIndexValue
      */
     public function setScope($scope)
     {
@@ -127,11 +120,11 @@ class ConfigModelValue
      * Set data
      *
      * @param string $value
-     * @return ConfigModelValue
+     * @return ConfigModelIndexValue
      */
     public function setValue($value)
     {
-        $this->value = $this->serializable ? serialize($value) : $value;
+        $this->value = $value;
 
         return $this;
     }
@@ -143,7 +136,7 @@ class ConfigModelValue
      */
     public function getValue()
     {
-        return $this->serializable ? unserialize($this->value) : $this->value;
+        return $this->value;
     }
 
     /**
@@ -189,27 +182,7 @@ class ConfigModelValue
         return array(
             'code'         => $this->code,
             'scope'        => $this->scope,
-            'value'        => $this->serializable ? unserialize($this->value) : $this->value,
-            'serializable' => $this->serializable
+            'value'        => $this->value,
         );
-    }
-
-    /**
-     * @param boolean $serializable
-     * @return $this
-     */
-    public function setSerializable($serializable)
-    {
-        $this->serializable = $serializable;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getSerializable()
-    {
-        return $this->serializable;
     }
 }
