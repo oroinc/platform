@@ -20,9 +20,6 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class OrmTotalsExtension extends AbstractExtension
 {
     /** @var  Translator */
@@ -196,17 +193,60 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * Get root entitiy id
+     * Get root entities config data
      *
+     * @param QueryBuilder $query
      * @return array with root entities config
      */
-    protected function getRootId()
+    protected function getRootIds(QueryBuilder $query)
     {
-        return [
-            'field'  => $this->masterQB->getEntityManager()
-                    ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier()[0],
-            'entityAlias' => $this->masterQB->getRootAliases()[0],
-        ];
+        $groupParts = $this->getGroupParts();
+        $rootIds    = [];
+        if (empty($groupParts)) {
+            $rootIdentifiers = $query->getEntityManager()
+                ->getClassMetadata($query->getRootEntities()[0])->getIdentifier();
+            $rootAlias       = $query->getRootAliases()[0];
+            foreach ($rootIdentifiers as $field) {
+                $rootIds[] = [
+                    'fieldAlias'  => $field,
+                    'alias'       => $field,
+                    'entityAlias' => $rootAlias
+                ];
+            }
+        } else {
+            foreach ($groupParts as $groupPart) {
+                if (strpos($groupPart, '.')) {
+                    list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
+                    $rootIds[] = [
+                        'fieldAlias'  => $rootIdentifierPart,
+                        'entityAlias' => $rootAlias,
+                        'alias'       => $rootIdentifierPart
+                    ];
+                } else {
+                    $selectParts = $this->masterQB->getDQLPart('select');
+                    /** @var Select $selectPart */
+                    foreach ($selectParts as $selectPart) {
+                        foreach ($selectPart->getParts() as $part) {
+                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                                if (count($matches) == 3 && $groupPart == $matches[2]) {
+                                    $rootIds[] = [
+                                        'fieldAlias' => $matches[1],
+                                        'alias'      => $matches[2]
+                                    ];
+                                }
+                            } else {
+                                $rootIds[] = [
+                                    'fieldAlias' => $groupPart,
+                                    'alias'      => $groupPart
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $rootIds;
     }
 
     /**
@@ -256,7 +296,8 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData, $perPage)
     {
-        $rootId = $this->getRootId();
+        $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
+
         if (!$perPage) {
             $query = clone $this->masterQB;
             $data = $query
@@ -267,12 +308,19 @@ class OrmTotalsExtension extends AbstractExtension
         } else {
             $data = $pageData['data'];
         }
-        $ids = [];
-        foreach ($data as $res) {
-            $ids[] = $res[$rootId['field']];
+        foreach ($rootIdentifiers as $identifier) {
+            $ids = [];
+            foreach ($data as $res) {
+                $ids[] = $res[$identifier['alias']];
+            }
+
+            $field = isset($identifier['entityAlias'])
+                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
+                : $identifier['fieldAlias'];
+
+            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
-        $field = $rootId['entityAlias'] . '.' . $rootId['field'];
-        $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
+
     }
 
     /**
