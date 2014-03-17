@@ -263,7 +263,7 @@ class OrmTotalsExtension extends AbstractExtension
     protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
     {
         // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
-        //       can be uninspected
+        //       can be unexpected
         $totalQueries = [];
         foreach ($columnsConfig as $field => $totalData) {
             if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
@@ -276,10 +276,14 @@ class OrmTotalsExtension extends AbstractExtension
         $query = clone $this->masterQB;
         $query
             ->select($totalQueries)
-            ->resetDQLPart('having')
-            ->resetDQLPart('where')
-            ->resetDQLPart('groupBy')
-            ->setParameters(new ArrayCollection());
+            ->resetDQLPart('groupBy');
+
+        $parameters = $query->getParameters();
+        if ($parameters->count()) {
+            $query->resetDQLPart('where')
+                ->resetDQLPart('having')
+                ->setParameters(new ArrayCollection());
+        }
 
         $this->addPageLimits($query, $pageData, $perPage);
 

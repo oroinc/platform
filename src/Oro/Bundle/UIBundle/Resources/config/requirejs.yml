@@ -120,3 +120,5 @@ config:
 
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
+
+        'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'

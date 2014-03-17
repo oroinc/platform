@@ -1,0 +1,13 @@
+<script type="text/javascript">
+    require(['jquery', 'oroui/js/mediator', 'oroui/js/content-processor/pinned-dropdown-button'
+    ], function ($, mediator) {
+        function init() {
+            $('[data-pinned-dropdown-button]').each(function () {
+                var $elem = $(this);
+                $elem.pinnedDropdownButtonProcessor($elem.data('pinned-dropdown-button'));
+            });
+        }
+        $(init);
+        mediator.on('hash_navigation_request:complete', init);
+    });
+</script>
