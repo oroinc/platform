@@ -10,7 +10,8 @@ define(['jquery', 'jquery-ui'], function ($) {
     $.widget('oroui.dropdownButtonProcessor', {
         options: {
             separator: '.separator-btn',
-            buttons: '.btn, .divider',
+            includeButtons: '.btn, .divider, .dropdown-menu>li>*',
+            excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
@@ -53,7 +54,11 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @private
          */
         _collectButtons: function () {
-            return this.element.find(this.options.buttons).removeClass('pull-right');
+            return this.element
+                .find(this.options.includeButtons)
+                .not(this.options.excludeButtons)
+                .addClass('btn')
+                .removeClass('pull-right');
         },
 
         /**
