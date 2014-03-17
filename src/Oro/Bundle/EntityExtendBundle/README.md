@@ -39,7 +39,7 @@ class OroCRMAccountBundle implements Migration
     }
 }
 ```
-Creating option set column or relations is more complex task and there is a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php). Your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtension.php) before you can use this extension. The following example shows how to create option set column:
+Creating option set column or relations is more complex task and there is a special extension for [Migration bundle](../MigrationBundle/README.md#extensions-for-database-structure-migrations) named [ExtendExtension](Migration/Extension/ExtendExtension.php). Your migration should implement [ExtendExtensionAwareInterface](Migration/Extension/ExtendExtensionAwareInterface.php) before you can use this extension. The following example shows how to create option set column:
 ``` php
 <?php
 
