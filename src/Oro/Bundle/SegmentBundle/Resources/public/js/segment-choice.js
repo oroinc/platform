@@ -5,23 +5,6 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
 ], function ($, _, EntityFieldUtil, EntityFieldView, ui, select2, routing) {
     'use strict';
 
-    function filterFields(fields, exclude) {
-        fields = _.filter(fields, function (item) {
-            var result;
-            if (item.children) {
-                item.children = filterFields(item.children, exclude);
-                result = !_.isEmpty(item.children);
-            } else {
-                result = !_.some(exclude, function (rule) {
-                    var cut = _.pick(item, _.keys(rule));
-                    return _.isEqual(cut, rule);
-                });
-            }
-            return result;
-        });
-        return fields;
-    }
-
     $.widget('orosegment.segmentChoice', {
         options: {
             entity: null,

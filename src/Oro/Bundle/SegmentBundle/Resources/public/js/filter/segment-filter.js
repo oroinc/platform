@@ -33,13 +33,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         disableSelector: '.disable-filter',
 
         /**
-         * Selector for widget button
-         *
-         * @property
-         */
-        buttonSelector: '.select-filter-widget.ui-multiselect:first',
-
-        /**
          * Selector for select input element
          *
          * @property
@@ -54,13 +47,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         selectWidget: null,
 
         /**
-         * Minimum widget menu width, calculated depends on filter options
-         *
-         * @property
-         */
-        minimumWidth: null,
-
-        /**
          * Select widget options
          *
          * @property
@@ -70,16 +56,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         },
 
         /**
-         * @property {Boolean}
-         */
-        contextSearch: true,
-
-        /**
          * Filter events
          *
          * @property
          */
         events: {
+        },
+
+        /**
+         * Filter choices
+         */
+        choices: {
         },
 
         /**
@@ -105,33 +92,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
          *
          * @return {*}
          */
-        render: function () {
-            //this.$segmentChoice.segmentChoice(this.options.segmentChoice);
+        render: function ($segmentChoice) {
+            var data = this.choices[this.getValue().value];
+            data.text = data.label;
+            data.id = 'segment_' + data.value;
+
+            $segmentChoice.segmentChoice('setSelectedData', data);
 
             return this;
-        },
-
-        /**
-         * Get text for filter hint
-         *
-         * @param {Array} checkedItems
-         * @protected
-         */
-        _getSelectedText: function(checkedItems) {
-            return '';
-        },
-
-        /**
-         * Get criteria hint value
-         *
-         * @return {String}
-         */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var choice = _.find(this.choices, function (c) {
-                return (c.value == value.value);
-            });
-            return !_.isUndefined(choice) ? choice.label : this.placeholder;
         },
 
         /**
@@ -149,6 +117,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
             return {
                 value: this._getInputValue(this.inputSelector)
             };
+        },
+
+        getValue: function() {
+            return {
+                type: null,
+                value: this.value.value
+            }
         }
     });
 });

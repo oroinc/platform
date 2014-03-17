@@ -2,7 +2,7 @@
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name',
     './segment-choice', 'jquery-ui'
-], function ($, _, __, mapFilterModuleName) {
+], function ($, _) {
     'use strict';
 
     /**
@@ -50,17 +50,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _renderFilter: function (fieldId) {
-            var segmentType = fieldId.split('_')[0],
-                segmentId   = fieldId.split('_')[1],
+            var segmentId = fieldId.split('_')[1],
                 filterId;
 
-            filterId = this._getApplicableFilterId(segmentType);
+            filterId = this._getApplicableFilterId('segment', segmentId);
 
             var data = this.element.find('input.select').select2('data');
             if (_.has(data, 'id')) {
                 data.value = segmentId;
+                // pre-set data
                 this.element.data('value', {
                     criterion: {
+                        filter: 'segment',
                         data: data
                     }
                 });
@@ -70,11 +71,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this._createFilter(options);
         },
 
-        _getApplicableFilterId: function (segmentType) {
+        _getApplicableFilterId: function (segmentType, segmentId) {
             var filterId = null;
 
             _.each(this.options.filters, function (filter, id) {
-                if (filter.name == segmentType) {
+                if (filter.type == segmentType) {
                     filterId = id;
                 }
             });
@@ -107,7 +108,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 this.filter.value = value.criterion.data;
             }
 
-            this.filter.render();
+            this.filter.render(this.$segmentChoice);
             this.$filterContainer.empty().append(this.filter.$el);
 
             this.filter.on('update', _.bind(this._onUpdate, this));
@@ -119,7 +120,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             if (!this.filter.isEmptyValue()) {
                 value = {
-                    columnName: this.element.find('input.select').select2('val'),
+                    columnName: 'id',
                     criterion: {
                         filter: this.filter.type,
                         data: this.filter.getValue()
@@ -135,7 +136,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
         selectSegment: function (data) {
             this.$segmentChoice.segmentChoice('setValue', data.columnName);
-            this.$segmentChoice.segmentChoice('setSelectedData', data.criterion.data);
         }
     });
 

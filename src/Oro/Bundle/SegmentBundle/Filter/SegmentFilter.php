@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\Query\Parameter;
 
+use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
@@ -47,9 +48,7 @@ class SegmentFilter extends EntityFilter
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'segment';
-
-        $this->name   = $name;
-        $this->params = $params;
+        AbstractFilter::init($name, $params);
     }
 
     /**
