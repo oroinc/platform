@@ -1,9 +1,15 @@
 parameters:
+    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
     oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
+    oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_workflow.datagrid.action_permission_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
+    oro_workflow.datagrid.workflow_definition_entity_name_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDefinitionGridEntityNameProvider
+    oro_workflow.field_generator.class: Oro\Bundle\WorkflowBundle\Field\FieldGenerator
+    oro_workflow.field_provider.class: Oro\Bundle\WorkflowBundle\Field\FieldProvider
 
 services:
     oro_workflow.context_accessor:
@@ -25,3 +31,63 @@ services:
             - @doctrine
             - @oro_workflow.registry
             - @oro_entity.doctrine_helper
+
+    oro_workflow.attribute_guesser:
+        class: %oro_workflow.attribute_guesser.class%
+        arguments:
+            - @form.registry
+            - @doctrine
+            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.form
+        calls:
+            # mapping from doctrine type to attribute parameters
+            - [addDoctrineTypeMapping, ["string", "string"]]
+            - [addDoctrineTypeMapping, ["integer", "integer"]]
+            - [addDoctrineTypeMapping, ["smallint", "integer"]]
+            - [addDoctrineTypeMapping, ["bigint", "integer"]]
+            - [addDoctrineTypeMapping, ["boolean", "boolean"]]
+            - [addDoctrineTypeMapping, ["decimal", "float"]]
+            - [addDoctrineTypeMapping, ["date", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["time", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetime", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetimetz", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["text", "string"]]
+            - [addDoctrineTypeMapping, ["array", "array"]]
+            - [addDoctrineTypeMapping, ["simple_array", "array"]]
+            - [addDoctrineTypeMapping, ["json_array", "array"]]
+            - [addDoctrineTypeMapping, ["float", "float"]]
+            - [addDoctrineTypeMapping, ["guid", "string"]]
+            # custom types
+            - [addDoctrineTypeMapping, ["percent", "float"]]
+            - [addDoctrineTypeMapping, ["money", "float"]]
+            # mapping from attribute type to form parameters
+            - [addFormTypeMapping, ["string", "text"]]
+            - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
+            - [addFormTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addFormTypeMapping, ["bool", "checkbox"]]
+            - [addFormTypeMapping, ["boolean", "checkbox"]]
+            - [addFormTypeMapping, ["float", "number"]]
+
+    oro_workflow.datagrid.action_permission_provider:
+        class: %oro_workflow.datagrid.action_permission_provider.class%
+        arguments:
+            - @oro_entity_config.provider.workflow
+
+    oro_workflow.datagrid.workflow_definition_entity_name_provider:
+        class: %oro_workflow.datagrid.workflow_definition_entity_name_provider.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @doctrine.orm.entity_manager
+            - @translator
+
+    oro_workflow.field_generator:
+        class: %oro_workflow.field_generator.class%
+        arguments:
+            - @translator
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.entity_processor
+            - @oro_workflow.entity_connector
+
+    oro_workflow.field_provider:
+        class: %oro_workflow.field_provider.class%
+        parent: oro_entity.entity_field_provider.abstract

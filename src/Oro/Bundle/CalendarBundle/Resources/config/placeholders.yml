@@ -1,0 +1,7 @@
+placeholders:
+    orocrm_reminder_reminder_templates:
+        items:
+            calendar_event_reminder_template: ~
+items:
+    calendar_event_reminder_template:
+        template: OroCalendarBundle:Calendar:reminderTemplate.html.twig

@@ -4,8 +4,8 @@
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 {% set title = form.vars.value.id
-    ? fullname ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
-    : 'New'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+    ? fullname ~ ' - ' ~ 'oro.user.edit_entity'|trans
+    : 'oro.user.new_entity'|trans
 %}
 {% set audit_entity_class = 'Oro_Bundle_UserBundle_Entity_User' %}
 {% if editRoute %}

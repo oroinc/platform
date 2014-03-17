@@ -29,7 +29,15 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             // register 'locale_date', 'locale_time' and 'locale_datetime' filters
             $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
             $filters = $securityPolicyDef->getArgument(1);
-            $filters = array_merge($filters, array('oro_format_date', 'oro_format_time', 'oro_format_datetime'));
+            $filters = array_merge(
+                $filters,
+                array(
+                    'oro_format_date',
+                    'oro_format_time',
+                    'oro_format_datetime',
+                    'date'
+                )
+            );
             $securityPolicyDef->replaceArgument(1, $filters);
             // register an twig extension implements these filters
             $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);

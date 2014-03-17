@@ -3,8 +3,8 @@
 
 {% set entityId = form.vars.value.id %}
 {% set title = entityId
-    ? 'Update'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans
-    : 'New'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans %}
+    ? 'oro.user.group.edit_entity'|trans
+    : 'oro.user.group.new_entity'|trans %}
 {% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}

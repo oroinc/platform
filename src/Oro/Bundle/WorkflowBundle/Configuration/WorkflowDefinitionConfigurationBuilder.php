@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
@@ -16,11 +17,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected $workflowAssembler;
 
     /**
-     * @param WorkflowAssembler $workflowAssembler
+     * @var FieldGenerator
      */
-    public function __construct(WorkflowAssembler $workflowAssembler)
+    protected $fieldGenerator;
+
+    /**
+     * @param WorkflowAssembler $workflowAssembler
+     * @param FieldGenerator $fieldGenerator
+     */
+    public function __construct(WorkflowAssembler $workflowAssembler, FieldGenerator $fieldGenerator)
     {
         $this->workflowAssembler = $workflowAssembler;
+        $this->fieldGenerator = $fieldGenerator;
     }
 
     /**
@@ -31,42 +39,54 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $workflowDefinitions = array();
         foreach ($configurationData as $workflowName => $workflowConfiguration) {
-            $this->assertConfigurationOptions($workflowConfiguration, array('label', 'entity'));
-
-            $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
-            $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
-            $entityAttributeName = $this->getConfigurationOption(
-                $workflowConfiguration,
-                'entity_attribute',
-                WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
-            );
-            $stepsDisplayOrdered = $this->getConfigurationOption(
-                $workflowConfiguration,
-                'steps_display_ordered',
-                false
-            );
-
-            $workflowDefinition = new WorkflowDefinition();
-            $workflowDefinition
-                ->setName($workflowName)
-                ->setLabel($workflowConfiguration['label'])
-                ->setRelatedEntity($workflowConfiguration['entity'])
-                ->setStepsDisplayOrdered($stepsDisplayOrdered)
-                ->setEnabled($enabled)
-                ->setEntityAttributeName($entityAttributeName)
-                ->setConfiguration($workflowConfiguration);
-
-            $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
-
-            $this->setSteps($workflowDefinition, $workflow);
-            $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
-
-            $this->setEntityAcls($workflowDefinition, $workflow);
-
-            $workflowDefinitions[] = $workflowDefinition;
+            $workflowDefinitions[] = $this->buildOneFromConfiguration($workflowName, $workflowConfiguration);
         }
 
         return $workflowDefinitions;
+    }
+
+    /**
+     * @param string $name
+     * @param array $configuration
+     * @return WorkflowDefinition
+     */
+    public function buildOneFromConfiguration($name, array $configuration)
+    {
+        $this->assertConfigurationOptions($configuration, array('label', 'entity'));
+
+        $system = $this->getConfigurationOption($configuration, 'is_system', false);
+        $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
+        $entityAttributeName = $this->getConfigurationOption(
+            $configuration,
+            'entity_attribute',
+            WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
+        );
+        $stepsDisplayOrdered = $this->getConfigurationOption(
+            $configuration,
+            'steps_display_ordered',
+            false
+        );
+
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition
+            ->setName($name)
+            ->setLabel($configuration['label'])
+            ->setRelatedEntity($configuration['entity'])
+            ->setStepsDisplayOrdered($stepsDisplayOrdered)
+            ->setSystem($system)
+            ->setEntityAttributeName($entityAttributeName)
+            ->setConfiguration($this->filterConfiguration($configuration));
+
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
+
+        $this->setSteps($workflowDefinition, $workflow);
+        $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
+
+        $this->setEntityAcls($workflowDefinition, $workflow);
+
+        $this->fieldGenerator->generateWorkflowFields($workflowDefinition->getRelatedEntity());
+
+        return $workflowDefinition;
     }
 
     /**
@@ -81,7 +101,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             $workflowStep
                 ->setName($step->getName())
                 ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder());
+                ->setStepOrder($step->getOrder())
+                ->setFinal($step->isFinal());
 
             $workflowSteps[] = $workflowStep;
         }
@@ -89,6 +110,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $workflowDefinition->setSteps($workflowSteps);
     }
 
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param Workflow $workflow
+     */
     protected function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $entityAcls = array();
@@ -113,5 +138,21 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         }
 
         $workflowDefinition->setEntityAcls($entityAcls);
+    }
+
+    /**
+     * @param array $configuration
+     * @return array
+     */
+    protected function filterConfiguration(array $configuration)
+    {
+        $configurationKeys = array(
+            WorkflowConfiguration::NODE_STEPS,
+            WorkflowConfiguration::NODE_ATTRIBUTES,
+            WorkflowConfiguration::NODE_TRANSITIONS,
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+        );
+
+        return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 }

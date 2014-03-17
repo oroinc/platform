@@ -23,7 +23,7 @@ class CalendarEventRepository extends EntityRepository
         $includingConnectedCalendars = false
     ) {
         $qb = $this->createQueryBuilder('e')
-            ->select('c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder')
+            ->select('c.id as calendar, e.id, e.title, e.start, e.end, e.allDay')
             ->innerJoin('e.calendar', 'c')
             ->where(
                 '(e.start < :start AND e.end >= :start) OR '
@@ -52,23 +52,5 @@ class CalendarEventRepository extends EntityRepository
         }
 
         return $qb;
-    }
-
-    /**
-     * Returns a query builder which can be used to get a list of calendar events
-     * for which a remind notification need to be sent.
-     *
-     * @param \DateTime $currentTime The current date/time in UTC
-     * @return QueryBuilder
-     */
-    public function getEventsToRemindQueryBuilder($currentTime)
-    {
-        return $this->createQueryBuilder('e')
-            ->select('e, c, u')
-            ->innerJoin('e.calendar', 'c')
-            ->innerJoin('c.owner', 'u')
-            ->where('e.remindAt <= :current AND e.start > :current AND e.reminded = :reminded')
-            ->setParameter('current', $currentTime)
-            ->setParameter('reminded', false);
     }
 }

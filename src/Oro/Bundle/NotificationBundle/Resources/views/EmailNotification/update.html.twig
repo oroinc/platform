@@ -6,8 +6,8 @@
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
 {% set title = form.vars.value.id
-    ? 'Edit'|trans ~ ' ' ~ 'notification rule'|trans ~ ' ' ~ form.vars.value.id
-    : 'New'|trans ~ ' ' ~ 'notification rule'|trans
+    ? 'oro.notification.emailnotification.edit_entity'|trans ~ ' ' ~ form.vars.value.id
+    : 'oro.notification.emailnotification.new_entity'|trans
 %}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}

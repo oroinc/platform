@@ -5,8 +5,8 @@
 
 {% set entityId = form.vars.value.id %}
 {% set title = entityId
-    ? 'Update'|trans ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans
-    : 'New'|trans  ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans
+    ? 'oro.organization.businessunit.edit_entity'|trans
+    : 'oro.organization.businessunit.new_entity'|trans
 %}
 {% oro_title_set({params : { "%business_unit.name%": form.vars.value.name } }) %}
 {% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}

@@ -112,6 +112,7 @@ config:
         'oroui/js/widget-manager': 'bundles/oroui/js/widget-manager.js'
         'oroui/js/widget/abstract': 'bundles/oroui/js/widget/abstract.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block.js'
+        'oro/page-widget': 'bundles/oroui/js/widget/page.js'
         'oro/buttons-widget': 'bundles/oroui/js/widget/buttons.js'
         'oroui/js/mobile/layout': 'bundles/oroui/js/mobile/layout.js'
         'oroui/js/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'

@@ -8,7 +8,7 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
-    oro_entity.doctrine_helper.class:                            Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
 
 services:
     oro_entity.listener.navigation_listener:

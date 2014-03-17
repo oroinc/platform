@@ -280,6 +280,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
 
         mediator.bind("hash_navigation_request:complete", adjustReloaded);
 
+        mediator.bind('layout:adjustReloaded', adjustReloaded);
         mediator.bind('layout:adjustHeight', adjustHeight);
 
         if ($('body').hasClass('error-page')) {
