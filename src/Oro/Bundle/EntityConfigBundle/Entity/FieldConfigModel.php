@@ -31,14 +31,20 @@ class FieldConfigModel extends AbstractConfigModel
      * @var EntityConfigModel
      * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
      * })
      */
     protected $entity;
 
     /**
-     * @var ConfigModelValue[]|PersistentCollection
-     * @ORM\OneToMany(targetEntity="ConfigModelValue", mappedBy="field", cascade={"all"})
+     * @var ConfigModelIndexValue[]|PersistentCollection
+     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
+     */
+    protected $indexedValues;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $values;
 
@@ -62,11 +68,11 @@ class FieldConfigModel extends AbstractConfigModel
 
     public function __construct($fieldName = null, $type = null)
     {
-        $this->type      = $type;
-        $this->mode      = ConfigModelManager::MODE_DEFAULT;
-        $this->values    = new ArrayCollection;
-        $this->options   = new ArrayCollection;
-        $this->fieldName = $fieldName;
+        $this->type          = $type;
+        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->indexedValues = new ArrayCollection;
+        $this->options       = new ArrayCollection;
+        $this->fieldName     = $fieldName;
     }
 
     /**
