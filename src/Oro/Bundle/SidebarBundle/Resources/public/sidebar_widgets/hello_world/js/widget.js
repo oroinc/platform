@@ -9,8 +9,16 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
      */
     var helloWorld = {};
 
+    var stripScriptTags = function (value) {
+        var scriptRegEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+        var scriptStartRegEx = /<script[^>]*>/gi;
+        var scriptEndRegEx = /<\/script[^>]*>/gi;
+
+        return String(value).replace(scriptRegEx, '').replace(scriptStartRegEx, '').replace(scriptEndRegEx, '');
+    }
+
     helloWorld.ContentView = Backbone.View.extend({
-        template: _.template('<span><%= settings.content %></span>'),
+        template: _.template('<span><%= content %></span>'),
 
         initialize: function () {
             var view = this;
@@ -19,7 +27,10 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         render: function () {
             var view = this;
-            view.$el.html(view.template(view.model.toJSON()));
+            var data = _.extend({}, view.model.toJSON() || {});
+
+            view.$el.html(view.template({content: stripScriptTags(data.settings.content)}));
+
             return view;
         }
     });

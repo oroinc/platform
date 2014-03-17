@@ -47,7 +47,7 @@
             {{ ui.renderProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
 
             {% if resource_granted('oro_tag_view_tag_cloud') %}
-                {{ ui.renderProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
+                {{ ui.renderHtmlProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
             {% endif %}
         </div>
     </div>
