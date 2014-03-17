@@ -26,10 +26,10 @@ class EntityConfigModel extends AbstractConfigModel
     protected $id;
 
     /**
-     * @var ConfigModelValue[]|ArrayCollection
-     * @ORM\OneToMany(targetEntity="ConfigModelValue", mappedBy="entity", cascade={"all"})
+     * @var ConfigModelIndexValue[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="entity", cascade={"all"})
      */
-    protected $values;
+    protected $indexedValues;
 
     /**
      * @var FieldConfigModel[]|ArrayCollection
