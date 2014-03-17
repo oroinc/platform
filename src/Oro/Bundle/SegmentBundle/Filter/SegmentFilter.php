@@ -44,6 +44,17 @@ class SegmentFilter extends EntityFilter
     /**
      * {@inheritDoc}
      */
+    public function init($name, array $params)
+    {
+        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'segment';
+
+        $this->name   = $name;
+        $this->params = $params;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getForm()
     {
         if (!$this->form) {
