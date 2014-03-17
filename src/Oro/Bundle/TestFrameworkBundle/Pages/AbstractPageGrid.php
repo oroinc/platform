@@ -115,7 +115,7 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][2]")
             ->text();
-        preg_match('/of\s+(\d+)\s+\|\s+(\d+)\s+records/i', $pager, $result);
+        preg_match('/of\s+(\d+)/i', $pager, $result);
         return intval($result[1]);
     }
 
@@ -126,9 +126,9 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getRowsCount()
     {
-        $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][2]")
+        $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][3]")
             ->text();
-        preg_match('/of\s+(\d+)\s+\|\s+(\d+)\s+records/i', $pager, $result);
+        preg_match('/of\s+(\d+)/i', $pager, $result);
         return intval($result[2]);
     }
 
