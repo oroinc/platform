@@ -91,6 +91,7 @@ class ExtendOptionsBuilder
             };
         }
 
+        $fieldName  = $this->getFieldName($tableName, $columnName);
         $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
         $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
@@ -121,7 +122,7 @@ class ExtendOptionsBuilder
 
             $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
                 $entityClassName,
-                $columnName,
+                $fieldName,
                 $columnType,
                 $options['extend']['target_entity']
             );
@@ -133,15 +134,15 @@ class ExtendOptionsBuilder
         if (!isset($this->result[$entityClassName]['fields'])) {
             $this->result[$entityClassName]['fields'] = [];
         }
-        $this->result[$entityClassName]['fields'][$columnName] = [];
+        $this->result[$entityClassName]['fields'][$fieldName] = [];
         if (!empty($options)) {
-            $this->result[$entityClassName]['fields'][$columnName]['configs'] = $options;
+            $this->result[$entityClassName]['fields'][$fieldName]['configs'] = $options;
         }
         if ($columnType) {
-            $this->result[$entityClassName]['fields'][$columnName]['type'] = $columnType;
+            $this->result[$entityClassName]['fields'][$fieldName]['type'] = $columnType;
         }
         if ($columnMode) {
-            $this->result[$entityClassName]['fields'][$columnName]['mode'] = $columnMode;
+            $this->result[$entityClassName]['fields'][$fieldName]['mode'] = $columnMode;
         }
     }
 

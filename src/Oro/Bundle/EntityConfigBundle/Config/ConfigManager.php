@@ -769,15 +769,24 @@ class ConfigManager
                 );
                 $configKey = $this->buildConfigKey($configId);
                 if (isset($this->localCache[$configKey])) {
-                    $this->localCache[$newConfigKey] = $this->localCache[$configKey];
+                    $this->localCache[$newConfigKey] = $this->changeConfigFieldName(
+                        $this->localCache[$configKey],
+                        $newFieldName
+                    );
                     unset($this->localCache[$configKey]);
                 }
                 if (isset($this->persistConfigs[$configKey])) {
-                    $this->persistConfigs[$newConfigKey] = $this->persistConfigs[$configKey];
+                    $this->persistConfigs[$newConfigKey] = $this->changeConfigFieldName(
+                        $this->persistConfigs[$configKey],
+                        $newFieldName
+                    );
                     unset($this->persistConfigs[$configKey]);
                 }
                 if (isset($this->originalConfigs[$configKey])) {
-                    $this->originalConfigs[$newConfigKey] = $this->originalConfigs[$configKey];
+                    $this->originalConfigs[$newConfigKey] = $this->changeConfigFieldName(
+                        $this->originalConfigs[$configKey],
+                        $newFieldName
+                    );
                     unset($this->originalConfigs[$configKey]);
                 }
                 if (isset($this->configChangeSets[$configKey])) {
@@ -822,6 +831,31 @@ class ConfigManager
         } else {
             return new EntityConfigId($scope, $model->getClassName());
         }
+    }
+
+    /**
+     * In case of FieldConfigId replaces OLD field name with given NEW one
+     *
+     * @param ConfigInterface $config
+     * @param $newFieldName
+     * @return Config|ConfigInterface
+     */
+    protected function changeConfigFieldName(ConfigInterface $config, $newFieldName)
+    {
+        $configId = $config->getId();
+        if ($configId instanceof FieldConfigId) {
+            $newConfigId = new FieldConfigId(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $newFieldName,
+                $configId->getFieldType()
+            );
+            $newConfig = new Config($newConfigId);
+            $newConfig->setValues($config->all());
+            $config = $newConfig;
+        }
+
+        return $config;
     }
 
     /**

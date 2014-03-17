@@ -56,6 +56,7 @@ class ConfigSubscriber implements EventSubscriberInterface
      *
      * @todo as discussed with Alpha team thm method will be refactored in this sprint
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function persistConfig(PersistConfigEvent $event)
     {
@@ -100,8 +101,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($scope == 'datagrid'
             && $event->getConfig()->getId() instanceof FieldConfigId
             && !in_array($event->getConfig()->getId()->getFieldType(), ['text'])
-            && $extendFieldConfig->is('is_extend')
-            && isset($change['is_visible'])
+            && ($extendFieldConfig->is('is_extend') || $extendFieldConfig->is('extend'))
         ) {
             $index        = [];
             $extendConfig = $extendConfigProvider->getConfig($className);
@@ -109,11 +109,24 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $index = $extendConfig->get('index');
             }
 
-            $index[$event->getConfig()->getId()->getFieldName()] = $event->getConfig()->get('is_visible');
+            if (!isset($index[$event->getConfig()->getId()->getFieldName()])
+                || $index[$event->getConfig()->getId()->getFieldName()] != $event->getConfig()->get('is_visible')
+            ) {
+                $index[$event->getConfig()->getId()->getFieldName()] = $event->getConfig()->get('is_visible');
 
-            $extendConfig->set('index', $index);
+                $extendConfig->set('index', $index);
 
-            $event->getConfigManager()->persist($extendConfig);
+                if (!$extendConfig->is('state', ExtendScope::STATE_NEW)) {
+                    $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                }
+
+                if (!$extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                    $extendFieldConfig->set('state', ExtendScope::STATE_UPDATED);
+                    $event->getConfigManager()->persist($extendFieldConfig);
+                }
+
+                $event->getConfigManager()->persist($extendConfig);
+            }
         }
     }
 

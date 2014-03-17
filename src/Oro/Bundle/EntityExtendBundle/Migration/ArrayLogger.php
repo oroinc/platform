@@ -22,12 +22,7 @@ class ArrayLogger extends AbstractLogger
     }
 
     /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
-     * @return null
+     * {@inheritdoc}
      */
     public function log($level, $message, array $context = array())
     {

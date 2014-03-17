@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 
 class MigrationUpdateConfigCommand extends ContainerAwareCommand
@@ -44,6 +45,9 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
         if (is_file($optionsPath)) {
 
             $options = Yaml::parse(file_get_contents($optionsPath));
+            /** @var ExtendOptionsParser $parser */
+            $parser  = $this->getContainer()->get('oro_entity_extend.migration.options_parser');
+            $options = $parser->parseOptions($options);
 
             $logger = new ConfigLogger(new OutputLogger($output));
             /** @var ExtendConfigProcessor $processor */
