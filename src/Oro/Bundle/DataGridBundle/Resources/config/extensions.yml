@@ -81,6 +81,5 @@ services:
             - @translator
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }

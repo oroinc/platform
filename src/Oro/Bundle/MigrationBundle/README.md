@@ -124,7 +124,7 @@ Also there is **oro:migration:dump** command to help in creation migration files
 
 Extensions for database structure migrations
 --------------------------------------------
-Sometime you cannot use standard Doctrime methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how `RenameExtension` can be used:
+Sometime you cannot use standard Doctrime methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how [RenameExtension][5] can be used:
 ``` php
 <?php
 
@@ -165,12 +165,12 @@ class AcmeTestBundle implements Migration, RenameExtensionAwareInterface
     }
 }
 ```
-As you can see to use the `RenameExtension` your migration class should implement `RenameExtensionAwareInterface` and `setRenameExtension` method.
+As you can see to use the [RenameExtension][5] your migration class should implement [RenameExtensionAwareInterface][6] and `setRenameExtension` method.
 Also there is some additional useful interfaces you can use in your migration class:
 
  - `ContainerAwareInterface` - provides an access to Symfony dependency container
- - `DatabasePlatformAwareInterface` - allows to write a database type independent migrations
- - `NameGeneratorAwareInterface` - provides an access to `DbIdentifierNameGenerator` class which can be used to generate names of indices, foreign key constraints and others.
+ - [DatabasePlatformAwareInterface][3] - allows to write a database type independent migrations
+ - [NameGeneratorAwareInterface][4] - provides an access to [DbIdentifierNameGenerator](./Tools/DbIdentifierNameGenerator.php) class which can be used to generate names of indices, foreign key constraints and others.
 
 Create own extensions for database structure migrations
 -------------------------------------------------------
@@ -227,7 +227,7 @@ services:
             - { name: oro_migration.extension, extension_name: test /*, priority: -10 - priority attribute is optional an can be helpful if you need to override existing extension */ }
 ```
 
-If you need an access to the database platform or the name generator you extension class should implement `DatabasePlatformAwareInterface` or `NameGeneratorAwareInterface` appropriately.  
+If you need an access to the database platform or the name generator you extension class should implement [DatabasePlatformAwareInterface][3] or [NameGeneratorAwareInterface][4] appropriately.
  
 Data fixtures
 -------------
@@ -245,3 +245,7 @@ Fixtures order can be changed with standard Doctrine ordering or dependency func
 
   [1]: http://php.net/manual/en/function.version-compare.php
   [2]: https://github.com/doctrine/data-fixtures#fixture-ordering
+  [3]: ./Migration/Extension/DatabasePlatformAwareInterface.php
+  [4]: ./Migration/Extension/NameGeneratorAwareInterface.php
+  [5]: ./Migration/Extension/RenameExtension.php
+  [6]: ./Migration/Extension/RenameExtensionAwareInterface.php
