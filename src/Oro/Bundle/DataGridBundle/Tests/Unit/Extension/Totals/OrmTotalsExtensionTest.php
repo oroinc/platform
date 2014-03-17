@@ -117,35 +117,6 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $this->assertEquals(-250, $this->extension->getPriority());
     }
 
-    public function visitResult()
-    {
-        $this->extension->processConfigs($this->config);
-        $em = $this->getTestEntityManager();
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Totals\TestEntity'
-        );
-
-        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $em->getConfiguration()->setEntityNamespaces(
-            array(
-                'TestEntity' => 'Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Totals\TestEntity'
-            )
-        );
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $datasource = new OrmDatasource($em, $aclHelper);
-        $qb = $this->getTestQB($em);
-        $datasource->setQueryBuilder($qb);
-        $this->extension->visitDatasource($this->config, $datasource);
-
-        $result = $this->getTestResult();
-        $this->extension->visitResult($this->config, $result);
-
-    }
-
     /**
      * @return DatagridConfiguration
      */
@@ -200,20 +171,5 @@ class OrmTotalsExtensionTest extends OrmTestCase
                 'totalRecords' => 14
             ]
         ]);
-    }
-
-    /**
-     * @param EntityManagerMock $em
-     * @return QueryBuilder
-     */
-    protected function getTestQB(EntityManagerMock $em)
-    {
-        return $em->createQueryBuilder()
-            ->select(['a.id', 'a.name', 'SUM(a.won) as wonCount'])
-            ->from('TestEntity:Test', 'a')
-            ->having('wonCount > 1')
-            ->where('a.status = 1')
-            ->groupBy('a.id')
-            ->addGroupBy('a.name');
     }
 }

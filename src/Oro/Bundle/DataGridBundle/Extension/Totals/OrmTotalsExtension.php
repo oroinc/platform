@@ -262,6 +262,8 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
     {
+        // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
+        //       can be uninspected
         $totalQueries = [];
         foreach ($columnsConfig as $field => $totalData) {
             if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
