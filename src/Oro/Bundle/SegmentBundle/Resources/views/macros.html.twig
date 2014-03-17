@@ -55,12 +55,15 @@
     <script type="text/javascript">
         require(['oroquerydesigner/js/condition-builder'], function ($) {
             var $fieldConditionCriteria = $('#{{ params.criteria_list_id }}').find('[data-criteria=condition-item]'),
+                $segmentConditionCriteria = $('#{{ params.criteria_list_id }}').find('[data-criteria=condition-segment]'),
                 $conditions = $('#{{ params.id }}');
 
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
                     $conditions.conditionBuilder('setValue', []);
                     $fieldConditionCriteria
+                        .toggleClass('disabled', $.isEmptyObject(fields));
+                    $segmentConditionCriteria
                         .toggleClass('disabled', $.isEmptyObject(fields));
                 });
 

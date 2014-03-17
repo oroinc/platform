@@ -4,16 +4,16 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\Query\Parameter;
 
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class SegmentFilter extends EntityFilter
 {
