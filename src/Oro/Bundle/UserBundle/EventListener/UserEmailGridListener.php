@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\EventListener;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
@@ -51,6 +52,8 @@ class UserEmailGridListener
                 $this->queryFactory->prepareQuery($queryBuilder);
             }
 
+            $emailAddresses = array();
+
             if ($id = $this->requestParams->get('userId')) {
                 $user = $this->em
                     ->getRepository('OroUserBundle:User')
@@ -66,11 +69,12 @@ class UserEmailGridListener
                 ) && $originId) {
                     $this->imapSync->syncOrigins(array($originId));
                 }
-            } else {
-                $originId = 0; // to make sure param bind passed
+
+                $emailAddresses = EmailUtil::extractEmailAddresses($user->getEmails());
+                $emailAddresses[] = $user->getEmail();
             }
 
-            $queryBuilder->setParameter('origin_id', $originId);
+            $queryBuilder->setParameter('email_addresses', $emailAddresses);
         }
     }
 }
