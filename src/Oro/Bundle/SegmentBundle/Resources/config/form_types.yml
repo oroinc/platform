@@ -1,7 +1,6 @@
 parameters:
     oro_segment.segment.entity.class:                   Oro\Bundle\SegmentBundle\Entity\Segment
     oro_segment.form.type.segment.class:                Oro\Bundle\SegmentBundle\Form\Type\SegmentType
-    oro_segment.form.type.segment_filter.class:         Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterType
     oro_segment.form.type.entity_choice.class:          Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType
     oro_segment.form.handler.segment.class:             Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler
 
@@ -10,11 +9,6 @@ services:
         class: %oro_segment.form.type.segment.class%
         tags:
             - { name: form.type, alias: oro_segment }
-
-    oro_segment.form.type.segment_filter:
-        class: %oro_segment.form.type.segment_filter.class%
-        tags:
-            - { name: form.type, alias: oro_segment_segment_filter }
 
     oro_segment.form.segment:
         class:           Symfony\Component\Form\Form
