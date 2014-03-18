@@ -47,6 +47,8 @@ services:
             - @oro_segment.query.dynamic_segment.query_builder
             - @oro_segment.query.static_segment.query_builder
             - @oro_segment.segment_provider
+            - @oro_entity_config.provider.entity
+            - @doctrine.orm.entity_manager
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: segment }
 

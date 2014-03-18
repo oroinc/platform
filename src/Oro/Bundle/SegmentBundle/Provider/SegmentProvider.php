@@ -25,4 +25,3 @@ class SegmentProvider
         return $this->segment;
     }
 }
-

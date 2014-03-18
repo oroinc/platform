@@ -117,7 +117,7 @@ function ($, _, SegmentFilter) {
 
             if (!this.filter.isEmptyValue()) {
                 value = {
-                    columnName: 'id',
+                    columnName: this.filter.entity_ids[this.$segmentChoice.data('entity')],
                     criterion: {
                         filter: this.filter.type,
                         data: this.filter.getValue()
