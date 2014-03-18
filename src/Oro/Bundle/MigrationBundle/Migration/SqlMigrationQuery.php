@@ -8,9 +8,9 @@ use Psr\Log\LoggerInterface;
 class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**
-     * @var string|string[]
+     * @var string[]
      */
-    protected $sql;
+    protected $queries;
 
     /**
      * @var Connection
@@ -21,16 +21,15 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
      * @param string|string[] $sql
      * @throws \InvalidArgumentException if $sql is empty
      */
-    public function __construct($sql)
+    public function __construct($sql = null)
     {
         if (empty($sql)) {
-            throw new \InvalidArgumentException('The SQL query must not be empty.');
-        }
-
-        if (is_array($sql) && count($sql) === 1) {
-            $this->sql = array_pop($sql);
+            $this->queries = [];
+        } elseif (is_array($sql)) {
+            $this->queries = $sql;
         } else {
-            $this->sql = $sql;
+            $this->queries   = [];
+            $this->queries[] = $sql;
         }
     }
 
@@ -43,11 +42,27 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
     }
 
     /**
+     * Adds SQL query
+     *
+     * @param string $query The SQL query
+     */
+    public function addSql($query)
+    {
+        $this->queries[] = $query;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getDescription()
     {
-        return $this->sql;
+        if (empty($this->queries)) {
+            return '';
+        } elseif (count($this->queries) === 1) {
+            return $this->queries[0];
+        }
+
+        return $this->queries;
     }
 
     /**
@@ -55,9 +70,9 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
      */
     public function execute(LoggerInterface $logger)
     {
-        foreach ((array)$this->sql as $sql) {
-            $logger->notice($sql);
-            $this->connection->executeUpdate($sql);
+        foreach ($this->queries as $query) {
+            $logger->notice($query);
+            $this->connection->executeUpdate($query);
         }
     }
 }

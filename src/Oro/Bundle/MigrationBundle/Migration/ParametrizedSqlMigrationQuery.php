@@ -14,7 +14,21 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
     /**
      * Adds SQL query
      *
-     * @param string $query  The SQL query to execute.
+     * @param string $query  The SQL query
+     * @param array  $params The parameters to bind to the query, if any.
+     * @param array  $types  The types the previous parameters are in.
+     */
+    public function __construct($query = null, array $params = [], array $types = [])
+    {
+        if (!empty($query)) {
+            $this->queries[] = [$query, $params, $types];
+        }
+    }
+
+    /**
+     * Adds SQL query
+     *
+     * @param string $query  The SQL query
      * @param array  $params The parameters to bind to the query, if any.
      * @param array  $types  The types the previous parameters are in.
      */
