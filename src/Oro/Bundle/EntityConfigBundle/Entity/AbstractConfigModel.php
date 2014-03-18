@@ -12,33 +12,42 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class AbstractConfigModel
 {
     /**
-     * @var \DateTime $created
+     * @var \DateTime
      * @ORM\Column(type="datetime")
      */
     protected $created;
 
     /**
-     * @var \DateTime $updated
+     * @var \DateTime
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $updated;
 
     /**
-     * @var string $updated
+     * @var string
      * @ORM\Column(type="string", length=8)
      */
     protected $mode;
 
     /**
-     * @var array key = scope!code
+     * @var array
+     *  [
+     *      scope => [
+     *          code => value,
+     *          ...
+     *      ],
+     *      ...
+     *  ]
      * @ORM\Column(name="values", type="array", nullable=true)
      */
     protected $values;
 
     /**
-     * @var ConfigModelIndexValue[]|ArrayCollection
+     * This variable is used to quick check whether a value is indexed or not
+     *
+     * @var array key = scope!code, value = true
      */
-    protected $indexedValues;
+    private $indexedValueMap;
 
     /**
      * @param string $mode
@@ -98,97 +107,58 @@ abstract class AbstractConfigModel
     }
 
     /**
-     * @param       $scope
-     * @param array $values
-     * @param array $indexedValues
+     * Gets a collection used to store indexed values
+     *
+     * @return ArrayCollection|ConfigModelIndexValue[]
      */
-    public function fromArray($scope, array $values, array $indexedValues)
+    abstract public function getIndexedValues();
+
+    /**
+     * Sets values for the given scope
+     *
+     * @param string $scope
+     * @param array  $values
+     * @param array  $indexed A list of indexed values. key = value code, value = true
+     */
+    public function fromArray($scope, array $values, array $indexed)
     {
+        // ensure a scope initialized
+        if (!isset($this->values[$scope])) {
+            $this->values[$scope] = [];
+        }
         // add new and update existing values
         foreach ($values as $code => $value) {
-            $this->values[sprintf('%s!%s', $scope, $code)] = $value;
-            if (isset($indexedValues[$code])) {
+            $this->values[$scope][$code] = $value;
+            if (isset($indexed[$code])) {
                 $this->addToIndex($scope, $code, $value);
             } else {
                 $this->removeFromIndex($scope, $code);
             }
         }
         // remove obsolete values
-        foreach ($this->values as $key => $value) {
-            $pair = explode('!', $key);
-            if ($scope === $pair[0] && !isset($values[$pair[1]])) {
-                unset($this->values[$key]);
-                $this->removeFromIndex($scope, $pair[1]);
+        foreach ($this->values[$scope] as $code => $value) {
+            if (!isset($values[$code])) {
+                unset($this->values[$scope][$code]);
+                $this->removeFromIndex($scope, $code);
             }
+        }
+        // remove empty scope
+        if (empty($this->values[$scope])) {
+            unset($this->values[$scope]);
         }
     }
 
     /**
+     * Gets all values of the given scope
+     *
      * @param string $scope
      * @return array
      */
     public function toArray($scope)
     {
-        $result = [];
-        foreach ($this->values as $key => $value) {
-            $pair = explode('!', $key);
-            if ($scope === $pair[0]) {
-                $result[$pair[1]] = $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Makes a value indexed
-     *
-     * @param string $scope
-     * @param string $code
-     * @param mixed  $value
-     * @return $this
-     */
-    public function addToIndex($scope, $code, $value)
-    {
-        if (is_bool($value)) {
-            $value = (int)$value;
-        }
-
-        $existingIndexedValue = null;
-        foreach ($this->indexedValues as $indexedValue) {
-            if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
-                $existingIndexedValue = $indexedValue;
-                break;
-            }
-        }
-        if ($existingIndexedValue) {
-            if ($existingIndexedValue->getValue() !== $value) {
-                $existingIndexedValue->setValue($value);
-            }
-        } else {
-            $this->indexedValues->add($this->createIndexedValue($scope, $code, $value));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Makes a value un-indexed
-     *
-     * @param string $scope
-     * @param string $code
-     * @return $this
-     */
-    public function removeFromIndex($scope, $code)
-    {
-        foreach ($this->indexedValues as $key => $indexedValue) {
-            if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
-                $this->indexedValues->remove($key);
-                break;
-            }
-        }
-
-        return $this;
+        return isset($this->values[$scope])
+            ? $this->values[$scope]
+            : [];
     }
 
     /**
@@ -208,7 +178,7 @@ abstract class AbstractConfigModel
     }
 
     /**
-     * Creates an instance of ConfigModelValue
+     * Creates an instance of ConfigModelIndexValue
      *
      * @param string $scope
      * @param string $code
@@ -216,4 +186,81 @@ abstract class AbstractConfigModel
      * @return ConfigModelIndexValue
      */
     abstract protected function createIndexedValue($scope, $code, $value);
+
+    /**
+     * Makes a value indexed
+     *
+     * @param string $scope
+     * @param string $code
+     * @param mixed  $value
+     * @return $this
+     */
+    protected function addToIndex($scope, $code, $value)
+    {
+        if (is_bool($value)) {
+            $value = (int)$value;
+        }
+        $value = (string)$value;
+
+        $indexedValues = $this->getIndexedValues();
+        $this->ensureIndexedValueMapInitialized($indexedValues);
+        $mapKey = sprintf('%s!%s', $scope, $code);
+        if (isset($this->indexedValueMap[$mapKey])) {
+            foreach ($indexedValues as $indexedValue) {
+                if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
+                    if ($indexedValue->getValue() !== $value) {
+                        $indexedValue->setValue($value);
+                    }
+                    break;
+                }
+            }
+        } else {
+            $indexedValues->add($this->createIndexedValue($scope, $code, $value));
+            $this->indexedValueMap[$mapKey] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Makes a value un-indexed
+     *
+     * @param string $scope
+     * @param string $code
+     * @return $this
+     */
+    protected function removeFromIndex($scope, $code)
+    {
+        $indexedValues = $this->getIndexedValues();
+        $this->ensureIndexedValueMapInitialized($indexedValues);
+        $mapKey = sprintf('%s!%s', $scope, $code);
+        if (isset($this->indexedValueMap[$mapKey])) {
+            foreach ($indexedValues as $indexKey => $indexedValue) {
+                if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
+                    $indexedValues->remove($indexKey);
+                    unset($this->indexedValueMap[$mapKey]);
+                    break;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Makes sure $this->indexedValueMap variable initialized
+     *
+     * @param ArrayCollection $indexedValues
+     */
+    private function ensureIndexedValueMapInitialized($indexedValues)
+    {
+        if (!$this->indexedValueMap) {
+            $this->indexedValueMap = [];
+            /** @var ConfigModelIndexValue[] $indexedValues */
+            foreach ($indexedValues as $indexedValue) {
+                $this->indexedValueMap[sprintf('%s!%s', $indexedValue->getScope(), $indexedValue->getCode())] = true;
+            }
+        }
+    }
+
 }
