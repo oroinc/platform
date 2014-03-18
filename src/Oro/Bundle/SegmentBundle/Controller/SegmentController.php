@@ -100,6 +100,8 @@ class SegmentController extends Controller
      */
     protected function update(Segment $entity)
     {
+        $this->get('oro_segment.segment_provider')->setCurrentSegment($entity);
+
         if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',

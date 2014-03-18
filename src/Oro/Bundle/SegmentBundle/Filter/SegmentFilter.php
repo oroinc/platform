@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Form\FormFactoryInterface;
@@ -14,6 +15,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Bundle\SegmentBundle\Provider\SegmentProvider;
 
 class SegmentFilter extends EntityFilter
 {
@@ -23,6 +25,9 @@ class SegmentFilter extends EntityFilter
     /** @var StaticSegmentQueryBuilder */
     protected $staticSegmentQueryBuilder;
 
+    /** @var SegmentProvider */
+    protected $segmentProvider;
+
     /**
      * Constructor
      *
@@ -30,16 +35,20 @@ class SegmentFilter extends EntityFilter
      * @param FilterUtility              $util
      * @param DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder
      * @param StaticSegmentQueryBuilder  $staticSegmentQueryBuilder
+     * @param SegmentProvider            $segmentProvider
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
         DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder,
-        StaticSegmentQueryBuilder $staticSegmentQueryBuilder
+        StaticSegmentQueryBuilder $staticSegmentQueryBuilder,
+        SegmentProvider $segmentProvider
     ) {
         parent::__construct($factory, $util);
+
         $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
         $this->staticSegmentQueryBuilder  = $staticSegmentQueryBuilder;
+        $this->segmentProvider            = $segmentProvider;
     }
 
     /**
@@ -57,6 +66,8 @@ class SegmentFilter extends EntityFilter
     public function getForm()
     {
         if (!$this->form) {
+            $segment = $this->segmentProvider->getCurrentSegment();
+
             // hard coded field, do not allow to pass any option
             $this->form = $this->formFactory->create(
                 $this->getFormType(),
@@ -67,6 +78,21 @@ class SegmentFilter extends EntityFilter
                         'class'    => 'OroSegmentBundle:Segment',
                         'property' => 'name',
                         'required' => true,
+                        'query_builder' => function (EntityRepository $repo) use ($segment) {
+                            $entityName = $segment->getEntity();
+                            if (empty($entityName)) {
+                                // produce empty dataset
+                                $qb = $repo->createQueryBuilder('s')
+                                    ->where('s.entity = :entity')
+                                    ->setParameter('entity', '');
+                            } else {
+                                $qb = $repo->createQueryBuilder('s')
+                                    ->where('s.entity = :entity')
+                                    ->setParameter('entity', $segment->getEntity());
+                            }
+
+                            return $qb;
+                        }
                     ]
                 ]
             );
