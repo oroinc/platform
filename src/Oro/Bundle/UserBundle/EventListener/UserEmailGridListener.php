@@ -59,15 +59,11 @@ class UserEmailGridListener
                     ->getRepository('OroUserBundle:User')
                     ->find($id);
 
-                // TODO: select imap configuration by userId
                 $origin = $user->getImapConfiguration();
-                $originId = $origin !== null ? $origin->getId() : 0;
+                $additionalParameters = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
 
-                if (array_key_exists(
-                    'refresh',
-                    $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS)
-                ) && $originId) {
-                    $this->imapSync->syncOrigins(array($originId));
+                if ($origin !== null && array_key_exists('refresh', $additionalParameters)) {
+                    $this->imapSync->syncOrigins(array($origin->getId()));
                 }
 
                 $emailAddresses = EmailUtil::extractEmailAddresses($user->getEmails());
