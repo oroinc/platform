@@ -123,7 +123,17 @@ class UserType extends AbstractType
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
             ->add('change_password', 'oro_change_password')
-            ->add('inviteUser', 'checkbox', ['label' => 'Invite User', 'mapped' => false, 'required' => false]);
+            ->add(
+                'inviteUser',
+                'checkbox',
+                [
+                    'label' => 'oro.user.invite.label',
+                    'mapped' => false,
+                    'required' => false,
+                    'tooltip' => 'oro.user.invite.tooltip',
+                    'data' => true
+                ]
+            );
     }
 
     /**

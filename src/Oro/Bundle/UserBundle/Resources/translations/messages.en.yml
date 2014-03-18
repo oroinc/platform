@@ -161,3 +161,6 @@ oro:
             role.label:   Role
             label.label:  Label
             owner.label:  Owner
+        invite:
+            label: Invite User by e-mail
+            tooltip: If selected an invitation email will be sent to the user with his user name and password
