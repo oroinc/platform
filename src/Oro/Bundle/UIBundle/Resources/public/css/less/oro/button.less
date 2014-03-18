@@ -205,15 +205,16 @@
   text-decoration:underline;
 }
 .btn-group+.btn-group { margin-left:8px; }
-.btn-group > .dropdown-menu li a {
-  padding-top:1px;
-  padding-bottom:1px;
-  font-size:12px;
-  color:@bodyColor;
-  text-shadow:none !important;
-  &:hover {
-    background:#3875d7;
-    color:#fff;
+.btn-group > .dropdown-menu li {
+  a, button {
+    padding-top:1px;
+    padding-bottom:1px;
+    font-size:12px;
+    color:@bodyColor;
+    text-shadow:none !important;
+    &:hover {
+      background:#f3f3f3;
+    }
   }
 }
 
@@ -237,19 +238,6 @@
     left: initial;
     right: 0;
     min-width: 100%;
-    li a, li button {
-      &:hover, &:hover [class^=icon-]:before {
-        background: #3875d7;
-        color: #fff;
-      }
-      &:focus, &:focus [class^=icon-]:before {
-        background: #f3f3f3;
-        color: #006acc;
-      }
-      &:active, &:active [class^=icon-]:before {
-        color: #444;
-      }
-    }
     li button {
       padding: 2px 12px;
       display: block;
