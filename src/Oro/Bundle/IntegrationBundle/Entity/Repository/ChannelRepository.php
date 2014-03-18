@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityRepository;
 
-use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelRepository extends EntityRepository
@@ -16,17 +16,22 @@ class ChannelRepository extends EntityRepository
      * Returns channels that have configured transports
      * Assume that they are ready for sync
      *
+     * @param null|string $type
+     *
      * @return array
      */
-    public function getConfiguredChannelsForSync()
+    public function getConfiguredChannelsForSync($type = null)
     {
-        $channels = $this->createQueryBuilder('c')
-            ->select('c')
-            ->where('c.transport is NOT NULL')
-            ->getQuery()
-            ->getResult();
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.transport is NOT NULL');
 
-        return $channels;
+        if (null !== $type) {
+            $qb->where('c.type = :type')
+                ->setParameter('type', $type);
+        }
+
+        return $qb->getQuery()
+            ->getResult();
     }
 
     /**
@@ -34,12 +39,12 @@ class ChannelRepository extends EntityRepository
      *
      * @param string $type
      *
+     * @deprecated since RC2 will be removed in 1.0
      * @return array
      */
     protected function getChannelsBytType($type)
     {
         $channels = $this->createQueryBuilder('c')
-            ->select('c')
             ->where('c.type = :type')
             ->setParameter('type', $type)
             ->getQuery()
@@ -67,7 +72,8 @@ class ChannelRepository extends EntityRepository
                 ->getQuery()
                 ->getSingleResult();
         } elseif ($this->loadedInstances[$id]
-            && $uow->getEntityState($this->loadedInstances[$id]) != UnitOfWork::STATE_MANAGED) {
+            && $uow->getEntityState($this->loadedInstances[$id]) != UnitOfWork::STATE_MANAGED
+        ) {
             $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
         }
 
