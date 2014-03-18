@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
@@ -23,7 +23,7 @@ class ConfigManager
     protected $om;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -46,12 +46,12 @@ class ConfigManager
 
     /**
      *
-     * @param EventDispatcher              $eventDispatcher
+     * @param EventDispatcherInterface     $eventDispatcher
      * @param ObjectManager                $om
      * @param ConfigDefinitionImmutableBag $configDefinition
      */
     public function __construct(
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         ObjectManager $om,
         ConfigDefinitionImmutableBag $configDefinition
     ) {

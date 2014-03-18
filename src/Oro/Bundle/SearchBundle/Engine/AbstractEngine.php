@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -27,7 +27,7 @@ abstract class AbstractEngine
     protected $logQueries;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -35,10 +35,10 @@ abstract class AbstractEngine
      * Init entity manager
      *
      * @param \Doctrine\ORM\EntityManager $em
-     * @param EventDispatcher $dispatcher
+     * @param EventDispatcherInterface $dispatcher
      * @param bool $logQueries
      */
-    public function __construct(EntityManager $em, EventDispatcher $dispatcher, $logQueries)
+    public function __construct(EntityManager $em, EventDispatcherInterface $dispatcher, $logQueries)
     {
         $this->em = $em;
         $this->dispatcher = $dispatcher;
