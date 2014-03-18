@@ -64,11 +64,11 @@ For table representation of segment used **OroDataGridBundle**. Configuration of
 Query could be retrieved using following code
 
 ```php
-        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
-            $query = $this->dynamicSegmentQueryBuilder->build($segment);
-        } else {
-            $query = $this->staticSegmentQueryBuilder->build($segment);
-        }
+if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
+    $query = $this->dynamicSegmentQueryBuilder->build($segment);
+} else {
+    $query = $this->staticSegmentQueryBuilder->build($segment);
+}
 ```
 
 `$query` vatiable will contain instance of *\Doctrine\ORM\Query* after that it could be added in where statement of any doctrine query in following way:
