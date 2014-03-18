@@ -10,10 +10,10 @@ Each bundle can have migration files that allow to update database schema.
 
 Migration files should be located in `Migrations\Schema\version_number` folder. A version number must be an PHP-standardized version number string, but with some limitations. This string must not contain "." and "+" characters as a version parts separator. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-Each migration class must implement [Migration](./Migration/Migration.php) interface and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter witch can be used to add additional queries.
+Each migration class must implement [Migration](./Migration/Migration.php) interface and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter which can be used to add additional queries.
 
 With `schema` parameter, you can create or update database structure without fear of compatibility between database engines. 
-If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter represents a [query bag](./Migration/QueryBag.php) and allows to add additional queries witch will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method). A query can be a string or an instance of a class implements [MigrationQuery](./Migration/MigrationQuery.php) interface. There are several ready to use implementations of this interface:
+If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter represents a [query bag](./Migration/QueryBag.php) and allows to add additional queries which will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method). A query can be a string or an instance of a class implements [MigrationQuery](./Migration/MigrationQuery.php) interface. There are several ready to use implementations of this interface:
 
  - [SqlMigrationQuery](./Migration/SqlMigrationQuery.php) - represents one or more SQL queries
  - [ParametrizedSqlMigrationQuery](./Migration/ParametrizedSqlMigrationQuery.php) - similar to the previous class, but each query can have own parameters.
