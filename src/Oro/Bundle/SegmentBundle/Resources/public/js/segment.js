@@ -230,7 +230,7 @@ define(function (require) {
 
         var $groupingContainer = $(options.grouping.itemContainer),
             $groupingForm      = $(options.grouping.form),
-            isReportPage       = !($.isEmptyObject($groupingContainer) && $.isEmptyObject(groupingForm));
+            isGrouping         = !(_.isEmpty($groupingContainer) && _.isEmpty($groupingForm));
 
         // common extra options for all choice inputs
         fieldChoiceOptions   = getFieldChoiceOptions(options);
@@ -240,7 +240,7 @@ define(function (require) {
             }
         });
 
-        if (isReportPage) {
+        if (isGrouping) {
             initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
         }
         initColumn(options.column, options.metadata, fieldChoiceOptions);
@@ -249,16 +249,14 @@ define(function (require) {
         $(options.entityChoice)
             .on('fieldsloadercomplete', function () {
                 var data = {columns: [], filters: []};
-                if (isReportPage) {
+                if (isGrouping) {
                     data.grouping_columns = [];
                 }
                 save(data);
 
-                if ($groupingContainer.length > 0) {
+                if (isGrouping) {
                     $groupingContainer.itemsManagerTable('reset');
-                }
-                if ($groupingForm.length > 0) {
-                    $(options.grouping.form).itemsManagerEditor('reset');
+                    $groupingForm.itemsManagerEditor('reset');
                 }
                 $(options.column.itemContainer).itemsManagerTable('reset');
                 $(options.column.form).itemsManagerEditor('reset');
