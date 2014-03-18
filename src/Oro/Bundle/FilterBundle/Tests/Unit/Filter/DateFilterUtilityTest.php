@@ -32,9 +32,9 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider parseDataProvider
      *
-     * @param mixed   $data
-     * @param  string $fieldName
-     * @param mixed   $expectedResults
+     * @param mixed  $data
+     * @param string $fieldName
+     * @param mixed  $expectedResults
      */
     public function testParse($data, $fieldName, $expectedResults)
     {
