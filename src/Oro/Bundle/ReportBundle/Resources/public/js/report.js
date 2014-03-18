@@ -10,6 +10,7 @@ define(function (require) {
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
     require('oroentity/js/field-choice');
+    require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
     require('oroquerydesigner/js/condition-builder');

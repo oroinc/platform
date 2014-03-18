@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
 
 {% oro_title_set({params : {"%report.name%": entity.name} }) %}
 {% set formAction = form.vars.value.id ? path('oro_report_update', { 'id': form.vars.value.id }) : path('oro_report_create')  %}
@@ -130,7 +131,7 @@
                 'title': 'oro.report.form.filters'|trans,
                 'spanClass': 'report-filters responsive-cell',
                 'data': [
-                    QD.query_designer_condition_builder({
+                    segmentQD.query_designer_condition_builder({
                         'id': 'report-condition-builder',
                         'criteria_list_id': 'filter-criteria-list',
                         'entity_choice_id': 'oro_report_form_entity'
@@ -149,85 +150,7 @@
     {{ UI.scrollData(id, data, form) }}
 
     {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
+    {{ segmentQD.query_designer_segment_template('segment-template') }}
+    {{ segmentQD.initJsWidgets('report', form, entities, metadata) }}
 
-    {% set entityFieldsRouteParams = {
-        'with-relations': 1,
-        'with-entity-details': 1,
-        'deep-level': 2
-    } %}
-    <script type="text/javascript">
-        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
-            'oroui/js/delete-confirmation', 'ororeport/js/report', 'oroentity/js/fields-loader'],
-            function ($, _, __, LoadingMask, DeleteConfirmation, reportManagerInit) {
-                var $entityChoice = $('#oro_report_form_entity');
-                var loadingMask = new LoadingMask();
-                var confirm = new DeleteConfirmation({
-                    title: __('Change Entity Confirmation'),
-                    okText: __('Yes, I Agree'),
-                    content: __('Are you sure you want to change entity?')
-                });
-
-                $('#report-designer').append(loadingMask.render().$el);
-
-                $entityChoice
-                    .fieldsLoader({
-                        router: 'oro_api_get_entity_fields',
-                        routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
-                        confirm: confirm,
-                        requireConfirm: function () {
-                            var data = $('#oro_report_form_definition').val();
-                            if (!data) {
-                                return false;
-                            }
-                            try {
-                                data = JSON.parse(data);
-                            } catch (e) {
-                                return false;
-                            }
-                            return _.some(data, function (value) {
-                                return !_.isEmpty(value);
-                            });
-                        }
-                    })
-                    .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
-                    .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
-
-                {% if not form.entity.vars.value is empty %}
-                {% set fieldsData = render(path('oro_api_get_entity_fields', {
-                        'entityName': form.entity.vars.value|replace({'\\': '_'})
-                    }|merge(entityFieldsRouteParams))) %};
-                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
-                {% endif %}
-
-                reportManagerInit({
-                    entityChoice: '#oro_report_form_entity',
-                    valueSource: '#oro_report_form_definition',
-                    filters: {
-                        criteriaList: '#filter-criteria-list',
-                        conditionBuilder: '#report-condition-builder'
-                    },
-                    grouping: {
-                        editor: {
-                            mapping: {
-                                name: 'oro_report_form[grouping][columnNames]'
-                            }
-                        },
-                        form: '#report-grouping-form',
-                        itemContainer: '#report-grouping-list .grouping-item-container',
-                        itemTemplate: '#report-grouping-item-row'
-                    },
-                    column: {
-                        editor: {
-                            namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/
-                        },
-                        form: '#report-column-form',
-                        itemContainer: '#report-column-list .item-container',
-                        itemTemplate: '#report-column-row'
-                    },
-                    select2FieldChoiceTemplate: '#report-column-chain-template',
-                    entities: {{ entities|json_encode|raw }},
-                    metadata: {{ metadata|json_encode|raw }}
-                });
-            });
-    </script>
 {% endblock content_data %}

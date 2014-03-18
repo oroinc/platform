@@ -95,6 +95,7 @@ class ReportController extends Controller
 
     protected function update(Report $entity)
     {
+        $this->get('oro_segment.segment_provider')->setCurrentItem($entity);
         if ($this->get('oro_report.form.handler.report')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
