@@ -12,8 +12,9 @@
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entity_index', {id: entity_id})) }}
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
-        {{ UI.saveAndStayButton() }}
-        {{ UI.saveAndCloseButton() }}
+        {% set html = UI.saveAndCloseButton() %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+        {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}
 {% endblock navButtons %}
 
