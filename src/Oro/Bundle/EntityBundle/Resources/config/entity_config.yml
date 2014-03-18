@@ -19,7 +19,6 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           20
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -74,7 +73,6 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           10
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
