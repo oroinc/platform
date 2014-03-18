@@ -19,7 +19,7 @@
             },
             util: {},
             segmentsLoaderSelector: '#' ~ params.entity_choice_id,
-            currentSegment: params.currentSegmentId
+            currentSegment: params.currentSegmentId|default(null)
         }
     } %}
     <div class="condition-builder left-panel-container">
@@ -256,15 +256,8 @@
                             itemContainer: '#{{ type }}-column-list .item-container',
                             itemTemplate: '#{{ type }}-column-row'
                         },
-                        {% if type == 'report' %}
-                        select2FieldChoiceTemplate: '#report-column-chain-template',
-                        {% endif %}
-                        {% if type == 'segment' %}
-                        select2FieldChoiceTemplate: {
-                            segment: '#segment-template',
-                            field:   '#column-chain-template'
-                        },
-                        {% endif %}
+                        select2FieldChoiceTemplate: '#{{ type }}-column-chain-template',
+                        select2SegmentChoiceTemplate: '#segment-template',
                         entities: {{ entities|json_encode|raw }},
                         metadata: {{ metadata|json_encode|raw }}
                     });
