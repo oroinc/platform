@@ -5,12 +5,17 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
-class SqlMigrationQuery implements MigrationQuery
+class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**
      * @var string|string[]
      */
     protected $sql;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * @param string|string[] $sql
@@ -32,6 +37,14 @@ class SqlMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDescription()
     {
         return $this->sql;
@@ -40,11 +53,11 @@ class SqlMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection, LoggerInterface $logger)
+    public function execute(LoggerInterface $logger)
     {
         foreach ((array)$this->sql as $sql) {
             $logger->notice($sql);
-            $connection->executeQuery($sql);
+            $this->connection->executeUpdate($sql);
         }
     }
 }

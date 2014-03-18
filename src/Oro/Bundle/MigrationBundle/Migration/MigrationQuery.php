@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
 interface MigrationQuery
@@ -18,8 +17,7 @@ interface MigrationQuery
     /**
      * Executes a query
      *
-     * @param Connection      $connection A SQL connection
-     * @param LoggerInterface $logger     A logger which can be used to log details of an execution process
+     * @param LoggerInterface $logger A logger which can be used to log details of an execution process
      */
-    public function execute(Connection $connection, LoggerInterface $logger);
+    public function execute(LoggerInterface $logger);
 }

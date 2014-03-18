@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Migration;
+namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Psr\Log\AbstractLogger;
 
