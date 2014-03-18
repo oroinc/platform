@@ -299,7 +299,7 @@ class PackageManager
                     }
                 );
                 $this->scriptRunner->clearApplicationCache();
-                $this->scriptRunner->runPlatformUpdate($loadDemoData);
+                $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
                         $this->scriptRunner->runInstallScripts($package);
