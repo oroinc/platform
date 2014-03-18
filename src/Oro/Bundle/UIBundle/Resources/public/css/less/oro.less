@@ -1789,19 +1789,31 @@ footer {
 
 .tag-sort-actions {
   margin-top: 5px;
-  margin-bottom:15px;
-  border-bottom:1px solid #ddd;
+  margin-bottom: 0;
+  border-bottom: 1px solid #ddd;
   white-space: nowrap;
+  &:after{
+    content: "";
+    display: block;
+    clear: both;
+  }
   li {
+    &:first-child{
+      a{
+        border-width: 1px;
+      }
+    }
     a {
       display:inline-block;
-      .border-radius(4px 4px 0 0);
-      background:#f3f3f3;
-      padding:0 12px;
-      color:#888;
+      .border-radius(0);
+      background:#fafafa;
+      outline: none;
+      padding:8px 12px;
+      color:#555;
       margin-bottom:-1px;
-      border:1px solid #dedede;
-      line-height:23px;
+      border: solid #ddd;
+      border-width: 1px 1px 1px 0;
+      line-height:20px;
       &.active {
         border-bottom-color:#fff;
         .box-shadow(none);
@@ -1816,10 +1828,21 @@ footer {
     }
   }
   &.inline li {
-    display:inline-block;
-    height:24px;
+    float: left;
+    margin-bottom: -1px;
     padding:0;
+    line-height: 20px;
   }
+}
+.tag-view .tags-holder{
+  -webkit-box-shadow: none;
+  box-shadow:none;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  border: solid #ddd;
+  border-width: 0 1px 1px;
+  padding: 10px;
+  overflow: hidden;
 }
 .tags-overlay .tag-list,
 .tag-view  .tag-list {
@@ -3253,7 +3276,18 @@ i.pin-status {
     min-height: 104px;
   }
 }
-
+.tab-content{
+  .oro-tabs{
+    .nav-tabs{
+      & > li{
+        & > a{
+          border-top-width: 0;
+          .forScreen(@mediumScreen, border-top-width, 1px);
+        }
+      }
+    }
+  }
+}
 // capitalize buttons, labels, titles, breadcrumb
 .btn, .btn-group a,
 #main label,
