@@ -94,7 +94,6 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit_Framework_TestCase
             $this->getExpectedLogs(),
             $logger->getMessages()
         );
-
     }
 
     protected function addSqls()
