@@ -29,6 +29,7 @@ services:
     oro_datagrid.extension.pager.orm.pager:
         arguments:
             - @oro_security.acl_helper
+            - @oro_batch.orm.query_builder.count_query_optimizer
         class: %oro_datagrid.extension.pager.orm.pager.class%
 
     oro_datagrid.extension.orm_sorter:
