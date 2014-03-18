@@ -78,10 +78,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
          */
         render: function ($segmentChoice) {
             var data = this.choices[this.getValue().value];
-            data.text = data.label;
-            data.id = 'segment_' + data.value;
-
-            $segmentChoice.segmentChoice('setSelectedData', data);
+            if (data !== undefined) {
+                data.text = data.label;
+                data.id = 'segment_' + data.value;
+                $segmentChoice.segmentChoice('setSelectedData', data);
+            }
 
             return this;
         },

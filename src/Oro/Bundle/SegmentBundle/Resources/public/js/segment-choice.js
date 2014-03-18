@@ -93,6 +93,13 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                     }, this)
                 }
             );
+
+            this.options.select2.initSelection = function (element, callback) {
+                var data = element.data('data');
+                if (!$.isEmptyObject(data)) {
+                    callback(data);
+                }
+            }
         },
 
         _bindFieldsLoader: function () {
@@ -110,7 +117,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
             this.element
                 .data('entity', entity)
                 .data('data', segmentData);
-            this.element.select2($.extend({data: segmentData}, this.options.select2));
+            this.element.select2(this.options.select2);
         },
 
         setValue: function (value) {
