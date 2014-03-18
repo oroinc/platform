@@ -100,7 +100,7 @@ define(['jquery', 'underscore'
                         return object.children ? str : self.highlightSelection(str, query);
                     };
                 if (object._html !== undefined) {
-                    result = object._html;
+                    result = _.escape(object._html);
                 } else if (jsTemplate) {
                     object = _.clone(object);
                     object.highlight = highlight;
@@ -109,7 +109,7 @@ define(['jquery', 'underscore'
                     }
                     result = jsTemplate(object);
                 } else {
-                    result = highlight(self.getTitle(object, self.config.properties));
+                    result = highlight(_.escape(self.getTitle(object, self.config.properties)));
                 }
                 return result;
             };

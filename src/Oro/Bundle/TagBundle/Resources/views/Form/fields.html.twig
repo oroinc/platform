@@ -67,7 +67,7 @@
             {% else %}
                 return {
                     id: term,
-                    name: term
+                    name: _.escape(term)
                 };
             {% endif %}
         }
