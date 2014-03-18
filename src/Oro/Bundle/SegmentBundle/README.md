@@ -71,7 +71,7 @@ if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
 }
 ```
 
-`$query` vatiable will contain instance of *\Doctrine\ORM\Query* after that it could be added in where statement of any doctrine query in following way:
+`$query` variable will contain instance of *\Doctrine\ORM\Query* after that it could be added in where statement of any doctrine query in following way:
 
 ```php
 /** @var EntityManger $em */
