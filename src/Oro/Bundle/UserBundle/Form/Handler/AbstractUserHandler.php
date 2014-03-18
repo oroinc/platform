@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,16 +27,42 @@ abstract class AbstractUserHandler
     protected $manager;
 
     /**
-     *
-     * @param FormInterface $form
-     * @param Request       $request
-     * @param UserManager   $manager
+     * @var \Swift_Mailer
      */
-    public function __construct(FormInterface $form, Request $request, UserManager $manager)
-    {
-        $this->form    = $form;
-        $this->request = $request;
-        $this->manager = $manager;
+    protected $mailer;
+
+    /**
+     * @var string
+     */
+    protected $platformEmail;
+
+    /**
+     * @var DelegatingEngine
+     */
+    protected $templating;
+
+    /**
+     * @param FormInterface $form
+     * @param Request $request
+     * @param UserManager $manager
+     * @param DelegatingEngine $templating
+     * @param string $platformEmail
+     * @param \Swift_Mailer $mailer
+     */
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        UserManager $manager,
+        DelegatingEngine $templating,
+        $platformEmail,
+        \Swift_Mailer $mailer = null
+    ) {
+        $this->form          = $form;
+        $this->request       = $request;
+        $this->manager       = $manager;
+        $this->platformEmail = $platformEmail;
+        $this->mailer        = $mailer;
+        $this->templating    = $templating;
     }
 
     /**

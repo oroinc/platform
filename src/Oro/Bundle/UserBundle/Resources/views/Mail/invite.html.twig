@@ -1,0 +1,12 @@
+{% extends 'OroUserBundle:Mail:layout.html.twig' %}
+
+{% block content %}
+    <h1>Hello, {{ user|oro_format_name }}!</h1>
+    <p>A new user has been created for you in the {{ oro_config_value('oro_ui.application_title') }} installation
+        at <a href="{{ url('oro_default') }}">{{ url('oro_default') }}</a>
+    </p>
+    <p>Please use the following credentials to log in:</p>
+    <p></p>
+    <p><strong>Login:</strong> {{ user.username }}</p>
+    <p><strong>Password:</strong> {{ password }}</p>
+{% endblock %}
