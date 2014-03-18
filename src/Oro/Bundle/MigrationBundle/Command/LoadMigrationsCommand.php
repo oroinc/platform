@@ -3,14 +3,14 @@
 namespace Oro\Bundle\MigrationBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoader;
@@ -77,23 +77,37 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 foreach ($queries as $item) {
                     $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
                     foreach ($item['queries'] as $query) {
-                        if ($query instanceof MigrationQuery) {
-                            if ($input->getOption('dry-run')) {
-                                $descriptions = $query->getDescription();
-                                foreach ((array)$descriptions as $description) {
-                                    $queryLogger->notice($description);
-                                }
-                            } else {
-                                $query->execute($connection, $queryLogger);
-                            }
-                        } else {
-                            $queryLogger->notice($query);
-                            if (!$input->getOption('dry-run')) {
-                                $connection->executeQuery($query);
-                            }
-                        }
+                        $this->processQuery($query, $connection, $queryLogger, $input->getOption('dry-run'));
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * @param string|MigrationQuery $query
+     * @param Connection            $connection
+     * @param LoggerInterface       $queryLogger
+     * @param bool                  $dryRun
+     */
+    protected function processQuery($query, Connection $connection, LoggerInterface $queryLogger, $dryRun)
+    {
+        if ($query instanceof MigrationQuery) {
+            if ($query instanceof ConnectionAwareInterface) {
+                $query->setConnection($connection);
+            }
+            if ($dryRun) {
+                $descriptions = $query->getDescription();
+                foreach ((array)$descriptions as $description) {
+                    $queryLogger->notice($description);
+                }
+            } else {
+                $query->execute($queryLogger);
+            }
+        } else {
+            $queryLogger->notice($query);
+            if (!$dryRun) {
+                $connection->executeQuery($query);
             }
         }
     }

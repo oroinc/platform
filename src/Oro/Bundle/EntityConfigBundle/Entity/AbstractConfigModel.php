@@ -38,9 +38,9 @@ abstract class AbstractConfigModel
      *      ],
      *      ...
      *  ]
-     * @ORM\Column(name="values", type="array", nullable=true)
+     * @ORM\Column(name="data", type="array", nullable=true)
      */
-    protected $values;
+    protected $data;
 
     /**
      * This variable is used to quick check whether a value is indexed or not
@@ -123,12 +123,12 @@ abstract class AbstractConfigModel
     public function fromArray($scope, array $values, array $indexed)
     {
         // ensure a scope initialized
-        if (!isset($this->values[$scope])) {
-            $this->values[$scope] = [];
+        if (!isset($this->data[$scope])) {
+            $this->data[$scope] = [];
         }
         // add new and update existing values
         foreach ($values as $code => $value) {
-            $this->values[$scope][$code] = $value;
+            $this->data[$scope][$code] = $value;
             if (isset($indexed[$code])) {
                 $this->addToIndex($scope, $code, $value);
             } else {
@@ -136,15 +136,15 @@ abstract class AbstractConfigModel
             }
         }
         // remove obsolete values
-        foreach ($this->values[$scope] as $code => $value) {
+        foreach ($this->data[$scope] as $code => $value) {
             if (!isset($values[$code])) {
-                unset($this->values[$scope][$code]);
+                unset($this->data[$scope][$code]);
                 $this->removeFromIndex($scope, $code);
             }
         }
         // remove empty scope
-        if (empty($this->values[$scope])) {
-            unset($this->values[$scope]);
+        if (empty($this->data[$scope])) {
+            unset($this->data[$scope]);
         }
     }
 
@@ -156,8 +156,8 @@ abstract class AbstractConfigModel
      */
     public function toArray($scope)
     {
-        return isset($this->values[$scope])
-            ? $this->values[$scope]
+        return isset($this->data[$scope])
+            ? $this->data[$scope]
             : [];
     }
 

@@ -97,7 +97,7 @@ class ConfigModelManagerTest extends OrmTestCase
                 array(
                     'oro_entity_config',
                     'oro_entity_config_field',
-                    'oro_entity_config_value',
+                    'oro_entity_config_index_value',
                 )
             )
         );

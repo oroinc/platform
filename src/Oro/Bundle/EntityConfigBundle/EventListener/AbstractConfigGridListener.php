@@ -355,7 +355,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                 }
 
                 $query->leftJoin(
-                    $rootAlias . '.values',
+                    $rootAlias . '.indexedValues',
                     $alias,
                     'WITH',
                     $alias . ".code='" . $code . "' AND " . $alias . ".scope='" . $provider->getScope() . "'"

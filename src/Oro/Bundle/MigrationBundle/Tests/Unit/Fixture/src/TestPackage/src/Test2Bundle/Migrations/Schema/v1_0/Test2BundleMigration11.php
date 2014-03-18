@@ -10,15 +10,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class Test2BundleMigration10 implements Migration, ContainerAwareInterface, OrderedMigrationInterface
+class Test2BundleMigration11 implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
-    public function getOrder()
-    {
-        return 1;
-    }
-
     /** @var ContainerInterface */
     protected $container;
+
+    public function getOrder()
+    {
+        return 2;
+    }
 
     public function up(Schema $schema, QueryBag $queries)
     {

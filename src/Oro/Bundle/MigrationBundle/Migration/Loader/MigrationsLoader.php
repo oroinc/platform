@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
@@ -328,16 +329,55 @@ class MigrationsLoader
             }
         }
 
+        // group migrations by bundle and version
+        $groupedMigrations = [];
+        foreach ($files['migrations'] as $sourceFile => $migration) {
+            if (isset($migrations[$sourceFile])) {
+                $bundleName = $migration['bundleName'];
+                $version    = $migration['version'];
+                if (!isset($groupedMigrations[$bundleName])) {
+                    $groupedMigrations[$bundleName] = [];
+                }
+                if (!isset($groupedMigrations[$bundleName][$version])) {
+                    $groupedMigrations[$bundleName][$version] = [];
+                }
+                $groupedMigrations[$bundleName][$version][] = $migrations[$sourceFile];
+            }
+        }
+        // sort migrations within the same version
+        foreach ($groupedMigrations as $bundleName => $versions) {
+            foreach ($versions as $version => $versionedMigrations) {
+                if (count($versionedMigrations) > 1) {
+                    usort(
+                        $groupedMigrations[$bundleName][$version],
+                        function ($a, $b) {
+                            $aOrder = $a instanceof OrderedMigrationInterface ? $a->getOrder() : 0;
+                            $bOrder = $b instanceof OrderedMigrationInterface ? $b->getOrder() : 0;
+                            if ($aOrder === $bOrder) {
+                                return 0;
+                            }
+
+                            return $aOrder < $bOrder ? -1 : 1;
+                        }
+                    );
+                }
+            }
+        }
+
         // add migration objects to result tacking into account bundles order
         foreach ($files['bundles'] as $bundleName) {
+            // add installers to the result
             foreach ($files['installers'] as $sourceFile => $installerBundleName) {
                 if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
                     $result[] = $migrations[$sourceFile];
                 }
             }
-            foreach ($files['migrations'] as $sourceFile => $migration) {
-                if ($migration['bundleName'] === $bundleName && isset($migrations[$sourceFile])) {
-                    $result[] = $migrations[$sourceFile];
+            // add migrations to the result
+            if (isset($groupedMigrations[$bundleName])) {
+                foreach ($groupedMigrations[$bundleName] as $versionedMigrations) {
+                    foreach ($versionedMigrations as $migration) {
+                        $result[] = $migration;
+                    }
                 }
             }
         }
