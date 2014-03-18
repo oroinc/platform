@@ -56,12 +56,16 @@ class ConfigModelIndexValue
      */
     protected $value;
 
-    public function __construct($code = null, $scope = null, $value = null)
+    /**
+     * @param string|null $scope
+     * @param string|null $code
+     * @param string|null $value
+     */
+    public function __construct($scope = null, $code = null, $value = null)
     {
-        $this->code         = $code;
-        $this->scope        = $scope;
-
-        $this->setValue($value);
+        $this->scope = $scope;
+        $this->code  = $code;
+        $this->value = $value;
     }
 
     /**
@@ -98,6 +102,8 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Set scope
+     *
      * @param string $scope
      * @return ConfigModelIndexValue
      */
@@ -109,6 +115,8 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Get scope
+     *
      * @return string
      */
     public function getScope()
@@ -117,7 +125,7 @@ class ConfigModelIndexValue
     }
 
     /**
-     * Set data
+     * Set value
      *
      * @param string $value
      * @return ConfigModelIndexValue
@@ -130,7 +138,7 @@ class ConfigModelIndexValue
     }
 
     /**
-     * Get data
+     * Get value
      *
      * @return string
      */
@@ -140,6 +148,8 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Set owning entity
+     *
      * @param EntityConfigModel $entity
      * @return $this
      */
@@ -151,6 +161,8 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Get owning entity
+     *
      * @return EntityConfigModel
      */
     public function getEntity()
@@ -159,6 +171,8 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Set owning field
+     *
      * @param FieldConfigModel $field
      * @return $this
      */
@@ -170,19 +184,12 @@ class ConfigModelIndexValue
     }
 
     /**
+     * Get owning field
+     *
      * @return FieldConfigModel
      */
     public function getField()
     {
         return $this->field;
-    }
-
-    public function toArray()
-    {
-        return array(
-            'code'         => $this->code,
-            'scope'        => $this->scope,
-            'value'        => $this->value,
-        );
     }
 }
