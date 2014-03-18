@@ -122,12 +122,12 @@ class SegmentFilter extends EntityFilter
                         'property' => 'name',
                         'required' => true,
                         'query_builder' => function (EntityRepository $repo) use ($segment) {
-                            $entityName = $segment->getEntity();
+                            $entityName = $segment ? $segment->getEntity() : '';
                             if (empty($entityName)) {
                                 // produce empty dataset
                                 $qb = $repo->createQueryBuilder('s')
                                     ->where('s.entity = :entity')
-                                    ->setParameter('entity', '');
+                                    ->setParameter('entity', false);
                             } else {
                                 $qb = $repo->createQueryBuilder('s')
                                     ->where('s.entity = :entity')
