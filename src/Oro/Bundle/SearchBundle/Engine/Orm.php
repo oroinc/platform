@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -40,7 +40,7 @@ class Orm extends AbstractEngine
 
     public function __construct(
         EntityManager $em,
-        EventDispatcher $dispatcher,
+        EventDispatcherInterface $dispatcher,
         ContainerInterface $container,
         ObjectMapper $mapper,
         $logQueries
