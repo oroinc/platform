@@ -109,7 +109,7 @@ class SegmentFilter extends EntityFilter
     public function getForm()
     {
         if (!$this->form) {
-            $segment = $this->segmentProvider->getCurrentSegment();
+            $segment = $this->segmentProvider->getCurrentItem();
 
             // hard coded field, do not allow to pass any option
             $this->form = $this->formFactory->create(

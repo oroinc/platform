@@ -3,4 +3,4 @@ query_designer:
         segment:
             applicable: [{type: entity}]
             type:       segment
-            query_type: [segment]
+            query_type: [segment, report]

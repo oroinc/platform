@@ -6,6 +6,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         Backbone = require('backbone'),
+        GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
     require('oroentity/js/field-choice');
@@ -21,6 +22,12 @@ define(function (require) {
             criteriaList: '',
             conditionBuilder: ''
         },
+        grouping: {
+            editor: {},
+            form: '',
+            itemContainer: '',
+            itemTemplate: ''
+        },
         column: {
             editor: {},
             form: '',
@@ -28,6 +35,7 @@ define(function (require) {
             itemTemplate: ''
         },
         select2FieldChoiceTemplate: '',
+        select2SegmentChoiceTemplate: '',
         entities: [],
         metadata: {}
     };
@@ -59,6 +67,19 @@ define(function (require) {
         $storage.val(JSON.stringify(data));
     }
 
+    function getFieldChoiceOptions(options) {
+        return {
+            select2: {
+                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
+            },
+            util: {
+                findEntity:  function (entityName) {
+                    return _.findWhere(options.entities, {name: entityName});
+                }
+            }
+        };
+    }
+
     function deleteHandler(collection, model, data) {
         var confirm = new DeleteConfirmation({
             content: data.message
@@ -69,12 +90,43 @@ define(function (require) {
         confirm.open();
     }
 
-    function initColumn(options, metadata, segmentChoiceOptions) {
-        var $editor, $segmentChoice, collection, util, template, sortingLabels;
+    function initGrouping(options, metadata, fieldChoiceOptions) {
+        var $editor, $fieldChoice, collection, util, template;
 
         $editor = $(options.form);
-        $segmentChoice = $editor.find('[data-purpose=column-selector]');
-        $segmentChoice.fieldChoice(_.extend({}, segmentChoiceOptions, {select2: {}}));
+        $fieldChoice = $editor.find('[data-purpose=column-selector]');
+        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, metadata.grouping, {select2: {}}));
+
+        collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
+        collection.on('add remove sort', function () {
+            save(collection.toJSON(), 'grouping_columns');
+        });
+
+        $editor.itemsManagerEditor($.extend(options.editor, {
+            collection: collection
+        }));
+
+        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+
+        $(options.itemContainer).itemsManagerTable({
+            collection: collection,
+            itemTemplate: $(options.itemTemplate).html(),
+            itemRender: function (tmpl, data) {
+                var name = util.splitFieldId(data.name);
+                data.name = template(name);
+                return tmpl(data);
+            },
+            deleteHandler: _.bind(deleteHandler, null, collection)
+        });
+    }
+
+    function initColumn(options, metadata, fieldChoiceOptions) {
+        var $editor, $fieldChoice, collection, util, template, sortingLabels;
+
+        $editor = $(options.form);
+        $fieldChoice = $editor.find('[data-purpose=column-selector]');
+        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, {select2: {}}));
 
         $editor.find('[data-purpose=function-selector]').functionChoice({
             converters: metadata.converters,
@@ -111,16 +163,16 @@ define(function (require) {
             sortingLabels[this.value] = $(this).text();
         });
 
-        util = $segmentChoice.data('oroentity-fieldChoice').entityFieldUtil;
-        template = _.template(segmentChoiceOptions.select2.formatSelectionTemplate);
+        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
         $(options.itemContainer).itemsManagerTable({
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                var name = util.splitFieldId(data.name),
+                var item, itemFunc,
                     func = data.func,
-                    item, itemFunc;
+                    name = util.splitFieldId(data.name);
 
                 data.name = template(name);
                 if (func && func.name) {
@@ -134,7 +186,6 @@ define(function (require) {
                 } else {
                     data.func = '';
                 }
-
                 if (data.sorting && sortingLabels[data.sorting]) {
                     data.sorting = sortingLabels[data.sorting];
                 }
@@ -172,38 +223,45 @@ define(function (require) {
     }
 
     return function (options) {
-        var fieldChoiceOptions, segmentChoiceOptions;
+        var fieldChoiceOptions, segmentChoiceOptions;;
         options = $.extend(true, {}, defaults, options);
 
         $storage = $(options.valueSource);
 
-        // common extra options for all segment-choice inputs
-        fieldChoiceOptions = {
-            select2: {
-                formatSelectionTemplate: $(options.select2FieldChoiceTemplate.field).text()
-            },
-            util: {
-                findEntity:  function (entityName) {
-                    return _.findWhere(options.entities, {name: entityName});
-                }
-            }
-        };
+        var $groupingContainer = $(options.grouping.itemContainer),
+            $groupingForm      = $(options.grouping.form),
+            isGrouping         = !(_.isEmpty($groupingContainer) && _.isEmpty($groupingForm));
+
+        // common extra options for all choice inputs
+        fieldChoiceOptions   = getFieldChoiceOptions(options);
         segmentChoiceOptions = _.extend(_.clone(fieldChoiceOptions), {
             select2: {
-                formatSelectionTemplate: $(options.select2FieldChoiceTemplate.segment).text()
+                formatSelectionTemplate: $(options.select2SegmentChoiceTemplate).text()
             }
         });
 
+        if (isGrouping) {
+            initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
+        }
         initColumn(options.column, options.metadata, fieldChoiceOptions);
         configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
         $(options.entityChoice)
             .on('fieldsloadercomplete', function () {
                 var data = {columns: [], filters: []};
+                if (isGrouping) {
+                    data.grouping_columns = [];
+                }
                 save(data);
+
+                if (isGrouping) {
+                    $groupingContainer.itemsManagerTable('reset');
+                    $groupingForm.itemsManagerEditor('reset');
+                }
                 $(options.column.itemContainer).itemsManagerTable('reset');
                 $(options.column.form).itemsManagerEditor('reset');
                 $(options.filters.conditionBuilder).conditionBuilder('setValue', data.filters);
             });
+
     };
 });
