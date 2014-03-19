@@ -131,11 +131,32 @@ function ($, _, DateFilter, localeSettings) {
          * @protected
          */
         _formatDatetime: function(value, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat) {
-            var datePart = this._formatDate(value, dateFromFormat, dateToFormat);
-            var dateBefore = this._formatDate(datePart, dateToFormat, dateFromFormat);
-            var timePart = value.substr(dateBefore.length + this.dateWidgetOptions.altSeparator.length);
-            timePart = this._formatTime(timePart, timeFromFormat, timeToToFormat);
-            return datePart + this.dateWidgetOptions.altSeparator + timePart;
+            try {
+                var separator = this.dateWidgetOptions.altSeparator;
+                var timeSettings = {
+                    timeFormat: timeFromFormat,
+                    separator: $.timepicker._defaults.separator
+                };
+
+                if (dateFromFormat == this.dateWidgetOptions.altFormat) {
+                    separator = $.timepicker._defaults.separator;
+                    timeSettings.separator = this.dateWidgetOptions.altSeparator;
+                }
+
+                var date = $.datepicker.parseDateTime(dateFromFormat, timeFromFormat, value, {}, timeSettings);
+
+                var time = {
+                    hour: date.getHours(),
+                    minute: date.getMinutes(),
+                    second: date.getSeconds()
+                };
+
+                return $.datepicker.formatDate(dateToFormat, date) + separator
+                    + $.datepicker.formatTime(timeToToFormat, time);
+            } catch (Exception) {
+                //if argument value is  variable
+                return value;
+            }
         },
 
         /**
