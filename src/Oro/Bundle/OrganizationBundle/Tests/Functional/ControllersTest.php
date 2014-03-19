@@ -48,6 +48,7 @@ class ControllersTest extends WebTestCase
                 "lastName" => "lastName",
                 "roles" => array("3"),
                 "owner" => "1",
+                "inviteUser" => false
             )
         );
         $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);

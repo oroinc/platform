@@ -40,6 +40,7 @@ class RestDataAuditApiTest extends WebTestCase
                 "nameSuffix" => "Sn.",
                 "roles" => array("2"),
                 "owner" => "1",
+                "inviteUser" => false
             )
         );
 

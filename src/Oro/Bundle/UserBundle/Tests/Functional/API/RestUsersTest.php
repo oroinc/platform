@@ -35,6 +35,7 @@ class RestUsersTest extends WebTestCase
                 "lastName"      => "lastName",
                 "roles"         => array("3"),
                 "owner"         => "1",
+                "inviteUser"    => false
             )
         );
         $this->client->request(
