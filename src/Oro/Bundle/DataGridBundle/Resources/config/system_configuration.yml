@@ -1,0 +1,39 @@
+oro_system_configuration:
+    groups:
+        look_and_feel:
+            title: 'Look & Feel'
+            icon:  'icon-flag'
+        grid_settings:
+            title: 'Datagrid settings'
+            icon:  'icon-font'
+
+        language_languages:
+            title: 'Languages'
+        locale_settings:
+            title: 'Localization options'
+
+    fields:
+        oro_grid.default_per_page:
+            type: choice
+            priority: 60
+            options:
+                label: 'Default per page'
+                tooltip: oro.grid.form.tooltip.default_per_page
+                required: true
+                choices: [10, 25, 50, 100]
+                constraints:
+                    - NotBlank: ~
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                priority: 260
+                                children:
+                                    grid_settings:
+                                        priority: 100
+                                        children:
+                                            - oro_grid.default_per_page
