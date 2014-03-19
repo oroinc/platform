@@ -82,7 +82,7 @@
         data  - property data
 #}
 {% macro renderProperty(title, data) %}
-    {{ _self.renderHtmlProperty(title, data|escape()) }}
+    {{ _self.renderHtmlProperty(title, data|escape) }}
 {% endmacro %}
 
 {#
