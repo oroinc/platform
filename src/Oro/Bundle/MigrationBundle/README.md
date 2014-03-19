@@ -129,6 +129,14 @@ This command supports some additional options:
 
 Also there is **oro:migration:dump** command to help in creation migration files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
 
+Examples of database structure migrations
+-----------------------------------------
+
+ - [Simple migration](../UserBundle/Migrations/Schema/v1_0)
+ - [Installer](../InstallerBundle/Migrations/Schema)
+ - [Complex migration](../EntityConfigBundle/Migrations/Schema/v1_2)
+
+
 Extensions for database structure migrations
 --------------------------------------------
 Sometime you cannot use standard Doctrime methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how [RenameExtension][5] can be used:
