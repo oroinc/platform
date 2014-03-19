@@ -72,7 +72,7 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
     {
         return 'DELETE FROM oro_entity_config_value WHERE NOT ('
         . " (scope = 'dataaudit' AND code = 'auditable')" // for both entity and field
-        . " OR (scope = 'extend' AND code IN ('owner', 'state', 'is_deleted'))" // for both entity and field
+        . " OR (scope = 'extend' AND code IN ('label', 'owner', 'state', 'is_deleted'))" // for both entity and field
         . " OR (scope = 'extend' AND code = 'is_extend' AND field_id IS NULL)" // for entity only
         . " OR (scope = 'ownership' AND code = 'owner_type' AND field_id IS NULL)" // for entity only
         . ')';

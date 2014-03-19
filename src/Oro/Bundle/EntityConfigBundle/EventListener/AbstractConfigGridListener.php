@@ -124,9 +124,22 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         $fields = [];
 
-        foreach ($this->configManager->getProviders() as $provider) {
-            foreach ($provider->getPropertyConfig()->getItems($itemsType) as $code => $item) {
-                if (!isset($item['grid'])) {
+        $providers = $this->configManager->getProviders();
+        foreach ($providers as $provider) {
+            $items = $provider->getPropertyConfig()->getItems($itemsType);
+            foreach ($items as $code => $item) {
+                if (!isset($item['grid'])
+                    || !isset($item['options'])
+                    || (
+                        isset($item['options'])
+                        && isset($item['options']['indexed'])
+                        && $item['options']['indexed'] == false
+                    )
+                    || (
+                        isset($item['options'])
+                        && !isset($item['options']['indexed'])
+                    )
+                ) {
                     continue;
                 }
 
@@ -194,7 +207,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             }
         }
 
-        return ['filters' => $filters, 'sorters' => $sorters];
+        return [
+            'filters' => $filters,
+            'sorters' => $sorters
+        ];
     }
 
     /**
