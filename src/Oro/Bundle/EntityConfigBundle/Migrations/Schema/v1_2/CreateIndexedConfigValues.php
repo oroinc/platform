@@ -52,6 +52,22 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
             'oro_entity_config_value',
             'oro_entity_config_index_value'
         );
+
+        $this->renameExtension->addIndex(
+            $schema,
+            $queries,
+            'oro_entity_config_index_value',
+            ['scope', 'code', 'value', 'entity_id'],
+            'idx_entity_config_index_entity'
+        );
+
+        $this->renameExtension->addIndex(
+            $schema,
+            $queries,
+            'oro_entity_config_index_value',
+            ['scope', 'code', 'value', 'field_id'],
+            'idx_entity_config_index_field'
+        );
     }
 
     /**
