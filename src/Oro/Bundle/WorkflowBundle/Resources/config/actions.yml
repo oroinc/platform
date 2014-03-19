@@ -6,6 +6,7 @@ parameters:
     oro_workflow.action.assign_value.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignValue
     oro_workflow.action.unset_value.class: Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue
     oro_workflow.action.create_object.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
+    oro_workflow.action.create_date.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
     oro_workflow.action.create_datetime.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime
     oro_workflow.action.create_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
     oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
@@ -58,6 +59,14 @@ services:
             - @oro_workflow.context_accessor
         tags:
             - { name: oro_workflow.action, alias: create_object }
+
+    oro_workflow.action.create_date:
+        class: %oro_workflow.action.create_date.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_locale.settings
+        tags:
+            - { name: oro_workflow.action, alias: create_date }
 
     oro_workflow.action.create_datetime:
         class: %oro_workflow.action.create_datetime.class%
