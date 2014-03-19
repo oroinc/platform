@@ -262,5 +262,4 @@ abstract class AbstractConfigModel
             }
         }
     }
-
 }
