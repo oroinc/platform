@@ -16,11 +16,12 @@
     <script type="text/javascript">
         require(['jquery', 'flotr2', 'oroui/js/layout'], function ($, Flotr, layout) {
             layout.onPageRendered(function () {
+                var ratio = {{ isMobileVersion() ? '0.8' : '0.35' }};
                 var $widgetContent = $('#{{ widgetContentId }}');
                 var $chart = $('#{{ widgetId }}-chart');
                 var $chartLegend = $('#{{ widgetId }}-legend');
                 var setChartSize = function () {
-                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.35), 350);
+                    var chartWidth = Math.min(Math.round($widgetContent.width() * ratio), 350);
                     if (chartWidth != $chart.width()) {
                         $chart.width(chartWidth);
                         $chart.height(chartWidth);

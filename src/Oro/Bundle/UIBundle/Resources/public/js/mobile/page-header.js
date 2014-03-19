@@ -4,10 +4,17 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
     'use strict';
 
     function updatePageHeader() {
-        var $header = $('.navigation.navbar-extra');
-        $header.find('.title-buttons-container').dropdownButtonProcessor({
-            moreLabel: __('More')
-        });
+        var $header = $('.navigation.navbar-extra'),
+            $container = $header.find('.title-buttons-container'),
+            options = {
+                moreLabel: __('More'),
+                minItemQuantity: 1
+            },
+            label = $container.find('.btn').slice(0,2).text().replace(/\s{2,}/g, ' ');
+        if (label.length > 35) {
+            options.minItemQuantity = 0;
+        }
+        $container.dropdownButtonProcessor(options);
     }
 
     /**
