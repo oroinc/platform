@@ -11,7 +11,6 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
@@ -44,11 +43,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     protected $env = 'prod';
 
     /**
-     * @var LocaleSettings
-     */
-    protected $localeSettings;
-
-    /**
      * Constructor
      *
      * @param LoggerInterface $logger
@@ -57,7 +51,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param EmailRenderer $emailRenderer
      * @param \Swift_Mailer $mailer
      * @param string $sendFrom
-     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         LoggerInterface $logger,
@@ -65,13 +58,11 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        LocaleSettings $localeSettings,
         $sendFrom
     ) {
         parent::__construct($logger, $em, $entityPool);
         $this->renderer = $emailRenderer;
         $this->mailer = $mailer;
-        $this->localeSettings = $localeSettings;
         $this->sendFrom = $sendFrom;
     }
 
@@ -111,7 +102,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate($this->localeSettings->getLanguage());
+            $emailTemplate = $notification->getTemplate();
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
@@ -132,7 +123,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
                 continue;
             }
 
-            // TODO: use locale for subject and body
             $params = new ParameterBag(
                 array(
                     'subject' => $subjectRendered,
