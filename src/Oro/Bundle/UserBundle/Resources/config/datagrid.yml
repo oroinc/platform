@@ -260,7 +260,7 @@ datagrid:
                             alias: o
                 where:
                     and:
-                        - o.id = :origin_id
+                        - a.email IN (:email_addresses)
 
     user-relation-grid:
         source:
@@ -440,9 +440,12 @@ datagrid:
                         origin:
                             join: f.origin
                             alias: o
+                        from_email_address:
+                            join: e.fromEmailAddress
+                            alias: a
                 where:
                     and:
-                        - o.id = :origin_id
+                        - a.email IN (:email_addresses)
         properties:
             id: ~
         options:
@@ -460,11 +463,6 @@ datagrid:
             query:
                 select:
                     - @oro_email.datagrid_query_factory->getFromEmailExpression
-                join:
-                    inner:
-                        from_email_address:
-                            join: e.fromEmailAddress
-                            alias: a
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.entity.class%::INBOX'
