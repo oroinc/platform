@@ -302,12 +302,10 @@ class PackageManager
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
-                        $this->scriptRunner->install($package);
+                        $this->scriptRunner->runInstallScripts($package);
                     },
                     $justInstalledPackages
                 );
-                $this->scriptRunner->updateWorkflow($justInstalledPackages);
-                $this->scriptRunner->loadFixtures($justInstalledPackages);
                 if ($loadDemoData) {
                     $this->scriptRunner->loadDemoData($justInstalledPackages);
                 }
@@ -402,7 +400,7 @@ class PackageManager
         array_map(
             function ($name) use ($installationManager, $localRepository) {
                 $package = $this->findInstalledPackage($name);
-                $this->scriptRunner->uninstall($package);
+                $this->scriptRunner->runUninstallScripts($package);
                 $installationManager->uninstall(
                     $localRepository,
                     new UninstallOperation($package)
@@ -499,7 +497,7 @@ class PackageManager
             );
             array_map(
                 function (PackageInterface $p) {
-                    $this->scriptRunner->install($p);
+                    $this->scriptRunner->runInstallScripts($p);
                 },
                 $installedPackages
             );
@@ -525,7 +523,7 @@ class PackageManager
             );
             array_map(
                 function (PackageInterface $p) {
-                    $this->scriptRunner->uninstall($p);
+                    $this->scriptRunner->runUninstallScripts($p);
                 },
                 $uninstalledPackages
             );
