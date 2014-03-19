@@ -1,7 +1,7 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
+define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
         'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'jquery.dialog.extended'
-    ], function ($, _, Backbone, app, error, AbstractWidget, StateModel) {
+    ], function ($, _, app, error, AbstractWidget, StateModel) {
     'use strict';
 
     /**
@@ -82,7 +82,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
                 if (this.options.el) {
                     this.setElement(this.options.el);
                 } else if (this.model.get('id')) {
-                    var restoredEl = Backbone.$('#widget-restored-state-' + this.model.get('id'));
+                    var restoredEl = $('#widget-restored-state-' + this.model.get('id'));
                     if (restoredEl.length) {
                         this.setElement(restoredEl);
                     }
@@ -121,7 +121,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
             }
             var saveData = _.omit(this.options, ['dialogOptions', 'el', 'model']);
             if (!saveData.url) {
-                saveData.el = Backbone.$('<div/>').append(this.$el.clone()).html();
+                saveData.el = $('<div/>').append(this.$el.clone()).html();
             }
             saveData.dialogOptions = {};
             _.each(this.options.dialogOptions, function(val, key) {
@@ -130,7 +130,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
                 }
             }, this);
 
-            saveData.dialogOptions.title = Backbone.$(e.target).dialog('option', 'title');
+            saveData.dialogOptions.title = $(e.target).dialog('option', 'title');
             saveData.dialogOptions.state = data.state;
             saveData.dialogOptions.snapshot = data.snapshot;
 
@@ -157,8 +157,8 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
 
         getActionsElement: function() {
             if (!this.actionsEl) {
-                this.actionsEl = Backbone.$('<div class="pull-right"/>').appendTo(
-                    Backbone.$('<div class="form-actions widget-actions"/>').appendTo(
+                this.actionsEl = $('<div class="pull-right"/>').appendTo(
+                    $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )
                 );
@@ -179,27 +179,21 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
          * Show dialog
          */
         show: function() {
-            var instance, self = this;
             if (!this.widget) {
                 if (typeof this.options.dialogOptions.position === 'undefined') {
                     this.options.dialogOptions.position = this._getWindowPlacement();
                 }
                 this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                this.widget = Backbone.$('<div/>').append(this.$el).dialog(this.options.dialogOptions);
-                instance = this.widget.data('ui-dialog');
-                instance._moveToVisible = _.wrap(instance._moveToVisible, function (origin) {
-                    self._adjustContentSize();
-                    origin.call(this, _.rest(arguments));
-                });
+                this.widget = $('<div/>').append(this.$el).dialog(this.options.dialogOptions);
             } else {
                 this.widget.html(this.$el);
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             AbstractWidget.prototype.show.apply(this);
+            this.widget.dialog('adjustContentSize');
         },
 
         _initAdjustHeight: function(content) {
-            this._adjustContentSize();
             this.widget.off("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
@@ -207,14 +201,6 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
                 this.widget.on("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
-        },
-
-        _adjustContentSize: function () {
-            var viewportHeight = $(window).height(),
-                dialogHeight = this.widget.parent().outerHeight(),
-                widgetHeight = this.widget.innerHeight(),
-                maxHeight = viewportHeight + widgetHeight - dialogHeight;
-            this.widget.css('max-height', maxHeight);
         },
 
         _fixScrollableHeight: function() {
