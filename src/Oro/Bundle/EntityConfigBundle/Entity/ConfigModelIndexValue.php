@@ -47,6 +47,7 @@ class ConfigModelIndexValue
      * @ORM\Column(name="code", type="string", length=255)
      */
     protected $code;
+
     /**
      * @var string
      * @ORM\Column(name="scope", type="string", length=255)
