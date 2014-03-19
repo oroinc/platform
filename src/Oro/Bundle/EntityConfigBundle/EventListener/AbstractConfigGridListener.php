@@ -136,7 +136,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     continue;
                 }
 
-                if (!isset($item['options']['indexed']) || $item['options']['indexed'] == false) {
+                if (!isset($item['options']['indexed']) || $item['options']['indexed'] === false) {
                     throw new LogicException(
                         sprintf(
                             'Option "indexed" should be set to TRUE for property "%s" in scope "%s".',
