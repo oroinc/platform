@@ -91,11 +91,11 @@ define(
              * It need for actualisation data
              */
             reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
+                var url = routing.generate('oro_reminder_requested');
                 var self = this;
-                $.getJSON(url, function(messageParams) {
+                $.post(url, function(messageParams) {
                     self.showReminders(messageParams);
-                });
+                }, 'json');
             }
         };
     });
