@@ -1,7 +1,7 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
+define(['jquery', 'underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
         'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'jquery.dialog.extended'
-    ], function (_, Backbone, app, error, AbstractWidget, StateModel) {
+    ], function ($, _, Backbone, app, error, AbstractWidget, StateModel) {
     'use strict';
 
     /**
@@ -179,12 +179,18 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
          * Show dialog
          */
         show: function() {
+            var instance, self = this;
             if (!this.widget) {
                 if (typeof this.options.dialogOptions.position === 'undefined') {
                     this.options.dialogOptions.position = this._getWindowPlacement();
                 }
                 this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
                 this.widget = Backbone.$('<div/>').append(this.$el).dialog(this.options.dialogOptions);
+                instance = this.widget.data('ui-dialog');
+                instance._moveToVisible = _.wrap(instance._moveToVisible, function (origin) {
+                    self._adjustContentSize();
+                    origin.call(this, _.rest(arguments));
+                });
             } else {
                 this.widget.html(this.$el);
             }
@@ -193,6 +199,7 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
         },
 
         _initAdjustHeight: function(content) {
+            this._adjustContentSize();
             this.widget.off("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
@@ -200,6 +207,14 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
                 this.widget.on("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
+        },
+
+        _adjustContentSize: function () {
+            var viewportHeight = $(window).height(),
+                dialogHeight = this.widget.parent().outerHeight(),
+                widgetHeight = this.widget.innerHeight(),
+                maxHeight = viewportHeight + widgetHeight - dialogHeight;
+            this.widget.css('max-height', maxHeight);
         },
 
         _fixScrollableHeight: function() {
