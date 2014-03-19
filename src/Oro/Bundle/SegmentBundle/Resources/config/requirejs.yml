@@ -1,0 +1,3 @@
+config:
+    paths:
+        'orosegment/js/segment': 'bundles/orosegment/js/segment.js'
