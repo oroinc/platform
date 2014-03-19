@@ -13,6 +13,6 @@ request:
     roles: [3]
     groups: ~
     owner: 1
-    inviteUser: false
+    inviteUser: null
 response:
     return: true
