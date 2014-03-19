@@ -27,7 +27,7 @@ class CountQueryBuilderOptimizer
      */
     public function getCountQueryBuilder(QueryBuilder $originalQb)
     {
-        $this->originalQb = $originalQb;
+        $this->setOriginalQueryBuilder($originalQb);
 
         $qb = clone $this->originalQb;
         // Permanently reset settings not related to count query
@@ -40,26 +40,33 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('join')
             ->resetDQLPart('having');
 
-        $qb->select(array('DISTINCT ' . $this->getIdFieldFQN()));
-
         $parts = $this->originalQb->getDQLParts();
         $this->prepareFieldAliases($parts['select']);
 
         // Collect list of tables which should be added to new query
+        $ifFieldFQN = $this->getIdFieldFQN();
+        $qb->select(array($ifFieldFQN));
         if ($parts['join']) {
             $requiredToJoin = array();
             if ($parts['where']) {
-                $requiredToJoin += $this->getUsedWhereAliases($parts['where']);
+                $requiredToJoin += $this->getUsedTableAliases($parts['where']);
+            }
+            if ($parts['groupBy']) {
+                $requiredToJoin += $this->getUsedTableAliases($parts['groupBy']);
             }
             if ($parts['having']) {
-                $requiredToJoin += $this->getUsedWhereAliases($parts['having']);
+                $requiredToJoin += $this->getUsedTableAliases($parts['having']);
                 $qb->having($this->getPreparedHaving($parts['having']));
             }
             $requiredToJoin += $this->getUsedJoinAliases($parts['join'], $requiredToJoin);
             $requiredToJoin = array_unique($requiredToJoin);
+
             /** @var Expr\Join $join */
+            $hasJoins = false;
             foreach ($parts['join'][$this->getRootAlias()] as $join) {
+                // To count results number join all tables with inner join and required to tables
                 if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($join->getAlias(), $requiredToJoin)) {
+                    $hasJoins = true;
                     if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
                         $qb->innerJoin(
                             $join->getJoin(),
@@ -79,10 +86,27 @@ class CountQueryBuilderOptimizer
                     }
                 }
             }
+            // In case when count query has joins count each id only once.
+            if ($hasJoins) {
+                $qb->select(array('DISTINCT ' . $ifFieldFQN));
+            }
         }
+
         $this->fixUnusedParameters($qb);
 
         return $qb;
+    }
+
+    /**
+     * @param QueryBuilder $originalQb
+     */
+    protected function setOriginalQueryBuilder(QueryBuilder $originalQb)
+    {
+        $this->rootAlias = null;
+        $this->idFieldName = null;
+        $this->fieldAliases = array();
+
+        $this->originalQb = $originalQb;
     }
 
     /**
@@ -181,7 +205,7 @@ class CountQueryBuilderOptimizer
                         }
                     }
                     if (!empty($joinCondition)) {
-                        $aliases += $this->getUsedWhereAliases($joinCondition);
+                        $aliases += $this->getUsedTableAliases($joinCondition);
                     }
                 }
             }
@@ -195,13 +219,13 @@ class CountQueryBuilderOptimizer
      * @param string|object $where
      * @return array
      */
-    protected function getUsedWhereAliases($where)
+    protected function getUsedTableAliases($where)
     {
         $aliases = array();
 
         if (is_array($where)) {
             foreach ($where as $wherePart) {
-                $aliases += $this->getUsedWhereAliases($wherePart);
+                $aliases += $this->getUsedTableAliases($wherePart);
             }
         } elseif (is_object($where)) {
             $where = (string) $where;
@@ -209,6 +233,7 @@ class CountQueryBuilderOptimizer
 
         if (is_string($where)) {
             $where = $this->replaceAliasesWithFields($where);
+            // Search for fields in where clause
             preg_match_all('/(\w+\.\w+)/', $where, $matches);
             if ($matches) {
                 foreach ($matches[1] as $match) {
@@ -232,6 +257,7 @@ class CountQueryBuilderOptimizer
     protected function replaceAliasesWithFields($condition)
     {
         foreach ($this->fieldAliases as $alias => $field) {
+            // Do not replace string if it is part of another string or parameter (starts with :)
             $condition = preg_replace('/(?<![A-Za-z0-9_:])(' . $alias .')([^A-Za-z0-9_])/', $field . ' ', $condition);
         }
         return $condition;
