@@ -12,8 +12,11 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
@@ -118,6 +121,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      * @param string|null $alias
      * @param string|null $itemsType
      *
+     * @throws LogicException
      * @return array
      */
     protected function getDynamicFields($alias = null, $itemsType = null)
@@ -128,19 +132,18 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($providers as $provider) {
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
-                if (!isset($item['grid'])
-                    || !isset($item['options'])
-                    || (
-                        isset($item['options'])
-                        && isset($item['options']['indexed'])
-                        && $item['options']['indexed'] == false
-                    )
-                    || (
-                        isset($item['options'])
-                        && !isset($item['options']['indexed'])
-                    )
-                ) {
+                if (!isset($item['grid'])) {
                     continue;
+                }
+
+                if (!isset($item['options']['indexed']) || $item['options']['indexed'] == false) {
+                    throw new LogicException(
+                        sprintf(
+                            'Option "indexed" should be set to TRUE for property "%s" in scope "%s".',
+                            $code,
+                            $provider->getScope()
+                        )
+                    );
                 }
 
                 $fieldName    = $provider->getScope() . '_' . $code;
