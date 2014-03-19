@@ -8,7 +8,7 @@ parameters:
     oro_segment.query.dynamic_segment.query_builder.class:   Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder
     oro_segment.query.static_segment.query_builder.class:    Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
     oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
-    oro_segment.segment_provider.class:                      Oro\Bundle\SegmentBundle\Provider\SegmentProvider
+    oro_segment.entity_name_provider.class:                  Oro\Bundle\SegmentBundle\Provider\EntityNameProvider
 
 services:
     oro_segment.entity_provider:
@@ -46,7 +46,7 @@ services:
             - @oro_filter.filter_utility
             - @oro_segment.query.dynamic_segment.query_builder
             - @oro_segment.query.static_segment.query_builder
-            - @oro_segment.segment_provider
+            - @oro_segment.entity_name_provider
             - @oro_entity_config.provider.entity
             - @doctrine.orm.entity_manager
         tags:
@@ -71,5 +71,5 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preRemove }
 
-    oro_segment.segment_provider:
-        class: %oro_segment.segment_provider.class%
+    oro_segment.entity_name_provider:
+        class: %oro_segment.entity_name_provider.class%

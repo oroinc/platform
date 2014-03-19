@@ -6,10 +6,14 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SegmentBundle\Provider\SegmentProvider;
+use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Filter\SegmentFilter;
@@ -19,6 +23,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\PreloadedExtension;
 
 class SegmentFilterTest extends OrmTestCase
 {
@@ -34,8 +40,8 @@ class SegmentFilterTest extends OrmTestCase
     /** @var StaticSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $staticSegmentQueryBuilder;
 
-    /** @var SegmentProvider|\PHPUnit_Framework_MockObject_MockObject  */
-    protected $segmentProvider;
+    /** @var EntityNameProvider|\PHPUnit_Framework_MockObject_MockObject  */
+    protected $entityNameProvider;
 
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject  */
     protected $configProvider;
@@ -58,7 +64,7 @@ class SegmentFilterTest extends OrmTestCase
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->segmentProvider = $this->getMock('Oro\Bundle\SegmentBundle\Provider\SegmentProvider');
+        $this->entityNameProvider = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
 
         $this->configProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -73,7 +79,7 @@ class SegmentFilterTest extends OrmTestCase
             new FilterUtility(),
             $this->dynamicSegmentQueryBuilder,
             $this->staticSegmentQueryBuilder,
-            $this->segmentProvider,
+            $this->entityNameProvider,
             $this->configProvider,
             $this->em
         );
@@ -82,6 +88,45 @@ class SegmentFilterTest extends OrmTestCase
     public function tearDown()
     {
         unset($this->formFactory, $this->dynamicSegmentQueryBuilder, $this->filter);
+    }
+
+    public function testGetMetadata()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
+
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions(
+                [
+                    new PreloadedExtension(
+                        [
+                            'oro_type_filter'                => new FilterType($translator),
+                            'oro_type_choice_filter'         => new ChoiceFilterType($translator),
+                            'oro_type_entity_filter'         => new EntityFilterType($translator),
+                        ],
+                        []
+                    ),
+                    new CsrfExtension(
+                        $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                    )
+                ]
+            )
+            ->getFormFactory();
+
+        $filter = new SegmentFilter(
+            $factory,
+            new FilterUtility(),
+            $this->dynamicSegmentQueryBuilder,
+            $this->staticSegmentQueryBuilder,
+            $this->entityNameProvider,
+            $this->configProvider,
+            $this->em
+        );
+        $filter->init('segment', ['entity' => '']);
+
+
+
+        $metadata = $filter->getMetadata();
     }
 
     public function testGetForm()

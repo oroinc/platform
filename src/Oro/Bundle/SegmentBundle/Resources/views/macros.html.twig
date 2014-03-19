@@ -18,7 +18,7 @@
                 }
             },
             util: {},
-            segmentsLoaderSelector: '#' ~ params.entity_choice_id,
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id,
             currentSegment: params.currentSegmentId|default(null)
         }
     } %}
@@ -180,6 +180,7 @@
     @param array    metadata
 #}
 {% macro initJsWidgets(type, form, entities, metadata) %}
+    {{ _self.query_designer_segment_template('segment-template') }}
     {% set entityFieldsRouteParams = {
         'with-relations': 1,
         'with-entity-details': 1,

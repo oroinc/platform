@@ -18,7 +18,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
-use Oro\Bundle\SegmentBundle\Provider\SegmentProvider;
+use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 
 class SegmentFilter extends EntityFilter
 {
@@ -28,8 +28,8 @@ class SegmentFilter extends EntityFilter
     /** @var StaticSegmentQueryBuilder */
     protected $staticSegmentQueryBuilder;
 
-    /** @var SegmentProvider */
-    protected $segmentProvider;
+    /** @var EntityNameProvider */
+    protected $entityNameProvider;
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -44,7 +44,7 @@ class SegmentFilter extends EntityFilter
      * @param FilterUtility               $util
      * @param DynamicSegmentQueryBuilder  $dynamicSegmentQueryBuilder
      * @param StaticSegmentQueryBuilder   $staticSegmentQueryBuilder
-     * @param SegmentProvider             $segmentProvider
+     * @param EntityNameProvider          $entityNameProvider
      * @param ConfigProvider              $configProvider
      * @param EntityManager               $em
      */
@@ -53,7 +53,7 @@ class SegmentFilter extends EntityFilter
         FilterUtility $util,
         DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder,
         StaticSegmentQueryBuilder $staticSegmentQueryBuilder,
-        SegmentProvider $segmentProvider,
+        EntityNameProvider $entityNameProvider,
         ConfigProvider $configProvider,
         EntityManager $em
     ) {
@@ -61,7 +61,7 @@ class SegmentFilter extends EntityFilter
 
         $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
         $this->staticSegmentQueryBuilder  = $staticSegmentQueryBuilder;
-        $this->segmentProvider            = $segmentProvider;
+        $this->entityNameProvider         = $entityNameProvider;
         $this->configProvider             = $configProvider;
         $this->em                         = $em;
     }
@@ -109,7 +109,7 @@ class SegmentFilter extends EntityFilter
     public function getForm()
     {
         if (!$this->form) {
-            $segment = $this->segmentProvider->getCurrentItem();
+            $entityName = $this->entityNameProvider->getEntityName();
 
             // hard coded field, do not allow to pass any option
             $this->form = $this->formFactory->create(
@@ -121,20 +121,10 @@ class SegmentFilter extends EntityFilter
                         'class'    => 'OroSegmentBundle:Segment',
                         'property' => 'name',
                         'required' => true,
-                        'query_builder' => function (EntityRepository $repo) use ($segment) {
-                            $entityName = $segment ? $segment->getEntity() : '';
-                            if (empty($entityName)) {
-                                // produce empty dataset
-                                $qb = $repo->createQueryBuilder('s')
-                                    ->where('s.entity = :entity')
-                                    ->setParameter('entity', false);
-                            } else {
-                                $qb = $repo->createQueryBuilder('s')
-                                    ->where('s.entity = :entity')
-                                    ->setParameter('entity', $segment->getEntity());
-                            }
-
-                            return $qb;
+                        'query_builder' => function (EntityRepository $repo) use ($entityName) {
+                            return $repo->createQueryBuilder('s')
+                                ->where('s.entity = :entity')
+                                ->setParameter('entity', $entityName);
                         }
                     ]
                 ]

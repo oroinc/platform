@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 minimumInputLength: 3
             },
             exclude: [],
-            segmentsLoaderSelector: ''
+            fieldsLoaderSelector: ''
         },
 
         _create: function () {
@@ -104,10 +104,10 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
 
         _bindFieldsLoader: function () {
             var $fieldsLoader;
-            if (!this.options.segmentsLoaderSelector) {
+            if (!this.options.fieldsLoaderSelector) {
                 return;
             }
-            $fieldsLoader = $(this.options.segmentsLoaderSelector);
+            $fieldsLoader = $(this.options.fieldsLoaderSelector);
 
             this._updateData($fieldsLoader.val(), this.options.segmentData);
         },
