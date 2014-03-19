@@ -5,8 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -87,9 +85,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $this->createRelation($event->getConfig());
             }
 
-            if (!$entityConfig->is('state', ExtendScope::STATE_NEW)) {
+            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
                 $entityConfig->set('state', ExtendScope::STATE_UPDATED);
-
                 $event->getConfigManager()->persist($entityConfig);
             }
         }
@@ -120,7 +117,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                     $extendConfig->set('state', ExtendScope::STATE_UPDATED);
                 }
 
-                if (!$extendFieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                if (!$extendFieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
                     $extendFieldConfig->set('state', ExtendScope::STATE_UPDATED);
                     $event->getConfigManager()->persist($extendFieldConfig);
                 }
@@ -146,10 +143,19 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         if ($parentClassName == 'Extend' . $className) {
             $config = $event->getConfigManager()->getProvider('extend')->getConfig($event->getClassName());
-            $config->set('is_extend', true);
-            $config->set('extend_class', ExtendConfigDumper::ENTITY . $parentClassName);
-
-            $event->getConfigManager()->persist($config);
+            $hasChanges = false;
+            if (!$config->is('is_extend')) {
+                $config->set('is_extend', true);
+                $hasChanges = true;
+            }
+            $extendClass = ExtendConfigDumper::ENTITY . $parentClassName;
+            if (!$config->is('extend_class', $extendClass)) {
+                $config->set('extend_class', $extendClass);
+                $hasChanges = true;
+            }
+            if ($hasChanges) {
+                $event->getConfigManager()->persist($config);
+            }
         }
     }
 
