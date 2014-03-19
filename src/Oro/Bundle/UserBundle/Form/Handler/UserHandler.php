@@ -71,7 +71,8 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         $this->manager->updateUser($user);
         $this->tagManager->saveTagging($user);
 
-        if ($this->mailer
+        if ($this->form->has('inviteUser')
+            && $this->mailer
             && $this->form->get('inviteUser')->getViewData()
             && $this->form->get('plainPassword')->getViewData()
         ) {

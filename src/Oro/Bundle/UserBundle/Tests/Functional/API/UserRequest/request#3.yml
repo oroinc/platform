@@ -12,6 +12,5 @@ request:
     roles: [3]
     groups: ~
     owner: 1
-    inviteUser: 0
 response:
     return: true

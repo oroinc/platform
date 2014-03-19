@@ -44,8 +44,7 @@ class SoapDataAuditApiTest extends WebTestCase
             "lastName" => "lastName",
             "nameSuffix" => "Sn.",
             "roles" => array("2"),
-            "owner" => "1",
-            "inviteUser" => 0
+            "owner" => "1"
         );
 
         $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
