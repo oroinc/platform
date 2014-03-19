@@ -93,8 +93,7 @@ define(
             reloadReminders: function () {
                 var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
                 var self = this;
-                require(['text!' + url], function (messageParams) {
-                    messageParams = JSON.parse(messageParams);
+                $.getJSON(url, function(messageParams) {
                     self.showReminders(messageParams);
                 });
             }
