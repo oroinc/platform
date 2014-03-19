@@ -126,8 +126,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
         $providers = $this->configManager->getProviders();
         foreach ($providers as $provider) {
-            $items = $provider->getPropertyConfig()->getItems($itemsType);
-            foreach ($items as $code => $item) {
+            $configItems = $provider->getPropertyConfig()->getItems($itemsType);
+            foreach ($configItems as $code => $item) {
                 if (!isset($item['grid'])
                     || !isset($item['options'])
                     || (
@@ -151,7 +151,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     $fieldName => array_merge(
                         $item['grid'],
                         [
-                            'expression' => $alias . $code . '.value',
+                            'expression' => $alias . $provider->getScope() . '_' . $code . '.value',
                             'field_name' => $fieldName,
                         ]
                     )
@@ -221,7 +221,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      */
     protected function prepareRowActions(&$actions, $type)
     {
-        foreach ($this->configManager->getProviders() as $provider) {
+        $providers = $this->configManager->getProviders();
+        foreach ($providers as $provider) {
             $gridActions = $provider->getPropertyConfig()->getGridActions($type);
 
             foreach ($gridActions as $config) {
@@ -249,7 +250,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         $filters    = array();
         $actions    = array();
 
-        foreach ($this->configManager->getProviders() as $provider) {
+        $providers = $this->configManager->getProviders();
+        foreach ($providers as $provider) {
             $gridActions = $provider->getPropertyConfig()->getGridActions($itemType);
 
             $this->prepareProperties($gridActions, $properties, $actions, $filters, $provider->getScope());
@@ -360,8 +362,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      */
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $joinAlias, $itemsType)
     {
-        foreach ($this->configManager->getProviders() as $provider) {
-            foreach ($provider->getPropertyConfig()->getItems($itemsType) as $code => $item) {
+        $providers = $this->configManager->getProviders();
+        foreach ($providers as $provider) {
+            $configItems = $provider->getPropertyConfig()->getItems($itemsType);
+            foreach ($configItems as $code => $item) {
                 $alias     = $joinAlias . $provider->getScope() . '_' . $code;
                 $fieldName = $provider->getScope() . '_' . $code;
 
