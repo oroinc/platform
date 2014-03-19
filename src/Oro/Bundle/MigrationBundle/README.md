@@ -132,7 +132,7 @@ Also there is **oro:migration:dump** command to help in creation migration files
 Examples of database structure migrations
 -----------------------------------------
 
- - [Simple migration](../UserBundle/Migrations/Schema/v1_0)
+ - [Simple migration](../UserBundle/Migrations/Schema/v1_0/OroUserBundle.php)
  - [Installer](../InstallerBundle/Migrations/Schema)
  - [Complex migration](../EntityConfigBundle/Migrations/Schema/v1_2)
 
