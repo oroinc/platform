@@ -251,10 +251,7 @@ class WorkflowController extends FOSRestController
      */
     public function activateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowName = $workflowDefinition->getName();
-        $entityConfig = $this->getEntityConfig($workflowDefinition->getRelatedEntity());
-        $entityConfig->set('active_workflow', $workflowName);
-        $this->persistEntityConfig($entityConfig);
+        $this->get('oro_workflow.manager')->activateWorkflow($workflowDefinition);
 
         return $this->handleView(
             $this->view(
@@ -286,9 +283,7 @@ class WorkflowController extends FOSRestController
      */
     public function deactivateAction($entityClass)
     {
-        $entityConfig = $this->getEntityConfig($entityClass);
-        $entityConfig->set('active_workflow', null);
-        $this->persistEntityConfig($entityConfig);
+        $this->get('oro_workflow.manager')->deactivateWorkflow($entityClass);
 
         return $this->handleView(
             $this->view(
@@ -323,32 +318,5 @@ class WorkflowController extends FOSRestController
     protected function formatErrorResponse($message)
     {
         return array('message' => $message);
-    }
-
-    /**
-     * @param string $entityClass
-     * @return ConfigInterface
-     * @throws WorkflowException
-     */
-    protected function getEntityConfig($entityClass)
-    {
-        /** @var ConfigProviderInterface $workflowConfigProvider */
-        $workflowConfigProvider = $this->get('oro_entity_config.provider.workflow');
-        if (!$workflowConfigProvider->hasConfig($entityClass)) {
-            throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
-        }
-
-        return $workflowConfigProvider->getConfig($entityClass);
-    }
-
-    /**
-     * @param ConfigInterface $entityConfig
-     */
-    protected function persistEntityConfig(ConfigInterface $entityConfig)
-    {
-        /** @var ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-        $configManager->persist($entityConfig);
-        $configManager->flush();
     }
 }
