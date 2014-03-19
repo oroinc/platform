@@ -47,7 +47,7 @@ class MigrateConfigValuesQuery extends ParametrizedMigrationQuery
             $types  = ['values' => 'array', 'id' => 'integer'];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeQuery($query, $params, $types);
+                $this->connection->executeUpdate($query, $params, $types);
             }
         }
     }
