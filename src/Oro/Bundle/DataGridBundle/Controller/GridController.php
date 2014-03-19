@@ -67,8 +67,8 @@ class GridController extends Controller
             if ($e instanceof UserInputErrorExceptionInterface) {
                 return new JsonResponse(
                     [
-                    'type'    => UserInputErrorExceptionInterface::TYPE,
-                    'message' => $this->get('translator')->trans($e->getMessageTemplate(), $e->getMessageParams())
+                        'type'    => UserInputErrorExceptionInterface::TYPE,
+                        'message' => $this->get('translator')->trans($e->getMessageTemplate(), $e->getMessageParams())
                     ],
                     500
                 );

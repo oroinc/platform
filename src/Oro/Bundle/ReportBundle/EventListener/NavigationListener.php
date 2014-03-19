@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+
 use Knp\Menu\ItemInterface;
-use Knp\Menu\MenuItem;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
@@ -52,11 +53,9 @@ class NavigationListener
             $reports = $this->em->getRepository('OroReportBundle:Report')
                 ->findBy([], ['name' => 'ASC']);
 
-            if (!empty($reports)) {
-                foreach ($reports as $key => $report) {
-                    if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
-                        unset($reports[$key]);
-                    }
+            foreach ($reports as $key => $report) {
+                if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
+                    unset($reports[$key]);
                 }
             }
 
@@ -113,7 +112,8 @@ class NavigationListener
     {
         $menu->addChild('divider-' . rand(1, 99999))
             ->setLabel('')
-            ->setAttribute('class', 'divider');
+            ->setAttribute('class', 'divider')
+            ->setExtra('position', 15); // after manage report, we have 10 there
     }
 
     /**
@@ -133,6 +133,8 @@ class NavigationListener
                 [
                     'label' => $entityLabel,
                     'uri'   => '#',
+                    // after divider, all entities will be added in EntityName:ASC order
+                    'extras'=> ['position' => 20]
                 ]
             );
             $entityItem = $reportItem->getChild($entityItemName);

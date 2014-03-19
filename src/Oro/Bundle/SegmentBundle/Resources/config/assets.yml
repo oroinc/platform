@@ -1,0 +1,3 @@
+css:
+    'segment':
+        - 'bundles/orosegment/css/segment.css'
