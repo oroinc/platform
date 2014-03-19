@@ -28,6 +28,7 @@ class UsersTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Manager'))
+            ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()

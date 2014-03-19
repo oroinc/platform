@@ -26,13 +26,15 @@ abstract class AbstractUserHandler
     protected $manager;
 
     /**
-     *
      * @param FormInterface $form
      * @param Request       $request
      * @param UserManager   $manager
      */
-    public function __construct(FormInterface $form, Request $request, UserManager $manager)
-    {
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        UserManager $manager
+    ) {
         $this->form    = $form;
         $this->request = $request;
         $this->manager = $manager;
