@@ -212,7 +212,7 @@ namespace Acme\Bundle\TestBundle\Migration\Extension;
 /**
  * MyExtensionAwareInterface should be implemented by migrations that depends on a MyExtension.
  */
-interface RenameExtensionAwareInterface
+interface MyExtensionAwareInterface
 {
     /**
      * Sets the MyExtension
