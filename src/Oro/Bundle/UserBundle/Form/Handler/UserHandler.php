@@ -41,12 +41,12 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected $businessUnitManager;
 
     /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param UserManager $manager
+     * @param FormInterface    $form
+     * @param Request          $request
+     * @param UserManager      $manager
      * @param DelegatingEngine $templating
-     * @param string $platformEmail
-     * @param \Swift_Mailer $mailer
+     * @param string           $platformEmail
+     * @param \Swift_Mailer    $mailer
      */
     public function __construct(
         FormInterface $form,
