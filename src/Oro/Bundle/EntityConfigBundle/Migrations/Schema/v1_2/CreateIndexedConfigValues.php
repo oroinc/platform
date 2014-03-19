@@ -42,9 +42,20 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
         $queries->addPreQuery($this->getRemoveObsoleteValuesSql());
 
         $table = $schema->getTable('oro_entity_config_value');
+
         $table->dropColumn('serializable');
+
         $table->getColumn('value')
             ->setType(Type::getType(Type::STRING));
+
+        $table->addIndex(
+            ['scope', 'code', 'value', 'entity_id'],
+            'idx_entity_config_index_entity'
+        );
+        $table->addIndex(
+            ['scope', 'code', 'value', 'field_id'],
+            'idx_entity_config_index_field'
+        );
 
         $this->renameExtension->renameTable(
             $schema,
