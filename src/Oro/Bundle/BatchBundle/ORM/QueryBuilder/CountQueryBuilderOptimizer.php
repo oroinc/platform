@@ -28,73 +28,91 @@ class CountQueryBuilderOptimizer
     public function getCountQueryBuilder(QueryBuilder $originalQb)
     {
         $this->setOriginalQueryBuilder($originalQb);
+        $parts = $this->originalQb->getDQLParts();
 
         $qb = clone $this->originalQb;
-        // Permanently reset settings not related to count query
         $qb->setFirstResult(null)
             ->setMaxResults(null)
-            ->resetDQLPart('orderBy');
-
-        // Reset settings that may be regenerated in count query
-        $qb->resetDQLPart('select')
+            ->resetDQLPart('orderBy')
+            ->resetDQLPart('select')
             ->resetDQLPart('join')
-            ->resetDQLPart('having');
+            ->resetDQLPart('where')
+            ->resetDQLPart('having')
+            ->resetDQLPart('groupBy');
 
-        $parts = $this->originalQb->getDQLParts();
         $this->prepareFieldAliases($parts['select']);
+        $qb->select(array($this->getIdFieldFQN()));
 
-        // Collect list of tables which should be added to new query
-        $ifFieldFQN = $this->getIdFieldFQN();
-        $qb->select(array($ifFieldFQN));
         if ($parts['join']) {
-            $requiredToJoin = array();
-            if ($parts['where']) {
-                $requiredToJoin += $this->getUsedTableAliases($parts['where']);
+            $this->addJoins($qb, $parts);
+        }
+        if ($parts['where']) {
+            $qb->where($this->getStringWithReplacedAliases($parts['where']));
+        }
+        if ($parts['groupBy']) {
+            $groupBy = (array) $parts['groupBy'];
+            $groupByStrParts = array();
+            foreach ($groupBy as $groupByExpr) {
+                $groupByStrParts[] = $this->getStringWithReplacedAliases($groupByExpr);
             }
-            if ($parts['groupBy']) {
-                $requiredToJoin += $this->getUsedTableAliases($parts['groupBy']);
-            }
-            if ($parts['having']) {
-                $requiredToJoin += $this->getUsedTableAliases($parts['having']);
-                $qb->having($this->getPreparedHaving($parts['having']));
-            }
-            $requiredToJoin += $this->getUsedJoinAliases($parts['join'], $requiredToJoin);
-            $requiredToJoin = array_unique($requiredToJoin);
-
-            /** @var Expr\Join $join */
-            $hasJoins = false;
-            foreach ($parts['join'][$this->getRootAlias()] as $join) {
-                // To count results number join all tables with inner join and required to tables
-                if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($join->getAlias(), $requiredToJoin)) {
-                    $hasJoins = true;
-                    if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
-                        $qb->innerJoin(
-                            $join->getJoin(),
-                            $join->getAlias(),
-                            $join->getConditionType(),
-                            $join->getCondition(),
-                            $join->getIndexBy()
-                        );
-                    } else {
-                        $qb->leftJoin(
-                            $join->getJoin(),
-                            $join->getAlias(),
-                            $join->getConditionType(),
-                            $join->getCondition(),
-                            $join->getIndexBy()
-                        );
-                    }
-                }
-            }
-            // In case when count query has joins count each id only once.
-            if ($hasJoins) {
-                $qb->select(array('DISTINCT ' . $ifFieldFQN));
-            }
+            $qb->groupBy(implode(', ', $groupByStrParts));
+        }
+        if ($parts['having']) {
+            $qb->having($this->getStringWithReplacedAliases($parts['having']));
         }
 
         $this->fixUnusedParameters($qb);
 
         return $qb;
+    }
+
+    /**
+     * Add required JOINs to resulting Query Builder.
+     *
+     * @param QueryBuilder $qb
+     * @param array $parts
+     */
+    protected function addJoins(QueryBuilder $qb, array $parts)
+    {
+        // Collect list of tables which should be added to new query
+        $requiredToJoin = array();
+        $requiredToJoin = array_merge($requiredToJoin, $this->getUsedTableAliases($parts['where']));
+        $requiredToJoin = array_merge($requiredToJoin, $this->getUsedTableAliases($parts['groupBy']));
+        $requiredToJoin = array_merge($requiredToJoin, $this->getUsedTableAliases($parts['having']));
+        $requiredToJoin = array_merge($requiredToJoin, $this->getUsedJoinAliases($parts['join'], $requiredToJoin));
+        $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->getRootAlias()));
+
+        /** @var Expr\Join $join */
+        $hasJoins = false;
+        foreach ($parts['join'][$this->getRootAlias()] as $join) {
+            $alias = $join->getAlias();
+            // To count results number join all tables with inner join and required to tables
+            if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
+                $hasJoins = true;
+                $condition = $this->getStringWithReplacedAliases($join->getCondition());
+                if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
+                    $qb->innerJoin(
+                        $join->getJoin(),
+                        $alias,
+                        $join->getConditionType(),
+                        $condition,
+                        $join->getIndexBy()
+                    );
+                } else {
+                    $qb->leftJoin(
+                        $join->getJoin(),
+                        $alias,
+                        $join->getConditionType(),
+                        $condition,
+                        $join->getIndexBy()
+                    );
+                }
+            }
+        }
+        // In case when count query has joins count each id only once.
+        if ($hasJoins) {
+            $qb->select(array('DISTINCT ' . $this->getIdFieldFQN()));
+        }
     }
 
     /**
@@ -112,16 +130,12 @@ class CountQueryBuilderOptimizer
     /**
      * Get prepared having string with replaced aliases.
      *
-     * @param string|object $originalHaving
+     * @param string|object $originalString
      * @return string
      */
-    protected function getPreparedHaving($originalHaving)
+    protected function getStringWithReplacedAliases($originalString)
     {
-        if (is_object($originalHaving)) {
-            $originalHaving = (string) $originalHaving;
-        }
-
-        return $this->replaceAliasesWithFields($originalHaving);
+        return $this->replaceAliasesWithFields((string) $originalString);
     }
 
     /**
@@ -134,14 +148,11 @@ class CountQueryBuilderOptimizer
     {
         /** @var Expr\Select $select */
         foreach ($selects as $select) {
-            $parts = $select->getParts();
-            if ($parts) {
-                foreach ($select->getParts() as $part) {
-                    $part = preg_replace('/ as /i', ' as ', $part);
-                    if (strpos($part, ' as ') !== false) {
-                        list($field, $alias) = explode(' as ', $part);
-                        $this->fieldAliases[trim($alias)] = trim($field);
-                    }
+            foreach ($select->getParts() as $part) {
+                $part = preg_replace('/ as /i', ' as ', $part);
+                if (strpos($part, ' as ') !== false) {
+                    list($field, $alias) = explode(' as ', $part);
+                    $this->fieldAliases[trim($alias)] = trim($field);
                 }
             }
         }
@@ -193,20 +204,18 @@ class CountQueryBuilderOptimizer
     {
         /** @var Expr\Join $join */
         foreach ($joins[$this->getRootAlias()] as $join) {
-            if ($join->getJoinType() == Expr\Join::LEFT_JOIN) {
-                $joinTable = $join->getJoin();
-                $joinCondition = $join->getCondition();
-                $alias = $join->getAlias();
-                if (in_array($alias, $aliases)) {
-                    if (!empty($joinTable)) {
-                        $data = explode('.', $joinTable);
-                        if (!in_array($data[0], $aliases)) {
-                            $aliases[] = $data[0];
-                        }
+            $joinTable = $join->getJoin();
+            $joinCondition = $join->getCondition();
+            $alias = $join->getAlias();
+            if (in_array($alias, $aliases)) {
+                if (!empty($joinTable)) {
+                    $data = explode('.', $joinTable);
+                    if (!in_array($data[0], $aliases)) {
+                        $aliases[] = $data[0];
                     }
-                    if (!empty($joinCondition)) {
-                        $aliases += $this->getUsedTableAliases($joinCondition);
-                    }
+                }
+                if (!empty($joinCondition)) {
+                    $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
                 }
             }
         }
@@ -216,7 +225,7 @@ class CountQueryBuilderOptimizer
     /**
      * Get list of table aliases mentioned in condition.
      *
-     * @param string|object $where
+     * @param string|object|array $where
      * @return array
      */
     protected function getUsedTableAliases($where)
@@ -225,21 +234,21 @@ class CountQueryBuilderOptimizer
 
         if (is_array($where)) {
             foreach ($where as $wherePart) {
-                $aliases += $this->getUsedTableAliases($wherePart);
+                $aliases = array_merge($aliases, $this->getUsedTableAliases($wherePart));
             }
-        } elseif (is_object($where)) {
+        } else {
             $where = (string) $where;
-        }
 
-        if (is_string($where)) {
-            $where = $this->replaceAliasesWithFields($where);
-            // Search for fields in where clause
-            preg_match_all('/(\w+\.\w+)/', $where, $matches);
-            if ($matches) {
-                foreach ($matches[1] as $match) {
-                    if (strpos($match, '.') !== false) {
-                        $data = explode('.', $match);
-                        $aliases[] = $data[0];
+            if ($where) {
+                $where = $this->replaceAliasesWithFields($where);
+                // Search for fields in where clause
+                preg_match_all('/(\w+\.\w+)/', $where, $matches);
+                if (count($matches) > 1) {
+                    foreach ($matches[1] as $match) {
+                        if (strpos($match, '.') !== false) {
+                            $data = explode('.', $match);
+                            $aliases[] = $data[0];
+                        }
                     }
                 }
             }
@@ -256,11 +265,18 @@ class CountQueryBuilderOptimizer
      */
     protected function replaceAliasesWithFields($condition)
     {
+
         foreach ($this->fieldAliases as $alias => $field) {
             // Do not replace string if it is part of another string or parameter (starts with :)
-            $condition = preg_replace('/(?<![A-Za-z0-9_:])(' . $alias .')([^A-Za-z0-9_])/', $field . ' ', $condition);
+            $searchRegExpParts = array(
+                '^(' . $alias .')$',
+                '(?<![A-Za-z0-9_:])(' . $alias .')([^A-Za-z0-9_])',
+                '(?<![A-Za-z0-9_:])(' . $alias .')$',
+                '^(' . $alias .')([^A-Za-z0-9_])'
+            );
+            $condition = preg_replace('/' . implode('|', $searchRegExpParts) . '/', $field . ' ', $condition);
         }
-        return $condition;
+        return trim($condition);
     }
 
     /**
@@ -310,6 +326,7 @@ class CountQueryBuilderOptimizer
         if (strpos($fieldName, '.') === false) {
             $fieldName = ($parentAlias ? : $this->getRootAlias()) . '.' . $fieldName;
         }
+
         return $fieldName;
     }
 
@@ -323,6 +340,7 @@ class CountQueryBuilderOptimizer
         if (!$this->rootAlias) {
             $this->rootAlias = current($this->originalQb->getRootAliases());
         }
+
         return $this->rootAlias;
     }
 }
