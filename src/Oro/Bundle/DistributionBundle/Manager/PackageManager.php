@@ -512,8 +512,6 @@ class PackageManager
 
                 return '';
             };
-            $this->scriptRunner->clearApplicationCache();
-            $this->scriptRunner->runPlatformUpdate();
             array_map(
                 function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
                     $previousInstalledPackageVersion = $fetchPreviousInstalledPackageVersion($p->getName());
