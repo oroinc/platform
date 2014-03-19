@@ -43,6 +43,7 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
 
         $table = $schema->getTable('oro_entity_config_value');
         $table->dropColumn('serializable');
+
         $table->getColumn('value')
             ->setType(Type::getType(Type::STRING));
 
@@ -50,7 +51,6 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
             ['scope', 'code', 'value', 'entity_id'],
             'idx_entity_config_index_entity'
         );
-
         $table->addIndex(
             ['scope', 'code', 'value', 'field_id'],
             'idx_entity_config_index_field'
