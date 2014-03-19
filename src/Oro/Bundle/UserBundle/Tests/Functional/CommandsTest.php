@@ -89,8 +89,7 @@ class CommandsTest extends WebTestCase
                 "firstName" => "firstName",
                 "lastName" => "lastName",
                 "roles" => array("3"),
-                "owner" => "1",
-                "inviteUser" => false
+                "owner" => "1"
             )
         );
     }
