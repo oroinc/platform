@@ -6,12 +6,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\DataGridBundle\Event\ResultAfter;
+use Oro\Bundle\DataGridBundle\Event\ResultBefore;
 
 class OrmDatasource implements DatasourceInterface
 {
@@ -23,13 +26,18 @@ class OrmDatasource implements DatasourceInterface
     /** @var EntityManager */
     protected $em;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    /** @var DatagridInterface */
+    protected $grid;
 
-    public function __construct(EntityManager $em, AclHelper $aclHelper)
-    {
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    public function __construct(
+        EntityManager $em,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->em = $em;
-        $this->aclHelper = $aclHelper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -37,6 +45,8 @@ class OrmDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
+        $this->grid = $grid;
+
         if (isset($config['query'])) {
             $queryConfig = array_intersect_key($config, array_flip(['query']));
             $converter = new YamlConverter();
@@ -76,23 +86,23 @@ class OrmDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $results = $this->getResultQuery()->execute();
+        $query = $this->qb->getQuery();
+
+        $event = new ResultBefore($this->grid, $query);
+        $this->eventDispatcher->dispatch(ResultBefore::NAME, $event);
+        $this->eventDispatcher->dispatch(ResultBefore::NAME . '.' . $this->grid->getName(), $event);
+
+        $results = $query->execute();
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
 
-        return $rows;
-    }
+        $event = new ResultAfter($this->grid, $rows);
+        $this->eventDispatcher->dispatch(ResultAfter::NAME, $event);
+        $this->eventDispatcher->dispatch(ResultAfter::NAME . '.' . $this->grid->getName(), $event);
 
-    /**
-     * Returns query is used to retrieve grid data
-     *
-     * @return Query
-     */
-    public function getResultQuery()
-    {
-        return $this->aclHelper->apply($this->qb->getQuery());
+        return $rows;
     }
 
     /**
