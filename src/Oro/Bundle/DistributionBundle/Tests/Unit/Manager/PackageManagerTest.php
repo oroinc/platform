@@ -1066,7 +1066,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('runInstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->exactly(2))
-            ->method('update')
+            ->method('runUpdateScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->once())
             ->method('runUninstallScripts')
