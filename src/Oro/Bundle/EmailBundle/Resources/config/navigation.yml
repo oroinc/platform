@@ -3,6 +3,8 @@ oro_menu_config:
         emails:
             label: oro.email.entity_plural_label
             uri: '#'
+            extras:
+                position: 40
         oro_email_emailtemplate_list:
             label: oro.email.emailtemplate.entity_plural_label
             route: 'oro_email_emailtemplate_index'

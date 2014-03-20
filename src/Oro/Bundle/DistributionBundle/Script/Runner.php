@@ -55,7 +55,7 @@ class Runner
      * @param PackageInterface $package
      * @return string
      */
-    public function install(PackageInterface $package)
+    public function runInstallScripts(PackageInterface $package)
     {
         return $this->run($this->getPackageScriptPath($package, 'install.php'));
     }
@@ -64,7 +64,7 @@ class Runner
      * @param PackageInterface $package
      * @return string
      */
-    public function uninstall(PackageInterface $package)
+    public function runUninstallScripts(PackageInterface $package)
     {
         return $this->run($this->getPackageScriptPath($package, 'uninstall.php'));
     }
@@ -74,7 +74,7 @@ class Runner
      * @param string $previousPackageVersion
      * @return string
      */
-    public function update(PackageInterface $updatedPackage, $previousPackageVersion)
+    public function runUpdateScripts(PackageInterface $updatedPackage, $previousPackageVersion)
     {
         $migrationScripts = $this->findMigrationScripts($updatedPackage, $previousPackageVersion);
         if (!$migrationScripts) {
@@ -145,26 +145,6 @@ class Runner
                 unlink($file->getPathname());
             }
         }
-    }
-
-    /**
-     * @param PackageInterface[] $packages
-     *
-     * @return string
-     */
-    public function loadFixtures(array $packages)
-    {
-        return $this->runCommand('oro:migration:data:load');
-    }
-
-    /**
-     * @param PackageInterface[] $packages
-     *
-     * @return string
-     */
-    public function updateWorkflow(array $packages)
-    {
-        return $this->runCommand('oro:workflow:definitions:load');
     }
 
     /**

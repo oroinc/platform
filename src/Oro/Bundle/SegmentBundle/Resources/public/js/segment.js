@@ -10,6 +10,7 @@ define(function (require) {
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
     require('oroentity/js/field-choice');
+    require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
     require('oroquerydesigner/js/condition-builder');
@@ -34,6 +35,7 @@ define(function (require) {
             itemTemplate: ''
         },
         select2FieldChoiceTemplate: '',
+        select2SegmentChoiceTemplate: '',
         entities: [],
         metadata: {}
     };
@@ -194,14 +196,22 @@ define(function (require) {
         });
     }
 
-    function configureFilters(options, metadata, fieldChoiceOptions) {
-        var $fieldCondition, $builder;
+    function configureFilters(options, metadata, fieldChoiceOptions, segmentChoiceOptions) {
+        var $fieldCondition, $segmentCondition, $builder;
+
         // mixin extra options to condition-builder's field choice
         $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
         $.extend(true, $fieldCondition.data('options'), {
             fieldChoice: fieldChoiceOptions,
             filters: metadata.filters
         });
+
+        $segmentCondition = $(options.criteriaList).find('[data-criteria=condition-segment]');
+        $.extend(true, $segmentCondition.data('options'), {
+            segmentChoice: segmentChoiceOptions,
+            filters: metadata.filters
+        });
+
         $builder = $(options.conditionBuilder);
         $builder.conditionBuilder({
             criteriaListSelector: options.criteriaList
@@ -213,24 +223,41 @@ define(function (require) {
     }
 
     return function (options) {
-        var fieldChoiceOptions;
+        var fieldChoiceOptions, segmentChoiceOptions;;
         options = $.extend(true, {}, defaults, options);
 
         $storage = $(options.valueSource);
 
-        // common extra options for all field-choice inputs
-        fieldChoiceOptions = getFieldChoiceOptions(options);
+        var $groupingContainer = $(options.grouping.itemContainer),
+            $groupingForm      = $(options.grouping.form),
+            isGrouping         = !(_.isEmpty($groupingContainer) && _.isEmpty($groupingForm));
 
-        initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
+        // common extra options for all choice inputs
+        fieldChoiceOptions   = getFieldChoiceOptions(options);
+        segmentChoiceOptions = _.extend(_.clone(fieldChoiceOptions), {
+            select2: {
+                formatSelectionTemplate: $(options.select2SegmentChoiceTemplate).text()
+            }
+        });
+
+        if (isGrouping) {
+            initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
+        }
         initColumn(options.column, options.metadata, fieldChoiceOptions);
-        configureFilters(options.filters, options.metadata, fieldChoiceOptions);
+        configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
         $(options.entityChoice)
             .on('fieldsloadercomplete', function () {
-                var data = {columns: [], grouping_columns: [], filters: []};
+                var data = {columns: [], filters: []};
+                if (isGrouping) {
+                    data.grouping_columns = [];
+                }
                 save(data);
-                $(options.grouping.itemContainer).itemsManagerTable('reset');
-                $(options.grouping.form).itemsManagerEditor('reset');
+
+                if (isGrouping) {
+                    $groupingContainer.itemsManagerTable('reset');
+                    $groupingForm.itemsManagerEditor('reset');
+                }
                 $(options.column.itemContainer).itemsManagerTable('reset');
                 $(options.column.form).itemsManagerEditor('reset');
                 $(options.filters.conditionBuilder).conditionBuilder('setValue', data.filters);
