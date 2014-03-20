@@ -65,10 +65,10 @@ class MigrationsLoader
     protected $excludeBundles;
 
     /**
-     * @param KernelInterface $kernel
-     * @param Connection $connection
+     * @param KernelInterface    $kernel
+     * @param Connection         $connection
      * @param ContainerInterface $container
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcher    $eventDispatcher
      */
     public function __construct(
         KernelInterface $kernel,
@@ -262,7 +262,7 @@ class MigrationsLoader
      * Creates an instances of all classes implement migration scripts
      *
      * @param Migration[] $result
-     * @param array $files Files contain migration scripts
+     * @param array       $files Files contain migration scripts
      *                           'migrations' => array
      *                           .      key   = full file path
      *                           .      value = array
