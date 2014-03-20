@@ -75,7 +75,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 $executor    = $this->getMigrationExecutor($input);
                 $executor->setLogger($logger);
                 $executor->getQueryExecutor()->setLogger($queryLogger);
-                $executor->executeUp($migrations, $logger, $input->getOption('dry-run'));
+                $executor->executeUp($migrations, $input->getOption('dry-run'));
             }
         }
     }
