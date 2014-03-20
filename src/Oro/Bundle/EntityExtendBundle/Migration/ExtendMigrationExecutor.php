@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator;
 
-class ExtendMigrationQueryLoader extends MigrationQueryLoaderWithNameGenerator
+class ExtendMigrationExecutor extends MigrationExecutorWithNameGenerator
 {
     /**
      * @var ExtendOptionsManager

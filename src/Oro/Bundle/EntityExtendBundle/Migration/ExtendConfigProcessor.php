@@ -231,9 +231,9 @@ class ExtendConfigProcessor
             ['configs' => $configs]
         );
 
-        $haveChanges = $this->updateConfigs($configs, $className);
+        $hasChanges = $this->updateConfigs($configs, $className);
 
-        if ($haveChanges) {
+        if ($hasChanges) {
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
@@ -293,9 +293,9 @@ class ExtendConfigProcessor
             ['configs' => $configs]
         );
 
-        $haveChanges = $this->updateConfigs($configs, $className, $fieldName);
+        $hasChanges = $this->updateConfigs($configs, $className, $fieldName);
 
-        if ($haveChanges) {
+        if ($hasChanges) {
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
@@ -332,12 +332,12 @@ class ExtendConfigProcessor
 
         foreach ($configs as $scope => $values) {
             $config      = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
-            $haveChanges = false;
+            $hasChanges = false;
             foreach ($values as $key => $value) {
                 $config->set($key, $value);
-                $haveChanges = true;
+                $hasChanges = true;
             }
-            if ($haveChanges) {
+            if ($hasChanges) {
                 $this->configManager->persist($config);
                 $result = true;
             }
