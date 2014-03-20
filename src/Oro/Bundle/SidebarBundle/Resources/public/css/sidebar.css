@@ -331,11 +331,6 @@
 }
 .sidebar-widget-content {
     color: #444;
-    margin: 8px;
-    padding: 10px;
-    border: 1px solid #dbdbdb;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     background-color: #f4f4f4;
 }
 .sidebar-widget-popup{
@@ -366,4 +361,12 @@
 }
 .sidebar-widget-popup{
     background-color: #cecece;
+}
+
+.sidebar-widget-hello-world .sidebar-widget-content {
+    margin: 8px;
+    border: 1px solid #dbdbdb;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 8px;
 }
