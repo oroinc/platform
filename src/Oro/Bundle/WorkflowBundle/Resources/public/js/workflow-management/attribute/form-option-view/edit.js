@@ -1,5 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'orotranslation/js/translator', 'oroentity/js/field-choice'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'orotranslation/js/translator',
+    'oroentity/js/field-choice', 'jquery.validate'],
 function(_, Backbone, Helper, __) {
     'use strict';
 
