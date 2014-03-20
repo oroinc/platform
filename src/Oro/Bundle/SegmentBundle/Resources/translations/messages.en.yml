@@ -1,0 +1,38 @@
+oro:
+    segment:
+        entity_label:        Segment
+        entity_plural_label: Segments
+        id:
+            label:   Id
+        name:
+            label:   Name
+        definition:
+            label:   Definition
+        description:
+            label:   Description
+        entity:
+            label:   Entity
+            saved:   Segment saved
+        type:
+            label:   Type
+            dynamic: Dynamic
+            static:  On demand
+        owner:
+            label:   Owner
+        created_at:
+            label:   Created At
+        updated_at:
+            label:   Updated At
+        last_run:
+            label:   Last run
+        form:
+            choose_segment_type:    Choose segment type
+            designer:               Grid designer
+            columns:                Columns
+            filters:                Filters
+
+        condition_builder:
+            criteria:
+                segment_condition: Apply segment
+            choose_entity_segment: Choose segment
+            apply_segment: Apply %s segment
