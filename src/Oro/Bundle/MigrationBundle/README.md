@@ -247,7 +247,7 @@ Versioned fixtures
 
 There is fixtures we need run time after time. For example for fixture witch upload countries data. If we add new countries list, developer need to create new data fixture witch upload this data.
 
-But, developer can use versioned data fixtures to avoid creation additional fixture class.
+To avoid creation additional fixture class, a developer can use versioned data fixtures.
 
 To make fixture versioned, it must implement `VersionedFixtureInterface` and have `getVersion` function witch returns new version of fixture data.
 
@@ -284,11 +284,11 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
 }
 ```
 
-In this example, if this fixture was not loaded earlier, it will be loaded and version 1.0 will be stored as current loaded version of this fixture.
+In this example, if this fixture was not loaded earlier, it will be loaded and version 1.0 will be saved as current loaded version of this fixture.
 
 To have possibility load this fixture again, it must return version string bigger than 1.0, for example 1.0.1 or 1.1. A version number string must be an PHP-standardized version number string. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-If fixture logic need to know version of this fixture witch wal loaded at last time, fixture can implement `RequestVersionFixtureInterface` and have `setDBVersion` function:
+If fixture logic need to know version of this fixture witch was loaded at last time, fixture can implement `LoadedFixtureVersionAwareInterface` and have `setLoadedVersion` function:
 
 ``` php
 <?php
@@ -301,7 +301,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
 
-class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface, RequestVersionFixtureInterface
+class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface, LoadedFixtureVersionAwareInterface
 {
     /**
      * @var $currendDBVersion string
@@ -311,7 +311,7 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
     /**
      * {@inheritdoc}
      */
-    public function setDBVersion($version = null)
+    public function setLoadedVersion($version = null)
     {
         $this->currendDBVersion = $version;
     }

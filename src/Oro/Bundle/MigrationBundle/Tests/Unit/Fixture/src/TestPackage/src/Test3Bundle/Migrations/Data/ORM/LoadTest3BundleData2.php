@@ -4,10 +4,12 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
+use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class LoadTest3BundleData2 extends AbstractFixture implements VersionedFixtureInterface, RequestVersionFixtureInterface
+class LoadTest3BundleData2 extends AbstractFixture implements
+    VersionedFixtureInterface,
+    LoadedFixtureVersionAwareInterface
 {
     public $dbVersion;
 
@@ -22,7 +24,7 @@ class LoadTest3BundleData2 extends AbstractFixture implements VersionedFixtureIn
     /**
      * {@inheritdoc}
      */
-    public function setDBVersion($version = null)
+    public function setLoadedVersion($version = null)
     {
         $this->dbVersion = $version;
     }

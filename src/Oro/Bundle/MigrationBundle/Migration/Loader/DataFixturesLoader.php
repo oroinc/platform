@@ -4,13 +4,13 @@ namespace Oro\Bundle\MigrationBundle\Migration\Loader;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
 
 class DataFixturesLoader extends ContainerAwareLoader
 {
@@ -59,10 +59,7 @@ class DataFixturesLoader extends ContainerAwareLoader
                 if ($fixture instanceof VersionedFixtureInterface) {
                     $version = $fixture->getVersion();
                 }
-                $toBeLoadFixtureClassNames[] = [
-                    'fixtureClass' => get_class($fixture),
-                    'version'      => $version
-                ];
+                $toBeLoadFixtureClassNames[get_class($fixture)] = $version;
             }
 
             $updateFixture = new UpdateDataFixturesFixture();
@@ -93,21 +90,21 @@ class DataFixturesLoader extends ContainerAwareLoader
             }
         }
 
-        $allreadeyLoaded = false;
+        $alreadyLoaded = false;
 
         if (isset($this->loadedFixtures[get_class($fixtureObject)])) {
-            $allreadeyLoaded  = true;
-            $dbVersion = $this->loadedFixtures[get_class($fixtureObject)];
+            $alreadyLoaded  = true;
+            $loadedVersion = $this->loadedFixtures[get_class($fixtureObject)];
             if ($fixtureObject instanceof VersionedFixtureInterface
-                && version_compare($dbVersion, $fixtureObject->getVersion()) == -1
+                && version_compare($loadedVersion, $fixtureObject->getVersion()) == -1
             ) {
-                if ($fixtureObject instanceof RequestVersionFixtureInterface) {
-                    $fixtureObject->setDBVersion($dbVersion);
+                if ($fixtureObject instanceof LoadedFixtureVersionAwareInterface) {
+                    $fixtureObject->setLoadedVersion($loadedVersion);
                 }
-                $allreadeyLoaded = false;
+                $alreadyLoaded = false;
             }
         }
 
-        return $allreadeyLoaded;
+        return $alreadyLoaded;
     }
 }

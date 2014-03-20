@@ -14,6 +14,6 @@ class OroMigrationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_migrations_data');
-        $table->addColumn('version', 'string', ['default' => null, 'notnull' => false, 'length' => 255]);
+        $table->addColumn('version', 'string', ['notnull' => false, 'length' => 255]);
     }
 }

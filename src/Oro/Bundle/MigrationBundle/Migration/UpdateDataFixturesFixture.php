@@ -11,6 +11,8 @@ class UpdateDataFixturesFixture extends AbstractFixture
 {
     /**
      * @var array
+     *  key - class name
+     *  value - current loaded version
      */
     protected $dataFixturesClassNames;
 
@@ -31,20 +33,20 @@ class UpdateDataFixturesFixture extends AbstractFixture
     {
         if (!empty($this->dataFixturesClassNames)) {
             $loadedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-            foreach ($this->dataFixturesClassNames as $fixtureData) {
+            foreach ($this->dataFixturesClassNames as $className => $version) {
                 $dataFixture = null;
-                if (isset($fixtureData['version'])) {
+                if ($version !== null) {
                     $dataFixture = $manager
                         ->getRepository('OroMigrationBundle:DataFixture')
-                        ->findOneBy(['className' => $fixtureData['fixtureClass']]);
+                        ->findOneBy(['className' => $className]);
                 }
                 if (!$dataFixture) {
                     $dataFixture = new DataFixture();
-                    $dataFixture->setClassName($fixtureData['fixtureClass']);
+                    $dataFixture->setClassName($className);
                 }
 
                 $dataFixture
-                    ->setVersion(isset($fixtureData['version']) ? $fixtureData['version'] : null)
+                    ->setVersion($version)
                     ->setLoadedAt($loadedAt);
                 $manager->persist($dataFixture);
             }
