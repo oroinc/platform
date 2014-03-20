@@ -51,7 +51,7 @@ function(_, Backbone, messanger, __,
             this.listenTo(this.model.get('steps'), 'add', this.setWorkflow);
             this.listenTo(this.model.get('transitions'), 'add', this.setWorkflow);
 
-            this.addStartStep();
+            this.addStartingPoint();
             this.initStartStepSelector();
 
             this.stepListView = new StepsListView({
@@ -156,7 +156,7 @@ function(_, Backbone, messanger, __,
             }, this));
         },
 
-        addStartStep: function() {
+        addStartingPoint: function() {
             this.model.get('steps').add(this._createStartingPoint());
         },
 
@@ -176,7 +176,7 @@ function(_, Backbone, messanger, __,
             resetCollection(this.model.get('transition_definitions'));
             resetCollection(this.model.get('transitions'));
 
-            this.addStartStep();
+            this.addStartingPoint();
         },
 
         createPathMapping: function(fields) {
@@ -306,9 +306,7 @@ function(_, Backbone, messanger, __,
         },
 
         _getStartingPoint: function() {
-            return _.find(this.model.get('steps').models, function(step) {
-                return step.get('name') == 'step:starting_point';
-            });
+            return this.model.getStepByName('step:starting_point');
         },
 
         renderSteps: function() {
