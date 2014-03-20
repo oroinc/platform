@@ -24,7 +24,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
         $this->nameGenerator = new DbIdentifierNameGenerator();
 
-        $this->executor = new MigrationExecutorWithNameGenerator($this->connection);
+        $this->executor = new MigrationExecutorWithNameGenerator($this->queryExecutor);
+        $this->executor->setLogger($this->logger);
         $this->executor->setNameGenerator($this->nameGenerator);
     }
 
@@ -50,9 +51,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             ->method('executeQuery')
             ->with('ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL');
 
-        $logger = new ArrayLogger();
-        $this->executor->executeUp($migrations, $logger);
-        $messages = $logger->getMessages();
+        $this->executor->executeUp($migrations);
+        $messages = $this->logger->getMessages();
         $this->assertEquals(
             [
                 '> Migration\v1_0\Test1BundleMigration10',
@@ -78,9 +78,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         $this->connection->expects($this->never())
             ->method('executeQuery');
 
-        $logger = new ArrayLogger();
-        $this->executor->executeUp($migrations, $logger, true);
-        $messages = $logger->getMessages();
+        $this->executor->executeUp($migrations, true);
+        $messages = $this->logger->getMessages();
         $this->assertEquals(
             [
                 '> Migration\v1_0\Test1BundleMigration10',
@@ -107,8 +106,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
                 'TestPackage\src\WrongTableNameMigration'
             )
         );
-        $logger = new ArrayLogger();
-        $this->executor->executeUp($migrations, $logger);
+        $this->executor->executeUp($migrations);
     }
 
     public function testWrongColumnNameQuery()
@@ -125,7 +123,6 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
                 'TestPackage\src\WrongColumnNameMigration'
             )
         );
-        $logger = new ArrayLogger();
-        $this->executor->executeUp($migrations, $logger);
+        $this->executor->executeUp($migrations);
     }
 }
