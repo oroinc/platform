@@ -3,33 +3,25 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator;
-
-class AbstractTestMigrationQueryLoader extends \PHPUnit_Framework_TestCase
+class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
 {
-    /** @var MigrationQueryLoaderWithNameGenerator */
-    protected $builder;
-
-    protected $em;
-
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $connection;
 
-    /** @var DbIdentifierNameGenerator */
-    protected $nameGenerator;
+    /** @var ArrayLogger */
+    protected $logger;
+
+    /** @var MigrationQueryExecutor */
+    protected $queryExecutor;
 
     public function setUp()
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->em         = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
-            ->method('getConnection')
-            ->will($this->returnValue($this->connection));
 
         $platform = new MySqlPlatform();
         $sm       = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
@@ -49,10 +41,10 @@ class AbstractTestMigrationQueryLoader extends \PHPUnit_Framework_TestCase
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
 
-        $this->nameGenerator = new DbIdentifierNameGenerator();
+        $this->logger = new ArrayLogger();
 
-        $this->builder = new MigrationQueryLoaderWithNameGenerator($this->connection);
-        $this->builder->setNameGenerator($this->nameGenerator);
+        $this->queryExecutor = new MigrationQueryExecutor($this->connection);
+        $this->queryExecutor->setLogger($this->logger);
     }
 
     /**

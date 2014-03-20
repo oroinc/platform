@@ -76,7 +76,7 @@ class OwnershipConditionDataBuilder
     /**
      * Get data for query acl access level check
      * Return null if entity has full access, empty array if user does't have access to the entity
-     *  and array with entity field and field values witch user have access.
+     *  and array with entity field and field values which user have access.
      *
      * @param $entityClassName
      * @param $permissions

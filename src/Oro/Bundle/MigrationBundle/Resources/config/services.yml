@@ -2,7 +2,8 @@ parameters:
     oro_migration.db_id_name_generator.class:         Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
     oro_migration.data_fixtures.loader.class:         Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
     oro_migration.migrations.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
-    oro_migration.migrations.query_loader.class:      Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator
+    oro_migration.migrations.query_executor.class:    Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
+    oro_migration.migrations.executor.class:          Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
     oro_migration.migration.pre_up.listener.class:    Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
     oro_migration.migrations.extension_manager.class: Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
     oro_migration.migration.extension.rename.class:   Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
@@ -25,10 +26,15 @@ services:
             - @service_container
             - @event_dispatcher
 
-    oro_migration.migrations.query_loader:
-        class: %oro_migration.migrations.query_loader.class%
+    oro_migration.migrations.query_executor:
+        class: %oro_migration.migrations.query_executor.class%
         arguments:
             - @doctrine.dbal.default_connection
+
+    oro_migration.migrations.executor:
+        class: %oro_migration.migrations.executor.class%
+        arguments:
+            - @oro_migration.migrations.query_executor
         calls:
             - [setExtensionManager, [@oro_migration.migrations.extension_manager]]
             - [setNameGenerator, [@oro_migration.db_id_name_generator]]

@@ -2,7 +2,7 @@
     <div class="btn-group filter-item oro-drop">
         <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">
             <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="filter-criteria-hint"><%= criteriaHint %></strong>
+            <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
             <span class="caret"></span>
         </button>
         <% if (canDisable) { %>
@@ -33,12 +33,12 @@
         <div class="input-prepend">
             <div class="btn-group">
                 <button class="btn dropdown-toggle" data-toggle="dropdown">
-                    <%= selectedChoiceLabel %><span class="caret"></span>
+                    <%- selectedChoiceLabel %><span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
                     <% _.each(choices, function (option) { %>
                         <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
                         </li>
                     <% }); %>
                 </ul>
@@ -54,7 +54,7 @@
     <div class="horizontal clearfix">
         <select name="<%= name %>" class="filter-select-oro">
             <% _.each(choices, function (option) { %>
-            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
             <% }); %>
         </select>
     </div>
@@ -100,7 +100,7 @@
             <select>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>>
-                    <%= option.label %>
+                    <%- option.label %>
                 </option>
                 <% }); %>
             </select>
@@ -113,7 +113,7 @@
         <div class="btn filter-select filter-criteria-selector">
             <% if (showLabel) { %><%= label %>: <% } %>
             <select multiple>
-                <% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>
+                <% _.each(options, function (option) { %><option value="<%= option.value %>"><%- option.label %></option><% }); %>
                 </select>
             </div>
         <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>

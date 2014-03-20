@@ -264,7 +264,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @return {*}
          */
         _updateCriteriaHint: function () {
-            this.$(this.criteriaHintSelector).html(this._getCriteriaHint());
+            this.$(this.criteriaHintSelector).html(_.escape(this._getCriteriaHint()));
             return this;
         },
 

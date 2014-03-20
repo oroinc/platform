@@ -19,7 +19,14 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         render: function () {
             var view = this;
-            view.$el.html(view.template(view.model.toJSON()));
+            try {
+                view.$el.html(view.template(view.model.toJSON()));
+            } catch (ex) {
+                // Supressing exceptions for possible syntax errors
+                if (console && (typeof console.log === 'function')) {
+                    console.log(ex);
+                }
+            }
             return view;
         }
     });
