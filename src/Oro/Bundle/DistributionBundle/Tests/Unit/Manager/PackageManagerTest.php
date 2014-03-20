@@ -1066,14 +1066,14 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('runInstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->exactly(2))
-            ->method('update')
+            ->method('runUpdateScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->once())
             ->method('runUninstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->once())
             ->method('clearDistApplicationCache');
-        $runner->expects($this->exactly(2))
+        $runner->expects($this->once())
             ->method('runPlatformUpdate');
 
         $composerInstaller = $this->prepareInstallerMock($packageName, 0);

@@ -73,6 +73,7 @@ $.widget( "ui.dialog", $.ui.dialog, {
         this._initButtons();
         this._initializeContainer();
         this._initializeState(this.options.state);
+        this.adjustContentSize();
 
         // Handle window resize
         $(window).bind('resize.dialog', $.proxy(this._windowResizeHandler, this));
@@ -291,7 +292,16 @@ $.widget( "ui.dialog", $.ui.dialog, {
                 position: [offset.left, offset.top]
             });
         }
+        this.adjustContentSize();
         return this;
+    },
+
+    adjustContentSize: function () {
+        var viewportHeight = $(window).height(),
+            dialogHeight = this.widget().outerHeight(),
+            widgetHeight = this.element.innerHeight(),
+            maxHeight = viewportHeight + widgetHeight - dialogHeight;
+        this.element.css('max-height', maxHeight);
     },
 
     _getTitleBarHeight: function() {

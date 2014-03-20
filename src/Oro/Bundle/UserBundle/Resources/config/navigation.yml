@@ -6,6 +6,8 @@ oro_menu_config:
         users_management:
             label: 'Users Management'
             uri: '#'
+            extras:
+                position: 20
         user_list:
             label: oro.user.entity_plural_label
             route: 'oro_user_index'
