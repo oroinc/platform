@@ -58,6 +58,8 @@ services:
 
     oro_datagrid.extension.toolbar:
         class: %oro_datagrid.extension.toolbar.class%
+        arguments:
+            - @oro_config.global
         tags:
             - { name: oro_datagrid.extension }
 

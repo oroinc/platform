@@ -1,7 +1,7 @@
 /* global define */
 define(['underscore', 'orotranslation/js/translator', 'backbone', 'oroui/js/messenger', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
-    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list'
+    'oroui/js/mediator', 'oroworkflow/js/workflow-management/transition/view/list', 'jquery.validate'
 ],
 function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, TransitionsListView) {
     'use strict';
