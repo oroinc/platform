@@ -65,10 +65,10 @@ class MigrationsLoader
     protected $excludeBundles;
 
     /**
-     * @param KernelInterface    $kernel
-     * @param Connection         $connection
+     * @param KernelInterface $kernel
+     * @param Connection $connection
      * @param ContainerInterface $container
-     * @param EventDispatcher    $eventDispatcher
+     * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         KernelInterface $kernel,
@@ -262,7 +262,7 @@ class MigrationsLoader
      * Creates an instances of all classes implement migration scripts
      *
      * @param Migration[] $result
-     * @param array       $files Files contain migration scripts
+     * @param array $files Files contain migration scripts
      *                           'migrations' => array
      *                           .      key   = full file path
      *                           .      value = array
@@ -273,17 +273,118 @@ class MigrationsLoader
      *                           .      value = bundle name
      *                           'bundles'    => string[] names of bundles
      * @throws \RuntimeException if a migration script contains more than one class
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function createMigrationObjects(&$result, $files)
     {
+        // load migration objects
+        list($migrations, $installers) = $this->loadMigrationObjects($files);
+
+        // remove versioned migrations covered by installers
+        foreach ($installers as $installer) {
+            $installerBundleName = $installer['bundleName'];
+            $installerVersion    = $installer['version'];
+            foreach ($files['migrations'] as $sourceFile => $migration) {
+                if ($migration['bundleName'] === $installerBundleName
+                    && version_compare($migration['version'], $installerVersion) < 1
+                ) {
+                    unset($migrations[$sourceFile]);
+                }
+            }
+        }
+
+        // group migration by bundle & version then sort them within same version
+        $groupedMigrations = $this->groupAndSortMigrations($files, $migrations);
+
+        // add migration objects to result tacking into account bundles order
+        foreach ($files['bundles'] as $bundleName) {
+            // add installers to the result
+            foreach ($files['installers'] as $sourceFile => $installerBundleName) {
+                if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
+                    $result[] = $migrations[$sourceFile];
+                }
+            }
+            // add migrations to the result
+            if (isset($groupedMigrations[$bundleName])) {
+                foreach ($groupedMigrations[$bundleName] as $versionedMigrations) {
+                    foreach ($versionedMigrations as $migration) {
+                        $result[] = $migration;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Groups migrations by bundle and version
+     * Sorts grouped migrations within the same version
+     *
+     * @param array $files
+     * @param array $migrations
+     * @return array
+     */
+    protected function groupAndSortMigrations($files, $migrations)
+    {
+        $groupedMigrations = [];
+        foreach ($files['migrations'] as $sourceFile => $migration) {
+            if (isset($migrations[$sourceFile])) {
+                $bundleName = $migration['bundleName'];
+                $version    = $migration['version'];
+                if (!isset($groupedMigrations[$bundleName])) {
+                    $groupedMigrations[$bundleName] = [];
+                }
+                if (!isset($groupedMigrations[$bundleName][$version])) {
+                    $groupedMigrations[$bundleName][$version] = [];
+                }
+                $groupedMigrations[$bundleName][$version][] = $migrations[$sourceFile];
+            }
+        }
+
+        foreach ($groupedMigrations as $bundleName => $versions) {
+            foreach ($versions as $version => $versionedMigrations) {
+                if (count($versionedMigrations) > 1) {
+                    usort(
+                        $groupedMigrations[$bundleName][$version],
+                        function ($a, $b) {
+                            $aOrder = 0;
+                            if ($a instanceof OrderedMigrationInterface) {
+                                $aOrder = $a->getOrder();
+                            }
+
+                            $bOrder = 0;
+                            if ($b instanceof OrderedMigrationInterface) {
+                                $bOrder = $b->getOrder();
+                            }
+
+                            if ($aOrder === $bOrder) {
+                                return 0;
+                            } elseif ($aOrder < $bOrder) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        }
+                    );
+                }
+            }
+        }
+
+        return $groupedMigrations;
+    }
+
+
+    /**
+     * Loads migration objects
+     *
+     * @param $files
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function loadMigrationObjects($files)
+    {
         $migrations = [];
         $installers = [];
+        $declared   = get_declared_classes();
 
-        // load migration objects
-        $declared = get_declared_classes();
         foreach ($declared as $className) {
             $reflClass  = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
@@ -316,72 +417,12 @@ class MigrationsLoader
             }
         }
 
-        // remove versioned migrations covered by installers
-        foreach ($installers as $installer) {
-            $installerBundleName = $installer['bundleName'];
-            $installerVersion    = $installer['version'];
-            foreach ($files['migrations'] as $sourceFile => $migration) {
-                if ($migration['bundleName'] === $installerBundleName
-                    && version_compare($migration['version'], $installerVersion) < 1
-                ) {
-                    unset($migrations[$sourceFile]);
-                }
-            }
-        }
-
-        // group migrations by bundle and version
-        $groupedMigrations = [];
-        foreach ($files['migrations'] as $sourceFile => $migration) {
-            if (isset($migrations[$sourceFile])) {
-                $bundleName = $migration['bundleName'];
-                $version    = $migration['version'];
-                if (!isset($groupedMigrations[$bundleName])) {
-                    $groupedMigrations[$bundleName] = [];
-                }
-                if (!isset($groupedMigrations[$bundleName][$version])) {
-                    $groupedMigrations[$bundleName][$version] = [];
-                }
-                $groupedMigrations[$bundleName][$version][] = $migrations[$sourceFile];
-            }
-        }
-        // sort migrations within the same version
-        foreach ($groupedMigrations as $bundleName => $versions) {
-            foreach ($versions as $version => $versionedMigrations) {
-                if (count($versionedMigrations) > 1) {
-                    usort(
-                        $groupedMigrations[$bundleName][$version],
-                        function ($a, $b) {
-                            $aOrder = $a instanceof OrderedMigrationInterface ? $a->getOrder() : 0;
-                            $bOrder = $b instanceof OrderedMigrationInterface ? $b->getOrder() : 0;
-                            if ($aOrder === $bOrder) {
-                                return 0;
-                            }
-
-                            return $aOrder < $bOrder ? -1 : 1;
-                        }
-                    );
-                }
-            }
-        }
-
-        // add migration objects to result tacking into account bundles order
-        foreach ($files['bundles'] as $bundleName) {
-            // add installers to the result
-            foreach ($files['installers'] as $sourceFile => $installerBundleName) {
-                if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
-                    $result[] = $migrations[$sourceFile];
-                }
-            }
-            // add migrations to the result
-            if (isset($groupedMigrations[$bundleName])) {
-                foreach ($groupedMigrations[$bundleName] as $versionedMigrations) {
-                    foreach ($versionedMigrations as $migration) {
-                        $result[] = $migration;
-                    }
-                }
-            }
-        }
+        return [
+            $migrations,
+            $installers
+        ];
     }
+
 
     /**
      * Removes already installed migrations
