@@ -23,6 +23,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             language: 'en',
             country: 'US',
             currency: 'USD',
+            datetime_separator: false,
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
@@ -181,6 +182,21 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                 return this.settings.format.datetime[vendor][type];
             }
             return defaultValue;
+        },
+
+        /**
+         * Return separator betwean date and time for current format
+         *
+         * @returns {string}
+         */
+        getDateTimeFormatSeparator: function() {
+            if (!this.settings.datetime_separator) {
+                this.settings.datetime_separator = this.getVendorDateTimeFormat('jquery_ui', 'datetime', '')
+                    .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'date'), '')
+                    .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'time'), '');
+            }
+
+            return this.settings.datetime_separator;
         },
 
         getLocaleData: function(country, dataType) {
