@@ -3,11 +3,19 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
 class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $connection;
+
+    /** @var ArrayLogger */
+    protected $logger;
+
+    /** @var MigrationQueryExecutor */
+    protected $queryExecutor;
 
     public function setUp()
     {
@@ -32,6 +40,11 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
         $this->connection->expects($this->once())
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
+
+        $this->logger = new ArrayLogger();
+
+        $this->queryExecutor = new MigrationQueryExecutor($this->connection);
+        $this->queryExecutor->setLogger($this->logger);
     }
 
     /**

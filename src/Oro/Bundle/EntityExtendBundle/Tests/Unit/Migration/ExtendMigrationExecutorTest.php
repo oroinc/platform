@@ -30,7 +30,8 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
 
-        $this->executor = new ExtendMigrationExecutor($this->connection);
+        $this->executor = new ExtendMigrationExecutor($this->queryExecutor);
+        $this->executor->setLogger($this->logger);
         $this->executor->setNameGenerator($this->nameGenerator);
         $this->executor->setExtendOptionsManager($extendOptionManager);
     }
@@ -53,9 +54,8 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
             ->method('executeQuery')
             ->with('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
 
-        $logger = new ArrayLogger();
-        $this->executor->executeUp($migrations, $logger);
-        $messages = $logger->getMessages();
+        $this->executor->executeUp($migrations);
+        $messages = $this->logger->getMessages();
         $this->assertEquals(
             [
                 '> Migration\v1_0\Test1BundleMigration10',

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
@@ -15,9 +14,14 @@ use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 class MigrationExecutor
 {
     /**
-     * @var Connection
+     * @var MigrationQueryExecutor
      */
-    protected $connection;
+    protected $queryExecutor;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @var MigrationExtensionManager
@@ -25,11 +29,31 @@ class MigrationExecutor
     protected $extensionManager;
 
     /**
-     * @param Connection $connection
+     * @param MigrationQueryExecutor $queryExecutor
      */
-    public function __construct(Connection $connection)
+    public function __construct(MigrationQueryExecutor $queryExecutor)
     {
-        $this->connection = $connection;
+        $this->queryExecutor = $queryExecutor;
+    }
+
+    /**
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Gets a query executor object this migration executor works with
+     *
+     * @return MigrationQueryExecutor
+     */
+    public function getQueryExecutor()
+    {
+        return $this->queryExecutor;
     }
 
     /**
@@ -41,7 +65,7 @@ class MigrationExecutor
     {
         $this->extensionManager = $extensionManager;
         $this->extensionManager->setDatabasePlatform(
-            $this->connection->getDatabasePlatform()
+            $this->queryExecutor->getConnection()->getDatabasePlatform()
         );
     }
 
@@ -49,14 +73,13 @@ class MigrationExecutor
      * Executes UP method for the given migrations
      *
      * @param Migration[]     $migrations
-     * @param LoggerInterface $logger
      * @param bool            $dryRun
      * @throws InvalidNameException if invalid table or column name is detected
      */
-    public function executeUp(array $migrations, LoggerInterface $logger, $dryRun = false)
+    public function executeUp(array $migrations, $dryRun = false)
     {
-        $platform   = $this->connection->getDatabasePlatform();
-        $sm         = $this->connection->getSchemaManager();
+        $platform   = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm         = $this->queryExecutor->getConnection()->getSchemaManager();
         $fromSchema = $this->createSchemaObject(
             $sm->listTables(),
             $platform->supportsSequences() ? $sm->listSequences() : [],
@@ -91,38 +114,9 @@ class MigrationExecutor
             $fromSchema = $toSchema;
             $queryBag->clear();
 
-            $logger->notice(sprintf('> %s', get_class($migration)));
+            $this->logger->notice(sprintf('> %s', get_class($migration)));
             foreach ($queries as $query) {
-                $this->executeQuery($query, $logger, $dryRun);
-            }
-        }
-    }
-
-    /**
-     * Executes the given query
-     *
-     * @param string|MigrationQuery $query
-     * @param LoggerInterface       $logger
-     * @param bool                  $dryRun
-     */
-    protected function executeQuery($query, LoggerInterface $logger, $dryRun)
-    {
-        if ($query instanceof MigrationQuery) {
-            if ($query instanceof ConnectionAwareInterface) {
-                $query->setConnection($this->connection);
-            }
-            if ($dryRun) {
-                $descriptions = $query->getDescription();
-                foreach ((array)$descriptions as $description) {
-                    $logger->notice($description);
-                }
-            } else {
-                $query->execute($logger);
-            }
-        } else {
-            $logger->notice($query);
-            if (!$dryRun) {
-                $this->connection->executeQuery($query);
+                $this->queryExecutor->execute($query, $dryRun);
             }
         }
     }

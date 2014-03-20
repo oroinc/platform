@@ -65,14 +65,17 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                     $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                 }
             } else {
-                $logger   = new OutputLogger(
+                $logger      = new OutputLogger($output, true, null, '  ');
+                $queryLogger = new OutputLogger(
                     $output,
                     true,
                     $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
-                    '  '
+                    '    '
                 );
-                $executor = $this->getMigrationExecutor($input);
-                $executor->executeUp($migrations, $logger, $input->getOption('dry-run'));
+                $executor    = $this->getMigrationExecutor($input);
+                $executor->setLogger($logger);
+                $executor->getQueryExecutor()->setLogger($queryLogger);
+                $executor->executeUp($migrations, $input->getOption('dry-run'));
             }
         }
     }
