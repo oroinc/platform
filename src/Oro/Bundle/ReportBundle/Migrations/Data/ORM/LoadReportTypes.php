@@ -17,10 +17,8 @@ class LoadReportTypes extends AbstractFixture
     {
         $tableReport = new ReportType('TABLE');
         $tableReport->setLabel('oro.report.type.table');
-        $this->addReference('table_report', $tableReport);
 
         $manager->persist($tableReport);
-
         $manager->flush();
     }
 }

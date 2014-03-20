@@ -85,15 +85,15 @@ define(
 
                 return message;
             },
+
             /**
              * Reloads reminders from server
              * It need for actualisation data
              */
             reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested') + '#' + Math.random();
+                var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
                 var self = this;
-                require(['text!' + url], function (messageParams) {
-                    messageParams = JSON.parse(messageParams);
+                $.getJSON(url, function(messageParams) {
                     self.showReminders(messageParams);
                 });
             }

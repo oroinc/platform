@@ -4,13 +4,16 @@ oro_menu_config:
             label: oro.embeddedform.entity_plural_label
             route: oro_embedded_form_list
             extras:
-                routes: ['oro_embedded_form_*']
+                position:   20
+                routes:     ['oro_embedded_form_*']
     tree:
         application_menu:
             children:
                 system_tab:
                     children:
-                        embedded_forms: ~
+                        channels_submenu:
+                            children:
+                                embedded_forms: ~
 
 oro_titles:
     oro_embedded_form_list:    ~

@@ -4,11 +4,11 @@ namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class AbstractQueryDesignerType extends AbstractType
@@ -78,44 +78,57 @@ abstract class AbstractQueryDesignerType extends AbstractType
      */
     protected function addFields($form, $factory, $entity = null)
     {
-        $form->add(
-            $factory->createNamed(
-                'grouping',
-                'oro_query_designer_grouping',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('grouping_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+        $config = $form->getConfig();
+
+        $groupingColumnChoiceType = $config->getOption('grouping_column_choice_type');
+        if ($groupingColumnChoiceType) {
+            $form->add(
+                $factory->createNamed(
+                    'grouping',
+                    'oro_query_designer_grouping',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $groupingColumnChoiceType,
+                        'entity'             => $entity,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
-        $form->add(
-            $factory->createNamed(
-                'column',
-                'oro_query_designer_column',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('column_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+            );
+        }
+
+        $columnChoiceType = $config->getOption('column_column_choice_type');
+        if ($columnChoiceType) {
+            $form->add(
+                $factory->createNamed(
+                    'column',
+                    'oro_query_designer_column',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $columnChoiceType,
+                        'entity'             => $entity,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
-        $form->add(
-            $factory->createNamed(
-                'filter',
-                'oro_query_designer_filter',
-                null,
-                array(
-                    'mapped'             => false,
-                    'column_choice_type' => $form->getConfig()->getOption('filter_column_choice_type'),
-                    'entity'             => $entity ? $entity : null,
-                    'auto_initialize'    => false
+            );
+        }
+
+        $filterColumnChoiceType = $config->getOption('filter_column_choice_type');
+        if ($filterColumnChoiceType) {
+            $form->add(
+                $factory->createNamed(
+                    'filter',
+                    'oro_query_designer_filter',
+                    null,
+                    array(
+                        'mapped'             => false,
+                        'column_choice_type' => $filterColumnChoiceType,
+                        'entity'             => $entity,
+                        'auto_initialize'    => false
+                    )
                 )
-            )
-        );
+            );
+        }
     }
 }
