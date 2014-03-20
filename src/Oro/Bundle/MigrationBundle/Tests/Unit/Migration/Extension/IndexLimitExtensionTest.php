@@ -30,7 +30,7 @@ class IndexLimitExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->setDatabasePlatform($platform);
         $table     = $this->getTable();
         $queries   = new QueryBag();
-        $columns   = ['key' => 255];
+        $columns   = ['key'];
         $indexName = 'index_idx';
         $this->extension->addLimitedIndex($queries, $table, $columns, $indexName);
 
@@ -46,36 +46,14 @@ class IndexLimitExtensionTest extends \PHPUnit_Framework_TestCase
         $table     = $this->getTable();
         $tableName = $table->getName();
         $queries   = new QueryBag();
-        $columns   = [
-            'key'    => 255,
-            'second' => 500
-        ];
+        $columns   = ['key', 'key2'];
         $indexName = 'index_idx';
 
         $this->extension->addLimitedIndex($queries, $table, $columns, $indexName);
         /** @var MigrationQuery $query */
         $query = $queries->getPostQueries()[0];
         $this->assertNotEmpty($query);
-        $this->assertEquals("ALTER TABLE `$tableName` ADD INDEX `$indexName` (key(255),second(500));", $query);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Index size is 805, maximum is 767
-     */
-    public function testAddLimitedIndexFailed()
-    {
-        $platform = new MySqlPlatform();
-        $this->extension->setDatabasePlatform($platform);
-        $table     = $this->getTable();
-        $queries   = new QueryBag();
-        $columns   = [
-            'key'    => 255,
-            'second' => 550
-        ];
-        $indexName = 'index_idx';
-
-        $this->extension->addLimitedIndex($queries, $table, $columns, $indexName);
+        $this->assertEquals("ALTER TABLE `$tableName` ADD INDEX `$indexName` (key(255),key2);", $query);
     }
 
     /**
@@ -86,6 +64,13 @@ class IndexLimitExtensionTest extends \PHPUnit_Framework_TestCase
         return new Table('table', [
             new Column(
                 'key',
+                Type::getType('string'),
+                [
+                    'length' => 500
+                ]
+            ),
+            new Column(
+                'key2',
                 Type::getType('string'),
                 [
                     'length' => 100

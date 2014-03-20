@@ -38,7 +38,7 @@ class OroTranslationBundle implements Migration, IndexLimitExtensionAwareInterfa
         $table->addColumn('scope', 'smallint', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'domain'], 'MESSAGES_IDX', []);
-        $this->indexLimitExtension->addLimitedIndex($queries, $table, ['`key`' => 255], 'MESSAGE_IDX');
+        $this->indexLimitExtension->addLimitedIndex($queries, $table, ['`key`'], 'MESSAGE_IDX');
         /** End of generate table oro_translation **/
     }
 }

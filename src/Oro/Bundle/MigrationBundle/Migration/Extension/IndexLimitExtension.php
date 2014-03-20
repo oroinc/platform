@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class IndexLimitExtension implements DatabasePlatformAwareInterface, NameGeneratorAwareInterface
 {
-    const MAX_INDEX_SIZE = 767;
+    const MAX_INDEX_SIZE = 255;
 
     /**
      * @var AbstractPlatform
@@ -42,7 +42,7 @@ class IndexLimitExtension implements DatabasePlatformAwareInterface, NameGenerat
     /**
      * @param QueryBag $queries
      * @param Table    $table
-     * @param string[] $columnNames Values are limits, indexes are columns
+     * @param string[] $columnNames
      * @param string   $indexName
      * @throws \Exception
      */
@@ -54,33 +54,29 @@ class IndexLimitExtension implements DatabasePlatformAwareInterface, NameGenerat
         }
 
         if ($this->platform instanceof MySqlPlatform) {
-            $size = array_sum($columnNames);
-
-            if ($size > self::MAX_INDEX_SIZE) {
-                throw new \RuntimeException(
-                    sprintf('Index size is %d, maximum is %d', $size, self::MAX_INDEX_SIZE)
-                );
-            }
-
-            $columnsString = $this->getColumnsString($columnNames);
+            $columnsString = $this->getColumnsString($table, $columnNames);
             $queries->addPostQuery(
                 "ALTER TABLE `$tableName` ADD INDEX `$indexName` ($columnsString);"
             );
         } else {
-            $table->addIndex(array_keys($columnNames), $indexName, []);
+            $table->addIndex($columnNames, $indexName, []);
         }
     }
 
     /**
+     * @param Table $table
      * @param array $columnNames
      * @return string
      */
-    protected function getColumnsString(array $columnNames)
+    protected function getColumnsString(Table $table, array $columnNames)
     {
         array_walk(
             $columnNames,
-            function (&$limit, $columnName) {
-                $limit = $columnName . '(' . $limit . ')';
+            function (&$columnName) use ($table) {
+                $columnLength = $table->getColumn($columnName)->getLength();
+                if ($columnLength > self::MAX_INDEX_SIZE) {
+                    $columnName = $columnName . '(' . self::MAX_INDEX_SIZE . ')';
+                }
             }
         );
 
