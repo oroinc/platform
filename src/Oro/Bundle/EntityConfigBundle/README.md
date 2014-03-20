@@ -77,6 +77,8 @@ oro_entity_config:
                                                                  # and actual value should be taken from translation table
                                                                  # or in twig via "|trans" filter
 
+                        indexed:            true                 # should be TRUE because this attribute is displayed in a data grid
+
                     grid:                                        # configure a data grid to display 'demo_attr' attribute
                         type:               string               # sets the attribute type
                         label:              'Demo Attr'          # sets the data grid column name
@@ -93,6 +95,26 @@ oro_entity_config:
 Now you may go to System > Entities. The 'Demo Attr' column should be displayed in the grid. Click Edit on any entity to go to edit entity form. 'Demo Attr' field should be displayed there.
 
 [Example of YAML config](Resources/doc/configuration.md)
+
+Indexed attributes
+------------------
+All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section. In this case you can mark an attribute as indexed. For example:
+``` yaml
+oro_entity_config:
+    acme:
+        entity:
+            items:
+                demo_attr:
+                    options:
+                        indexed: true
+```
+When you do this a copy of this attribute will be stored (and will be kept synchronized if a value is changed) in `oro_entity_config_index_value` table. As a result you can write SQL query like this:
+``` sql
+select *
+from oro_entity_config c
+    inner join oro_entity_config_index_value v on v.entity_id = c.id
+where v.scope = 'entity' and v.code = 'label' and v.value like '%test%'
+```
 
 Implementation
 --------------

@@ -5,28 +5,50 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
-class SqlMigrationQuery implements MigrationQuery
+class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**
-     * @var string|string[]
+     * @var string[]
      */
-    protected $sql;
+    protected $queries;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * @param string|string[] $sql
      * @throws \InvalidArgumentException if $sql is empty
      */
-    public function __construct($sql)
+    public function __construct($sql = null)
     {
         if (empty($sql)) {
-            throw new \InvalidArgumentException('The SQL query must not be empty.');
-        }
-
-        if (is_array($sql) && count($sql) === 1) {
-            $this->sql = array_pop($sql);
+            $this->queries = [];
+        } elseif (is_array($sql)) {
+            $this->queries = $sql;
         } else {
-            $this->sql = $sql;
+            $this->queries   = [];
+            $this->queries[] = $sql;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * Adds SQL query
+     *
+     * @param string $query The SQL query
+     */
+    public function addSql($query)
+    {
+        $this->queries[] = $query;
     }
 
     /**
@@ -34,17 +56,23 @@ class SqlMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        return $this->sql;
+        if (empty($this->queries)) {
+            return '';
+        } elseif (count($this->queries) === 1) {
+            return $this->queries[0];
+        }
+
+        return $this->queries;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection, LoggerInterface $logger)
+    public function execute(LoggerInterface $logger)
     {
-        foreach ((array)$this->sql as $sql) {
-            $logger->notice($sql);
-            $connection->executeQuery($sql);
+        foreach ($this->queries as $query) {
+            $logger->notice($query);
+            $this->connection->executeUpdate($query);
         }
     }
 }
