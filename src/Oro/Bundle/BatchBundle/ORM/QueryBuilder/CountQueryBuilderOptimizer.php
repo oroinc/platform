@@ -37,30 +37,33 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('select')
             ->resetDQLPart('join')
             ->resetDQLPart('where')
-            ->resetDQLPart('having')
-            ->resetDQLPart('groupBy');
+            ->resetDQLPart('having');
 
         $this->prepareFieldAliases($parts['select']);
-        $qb->select(array($this->getIdFieldFQN()));
+        $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
+        if ($parts['groupBy']) {
+            $usedAliases = $this->getUsedAliases((array) $parts['groupBy']);
+            foreach ($usedAliases as $alias) {
+                // Add group by fields to select fields.
+                $fieldsToSelect[] = $this->fieldAliases[$alias] . ' as ' . $alias;
+                // Remove this alias from aliases list to prevent their normalization in future.
+                unset($this->fieldAliases[$alias]);
+            }
+        }
 
+        $hasJoins = false;
         if ($parts['join']) {
-            $this->addJoins($qb, $parts);
+            $hasJoins = $this->addJoins($qb, $parts);
         }
         if ($parts['where']) {
             $qb->where($this->getStringWithReplacedAliases($parts['where']));
-        }
-        if ($parts['groupBy']) {
-            $groupBy = (array) $parts['groupBy'];
-            $groupByStrParts = array();
-            foreach ($groupBy as $groupByExpr) {
-                $groupByStrParts[] = $this->getStringWithReplacedAliases($groupByExpr);
-            }
-            $qb->groupBy(implode(', ', $groupByStrParts));
         }
         if ($parts['having']) {
             $qb->having($this->getStringWithReplacedAliases($parts['having']));
         }
 
+        $qb->select($fieldsToSelect);
+        $qb->distinct($hasJoins);
         $this->fixUnusedParameters($qb);
 
         return $qb;
@@ -71,6 +74,7 @@ class CountQueryBuilderOptimizer
      *
      * @param QueryBuilder $qb
      * @param array $parts
+     * @return bool
      */
     protected function addJoins(QueryBuilder $qb, array $parts)
     {
@@ -80,11 +84,11 @@ class CountQueryBuilderOptimizer
         $requiredToJoin = array_merge($requiredToJoin, $this->getUsedTableAliases($parts['groupBy']));
         $requiredToJoin = array_merge($requiredToJoin, $this->getUsedTableAliases($parts['having']));
         $requiredToJoin = array_merge($requiredToJoin, $this->getUsedJoinAliases($parts['join'], $requiredToJoin));
-        $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->getRootAlias()));
+        $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->rootAlias));
 
         /** @var Expr\Join $join */
         $hasJoins = false;
-        foreach ($parts['join'][$this->getRootAlias()] as $join) {
+        foreach ($parts['join'][$this->rootAlias] as $join) {
             $alias = $join->getAlias();
             // To count results number join all tables with inner join and required to tables
             if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
@@ -109,13 +113,13 @@ class CountQueryBuilderOptimizer
                 }
             }
         }
-        // In case when count query has joins count each id only once.
-        if ($hasJoins) {
-            $qb->select(array('DISTINCT ' . $this->getIdFieldFQN()));
-        }
+
+        return $hasJoins;
     }
 
     /**
+     * Set original query builder.
+     *
      * @param QueryBuilder $originalQb
      */
     protected function setOriginalQueryBuilder(QueryBuilder $originalQb)
@@ -125,6 +129,9 @@ class CountQueryBuilderOptimizer
         $this->fieldAliases = array();
 
         $this->originalQb = $originalQb;
+
+        $this->rootAlias = current($this->originalQb->getRootAliases());
+        $this->initIdFieldName();
     }
 
     /**
@@ -203,7 +210,7 @@ class CountQueryBuilderOptimizer
     protected function getUsedJoinAliases($joins, $aliases)
     {
         /** @var Expr\Join $join */
-        foreach ($joins[$this->getRootAlias()] as $join) {
+        foreach ($joins[$this->rootAlias] as $join) {
             $joinTable = $join->getJoin();
             $joinCondition = $join->getCondition();
             $alias = $join->getAlias();
@@ -214,9 +221,7 @@ class CountQueryBuilderOptimizer
                         $aliases[] = $data[0];
                     }
                 }
-                if (!empty($joinCondition)) {
-                    $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
-                }
+                $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
             }
         }
         return $aliases;
@@ -265,82 +270,89 @@ class CountQueryBuilderOptimizer
      */
     protected function replaceAliasesWithFields($condition)
     {
-
         foreach ($this->fieldAliases as $alias => $field) {
-            // Do not replace string if it is part of another string or parameter (starts with :)
-            $searchRegExpParts = array(
-                '^(' . $alias .')$',
-                '(?<![A-Za-z0-9_:])(' . $alias .')([^A-Za-z0-9_])',
-                '(?<![A-Za-z0-9_:])(' . $alias .')$',
-                '^(' . $alias .')([^A-Za-z0-9_])'
-            );
-            $condition = preg_replace('/' . implode('|', $searchRegExpParts) . '/', $field . ' ', $condition);
+            $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field . ' ', $condition);
         }
+
         return trim($condition);
     }
 
     /**
-     * Retrieve the column id of the targeted class
+     * Get list of aliases used in condition.
      *
-     * @return string
+     * @param string|object|array $condition
+     * @return array
      */
-    protected function getIdFieldName()
+    protected function getUsedAliases($condition)
     {
-        if (!$this->idFieldName) {
-            /** @var $from \Doctrine\ORM\Query\Expr\From */
-            $from = current($this->originalQb->getDQLPart('from'));
-            $class = $from->getFrom();
-
-            $idNames = $this->originalQb
-                ->getEntityManager()
-                ->getMetadataFactory()
-                ->getMetadataFor($class)
-                ->getIdentifierFieldNames();
-
-            $this->idFieldName = current($idNames);
+        $aliases = array();
+        if (is_array($condition)) {
+            foreach ($condition as $conditionPart) {
+                $aliases = array_merge($aliases, $this->getUsedAliases($conditionPart));
+            }
+        } else {
+            $condition = (string) $condition;
+            foreach (array_keys($this->fieldAliases) as $alias) {
+                if (preg_match($this->getRegExpQueryForAlias($alias), $condition)) {
+                    $aliases[] = $alias;
+                }
+            }
         }
 
-        return $this->idFieldName;
+        return $aliases;
     }
 
     /**
-     * Get id field fully qualified name
+     * Get regular expression for alias checking.
+     *
+     * @param string $alias
+     * @return string
+     */
+    protected function getRegExpQueryForAlias($alias)
+    {
+        // Do not match string if it is part of another string or parameter (starts with :)
+        $searchRegExpParts = array(
+            '^(' . $alias .')$',
+            '(?<![A-Za-z0-9_:])(' . $alias .')([^A-Za-z0-9_])',
+            '(?<![A-Za-z0-9_:])(' . $alias .')$',
+            '^(' . $alias .')([^A-Za-z0-9_])'
+        );
+
+        return '/' . implode('|', $searchRegExpParts) . '/';
+    }
+
+    /**
+     * Initialize the column id of the targeted class.
      *
      * @return string
      */
-    protected function getIdFieldFQN()
+    protected function initIdFieldName()
     {
-        return $this->getFieldFQN($this->getIdFieldName());
+        /** @var $from \Doctrine\ORM\Query\Expr\From */
+        $from = current($this->originalQb->getDQLPart('from'));
+        $class = $from->getFrom();
+
+        $idNames = $this->originalQb
+            ->getEntityManager()
+            ->getMetadataFactory()
+            ->getMetadataFor($class)
+            ->getIdentifierFieldNames();
+
+        $this->idFieldName = current($idNames);
     }
 
     /**
      * Get fields fully qualified name
      *
      * @param string $fieldName
-     * @param string|null $parentAlias
      * @return string
      */
-    protected function getFieldFQN($fieldName, $parentAlias = null)
+    protected function getFieldFQN($fieldName)
     {
-        // add the current alias
         if (strpos($fieldName, '.') === false) {
-            $fieldName = ($parentAlias ? : $this->getRootAlias()) . '.' . $fieldName;
+            $fieldName = $this->rootAlias . '.' . $fieldName;
         }
 
         return $fieldName;
-    }
-
-    /**
-     * Gets the root alias of the query
-     *
-     * @return string
-     */
-    protected function getRootAlias()
-    {
-        if (!$this->rootAlias) {
-            $this->rootAlias = current($this->originalQb->getRootAliases());
-        }
-
-        return $this->rootAlias;
     }
 }
