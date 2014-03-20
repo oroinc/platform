@@ -3,17 +3,17 @@
 namespace Oro\Bundle\MigrationBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoader;
+use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
 class LoadMigrationsCommand extends ContainerAwareCommand
 {
@@ -65,35 +65,17 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                     $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                 }
             } else {
-                $migrationQueryLoader = $this->getMigrationQueryLoader($input);
-                $queries              = $migrationQueryLoader->getQueries($migrations);
-                $connection           = $migrationQueryLoader->getConnection();
-                $queryLogger          = new OutputLogger(
+                $logger      = new OutputLogger($output, true, null, '  ');
+                $queryLogger = new OutputLogger(
                     $output,
                     true,
                     $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
                     '    '
                 );
-                foreach ($queries as $item) {
-                    $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
-                    foreach ($item['queries'] as $query) {
-                        if ($query instanceof MigrationQuery) {
-                            if ($input->getOption('dry-run')) {
-                                $descriptions = $query->getDescription();
-                                foreach ((array)$descriptions as $description) {
-                                    $queryLogger->notice($description);
-                                }
-                            } else {
-                                $query->execute($connection, $queryLogger);
-                            }
-                        } else {
-                            $queryLogger->notice($query);
-                            if (!$input->getOption('dry-run')) {
-                                $connection->executeQuery($query);
-                            }
-                        }
-                    }
-                }
+                $executor    = $this->getMigrationExecutor($input);
+                $executor->setLogger($logger);
+                $executor->getQueryExecutor()->setLogger($queryLogger);
+                $executor->executeUp($migrations, $input->getOption('dry-run'));
             }
         }
     }
@@ -119,10 +101,10 @@ class LoadMigrationsCommand extends ContainerAwareCommand
 
     /**
      * @param InputInterface $input
-     * @return MigrationQueryLoader
+     * @return MigrationExecutor
      */
-    protected function getMigrationQueryLoader(InputInterface $input)
+    protected function getMigrationExecutor(InputInterface $input)
     {
-        return $this->getContainer()->get('oro_migration.migrations.query_loader');
+        return $this->getContainer()->get('oro_migration.migrations.executor');
     }
 }

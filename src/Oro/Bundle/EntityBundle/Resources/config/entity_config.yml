@@ -19,6 +19,7 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           20
+                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -73,6 +74,7 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           10
+                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -136,7 +138,7 @@ oro_entity_config:
                 # form options for specific entity
                 form_options:
                     options:
-                        serializable: true
+                        auditable: false
         field:
             items:
                 # form type for specific field
@@ -145,7 +147,7 @@ oro_entity_config:
                 # form options for specific field
                 form_options:
                     options:
-                        serializable: true
+                        auditable: false
                 # is form enabled for specific field
                 is_enabled:
                     options:

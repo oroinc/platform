@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\AbstractPager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -24,11 +25,20 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var AclHelper */
     protected $aclHelper;
 
-    public function __construct(AclHelper $aclHelper, $maxPerPage = 10, QueryBuilder $qb = null)
-    {
+    /** @var CountQueryBuilderOptimizer */
+    protected $countQueryBuilderOptimizer;
+
+    public function __construct(
+        AclHelper $aclHelper,
+        CountQueryBuilderOptimizer $countQueryOptimizer,
+        $maxPerPage = 10,
+        QueryBuilder $qb = null
+    ) {
         $this->qb = $qb;
         parent::__construct($maxPerPage);
+
         $this->aclHelper = $aclHelper;
+        $this->countQueryBuilderOptimizer = $countQueryOptimizer;
     }
 
     /**
@@ -58,12 +68,8 @@ class Pager extends AbstractPager implements PagerInterface
      */
     public function computeNbResult()
     {
-        $qb    = clone $this->getQueryBuilder();
-        $query = $qb->setFirstResult(null)
-            ->setMaxResults(null)
-            ->resetDQLPart('orderBy')
-            ->getQuery();
-
+        $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
+        $query = $countQb->getQuery();
         $query = $this->aclHelper->apply($query);
 
         return QueryCountCalculator::calculateCount($query);

@@ -10,7 +10,7 @@
                     {% if value.link is defined and value.link != false  %}
                         {% set data = data ~ ui.renderUrl(value.link, value.title) %}
                     {% else %}
-                        {% set data = data ~ value.title %}
+                        {% set data = data ~ value.title|escape %}
                     {% endif %}
                     {% if not loop.last %}
                         {% set data = data ~ ', ' %}
@@ -20,16 +20,18 @@
             {% endif %}
 
             {% if item.type == 'text' %}
-                {% set itemValue = itemValue|nl2br %}
+                {% set itemValue = itemValue|escape|nl2br %}
             {% elseif item.type == 'boolean' %}
                 {% set itemValue = itemValue ? 'Yes'|trans : 'No'|trans %}
             {% elseif item.type == 'money' %}
                 {% set itemValue = itemValue | oro_format_currency %}
             {% elseif item.type == 'percent' %}
                 {% set itemValue = itemValue | oro_format_percent %}
+            {% else %}
+                {% set itemValue = itemValue|escape %}
             {% endif %}
 
-            {{ ui.renderProperty(item.label|trans, itemValue) }}
+            {{ ui.renderHtmlProperty(item.label|trans, itemValue) }}
         {% endfor %}
     {% endif %}
 {% endmacro %}

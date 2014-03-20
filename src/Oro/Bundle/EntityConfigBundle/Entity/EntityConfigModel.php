@@ -26,13 +26,15 @@ class EntityConfigModel extends AbstractConfigModel
     protected $id;
 
     /**
-     * @var ConfigModelValue[]|ArrayCollection
-     * @ORM\OneToMany(targetEntity="ConfigModelValue", mappedBy="entity", cascade={"all"})
+     * IMPORTANT: do not modify this collection manually. addToIndex and removeFromIndex should be used
+     *
+     * @var ArrayCollection|ConfigModelIndexValue[]
+     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="entity", cascade={"all"})
      */
-    protected $values;
+    protected $indexedValues;
 
     /**
-     * @var FieldConfigModel[]|ArrayCollection
+     * @var ArrayCollection|FieldConfigModel[]
      * @ORM\OneToMany(targetEntity="FieldConfigModel", mappedBy="entity", cascade={"all"})
      */
     protected $fields;
@@ -43,12 +45,15 @@ class EntityConfigModel extends AbstractConfigModel
      */
     protected $className;
 
+    /**
+     * @param string|null $className
+     */
     public function __construct($className = null)
     {
-        $this->className = $className;
-        $this->fields    = new ArrayCollection();
-        $this->values    = new ArrayCollection();
-        $this->mode      = ConfigModelManager::MODE_DEFAULT;
+        $this->className     = $className;
+        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->fields        = new ArrayCollection();
+        $this->indexedValues = new ArrayCollection();
     }
 
     /**
@@ -79,7 +84,7 @@ class EntityConfigModel extends AbstractConfigModel
     }
 
     /**
-     * @param FieldConfigModel[] $fields
+     * @param ArrayCollection $fields
      * @return $this
      */
     public function setFields($fields)
@@ -102,8 +107,8 @@ class EntityConfigModel extends AbstractConfigModel
     }
 
     /**
-     * @param  callable $filter
-     * @return FieldConfigModel[]|ArrayCollection
+     * @param  callable $filter function (FieldConfigModel $model)
+     * @return ArrayCollection|FieldConfigModel[]
      */
     public function getFields(\Closure $filter = null)
     {
@@ -123,5 +128,24 @@ class EntityConfigModel extends AbstractConfigModel
         );
 
         return $fields->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndexedValues()
+    {
+        return $this->indexedValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createIndexedValue($scope, $code, $value)
+    {
+        $result = new ConfigModelIndexValue($scope, $code, $value);
+        $result->setEntity($this);
+
+        return $result;
     }
 }

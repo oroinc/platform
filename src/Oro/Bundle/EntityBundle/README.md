@@ -66,7 +66,7 @@ where
 
 ## Doctrine field types ##
 
-Some entities have fields witch data is money or percents.
+Some entities have fields which data is money or percents.
 
 For this data was created new field types - currency and percent.
 

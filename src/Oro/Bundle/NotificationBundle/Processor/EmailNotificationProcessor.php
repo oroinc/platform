@@ -56,8 +56,8 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param EntityPool $entityPool
      * @param EmailRenderer $emailRenderer
      * @param \Swift_Mailer $mailer
-     * @param string $sendFrom
      * @param LocaleSettings $localeSettings
+     * @param string $sendFrom
      */
     public function __construct(
         LoggerInterface $logger,

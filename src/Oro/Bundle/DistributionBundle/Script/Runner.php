@@ -74,7 +74,7 @@ class Runner
      * @param string $previousPackageVersion
      * @return string
      */
-    public function update(PackageInterface $updatedPackage, $previousPackageVersion)
+    public function runUpdateScripts(PackageInterface $updatedPackage, $previousPackageVersion)
     {
         $migrationScripts = $this->findMigrationScripts($updatedPackage, $previousPackageVersion);
         if (!$migrationScripts) {

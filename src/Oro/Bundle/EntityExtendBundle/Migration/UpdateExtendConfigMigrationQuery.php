@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
@@ -54,7 +54,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection, LoggerInterface $logger)
+    public function execute(LoggerInterface $logger)
     {
         $this->runUpdateConfigCommand($logger);
     }

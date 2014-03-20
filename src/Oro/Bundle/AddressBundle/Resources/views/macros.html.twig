@@ -1,7 +1,7 @@
 {% macro renderAddress(address) %}
     {% if address.label %}
-        <b>{{ address.label }}</b>
+        <b>{{ address.label|escape }}</b>
         <br />
     {% endif %}
-    {{ address|oro_format_address }}
+    {{ address|oro_format_address|escape|nl2br }}
 {% endmacro %}

@@ -40,7 +40,7 @@
 .ui-dialog{
     position: absolute;
 }
-.ui-widget-content{
+.ui-dialog-content{
     overflow: auto;
 }
 .ui-dialog .ui-dialog-titlebar{
