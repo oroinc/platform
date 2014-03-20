@@ -23,7 +23,7 @@ define(['underscore', 'backbone', 'oronavigation/js/navigation', 'orotranslation
                         '<% if (tag.get("url").length > 0) { %>' +
                             '<a href="<%= tag.get("url") %>">' +
                         '<%} %>' +
-                            '<span class="label label-info"><%= tag.get("name") %></span>' +
+                            '<span class="label label-info"><%- tag.get("name") %></span>' +
                         '<% if (tag.get("url").length > 0) { %>' +
                             '</a>' +
                         '<%} %>' +

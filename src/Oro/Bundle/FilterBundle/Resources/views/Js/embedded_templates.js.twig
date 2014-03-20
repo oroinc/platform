@@ -6,11 +6,11 @@
 <script type="text/template" id="choice-filter-template-embedded">
     <span> field value </span>
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%- selectedChoiceLabel %></a>:
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
                 </li>
             <% }); %>
         </ul>
@@ -31,7 +31,7 @@
         </ul>
         <select name="<%= name %>" class="filter-select-oro name_input" style="display:none">
             <% _.each(choices, function (option) { %>
-            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
             <% }); %>
         </select>
     </div>
@@ -55,7 +55,7 @@
             <select>
                 <% _.each(options, function (option) { %>
                 <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>>
-                <%= option.label %>
+                <%- option.label %>
                 </option>
                 <% }); %>
             </select>

@@ -1,1 +1,1 @@
-<% var field = context.getFieldData(id); %><% if (!_.isUndefined(field.related_entity_name)) { %><%= field.related_entity_plural_label %>&#32;(<b><%= text %></b>)<% } else { %><%= text %><% } %>
+<% var field = context.getFieldData(id); %><% if (!_.isUndefined(field.related_entity_name)) { %><%= _.escape(field.related_entity_plural_label) %>&#32;(<b><%= _.escape(text) %></b>)<% } else { %><%= _.escape(text) %><% } %>
