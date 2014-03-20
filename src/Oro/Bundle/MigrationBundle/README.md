@@ -242,6 +242,98 @@ Data fixtures for this command should be put in `Migrations/Data/ORM` or in `Mig
 
 Fixtures order can be changed with standard Doctrine ordering or dependency functionality. More information about fixture ordering can be found in [doctrine data fixtures manual][2].
 
+Versioned fixtures
+------------------
+
+There is fixtures we need run time after time. For example for fixture witch upload countries data. If we add new countries list, developer need to create new data fixture witch upload this data.
+
+But, developer can use versioned data fixtures to avoid creation additional fixture class.
+
+To make fixture versioned, it must implement `VersionedFixtureInterface` and have `getVersion` function witch returns new version of fixture data.
+
+Example:
+
+``` php
+
+<?php
+
+namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+
+class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.0';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // Here we can use fixture data code witch will be run time after time
+    }
+}
+```
+
+In this example, if this fixture was not loaded earlier, it will be loaded and version 1.0 will be stored as current loaded version of this fixture.
+
+To have possibility load this fixture again, it must return version string bigger than 1.0, for example 1.0.1 or 1.1. A version number string must be an PHP-standardized version number string. More info about PHP-standardized version number string can be found in [PHP manual][1].
+
+If fixture logic need to know version of this fixture witch wal loaded at last time, fixture can implement `RequestVersionFixtureInterface` and have `setDBVersion` function:
+
+``` php
+<?php
+
+namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
+
+class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface, RequestVersionFixtureInterface
+{
+    /**
+     * @var $currendDBVersion string
+     */
+    protected $currendDBVersion = null;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function setDBVersion($version = null)
+    {
+        $this->currendDBVersion = $version;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.0';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // Here we can check last loaded version and load data data difference between last 
+        // uploaded version and current version
+    }
+}
+```
 
   [1]: http://php.net/manual/en/function.version-compare.php
   [2]: https://github.com/doctrine/data-fixtures#fixture-ordering
