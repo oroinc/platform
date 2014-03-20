@@ -9,6 +9,8 @@ use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
 
 class DataFixturesLoader extends ContainerAwareLoader
 {
@@ -25,7 +27,7 @@ class DataFixturesLoader extends ContainerAwareLoader
     /**
      * Constructor.
      *
-     * @param EntityManager      $em
+     * @param EntityManager $em
      * @param ContainerInterface $container
      */
     public function __construct(EntityManager $em, ContainerInterface $container)
@@ -44,7 +46,7 @@ class DataFixturesLoader extends ContainerAwareLoader
 
         // remove already loaded fixtures
         foreach ($fixtures as $key => $fixture) {
-            if ($this->isFixtureAlreadyLoaded(get_class($fixture))) {
+            if ($this->isFixtureAlreadyLoaded($fixture)) {
                 unset($fixtures[$key]);
             }
         }
@@ -53,7 +55,11 @@ class DataFixturesLoader extends ContainerAwareLoader
         if (!empty($fixtures)) {
             $toBeLoadFixtureClassNames = [];
             foreach ($fixtures as $fixture) {
-                $toBeLoadFixtureClassNames[] = get_class($fixture);
+                $version = null;
+                if ($fixture instanceof VersionedFixtureInterface) {
+                    $version = $fixture->getVersion();
+                }
+                $toBeLoadFixtureClassNames[get_class($fixture)] = $version;
             }
 
             $updateFixture = new UpdateDataFixturesFixture();
@@ -67,10 +73,10 @@ class DataFixturesLoader extends ContainerAwareLoader
     /**
      * Determines whether the given data fixture is already loaded or not
      *
-     * @param string $className
+     * @param object $fixtureObject
      * @return bool
      */
-    protected function isFixtureAlreadyLoaded($className)
+    protected function isFixtureAlreadyLoaded($fixtureObject)
     {
         if (!$this->loadedFixtures) {
             $this->loadedFixtures = [];
@@ -80,10 +86,25 @@ class DataFixturesLoader extends ContainerAwareLoader
                 ->findAll();
             /** @var DataFixture $fixture */
             foreach ($loadedFixtures as $fixture) {
-                $this->loadedFixtures[$fixture->getClassName()] = true;
+                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getVersion() ? : '';
             }
         }
 
-        return isset($this->loadedFixtures[$className]);
+        $alreadyLoaded = false;
+
+        if (isset($this->loadedFixtures[get_class($fixtureObject)])) {
+            $alreadyLoaded  = true;
+            $loadedVersion = $this->loadedFixtures[get_class($fixtureObject)];
+            if ($fixtureObject instanceof VersionedFixtureInterface
+                && version_compare($loadedVersion, $fixtureObject->getVersion()) == -1
+            ) {
+                if ($fixtureObject instanceof LoadedFixtureVersionAwareInterface) {
+                    $fixtureObject->setLoadedVersion($loadedVersion);
+                }
+                $alreadyLoaded = false;
+            }
+        }
+
+        return $alreadyLoaded;
     }
 }
