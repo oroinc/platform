@@ -7,7 +7,12 @@
     ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
     : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
 %}
-{% set formAction = entity.name ? path('oro_workflow_definition_update', { 'name': entity.name }) : path('oro_workflow_definition_create')  %}
+{# API REST route for POST used both for create and update #}
+{% if entity.name %}
+    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
+{% else %}
+    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post') %}
+{% endif %}
 
 {% block head_script %}
     {{ parent() }}
@@ -17,11 +22,13 @@
     {% endblock %}
 {% endblock %}
 
+{% set gridUrl = path('oro_workflow_definition_index') %}
+
 {% block navButtons %}
     {% if entity.name and resource_granted('DELETE', entity) %}
-            {{ UI.deleteButton({
+        {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
-            'dataRedirect': path('oro_workflow_definition_index'),
+            'dataRedirect': gridUrl,
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-workflow',
             'dataId': entity.name,
@@ -29,24 +36,17 @@
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ UI.cancelButton(path('oro_workflow_definition_index')) }}
+    {{ UI.cancelButton(gridUrl) }}
 
-    {# API REST route for POST used both for create and update #}
-    {% if entity.name %}
-        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
-    {% else %}
-        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post') %}
-    {% endif %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-success" id="save-btn" data-url="{{ apiPath }}">{{ 'Save'|trans }}</button>
-    </div>
+    {% set html = UI.saveAndCloseButton() ~ UI.saveAndStayButton() %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock %}
 
 {% block pageHeader %}
     {% if entity.name %}
         {% set breadcrumbs = {
             'entity':      entity,
-            'indexPath':   path('oro_workflow_definition_index'),
+            'indexPath':   gridUrl,
             'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
             'entityTitle': entity.label
         } %}
@@ -465,6 +465,23 @@
         </div>
     </div>
     <div class="workflow-definition-steps-list-container"></div>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'Designer'|trans,
+        'subblocks': [
+            {
+                'title': 'Workflow steps and transitions'|trans,
+                'data': [stepsListWidget]
+            }
+        ]
+    }] ) %}
+
+    {% set id = 'workflow-designer' %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
 
     <script type="text/javascript">
         require([
@@ -540,28 +557,11 @@
             var workflowManagement = new WorkflowManagement({
                 el: '#{{ form.vars.id }}',
                 stepsEl: '.workflow-definition-steps-list-container',
-                saveBtnEl: '#save-btn',
-                model: workflowModel
+                model: workflowModel,
+                backUrl: {{ gridUrl|json_encode|raw }}
             });
 
             workflowManagement.render();
         });
     </script>
-    {% endset %}
-
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'Designer'|trans,
-        'subblocks': [
-            {
-                'title': 'Workflow steps and transitions'|trans,
-                'data': [stepsListWidget]
-            }
-        ]
-    }] ) %}
-
-    {% set id = 'workflow-designer' %}
-    {% set data = {
-        'dataBlocks': dataBlocks,
-    } %}
-    {{ parent() }}
 {% endblock content_data %}
