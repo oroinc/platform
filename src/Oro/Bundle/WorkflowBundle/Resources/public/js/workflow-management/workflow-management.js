@@ -218,17 +218,6 @@ function(_, Backbone, messanger, __,
         saveConfiguration: function(e) {
             e.preventDefault();
 
-            // at least one step and one transition must exist
-            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
-                messanger.notificationFlashMessage(
-                    'error',
-                    __('Could not save workflow. Please add at least one step and one transition.')
-                );
-                return;
-            }
-
-            var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
-
             var formData = Helper.getFormData(this.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
 
@@ -240,27 +229,11 @@ function(_, Backbone, messanger, __,
             this.model.set('entity', formData.related_entity);
             this.model.set('start_step', formData.start_step);
 
-            // workflow label should be defined
-            if (!this.model.get('label')) {
-                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
+            if (!this.validateConfiguration()) {
                 return;
             }
 
-            // related entity should be defined
-            if (!this.model.get('entity')) {
-                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set related entity.'));
-                return;
-            }
-
-            // should be defined either start step or at least one start transition
-            if (!this.model.get('start_step') && _.isEmpty(this._getStartingPoint().get('allowed_transitions'))) {
-                messanger.notificationFlashMessage(
-                    'error',
-                    __('Could not save workflow. Please either set default step or add transitions to starting point.')
-                );
-                return;
-            }
-
+            var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
             if (navigation) {
                 navigation.showLoading();
             }
@@ -281,6 +254,40 @@ function(_, Backbone, messanger, __,
                     messanger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
             });
+        },
+
+        validateConfiguration: function() {
+            // workflow label should be defined
+            if (!this.model.get('label')) {
+                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
+                return false;
+            }
+
+            // related entity should be defined
+            if (!this.model.get('entity')) {
+                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set related entity.'));
+                return false;
+            }
+
+            // at least one step and one transition must exist
+            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please add at least one step and one transition.')
+                );
+                return false;
+            }
+
+            // should be defined either start step or at least one start transition
+            if (!this.model.get('start_step') && _.isEmpty(this._getStartingPoint().get('allowed_transitions'))) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please either set default step or add transitions to starting point.')
+                );
+                return false;
+            }
+
+            return true;
         },
 
         _createStartingPoint: function() {
