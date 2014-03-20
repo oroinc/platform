@@ -1,7 +1,7 @@
 /*global define*/
 define(
-    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore'],
-    function ($, sync, messenger, routing, _) {
+    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oronavigation/js/navigation'],
+    function ($, sync, messenger, routing, _, Navigation) {
         /**
          * @export ororeminder/js/subscriber
          */
@@ -62,8 +62,19 @@ define(
                     });
                 }, this);
 
+                var navigation = Navigation.getInstance();
+
                 $('.alert-reminder .close').unbind('click').bind('click', function () {
                     $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
+                });
+
+                $('.alert-reminder .hash-navigation-link').unbind('click').bind('click', function (event) {
+                    event.preventDefault();
+                    var url = $(this).attr('href');
+                    navigation.processRedirect({
+                        fullRedirect: false,
+                        location: url
+                    });
                 });
             },
 
