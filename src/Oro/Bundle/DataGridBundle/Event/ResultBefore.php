@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 /**
- * Class ResultAfter
+ * Class ResultBefore
  * @package Oro\Bundle\DataGridBundle\Event
  *
  * This event dispatched before datagrid builder starts build result
@@ -18,12 +18,20 @@ class ResultBefore extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.datgrid.result.before';
 
-    /** @var DatagridInterface */
+    /**
+     * @var DatagridInterface
+     */
     protected $datagrid;
 
-    /** @var Query */
+    /**
+     * @var Query
+     */
     protected $query;
 
+    /**
+     * @param DatagridInterface $datagrid
+     * @param Query             $query
+     */
     public function __construct(DatagridInterface $datagrid, Query $query)
     {
         $this->datagrid = $datagrid;

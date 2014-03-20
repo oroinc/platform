@@ -27,7 +27,7 @@ class OrmDatasource implements DatasourceInterface
     protected $em;
 
     /** @var DatagridInterface */
-    protected $grid;
+    protected $datagrid;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
@@ -45,7 +45,7 @@ class OrmDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $this->grid = $grid;
+        $this->datagrid = $grid;
 
         if (isset($config['query'])) {
             $queryConfig = array_intersect_key($config, array_flip(['query']));
@@ -88,9 +88,9 @@ class OrmDatasource implements DatasourceInterface
     {
         $query = $this->qb->getQuery();
 
-        $event = new ResultBefore($this->grid, $query);
+        $event = new ResultBefore($this->datagrid, $query);
         $this->eventDispatcher->dispatch(ResultBefore::NAME, $event);
-        $this->eventDispatcher->dispatch(ResultBefore::NAME . '.' . $this->grid->getName(), $event);
+        $this->eventDispatcher->dispatch(ResultBefore::NAME . '.' . $this->datagrid->getName(), $event);
 
         $results = $query->execute();
         $rows    = [];
@@ -98,9 +98,9 @@ class OrmDatasource implements DatasourceInterface
             $rows[] = new ResultRecord($result);
         }
 
-        $event = new ResultAfter($this->grid, $rows);
+        $event = new ResultAfter($this->datagrid, $rows);
         $this->eventDispatcher->dispatch(ResultAfter::NAME, $event);
-        $this->eventDispatcher->dispatch(ResultAfter::NAME . '.' . $this->grid->getName(), $event);
+        $this->eventDispatcher->dispatch(ResultAfter::NAME . '.' . $this->datagrid->getName(), $event);
 
         return $rows;
     }

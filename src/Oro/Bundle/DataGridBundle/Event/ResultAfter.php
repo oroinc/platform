@@ -17,12 +17,20 @@ class ResultAfter extends Event implements GridEventInterface
 {
     const NAME = 'oro_datagrid.datgrid.result.after';
 
-    /** @var DatagridInterface */
+    /**
+     * @var DatagridInterface
+     */
     protected $datagrid;
 
-    /** @var ResultRecordInterface[] */
+    /**
+     * @var ResultRecordInterface[]
+     */
     protected $records;
 
+    /**
+     * @param DatagridInterface $datagrid
+     * @param array             $records
+     */
     public function __construct(DatagridInterface $datagrid, array $records = array())
     {
         $this->datagrid = $datagrid;
@@ -38,7 +46,7 @@ class ResultAfter extends Event implements GridEventInterface
     }
 
     /**
-     * @return array
+     * @return ResultRecordInterface[]
      */
     public function getRecords()
     {

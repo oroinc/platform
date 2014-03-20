@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\ResultBefore;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -25,6 +26,9 @@ class OrmDatasourceAclListener
      */
     public function onResultBefore(ResultBefore $event)
     {
-        $this->aclHelper->apply($event->getQuery());
+        $source = $event->getDatagrid()->getDatasource();
+        if ($source instanceof OrmDatasource) {
+            $this->aclHelper->apply($event->getQuery());
+        }
     }
 }
