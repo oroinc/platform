@@ -247,7 +247,7 @@ Versioned fixtures
 
 There are fixtures which need to be executed time after time. An example is a fixture which uploads countries data. Usually, if you add new countries list, you need to create new data fixture which will upload this data. To avoid this you can use versioned data fixtures.
 
-To make fixture versioned, this fixture must implement [VersionedFixtureInterface](./Fixture/VersionedFixtureInterface.php) and `getVersion` method witch returns a version of fixture data.
+To make fixture versioned, this fixture must implement [VersionedFixtureInterface](./Fixture/VersionedFixtureInterface.php) and `getVersion` method which returns a version of fixture data.
 
 Example:
 
@@ -277,7 +277,7 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
      */
     public function load(ObjectManager $manager)
     {
-        // Here we can use fixture data code witch will be run time after time
+        // Here we can use fixture data code which will be run time after time
     }
 }
 ```
