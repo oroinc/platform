@@ -426,13 +426,13 @@
     </script>
 
     {% set startStepSelector %}
-    {% set startStep = entity.startStep ? entity.startStep.name : '' %}
-    <div class="control-group">
-        <label class="control-label">{{ "Default step"|trans }} <em></em></label>
-        <div class="controls">
-            <input type="hidden" name="start_step" value="{{ startStep }}"/>
+        {% set startStep = entity.startStep ? entity.startStep.name : '' %}
+        <div class="control-group">
+            <label class="control-label">{{ "Default step"|trans }} <em></em></label>
+            <div class="controls">
+                <input type="hidden" name="start_step" value="{{ startStep }}"/>
+            </div>
         </div>
-    </div>
     {% endset %}
 
     {% set dataBlocks = [{
