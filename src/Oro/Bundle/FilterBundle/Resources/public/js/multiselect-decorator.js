@@ -115,6 +115,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
          */
         getMinimumDropdownWidth: function() {
             var minimumWidth = 0;
+            this.getWidget().find('.ui-multiselect-checkboxes').removeClass('fixed-li');
             var elements = this.getWidget().find('.ui-multiselect-checkboxes li');
             _.each(elements, function(element) {
                 var width = this._getTextWidth($(element).find('label'));
@@ -122,7 +123,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
                     minimumWidth = width;
                 }
             }, this);
-
+            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
             return minimumWidth;
         },
 
@@ -137,7 +138,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
             var html_org = element.html();
             var html_calc = '<span>' + html_org + '</span>';
             element.html(html_calc);
-            var width = element.find('span:first').width();
+            var width = element.outerWidth();
             element.html(html_org);
             return width;
         },
