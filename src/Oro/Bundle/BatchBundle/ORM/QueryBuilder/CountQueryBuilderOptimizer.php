@@ -158,7 +158,7 @@ class CountQueryBuilderOptimizer
             foreach ($select->getParts() as $part) {
                 $part = preg_replace('/ as /i', ' as ', $part);
                 if (strpos($part, ' as ') !== false) {
-                    list($field, $alias) = explode(' as ', $part);
+                    list($field, $alias) = explode(' as ', $part, 2);
                     $this->fieldAliases[trim($alias)] = trim($field);
                 }
             }
