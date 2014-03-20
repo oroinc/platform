@@ -73,6 +73,9 @@ class RenameExtendTablesAndColumns implements
     {
         /** @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_entity_config.config_manager');
+        // clear a configurable cache to make sure that this migration will work
+        // even if a config tables structure was changed previous migrations
+        $configManager->clearConfigurableCache();
 
         $this->renameExtendColumns($schema, $queries, $configManager);
         $this->renameCustomManyToManyRelationTables($schema, $queries, $configManager);
