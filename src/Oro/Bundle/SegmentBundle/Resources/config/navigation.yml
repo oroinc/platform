@@ -1,0 +1,35 @@
+oro_menu_config:
+    items:
+        reports_tab:
+            label: Reports & Segments
+            uri: '#'
+            extras:
+                routes: ['oro_segment_view']
+
+        segments_divider:
+            label: ''
+            extras:
+                position: 100
+            attributes:
+                class: divider
+
+        manage_segments:
+            label: 'Manage Segments'
+            route: 'oro_segment_index'
+            extras:
+                position: 105
+                routes: ['oro_segment_index', 'oro_segment_update']
+
+    tree:
+        application_menu:
+            children:
+                reports_tab:
+                    children:
+                        segments_divider: ~
+                        manage_segments: ~
+
+oro_titles:
+    oro_segment_index:  ~
+    oro_segment_view:   %%segment.name%% - %%segment.group%%
+    oro_segment_create: Create segment
+    oro_segment_update: %%segment.name%% - Edit

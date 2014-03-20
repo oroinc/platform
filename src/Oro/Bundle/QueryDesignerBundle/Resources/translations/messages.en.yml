@@ -33,6 +33,6 @@ oro:
         condition_builder:
             criteria:
                 drag_hint: drag to select
-                field_condition: Field Condition
-                conditions_group: Conditions Group
+                field_condition:   Field Condition
+                conditions_group:  Conditions Group
             choose_entity_field: Choose a field...
