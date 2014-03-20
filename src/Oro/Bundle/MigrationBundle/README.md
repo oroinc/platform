@@ -245,11 +245,9 @@ Fixtures order can be changed with standard Doctrine ordering or dependency func
 Versioned fixtures
 ------------------
 
-There is fixtures we need run time after time. For example for fixture witch upload countries data. If we add new countries list, developer need to create new data fixture witch upload this data.
+There are fixtures which need to be executed time after time. An example is a fixture which uploads countries data. Usually, if you add new countries list, you need to create new data fixture which will upload this data. To avoid this you can use versioned data fixtures.
 
-To avoid creation additional fixture class, a developer can use versioned data fixtures.
-
-To make fixture versioned, it must implement `VersionedFixtureInterface` and have `getVersion` function witch returns new version of fixture data.
+To make fixture versioned, this fixture must implement [VersionedFixtureInterface](./Fixture/VersionedFixtureInterface.php) and `getVersion` method witch returns a version of fixture data.
 
 Example:
 
@@ -284,11 +282,11 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
 }
 ```
 
-In this example, if this fixture was not loaded earlier, it will be loaded and version 1.0 will be saved as current loaded version of this fixture.
+In this example, if the fixture was not loaded yet, it will be loaded and version 1.0 will be saved as current loaded version of this fixture.
 
-To have possibility load this fixture again, it must return version string bigger than 1.0, for example 1.0.1 or 1.1. A version number string must be an PHP-standardized version number string. More info about PHP-standardized version number string can be found in [PHP manual][1].
+To have possibility to load this fixture again, the fixture must return a version greater then 1.0, for example 1.0.1 or 1.1. A version number must be an PHP-standardized version number string. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-If fixture logic need to know version of this fixture witch was loaded at last time, fixture can implement `LoadedFixtureVersionAwareInterface` and have `setLoadedVersion` function:
+If a fixture need to know the last loaded version, it must implement [LoadedFixtureVersionAwareInterface](./Fixture/LoadedFixtureVersionAwareInterface.php) and `setLoadedVersion` method:
 
 ``` php
 <?php
@@ -321,7 +319,7 @@ class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInt
      */
     public function getVersion()
     {
-        return '1.0';
+        return '2.0';
     }
 
     /**
