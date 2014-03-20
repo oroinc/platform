@@ -123,6 +123,8 @@ class UserType extends AbstractType
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
             ->add('change_password', 'oro_change_password');
+
+        $this->addInviteUserField($builder);
     }
 
     /**
@@ -178,5 +180,25 @@ class UserType extends AbstractType
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
             ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false ]);
+    }
+
+    /**
+     * Add Invite user fields
+     *
+     * @param FormBuilderInterface $builder
+     */
+    protected function addInviteUserField(FormBuilderInterface $builder)
+    {
+        $builder->add(
+            'inviteUser',
+            'checkbox',
+            [
+                'label' => 'oro.user.invite.label',
+                'mapped' => false,
+                'required' => false,
+                'tooltip' => 'oro.user.invite.tooltip',
+                'data' => true
+            ]
+        );
     }
 }

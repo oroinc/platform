@@ -51,6 +51,8 @@ class User extends AbstractPageEntity
     protected $website;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
+    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $inviteUser;
 
     public function init($new = false)
     {
@@ -66,6 +68,14 @@ class User extends AbstractPageEntity
         $this->groups = $this->test->byId('oro_user_user_form_groups');
         $this->roles = $this->test->byId('oro_user_user_form_roles');
         $this->owner = $this->test->select($this->test->byId('oro_user_user_form_owner'));
+        $this->inviteUser = $this->test->byId('oro_user_user_form_inviteUser');
+
+        return $this;
+    }
+
+    public function uncheckInviteUser()
+    {
+        $this->inviteUser->click();
 
         return $this;
     }
