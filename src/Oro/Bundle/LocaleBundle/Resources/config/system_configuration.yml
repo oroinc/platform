@@ -98,7 +98,7 @@ oro_system_configuration:
                     general_setup:
                         children:
                             localization:
-                                priority: 254
+                                priority: 255
                                 children:
                                     locale_settings:
                                         priority: 100
@@ -110,6 +110,7 @@ oro_system_configuration:
                                             - oro_locale.currency
                                             - oro_locale.quarter_start
                             language_settings:
+                                priority: 230
                                 children:
                                     language_languages:
                                         children:
