@@ -4,7 +4,8 @@ oro_menu_config:
             label: oro.tag.entity_plural_label
             route: oro_tag_index
             extras:
-                routes: ['oro_tag_*']
+                position:    90
+                routes:      ['oro_tag_*']
                 description: Tags list
         shortcut_new_tag:
             label: Create new tag
