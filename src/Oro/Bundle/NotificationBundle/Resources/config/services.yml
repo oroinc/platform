@@ -1,6 +1,4 @@
 parameters:
-    oro_notification.send_from: %oro_user.email%
-
     # Entity classes
     oro_notification.event_entity.class: Oro\Bundle\NotificationBundle\Entity\Event
     oro_notification.emailnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\EmailNotification
