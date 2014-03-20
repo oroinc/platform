@@ -126,23 +126,23 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getSerializableValuesProvider
-     */
-    public function testgetSerializableValues($type, $config, $expectedValues)
-    {
-        $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getSerializableValues($type);
-
-        $this->assertEquals($expectedValues, $result);
-    }
-
-    /**
      * @dataProvider getTranslatableValuesProvider
      */
     public function testGetTranslatableValues($type, $config, $expectedValues)
     {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getTranslatableValues($type);
+
+        $this->assertEquals($expectedValues, $result);
+    }
+
+    /**
+     * @dataProvider getIndexedValuesProvider
+     */
+    public function testGetIndexedValues($type, $config, $expectedValues)
+    {
+        $this->configContainer->setConfig($config);
+        $result = $this->configContainer->getIndexedValues($type);
 
         $this->assertEquals($expectedValues, $result);
     }
@@ -490,10 +490,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     'entity' => $this->getItemsForNotAuditableValuesTest()
                 ],
                 [
-                    'item2' => true,
-                    'item5' => true,
-                    'item7' => true,
-                    'item8' => true,
+                    'item2' => true
                 ]
             ],
             'entity config (by id)' => [
@@ -502,10 +499,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     'entity' => $this->getItemsForNotAuditableValuesTest()
                 ],
                 [
-                    'item2' => true,
-                    'item5' => true,
-                    'item7' => true,
-                    'item8' => true,
+                    'item2' => true
                 ]
             ],
             'field config'          => [
@@ -514,10 +508,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     'field' => $this->getItemsForNotAuditableValuesTest()
                 ],
                 [
-                    'item2' => true,
-                    'item5' => true,
-                    'item7' => true,
-                    'item8' => true,
+                    'item2' => true
                 ]
             ],
             'field config (by id)'  => [
@@ -526,10 +517,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     'field' => $this->getItemsForNotAuditableValuesTest()
                 ],
                 [
-                    'item2' => true,
-                    'item5' => true,
-                    'item7' => true,
-                    'item8' => true,
+                    'item2' => true
                 ]
             ],
         ];
@@ -554,30 +542,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'item4' => [
-                ],
-                'item5' => [
-                    'options' => [
-                        'auditable'    => true,
-                        'serializable' => true,
-                    ]
-                ],
-                'item6' => [
-                    'options' => [
-                        'auditable'    => true,
-                        'serializable' => false,
-                    ]
-                ],
-                'item7' => [
-                    'options' => [
-                        'auditable'    => false,
-                        'serializable' => true,
-                    ]
-                ],
-                'item8' => [
-                    'options' => [
-                        'auditable'    => false,
-                        'serializable' => false,
-                    ]
                 ],
             ]
         ];
@@ -646,7 +610,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function getSerializableValuesProvider()
+    public function getIndexedValuesProvider()
     {
         return [
             'no entity config'      => [
@@ -657,58 +621,54 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
             'entity config'         => [
                 PropertyConfigContainer::TYPE_ENTITY,
                 [
-                    'entity' => $this->getItemsForSerializableValuesTest()
+                    'entity' => $this->getItemsForIndexedValuesTest()
                 ],
                 [
-                    'item1' => true,
-                    'item2' => false,
+                    'item1' => true
                 ]
             ],
             'entity config (by id)' => [
                 new EntityConfigId('testScope', 'Test\Cls'),
                 [
-                    'entity' => $this->getItemsForSerializableValuesTest()
+                    'entity' => $this->getItemsForIndexedValuesTest()
                 ],
                 [
-                    'item1' => true,
-                    'item2' => false,
+                    'item1' => true
                 ]
             ],
             'field config'          => [
                 PropertyConfigContainer::TYPE_FIELD,
                 [
-                    'field' => $this->getItemsForSerializableValuesTest()
+                    'field' => $this->getItemsForIndexedValuesTest()
                 ],
                 [
-                    'item1' => true,
-                    'item2' => false,
+                    'item1' => true
                 ]
             ],
             'field config (by id)'  => [
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
-                    'field' => $this->getItemsForSerializableValuesTest()
+                    'field' => $this->getItemsForIndexedValuesTest()
                 ],
                 [
-                    'item1' => true,
-                    'item2' => false,
+                    'item1' => true
                 ]
             ],
         ];
     }
 
-    protected function getItemsForSerializableValuesTest()
+    protected function getItemsForIndexedValuesTest()
     {
         return [
             'items' => [
                 'item1' => [
                     'options' => [
-                        'serializable' => true,
+                        'indexed' => true,
                     ]
                 ],
                 'item2' => [
                     'options' => [
-                        'serializable' => false,
+                        'indexed' => false,
                     ]
                 ],
                 'item3' => [

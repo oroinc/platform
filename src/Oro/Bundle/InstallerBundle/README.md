@@ -59,7 +59,7 @@ To provide demo fixtures for your bundle just place them in "YourBundle\Data\Dem
 To add additional install scripts during install process you can use install.php files in your bundles and packages.
 This install files will be run before last clear cache during installation.
 
-This file must be started with `@OroScript` annotation with script label witch will be shown during web install process.
+This file must be started with `@OroScript` annotation with script label which will be shown during web install process.
 
 Example:
 ``` php

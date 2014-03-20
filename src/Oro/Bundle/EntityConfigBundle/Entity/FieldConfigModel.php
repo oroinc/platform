@@ -3,10 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\ORM\Mapping as ORM;
-
-use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 
@@ -31,19 +28,21 @@ class FieldConfigModel extends AbstractConfigModel
      * @var EntityConfigModel
      * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields", cascade={"persist"})
      * @ORM\JoinColumns({
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
      * })
      */
     protected $entity;
 
     /**
-     * @var ConfigModelValue[]|PersistentCollection
-     * @ORM\OneToMany(targetEntity="ConfigModelValue", mappedBy="field", cascade={"all"})
+     * IMPORTANT: do not modify this collection manually. addToIndex and removeFromIndex should be used
+     *
+     * @var ArrayCollection|ConfigModelIndexValue[]
+     * @ORM\OneToMany(targetEntity="ConfigModelIndexValue", mappedBy="field", cascade={"all"})
      */
-    protected $values;
+    protected $indexedValues;
 
     /**
-     * @var OptionSet[]|PersistentCollection
+     * @var ArrayCollection|OptionSet[]
      * @ORM\OneToMany(targetEntity="OptionSet", mappedBy="field", cascade={"all"})
      */
     protected $options;
@@ -60,13 +59,17 @@ class FieldConfigModel extends AbstractConfigModel
      */
     protected $type;
 
+    /**
+     * @param string|null $fieldName
+     * @param string|null $type
+     */
     public function __construct($fieldName = null, $type = null)
     {
-        $this->type      = $type;
-        $this->mode      = ConfigModelManager::MODE_DEFAULT;
-        $this->values    = new ArrayCollection;
-        $this->options   = new ArrayCollection;
-        $this->fieldName = $fieldName;
+        $this->fieldName     = $fieldName;
+        $this->type          = $type;
+        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->indexedValues = new ArrayCollection();
+        $this->options       = new ArrayCollection();
     }
 
     /**
@@ -135,7 +138,7 @@ class FieldConfigModel extends AbstractConfigModel
     }
 
     /**
-     * @return ArrayCollection|PersistentCollection|OptionSet[]
+     * @return ArrayCollection|OptionSet[]
      */
     public function getOptions()
     {
@@ -143,12 +146,32 @@ class FieldConfigModel extends AbstractConfigModel
     }
 
     /**
-     * @param ArrayCollection|PersistentCollection|OptionSet[] $options
+     * @param ArrayCollection $options
      * @return $this
      */
     public function setOptions($options)
     {
         $this->options = $options;
+
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndexedValues()
+    {
+        return $this->indexedValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createIndexedValue($scope, $code, $value)
+    {
+        $result = new ConfigModelIndexValue($scope, $code, $value);
+        $result->setField($this);
+
+        return $result;
     }
 }

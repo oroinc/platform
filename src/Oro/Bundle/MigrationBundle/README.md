@@ -10,10 +10,17 @@ Each bundle can have migration files that allow to update database schema.
 
 Migration files should be located in `Migrations\Schema\version_number` folder. A version number must be an PHP-standardized version number string, but with some limitations. This string must not contain "." and "+" characters as a version parts separator. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-Each migration class must extend `Oro\Bundle\MigrationBundle\Migration\Migration` abstract class and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter witch can be used to add additional queries.
+Each migration class must implement [Migration](./Migration/Migration.php) interface and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter which can be used to add additional queries.
 
 With `schema` parameter, you can create or update database structure without fear of compatibility between database engines. 
-If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter allows to add additional queries witch will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method).
+If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter represents a [query bag](./Migration/QueryBag.php) and allows to add additional queries which will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method). A query can be a string or an instance of a class implements [MigrationQuery](./Migration/MigrationQuery.php) interface. There are several ready to use implementations of this interface:
+
+ - [SqlMigrationQuery](./Migration/SqlMigrationQuery.php) - represents one or more SQL queries
+ - [ParametrizedSqlMigrationQuery](./Migration/ParametrizedSqlMigrationQuery.php) - similar to the previous class, but each query can have own parameters.
+
+If you need to create own implementation of [MigrationQuery](./Migration/MigrationQuery.php) the [ConnectionAwareInterface](./Migration/ConnectionAwareInterface.php) can be helpful. Just implement this interface in your migration query class if you need a database connection. Also you can use [ParametrizedMigrationQuery](./Migration/ParametrizedMigrationQuery.php) class as a base class for your migration query.
+
+If you have several migration classes within the same version and you need to make sure that they will be executed in a specified order you can use [OrderedMigrationInterface](./Migration/OrderedMigrationInterface.php) interface.
 
 Example of migration file:
 
@@ -70,7 +77,7 @@ class AcmeTestBundle implements Migration, RenameExtensionAwareInterface
 ``` 
 
  
-Each bundle can have an **installation** file as well. This migration file replaces running multiple migration files. Install migration class must extend `Oro\Bundle\MigrationBundle\Migration\Installation` abstract class and must implement `up` and `getMigrationVersion` methods. The `getMigrationVersion` method must return max migration version number that this installation file replaces.
+Each bundle can have an **installation** file as well. This migration file replaces running multiple migration files. Install migration class must implement [Installation](./Migration/Installation.php) interface and must implement `up` and `getMigrationVersion` methods. The `getMigrationVersion` method must return max migration version number that this installation file replaces.
 
 During an install process (it means that you installs a system from a scratch), if install migration file was found, it will be loaded first and then migration files with versions greater then a version returned by `getMigrationVersion` method will be loaded.
 
@@ -121,6 +128,14 @@ This command supports some additional options:
  - **exclude** - A list of bundle names which migrations should be skipped.
 
 Also there is **oro:migration:dump** command to help in creation migration files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
+
+Examples of database structure migrations
+-----------------------------------------
+
+ - [Simple migration](../UserBundle/Migrations/Schema/v1_0/OroUserBundle.php)
+ - [Installer](../InstallerBundle/Migrations/Schema)
+ - [Complex migration](../EntityConfigBundle/Migrations/Schema/v1_2)
+
 
 Extensions for database structure migrations
 --------------------------------------------
@@ -205,7 +220,7 @@ namespace Acme\Bundle\TestBundle\Migration\Extension;
 /**
  * MyExtensionAwareInterface should be implemented by migrations that depends on a MyExtension.
  */
-interface RenameExtensionAwareInterface
+interface MyExtensionAwareInterface
 {
     /**
      * Sets the MyExtension
