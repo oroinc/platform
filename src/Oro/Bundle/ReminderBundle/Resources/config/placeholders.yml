@@ -4,7 +4,7 @@ placeholders:
            oro_reminder_subscriber_js:
               order: 10
 
-    orocrm_reminder_reminder_templates:
+    oro_reminder_reminder_templates:
         items:
            default_template:
               order: 10

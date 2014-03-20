@@ -27,7 +27,7 @@ define(
              * @return {object}
              */
             removeDuplicate: function (messageParamsArray) {
-                var url = routing.generate('oro_reminder_shown');
+                var url = routing.generate('oro_api_post_reminder_shown');
                 var reminderIds = [];
                 var uniqueReminders = {};
                 messageParamsArray.reduce(function (previouse, current) {
@@ -55,7 +55,7 @@ define(
                         + messageObject.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
                     var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
                     $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind('click', actions, function (eventObject) {
-                        var url = routing.generate('oro_reminder_shown');
+                        var url = routing.generate('oro_api_post_reminder_shown');
                         var reminderId = $(this).data('id');
                         eventObject.data.close();
                         $.post(url, { 'ids': [reminderId] });
@@ -91,11 +91,17 @@ define(
              * It need for actualisation data
              */
             reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested');
+                var url = routing.generate('oro_api_get_reminder_requested');
                 var self = this;
-                $.post(url, function(messageParams) {
-                    self.showReminders(messageParams);
-                }, 'json');
+
+                var requestParams = {
+                    success: function(messageParams) {
+                        self.showReminders(messageParams);
+                    },
+                    dataType: 'json'
+                };
+
+                $.ajax(url, requestParams);
             }
         };
     });
