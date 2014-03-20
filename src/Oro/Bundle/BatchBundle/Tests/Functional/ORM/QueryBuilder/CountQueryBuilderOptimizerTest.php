@@ -64,37 +64,37 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
 
         $withInnerJoinQb = new QueryBuilder($em);
         $withInnerJoinQb->from('OroUserBundle:User', 'u')
-            ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu')
+            ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu', Join::WITH, 'u.owner = bu.id')
             ->leftJoin('OroUserBundle:UserApi', 'api')
             ->select(array('u.id', 'u.username', 'api.apiKey as aKey'));
 
         $withInnerJoinAndTwoLeftGroupQb = new QueryBuilder($em);
         $withInnerJoinAndTwoLeftGroupQb->from('OroUserBundle:User', 'u')
-            ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu')
-            ->leftJoin('OroUserBundle:Group', 'g')
-            ->leftJoin('OroUserBundle:Role', 'r')
+            ->innerJoin('u.owner', 'bu')
+            ->leftJoin('u.groups', 'g')
+            ->leftJoin('u.roles', 'r')
             ->leftJoin('g.roles', 'gr')
             ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
             ->groupBy('gr.id')
-            ->having('u.username LIKE "%test%"');
+            ->having('u.username LIKE :test');
 
         $withInnerJoinAndTwoLeftHavingQb = new QueryBuilder($em);
         $withInnerJoinAndTwoLeftHavingQb->from('OroUserBundle:User', 'u')
-            ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu')
-            ->leftJoin('OroUserBundle:Group', 'g')
-            ->leftJoin('OroUserBundle:Role', 'r')
+            ->innerJoin('u.owner', 'bu')
+            ->leftJoin('u.groups', 'g')
+            ->leftJoin('u.roles', 'r')
             ->leftJoin('g.roles', 'gr')
             ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
             ->groupBy('u.id')
-            ->having('gr.label LIKE "%test%"');
+            ->having('gr.label LIKE :test');
 
         $thirdLeftJoinInOnQb = new QueryBuilder($em);
         $thirdLeftJoinInOnQb->from('OroUserBundle:User', 'u')
-            ->innerJoin('OroOrganizationBundle:BusinessUnit', 'bu')
-            ->leftJoin('OroUserBundle:Group', 'g')
-            ->leftJoin('OroUserBundle:Role', 'r')
-            ->leftJoin('g.roles', 'gr', Join::WITH, 'aKey = "test"')
-            ->leftJoin('OroUserBundle:UserApi', 'api')
+            ->innerJoin('u.owner', 'bu')
+            ->leftJoin('u.groups', 'g')
+            ->leftJoin('u.roles', 'r')
+            ->leftJoin('g.roles', 'gr', Join::WITH, 'aKey = :test')
+            ->leftJoin('u.api', 'api')
             ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
             ->where('gr.id > 10');
 
@@ -123,7 +123,9 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
         $countQb = $optimizer->getCountQueryBuilder(self::$queryBuilders[$qbKey]);
 
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
+        // Check for expected DQL
         $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
+        // Check that Optimized DQL can be converted to SQL
         $this->assertNotEmpty($countQb->getQuery()->getSQL());
     }
 
@@ -139,11 +141,11 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ),
             'group_test' => array(
                 'group_test',
-                'SELECT u.id FROM OroUserBundle:User u GROUP BY u.username'
+                'SELECT u.id, u.username as uName FROM OroUserBundle:User u GROUP BY uName'
             ),
             'function_group_test' => array(
                 'function_group_test',
-                'SELECT u.id FROM OroUserBundle:User u GROUP BY SUBSTRING(u.username, 1, 3)'
+                'SELECT u.id, SUBSTRING(u.username, 1, 3) as uName FROM OroUserBundle:User u GROUP BY uName'
             ),
             'one_table' => array(
                 'one_table',
@@ -164,34 +166,35 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ),
             'with_inner_join' => array(
                 'with_inner_join',
-                'SELECT DISTINCT u.id FROM OroUserBundle:User u INNER JOIN OroOrganizationBundle:BusinessUnit bu'
+                'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                    . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu WITH u.owner = bu.id'
             ),
             'inner_with_2_left_group' => array(
                 'inner_with_2_left_group',
                 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
-                . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu '
-                . 'LEFT JOIN OroUserBundle:Group g '
-                . 'LEFT JOIN g.roles gr '
-                . 'GROUP BY gr.id '
-                . 'HAVING u.username LIKE "%test%"'
+                    . 'INNER JOIN u.owner bu '
+                    . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN g.roles gr '
+                    . 'GROUP BY gr.id '
+                    . 'HAVING u.username LIKE :test'
             ),
             'inner_with_2_left_having' => array(
                 'inner_with_2_left_having',
                 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
-                . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu '
-                . 'LEFT JOIN OroUserBundle:Group g '
-                . 'LEFT JOIN g.roles gr '
-                . 'GROUP BY u.id '
-                . 'HAVING gr.label LIKE "%test%"'
+                    . 'INNER JOIN u.owner bu '
+                    . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN g.roles gr '
+                    . 'GROUP BY u.id '
+                    . 'HAVING gr.label LIKE :test'
             ),
             'third_join_in_on' => array(
                 'third_join_in_on',
                 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
-                . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu '
-                . 'LEFT JOIN OroUserBundle:Group g '
-                . 'LEFT JOIN g.roles gr WITH api.apiKey = "test" '
-                . 'LEFT JOIN OroUserBundle:UserApi api '
-                . 'WHERE gr.id > 10'
+                    . 'INNER JOIN u.owner bu '
+                    . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
+                    . 'LEFT JOIN u.api api '
+                    . 'WHERE gr.id > 10'
             )
         );
     }
