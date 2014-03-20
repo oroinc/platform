@@ -515,7 +515,7 @@ class PackageManager
             array_map(
                 function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
                     $previousInstalledPackageVersion = $fetchPreviousInstalledPackageVersion($p->getName());
-                    $this->scriptRunner->update($p, $previousInstalledPackageVersion);
+                    $this->scriptRunner->runUpdateScripts($p, $previousInstalledPackageVersion);
                 },
                 $updatedPackages
             );
