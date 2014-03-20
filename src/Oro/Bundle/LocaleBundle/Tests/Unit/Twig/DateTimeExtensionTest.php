@@ -62,44 +62,90 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $this->extension->formatDateTime($value, $options));
     }
 
-    public function testFormatDate()
+    /**
+     * @return array
+     */
+    public function formatDateDataProvider()
     {
-        $value = new \DateTime('2013-12-31 00:00:00');
-        $dateType = 'short';
-        $locale = 'en_US';
-        $timeZone = 'America/Los_Angeles';
+        return array(
+            'default options' => array(
+                'value' => new \DateTime('2013-12-31 00:00:00'),
+                'expected' => '12/31/13',
+            ),
+            'custom options' => array(
+                'value' => new \DateTime('2013-12-31 00:00:00'),
+                'expected' => '12/31/13',
+                'dateType' => 'short',
+                'locale' => 'en_US',
+                'timeZone' => 'America/Los_Angeles',
+            ),
+        );
+    }
+
+    /**
+     * @param \DateTime $value
+     * @param string $dateType
+     * @param string $locale
+     * @param string $timeZone
+     * @param string $expected
+     * @dataProvider formatDateDataProvider
+     */
+    public function testFormatDate($value, $expected, $dateType = null, $locale = null, $timeZone = null)
+    {
         $options = array(
             'dateType' => $dateType,
             'locale' => $locale,
             'timeZone' => $timeZone
         );
-        $expectedResult = '12/31/13';
 
         $this->formatter->expects($this->once())->method('formatDate')
-            ->with($value, $dateType, $locale, $timeZone)
-            ->will($this->returnValue($expectedResult));
+            ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
+            ->will($this->returnValue($expected));
 
-        $this->assertEquals($expectedResult, $this->extension->formatDate($value, $options));
+        $this->assertEquals($expected, $this->extension->formatDate($value, $options));
     }
 
-    public function testFormatTime()
+    /**
+     * @return array
+     */
+    public function formatTimeDataProvider()
     {
-        $value = new \DateTime('2013-12-31 00:00:00');
-        $timeType = 'short';
-        $locale = 'en_US';
-        $timeZone = 'America/Los_Angeles';
+        return array(
+            'default options' => array(
+                'value' => new \DateTime('2013-12-31 00:00:00'),
+                'expected' => '12 AM',
+            ),
+            'custom options' => array(
+                'value' => new \DateTime('2013-12-31 00:00:00'),
+                'expected' => '12 AM',
+                'timeType' => 'short',
+                'locale' => 'en_US',
+                'timeZone' => 'America/Los_Angeles',
+            ),
+        );
+    }
+
+    /**
+     * @param \DateTime $value
+     * @param string $timeType
+     * @param string $locale
+     * @param string $timeZone
+     * @param string $expected
+     * @dataProvider formatTimeDataProvider
+     */
+    public function testFormatTime($value, $expected, $timeType = null, $locale = null, $timeZone = null)
+    {
         $options = array(
             'timeType' => $timeType,
             'locale' => $locale,
             'timeZone' => $timeZone
         );
-        $expectedResult = '12 AM';
 
         $this->formatter->expects($this->once())->method('formatTime')
-            ->with($value, $timeType, $locale, $timeZone)
-            ->will($this->returnValue($expectedResult));
+            ->with($value, $timeType, $locale, $timeZone ?: 'UTC')
+            ->will($this->returnValue($expected));
 
-        $this->assertEquals($expectedResult, $this->extension->formatTime($value, $options));
+        $this->assertEquals($expected, $this->extension->formatTime($value, $options));
     }
 
     public function testGetName()

@@ -58,10 +58,11 @@
     {% endif %}
     {{ UI.cancelButton(path('oro_email_emailtemplate_index')) }}
     {% if form.vars.value.isEditable %}
+        {% set html = UI.saveAndCloseButton() %}
         {% if form.vars.value.id or resource_granted('oro_email_emailtemplate_update') %}
-            {{ UI.saveAndStayButton() }}
+            {% set html = html ~ UI.saveAndStayButton() %}
         {% endif %}
-        {{ UI.saveAndCloseButton() }}
+        {{ UI.dropdownSaveButton({'html': html}) }}
     {% endif %}
 {% endblock navButtons %}
 

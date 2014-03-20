@@ -169,6 +169,43 @@
 {% endmacro %}
 
 {#
+    Create the dropdown button wich preserves last used button
+    Parameters - array:
+        [
+            'html'     - original buttons markup
+            'groupKey' - key, to remember last used button
+            'options'  - options for pinnedDropdownButtonProcessor widget
+        ]
+#}
+{% macro pinnedDropdownButton(parameters) %}
+    {% if isDesktopVersion() %}
+        {% set options = parameters.options|default({})|merge({
+            groupKey: parameters.groupKey
+        }) %}
+        <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
+            {{ parameters.html|raw }}
+        </div>
+    {% else %}
+        {{ parameters.html|raw }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Predefiend pinnedDropdownButton's settings for save button
+#}
+{% macro dropdownSaveButton(parameters) %}
+    {% set parameters = {
+        'groupKey': 'saveButtons',
+        'options': {
+            'moreButtonAttrs': {
+                'class': 'btn-success'
+            }
+        }
+    }|merge(parameters|default({})) %}
+    {{ _self.pinnedDropdownButton(parameters) }}
+{% endmacro %}
+
+{#
     Create 'Cancel' button
     Parameters
         'path' - button url

@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\GroupBy;
-use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -26,9 +25,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
  */
 class OrmTotalsExtension extends AbstractExtension
 {
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var  Translator */
     protected $translator;
 
@@ -49,10 +45,8 @@ class OrmTotalsExtension extends AbstractExtension
     public function __construct(
         Translator $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter,
-        RequestParameters $requestParams = null
+        DateTimeFormatter $dateTimeFormatter
     ) {
-        $this->requestParams     = $requestParams;
         $this->translator        = $translator;
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
@@ -268,6 +262,8 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
     {
+        // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
+        //       can be unexpected
         $totalQueries = [];
         foreach ($columnsConfig as $field => $totalData) {
             if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
@@ -282,14 +278,19 @@ class OrmTotalsExtension extends AbstractExtension
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
-        if ($perPage) {
-            $this->addPageLimits($query, $pageData);
+        $parameters = $query->getParameters();
+        if ($parameters->count()) {
+            $query->resetDQLPart('where')
+                ->resetDQLPart('having')
+                ->setParameters(new ArrayCollection());
         }
+
+        $this->addPageLimits($query, $pageData, $perPage);
 
         $resultData = $query
             ->getQuery()
             ->setFirstResult(null)
-            ->setMaxResults(null)
+            ->setMaxResults(1)
             ->getScalarResult();
 
         return array_shift($resultData);
@@ -299,14 +300,26 @@ class OrmTotalsExtension extends AbstractExtension
      * Add "in" expression as page limit to query builder
      *
      * @param QueryBuilder $dataQueryBuilder
-     * @param $pageData
+     * @param ResultsObject $pageData
+     * @param bool $perPage
      */
-    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData)
+    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData, $perPage)
     {
         $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
+
+        if (!$perPage) {
+            $query = clone $this->masterQB;
+            $data = $query
+                ->getQuery()
+                ->setFirstResult(null)
+                ->setMaxResults(null)
+                ->getScalarResult();
+        } else {
+            $data = $pageData['data'];
+        }
         foreach ($rootIdentifiers as $identifier) {
             $ids = [];
-            foreach ($pageData['data'] as $res) {
+            foreach ($data as $res) {
                 $ids[] = $res[$identifier['alias']];
             }
 
@@ -316,6 +329,7 @@ class OrmTotalsExtension extends AbstractExtension
 
             $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
+
     }
 
     /**

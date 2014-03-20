@@ -14,7 +14,7 @@ define(['underscore', 'orotranslation/js/translator'
     return [
         'Regex',
         function (value, element, param) {
-            var parts = param.pattern.match(/^\/(\w\W*?)\/(g?i?m?y?)$/),
+            var parts = param.pattern.match(/^\/([\w\W]*?)\/(g?i?m?y?)$/),
                 pattern = new RegExp(parts[1], parts[2]);
             param = _.extend({}, defaultParam, param);
             return this.optional(element) || Boolean(param.match) === pattern.test(value);
