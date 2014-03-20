@@ -13,7 +13,7 @@ use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoader;
+use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
 class LoadMigrationsCommand extends ContainerAwareCommand
 {
@@ -65,49 +65,14 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                     $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                 }
             } else {
-                $migrationQueryLoader = $this->getMigrationQueryLoader($input);
-                $queries              = $migrationQueryLoader->getQueries($migrations);
-                $connection           = $migrationQueryLoader->getConnection();
-                $queryLogger          = new OutputLogger(
+                $logger   = new OutputLogger(
                     $output,
                     true,
                     $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
-                    '    '
+                    '  '
                 );
-                foreach ($queries as $item) {
-                    $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
-                    foreach ($item['queries'] as $query) {
-                        $this->processQuery($query, $connection, $queryLogger, $input->getOption('dry-run'));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string|MigrationQuery $query
-     * @param Connection            $connection
-     * @param LoggerInterface       $queryLogger
-     * @param bool                  $dryRun
-     */
-    protected function processQuery($query, Connection $connection, LoggerInterface $queryLogger, $dryRun)
-    {
-        if ($query instanceof MigrationQuery) {
-            if ($query instanceof ConnectionAwareInterface) {
-                $query->setConnection($connection);
-            }
-            if ($dryRun) {
-                $descriptions = $query->getDescription();
-                foreach ((array)$descriptions as $description) {
-                    $queryLogger->notice($description);
-                }
-            } else {
-                $query->execute($queryLogger);
-            }
-        } else {
-            $queryLogger->notice($query);
-            if (!$dryRun) {
-                $connection->executeQuery($query);
+                $executor = $this->getMigrationExecutor($input);
+                $executor->executeUp($migrations, $logger, $input->getOption('dry-run'));
             }
         }
     }
@@ -133,10 +98,10 @@ class LoadMigrationsCommand extends ContainerAwareCommand
 
     /**
      * @param InputInterface $input
-     * @return MigrationQueryLoader
+     * @return MigrationExecutor
      */
-    protected function getMigrationQueryLoader(InputInterface $input)
+    protected function getMigrationExecutor(InputInterface $input)
     {
-        return $this->getContainer()->get('oro_migration.migrations.query_loader');
+        return $this->getContainer()->get('oro_migration.migrations.executor');
     }
 }

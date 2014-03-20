@@ -9,9 +9,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
-class MigrationQueryLoader
+class MigrationExecutor
 {
     /**
      * @var Connection
@@ -45,28 +46,15 @@ class MigrationQueryLoader
     }
 
     /**
-     * Gets a connection object this migration query builder works with
+     * Executes UP method for the given migrations
      *
-     * @return Connection
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * Gets a list of SQL queries can be used to apply database changes
-     *
-     * @param Migration[] $migrations
-     * @return array
-     *   'migration' => class name of a migration
-     *   'queries'   => a list of sql queries (a query can be a string or instance of MigrationQuery)
+     * @param Migration[]     $migrations
+     * @param LoggerInterface $logger
+     * @param bool            $dryRun
      * @throws InvalidNameException if invalid table or column name is detected
      */
-    public function getQueries(array $migrations)
+    public function executeUp(array $migrations, LoggerInterface $logger, $dryRun = false)
     {
-        $result = [];
-
         $platform   = $this->connection->getDatabasePlatform();
         $sm         = $this->connection->getSchemaManager();
         $fromSchema = $this->createSchemaObject(
@@ -100,23 +88,50 @@ class MigrationQueryLoader
                 $queryBag->getPostQueries()
             );
 
-            $result[] = [
-                'migration' => get_class($migration),
-                'queries'   => $queries
-            ];
-
             $fromSchema = $toSchema;
             $queryBag->clear();
-        }
 
-        return $result;
+            $logger->notice(sprintf('> %s', get_class($migration)));
+            foreach ($queries as $query) {
+                $this->executeQuery($query, $logger, $dryRun);
+            }
+        }
+    }
+
+    /**
+     * Executes the given query
+     *
+     * @param string|MigrationQuery $query
+     * @param LoggerInterface       $logger
+     * @param bool                  $dryRun
+     */
+    protected function executeQuery($query, LoggerInterface $logger, $dryRun)
+    {
+        if ($query instanceof MigrationQuery) {
+            if ($query instanceof ConnectionAwareInterface) {
+                $query->setConnection($this->connection);
+            }
+            if ($dryRun) {
+                $descriptions = $query->getDescription();
+                foreach ((array)$descriptions as $description) {
+                    $logger->notice($description);
+                }
+            } else {
+                $query->execute($logger);
+            }
+        } else {
+            $logger->notice($query);
+            if (!$dryRun) {
+                $this->connection->executeQuery($query);
+            }
+        }
     }
 
     /**
      * Creates a database schema object
      *
-     * @param Table[]      $tables
-     * @param Sequence[]   $sequences
+     * @param Table[]           $tables
+     * @param Sequence[]        $sequences
      * @param SchemaConfig|null $schemaConfig
      * @return Schema
      */
