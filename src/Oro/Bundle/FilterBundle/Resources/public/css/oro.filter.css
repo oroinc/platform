@@ -1,3 +1,6 @@
+.ui-multiselect-checkboxes{
+    overflow-x: visible;
+}
 .filter-item {
     padding-left: 5px;
 }
@@ -97,11 +100,14 @@
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes li {
     padding: 0;
 }
-
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label {
     margin: 0;
+    float: left;
 }
 
+.ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes.fixed-li label{
+    float: none;
+}
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-hover {
     background-image: none;
     background-color: #3875d7;
