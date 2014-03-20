@@ -69,13 +69,19 @@ class SearchResultsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows       = $result->offsetGetByPath('[data]');
-        $rows       = array_map(
-            function (ResultRecordInterface $record) {
-                return $record->getRootEntity();
-            },
-            $rows
-        );
+        $rows = $result->offsetGetByPath('[data]');
+
+        if (!is_array($rows)) {
+            $rows = array();
+        } else {
+            $rows = array_map(
+                function (ResultRecordInterface $record) {
+                    return $record->getRootEntity();
+                },
+                $rows
+            );
+        }
+
         $entities   = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
