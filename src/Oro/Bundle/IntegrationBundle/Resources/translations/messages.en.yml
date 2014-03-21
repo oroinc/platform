@@ -21,7 +21,7 @@ oro:
             simple: Simple
 
         channel:
-            entity_label:        Channels
+            entity_label:        Channel
             entity_plural_label: Channels
             entity_description:  Represent channel
             create_entity:       New Channel
