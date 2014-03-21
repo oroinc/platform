@@ -78,7 +78,7 @@ define(['underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'or
          * @private
          */
         _processRedirect: function () {
-            document.location.href = routing.generate('oro_user_security_login');
+            window.location.href = routing.generate('oro_user_security_login');
         }
     });
 
