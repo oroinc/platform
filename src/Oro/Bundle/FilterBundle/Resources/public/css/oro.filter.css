@@ -2,7 +2,7 @@
     overflow-x: visible;
 }
 .filter-item {
-    padding-left: 5px;
+    padding-right: 7px;
 }
 .filter-box .btn-group [class^='icon-'] {
   padding-top:2px;
@@ -130,6 +130,8 @@
 .ui-multiselect.select-filter-widget span.caret {
     margin-top: 8px;
     margin-right: 8px;
+}
+.ui-multiselect.select-filter-widget #add-filter-button span.caret {
     border-top-color: #006ACC;
 }
 .ui-multiselect.select-filter-widget #add-filter-button:hover{

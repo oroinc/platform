@@ -7,11 +7,11 @@ function($, _, routing, mediator) {
               timeout = 700,
               searchBarContainer = $('#search-div'),
               searchBarInput = searchBarContainer.find('#search-bar-search'),
+              searchBarFrame = searchBarContainer.find('div.header-search-frame'),
               searchBarDropdown = searchBarContainer.find('#search-bar-dropdown'),
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
-
           mediator.bind(
               'hash_navigation_request:complete',
               searchByTagClose,
@@ -51,6 +51,8 @@ function($, _, routing, mediator) {
                   .addClass('active');
               searchBarForm.val($(this).parent().attr('data-alias'));
               searchBarButton.find('.search-bar-type').html($(this).html());
+              var searchDropWidth = searchBarFrame.outerWidth() + searchBarContainer.find('div.btn-group.btn-block').outerWidth();
+              searchBarContainer.width(searchDropWidth);
               searchByTagClose();
               e.preventDefault();
           });

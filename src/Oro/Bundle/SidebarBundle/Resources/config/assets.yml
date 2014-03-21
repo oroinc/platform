@@ -1,4 +1,5 @@
 css:
-  'sidebar':
+  'orosidebar':
       - 'bundles/orosidebar/css/sidebar.css'
       - 'bundles/orosidebar/css/widget-add.css'
+      - 'bundles/orosidebar/css/modal.css'

@@ -1,7 +1,7 @@
 /*global define*/
 define(
-    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore'],
-    function ($, sync, messenger, routing, _) {
+    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oronavigation/js/navigation'],
+    function ($, sync, messenger, routing, _, Navigation) {
         /**
          * @export ororeminder/js/subscriber
          */
@@ -50,20 +50,30 @@ define(
             showReminders: function (messageParamsArray) {
                 _.each(this.removeDuplicate(messageParamsArray), function (messageObject) {
                     var message = this.reminderTextConstructor(messageObject);
-                    //todo: remove html to templates
                     message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
                         + messageObject.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
+
                     var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
+
                     $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind('click', actions, function (eventObject) {
                         var url = routing.generate('oro_reminder_shown');
                         var reminderId = $(this).data('id');
                         eventObject.data.close();
                         $.post(url, { 'ids': [reminderId] });
                     });
+
                 }, this);
+
+                var navigation = Navigation.getInstance();
 
                 $('.alert-reminder .close').unbind('click').bind('click', function () {
                     $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
+                });
+
+                $('.alert-reminder .hash-navigation-link').unbind('click').bind('click', function (event) {
+                    event.preventDefault();
+                    var url = $(this).attr('href');
+                    navigation.setLocation(url);
                 });
             },
 
@@ -73,7 +83,6 @@ define(
              */
             reminderTextConstructor: function (messageObject) {
                 var message = '';
-                //todo: remove html to templates
                 try {
                     message = '<i class="icon-bell"></i>';
                     var template = $('.reminder_templates[data-identifier="' + messageObject.templateId + '"]').html();
