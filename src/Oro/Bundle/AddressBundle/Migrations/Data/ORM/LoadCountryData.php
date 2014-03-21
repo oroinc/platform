@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Migrations\Data\ORM;
 
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Doctrine\Common\Persistence\ObjectManager;
@@ -11,7 +12,7 @@ use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
-class LoadCountryData extends AbstractTranslatableEntityFixture
+class LoadCountryData extends AbstractTranslatableEntityFixture implements VersionedFixtureInterface
 {
     const COUNTRY_PREFIX = 'country';
     const REGION_PREFIX  = 'region';
@@ -30,6 +31,14 @@ class LoadCountryData extends AbstractTranslatableEntityFixture
      * @var string
      */
     protected $structureFileName = '/data/countries.yml';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.0';
+    }
 
     /**
      * {@inheritdoc}
