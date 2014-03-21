@@ -36,30 +36,36 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('orderBy')
             ->resetDQLPart('select')
             ->resetDQLPart('join')
-            ->resetDQLPart('where')
-            ->resetDQLPart('having');
+            ->resetDQLPart('where');
 
         $this->prepareFieldAliases($parts['select']);
         $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
+        $usedAliases = array();
         if ($parts['groupBy']) {
-            $usedAliases = $this->getUsedAliases((array) $parts['groupBy']);
-            foreach ($usedAliases as $alias) {
-                // Add group by fields to select fields.
-                $fieldsToSelect[] = $this->fieldAliases[$alias] . ' as ' . $alias;
-                // Remove this alias from aliases list to prevent their normalization in future.
-                unset($this->fieldAliases[$alias]);
-            }
+            $usedAliases = array_merge($usedAliases, $this->getUsedAliases((array) $parts['groupBy']));
+        } elseif (!$parts['where'] && $parts['having']) {
+            // If there is no where and group by, but having is present - convert having to where.
+            $parts['where'] = $parts['having'];
+            $parts['having'] = null;
+            $qb->resetDQLPart('having');
+        }
+
+        if ($parts['having']) {
+            $usedAliases = array_merge($usedAliases, $this->getUsedAliases($parts['having']));
         }
 
         $hasJoins = false;
         if ($parts['join']) {
             $hasJoins = $this->addJoins($qb, $parts);
         }
+
+        // Add group by fields to select fields.
+        foreach ($usedAliases as $alias) {
+            $fieldsToSelect[] = $this->fieldAliases[$alias] . ' as ' . $alias;
+        }
+
         if ($parts['where']) {
             $qb->where($this->getStringWithReplacedAliases($parts['where']));
-        }
-        if ($parts['having']) {
-            $qb->having($this->getStringWithReplacedAliases($parts['having']));
         }
 
         $qb->select($fieldsToSelect);
