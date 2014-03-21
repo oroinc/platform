@@ -13,7 +13,7 @@ define(function (require) {
      */
     var WidgetSetupView = Modal.extend({
         /** @property {String} */
-        className: 'modal oro-modal-normal',
+        className: 'modal oro-modal-normal widget-setup',
 
         initialize: function (options) {
             var view = this;
@@ -29,13 +29,23 @@ define(function (require) {
                 });
                 view.setupView.render();
                 view.$el.find('.sidebar-widgetsetup').append(view.setupView.$el);
+
+                view.once('ok', function () {
+                    view.setupView.trigger('ok');
+                });
+
+                view.once('cancel', function () {
+                    view.setupView.trigger('cancel');
+                    view.setupView.remove();
+                });
+
+                view.setupView.once('close', function () {
+                    view.setupView.remove();
+                    view.close();
+                });
             });
 
             Modal.prototype.initialize.apply(this, arguments);
-
-            view.once('ok cancel', function () {
-                view.setupView.remove();
-            });
         }
     });
 
