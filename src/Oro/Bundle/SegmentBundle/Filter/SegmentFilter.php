@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -32,10 +31,10 @@ class SegmentFilter extends EntityFilter
     protected $entityNameProvider;
 
     /** @var ConfigProvider */
-    protected $configProvider;
+    protected $entityConfigProvider;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
 
     /**
      * Constructor
@@ -45,8 +44,8 @@ class SegmentFilter extends EntityFilter
      * @param DynamicSegmentQueryBuilder  $dynamicSegmentQueryBuilder
      * @param StaticSegmentQueryBuilder   $staticSegmentQueryBuilder
      * @param EntityNameProvider          $entityNameProvider
-     * @param ConfigProvider              $configProvider
-     * @param EntityManager               $em
+     * @param ConfigProvider              $entityConfigProvider
+     * @param ConfigProvider              $extendConfigProvider
      */
     public function __construct(
         FormFactoryInterface $factory,
@@ -54,16 +53,16 @@ class SegmentFilter extends EntityFilter
         DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder,
         StaticSegmentQueryBuilder $staticSegmentQueryBuilder,
         EntityNameProvider $entityNameProvider,
-        ConfigProvider $configProvider,
-        EntityManager $em
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider
     ) {
         parent::__construct($factory, $util);
 
         $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
         $this->staticSegmentQueryBuilder  = $staticSegmentQueryBuilder;
         $this->entityNameProvider         = $entityNameProvider;
-        $this->configProvider             = $configProvider;
-        $this->em                         = $em;
+        $this->entityConfigProvider       = $entityConfigProvider;
+        $this->extendConfigProvider       = $extendConfigProvider;
     }
 
     /**
@@ -82,23 +81,23 @@ class SegmentFilter extends EntityFilter
     {
         $metadata = parent::getMetadata();
 
-        $em = $this->em;
-        $configs = $this->configProvider->getConfigs();
-        $configs = array_map(
-            function (Config $item) {
-                return $item->getId()->getClassName();
-            },
-            $configs
-        );
-
-        $result = [];
-        foreach ($configs as $entityName) {
-            $classMetadata = $em->getClassMetadata($entityName);
-            $identifiers   = $classMetadata->getIdentifier();
-            $result[$entityName] = array_shift($identifiers);
+        $entityIds = [];
+        $em        = $this->entityConfigProvider->getConfigManager()->getEntityManager();
+        $configIds = $this->entityConfigProvider->getIds();
+        foreach ($configIds as $configId) {
+            $className = $configId->getClassName();
+            if ($this->extendConfigProvider->getConfig($className)->in(
+                'state',
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+            )
+            ) {
+                $classMetadata         = $em->getClassMetadata($className);
+                $identifiers           = $classMetadata->getIdentifier();
+                $entityIds[$className] = array_shift($identifiers);
+            }
         }
 
-        $metadata['entity_ids'] = $result;
+        $metadata['entity_ids'] = $entityIds;
 
         return $metadata;
     }

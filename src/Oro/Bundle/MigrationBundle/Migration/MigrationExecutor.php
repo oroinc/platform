@@ -2,21 +2,26 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
-class MigrationQueryLoader
+class MigrationExecutor
 {
     /**
-     * @var Connection
+     * @var MigrationQueryExecutor
      */
-    protected $connection;
+    protected $queryExecutor;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @var MigrationExtensionManager
@@ -24,11 +29,31 @@ class MigrationQueryLoader
     protected $extensionManager;
 
     /**
-     * @param Connection $connection
+     * @param MigrationQueryExecutor $queryExecutor
      */
-    public function __construct(Connection $connection)
+    public function __construct(MigrationQueryExecutor $queryExecutor)
     {
-        $this->connection = $connection;
+        $this->queryExecutor = $queryExecutor;
+    }
+
+    /**
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Gets a query executor object this migration executor works with
+     *
+     * @return MigrationQueryExecutor
+     */
+    public function getQueryExecutor()
+    {
+        return $this->queryExecutor;
     }
 
     /**
@@ -40,35 +65,21 @@ class MigrationQueryLoader
     {
         $this->extensionManager = $extensionManager;
         $this->extensionManager->setDatabasePlatform(
-            $this->connection->getDatabasePlatform()
+            $this->queryExecutor->getConnection()->getDatabasePlatform()
         );
     }
 
     /**
-     * Gets a connection object this migration query builder works with
+     * Executes UP method for the given migrations
      *
-     * @return Connection
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * Gets a list of SQL queries can be used to apply database changes
-     *
-     * @param Migration[] $migrations
-     * @return array
-     *   'migration' => class name of a migration
-     *   'queries'   => a list of sql queries (a query can be a string or instance of MigrationQuery)
+     * @param Migration[]     $migrations
+     * @param bool            $dryRun
      * @throws InvalidNameException if invalid table or column name is detected
      */
-    public function getQueries(array $migrations)
+    public function executeUp(array $migrations, $dryRun = false)
     {
-        $result = [];
-
-        $platform   = $this->connection->getDatabasePlatform();
-        $sm         = $this->connection->getSchemaManager();
+        $platform   = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm         = $this->queryExecutor->getConnection()->getSchemaManager();
         $fromSchema = $this->createSchemaObject(
             $sm->listTables(),
             $platform->supportsSequences() ? $sm->listSequences() : [],
@@ -100,23 +111,21 @@ class MigrationQueryLoader
                 $queryBag->getPostQueries()
             );
 
-            $result[] = [
-                'migration' => get_class($migration),
-                'queries'   => $queries
-            ];
-
             $fromSchema = $toSchema;
             $queryBag->clear();
-        }
 
-        return $result;
+            $this->logger->notice(sprintf('> %s', get_class($migration)));
+            foreach ($queries as $query) {
+                $this->queryExecutor->execute($query, $dryRun);
+            }
+        }
     }
 
     /**
      * Creates a database schema object
      *
-     * @param Table[]      $tables
-     * @param Sequence[]   $sequences
+     * @param Table[]           $tables
+     * @param Sequence[]        $sequences
      * @param SchemaConfig|null $schemaConfig
      * @return Schema
      */

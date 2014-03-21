@@ -50,7 +50,10 @@ class WidgetController extends Controller
             $workflow = $workflowManager->getWorkflow($workflowItem);
 
             $workflowDefinition = $workflow->getDefinition();
-            if (!$workflowDefinition->isStepsDisplayOrdered()) {
+
+            if ($workflowDefinition->isStepsDisplayOrdered()) {
+                $steps = $workflow->getStepManager()->getOrderedSteps();
+            } else {
                 $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
             }
 
@@ -58,24 +61,6 @@ class WidgetController extends Controller
                 $currentStepName = $workflowItem->getCurrentStep()->getName();
                 $currentStep = $workflow->getStepManager()->getStep($currentStepName);
             }
-        } else {
-            $workflow = $workflowManager->getApplicableWorkflow($entity);
-            $workflowDefinition = $workflow->getDefinition();
-            if (!$currentStep && $workflowDefinition->getStartStep()) {
-                $currentStep = $workflow->getStepManager()
-                    ->getStep($workflowDefinition->getStartStep()->getName());
-
-                if (!$workflowDefinition->isStepsDisplayOrdered()) {
-                    $steps = array($currentStep);
-                }
-            }
-        }
-
-        if ($workflowDefinition->isStepsDisplayOrdered()) {
-            $steps = $workflow->getStepManager()->getOrderedSteps();
-        }
-        if (!$steps && $currentStep) {
-            $steps[] = $currentStep;
         }
 
         return array(
