@@ -16,7 +16,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for code, action in actionsList %}
+                    {% for code, action in actionsList if action["url"] %}
                         <tr>
                             <td><a href="{{ action["url"] }}" target="_blank">{{ code }}</a></td>
                             <td>{{ action["description"] }}</td>

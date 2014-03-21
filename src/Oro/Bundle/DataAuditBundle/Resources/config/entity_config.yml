@@ -6,6 +6,7 @@ oro_entity_config:
                     options:
                         priority:           60
                         default_value:      false
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Auditable'
@@ -27,6 +28,7 @@ oro_entity_config:
                     options:
                         priority:           60
                         default_value:      false
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Auditable'

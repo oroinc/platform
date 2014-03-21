@@ -71,7 +71,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
                 postal_code: data.postalCode,
                 region: data.region || data.regionText,
                 region_code: data.regionCode
-            });
+            }, null, "\n");
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();

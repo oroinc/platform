@@ -1,0 +1,32 @@
+oro_system_configuration:
+    groups:
+        look_and_feel:
+            title: 'Look & Feel'
+            icon:  'icon-eye-open'
+        grid_settings:
+            title: 'Datagrid settings'
+    fields:
+        oro_data_grid.default_per_page:
+            type: choice
+            options:
+                label:    'Default per page'
+                choices:
+                    10:     10
+                    25:     25
+                    50:     50
+                    100:    100
+                constraints:
+                    - NotBlank: ~
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            look_and_feel:
+                                priority: 210
+                                children:
+                                    grid_settings:
+                                        children:
+                                            - oro_data_grid.default_per_page

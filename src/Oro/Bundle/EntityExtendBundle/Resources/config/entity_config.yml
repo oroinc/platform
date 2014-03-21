@@ -27,6 +27,7 @@ oro_entity_config:
                         priority:           40
                         auditable:          false
                         default_value:      'System'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Type'
@@ -42,6 +43,7 @@ oro_entity_config:
                         priority:           27
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Is Extend'
@@ -55,7 +57,7 @@ oro_entity_config:
                     options:
                         priority:           25
                         default_value:      'Active'
-                        label:              'Schema status'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Schema status'
@@ -70,9 +72,8 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
-                        # TODO: remove/deprecate show_column key here with GridBundle
-                        show_column:        false
                         renderable:         false
                         query:
                             operator:       '!='
@@ -81,12 +82,10 @@ oro_entity_config:
                 unique_key:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 index:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 upgradeable:
                     options:
@@ -96,12 +95,10 @@ oro_entity_config:
                 relation:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 schema:
                     options:
                         auditable:          false
-                        serializable:       true
 
         field:
             grid_action:
@@ -143,6 +140,7 @@ oro_entity_config:
                         priority:           20
                         default_value:      'System'
                         auditable:          false
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Type'
@@ -156,7 +154,7 @@ oro_entity_config:
                     options:
                         priority:           25
                         default_value:      'Active'
-                        label:              'Schema status'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Schema status'
@@ -245,9 +243,8 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
-                        # TODO: remove/deprecate show_column key here with GridBundle
-                        show_column:        false
                         renderable:         false
                         query:
                             operator:       '!='
@@ -264,10 +261,10 @@ oro_entity_config:
                 relation:
                     options:
                         allowed_type:       [oneToMany, manyToOne, manyToMany]
-                        serializable:       true
+                        auditable:          false
                         required_property:
                             config_id:
-                                field_name:  null
+                                field_name: null
                                 scope:      extend
                             code:           is_extend
                             value:          true
@@ -287,17 +284,14 @@ oro_entity_config:
                 target_grid:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 target_title:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 target_detailed:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 #
                 # OptionSet form type fields
@@ -321,7 +315,6 @@ oro_entity_config:
                     options:
                         allowed_type:       [optionSet]
                         auditable:          false
-                        serializable:       true
                     form:
                         type:               oro_entity_option_set_collection
                         options:

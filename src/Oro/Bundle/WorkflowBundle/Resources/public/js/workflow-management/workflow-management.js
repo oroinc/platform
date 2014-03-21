@@ -40,18 +40,20 @@ function(_, Backbone, messanger, __,
 
         options: {
             stepsEl: null,
-            saveBtnEl: null,
             model: null,
-            entities: []
+            entities: [],
+            backUrl: null
         },
 
         initialize: function() {
+            this.saveAndClose = false;
+
             _.each(this.model.get('steps').models, this.setWorkflow, this);
             _.each(this.model.get('transitions').models, this.setWorkflow, this);
             this.listenTo(this.model.get('steps'), 'add', this.setWorkflow);
             this.listenTo(this.model.get('transitions'), 'add', this.setWorkflow);
 
-            this.addStartStep();
+            this.addStartingPoint();
             this.initStartStepSelector();
 
             this.stepListView = new StepsListView({
@@ -61,23 +63,31 @@ function(_, Backbone, messanger, __,
             });
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
             this.initEntityFieldsLoader();
+            this.initForm();
 
             this.listenTo(this.model, 'requestAddTransition', this.addNewStepTransition);
             this.listenTo(this.model, 'requestEditStep', this.openManageStepForm);
             this.listenTo(this.model, 'requestCloneStep', this.cloneStep);
             this.listenTo(this.model, 'requestRemoveStep', this.removeStep);
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
-            this.listenTo(this.model.get('transitions'), 'destroy', this.onTransitionRemove);
 
             this.listenTo(this.model, 'requestRemoveTransition', this.removeTransition);
             this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
             this.listenTo(this.model, 'requestEditTransition', this.openManageTransitionForm);
 
             this.listenTo(this.model, 'change:entity', this.resetWorkflow);
+        },
 
-            this.$saveBtn = $(this.options.saveBtnEl);
-            this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
-            this.model.url = this.$saveBtn.data('url');
+        initForm: function() {
+            this.$el.on('submit', _.bind(this.saveConfiguration, this));
+            this.model.url = this.$el.attr('action');
+
+            this.$('[type="submit"]').on('click', _.bind(function() {
+                this.saveAndClose = true;
+            }, this));
+            this.$('[data-action="save_and_stay"]').on('click', _.bind(function() {
+                this.saveAndClose = false;
+            }, this));
         },
 
         setWorkflow: function(item) {
@@ -88,7 +98,11 @@ function(_, Backbone, messanger, __,
             var getSteps = _.bind(function(query) {
                 var steps = [];
                 _.each(this.model.get('steps').models, function(step) {
-                    if (!step.get('_is_start') && _.indexOf(step.get('label'), query.term) !== -1) {
+                    // starting point is not allowed to be a start step
+                    var stepLabel = step.get('label');
+                    if (!step.get('_is_start')
+                        && (!query.term || query.term == stepLabel || _.indexOf(stepLabel, query.term) !== -1)
+                    ) {
                         steps.push({
                             'id': step.get('name'),
                             'text': step.get('label')
@@ -152,8 +166,8 @@ function(_, Backbone, messanger, __,
             }, this));
         },
 
-        addStartStep: function() {
-            this.model.get('steps').add(this._getStartStep());
+        addStartingPoint: function() {
+            this.model.get('steps').add(this._createStartingPoint());
         },
 
         resetWorkflow: function() {
@@ -172,7 +186,7 @@ function(_, Backbone, messanger, __,
             resetCollection(this.model.get('transition_definitions'));
             resetCollection(this.model.get('transitions'));
 
-            this.addStartStep();
+            this.addStartingPoint();
         },
 
         createPathMapping: function(fields) {
@@ -213,16 +227,9 @@ function(_, Backbone, messanger, __,
 
         saveConfiguration: function(e) {
             e.preventDefault();
-
-            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
-                messanger.notificationFlashMessage(
-                    'error',
-                    __('Could not save workflow. Please add steps and transitions.')
-                );
+            if (!this.$el.valid()) {
                 return;
             }
-
-            var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
 
             var formData = Helper.getFormData(this.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
@@ -235,20 +242,23 @@ function(_, Backbone, messanger, __,
             this.model.set('entity', formData.related_entity);
             this.model.set('start_step', formData.start_step);
 
-            if (navigation) {
-                navigation.showLoading();
+            if (!this.validateConfiguration()) {
+                return;
             }
+
+            var navigation = Navigation.getInstance();
+            navigation.showLoading();
             this.model.save(null, {
-                'success': function() {
-                    if (navigation) {
-                        navigation.hideLoading();
+                'success': _.bind(function() {
+                    navigation.hideLoading();
+                    if (this.saveAndClose) {
+                        navigation.setLocation(this.options.backUrl);
                     }
+
                     messanger.notificationFlashMessage('success', __('Workflow saved.'));
-                },
+                }, this),
                 'error': function(model, response) {
-                    if (navigation) {
-                        navigation.hideLoading();
-                    }
+                    navigation.hideLoading();
                     if (app.debug && !_.isUndefined(console) && !_.isUndefined(response.responseJSON.error)) {
                         console.error(response.responseJSON.error);
                     }
@@ -257,7 +267,41 @@ function(_, Backbone, messanger, __,
             });
         },
 
-        _getStartStep: function() {
+        validateConfiguration: function() {
+            // workflow label should be defined
+            if (!this.model.get('label')) {
+                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
+                return false;
+            }
+
+            // related entity should be defined
+            if (!this.model.get('entity')) {
+                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set related entity.'));
+                return false;
+            }
+
+            // at least one step and one transition must exist
+            if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please add at least one step and one transition.')
+                );
+                return false;
+            }
+
+            // should be defined either start step or at least one start transition
+            if (!this.model.get('start_step') && _.isEmpty(this._getStartingPoint().get('allowed_transitions'))) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please either set default step or add transitions to starting point.')
+                );
+                return false;
+            }
+
+            return true;
+        },
+
+        _createStartingPoint: function() {
             var startStepModel = new StepModel({
                 'name': 'step:starting_point',
                 'label': __('(Starting point)'),
@@ -270,6 +314,10 @@ function(_, Backbone, messanger, __,
                 .reset(this.model.getStartTransitions());
 
             return startStepModel;
+        },
+
+        _getStartingPoint: function() {
+            return this.model.getStepByName('step:starting_point');
         },
 
         renderSteps: function() {

@@ -27,6 +27,13 @@ class DataFixture
     protected $className;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="version", type="string", length=255, nullable=true)
+     */
+    protected $version;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="loaded_at", type="datetime")
@@ -77,5 +84,24 @@ class DataFixture
         $this->loadedAt = $loadedAt;
 
         return $this;
+    }
+
+    /**
+     * @param string $version
+     * @return $this
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
     }
 }

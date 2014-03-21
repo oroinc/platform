@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 class CreateDateTime extends AbstractDateAction
