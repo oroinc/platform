@@ -35,6 +35,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         );
         $commandExecutor
             ->runCommand('oro:migration:load', ['--process-isolation' => true, '--process-timeout' => 300])
+            ->runCommand('oro:entity-config:update')
             ->runCommand('oro:workflow:definitions:load')
             ->runCommand('oro:migration:data:load', ['--process-isolation' => true, '--process-timeout' => 300])
             ->runCommand('oro:navigation:init', array('--process-isolation' => true))
