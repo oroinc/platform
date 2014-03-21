@@ -1,4 +1,4 @@
-oro_navigation_api_pinbar:
+oro_reminder_bundle_api:
     resource:     "@OroReminderBundle/Controller/Api/Rest/ReminderController.php"
     type:         rest
     prefix:       api/rest/{version}/
