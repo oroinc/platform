@@ -63,6 +63,7 @@ define(function (require) {
             view.listenTo(widgets, 'remove', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
+            view.listenTo(Backbone, 'refreshWidget', view.onRefreshWidget);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
             view.listenTo(Backbone, 'closeWidget', view.onCloseWidget);
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
@@ -304,6 +305,24 @@ define(function (require) {
             view.hoverViews[cid] = hoverView;
         },
 
+        onRefreshWidget: function (cid) {
+            var widget = this.getWidgets().get(cid);
+            if (!widget) {
+                return;
+            }
+
+            var widgetView, state = widget.get('state');
+            if (state == constants.WIDGET_MAXIMIZED) {
+                widgetView = this.widgetViews[cid];
+            } else if (state == constants.WIDGET_MAXIMIZED_HOVER) {
+                widgetView = this.hoverViews[cid];
+            }
+
+            if (widgetView) {
+                widgetView.contentView.trigger('refresh');
+            }
+        },
+
         hideWidgetHover: function (cid) {
             var hoverView = this.hoverViews[cid];
             if (hoverView) {
@@ -364,7 +383,8 @@ define(function (require) {
             var widgetSnapshot = JSON.stringify(widget);
 
             var widgetSetupView = new WidgetSetupView({
-                model: widget
+                model: widget,
+                okCloses: false
             });
 
             widgetSetupView.on('ok', function () {
