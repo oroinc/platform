@@ -3,7 +3,10 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 use Doctrine\ORM\EntityManager;
@@ -62,48 +65,73 @@ class ConfigModelManagerTest extends OrmTestCase
         $this->assertEquals($this->em, $this->configModelManager->getEntityManager());
     }
 
-    public function testCheckDatabaseFalse()
-    {
-        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schema->expects($this->any())->method('listTableNames')->will($this->returnValue(array()));
-        $this->em->getConnection()->getDriver()->setSchemaManager($schema);
-
-        $this->assertFalse($this->configModelManager->checkDatabase());
-    }
-
     public function testCheckDatabaseException()
     {
-        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
+        $connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue(new MySqlPlatform()));
+        $connection->expects($this->once())
+            ->method('fetchAll')
+            ->will($this->throwException(new \PDOException()));
+        $sm = new SchemaManagerMock($connection);
 
-        $schema->expects($this->any())->method('listTableNames')->will($this->throwException(new \PDOException()));
-        $this->em->getConnection()->getDriver()->setSchemaManager($schema);
+        $this->em->getConnection()->getDriver()->setSchemaManager($sm);
 
         $this->assertFalse($this->configModelManager->checkDatabase());
     }
 
-    public function testCheckDatabase()
+    /**
+     * @dataProvider checkDatabaseProvider
+     */
+    public function testCheckDatabase(array $tables, $expectedResult)
     {
-        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
+        $connection->expects($this->once())
+            ->method('getConfiguration')
+            ->will($this->returnValue(new Configuration()));
+        $connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue(new MySqlPlatform()));
+        $connection->expects($this->once())
+            ->method('fetchAll')
+            ->will($this->returnValue($tables));
+        $sm = new SchemaManagerMock($connection);
 
-        $schema->expects($this->any())->method('listTableNames')->will(
-            $this->returnValue(
-                array(
+        $this->em->getConnection()->getDriver()->setSchemaManager($sm);
+
+        $this->assertEquals($expectedResult, $this->configModelManager->checkDatabase());
+    }
+
+    public function checkDatabaseProvider()
+    {
+        return [
+            [
+                [
+                    'other_table',
                     'oro_entity_config',
                     'oro_entity_config_field',
-                    'oro_entity_config_value',
-                )
-            )
-        );
-        $this->em->getConnection()->getDriver()->setSchemaManager($schema);
-
-        $this->assertTrue($this->configModelManager->checkDatabase());
+                    'oro_entity_config_index_value',
+                ],
+                true
+            ],
+            [
+                [
+                    'other_table',
+                    'oro_entity_config',
+                    'oro_entity_config_field',
+                ],
+                false
+            ],
+            [
+                [],
+                false
+            ],
+        ];
     }
 
     /**

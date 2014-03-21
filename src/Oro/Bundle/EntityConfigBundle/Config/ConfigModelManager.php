@@ -53,7 +53,7 @@ class ConfigModelManager
     private $requiredTables = array(
         'oro_entity_config',
         'oro_entity_config_field',
-        'oro_entity_config_value',
+        'oro_entity_config_index_value',
     );
 
     public function __construct(ServiceLink $proxyEm)
@@ -76,20 +76,18 @@ class ConfigModelManager
     public function checkDatabase()
     {
         if ($this->dbCheckCache === null) {
+            $this->dbCheckCache = false;
             try {
                 $conn = $this->getEntityManager()->getConnection();
 
                 if (!$conn->isConnected()) {
                     $this->getEntityManager()->getConnection()->connect();
                 }
-
-                $this->dbCheckCache = $conn->isConnected()
-                    && (bool)array_intersect(
-                        $this->requiredTables,
-                        $this->getEntityManager()->getConnection()->getSchemaManager()->listTableNames()
-                    );
+                if ($conn->isConnected()) {
+                    $sm = $this->getEntityManager()->getConnection()->getSchemaManager();
+                    $this->dbCheckCache = $sm->tablesExist($this->requiredTables);
+                }
             } catch (\PDOException $e) {
-                $this->dbCheckCache = false;
             }
         }
 

@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
+use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class SegmentController extends Controller
 {
@@ -101,6 +102,7 @@ class SegmentController extends Controller
     protected function update(Segment $entity)
     {
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+        $isNewEntity = null == $entity->getId();
 
         if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -108,7 +110,8 @@ class SegmentController extends Controller
                 $this->get('translator')->trans('oro.segment.entity.saved')
             );
 
-            if ($this->getRequest()->get(Router::ACTION_PARAMETER) === 'save_and_refresh') {
+            $isSaveAndRefresh = $this->getRequest()->get(Router::ACTION_PARAMETER) === 'save_and_refresh';
+            if ($entity->getType()->getName() == SegmentType::TYPE_STATIC && ($isSaveAndRefresh || $isNewEntity)) {
                 $this->get('oro_segment.static_segment_manager')->run($entity);
             }
 

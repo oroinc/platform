@@ -1,3 +1,3 @@
 css:
-  'entityextend':
+  'oroentityextend':
       - 'bundles/oroentityextend/css/extend.css'
