@@ -31,6 +31,7 @@ services:
             - @doctrine
             - @oro_workflow.registry
             - @oro_entity.doctrine_helper
+            - @oro_entity_config.config_manager
 
     oro_workflow.attribute_guesser:
         class: %oro_workflow.attribute_guesser.class%

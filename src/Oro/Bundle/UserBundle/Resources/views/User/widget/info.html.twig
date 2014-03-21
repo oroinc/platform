@@ -11,7 +11,7 @@
 
 {% macro renderApiBlock(user) %}
     <div style="padding-top: 2px">
-        <span class="api-key">{{ user.api ? user.api.apiKey : '' }}</span>
+        <span class="api-key">{{ user.api ? user.api.apiKey|escape : '' }}</span>
         {% if resource_granted('EDIT', user) %}
             <a class="btn btn-mini no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"
                data-title="{{ 'Generate key'|trans }}" data-message="{{ 'Generate key was successful. New key:'|trans }}">
@@ -38,16 +38,16 @@
             {% for emailEntity in entity.emails %}
                 {% set emails = emails|merge([_self.renderEmail(emailEntity.email)]) %}
             {% endfor %}
-            {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
+            {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
             {{ entityConfig.renderDynamicFields(entity) }}
         </div>
 
         <div class="responsive-block">
-            {{ ui.renderProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
+            {{ ui.renderHtmlProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
 
             {% if resource_granted('oro_tag_view_tag_cloud') %}
-                {{ ui.renderProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
+                {{ ui.renderHtmlProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
             {% endif %}
         </div>
     </div>
