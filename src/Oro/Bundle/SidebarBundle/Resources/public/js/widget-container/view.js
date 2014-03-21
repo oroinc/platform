@@ -18,6 +18,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
+            'click .sidebar-widget-refresh': 'onClickRefresh',
             'click .sidebar-widget-settings': 'onClickSettings',
             'click .sidebar-widget-remove': 'onClickRemove',
             'click .sidebar-widget-close': 'onClickClose'
@@ -41,6 +42,11 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
+
+
+            if (view.model.get('cssClass')) {
+                view.$el.attr('class', view.model.get('cssClass'));
+            }
 
             if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
                 requirejs([model.get('module')], function (Widget) {
@@ -76,6 +82,13 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
             this.model.toggleState();
             this.model.save();
+        },
+
+        onClickRefresh: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            Backbone.trigger('refreshWidget', this.model.cid);
         },
 
         onClickSettings: function (e) {

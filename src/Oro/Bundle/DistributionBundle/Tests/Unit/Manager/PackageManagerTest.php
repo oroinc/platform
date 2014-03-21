@@ -317,9 +317,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$newPackage]));
 
         $runner = $this->createScriptRunnerMock();
-
-        $runner->expects($this->once())
-            ->method('loadFixtures');
         $runner->expects($this->once())
             ->method('clearDistApplicationCache');
         $runner->expects($this->once())
@@ -327,7 +324,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->once())
             ->method('runPlatformUpdate');
         $runner->expects($this->once())
-            ->method('install')
+            ->method('runInstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
@@ -578,7 +575,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $scriptRunner = $this->createScriptRunnerMock();
         $scriptRunner->expects($this->any())
-            ->method('install')
+            ->method('runInstallScripts')
             ->will($this->throwException($thrownException = new \Exception('Exception message')));
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
@@ -807,10 +804,10 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // run uninstall scripts
         $runner = $this->createScriptRunnerMock();
         $runner->expects($this->at(0))
-            ->method('uninstall')
+            ->method('runUninstallScripts')
             ->with($installedPackages[0]);
         $runner->expects($this->at(1))
-            ->method('uninstall')
+            ->method('runUninstallScripts')
             ->with($installedPackages[1]);
         $runner->expects($this->once())
             ->method('removeCachedFiles');
@@ -1066,17 +1063,17 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $runner = $this->createScriptRunnerMock();
         $runner->expects($this->once())
-            ->method('install')
+            ->method('runInstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->exactly(2))
-            ->method('update')
+            ->method('runUpdateScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->once())
-            ->method('uninstall')
+            ->method('runUninstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
         $runner->expects($this->once())
             ->method('clearDistApplicationCache');
-        $runner->expects($this->exactly(2))
+        $runner->expects($this->once())
             ->method('runPlatformUpdate');
 
         $composerInstaller = $this->prepareInstallerMock($packageName, 0);

@@ -1,0 +1,34 @@
+parameters:
+    oro_segment.segment.entity.class:                   Oro\Bundle\SegmentBundle\Entity\Segment
+    oro_segment.form.type.segment.class:                Oro\Bundle\SegmentBundle\Form\Type\SegmentType
+    oro_segment.form.type.entity_choice.class:          Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType
+    oro_segment.form.handler.segment.class:             Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler
+
+services:
+    oro_segment.form.type.segment:
+        class: %oro_segment.form.type.segment.class%
+        tags:
+            - { name: form.type, alias: oro_segment }
+
+    oro_segment.form.segment:
+        class:           Symfony\Component\Form\Form
+        factory_method:  createNamed
+        factory_service: form.factory
+        arguments:
+            - "oro_segment_form"
+            - "oro_segment"
+
+    oro_segment.form.handler.segment:
+        class: %oro_segment.form.handler.segment.class%
+        scope: request
+        arguments:
+            - @oro_segment.form.segment
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_segment.form.type.entity_choice:
+        class: %oro_segment.form.type.entity_choice.class%
+        arguments:
+            - @oro_segment.entity_provider
+        tags:
+            - { name: form.type, alias: oro_segment_entity_choice }

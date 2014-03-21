@@ -1,0 +1,272 @@
+{% macro query_designer_condition_builder(params) %}
+    {% set fieldConditionOptions = {
+        fieldChoice: {
+            select2: {
+                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+            },
+            util: {},
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id
+        }
+    } %}
+    {% set segmentConditionOptions = {
+        segmentChoice: {
+            select2: {
+                placeholder: 'oro.segment.condition_builder.choose_entity_segment'|trans,
+                ajax: {
+                    url: 'oro_api_get_segment_items',
+                    quietMillis: 100,
+                }
+            },
+            util: {},
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id,
+            currentSegment: params.currentSegmentId|default(null)
+        }
+    } %}
+    <div class="condition-builder left-panel-container">
+        <div class="panel-placeholder">
+            <div>
+                <div class="row-fluid">
+                    <div class="span3 filter-criteria">
+                        <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                            <li class="option" data-criteria="condition-item"
+                                data-module="oroquerydesigner/js/field-condition"
+                                data-widget="fieldCondition"
+                                data-options="{{ fieldConditionOptions|json_encode }}">
+                                {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
+                            </li>
+                            <li class="option" data-criteria="condition-segment"
+                                data-module="orosegment/js/segment-condition"
+                                data-widget="segmentCondition"
+                                data-options="{{ segmentConditionOptions|json_encode }}">
+                                {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
+                            </li>
+                            <li class="option" data-criteria="conditions-group">
+                                {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="span9">
+                        <div class="condition-builder" id="{{ params.id }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require(['oroquerydesigner/js/condition-builder'], function ($) {
+            var $criteriaList             = $('#{{ params.criteria_list_id }}'),
+                $fieldConditionCriteria   = $criteriaList.find('[data-criteria=condition-item]'),
+                $segmentConditionCriteria = $criteriaList.find('[data-criteria=condition-segment]'),
+                $conditionsGroup          = $criteriaList.find('[data-criteria=conditions-group]'),
+                $conditions = $('#{{ params.id }}');
+
+            $('#{{ params.entity_choice_id }}')
+                .on('fieldsloaderupdate', function (e, fields) {
+                    $conditions.conditionBuilder('setValue', []);
+                    var isEmptyObject = $.isEmptyObject(fields);
+                    $fieldConditionCriteria
+                        .toggleClass('disabled', isEmptyObject);
+                    $segmentConditionCriteria
+                        .toggleClass('disabled', isEmptyObject);
+                    $conditionsGroup
+                        .toggleClass('disabled', isEmptyObject);
+                });
+
+            $conditions.conditionBuilder({
+                criteriaListSelector: '#{{ params.criteria_list_id }}'
+            });
+        });
+    </script>
+{% endmacro %}
+
+{% macro query_designer_segment_template(id) %}
+    <script type="text/html" id="{{ id }}">
+        {% trans %}Apply segment {% endtrans %}
+        <%= obj.text %>
+    </script>
+{% endmacro %}
+
+{#
+    Renders run button for static segment if allowed
+
+    @param Segment entity
+    @param bool    reloadRequired - is page reload required after run
+#}
+{% macro runButton(entity, reloadRequired = false) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% if entity.id and resource_granted('EDIT', entity)
+        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
+    %}
+        {{ UI.clientButton({
+            'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
+            'aCss':   'no-hash run-button btn',
+            'title' : 'Refresh segment',
+            'label' : 'Refresh segment',
+            'iCss':   'icon-refresh'
+        }) }}
+
+        <script type="text/javascript">
+            require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger',
+                     'oronavigation/js/navigation', 'oroui/js/delete-confirmation', 'oroui/js/mediator'],
+            function ($, __, routing, messenger, Navigation, DeleteConfirmation, mediator) {
+                $(function () {
+                    $('.run-button').click(function (e) {
+                        e.preventDefault();
+
+                        var confirm = new DeleteConfirmation({
+                            title:    __('Run confirmation'),
+                            okText:   __('Yes, I Agree'),
+                            content:  __('Are you sure you want to refresh this segment?')
+                        });
+
+                        var url = $(this).data('url'),
+                            navigation = Navigation.getInstance(),
+                                run = function () {
+                                    if (navigation) {
+                                        navigation.loadingMask.show();
+                                    }
+
+                                    var success = false;
+                                    $.post(url,function () {
+                                        success = true;
+                                    }).error(function () {
+                                        messenger.notificationFlashMessage('error', __('Error was occurred, please contact administrator.'));
+                                    }).always(function () {
+                                        if (navigation) {
+                                            navigation.loadingMask.hide();
+                                        }
+                                        if (success) {
+                                            var successMessage = __('Segment successfully processed.');
+
+                                            {% if reloadRequired %}
+                                                mediator.once("hash_navigation_request:refresh", function() {
+                                                    messenger.notificationFlashMessage('success', successMessage);
+                                                });
+                                                navigation.refreshPage();
+                                            {% else %}
+                                                messenger.notificationFlashMessage('success', successMessage);
+                                            {% endif %}
+                                        }
+                                    });
+                                };
+
+                        confirm.on('ok', run);
+                        confirm.open();
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}
+
+{#
+    Renders save and refresh button
+
+    @param Segment entity
+#}
+{% macro saveAndRefreshButton(entity) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% if entity.id and resource_granted('EDIT', entity)
+        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
+    %}
+        {{ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save and refresh', 'action': 'save_and_refresh'}) }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Render JS code for report/segment init
+
+    @param string   type     segment or report
+    @param FormView form
+    @param array    entities
+    @param array    metadata
+#}
+{% macro initJsWidgets(type, form, entities, metadata) %}
+    {{ _self.query_designer_segment_template('segment-template') }}
+    {% set entityFieldsRouteParams = {
+        'with-relations': 1,
+        'with-entity-details': 1,
+        'deep-level': 2
+    } %}
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
+            'oroui/js/delete-confirmation', 'orosegment/js/segment', 'oroentity/js/fields-loader'],
+                function ($, _, __, LoadingMask, DeleteConfirmation, managerInit) {
+                    var $entityChoice = $('#oro_{{ type }}_form_entity');
+                    var loadingMask = new LoadingMask();
+                    var confirm = new DeleteConfirmation({
+                        title: __('Change Entity Confirmation'),
+                        okText: __('Yes, I Agree'),
+                        content: __('Are you sure you want to change entity?')
+                    });
+
+                    $('#{{ type }}-designer').append(loadingMask.render().$el);
+
+                    $entityChoice
+                        .fieldsLoader({
+                            router: 'oro_api_get_entity_fields',
+                            routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
+                            confirm: confirm,
+                            requireConfirm: function () {
+                                var data = $('#oro_{{ type }}_form_definition').val();
+                                if (!data) {
+                                    return false;
+                                }
+                                try {
+                                    data = JSON.parse(data);
+                                } catch (e) {
+                                    return false;
+                                }
+                                return _.some(data, function (value) {
+                                    return !_.isEmpty(value);
+                                });
+                            }
+                        })
+                        .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+                        .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
+
+                    {% if not form.entity.vars.value is empty %}
+                    {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                            'entityName': form.entity.vars.value|replace({'\\': '_'})
+                        }|merge(entityFieldsRouteParams))) %};
+                    $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                    {% endif %}
+
+                    managerInit({
+                        entityChoice: '#oro_{{ type }}_form_entity',
+                        valueSource: '#oro_{{ type }}_form_definition',
+                        filters: {
+                            criteriaList: '#filter-criteria-list',
+                            conditionBuilder: '#{{ type }}-condition-builder'
+                        },
+                        {% if type == 'report' %}
+                        grouping: {
+                            editor: {
+                                mapping: {
+                                    name: 'oro_report_form[grouping][columnNames]'
+                                }
+                            },
+                            form: '#report-grouping-form',
+                            itemContainer: '#report-grouping-list .grouping-item-container',
+                            itemTemplate: '#report-grouping-item-row'
+                        },
+                        {% endif %}
+                        column: {
+                            editor: {
+                                namePattern:  /^oro_{{ type }}_form\[column\]\[([\w\W]*)\]$/
+                            },
+                            form: '#{{ type }}-column-form',
+                            itemContainer: '#{{ type }}-column-list .item-container',
+                            itemTemplate: '#{{ type }}-column-row'
+                        },
+                        select2FieldChoiceTemplate: '#column-chain-template',
+                        select2SegmentChoiceTemplate: '#segment-template',
+                        entities: {{ entities|json_encode|raw }},
+                        metadata: {{ metadata|json_encode|raw }}
+                    });
+                });
+    </script>
+{% endmacro %}

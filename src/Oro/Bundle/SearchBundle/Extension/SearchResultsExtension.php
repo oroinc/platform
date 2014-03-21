@@ -85,6 +85,8 @@ class SearchResultsExtension extends AbstractExtension
             $entityId   = $row->getRecordId();
             if (isset($entities[$entityName][$entityId])) {
                 $entity = $entities[$entityName][$entityId];
+            } else {
+                continue;
             }
 
             $item         = new ResultItem(

@@ -11,6 +11,8 @@ oro_menu_config:
             route: 'oro_report_index'
             extras:
                 position: 10
+            attributes:
+                class: 'mobile-hide'
 
     tree:
         application_menu:

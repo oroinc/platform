@@ -762,7 +762,7 @@ footer {
   padding: 0 30px 0 0;
   #gradient > .vertical(@pinBarColorStart, @pinBarColorEnd);
   position: relative;
-  z-index: 998;
+  z-index: 850;
   .pin-menus {
     float:right;
     position: relative;
@@ -1713,6 +1713,10 @@ footer {
         .control-label {
           width: auto;
         }
+        select{
+          width: 100%;
+          max-width: 282px;
+        }
       }
     }
   }
@@ -1773,7 +1777,7 @@ footer {
   border: 1px solid #bbb;
 }
 .user-info-state {
-  padding: 2px 0 0;
+  padding: 10px 0 0;
   clear: right;
 }
 .user-profile-cols .label {
@@ -1892,6 +1896,7 @@ footer {
     font-size: 17px;
     color: #999;
     float: left;
+    margin-bottom: 7px;
   }
   .separator {
     float: left;
@@ -1900,8 +1905,9 @@ footer {
     font-size: 18px;
   }
   .user-name {
-    margin: 0 10px 5px 0;
+    margin: 0 10px 7px 0;
     font-size: 19px;
+    min-height: 15px;
     line-height: 22px;
     float: left;
     font: bold 17px/18px 'HelveticaNeue bold', Arial, Helvetica, sans-serif;
@@ -3294,4 +3300,7 @@ i.pin-status {
 .oro-subtitle, .title,
 .breadcrumb li {
   text-transform: capitalize;
+}
+.customer-content.pull-left{
+  padding-top: 9px;
 }

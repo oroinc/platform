@@ -22,6 +22,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
@@ -101,7 +102,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                 )
             );
 
-        $extension  = new OrmDatasourceExtension($manager);
+        $extension  = new OrmDatasourceExtension(new RestrictionBuilder($manager));
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
