@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
 class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $translator;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -34,8 +31,6 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -49,7 +44,6 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->generator = new FieldGenerator(
-            $this->translator,
             $this->configManager,
             $this->entityProcessor,
             $this->entityConnector
@@ -58,7 +52,6 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->translator);
         unset($this->configManager);
         unset($this->entityProcessor);
         unset($this->entityConnector);
@@ -105,14 +98,6 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testGenerateWorkflowFields()
     {
         $entityClass = 'TestEntity';
-
-        $this->translator->expects($this->any())->method('trans')->will(
-            $this->returnCallback(
-                function ($id) {
-                    return $id . '.translated';
-                }
-            )
-        );
 
         $this->entityConnector->expects($this->once())->method('isWorkflowAware')->with($entityClass)
             ->will($this->returnValue(false));
@@ -171,6 +156,10 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->entityProcessor->expects($this->once())->method('updateDatabase');
 
+        $this->addHideAssertions($entityClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM, 0);
+        $this->addHideAssertions($entityClass, FieldGenerator::PROPERTY_WORKFLOW_STEP, 1);
+        $this->configManager->expects($this->at(17))->method('flush');
+
         // run test
         $this->generator->generateWorkflowFields($entityClass);
     }
@@ -210,8 +199,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             ->with($entityClass, $fieldName, 'manyToOne');
 
         $entityFieldConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $entityFieldConfig->expects($this->at(0))->method('set')->with('label', $label . '.translated');
-        $entityFieldConfig->expects($this->at(1))->method('set')->with('description', $description . '.translated');
+        $entityFieldConfig->expects($this->at(0))->method('set')->with('label', $label);
+        $entityFieldConfig->expects($this->at(1))->method('set')->with('description', $description);
         $entityConfigProvider->expects($this->at($iteration))->method('getConfig')->with($entityClass, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
 
@@ -221,6 +210,10 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $extendFieldConfig->expects($this->at(2))->method('set')->with('extend', true);
         $extendFieldConfig->expects($this->at(3))->method('set')->with('target_entity', $targetEntity);
         $extendFieldConfig->expects($this->at(4))->method('set')->with('target_field', $targetField);
+        $extendFieldConfig->expects($this->at(5))->method('set')->with(
+            'relation_key',
+            ExtendHelper::buildRelationKey($entityClass, $targetField, 'manyToOne', $targetEntity)
+        );
         $extendConfigProvider->expects($this->at($iteration + 1))->method('getConfig')->with($entityClass, $fieldName)
             ->will($this->returnValue($extendFieldConfig));
 
@@ -233,5 +226,20 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $viewFieldConfig->expects($this->at(0))->method('set')->with('is_displayable', false);
         $viewConfigProvider->expects($this->at($iteration))->method('getConfig')->with($entityClass, $fieldName)
             ->will($this->returnValue($viewFieldConfig));
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param int $iteration
+     */
+    protected function addHideAssertions($entityClass, $fieldName, $iteration)
+    {
+        $fieldModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')->getMock();
+        $fieldModel->expects($this->once())->method('setType')->with(ConfigModelManager::MODE_HIDDEN);
+
+        $this->configManager->expects($this->at(15 + $iteration))->method('getConfigFieldModel')
+            ->with($entityClass, $fieldName)
+            ->will($this->returnValue($fieldModel));
     }
 }
