@@ -6,8 +6,6 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigManagerTest;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
 class FoundEntityConfigRepository extends EntityRepository
@@ -40,21 +38,14 @@ class FoundEntityConfigRepository extends EntityRepository
             self::$configEntity = new EntityConfigModel(DemoEntity::ENTITY_NAME);
 
             self::$configEntity->addField(self::getResultConfigField());
-
-            $configValue = new ConfigModelValue(
-                'test_value',
+            self::$configEntity->fromArray(
                 'test',
-                'test_value_origin'
+                [
+                    'test_value'              => 'test_value_origin',
+                    'test_value_serializable' => ['test_value' => 'test_value_origin']
+                ],
+                ['test_value' => true]
             );
-
-            $configValueSerializable = new ConfigModelValue(
-                'test_value_serializable',
-                'test',
-                array('test_value' => 'test_value_origin')
-            );
-
-            self::$configEntity->addValue($configValue);
-            self::$configEntity->addValue($configValueSerializable);
         }
 
         return self::$configEntity;
@@ -64,14 +55,13 @@ class FoundEntityConfigRepository extends EntityRepository
     {
         if (!self::$configField) {
             self::$configField = new FieldConfigModel('testField', 'string');
-
-            $configValue = new ConfigModelValue(
-                'test_value',
+            self::$configField->fromArray(
                 'test',
-                'test_value_origin'
+                [
+                    'test_value' => 'test_value_origin'
+                ],
+                ['test_value' => true]
             );
-
-            self::$configField->addValue($configValue);
         }
 
         return self::$configField;

@@ -89,7 +89,11 @@ class Config implements ConfigInterface
      */
     public function is($code, $value = true)
     {
-        return $this->get($code) === null ? false : $this->get($code) == $value;
+        $existingValue = $this->get($code);
+
+        return $existingValue === null
+            ? false
+            : $existingValue == $value;
     }
 
     /**

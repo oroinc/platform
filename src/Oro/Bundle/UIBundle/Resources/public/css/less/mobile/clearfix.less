@@ -22,8 +22,6 @@
 .form-horizontal .control-group label.control-label {
   float: none;
   text-align: left;
-//  something goes wrong after width:auto, font-size starts jumping (+1px)
-//  width: auto;
 }
 
 .form-horizontal .control-group .controls {
@@ -53,13 +51,15 @@
 
 #progressbar {
   margin-top: 100px;
+  width: 200px
 }
 
 .ui-dialog {
   max-width: 100%;
-  max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
+  .form-dialog {
+    min-width: initial !important;
+  }
 }
 
 #footer {

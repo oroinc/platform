@@ -1,0 +1,214 @@
+<?php
+
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
+
+class ConfigModelTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider modelProvider
+     */
+    public function testBaseProperties(AbstractConfigModel $model)
+    {
+        // test get/set mode
+        $this->assertEquals(ConfigModelManager::MODE_DEFAULT, $model->getMode());
+        $model->setMode(ConfigModelManager::MODE_READONLY);
+        $this->assertEquals(ConfigModelManager::MODE_READONLY, $model->getMode());
+
+        // test get/set created
+        $this->assertNull($model->getCreated());
+        $model->setCreated(new \DateTime('2013-01-01'));
+        $this->assertEquals('2013-01-01', $model->getCreated()->format('Y-m-d'));
+
+        // test get/set updated
+        $this->assertNull($model->getUpdated());
+        $model->setUpdated(new \DateTime('2013-01-01'));
+        $this->assertEquals('2013-01-01', $model->getUpdated()->format('Y-m-d'));
+
+        // test prePersist
+        $model->prePersist();
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->assertEquals($currentDate->format('Y-m-d'), $model->getCreated()->format('Y-m-d'));
+
+        // test preUpdate
+        $model->preUpdate();
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->assertEquals($currentDate->format('Y-m-d'), $model->getUpdated()->format('Y-m-d'));
+    }
+
+    public function testEntityConfigModel()
+    {
+        $className   = 'Test\TestClass';
+        $entityModel = new EntityConfigModel($className);
+
+        $this->assertEmpty($entityModel->getId());
+        $this->assertEquals($className, $entityModel->getClassName());
+
+        $className1 = 'Test\TestClass1';
+        $entityModel->setClassName($className1);
+        $this->assertEquals($className1, $entityModel->getClassName());
+    }
+
+    public function testFieldsCollectionOfEntityConfigModel()
+    {
+        $entityModel = new EntityConfigModel();
+        $this->assertCount(0, $entityModel->getFields());
+
+        $fieldModel1 = new FieldConfigModel('field1', 'string');
+        $fieldModel2 = new FieldConfigModel('field2', 'integer');
+
+        $entityModel->addField($fieldModel1);
+        $entityModel->addField($fieldModel2);
+        $fields = $entityModel->getFields();
+        $this->assertCount(2, $fields);
+        $this->assertSame($fieldModel1, $fields->first());
+        $this->assertSame($fieldModel2, $fields->last());
+
+        $this->assertSame($fieldModel1, $entityModel->getField('field1'));
+        $this->assertSame($fieldModel2, $entityModel->getField('field2'));
+
+        $fields = $entityModel->getFields(
+            function (FieldConfigModel $model) {
+                return $model->getFieldName() === 'field2';
+            }
+        );
+        $this->assertCount(1, $fields);
+        $this->assertSame($fieldModel2, $fields->first());
+
+        $entityModel->setFields(new ArrayCollection([$fieldModel1]));
+        $fields = $entityModel->getFields();
+        $this->assertCount(1, $fields);
+        $this->assertSame($fieldModel1, $fields->first());
+    }
+
+    public function testFieldConfigModel()
+    {
+        $fieldName   = 'testField';
+        $fieldType   = 'integer';
+        $entityModel = new EntityConfigModel('Test\TestClass');
+
+        $fieldModel = new FieldConfigModel($fieldName, $fieldType);
+        $fieldModel->setEntity($entityModel);
+
+        $this->assertEmpty($fieldModel->getId());
+        $this->assertEquals($fieldName, $fieldModel->getFieldName());
+        $this->assertEquals($fieldType, $fieldModel->getType());
+        $this->assertSame($entityModel, $fieldModel->getEntity());
+
+        $fieldName1 = 'testField';
+        $fieldType1 = 'integer';
+        $fieldModel->setFieldName($fieldName1);
+        $fieldModel->setType($fieldType1);
+        $this->assertEquals($fieldName1, $fieldModel->getFieldName());
+        $this->assertEquals($fieldType1, $fieldModel->getType());
+
+        $this->assertCount(0, $fieldModel->getOptions());
+        $optionSet = new OptionSet();
+        $fieldModel->setOptions(new ArrayCollection([$optionSet]));
+        $this->assertCount(1, $fieldModel->getOptions());
+        $this->assertSame($optionSet, $fieldModel->getOptions()->first());
+    }
+
+    /**
+     * @dataProvider modelProvider
+     */
+    public function testFromArrayAndToArray(AbstractConfigModel $model)
+    {
+        $values  = [
+            'is_searchable' => true,
+            'is_sortable'   => false,
+            'doctrine'      => [
+                'code' => 'test_001',
+                'type' => 'string'
+            ]
+        ];
+        $indexed = [
+            'is_sortable' => true
+        ];
+
+        $model->fromArray('datagrid', $values, $indexed);
+        $this->assertEquals($values, $model->toArray('datagrid'));
+
+        $indexedValues = $model->getIndexedValues();
+        $this->assertCount(1, $indexedValues);
+        /** @var ConfigModelIndexValue $indexedValue */
+        $indexedValue = $indexedValues->first();
+        $this->assertEquals('datagrid', $indexedValue->getScope());
+        $this->assertEquals('is_sortable', $indexedValue->getCode());
+        $this->assertEquals(0, $indexedValue->getValue());
+        if ($model instanceof FieldConfigModel) {
+            $this->assertNull($indexedValue->getEntity());
+            $this->assertSame($model, $indexedValue->getField());
+        } else {
+            $this->assertSame($model, $indexedValue->getEntity());
+            $this->assertNull($indexedValue->getField());
+        }
+    }
+
+    /**
+     * @dataProvider modelProvider
+     */
+    public function testFromArray(AbstractConfigModel $model)
+    {
+        $values  = [
+            'value1'   => 1,
+            'value2'   => 2,
+            'indexed1' => 3,
+            'indexed2' => 4,
+        ];
+        $indexed = [
+            'indexed1' => true,
+            'indexed2' => true,
+        ];
+
+        $model->fromArray('test_scope', $values, $indexed);
+        $this->assertEquals($values, $model->toArray('test_scope'));
+
+        $indexedValues = $model->getIndexedValues();
+        $this->assertCount(2, $indexedValues);
+        /** @var ConfigModelIndexValue $indexedValue1 */
+        $indexedValue1 = $indexedValues->first();
+        $this->assertEquals('test_scope', $indexedValue1->getScope());
+        $this->assertEquals('indexed1', $indexedValue1->getCode());
+        $this->assertEquals(3, $indexedValue1->getValue());
+        /** @var ConfigModelIndexValue $indexedValue2 */
+        $indexedValue2 = $indexedValues->last();
+        $this->assertEquals('test_scope', $indexedValue2->getScope());
+        $this->assertEquals('indexed2', $indexedValue2->getCode());
+        $this->assertEquals(4, $indexedValue2->getValue());
+
+        $values = [
+            'value2'   => 1,
+            'indexed2' => 2,
+        ];
+        $model->fromArray('test_scope', $values, $indexed);
+        $this->assertEquals($values, $model->toArray('test_scope'));
+
+        $indexedValues = $model->getIndexedValues();
+        $this->assertCount(1, $indexedValues);
+        /** @var ConfigModelIndexValue $indexedValue1 */
+        $indexedValue1 = $indexedValues->first();
+        $this->assertEquals('test_scope', $indexedValue1->getScope());
+        $this->assertEquals('indexed2', $indexedValue1->getCode());
+        $this->assertEquals(2, $indexedValue1->getValue());
+
+        $values = [];
+        $model->fromArray('test_scope', $values, $indexed);
+        $this->assertEquals($values, $model->toArray('test_scope'));
+    }
+
+    public function modelProvider()
+    {
+        return [
+            [new EntityConfigModel()],
+            [new FieldConfigModel()]
+        ];
+    }
+}

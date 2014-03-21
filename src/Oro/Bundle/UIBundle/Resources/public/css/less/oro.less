@@ -1185,6 +1185,9 @@ footer {
 .filter-box .btn-group {
   margin-bottom: 7px;
 }
+.filter-box .btn-group + .btn-group{
+  margin-left: 0;
+}
 .new-line {
   clear: both;
   display: block;
@@ -1337,9 +1340,14 @@ footer {
   }
   li {
     margin:0 0 5px;
+    float: none;
+    display: table-cell;
   }
   .nav-pills {
     padding:0 10px;
+  }
+  .launchers-dropdown-menu{
+    min-width: 35px;
   }
   .launcher-item {
     [class^='icon-']:before {
@@ -1445,6 +1453,11 @@ footer {
         }
       }
     }
+  }
+}
+.btn-primary{
+  .icon-plus{
+    font-size: 12px;
   }
 }
 .scroll-holder {
@@ -1814,7 +1827,7 @@ footer {
       outline: none;
       padding:8px 12px;
       color:#555;
-      margin-bottom:-1px;
+      margin-bottom:0;
       border: solid #ddd;
       border-width: 1px 1px 1px 0;
       line-height:20px;
@@ -1910,7 +1923,7 @@ footer {
     min-height: 15px;
     line-height: 22px;
     float: left;
-    font: bold 17px/18px 'HelveticaNeue bold', Arial, Helvetica, sans-serif;
+    font: bold 17px/18px Helvetica, Arial, sans-serif;
 
   }
   .dropdown.open .caret,
@@ -2735,6 +2748,11 @@ div.uploader.focus,
   margin: 4px 8px 0;
   height: 24px;
 }
+.title-buttons-container{
+  .pull-left > .separator-btn{
+    margin-right: 1px;
+  }
+}
 .pagination-centered > label {
   margin-right: -4px;
   padding-left: 5px;
@@ -2978,7 +2996,11 @@ button.filter-update {
     right: 10px;
   }
 }
-
+.add-list-item {
+  i.icon-plus{
+    font-size: 12px;
+  }
+}
 .oro-item-collection {
   &>div {
     position: relative;
@@ -3067,7 +3089,7 @@ button.filter-update {
 .box-type1 {
   background-color: #fff;
   .title {
-    font:bold 14px/18px 'helveticaneue bold', Arial, Helvetica, sans-serif;
+    font:bold 14px/18px Helvetica, Arial, sans-serif;
     padding:10px 15px;
   }
   .box-content {
@@ -3178,9 +3200,6 @@ span.validation-failed {
  .filter-box {
     padding: 5px 20px 5px 130px;
     margin: 5px;
-    .btn-group {
-      margin-bottom: 0px;
-    }
   }
   .tab-container{
     .nav-tabs > li > a{
