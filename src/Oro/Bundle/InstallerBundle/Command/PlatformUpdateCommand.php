@@ -40,7 +40,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             ->runCommand('oro:workflow:definitions:load')
             ->runCommand('oro:migration:data:load', ['--process-isolation' => true, '--process-timeout' => 300])
             ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-            ->runCommand('assets:install')
+            ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
             ->runCommand('assetic:dump')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
