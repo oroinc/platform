@@ -207,6 +207,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                             submitReplacement.css({
                                 position: 'absolute',
                                 left: '-9999px',
+                                top: '-9999px',
                                 width: '1px',
                                 height: '1px'
                             });
