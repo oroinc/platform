@@ -1,17 +1,24 @@
 placeholders:
     scripts_after:
         items:
-           oro_reminder_subscriber_js:
+           oro_reminder_subscribe_script:
               order: 10
 
-    orocrm_reminder_reminder_templates:
+    content_before:
+        items:
+           oro_reminder_show_script: ~
+
+    oro_reminder_reminder_templates:
         items:
            default_template:
               order: 10
 
 items:
-    oro_reminder_subscriber_js:
-        template: OroReminderBundle:Reminder:reminderScripts.html.twig
+    oro_reminder_subscribe_script:
+        template: OroReminderBundle:Reminder:subscribeScript.html.twig
+
+    oro_reminder_show_script:
+        template: OroReminderBundle:Reminder:showScript.html.twig
 
     default_template:
         template: OroReminderBundle:Reminder:reminderDefault.html.twig
