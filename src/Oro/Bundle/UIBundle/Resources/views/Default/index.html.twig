@@ -132,8 +132,8 @@
                     <div class="hash-loading-mask"></div>
                     <div id="container" class="scrollable-container">
                         {% block page_container %}
+                            {% placeholder content_before %}
                             {% block content %}
-                                {% placeholder content_before %}
                                 <div class="container" style="background: #fff">
                                     <div class="row">
                                         <div class="span4">
@@ -175,8 +175,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% placeholder content_after %}
                             {% endblock content %}
+                            {% placeholder content_after %}
                         {% endblock page_container %}
                     </div>
                 </div>

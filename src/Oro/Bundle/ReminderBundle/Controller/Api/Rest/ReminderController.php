@@ -18,30 +18,6 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 class ReminderController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * Get requested reminders list
-     *
-     * @throws HttpException
-     */
-    public function getRequestedAction()
-    {
-        $user = $this->getUser();
-
-        if ($user == null) {
-            return $this->handleView($this->view('User not logged in.', Codes::HTTP_UNAUTHORIZED));
-        }
-
-        /**
-         * @var MessageParamsProvider
-         */
-        $paramsProvider = $this->get('oro_reminder.web_socket.message_params_provider');
-        $reminders      = $this->getReminderRepository()->findRequestedReminders($user);
-
-        $view = $this->view($paramsProvider->getMessageParamsForReminders($reminders), Codes::HTTP_OK);
-
-        return $this->handleView($view);
-    }
-
-    /**
      * Update reminder, set shown status
      *
      * @return \Symfony\Component\HttpFoundation\Response
