@@ -135,13 +135,13 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
     public function getValidLocaleDataProvider()
     {
         return array(
-            array('ru_RU', 'ru'),
+            array('ru_RU', 'ru_RU'),
             array('en', LocaleConfiguration::DEFAULT_LOCALE),
             array(null, LocaleConfiguration::DEFAULT_LOCALE),
             array('ru', 'ru'),
-            array('en_Hans_CN_nedis_rozaj_x_prv1_prv2', 'en'),
-            array('en_Hans_CA_nedis_rozaj_x_prv1_prv2', 'en'),
-            array('unknown', LocaleConfiguration::DEFAULT_LOCALE),
+            array('en_Hans_CN_nedis_rozaj_x_prv1_prv2', 'en_US'),
+            array('en_Hans_CA_nedis_rozaj_x_prv1_prv2', 'en_CA'),
+            array('unknown', 'en_US'),
         );
     }
 
