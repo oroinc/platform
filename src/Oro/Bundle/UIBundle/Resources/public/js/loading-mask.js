@@ -101,6 +101,7 @@ define(['jquery', 'underscore', 'backbone'
                 loadingTop = (windowHeight - containerTop) / 2 - halfLoadingHeight;
             }
 
+            loadingTop = loadingHeight > 0 ? loadingTop : 0;
             loadingTop = loadingTop < containerHeight - loadingHeight ? loadingTop : containerHeight - loadingHeight;
             loadingLeft = loadingLeft > 0 ? Math.round(loadingLeft) : 0;
             loadingTop = loadingTop > 0 ? Math.round(loadingTop) : 0;

@@ -1,0 +1,6 @@
+parameters:
+    oro_batch.orm.query_builder.count_query_optimizer.class: Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer
+
+services:
+    oro_batch.orm.query_builder.count_query_optimizer:
+        class: %oro_batch.orm.query_builder.count_query_optimizer.class%

@@ -19,7 +19,14 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         render: function () {
             var view = this;
-            view.$el.html(view.template(view.model.toJSON()));
+            try {
+                view.$el.html(view.template(view.model.toJSON()));
+            } catch (ex) {
+                // Supressing exceptions for possible syntax errors
+                if (console && (typeof console.log === 'function')) {
+                    console.log(ex);
+                }
+            }
             return view;
         }
     });
@@ -27,8 +34,9 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     helloWorld.SetupView = Backbone.View.extend({
         template: _.template('<h3>Hello world settings</h3><textarea style="width: 400px; height: 150px;"><%= settings.content %></textarea>'),
 
-        events: {
-            'keyup textarea': 'onKeyup'
+        initialize: function () {
+            this.on('ok', this.onSubmit);
+            Backbone.View.prototype.initialize.apply(this, arguments);
         },
 
         render: function () {
@@ -37,17 +45,20 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
             return view;
         },
 
-        onKeyup: function (e) {
+        onSubmit: function () {
             var view = this;
             var model = view.model;
 
             var content = view.$el.find('textarea').val();
-
             var settings = model.get('settings');
-            settings.content = content;
 
-            model.set({ settings: settings }, { silent: true });
-            model.trigger('change');
+            if (settings.content != content) {
+                settings.content = content;
+                model.set({ settings: settings }, { silent: true });
+                model.trigger('change');
+            }
+
+            this.trigger('close');
         }
     });
 

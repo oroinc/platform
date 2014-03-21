@@ -1,5 +1,11 @@
 .mobile-hide{
-  display:none !important
+  display:none;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
 }
 &, #page, #top-page {
   overflow: hidden;
@@ -44,6 +50,13 @@
 }
 .container-fluid > .responsive-section .responsive-cell {
   padding: 0 @contentPadding;
+}
+.responsive-cell .box-type1{
+  .filter-box {
+    .btn-group {
+      margin-bottom: 0px;
+    }
+  }
 }
 
 .responsive-section {

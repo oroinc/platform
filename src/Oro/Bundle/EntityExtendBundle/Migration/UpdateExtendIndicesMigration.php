@@ -89,7 +89,7 @@ class UpdateExtendIndicesMigration implements
                 if ($pair === 2) {
                     $tableName  = $pair[0];
                     $columnName = $pair[1];
-                    $this->processColumn($toSchema, $tableName, $columnName, $options);
+                    $this->processColumn($toSchema, $queries, $tableName, $columnName, $options);
                 }
             }
 

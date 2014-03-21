@@ -88,7 +88,14 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
             'with_date' => array(
                 'options' => array(
                     'attribute' => new PropertyPath('test_attribute'),
-                    'date'      => '2014-01-01 00:00:00',
+                    'date'      => '2014-01-01',
+                ),
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('UTC'))
+            ),
+            'with_datetime' => array(
+                'options' => array(
+                    'attribute' => new PropertyPath('test_attribute'),
+                    'date'      => '2014-01-01 12:12:12',
                 ),
                 'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('UTC'))
             ),
