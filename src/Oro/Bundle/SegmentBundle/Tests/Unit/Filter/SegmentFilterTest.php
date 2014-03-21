@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -44,7 +47,10 @@ class SegmentFilterTest extends OrmTestCase
     protected $entityNameProvider;
 
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject  */
-    protected $configProvider;
+    protected $entityConfigProvider;
+
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject  */
+    protected $extendConfigProvider;
 
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject  */
     protected $em;
@@ -66,13 +72,27 @@ class SegmentFilterTest extends OrmTestCase
 
         $this->entityNameProvider = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
 
-        $this->configProvider = $this
+        $this->entityConfigProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->extendConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
 
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfigManager')
+            ->will($this->returnValue($configManager));
+        $configManager->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($this->em));
+
 
         $this->filter = new SegmentFilter(
             $this->formFactory,
@@ -80,8 +100,8 @@ class SegmentFilterTest extends OrmTestCase
             $this->dynamicSegmentQueryBuilder,
             $this->staticSegmentQueryBuilder,
             $this->entityNameProvider,
-            $this->configProvider,
-            $this->em
+            $this->entityConfigProvider,
+            $this->extendConfigProvider
         );
     }
 
@@ -92,6 +112,42 @@ class SegmentFilterTest extends OrmTestCase
 
     public function testGetMetadata()
     {
+        $activeClassName  = 'Oro\Bundle\SegmentBundle\Entity\Segment';
+        $newClassName     = 'Test\NewEntity';
+        $deletedClassName = 'Test\DeletedEntity';
+        $entityConfigIds = [
+            new EntityConfigId('entity', $activeClassName),
+            new EntityConfigId('entity', $newClassName),
+            new EntityConfigId('entity', $deletedClassName),
+        ];
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getIds')
+            ->will($this->returnValue($entityConfigIds));
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            $activeClassName,
+                            null,
+                            $this->createExtendConfig($activeClassName, ExtendScope::STATE_ACTIVE)
+                        ],
+                        [
+                            $newClassName,
+                            null,
+                            $this->createExtendConfig($newClassName, ExtendScope::STATE_NEW)
+                        ],
+                        [
+                            $deletedClassName,
+                            null,
+                            $this->createExtendConfig($deletedClassName, ExtendScope::STATE_DELETED)
+                        ],
+                    ]
+                )
+            );
+
         $repo = $this->getRepoForMetadata();
 
         $this->em->expects($this->once())
@@ -105,9 +161,23 @@ class SegmentFilterTest extends OrmTestCase
 
         $this->assertTrue(isset($metadata['entity_ids']));
         $this->assertEquals(
-            ['OroSegment:Segment' => 'id'],
+            [$activeClassName => 'id'],
             $metadata['entity_ids']
         );
+    }
+
+    /**
+     * @param string $className
+     * @param string $state
+     * @return Config
+     */
+    protected function createExtendConfig($className, $state)
+    {
+        $configId = new EntityConfigId('extend', $className);
+        $config   = new Config($configId);
+        $config->set('state', $state);
+
+        return $config;
     }
 
     protected function createFilter()
@@ -153,35 +223,14 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getClassMetadata')
             ->will($this->returnValue($classMetaData));
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $configId->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('OroSegment:Segment'));
-
-        $config->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($configId));
-        $configs = [
-            $config
-        ];
-
-        $this->configProvider->expects($this->once())
-            ->method('getConfigs')
-            ->will($this->returnValue($configs));
-
-
         $filter = new SegmentFilter(
             $factory,
             new FilterUtility(),
             $this->dynamicSegmentQueryBuilder,
             $this->staticSegmentQueryBuilder,
             $this->entityNameProvider,
-            $this->configProvider,
-            $this->em
+            $this->entityConfigProvider,
+            $this->extendConfigProvider
         );
         $filter->init('segment', ['entity' => '']);
 
