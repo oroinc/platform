@@ -91,9 +91,9 @@ define(
              * It need for actualisation data
              */
             reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested');
+                var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
                 var self = this;
-                $.post(url, function(messageParams) {
+                $.getJSON(url, function(messageParams) {
                     self.showReminders(messageParams);
                 });
             }
