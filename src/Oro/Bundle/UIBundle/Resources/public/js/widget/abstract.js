@@ -562,8 +562,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                 this.actionsEl = null;
                 this.actions = {};
                 this.setElement($(content).filter('.widget-content:first'));
-                mediator.trigger('layout.init', this.$el);
                 this._show();
+                mediator.trigger('layout.init', this.widget);
             } catch (error) {
                 console.warn(error);
                 // Remove state with unrestorable content
