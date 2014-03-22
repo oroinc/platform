@@ -110,7 +110,6 @@ datagrid:
                 author:
                     type: string
                     data_name: author
-                    filter_by_having: true
                 loggedAt:
                     type: datetime
                     data_name: a.loggedAt
