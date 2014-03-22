@@ -21,8 +21,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             $segment,
             $this->getFunctionProvider(),
             $doctrine,
-            $configManager,
-            'oro_user_view'
+            $configManager
         );
 
         $result   = $builder->getConfiguration()->toArray();
@@ -62,7 +61,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             'actions'    => [
                 'view' => [
                     'type'  => 'navigate',
-                    'label' => 'view',
+                    'label' => 'View',
                     'icon'  => 'user',
                     'link'  => 'view_link',
                     'rowAction' => true,

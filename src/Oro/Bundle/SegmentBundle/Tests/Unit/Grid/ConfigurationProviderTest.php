@@ -35,12 +35,6 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
             $this->doctrine,
             $this->configManager
         );
-
-        $metadata = new EntityMetadata('Oro\Bundle\UserBundle\Entity\User');
-        $this->configManager->expects($this->exactly(2))
-            ->method('getEntityMetadata')
-            ->will($this->returnValue($metadata));
-
     }
 
     public function tearDown()
@@ -56,6 +50,11 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
     public function testGetConfiguration()
     {
+        $metadata = new EntityMetadata('Oro\Bundle\UserBundle\Entity\User');
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->will($this->returnValue($metadata));
+
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('find')->with(2)

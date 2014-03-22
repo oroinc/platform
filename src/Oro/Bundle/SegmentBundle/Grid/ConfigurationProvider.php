@@ -60,15 +60,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             $id                = intval(substr($gridName, strlen(self::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
             $segment           = $segmentRepository->find($id);
-
-            $entityMetadata    = $this->configManager->getEntityMetadata($segment->getEntity());
             $builder           = new SegmentDatagridConfigurationBuilder(
                 $gridName,
                 $segment,
                 $this->functionProvider,
                 $this->doctrine,
-                $this->configManager,
-                $entityMetadata->routeName ? $entityMetadata->routeName : false
+                $this->configManager
             );
 
             $this->configuration = $builder->getConfiguration();
