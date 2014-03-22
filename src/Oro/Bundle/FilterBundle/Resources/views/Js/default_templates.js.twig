@@ -3,7 +3,9 @@
         <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
-            <a href="<%= nullLink %>" class="reset-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a>
+            <a href="<%= nullLink %>" class="reset-filter"
+                title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></a>
             <span class="caret"></span>
         </button>
         <div class="filter-criteria dropdown-menu" />
