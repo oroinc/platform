@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
@@ -121,6 +122,9 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $extendConfigProvider->expects($this->at(0))->method('getConfig')->with($entityClass)
             ->will($this->returnValue($entityConfig));
 
+        $workflowItemClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
+        $workflowStepClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep';
+
         $this->addFieldAssertions(
             $entityConfigProvider,
             $extendConfigProvider,
@@ -128,8 +132,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             $viewConfigProvider,
             $entityClass,
             FieldGenerator::PROPERTY_WORKFLOW_ITEM,
-            'oro.workflow.workflowitem.entity_label',
-            'oro.workflow.workflowitem.entity_description',
+            ConfigHelper::getTranslationKey('label', $workflowItemClass),
+            ConfigHelper::getTranslationKey('description', $workflowItemClass),
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
             'id',
             0
@@ -141,8 +145,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             $viewConfigProvider,
             $entityClass,
             FieldGenerator::PROPERTY_WORKFLOW_STEP,
-            'oro.workflow.workflowstep.entity_label',
-            'oro.workflow.workflowstep.entity_description',
+            ConfigHelper::getTranslationKey('label', $workflowStepClass),
+            ConfigHelper::getTranslationKey('description', $workflowStepClass),
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
             'label',
             1
@@ -192,7 +196,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $targetField,
         $iteration
     ) {
-        $this->configManager->expects($this->at($iteration * 6 + 1))->method('hasConfigFieldModel')
+        $this->configManager->expects($this->at($iteration * 6 + 1))->method('hasConfig')
             ->with($entityClass, $fieldName)
             ->will($this->returnValue(false));
         $this->configManager->expects($this->at($iteration * 6 + 2))->method('createConfigFieldModel')

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Field;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class FieldGenerator
 {
@@ -61,26 +62,29 @@ class FieldGenerator
             throw new WorkflowException(sprintf('Class %s can not be extended', $entityClass));
         }
 
+        $workflowItemClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem';
+        $workflowStepClass = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep';
+
         // add fields
-        $hasWorkflowItemField = $this->configManager->hasConfigFieldModel($entityClass, self::PROPERTY_WORKFLOW_ITEM);
+        $hasWorkflowItemField = $this->configManager->hasConfig($entityClass, self::PROPERTY_WORKFLOW_ITEM);
         if (!$hasWorkflowItemField) {
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_ITEM,
-                'oro.workflow.workflowitem.entity_label',
-                'oro.workflow.workflowitem.entity_description',
-                'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
+                ConfigHelper::getTranslationKey('label', $workflowItemClass),
+                ConfigHelper::getTranslationKey('description', $workflowItemClass),
+                $workflowItemClass,
                 'id'
             );
         }
-        $hasWorkflowStepField = $this->configManager->hasConfigFieldModel($entityClass, self::PROPERTY_WORKFLOW_STEP);
+        $hasWorkflowStepField = $this->configManager->hasConfig($entityClass, self::PROPERTY_WORKFLOW_STEP);
         if (!$hasWorkflowStepField) {
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_STEP,
-                'oro.workflow.workflowstep.entity_label',
-                'oro.workflow.workflowstep.entity_description',
-                'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
+                ConfigHelper::getTranslationKey('label', $workflowStepClass),
+                ConfigHelper::getTranslationKey('description', $workflowStepClass),
+                $workflowStepClass,
                 'label'
             );
         }
@@ -95,6 +99,8 @@ class FieldGenerator
         $this->entityProcessor->updateDatabase();
 
         // make fields hidden
+        // TODO: Fields can be hidden only after schema update due to a bug in DoctrineSubscriber
+        // TODO: Should be fixed in in scope of https://magecore.atlassian.net/browse/BAP-3621
         if (!$hasWorkflowItemField) {
             $this->hideRelationField($entityClass, self::PROPERTY_WORKFLOW_ITEM);
         }
