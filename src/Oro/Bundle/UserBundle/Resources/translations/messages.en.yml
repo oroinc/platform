@@ -129,7 +129,7 @@ oro:
         groups.label:      Groups
         api.label:         API key
         api.tooltip_text: >
-            API key could be used for authentification in third party software.
+            API key could be used for authentication in third party software.
             Please keep your regular password in secret.
 
         statuses.label:    Statuses
