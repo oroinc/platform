@@ -119,10 +119,10 @@
                     QD.query_designer_column_form(
                         form.column,
                         {'id': 'segment-column-form'},
-                        {'entity_choice_id': 'oro_segment_form_entity'}
+                        {'entity_choice_id': 'oro_segment_form_entity', 'showFunc': false}
                     ),
-                    QD.query_designer_column_list({'id': 'segment-column-list'}),
-                    QD.query_designer_column_template('segment-column-row')
+                    QD.query_designer_column_list({'id': 'segment-column-list'}, false),
+                    QD.query_designer_column_template('segment-column-row', false)
                 ]
             },
         ]

@@ -58,7 +58,7 @@
     </script>
 {% endmacro %}
 
-{% macro query_designer_column_list(attr) %}
+{% macro query_designer_column_list(attr, showFunc = true) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
@@ -67,7 +67,9 @@
             <tr>
                 <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
                 <th class="label-column"><span>{{ 'oro.query_designer.datagrid.column.label'|trans }}</span></th>
+                {% if showFunc %}
                 <th class="function-column"><span>{{ 'oro.query_designer.datagrid.column.function'|trans }}</span></th>
+                {% endif %}
                 <th class="sorting-column"><span>{{ 'oro.query_designer.datagrid.column.sorting'|trans }}</span></th>
                 <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
             </tr>
@@ -97,12 +99,14 @@
     </div>
 {% endmacro %}
 
-{% macro query_designer_column_template(id) %}
+{% macro query_designer_column_template(id, showFunc = true) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
             <td class="name-cell"><%= name %></td>
             <td class="label-cell"><%- label %></td>
+            {% if showFunc %}
             <td class="function-cell"><%= func %></td>
+            {% endif %}
             <td class="sorting-cell"><%= sorting %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
@@ -165,6 +169,7 @@
                 'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
+        {% if params.showFunc %}
         {{ form_row(form.func, {
             'label': 'oro.query_designer.form.function'|trans,
             'attr': {
@@ -172,6 +177,7 @@
                 'data-purpose': 'function-selector'
             }
         }) }}
+        {% endif %}
         {{ form_row(form.sorting, {
             'label': 'oro.query_designer.form.sorting'|trans,
             'attr': {
@@ -202,9 +208,13 @@
                 $fields = $form.find('[data-purpose=column-selector]'),
                 $functions = $form.find('[data-purpose=function-selector]'),
                 $label = $form.find('[data-purpose=label]');
+
+            {% if params.showFunc|default(false) %}
             $functions.functionChoice({
                 fieldChoiceSelector: $fields
             });
+            {% endif %}
+
             $fields
                 .on('change', function (e) {
                     if (e.added) {
