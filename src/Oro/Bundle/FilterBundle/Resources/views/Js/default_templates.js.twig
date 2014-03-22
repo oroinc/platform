@@ -1,15 +1,13 @@
 <script type="text/template" id="filter-wrapper-template">
-    <div class="btn-group filter-item oro-drop">
-        <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">
+    <div class="filter-item oro-drop">
+        <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
+            <a href="<%= nullLink %>" class="reset-filter"
+                title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></a>
             <span class="caret"></span>
         </button>
-        <% if (canDisable) { %>
-            <a href="<%= nullLink %>" class="disable-filter">
-                <i class="icon-remove hide-text"><%- _.__("Close") %></i>
-            </a>
-        <% } %>
         <div class="filter-criteria dropdown-menu" />
     </div>
 </script>
@@ -38,7 +36,7 @@
                 <ul class="dropdown-menu">
                     <% _.each(choices, function (option) { %>
                         <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                            <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
                         </li>
                     <% }); %>
                 </ul>
