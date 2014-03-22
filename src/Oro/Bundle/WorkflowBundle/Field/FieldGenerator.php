@@ -100,7 +100,10 @@ class FieldGenerator
 
         // make fields hidden
         // TODO: Fields can be hidden only after schema update due to a bug in DoctrineSubscriber
-        // TODO: Should be fixed in in scope of https://magecore.atlassian.net/browse/BAP-3621
+        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
+        // TODO: If make fields hidden then these fields will be created only for the first extended entity
+        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3632
+        /*
         if (!$hasWorkflowItemField) {
             $this->hideRelationField($entityClass, self::PROPERTY_WORKFLOW_ITEM);
         }
@@ -108,6 +111,7 @@ class FieldGenerator
             $this->hideRelationField($entityClass, self::PROPERTY_WORKFLOW_STEP);
         }
         $this->configManager->flush();
+        */
     }
 
     /**
