@@ -36,6 +36,7 @@ services:
         arguments:
             - @oro_query_designer.query_designer.manager
             - @doctrine
+            - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.configuration.provider }
 
