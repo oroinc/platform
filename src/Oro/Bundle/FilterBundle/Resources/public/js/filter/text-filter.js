@@ -43,6 +43,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         criteriaSelector: '.filter-criteria',
 
         /**
+         * Element enclosing a criteria dropdown
+         *
+         * @property {string|jQuery|HTMLElement}
+         */
+        limitCriteriaTo: '#container',
+
+        /**
          * Selectors for filter criteria elements
          *
          * @property {Object}
@@ -204,11 +211,24 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          */
         _showCriteria: function () {
             this.$(this.criteriaSelector).show();
+            this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
             setTimeout(_.bind(function () {
                 this.popupCriteriaShowed = true;
             }, this), 100);
+        },
+
+        /**
+         * Check if criteria dropdown fits viewport, if not - applies margin shift
+         *
+         * @private
+         */
+        _alignCriteria: function () {
+            var $container = $(this.limitCriteriaTo),
+                $criteria = this.$(this.criteriaSelector),
+                shift = $container.width() + $container.offset().left - this.$el.offset().left - $criteria.outerWidth();
+            $criteria.css('margin-left', shift < 0 ? shift : 0);
         },
 
         /**
@@ -268,7 +288,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             this.$(this.criteriaHintSelector)
                 .html(_.escape(this._getCriteriaHint()))
                 .closest('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmpty());
+                .toggleClass('filter-default-value', this.isEmptyValue());
             return this;
         },
 
