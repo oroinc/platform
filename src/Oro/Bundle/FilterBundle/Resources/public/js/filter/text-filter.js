@@ -65,7 +65,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter'
+            'click .disable-filter': '_onClickDisableFilter',
+            'click .reset-filter': '_onClickResetFilter'
         },
 
         /**
@@ -264,7 +265,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @return {*}
          */
         _updateCriteriaHint: function () {
-            this.$(this.criteriaHintSelector).html(_.escape(this._getCriteriaHint()));
+            this.$(this.criteriaHintSelector)
+                .html(_.escape(this._getCriteriaHint()))
+                .closest('.filter-criteria-selector')
+                .toggleClass('filter-default-value', this.isEmpty());
             return this;
         },
 

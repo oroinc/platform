@@ -98,7 +98,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange'
+            'change select': '_onSelectChange',
+            'click .reset-filter': '_onClickResetFilter'
         },
 
         /**
