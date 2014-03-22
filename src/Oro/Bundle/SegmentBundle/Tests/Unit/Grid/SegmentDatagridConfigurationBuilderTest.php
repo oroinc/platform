@@ -13,11 +13,16 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
     {
         $segment  = $this->getSegment();
         $doctrine = $this->getDoctrine([self::TEST_ENTITY => []], [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
         $builder  = new SegmentDatagridConfigurationBuilder(
             self::TEST_GRID_NAME,
             $segment,
             $this->getFunctionProvider(),
-            $doctrine
+            $doctrine,
+            $configManager,
+            'oro_user_view'
         );
 
         $result   = $builder->getConfiguration()->toArray();
@@ -28,7 +33,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             'filters' => ['columns' => ['c1' => ['type' => 'string', 'data_name' => 'c1', 'translatable' => false]]],
             'source'  => [
                 'query'        => [
-                    'select' => ['t1.userName as c1'],
+                    'select' => ['t1.userName as c1', 't1.'.self::TEST_IDENTIFIER_NAME],
                     'from'   => [['table' => self::TEST_ENTITY, 'alias' => 't1']]
                 ],
                 'query_config' => [
@@ -45,7 +50,24 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'type'         => 'orm',
                 'acl_resource' => 'oro_segment_view',
             ],
-            'options' => ['export' => true]
+            'options' => ['export' => true],
+            'properties' => [
+                'id' => null,
+                'view_link' => [
+                    'type' => 'url',
+                    'route' => null,
+                    'params' => ['id']
+                ]
+            ],
+            'actions'    => [
+                'view' => [
+                    'type'  => 'navigate',
+                    'label' => 'view',
+                    'icon'  => 'user',
+                    'link'  => 'view_link',
+                    'rowAction' => true,
+                ],
+            ],
         ];
 
         $this->assertSame($expected, $result);

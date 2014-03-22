@@ -24,15 +24,13 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
      * @param FunctionProviderInterface $functionProvider
      * @param ManagerRegistry           $doctrine
      * @param ConfigManager             $configManager
-     * @param string                    $entityRoute
      */
     public function __construct(
         $gridName,
         Segment $segment,
         FunctionProviderInterface $functionProvider,
         ManagerRegistry $doctrine,
-        ConfigManager $configManager,
-        $entityRoute
+        ConfigManager $configManager
     ) {
         parent::__construct(
             $gridName,
