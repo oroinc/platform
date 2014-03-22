@@ -5,4 +5,4 @@ Oro\Bundle\TagBundle\Entity\Tag:
         name:
             - NotBlank:     ~
             - Length:
-                max:        255
+                max:        50

@@ -79,12 +79,10 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getMessageParams')
             ->will($this->returnValue(array()));
 
-        $this->reminder->expects($this->at(1))
+        $this->reminder->expects($this->exactly(2))
             ->method('setState')
             ->with($this->equalTo(Reminder::STATE_REQUESTED));
-        $this->reminder->expects($this->at(3))
-            ->method('setState')
-            ->with($this->equalTo(Reminder::STATE_NOT_SENT));
+
         $this->processor->process($this->reminder);
         $this->processor->process($this->reminder);
     }

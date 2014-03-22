@@ -3,6 +3,8 @@ oro_menu_config:
         system_tab:
             label: 'System'
             uri: '#'
+            attributes:
+                class: 'mobile-hide'
         users_management:
             label: 'Users Management'
             uri: '#'

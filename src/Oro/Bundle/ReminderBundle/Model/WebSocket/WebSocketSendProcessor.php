@@ -40,9 +40,9 @@ class WebSocketSendProcessor implements SendProcessorInterface
     {
         $message = $this->messageParamsProvider->getMessageParams($reminder);
 
-        $sentResult = $this->sendMessage($reminder, $message);
+        $this->sendMessage($reminder, $message);
 
-        $reminder->setState($sentResult ? Reminder::STATE_REQUESTED : Reminder::STATE_NOT_SENT);
+        $reminder->setState(Reminder::STATE_REQUESTED);
     }
 
     /**
