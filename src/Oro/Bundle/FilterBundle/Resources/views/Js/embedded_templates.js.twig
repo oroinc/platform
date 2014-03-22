@@ -10,7 +10,7 @@
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                    <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
                 </li>
             <% }); %>
         </ul>
@@ -25,7 +25,7 @@
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
             <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+            <a class="choice-value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
             </li>
             <% }); %>
         </ul>

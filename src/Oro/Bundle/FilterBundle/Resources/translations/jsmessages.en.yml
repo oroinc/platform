@@ -11,6 +11,10 @@
 "and": "and"
 oro:
     filter:
+        wrapper:
+            reset:
+                hint: Reset
+                tooltip: Reset this filter
         date:
             variable:
                 title: Available variables
