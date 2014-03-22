@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
-use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
@@ -179,21 +179,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            if ($form->has('transportType')) {
-                $config = $form->get('transportType')->getConfig()->getOptions();
-                unset($config['choice_list']);
-                unset($config['choices']);
-            } else {
-                $config = array();
-            }
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
             $choices = $registry->getAvailableTransportTypesChoiceList($type);
-
-            $form->add('transportType', 'choice', array_merge($config, ['choices' => $choices]));
+            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], ['choice_list']);
         };
     }
 
@@ -213,21 +200,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            if ($form->has('connectors')) {
-                $config = $form->get('connectors')->getConfig()->getOptions();
-                unset($config['choice_list']);
-                unset($config['choices']);
-            } else {
-                $config = array();
-            }
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
             $choices = $registry->getAvailableConnectorsTypesChoiceList($type);
-
-            $form->add('connectors', 'choice', array_merge($config, ['choices' => $choices]));
+            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], ['choice_list']);
         };
     }
 
