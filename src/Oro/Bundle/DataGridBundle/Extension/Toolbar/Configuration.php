@@ -5,8 +5,21 @@ namespace Oro\Bundle\DataGridBundle\Extension\Toolbar;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 class Configuration implements ConfigurationInterface
 {
+    /** @var int */
+    private $defaultPerPage;
+
+    /**
+     * @param ConfigManager $cm
+     */
+    public function __construct(ConfigManager $cm)
+    {
+        $this->defaultPerPage = $cm->get('oro_data_grid.default_per_page');
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -20,7 +33,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('pageSize')->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hide')->defaultFalse()->end()
-                        ->scalarNode('default_per_page')->defaultValue(10)->end()
+                        ->scalarNode('default_per_page')->defaultValue($this->defaultPerPage)->end()
                         ->arrayNode('items')
                             ->defaultValue([10, 25, 50, 100])
                             ->prototype('variable')->end()

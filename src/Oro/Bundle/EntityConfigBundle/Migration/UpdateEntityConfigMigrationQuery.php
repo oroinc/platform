@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -33,7 +32,7 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
-    public function execute(Connection $connection, LoggerInterface $logger)
+    public function execute(LoggerInterface $logger)
     {
         $this->commandExecutor->runCommand(
             'oro:entity-config:update',

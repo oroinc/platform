@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
-use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
-use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
-use Oro\Bundle\EntityExtendBundle\Migration\ArrayLogger;
-
 use Psr\Log\LoggerInterface;
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 
 class UpdateEntityConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  CommandExecutor */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $commandExecutor;
 
     protected function setUp()
@@ -55,11 +53,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
         $migrationQuery = new UpdateEntityConfigMigrationQuery($this->commandExecutor);
 
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $migrationQuery->execute($connection, $logger);
+        $migrationQuery->execute($logger);
 
         $this->assertEquals(['ok'], $logger->getMessages());
     }

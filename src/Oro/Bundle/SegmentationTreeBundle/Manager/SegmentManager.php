@@ -1,17 +1,14 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Manager;
 
-use Oro\Bundle\SegmentationTreeBundle\Entity\Repository\SegmentRepository;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\SegmentationTreeBundle\Entity\Repository\SegmentRepository;
 use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
 
 /**
  * Service class to manage segments node and tree
- *
- *
  */
 class SegmentManager
 {
@@ -90,15 +87,13 @@ class SegmentManager
      * If the $selectNodeId is provided, all the children
      * level needed to provides the selectNode are returned
      *
-     * @param integer $parentId
-     * @param integer $selectNodeId
+     * @param integer  $parentId
+     * @param bool|int $selectNodeId
      *
      * @return ArrayCollection
      */
     public function getChildren($parentId, $selectNodeId = false)
     {
-        $children = array();
-
         $entityRepository = $this->getEntityRepository();
 
         if ($selectNodeId === false) {
@@ -108,8 +103,6 @@ class SegmentManager
         }
 
         return $children;
-
-
     }
 
     /**
@@ -162,7 +155,6 @@ class SegmentManager
 
         $this->getStorageManager()->persist($segment);
     }
-
 
     /**
      * Move a segment to another parent
@@ -290,8 +282,10 @@ class SegmentManager
     /**
      * Check is a parent node is an ancestor of a child node
      *
-     * @param Segment $parentNode
-     * @param Segment $childNode
+     * @param AbstractSegment $parentNode
+     * @param AbstractSegment $childNode
+     *
+     * @return bool
      */
     public function isAncestor(AbstractSegment $parentNode, AbstractSegment $childNode)
     {

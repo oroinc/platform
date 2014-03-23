@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Toolbar;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -18,6 +20,19 @@ class ToolbarExtension extends AbstractExtension
     const PAGER_ITEMS_OPTION_PATH            = '[options][toolbarOptions][pageSize][items]';
     const PAGER_DEFAULT_PER_PAGE_OPTION_PATH = '[options][toolbarOptions][pageSize][default_per_page]';
 
+    /** @var ConfigManager */
+    private $cm;
+
+    /**
+     * @param ConfigManager     $cm
+     * @param RequestParameters $requestParams
+     */
+    public function __construct(ConfigManager $cm, RequestParameters $requestParams = null)
+    {
+        parent::__construct($requestParams);
+        $this->cm = $cm;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -33,7 +48,7 @@ class ToolbarExtension extends AbstractExtension
     {
         $options = $config->offsetGetByPath(self::TOOLBAR_OPTION_PATH, []);
         // validate configuration and pass default values back to config
-        $configuration = $this->validateConfiguration(new Configuration(), ['toolbarOptions' => $options]);
+        $configuration = $this->validateConfiguration(new Configuration($this->cm), ['toolbarOptions' => $options]);
         $config->offsetSetByPath(sprintf('%s[%s]', self::OPTIONS_PATH, 'toolbarOptions'), $configuration);
     }
 

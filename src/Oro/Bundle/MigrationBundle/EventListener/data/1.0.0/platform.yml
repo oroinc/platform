@@ -1,0 +1,41 @@
+OroSecurityBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\SecurityBundle\Migrations\Data\ORM\LoadAclRoles
+
+OroAddressBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\AddressBundle\Migrations\Data\ORM\LoadAddressTypeData
+            - Oro\Bundle\AddressBundle\Migrations\Data\ORM\LoadCountryData
+
+OroCalendarBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\CalendarBundle\Migrations\Data\ORM\LoadEmailTemplates
+            - Oro\Bundle\CalendarBundle\Migrations\Data\ORM\UpdateAclRoles
+
+OroEmailBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\EmailBundle\Migrations\Data\ORM\LoadInternalEmailOrigins
+
+OroNotificationBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\NotificationBundle\Migrations\Data\ORM\LoadDefaultNotificationEvents
+
+OroOrganizationBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData
+
+OroReportBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\ReportBundle\Migrations\Data\ORM\LoadReportTypes
+OroUserBundle:
+    main:
+        v1_0:
+            - Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadGroupData
+            - Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData

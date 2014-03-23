@@ -10,10 +10,17 @@ Each bundle can have migration files that allow to update database schema.
 
 Migration files should be located in `Migrations\Schema\version_number` folder. A version number must be an PHP-standardized version number string, but with some limitations. This string must not contain "." and "+" characters as a version parts separator. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-Each migration class must extend `Oro\Bundle\MigrationBundle\Migration\Migration` abstract class and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter witch can be used to add additional queries.
+Each migration class must implement [Migration](./Migration/Migration.php) interface and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter which can be used to add additional queries.
 
 With `schema` parameter, you can create or update database structure without fear of compatibility between database engines. 
-If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter allows to add additional queries witch will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method).
+If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter represents a [query bag](./Migration/QueryBag.php) and allows to add additional queries which will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method). A query can be a string or an instance of a class implements [MigrationQuery](./Migration/MigrationQuery.php) interface. There are several ready to use implementations of this interface:
+
+ - [SqlMigrationQuery](./Migration/SqlMigrationQuery.php) - represents one or more SQL queries
+ - [ParametrizedSqlMigrationQuery](./Migration/ParametrizedSqlMigrationQuery.php) - similar to the previous class, but each query can have own parameters.
+
+If you need to create own implementation of [MigrationQuery](./Migration/MigrationQuery.php) the [ConnectionAwareInterface](./Migration/ConnectionAwareInterface.php) can be helpful. Just implement this interface in your migration query class if you need a database connection. Also you can use [ParametrizedMigrationQuery](./Migration/ParametrizedMigrationQuery.php) class as a base class for your migration query.
+
+If you have several migration classes within the same version and you need to make sure that they will be executed in a specified order you can use [OrderedMigrationInterface](./Migration/OrderedMigrationInterface.php) interface.
 
 Example of migration file:
 
@@ -70,7 +77,7 @@ class AcmeTestBundle implements Migration, RenameExtensionAwareInterface
 ``` 
 
  
-Each bundle can have an **installation** file as well. This migration file replaces running multiple migration files. Install migration class must extend `Oro\Bundle\MigrationBundle\Migration\Installation` abstract class and must implement `up` and `getMigrationVersion` methods. The `getMigrationVersion` method must return max migration version number that this installation file replaces.
+Each bundle can have an **installation** file as well. This migration file replaces running multiple migration files. Install migration class must implement [Installation](./Migration/Installation.php) interface and must implement `up` and `getMigrationVersion` methods. The `getMigrationVersion` method must return max migration version number that this installation file replaces.
 
 During an install process (it means that you installs a system from a scratch), if install migration file was found, it will be loaded first and then migration files with versions greater then a version returned by `getMigrationVersion` method will be loaded.
 
@@ -121,6 +128,14 @@ This command supports some additional options:
  - **exclude** - A list of bundle names which migrations should be skipped.
 
 Also there is **oro:migration:dump** command to help in creation migration files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
+
+Examples of database structure migrations
+-----------------------------------------
+
+ - [Simple migration](../UserBundle/Migrations/Schema/v1_0/OroUserBundle.php)
+ - [Installer](../InstallerBundle/Migrations/Schema)
+ - [Complex migration](../EntityConfigBundle/Migrations/Schema/v1_2)
+
 
 Extensions for database structure migrations
 --------------------------------------------
@@ -205,7 +220,7 @@ namespace Acme\Bundle\TestBundle\Migration\Extension;
 /**
  * MyExtensionAwareInterface should be implemented by migrations that depends on a MyExtension.
  */
-interface RenameExtensionAwareInterface
+interface MyExtensionAwareInterface
 {
     /**
      * Sets the MyExtension
@@ -242,6 +257,96 @@ Data fixtures for this command should be put in `Migrations/Data/ORM` or in `Mig
 
 Fixtures order can be changed with standard Doctrine ordering or dependency functionality. More information about fixture ordering can be found in [doctrine data fixtures manual][2].
 
+Versioned fixtures
+------------------
+
+There are fixtures which need to be executed time after time. An example is a fixture which uploads countries data. Usually, if you add new countries list, you need to create new data fixture which will upload this data. To avoid this you can use versioned data fixtures.
+
+To make fixture versioned, this fixture must implement [VersionedFixtureInterface](./Fixture/VersionedFixtureInterface.php) and `getVersion` method which returns a version of fixture data.
+
+Example:
+
+``` php
+
+<?php
+
+namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+
+class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.0';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // Here we can use fixture data code which will be run time after time
+    }
+}
+```
+
+In this example, if the fixture was not loaded yet, it will be loaded and version 1.0 will be saved as current loaded version of this fixture.
+
+To have possibility to load this fixture again, the fixture must return a version greater then 1.0, for example 1.0.1 or 1.1. A version number must be an PHP-standardized version number string. More info about PHP-standardized version number string can be found in [PHP manual][1].
+
+If a fixture need to know the last loaded version, it must implement [LoadedFixtureVersionAwareInterface](./Fixture/LoadedFixtureVersionAwareInterface.php) and `setLoadedVersion` method:
+
+``` php
+<?php
+
+namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
+use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
+
+class LoadSomeDataFixture extends AbstractFixture implements VersionedFixtureInterface, LoadedFixtureVersionAwareInterface
+{
+    /**
+     * @var $currendDBVersion string
+     */
+    protected $currendDBVersion = null;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function setLoadedVersion($version = null)
+    {
+        $this->currendDBVersion = $version;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '2.0';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // Here we can check last loaded version and load data data difference between last 
+        // uploaded version and current version
+    }
+}
+```
 
   [1]: http://php.net/manual/en/function.version-compare.php
   [2]: https://github.com/doctrine/data-fixtures#fixture-ordering

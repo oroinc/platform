@@ -6,7 +6,7 @@ use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Oro\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class MigrationQueryLoaderWithNameGenerator extends MigrationQueryLoader
+class MigrationExecutorWithNameGenerator extends MigrationExecutor
 {
     /**
      * @var DbIdentifierNameGenerator
