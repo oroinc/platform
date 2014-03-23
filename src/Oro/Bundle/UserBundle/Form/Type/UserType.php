@@ -97,6 +97,16 @@ class UserType extends AbstractType
                 )
             )
             ->add(
+                'businessUnits',
+                'oro_business_unit_tree',
+                array(
+                    'multiple' => true,
+                    'expanded' => true,
+                    'required' => false,
+                    'label' => 'oro.user.business_units.label'
+                )
+            )
+            ->add(
                 'plainPassword',
                 'repeated',
                 array(

@@ -1,3 +1,23 @@
+{% block oro_business_unit_tree_widget %}
+    {% if expanded %}
+        {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
+        {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
+        <div {{ block('widget_container_attributes') }}>
+            {% for id, child in form %}
+                <div class="oro-clearfix">
+                    {% set choice = choices[id]  %}
+                    {% set labelIndent = ''  %}
+                    {% if choice.data.level > 0%}{% for i in range(0, choice.data.level) %}{% set labelIndent = labelIndent ~ '&nbsp;&nbsp;&nbsp;' %}{% endfor %}{% endif %}
+                    {{ form_widget(child) }}
+                    {{ form_label(child, labelIndent ~ choice.label|trans({}, translation_domain), {'raw_label': true}) }}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ block('choice_widget_collapsed') }}
+    {% endif %}
+{% endblock %}
+
 {% block oro_type_choice_ownership_type_widget %}
     {% spaceless %}
         {% if value or disabled %}

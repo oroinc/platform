@@ -118,10 +118,21 @@ class BusinessUnit implements NotificationEmailInterface
 
     /**
      * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="BusinessUnit")
+     * @ORM\ManyToOne(targetEntity="BusinessUnit", inversedBy="children")
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var BusinessUnit[]
+     * @ORM\OneToMany(targetEntity="BusinessUnit", mappedBy="owner")
+     */
+    protected $children;
+
+    /**
+     * @var integer
+     */
+    protected $level;
 
     /**
      * Get id
@@ -400,5 +411,37 @@ class BusinessUnit implements NotificationEmailInterface
         $emails[] = $this->getEmail();
 
         return $emails;
+    }
+
+    /**
+     * @param BusinessUnit[] $children
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param int $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 }
