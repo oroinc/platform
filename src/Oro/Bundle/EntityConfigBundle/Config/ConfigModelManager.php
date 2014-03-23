@@ -464,7 +464,7 @@ class ConfigModelManager
         if (!empty($this->entityLocalCache)) {
             $result = true;
             foreach ($this->entityLocalCache as $model) {
-                if (!$this->isEntityDetached($model)) {
+                if ($model && !$this->isEntityDetached($model)) {
                     $result = false;
                     break;
                 }
