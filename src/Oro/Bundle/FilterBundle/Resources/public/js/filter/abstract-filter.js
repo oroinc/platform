@@ -242,6 +242,17 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
         },
 
         /**
+         * Handles click on filter-item reset button
+         *
+         * @param {jQuery.Event} e
+         * @private
+         */
+        _onClickResetFilter: function (e) {
+            e.stopPropagation();
+            this.reset();
+        },
+
+        /**
          * Triggers update event
          *
          * @param {*} newValue

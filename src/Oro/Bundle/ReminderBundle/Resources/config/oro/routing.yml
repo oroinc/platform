@@ -1,4 +1,9 @@
-oro_reminder_bundle:
-    resource:     "@OroReminderBundle/Controller"
-    type:         annotation
-    prefix:       /
+oro_reminder_bundle_api:
+    resource:     "@OroReminderBundle/Controller/Api/Rest/ReminderController.php"
+    type:         rest
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
