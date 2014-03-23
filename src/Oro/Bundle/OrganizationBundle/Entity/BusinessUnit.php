@@ -414,7 +414,7 @@ class BusinessUnit implements NotificationEmailInterface
     }
 
     /**
-     * @param BusinessUnit[] $children
+     * @param ArrayCollection $children
      */
     public function setChildren($children)
     {
