@@ -16,6 +16,12 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     /** @var string */
     protected $route;
 
+    /** @var string */
+    protected $identifierName;
+
+    /** @var string */
+    protected $icon;
+
     /**
      * Constructor
      *
@@ -32,9 +38,10 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         ManagerRegistry $doctrine,
         ConfigManager $configManager
     ) {
+        $em = $doctrine->getManagerForClass($segment->getEntity());
         parent::__construct(
             $gridName,
-            new DatagridSourceSegmentProxy($segment, $doctrine->getManagerForClass($segment->getEntity())),
+            new DatagridSourceSegmentProxy($segment, $em),
             $functionProvider,
             $doctrine
         );
@@ -42,7 +49,12 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         $entityMetadata = $configManager->getEntityMetadata($segment->getEntity());
         if ($entityMetadata && $entityMetadata->routeView) {
             $this->route = $entityMetadata->routeView;
+            $this->icon  = $entityMetadata->defaultValues['entity']['icon'];
         }
+
+        $classMetadata        = $em->getClassMetadata($segment->getEntity());
+        $identifiers          = $classMetadata->getIdentifier();
+        $this->identifierName = array_shift($identifiers);
 
         $this->config->offsetSetByPath('[source][acl_resource]', 'oro_segment_view');
         $this->config->offsetSetByPath(ExportExtension::EXPORT_OPTION_PATH, true);
@@ -74,7 +86,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
                     'type'         => 'navigate',
                     //'acl_resource' => 'oro_segment_view',
                     'label'        => 'View',
-                    'icon'         => 'user',
+                    'icon'         => $this->icon,
                     'link'         => 'view_link',
                     'rowAction'    => true,
                 ]
@@ -86,7 +98,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
 
         $config->offsetAddToArrayByPath(
             '[source][query][select]',
-            [$tableAlias . '.id']
+            [sprintf('%s.%s', $tableAlias, $this->identifierName)]
         );
 
         return $config;

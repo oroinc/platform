@@ -62,7 +62,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'view' => [
                     'type'  => 'navigate',
                     'label' => 'View',
-                    'icon'  => 'user',
+                    'icon'  => null,
                     'link'  => 'view_link',
                     'rowAction' => true,
                 ],
