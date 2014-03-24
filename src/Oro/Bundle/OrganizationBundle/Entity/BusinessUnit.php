@@ -118,7 +118,7 @@ class BusinessUnit implements NotificationEmailInterface
 
     /**
      * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="BusinessUnit", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="BusinessUnit")
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
