@@ -51,7 +51,7 @@ class DatabasePersister
             $this->em->beginTransaction();
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
-                    if (sizeof($key) <= MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+                    if (strlen($key) <= MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
                         $writeCount++;
                         $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
                         if (0 === $writeCount % $this->batchSize) {
