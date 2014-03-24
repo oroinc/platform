@@ -515,7 +515,7 @@
             }) }}
         </div>
 
-        <div class="entity-view-block responsive-section {% if view_widgets|length > 1 %}row-fluid row-fluid-divider{% endif %}">
+        <div class="entity-view-block {% if view_widgets|length > 1 %}row-fluid row-fluid-divider{% endif %}">
             {% for view_widget in view_widgets %}
                 <div class="responsive-cell">
                     {% set routeParameters = view_widget.route_parameters %}
