@@ -97,7 +97,7 @@ function ($, _, DateFilter, localeSettings) {
         },
 
         /**
-         * Format datetimes in a valut to another format
+         * Format datetimes in a value to another format
          *
          * @param {Object} value
          * @param {String} dateFromFormat
@@ -141,11 +141,11 @@ function ($, _, DateFilter, localeSettings) {
                 var separator = this.dateWidgetOptions.altSeparator;
                 var timeSettings = {
                     timeFormat: timeFromFormat,
-                    separator: $.timepicker._defaults.separator
+                    separator: localeSettings.getDateTimeFormatSeparator()
                 };
 
                 if (dateFromFormat == this.dateWidgetOptions.altFormat) {
-                    separator = $.timepicker._defaults.separator;
+                    separator = localeSettings.getDateTimeFormatSeparator();
                     timeSettings.separator = this.dateWidgetOptions.altSeparator;
                 }
 
