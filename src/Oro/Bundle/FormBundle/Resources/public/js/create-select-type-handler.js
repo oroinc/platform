@@ -58,9 +58,14 @@ function ($, widgetManager, routing) {
             widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
                 if (widget.firstRun) {
                     widget.render();
+                    widget.on('renderComplete', function() {
+                        setCurrentMode('grid');
+                    });
+                } else {
+                    setCurrentMode('grid');
                 }
             });
-            setCurrentMode('grid');
+
         });
 
         // Render create from and change current mode to create
