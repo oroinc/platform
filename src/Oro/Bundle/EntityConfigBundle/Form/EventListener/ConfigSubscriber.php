@@ -168,7 +168,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                     }
                 }
 
-                $config->setValues($data[$scope]);
+                foreach ($data[$scope] as $code => $value) {
+                    $config->set($code, $value);
+                }
                 $this->configManager->persist($config);
             }
         }

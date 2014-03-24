@@ -40,7 +40,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
-            'click .choice_value': '_onClickChoiceValue'
+            'click .choice-value': '_onClickChoiceValue',
+            'click .reset-filter': '_onClickResetFilter'
         },
 
         /**

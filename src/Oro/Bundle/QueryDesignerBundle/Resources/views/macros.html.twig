@@ -35,14 +35,20 @@
     </div>
     <script type="text/javascript">
         require(['oroquerydesigner/js/condition-builder'], function ($) {
-            var $fieldConditionCriteria = $('#{{ params.criteria_list_id }}').find('[data-criteria=condition-item]'),
+            var $criteriaList = $('#{{ params.criteria_list_id }}'),
+                $fieldConditionCriteria = $criteriaList.find('[data-criteria=condition-item]'),
+                $groupConditionCriteria = $criteriaList.find('[data-criteria=conditions-group]'),
                 $conditions = $('#{{ params.id }}');
 
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
                     $conditions.conditionBuilder('setValue', []);
+
+                    var isEmptyObject = $.isEmptyObject(fields);
                     $fieldConditionCriteria
-                        .toggleClass('disabled', $.isEmptyObject(fields));
+                        .toggleClass('disabled', isEmptyObject);
+                    $groupConditionCriteria
+                        .toggleClass('disabled', isEmptyObject);
                 });
 
             $conditions.conditionBuilder({

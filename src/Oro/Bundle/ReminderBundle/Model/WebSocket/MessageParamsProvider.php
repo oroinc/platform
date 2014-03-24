@@ -73,7 +73,7 @@ class MessageParamsProvider
             'subject'      => $reminder->getSubject(),
             'url'          => $this->urlProvider->getUrl($reminder),
             'id'           => $reminder->getId(),
-            'uniqueId'     => md5($reminder->getRelatedEntityClassName().$reminder->getRelatedEntityId())
+            'uniqueId'     => md5($reminder->getRelatedEntityClassName() . $reminder->getRelatedEntityId())
         );
     }
 

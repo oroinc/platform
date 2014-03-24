@@ -18,14 +18,12 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  *     @ORM\Index(name="reminder_state_idx", columns={"state"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
- * @Oro\Loggable
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-bell"
- *      },
- *      "dataaudit"={"auditable"=true}
+ *      }
  *  }
  * )
  */
@@ -49,12 +47,6 @@ class Reminder
      * @var string
      *
      * @ORM\Column(name="subject", type="string", length=32, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $subject;
 
@@ -62,12 +54,6 @@ class Reminder
      * @var \DateTime
      *
      * @ORM\Column(name="start_at", type="datetime", nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $startAt;
 
@@ -75,12 +61,6 @@ class Reminder
      * @var \DateTime
      *
      * @ORM\Column(name="expire_at", type="datetime", nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $expireAt;
 
@@ -88,12 +68,6 @@ class Reminder
      * @var string
      *
      * @ORM\Column(name="method", type="string", length=255, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $method;
 
@@ -106,12 +80,6 @@ class Reminder
      * @var integer $intervalNumber
      *
      * @ORM\Column(name="interval_number", type="integer", nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $intervalNumber;
 
@@ -119,12 +87,6 @@ class Reminder
      * @var integer
      *
      * @ORM\Column(name="interval_unit", type="string", length=1, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $intervalUnit;
 
@@ -132,12 +94,6 @@ class Reminder
      * @var string $state
      *
      * @ORM\Column(name="state", type="string", length=32, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $state;
 
@@ -145,12 +101,6 @@ class Reminder
      * @var integer
      *
      * @ORM\Column(name="related_entity_id", type="integer", nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $relatedEntityId;
 
@@ -158,12 +108,6 @@ class Reminder
      * @var integer
      *
      * @ORM\Column(name="related_entity_classname", type="string", length=255, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
      */
     protected $relatedEntityClassName;
 
