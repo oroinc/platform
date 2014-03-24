@@ -5,11 +5,8 @@
         <div {{ block('widget_container_attributes') }}>
             {% for id, child in form %}
                 <div class="oro-clearfix">
-                    {% set choice = choices[id]  %}
-                    {% set labelIndent = ''  %}
-                    {% if choice.data.level > 0%}{% for i in range(0, choice.data.level) %}{% set labelIndent = labelIndent ~ '&nbsp;&nbsp;&nbsp;' %}{% endfor %}{% endif %}
                     {{ form_widget(child) }}
-                    {{ form_label(child, labelIndent ~ choice.label|trans({}, translation_domain), {'raw_label': true}) }}
+                    {{ form_label(child, null , {'raw_label': true}) }}
                 </div>
             {% endfor %}
         </div>

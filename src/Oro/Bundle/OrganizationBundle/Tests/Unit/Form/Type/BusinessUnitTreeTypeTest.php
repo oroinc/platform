@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BusinessUnitTreeTypeTest  extends \PHPUnit_Framework_TestCase
+class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var BusinessUnitTreeType
@@ -22,7 +22,7 @@ class BusinessUnitTreeTypeTest  extends \PHPUnit_Framework_TestCase
 
     public function testParent()
     {
-        $this->assertEquals('entity', $this->formType->getParent());
+        $this->assertEquals('choice', $this->formType->getParent());
     }
 
     public function testName()
@@ -34,8 +34,6 @@ class BusinessUnitTreeTypeTest  extends \PHPUnit_Framework_TestCase
     {
         $resolver = new OptionsResolver();
         $this->formType->setDefaultOptions($resolver);
-
-        $this->assertTrue($resolver->isKnown('class'));
         $this->assertTrue($resolver->isKnown('choices'));
     }
 }

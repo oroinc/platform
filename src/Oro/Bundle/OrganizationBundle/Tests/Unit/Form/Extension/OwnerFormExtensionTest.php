@@ -94,6 +94,16 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->businessUnitManager->expects($this->any())
             ->method('getBusinessUnitsTree')
             ->will($this->returnValue($businessUnitsTree));
+        $this->businessUnitManager->expects($this->any())
+            ->method('getFormattedBusinessUnitsTree')
+            ->will(
+                $this->returnValue(
+                    array(
+                        1 => 'Root',
+                        2 => '&nbsp;&nbsp;&nbsp;Child'
+                    )
+                )
+            );
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();

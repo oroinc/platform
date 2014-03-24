@@ -39,19 +39,14 @@ class BusinessUnitManager
     }
 
     /**
-     * Get list of business units with tree levels
+     * Get Business Units list with formatted labels
      *
-     * @return ArrayCollection
+     * @param User $entity
+     * @return array
      */
-    public function getBusinessUnitTreeWithLevels()
+    public function getFormattedBusinessUnitsTree(User $entity = null)
     {
-        $result = new ArrayCollection();
-        $businessUnits = $this->getBusinessUnitRepo()->findBy(['owner' => null]);
-        foreach ($businessUnits as $businessUnit) {
-            $this->processTree($result, $businessUnit);
-        }
-
-        return $result;
+        return $this->getTreeOptions($this->getBusinessUnitsTree($entity));
     }
 
     /**
@@ -129,19 +124,23 @@ class BusinessUnitManager
     }
 
     /**
-     * @param ArrayCollection $result
-     * @param BusinessUnit    $businessUnit
-     * @param int             $level
+     * Prepare choice options for a hierarchical select
+     *
+     * @param $options
+     * @param int $level
+     * @return array
      */
-    protected function processTree(ArrayCollection $result, BusinessUnit $businessUnit, $level = 0)
+    protected function getTreeOptions($options, $level = 0)
     {
-        $businessUnit->setLevel($level);
-        $result->add($businessUnit);
-        $children = $businessUnit->getChildren();
-        if ($children->count()) {
-            foreach ($children as $child) {
-                $this->processTree($result, $child, $level + 1);
+        $choices = array();
+        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
+        foreach ($options as $option) {
+            $choices += array($option['id'] => $blanks . $option['name']);
+            if (isset($option['children'])) {
+                $choices += $this->getTreeOptions($option['children'], $level + 1);
             }
         }
+
+        return $choices;
     }
 }
