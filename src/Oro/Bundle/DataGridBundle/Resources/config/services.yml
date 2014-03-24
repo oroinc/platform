@@ -68,4 +68,4 @@ services:
         arguments:
             - @oro_security.acl_helper
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datgrid.result.before, method: onResultBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }

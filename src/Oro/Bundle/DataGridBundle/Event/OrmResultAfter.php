@@ -13,9 +13,9 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
  *
  * This event dispatched after datagrid builder finish building result
  */
-class ResultAfter extends Event implements GridEventInterface
+class OrmResultAfter extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.datgrid.result.after';
+    const NAME = 'oro_datagrid.orm_datasource.result.after';
 
     /**
      * @var DatagridInterface

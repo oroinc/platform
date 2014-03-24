@@ -5,8 +5,7 @@ namespace Oro\Bundle\AddressBundle\Datagrid;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Event\ResultBefore;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 
 class CountryDatagridHelper
 {
@@ -26,16 +25,13 @@ class CountryDatagridHelper
     /**
      * Set country translation query walker
      *
-     * @param ResultBefore $event
+     * @param OrmResultBefore $event
      */
-    public function onResultBefore(ResultBefore $event)
+    public function onResultBefore(OrmResultBefore $event)
     {
-        $source = $event->getDatagrid()->getDatasource();
-        if ($source instanceof OrmDatasource) {
-            $event->getQuery()->setHint(
-                Query::HINT_CUSTOM_OUTPUT_WALKER,
-                'Gedmo\Translatable\Query\TreeWalker\TranslationWalker'
-            );
-        }
+        $event->getQuery()->setHint(
+            Query::HINT_CUSTOM_OUTPUT_WALKER,
+            'Gedmo\Translatable\Query\TreeWalker\TranslationWalker'
+        );
     }
 }
