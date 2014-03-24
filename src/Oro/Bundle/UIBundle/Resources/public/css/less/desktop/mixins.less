@@ -1,0 +1,17 @@
+@import "../mixins";
+
+.forScreenWithSideBar (@size; @_; @value) {
+  .desktop-version &{
+    .forScreen (@size; @_; @value);
+  }
+  .desktop-version .sidebar-on &{
+    .forScreen (@size + @sideBarClosedWidth * 2; @_; @value);
+  }
+  .desktop-version .sidebar-on.left-sidebar-open &,
+  .desktop-version .sidebar-on.right-sidebar-open &{
+      .forScreen (@size + @sideBarClosedWidth + @sideBarOpenedWidth; @_; @value);
+  }
+  .desktop-version .sidebar-on.left-sidebar-open.right-sidebar-open &{
+    .forScreen (@size + @sideBarOpenedWidth * 2; @_; @value);
+  }
+}
