@@ -90,7 +90,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         $notification = $this->createNotification(true);
         $template     = $notification->getTemplate(self::LOCALE);
-        $this->assertEquals(self::LOCALE, $template->getLocale());
+        $this->assertEquals($this->createTemplate(), $template);
     }
 
     /**
