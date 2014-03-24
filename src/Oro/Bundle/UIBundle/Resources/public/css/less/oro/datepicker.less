@@ -18,6 +18,7 @@
     }
   }
 }
+.ui-datepicker,
 .dropdown-menu-calendar .ui-datepicker {
   .ui-datepicker-calendar{
     thead{
@@ -38,11 +39,8 @@
     }
   }
 }
+body,
 .dropdown-menu-calendar {
-  padding: 0;
-  margin-top: -11px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
   .ui-datepicker{
     width: auto;
     border: 0 !important;
@@ -216,6 +214,19 @@
     }
   }
 }
+.dropdown-menu-calendar{
+  padding: 0;
+  margin-top: -11px;
+  -webkit-border-radius: 0 0 3px 3px;
+  border-radius: 0 0 3px 3px;
+}
+body .ui-datepicker{
+  &.ui-widget.ui-widget-content{
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    .box-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+  }
+}
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-close,
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current{
   .border-radius(4px);
@@ -278,3 +289,6 @@
   line-height: 14px;
 }
 
+body > .ui-datepicker.ui-widget.ui-widget-content{
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}

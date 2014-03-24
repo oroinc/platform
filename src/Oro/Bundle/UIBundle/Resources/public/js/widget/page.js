@@ -18,7 +18,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
                 '<div class="container-fluid page-title">' +
                     '<div class="navigation clearfix navbar-extra navbar-extra-right">' +
                         '<div class="row">' +
-                            '<div class="span9">' +
+                            '<div class="pull-left pull-left-extra">' +
                                 '<div class="clearfix customer-info well-small customer-simple">' +
                                     '<div class="customer-content pull-left">' +
                                         '<div class="clearfix">' +
