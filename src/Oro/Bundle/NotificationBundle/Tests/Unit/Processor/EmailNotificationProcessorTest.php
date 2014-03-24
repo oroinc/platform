@@ -46,10 +46,6 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $mailer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $localeSettings;
 
     /**
      * @var EmailNotificationProcessor
@@ -58,8 +54,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMockBuilder('Monolog\Logger')
-            ->disableOriginalConstructor()->getMock();
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -73,16 +68,12 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()->getMock();
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()->getMock();
-
         $this->processor = new EmailNotificationProcessor(
             $this->logger,
             $this->entityManager,
             $this->entityPool,
             $this->emailRenderer,
             $this->mailer,
-            $this->localeSettings,
             self::TEST_FROM_EMAIL
         );
 
@@ -112,11 +103,6 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
 
-        $locale = 'uk_UA';
-        $this->localeSettings->expects($this->once())
-            ->method('getLanguage')
-            ->will($this->returnValue($locale));
-
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
             ->method('getType')
@@ -124,7 +110,6 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $notification->expects($this->once())
             ->method('getTemplate')
-            ->with($locale)
             ->will($this->returnValue($template));
 
         $expectedSubject = 'subject';

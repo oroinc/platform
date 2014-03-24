@@ -5,7 +5,7 @@
             fieldset.data('index', fieldset.find(':input').length);
 
             $('#add_repo_link').on('click', function (e) {
-                event.preventDefault()
+                e.preventDefault();
                 var index = fieldset.data('index');
                 var field = fieldset.data('prototype').replace(/__name__/g, index);
 
