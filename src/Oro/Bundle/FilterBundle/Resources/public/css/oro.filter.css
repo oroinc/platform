@@ -3,6 +3,20 @@
 }
 .filter-item {
     padding-right: 7px;
+    margin-bottom: 7px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.filter-item .reset-filter:hover [class^='icon-']:before {
+    color: #666;
+}
+.filter-item .reset-filter {
+    margin-left: 2px;
+}
+.filter-item .filter-default-value .reset-filter {
+    display: none;
 }
 .filter-box .btn-group [class^='icon-'] {
   padding-top:2px;

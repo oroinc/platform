@@ -73,6 +73,8 @@
         }
     }
 
+    select2Config.maximumInputLength = 50;
+
     {% if not resource_granted('oro_tag_create') %}
         select2Config.placeholder = '{{ 'oro.tag.form.choose_tag'|trans }}';
     {% endif %}
