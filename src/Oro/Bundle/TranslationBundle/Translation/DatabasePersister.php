@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -50,12 +51,14 @@ class DatabasePersister
             $this->em->beginTransaction();
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
-                    $writeCount++;
-                    $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
-                    if (0 === $writeCount % $this->batchSize) {
-                        $this->write($this->toWrite);
+                    if (sizeof($key) <= MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+                        $writeCount++;
+                        $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
+                        if (0 === $writeCount % $this->batchSize) {
+                            $this->write($this->toWrite);
 
-                        $this->toWrite = [];
+                            $this->toWrite = [];
+                        }
                     }
                 }
             }

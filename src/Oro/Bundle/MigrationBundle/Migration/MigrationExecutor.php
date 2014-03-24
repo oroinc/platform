@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
@@ -158,6 +160,7 @@ class MigrationExecutor
         foreach ($tables as $table) {
             $this->checkTableName($table->getName(), $migration);
             $this->checkColumnNames($table->getName(), $table->getColumns(), $migration);
+            $this->checkIndexes($table, $migration);
         }
     }
 
@@ -197,5 +200,40 @@ class MigrationExecutor
      */
     protected function checkColumnName($tableName, $columnName, Migration $migration)
     {
+    }
+
+    /**
+     * @param Table     $table
+     * @param Migration $migration
+     */
+    protected function checkIndexes($table, Migration $migration)
+    {
+        foreach ($table->getIndexes() as $index) {
+            $this->checkIndex($table, $index, $migration);
+        }
+    }
+
+    /**
+     * @param Table     $table
+     * @param Index     $index
+     * @param Migration $migration
+     * @throws InvalidNameException
+     */
+    protected function checkIndex(Table $table, Index $index, Migration $migration)
+    {
+        $columns = $index->getColumns();
+        foreach ($columns as $columnName) {
+            if ($table->getColumn($columnName)->getLength() > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+                throw new InvalidNameException(
+                    sprintf(
+                        'Max index size is %s. Please correct "%s:%s" column size in "%s" migration',
+                        MySqlPlatform::LENGTH_LIMIT_TINYTEXT,
+                        $table->getName(),
+                        $columnName,
+                        get_class($migration)
+                    )
+                );
+            }
+        }
     }
 }
