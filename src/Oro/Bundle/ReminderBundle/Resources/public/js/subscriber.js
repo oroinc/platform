@@ -6,6 +6,9 @@ define(
          * @export ororeminder/js/subscriber
          */
         return {
+
+            deletedList: {},
+
             /**
              * @param {integer} id Current user id
              */
@@ -20,8 +23,8 @@ define(
             },
 
             /**
-             * @param {array} messageParamsArray
-             * @return {object}
+             * @param {Array} messageParamsArray
+             * @return {Array}
              */
             removeDuplicate: function (messageParamsArray) {
                 var uniqueReminders = {};
@@ -38,10 +41,37 @@ define(
             },
 
             /**
-             * @param {array} messageParamsArray
+             * @param {Array} messageParamsArray
+             * @return {Array}
+             */
+            removePhantomReminders: function(messageParamsArray){
+                var list = [];
+                var currentDate = new Date();
+                var currentTime = currentDate.getTime();
+                _.each(messageParamsArray, function(element){
+                    if(!this.deletedList[element.id]){
+                        list.push(element);
+                    }else if($.type(this.deletedList[element.id]) == 'date' && this.deletedList[element.id].getTime){
+                        var dismissTime = this.deletedList[element.id].getTime();
+                        var timeDifference = currentTime - dismissTime;
+
+                        //if dismissed more then one minutes ago show it
+                        if(timeDifference > 60000){
+                            list.push(element);
+                        }
+                    }
+                }, this);
+
+                return list;
+            },
+
+            /**
+             * @param {Array} messageParamsArray
              */
             showReminders: function (messageParamsArray) {
-                _.each(this.removeDuplicate(messageParamsArray), function (messageObject) {
+                var self = this;
+                messageParamsArray = this.removeDuplicate(this.removePhantomReminders(messageParamsArray));
+                _.each(messageParamsArray, function (messageObject) {
                     var message = this.reminderTextConstructor(messageObject);
                     message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
                         + messageObject.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
@@ -57,7 +87,16 @@ define(
                         function (eventObject) {
                             var url = routing.generate('oro_api_post_reminder_shown');
                             var messageObject = eventObject.data.messageObject;
-                            $.post(url, { 'ids': [messageObject.id].concat(messageObject.duplicateIds) });
+
+                            var deletingList = [messageObject.id].concat(messageObject.duplicateIds);
+
+                            $.post(url, { 'ids': deletingList });
+
+                            deletingList.reduce(function(previousState, currentElement){
+                                previousState[currentElement] = new Date();
+                                return previousState;
+                            }, self.deletedList);
+
                             eventObject.data.actions.close();
                         }
                     );
