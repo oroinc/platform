@@ -74,8 +74,8 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         $config->offsetAddToArray(
             'properties',
             [
-                'id'        => null,
-                'view_link' => [
+                $this->identifierName => null,
+                'view_link'  => [
                     'type'   => 'url',
                     'route'  => $this->route,
                     'params' => ['id']
