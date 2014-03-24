@@ -132,8 +132,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             $viewConfigProvider,
             $entityClass,
             FieldGenerator::PROPERTY_WORKFLOW_ITEM,
-            ConfigHelper::getTranslationKey('label', $workflowItemClass),
-            ConfigHelper::getTranslationKey('description', $workflowItemClass),
+            ConfigHelper::getTranslationKey('label', $workflowItemClass, 'related_entity'),
+            ConfigHelper::getTranslationKey('description', $workflowItemClass, 'related_entity'),
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
             'id',
             0
@@ -145,8 +145,8 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             $viewConfigProvider,
             $entityClass,
             FieldGenerator::PROPERTY_WORKFLOW_STEP,
-            ConfigHelper::getTranslationKey('label', $workflowStepClass),
-            ConfigHelper::getTranslationKey('description', $workflowStepClass),
+            ConfigHelper::getTranslationKey('label', $workflowStepClass, 'related_entity'),
+            ConfigHelper::getTranslationKey('description', $workflowStepClass, 'related_entity'),
             'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
             'label',
             1

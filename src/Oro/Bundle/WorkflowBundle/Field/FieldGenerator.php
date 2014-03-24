@@ -71,8 +71,8 @@ class FieldGenerator
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_ITEM,
-                ConfigHelper::getTranslationKey('label', $workflowItemClass),
-                ConfigHelper::getTranslationKey('description', $workflowItemClass),
+                ConfigHelper::getTranslationKey('label', $workflowItemClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('description', $workflowItemClass, 'related_entity'),
                 $workflowItemClass,
                 'id'
             );
@@ -82,8 +82,8 @@ class FieldGenerator
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_STEP,
-                ConfigHelper::getTranslationKey('label', $workflowStepClass),
-                ConfigHelper::getTranslationKey('description', $workflowStepClass),
+                ConfigHelper::getTranslationKey('label', $workflowStepClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('description', $workflowStepClass, 'related_entity'),
                 $workflowStepClass,
                 'label'
             );
