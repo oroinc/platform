@@ -20,9 +20,6 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     protected $identifierName;
 
     /** @var string */
-    protected $icon;
-
-    /** @var string */
     protected $entityName;
 
     /**
@@ -53,7 +50,6 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         $entityMetadata = $configManager->getEntityMetadata($this->entityName);
         if ($entityMetadata && $entityMetadata->routeView) {
             $this->route = $entityMetadata->routeView;
-            $this->icon  = $entityMetadata->defaultValues['entity']['icon'];
         }
 
         $classMetadata        = $em->getClassMetadata($this->entityName);
@@ -90,7 +86,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
                     'type'         => 'navigate',
                     'acl_resource' => 'VIEW;entity:'.$this->entityName,
                     'label'        => 'View',
-                    'icon'         => $this->icon,
+                    'icon'         => 'user',
                     'link'         => 'view_link',
                     'rowAction'    => true,
                 ]
