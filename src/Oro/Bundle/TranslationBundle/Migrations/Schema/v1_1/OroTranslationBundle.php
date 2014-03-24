@@ -15,9 +15,8 @@ class OroTranslationBundle implements Migration
     {
         $table = $schema->createTable('oro_translation');
         $table->dropIndex('MESSAGE_IDX');
-        $table->dropColumn('`key`');
 
-        $table->addColumn('key', 'string', ['length' => 255]);
+        $table->getColumn('`key`')->setLength(255);
         $table->addIndex(['locale', 'domain'], 'MESSAGES_IDX', []);
         $table->addIndex(['`key`'], 'MESSAGE_IDX', []);
     }

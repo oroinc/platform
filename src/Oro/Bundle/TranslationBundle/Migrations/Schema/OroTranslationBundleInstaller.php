@@ -25,7 +25,7 @@ class OroTranslationBundleInstaller implements Installation
         /** Generate table oro_translation **/
         $table = $schema->createTable('oro_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('key', 'string', ['length' => 500]);
+        $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('value', 'text', ['notnull' => false]);
         $table->addColumn('locale', 'string', ['length' => 5]);
         $table->addColumn('domain', 'string', ['length' => 255]);
