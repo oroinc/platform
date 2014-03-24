@@ -86,8 +86,15 @@
 {%  endblock %}
 
 {% block oro_address_widget %}
-    {{ block('oro_address_rows') }}
-{%  endblock %}
+    {% set previousFormId = id %}
+    <!-- id is duplicate on contact page BAP-3549, so we can not render id here  -->
+    {% set id = '' %}
+    <div {{ block('widget_container_attributes') }}>
+        {{ block('oro_address_rows') }}
+    </div>
+    <!-- return previous value to avoid bugs -->
+    {% set id = previousFormId %}
+{% endblock %}
 
 {% block oro_address_rows %}
     {{ form_row(form.id) }}
