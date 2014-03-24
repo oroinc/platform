@@ -4,9 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
@@ -46,6 +48,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         if ($data === null) {
             return;
         }
+
+        $this->muteFields($form, $data);
 
         $typeChoices = array_keys($form->get('type')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
@@ -118,6 +122,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $originalData = $form->getData();
         $data         = $event->getData();
 
+        $this->muteFields($form, $originalData);
+
         if (!empty($data['type'])) {
             $type                  = $data['type'];
             $transportTypeModifier = $this->getTransportTypeModifierClosure($type);
@@ -173,21 +179,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            if ($form->has('transportType')) {
-                $config = $form->get('transportType')->getConfig()->getOptions();
-                unset($config['choice_list']);
-                unset($config['choices']);
-            } else {
-                $config = array();
-            }
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
             $choices = $registry->getAvailableTransportTypesChoiceList($type);
-
-            $form->add('transportType', 'choice', array_merge($config, ['choices' => $choices]));
+            FormUtils::replaceField($form, 'transportType', ['choices' => $choices], ['choice_list']);
         };
     }
 
@@ -207,21 +200,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            if ($form->has('connectors')) {
-                $config = $form->get('connectors')->getConfig()->getOptions();
-                unset($config['choice_list']);
-                unset($config['choices']);
-            } else {
-                $config = array();
-            }
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
             $choices = $registry->getAvailableConnectorsTypesChoiceList($type);
-
-            $form->add('connectors', 'choice', array_merge($config, ['choices' => $choices]));
+            FormUtils::replaceField($form, 'connectors', ['choices' => $choices], ['choice_list']);
         };
     }
 
@@ -245,7 +225,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $formType = $registry->getTransportType($channelType, $transportType)->getSettingsFormType();
 
             $connectorsKey = 'connectors';
-            $children = $form->getIterator();
+            $children      = $form->getIterator();
 
             $form->add('transport', $formType, ['required' => true]);
 
@@ -256,5 +236,29 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                 $children[$connectorsKey] = $connectors;
             }
         };
+    }
+
+    /**
+     * Disable fields that are not allowed to be modified since channel has at least one sync completed
+     *
+     * @param FormInterface $form
+     * @param Channel       $channel
+     */
+    protected function muteFields(FormInterface $form, Channel $channel = null)
+    {
+        if (!($channel && $channel->getId())) {
+            // do nothing if channel is new
+            return;
+        }
+
+        $atLeastOneSync = $channel->getStatuses()->exists(
+            function ($key, Status $status) {
+                return intval($status->getCode()) === Status::STATUS_COMPLETED;
+            }
+        );
+        if ($atLeastOneSync) {
+            // disable type field
+            FormUtils::replaceField($form, 'type', ['disabled' => true]);
+        }
     }
 }
