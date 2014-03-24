@@ -13,8 +13,8 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Event\ResultAfter;
-use Oro\Bundle\DataGridBundle\Event\ResultBefore;
+use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 
 class OrmDatasource implements DatasourceInterface
 {
@@ -88,21 +88,21 @@ class OrmDatasource implements DatasourceInterface
     {
         $query = $this->qb->getQuery();
 
-        $event = new ResultBefore($this->datagrid, $query);
-        $this->eventDispatcher->dispatch(ResultBefore::NAME, $event);
-        $this->eventDispatcher->dispatch(ResultBefore::NAME . '.' . $this->datagrid->getName(), $event);
+        $event = new OrmResultBefore($this->datagrid, $query);
+        $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
+        $this->eventDispatcher->dispatch(OrmResultBefore::NAME . '.' . $this->datagrid->getName(), $event);
 
-        $results = $query->execute();
+        $results = $event->getQuery()->execute();
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
 
-        $event = new ResultAfter($this->datagrid, $rows);
-        $this->eventDispatcher->dispatch(ResultAfter::NAME, $event);
-        $this->eventDispatcher->dispatch(ResultAfter::NAME . '.' . $this->datagrid->getName(), $event);
+        $event = new OrmResultAfter($this->datagrid, $rows);
+        $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
+        $this->eventDispatcher->dispatch(OrmResultAfter::NAME . '.' . $this->datagrid->getName(), $event);
 
-        return $rows;
+        return $event->getRecords();
     }
 
     /**

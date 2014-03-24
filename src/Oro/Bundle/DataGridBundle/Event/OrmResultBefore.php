@@ -14,9 +14,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
  *
  * This event dispatched before datagrid builder starts build result
  */
-class ResultBefore extends Event implements GridEventInterface
+class OrmResultBefore extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.datgrid.result.before';
+    const NAME = 'oro_datagrid.orm_datasource.result.before';
 
     /**
      * @var DatagridInterface

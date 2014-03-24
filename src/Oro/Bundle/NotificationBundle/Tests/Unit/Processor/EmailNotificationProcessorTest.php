@@ -54,8 +54,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMockBuilder('Monolog\Logger')
-            ->disableOriginalConstructor()->getMock();
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
