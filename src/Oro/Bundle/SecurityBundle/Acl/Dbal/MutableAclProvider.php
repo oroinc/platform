@@ -3,16 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\DBAL\Driver\Connection;
-use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
-use Symfony\Component\Security\Acl\Model\AclCacheInterface;
-
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 use Symfony\Component\Security\Acl\Dbal\MutableAclProvider as BaseMutableAclProvider;
+use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Model\AclInterface;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Acl\Domain\Acl;
 
 /**
  * This class extends the standard Symfony MutableAclProvider.
@@ -61,13 +61,35 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
-     * Put in cache empty ACL object for given OID
+     * Put in cache empty ACL object for the given OID
      *
      * @param ObjectIdentityInterface $oid
      */
     public function cacheEmptyAcl(ObjectIdentityInterface $oid)
     {
-        $this->cache->putInCache(new Acl(0, $oid, $this->permissionStrategy, array(), true));
+        $this->cache->putInCache(new Acl(0, $oid, $this->permissionStrategy, array(), false));
+    }
+
+    /**
+     * Put in cache empty ACL object for the given OID indicates that we have to use
+     * underlying ACL instead it
+     *
+     * @param ObjectIdentityInterface $oid
+     */
+    public function cacheWithUnderlyingAcl(ObjectIdentityInterface $oid)
+    {
+        $this->cache->putInCache(new Acl(-1, $oid, $this->permissionStrategy, array(), false));
+    }
+
+    /**
+     * Checks whether the given ACL should be replaced with underlying ACL
+     *
+     * @param AclInterface $acl
+     * @return bool
+     */
+    public function isReplaceWithUnderlyingAcl(AclInterface $acl)
+    {
+        return method_exists($acl, 'getId') && $acl->getId() === -1;
     }
 
     /**
