@@ -56,7 +56,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         events: {
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter'
+            'click .disable-filter': '_onClickDisableFilter',
+            'click .reset-filter': '_onClickResetFilter'
         },
 
         /**

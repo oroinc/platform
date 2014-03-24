@@ -1,0 +1,8 @@
+.api-block .control-label i {
+    color: #6b92d0;
+    font-size: 13px;
+}
+
+.api-block .control-label i + .popover {
+    text-transform: none;
+}

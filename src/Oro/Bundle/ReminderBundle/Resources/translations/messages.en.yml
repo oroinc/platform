@@ -1,5 +1,21 @@
 oro:
     reminder:
+        created_at.label:                 Created At
+        expire_at.label:                  Expire At
+        failure_exception.label:          Failure exception
+        id.label:                         Id
+        interval_number.label:            Interval number
+        interval_unit.label:              Interval unit label
+        method.label:                     Method
+        recipient.label:                  Recipient
+        related_entity_class_name.label:  Related entity name
+        related_entity_id.label:          Related entity id
+        sent_at.label:                    Sent At
+        start_at.label:                   Start At
+        state.label:                      State
+        subject.label:                    Subject
+        updated_at.label:                 Updated At
+
         entity_label:        Reminder
         entity_plural_label: Reminders
         entity_description:  Represent reminder

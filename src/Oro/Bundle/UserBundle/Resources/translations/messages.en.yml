@@ -128,6 +128,10 @@ oro:
         roles.label:       Roles
         groups.label:      Groups
         api.label:         API key
+        api.tooltip_text: >
+            API key could be used for authentication in third party software.
+            Please keep your regular password in secret.
+
         statuses.label:    Statuses
         emails.label:      Emails
         current_status.label: Current status

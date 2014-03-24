@@ -1,16 +1,15 @@
 /*global define*/
 define(
-    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore'],
-    function ($, sync, messenger, routing, _) {
+    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oronavigation/js/navigation'],
+    function ($, sync, messenger, routing, _, Navigation) {
         /**
          * @export ororeminder/js/subscriber
          */
         return {
             /**
              * @param {integer} id Current user id
-             * @param {string} oldReminders object[] in JSON
              */
-            init: function (id, oldReminders) {
+            init: function (id) {
                 var self = this;
 
                 sync.subscribe('oro/reminder/remind_user_' + id, function (messageParams) {
@@ -18,8 +17,6 @@ define(
                     $('.reminders_dismiss_link[data-unique-id="' + messageParams.uniqueId + '"]').trigger('click');
                     self.showReminders([messageParams]);
                 });
-
-                self.showReminders(oldReminders);
             },
 
             /**
@@ -27,21 +24,17 @@ define(
              * @return {object}
              */
             removeDuplicate: function (messageParamsArray) {
-                var url = routing.generate('oro_reminder_shown');
-                var reminderIds = [];
                 var uniqueReminders = {};
-                messageParamsArray.reduce(function (previouse, current) {
-                    if (previouse[current.uniqueId]) {
-                        reminderIds.push(uniqueReminders[current.uniqueId].id);
+                messageParamsArray.reduce(function (previous, current) {
+                    if (previous[current.uniqueId]) {
+                        previous[current.uniqueId].duplicateIds.push(current.id);
+                    } else {
+                        current.duplicateIds = [];
+                        previous[current.uniqueId] = current;
                     }
-                    previouse[current.uniqueId] = current;
-
-                    return previouse;
+                    return previous;
                 }, uniqueReminders);
-                if (reminderIds.length > 0) {
-                    $.post(url, { 'ids': reminderIds });
-                }
-                return uniqueReminders;
+                return _.toArray(uniqueReminders);
             },
 
             /**
@@ -50,20 +43,37 @@ define(
             showReminders: function (messageParamsArray) {
                 _.each(this.removeDuplicate(messageParamsArray), function (messageObject) {
                     var message = this.reminderTextConstructor(messageObject);
-                    //todo: remove html to templates
                     message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
                         + messageObject.uniqueId + '" href="javascript:void(0);">dismiss</a>)';
+
                     var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
-                    $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind('click', actions, function (eventObject) {
-                        var url = routing.generate('oro_reminder_shown');
-                        var reminderId = $(this).data('id');
-                        eventObject.data.close();
-                        $.post(url, { 'ids': [reminderId] });
-                    });
+
+                    $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind(
+                        'click',
+                        {
+                            actions: actions,
+                            messageObject: messageObject
+                        },
+                        function (eventObject) {
+                            var url = routing.generate('oro_api_post_reminder_shown');
+                            var messageObject = eventObject.data.messageObject;
+                            $.post(url, { 'ids': [messageObject.id].concat(messageObject.duplicateIds) });
+                            eventObject.data.actions.close();
+                        }
+                    );
+
                 }, this);
+
+                var navigation = Navigation.getInstance();
 
                 $('.alert-reminder .close').unbind('click').bind('click', function () {
                     $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
+                });
+
+                $('.alert-reminder .hash-navigation-link').unbind('click').bind('click', function (event) {
+                    event.preventDefault();
+                    var url = $(this).attr('href');
+                    navigation.setLocation(url);
                 });
             },
 
@@ -73,7 +83,6 @@ define(
              */
             reminderTextConstructor: function (messageObject) {
                 var message = '';
-                //todo: remove html to templates
                 try {
                     message = '<i class="icon-bell"></i>';
                     var template = $('.reminder_templates[data-identifier="' + messageObject.templateId + '"]').html();
@@ -84,18 +93,6 @@ define(
                 } catch (Exception){}
 
                 return message;
-            },
-
-            /**
-             * Reloads reminders from server
-             * It need for actualisation data
-             */
-            reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
-                var self = this;
-                $.getJSON(url, function(messageParams) {
-                    self.showReminders(messageParams);
-                });
             }
         };
     });

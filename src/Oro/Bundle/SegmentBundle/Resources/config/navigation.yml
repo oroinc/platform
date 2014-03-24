@@ -18,7 +18,7 @@ oro_menu_config:
             route: 'oro_segment_index'
             extras:
                 position: 105
-                routes: ['oro_segment_index', 'oro_segment_update']
+                routes: ['oro_segment_index', 'oro_segment_update', 'oro_segment_create']
 
     tree:
         application_menu:

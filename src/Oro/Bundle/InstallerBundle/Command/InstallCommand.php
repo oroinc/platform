@@ -278,7 +278,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
-            ->runCommand('assets:install')
+            ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
             ->runCommand('assetic:dump')
             ->runCommand('oro:translation:dump')
             ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
