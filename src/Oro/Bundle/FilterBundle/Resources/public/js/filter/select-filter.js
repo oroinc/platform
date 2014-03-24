@@ -44,7 +44,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @property
          */
-        buttonSelector: '.select-filter-widget.ui-multiselect:first',
+        buttonSelector: '.filter-criteria-selector',
 
         /**
          * Selector for select input element
@@ -149,7 +149,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                     placeholder: this.placeholder,
                     nullLink: this.nullLink,
                     canDisable: this.canDisable,
-                    selected: _.extend({}, this.emptyValue, this.value)
+                    selected: _.extend({}, this.emptyValue, this.value),
+                    isEmpty: this.isEmpty()
                 })
             ));
 
@@ -296,6 +297,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _onValueUpdated: function(newValue, oldValue) {
             AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
+            this.$(this.buttonSelector)
+                .toggleClass('filter-default-value', this.isEmpty());;
         },
 
         /**
