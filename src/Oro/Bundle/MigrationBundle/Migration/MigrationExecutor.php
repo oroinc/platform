@@ -258,23 +258,17 @@ class MigrationExecutor
      */
     protected function getTableFromDiff(TableDiff $diff)
     {
-        $table = clone $diff->fromTable;
+        $changedColumns = array_map(
+            function (ColumnDiff $columnDiff) {
+                return $columnDiff->column;
+            },
+            $diff->changedColumns
+        );
 
-        foreach ($diff->changedColumns as $columnName => $changedColumn) {
-            /* @var ColumnDiff $changedColumn */
-            $options = [];
-            foreach ($changedColumn->changedProperties as $changedProperty) {
-                $getter  = 'get' . $changedProperty;
-                if (method_exists($changedColumn->column, $getter)) {
-                    $value = $changedColumn->column->$getter();
-
-                    $options[$changedProperty] = $value;
-                }
-
-                $table->getColumn($columnName)->setOptions($options);
-            }
-        }
-
+        $table = new Table(
+            $diff->fromTable->getName(),
+            array_merge($diff->fromTable->getColumns(), $diff->addedColumns, $changedColumns)
+        );
 
         return $table;
     }
