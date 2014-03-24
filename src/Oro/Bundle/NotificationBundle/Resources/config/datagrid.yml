@@ -9,6 +9,7 @@ datagrid:
                 select:
                     - e
                     - event.name as eventName
+                    - event.id as eventId
                     - recipientList.owner as ownerRecipient
                     - recipientList.email as emailRecipient
                     - template.name as templateName
@@ -104,7 +105,7 @@ datagrid:
                 eventName:
                     filter_by_having: true
                     type: choice
-                    data_name: eventName
+                    data_name: eventId
                     options:
                         field_options:
                             multiple: true
@@ -133,9 +134,7 @@ datagrid:
                 emailRecipient:
                     type: string
                     data_name: emailRecipient
-                    filter_by_having: true
 
                 ownerRecipient:
                     type: boolean
                     data_name: ownerRecipient
-                    filter_by_having: true

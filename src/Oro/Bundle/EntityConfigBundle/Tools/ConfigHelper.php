@@ -6,6 +6,24 @@ use Doctrine\Common\Util\Inflector;
 
 class ConfigHelper
 {
+    private static $configModelClasses = [
+        'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'   => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'     => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'      => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue' => true,
+    ];
+
+    /**
+     * Checks whether the given class is one of entities used to store entity configs or not
+     *
+     * @param string $className
+     * @return bool
+     */
+    public static function isConfigModelEntity($className)
+    {
+        return isset(self::$configModelClasses[$className]);
+    }
+
     /**
      * Returns translation key (placeholder) by entity class name, field name and property code
      * example:
@@ -36,7 +54,7 @@ class ConfigHelper
         }
 
         //example: className - OroCRM\Bundle\ContactBundle\Entity\ContactAddress
-        $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
+        $class = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
 
         //example: className - OroCRM\Contact\ContactAddress
         $classArray = explode('\\', strtolower($class));
@@ -54,7 +72,7 @@ class ConfigHelper
         }
 
         $propertyName = Inflector::tableize($propertyName);
-        $keyArray[] = $fieldName ? $propertyName : 'entity_' . $propertyName;
+        $keyArray[]   = $fieldName ? $propertyName : 'entity_' . $propertyName;
 
         return implode('.', $keyArray);
     }
@@ -71,11 +89,11 @@ class ConfigHelper
             return ['', ''];
         }
 
-        $parts = explode('\\', $className);
+        $parts      = explode('\\', $className);
         $entityName = $parts[count($parts) - 1];
 
         $moduleName = null;
-        $isBundle = false;
+        $isBundle   = false;
         for ($i = 0; $i < count($parts) - 1; $i++) {
             $part = $parts[$i];
             if (!in_array($part, array('Bundle', 'Bundles', 'Entity', 'Entities'))) {

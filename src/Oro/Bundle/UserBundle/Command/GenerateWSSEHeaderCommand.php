@@ -19,7 +19,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $this->setDescription('Generate X-WSSE HTTP header for a given user');
         $this->setDefinition(
             array(
-                new InputArgument('username', InputArgument::REQUIRED, 'The username'),
+                 new InputArgument('username', InputArgument::REQUIRED, 'The username'),
             )
         );
     }
@@ -52,12 +52,18 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         // http://stackoverflow.com/questions/18117695/how-to-calculate-wsse-nonce
         $prefix = gethostname();
         $nonce  = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
+        $salt   = ''; // do not use real salt here, because API key already encrypted enough
 
         /** @var MessageDigestPasswordEncoder $encoder */
         $encoder        = $this->getContainer()->get('escape_wsse_authentication.encoder.wsse_secured');
         $passwordDigest = $encoder->encodePassword(
-            base64_decode($nonce) . $created . $user->getApi()->getApiKey(),
-            $user->getSalt()
+            sprintf(
+                '%s%s%s',
+                base64_decode($nonce),
+                $created,
+                $user->getApi()->getApiKey()
+            ),
+            $salt
         );
 
         $output->writeln('<info>To use WSSE authentication add following headers to the request:</info>');
