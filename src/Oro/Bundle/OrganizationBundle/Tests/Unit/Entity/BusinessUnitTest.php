@@ -131,11 +131,4 @@ class BusinessUnitTest extends \PHPUnit_Framework_TestCase
         $this->unit->setChildren($children);
         $this->assertSame($children, $this->unit->getChildren());
     }
-
-    public function testLevel()
-    {
-        $this->assertEmpty($this->unit->getLevel());
-        $this->unit->setLevel(1);
-        $this->assertEquals(1, $this->unit->getLevel());
-    }
 }

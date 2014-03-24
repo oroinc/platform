@@ -130,11 +130,6 @@ class BusinessUnit implements NotificationEmailInterface
     protected $children;
 
     /**
-     * @var integer
-     */
-    protected $level;
-
-    /**
      * Get id
      *
      * @return integer
@@ -427,21 +422,5 @@ class BusinessUnit implements NotificationEmailInterface
     public function getChildren()
     {
         return $this->children;
-    }
-
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
-    {
-        $this->level = $level;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLevel()
-    {
-        return $this->level;
     }
 }
