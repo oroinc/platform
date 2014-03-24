@@ -81,6 +81,9 @@ oro:
             created.label:            Created
             updated.label:            Updated
 
+            related_entity.label:       Workflow Item
+            related_entity.description: Related field for Workflow Item
+
         workflowstep:
             entity_label:         Workflow Step
             entity_plural_label:  Workflow Steps
@@ -91,6 +94,9 @@ oro:
             label.label:          Label
             name.label:           Name
             step_order.label:     Step order
+
+            related_entity.label:       Workflow Step
+            related_entity.description: Related field for Workflow Step
 
         workflowdefinition:
             entity_label:                 Workflow

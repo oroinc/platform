@@ -1,0 +1,16 @@
+<div class="control-group">
+    <label for="oro_package_install_packageName" class="required">Package Name</label>
+    <div class="controls">
+        <input type="text"
+               id="oro_package_install_packageName"
+               required="required"
+               autocomplete="off"
+               data-required-message="Please enter the package name"
+        />
+    </div>
+    <div class="actions">
+        <a href="#" class="btn btn-success ajax install"
+           data-action="install"
+           data-params='{"packageName": "#oro_package_install_packageName"}'>Install</a>
+    </div>
+</div>

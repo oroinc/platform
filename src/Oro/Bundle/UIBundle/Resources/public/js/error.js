@@ -1,6 +1,7 @@
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'oroui/js/app', 'oroui/js/modal'
-], function (_, __, Backbone, routing, app, Modal) {
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'oroui/js/app', 'oroui/js/modal',
+    'oronavigation/js/navigation'
+], function (_, __, Backbone, routing, app, Modal, Navigation) {
     'use strict';
 
     var defaults = {
@@ -78,7 +79,13 @@ define(['underscore', 'orotranslation/js/translator', 'backbone', 'routing', 'or
          * @private
          */
         _processRedirect: function () {
-            document.location.href = routing.generate('oro_user_security_login');
+            var hashUrl = '';
+            if (Navigation.isEnabled()) {
+                var navigation = Navigation.getInstance();
+                hashUrl = '#url=' + navigation.getHashUrl();
+            }
+
+            window.location.href = routing.generate('oro_user_security_login') + hashUrl;
         }
     });
 
