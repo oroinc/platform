@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
 {
     /** @var string */
-    protected $route;
+    protected $route = null;
 
     /** @var string */
     protected $identifierName;
@@ -67,39 +67,41 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     {
         $config = parent::getConfiguration();
 
-        $config->offsetAddToArray(
-            'properties',
-            [
-                $this->identifierName => null,
-                'view_link'  => [
-                    'type'   => 'url',
-                    'route'  => $this->route,
-                    'params' => ['id']
+        if (!empty($this->route)) {
+            $config->offsetAddToArray(
+                'properties',
+                [
+                    $this->identifierName => null,
+                    'view_link'  => [
+                        'type'   => 'url',
+                        'route'  => $this->route,
+                        'params' => ['id']
+                    ]
                 ]
-            ]
-        );
+            );
 
-        $config->offsetAddToArray(
-            'actions',
-            [
-                'view' => [
-                    'type'         => 'navigate',
-                    'acl_resource' => 'VIEW;entity:'.$this->entityName,
-                    'label'        => 'View',
-                    'icon'         => 'user',
-                    'link'         => 'view_link',
-                    'rowAction'    => true,
+            $config->offsetAddToArray(
+                'actions',
+                [
+                    'view' => [
+                        'type'         => 'navigate',
+                        'acl_resource' => 'VIEW;entity:'.$this->entityName,
+                        'label'        => 'View',
+                        'icon'         => 'user',
+                        'link'         => 'view_link',
+                        'rowAction'    => true,
+                    ]
                 ]
-            ]
-        );
+            );
 
-        $tableAlias = $config->offsetGetByPath('[source][query_config][table_aliases]');
-        $tableAlias = array_shift($tableAlias);
+            $tableAlias = $config->offsetGetByPath('[source][query_config][table_aliases]');
+            $tableAlias = array_shift($tableAlias);
 
-        $config->offsetAddToArrayByPath(
-            '[source][query][select]',
-            [sprintf('%s.%s', $tableAlias, $this->identifierName)]
-        );
+            $config->offsetAddToArrayByPath(
+                '[source][query][select]',
+                [sprintf('%s.%s', $tableAlias, $this->identifierName)]
+            );
+        }
 
         return $config;
     }
