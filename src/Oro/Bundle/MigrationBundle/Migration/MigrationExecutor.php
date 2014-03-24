@@ -4,12 +4,15 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\TableDiff;
 use Psr\Log\LoggerInterface;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
@@ -97,15 +100,8 @@ class MigrationExecutor
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
-            $this->checkTables($schemaDiff->newTables, $migration);
-            $changedTables = $schemaDiff->changedTables;
-            foreach ($changedTables as $tableName => $diff) {
-                $this->checkColumnNames(
-                    $tableName,
-                    array_values($diff->addedColumns),
-                    $migration
-                );
-            }
+            $this->checkTables($schemaDiff, $migration);
+            $this->checkIndexes($schemaDiff, $migration);
 
             $queries = array_merge(
                 $queryBag->getPreQueries(),
@@ -149,18 +145,25 @@ class MigrationExecutor
     }
 
     /**
-     * Validates the given tables
+     * Validates the given tables from SchemaDiff
      *
-     * @param Table[]   $tables
-     * @param Migration $migration
+     * @param SchemaDiff $schemaDiff
+     * @param Migration  $migration
      * @throws InvalidNameException if invalid table or column name is detected
      */
-    protected function checkTables($tables, Migration $migration)
+    protected function checkTables(SchemaDiff $schemaDiff, Migration $migration)
     {
-        foreach ($tables as $table) {
+        foreach ($schemaDiff->newTables as $table) {
             $this->checkTableName($table->getName(), $migration);
             $this->checkColumnNames($table->getName(), $table->getColumns(), $migration);
-            $this->checkIndexes($table, $migration);
+        }
+
+        foreach ($schemaDiff->changedTables as $tableName => $diff) {
+            $this->checkColumnNames(
+                $tableName,
+                array_values($diff->addedColumns),
+                $migration
+            );
         }
     }
 
@@ -203,13 +206,25 @@ class MigrationExecutor
     }
 
     /**
-     * @param Table     $table
-     * @param Migration $migration
+     * @param SchemaDiff $schemaDiff
+     * @param Migration  $migration
      */
-    protected function checkIndexes($table, Migration $migration)
+    protected function checkIndexes(SchemaDiff $schemaDiff, Migration $migration)
     {
-        foreach ($table->getIndexes() as $index) {
-            $this->checkIndex($table, $index, $migration);
+        foreach ($schemaDiff->newTables as $table) {
+            foreach ($table->getIndexes() as $index) {
+                $this->checkIndex($table, $index, $migration);
+            }
+        }
+
+        foreach ($schemaDiff->changedTables as $tableDiff) {
+            foreach (array_values($tableDiff->addedIndexes) as $index) {
+                $this->checkIndex(
+                    $this->getTableFromDiff($tableDiff),
+                    $index,
+                    $migration
+                );
+            }
         }
     }
 
@@ -235,5 +250,32 @@ class MigrationExecutor
                 );
             }
         }
+    }
+
+    /**
+     * @param TableDiff $diff
+     * @return Table
+     */
+    protected function getTableFromDiff(TableDiff $diff)
+    {
+        $table = clone $diff->fromTable;
+
+        foreach ($diff->changedColumns as $columnName => $changedColumn) {
+            /* @var ColumnDiff $changedColumn */
+            $options = [];
+            foreach ($changedColumn->changedProperties as $changedProperty) {
+                $getter  = 'get' . $changedProperty;
+                if (method_exists($changedColumn->column, $getter)) {
+                    $value = $changedColumn->column->$getter();
+
+                    $options[$changedProperty] = $value;
+                }
+
+                $table->getColumn($columnName)->setOptions($options);
+            }
+        }
+
+
+        return $table;
     }
 }

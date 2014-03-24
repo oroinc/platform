@@ -17,7 +17,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
     /** @var MigrationQueryExecutor */
     protected $queryExecutor;
 
-    public function setUp()
+    public function setUp($tables = [])
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -30,11 +30,11 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $sm->expects($this->once())
             ->method('listTables')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue($tables));
         $sm->expects($this->once())
             ->method('createSchemaConfig')
             ->will($this->returnValue(null));
-        $this->connection->expects($this->once())
+        $this->connection->expects($this->atLeastOnce())
             ->method('getSchemaManager')
             ->will($this->returnValue($sm));
         $this->connection->expects($this->once())

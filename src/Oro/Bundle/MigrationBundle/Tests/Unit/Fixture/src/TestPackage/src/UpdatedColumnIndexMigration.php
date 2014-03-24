@@ -13,10 +13,7 @@ class UpdatedColumnIndexMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('index_table');
-        $table->addColumn('key', 'string', ['length' => 255]);
-        $table->addIndex(['key'], 'index');
-
+        $table = $schema->getTable('index_table2');
         $table->getColumn('key')->setLength(500);
         $table->addIndex(['key'], 'index2');
     }

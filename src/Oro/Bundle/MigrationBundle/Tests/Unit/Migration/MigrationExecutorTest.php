@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\Type;
+
 use TestPackage\src\IndexMigration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
@@ -15,9 +19,9 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     /** @var DbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp()
+    public function setUp($tables = [])
     {
-        parent::setUp();
+        parent::setUp($this->getTables());
 
         $this->nameGenerator = new DbIdentifierNameGenerator();
 
@@ -41,21 +45,48 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
      * @expectedExceptionMessage Max index size is 255.
      * @dataProvider invalidMigrationsProvider
      */
-    public function testIndexesFailed($migration)
+    public function testIndexesFailed($migrations)
     {
-        $this->IncludeFile($migration . '.php');
+        $migrationsToExecute = [];
+        foreach ($migrations as $migration) {
+            $this->IncludeFile($migration . '.php');
+            $migrationClass = 'TestPackage\\src\\' . $migration;
+            $migrationsToExecute[] = new $migrationClass();
+        }
 
-        $migrationClass = 'TestPackage\\src\\' . $migration;
-        $migrations = [new $migrationClass()];
-
-        $this->executor->executeUp($migrations);
+        $this->executor->executeUp($migrationsToExecute);
     }
 
     public function invalidMigrationsProvider()
     {
         return [
-            'new'     => ['InvalidIndexMigration'],
-            'updated' => ['UpdatedColumnIndexMigration']
+            'new'     => [
+                'migrations' => ['InvalidIndexMigration']
+            ],
+            'updated' => [
+                'migrations' => ['IndexMigration', 'UpdatedColumnIndexMigration']
+            ]
+        ];
+    }
+
+    /**
+     * @return Table[]
+     */
+    protected function getTables()
+    {
+        return [
+            new Table(
+                'index_table2',
+                [
+                    new Column(
+                        'key',
+                        Type::getType('string'),
+                        [
+                            'length' => 255
+                        ]
+                    )
+                ]
+            )
         ];
     }
 }
