@@ -58,26 +58,35 @@
     </script>
 {% endmacro %}
 
-{% macro query_designer_column_list(attr, showFunc = true) %}
+{% macro query_designer_column_list(attr, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
             <thead>
             <tr>
+                {% if ('column' in showItems) %}
                 <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
+                {% endif %}
+                {% if ('label' in showItems) %}
                 <th class="label-column"><span>{{ 'oro.query_designer.datagrid.column.label'|trans }}</span></th>
-                {% if showFunc %}
+                {% endif %}
+                {% if ('function' in showItems) %}
                 <th class="function-column"><span>{{ 'oro.query_designer.datagrid.column.function'|trans }}</span></th>
                 {% endif %}
+                {% if ('sorting' in showItems) %}
                 <th class="sorting-column"><span>{{ 'oro.query_designer.datagrid.column.sorting'|trans }}</span></th>
+                {% endif %}
+                {% if ('action' in showItems) %}
                 <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
+                {% endif %}
             </tr>
             </thead>
             <tbody class="item-container">
             </tbody>
         </table>
     </div>
+    {{ _self.query_designer_column_template(attr.rowId, showItems) }}
 {% endmacro %}
 
 {% macro query_designer_grouping_list(attr) %}
@@ -99,15 +108,22 @@
     </div>
 {% endmacro %}
 
-{% macro query_designer_column_template(id, showFunc = true) %}
+{% macro query_designer_column_template(id, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
+            {% if ('column' in showItems) %}
             <td class="name-cell"><%= name %></td>
+            {% endif %}
+            {% if ('label' in showItems) %}
             <td class="label-cell"><%- label %></td>
-            {% if showFunc %}
+            {% endif %}
+            {% if ('function' in showItems) %}
             <td class="function-cell"><%= func %></td>
             {% endif %}
+            {% if ('sorting' in showItems) %}
             <td class="sorting-cell"><%= sorting %></td>
+            {% endif %}
+            {% if ('action' in showItems) %}
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
@@ -121,6 +137,7 @@
                 <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
                     <i class="icon-list handle"></i></span>
             </td>
+            {% endif %}
         </tr>
     </script>
 {% endmacro %}
@@ -146,12 +163,13 @@
     </script>
 {% endmacro %}
 
-{% macro query_designer_column_form(form, attr, params) %}
+{% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         {# @todo own formtype for this kind field based on hidden input #}
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {% if ('column' in showItems) %}
         {{ form_row(form.name, {
             'label': 'oro.query_designer.form.column'|trans,
             'entity_choice_selector': '#' ~ params.entity_choice_id,
@@ -160,7 +178,9 @@
                 'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
+        {% endif %}
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {% if ('label' in showItems) %}
         {{ form_row(form.label, {
             'label': 'oro.query_designer.form.label'|trans,
             'attr': {
@@ -169,7 +189,8 @@
                 'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
-        {% if params.showFunc %}
+        {% endif %}
+        {% if ('function' in showItems) %}
         {{ form_row(form.func, {
             'label': 'oro.query_designer.form.function'|trans,
             'attr': {
@@ -178,6 +199,7 @@
             }
         }) }}
         {% endif %}
+        {% if ('sorting' in showItems) %}
         {{ form_row(form.sorting, {
             'label': 'oro.query_designer.form.sorting'|trans,
             'attr': {
@@ -185,6 +207,8 @@
                 'data-purpose': 'sorting-selector'
             }
         }) }}
+        {% endif %}
+        {% if ('action' in showItems) %}
         <div class="pull-right">
             {{ UI.clientButton({
                 'aCss': 'no-hash cancel-button column-form-button',
@@ -201,6 +225,7 @@
                 'label' : 'oro.query_designer.form.action.add'|trans
             }) }}
         </div>
+        {% endif %}
     </div>
     <script type="text/javascript">
         require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
@@ -209,7 +234,7 @@
                 $functions = $form.find('[data-purpose=function-selector]'),
                 $label = $form.find('[data-purpose=label]');
 
-            {% if params.showFunc|default(false) %}
+            {% if ('function' in showItems) %}
             $functions.functionChoice({
                 fieldChoiceSelector: $fields
             });

@@ -60,11 +60,12 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             ],
             'actions'    => [
                 'view' => [
-                    'type'  => 'navigate',
-                    'label' => 'View',
-                    'icon'  => null,
-                    'link'  => 'view_link',
-                    'rowAction' => true,
+                    'type'         => 'navigate',
+                    'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
+                    'label'        => 'View',
+                    'icon'         => null,
+                    'link'         => 'view_link',
+                    'rowAction'    => true,
                 ],
             ],
         ];

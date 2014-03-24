@@ -22,6 +22,9 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     /** @var string */
     protected $icon;
 
+    /** @var string */
+    protected $entityName;
+
     /**
      * Constructor
      *
@@ -46,13 +49,14 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
             $doctrine
         );
 
-        $entityMetadata = $configManager->getEntityMetadata($segment->getEntity());
+        $this->entityName     = $segment->getEntity();
+        $entityMetadata = $configManager->getEntityMetadata($this->entityName);
         if ($entityMetadata && $entityMetadata->routeView) {
             $this->route = $entityMetadata->routeView;
             $this->icon  = $entityMetadata->defaultValues['entity']['icon'];
         }
 
-        $classMetadata        = $em->getClassMetadata($segment->getEntity());
+        $classMetadata        = $em->getClassMetadata($this->entityName);
         $identifiers          = $classMetadata->getIdentifier();
         $this->identifierName = array_shift($identifiers);
 
@@ -84,7 +88,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
             [
                 'view' => [
                     'type'         => 'navigate',
-                    //'acl_resource' => 'oro_segment_view',
+                    'acl_resource' => 'VIEW;entity:'.$this->entityName,
                     'label'        => 'View',
                     'icon'         => $this->icon,
                     'link'         => 'view_link',
