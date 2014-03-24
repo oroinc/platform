@@ -124,12 +124,6 @@ class BusinessUnit implements NotificationEmailInterface
     protected $owner;
 
     /**
-     * @var BusinessUnit[]
-     * @ORM\OneToMany(targetEntity="BusinessUnit", mappedBy="owner")
-     */
-    protected $children;
-
-    /**
      * Get id
      *
      * @return integer
@@ -406,21 +400,5 @@ class BusinessUnit implements NotificationEmailInterface
         $emails[] = $this->getEmail();
 
         return $emails;
-    }
-
-    /**
-     * @param ArrayCollection $children
-     */
-    public function setChildren($children)
-    {
-        $this->children = $children;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getChildren()
-    {
-        return $this->children;
     }
 }

@@ -122,13 +122,4 @@ class BusinessUnitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
-
-    public function testChildren()
-    {
-        $children = new ArrayCollection();
-        $children->add(new BusinessUnit());
-        $this->assertEmpty($this->unit->getChildren());
-        $this->unit->setChildren($children);
-        $this->assertSame($children, $this->unit->getChildren());
-    }
 }
