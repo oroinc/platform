@@ -41,7 +41,7 @@ function ($, _, DateFilter, localeSettings) {
         dateWidgetOptions: _.extend({
             timeFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'time', 'HH:mm'),
             altFieldTimeOnly: false,
-            altSeparator: localeSettings.getDateTimeFormatSeparator(),
+            altSeparator: ' ',
             altTimeFormat: 'HH:mm'
         }, DateFilter.prototype.dateWidgetOptions),
 
@@ -141,7 +141,7 @@ function ($, _, DateFilter, localeSettings) {
                 var separator = this.dateWidgetOptions.altSeparator;
                 var timeSettings = {
                     timeFormat: timeFromFormat,
-                    separator: $.timepicker._defaults.separator
+                    separator: localeSettings.getDateTimeFormatSeparator()
                 };
 
                 if (dateFromFormat == this.dateWidgetOptions.altFormat) {
