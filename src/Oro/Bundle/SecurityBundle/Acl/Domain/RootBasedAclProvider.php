@@ -109,10 +109,13 @@ class RootBasedAclProvider implements AclProviderInterface
 
         try {
             $rootAcl = $this->baseAclProvider->findAcl($rootOid, $sids);
+            if ($this->baseAclProvider->isEmptyAcl($acl)) {
+                return $rootAcl;
+            } else {
+                return new RootBasedAclWrapper($acl, $rootAcl);
+            }
         } catch (AclNotFoundException $noRootAcl) {
             return $acl;
         }
-
-        return new RootBasedAclWrapper($acl, $rootAcl);
     }
 }

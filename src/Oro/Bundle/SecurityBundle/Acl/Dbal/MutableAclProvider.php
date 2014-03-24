@@ -71,7 +71,18 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
-     * Put in cache empty ACL object for the given OID indicates that we have to use
+     * Checks whether the given ACL is empty
+     *
+     * @param AclInterface $acl
+     * @return bool
+     */
+    public function isEmptyAcl(AclInterface $acl)
+    {
+        return method_exists($acl, 'getId') && $acl->getId() === 0;
+    }
+
+    /**
+     * Put in cache empty ACL object for the given OID indicates that we should use
      * underlying ACL instead it
      *
      * @param ObjectIdentityInterface $oid
