@@ -102,6 +102,7 @@ datagrid:
                             choices: @oro_entity.datagrid_helper->getEntityNames
 
                 eventName:
+                    filter_by_having: true
                     type: choice
                     data_name: eventName
                     options:
@@ -132,7 +133,9 @@ datagrid:
                 emailRecipient:
                     type: string
                     data_name: emailRecipient
+                    filter_by_having: true
 
                 ownerRecipient:
                     type: boolean
                     data_name: ownerRecipient
+                    filter_by_having: true

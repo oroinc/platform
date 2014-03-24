@@ -5,8 +5,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Abract segment mapped super class implementing node and tree
- *
+ * Abstract segment mapped super class implementing node and tree
  *
  * @ORM\MappedSuperclass
  * @Gedmo\Tree(type="nested")

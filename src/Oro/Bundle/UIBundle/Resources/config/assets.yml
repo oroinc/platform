@@ -1,5 +1,5 @@
 css:
-    'UI':
+    'oroui':
         - 'bundles/oroui/css/jquery-ui.grid.css'
         - 'bundles/oroui/css/less/main.less'
         - 'bundles/oroui/css/all.css'

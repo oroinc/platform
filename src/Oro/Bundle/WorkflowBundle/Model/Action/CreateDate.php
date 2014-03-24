@@ -29,10 +29,9 @@ class CreateDate extends AbstractDateAction
      */
     protected function createDateTime()
     {
-        return new \DateTime(
-            $this->getOption($this->options, 'date'),
-            new \DateTimeZone('UTC')
-        );
+        $fullDate = new \DateTime($this->getOption($this->options, 'date'), new \DateTimeZone('UTC'));
+
+        return new \DateTime($fullDate->format('Y-m-d'), new \DateTimeZone('UTC'));
     }
 
     /**

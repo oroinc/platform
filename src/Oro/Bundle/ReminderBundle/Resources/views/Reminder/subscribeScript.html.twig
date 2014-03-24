@@ -1,0 +1,13 @@
+{% if app.user %}
+    {% placeholder oro_reminder_reminder_templates %}
+    <script type="text/javascript">
+        {% if check_ws() %}
+            require(['ororeminder/js/subscriber', 'oroui/js/mediator'], function(subscriber, mediator){
+                mediator.once('page-rendered', function () {
+                    subscriber.init({{ app.user.id }});
+                });
+            });
+        {% endif %}
+    </script>
+{% endif %}
+
