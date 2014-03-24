@@ -264,6 +264,11 @@
                         },
                         select2FieldChoiceTemplate: '#column-chain-template',
                         select2SegmentChoiceTemplate: '#segment-template',
+                        {% if type == 'segment' %}
+                        gridFieldChoiceOptions: {
+                            exclude: ['children']
+                        },
+                        {% endif %}
                         entities: {{ entities|json_encode|raw }},
                         metadata: {{ metadata|json_encode|raw }}
                     });
