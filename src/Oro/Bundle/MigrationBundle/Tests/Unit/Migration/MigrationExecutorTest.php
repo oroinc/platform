@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use TestPackage\src\IndexMigration;
-use TestPackage\src\InvalidIndexMigration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
@@ -40,15 +39,23 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     /**
      * @expectedException \Oro\Bundle\MigrationBundle\Exception\InvalidNameException
      * @expectedExceptionMessage Max index size is 255.
+     * @dataProvider invalidMigrationsProvider
      */
-    public function testIndexesFailed()
+    public function testIndexesFailed($migration)
     {
-        $this->IncludeFile('InvalidIndexMigration.php');
+        $this->IncludeFile($migration . '.php');
 
-        $migrations = [
-            new InvalidIndexMigration(),
-        ];
+        $migrationClass = 'TestPackage\\src\\' . $migration;
+        $migrations = [new $migrationClass()];
 
         $this->executor->executeUp($migrations);
+    }
+
+    public function invalidMigrationsProvider()
+    {
+        return [
+            'new'     => ['InvalidIndexMigration'],
+            'updated' => ['UpdatedColumnIndexMigration']
+        ];
     }
 }
