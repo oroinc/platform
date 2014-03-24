@@ -56,8 +56,11 @@ class EntityProcessor
         $env     = $this->kernel->getEnvironment();
 
         $commands = array(
-            'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
-            'schemaUpdate' => new Process($console . ' oro:entity-extend:update-schema --env ' . $env),
+            'update'         => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
+            'schemaUpdate'   => new Process($console . ' oro:entity-extend:update-schema --env ' . $env),
+            // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
+            // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
+            'doctrineUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
         );
 
         // put system in maintenance mode

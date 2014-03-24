@@ -42,14 +42,14 @@ datagrid:
                     data_name: embedded_form.formType
                     options:
                         field_options:
-                          choices: @oro_embedded_form.manager->getAll
+                            choices: @oro_embedded_form.manager->getAll
                 channelName:
                     type: entity
-                    data_name: channel
+                    data_name: channel.id
                     options:
                         field_options:
-                          class: OroIntegrationBundle:Channel
-                          property: name
+                            class: OroIntegrationBundle:Channel
+                            property: name
 
         properties:
             id: ~

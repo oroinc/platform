@@ -84,7 +84,6 @@ services:
     oro_workflow.field_generator:
         class: %oro_workflow.field_generator.class%
         arguments:
-            - @translator
             - @oro_entity_config.config_manager
             - @oro_entity_extend.extend.entity_processor
             - @oro_workflow.entity_connector

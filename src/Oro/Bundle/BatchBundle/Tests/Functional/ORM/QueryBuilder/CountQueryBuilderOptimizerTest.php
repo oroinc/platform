@@ -16,6 +16,8 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
 
     /**
      * Initialize kernel and create query builders for data provider
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public static function setUpBeforeClass()
     {
@@ -98,6 +100,41 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
             ->where('gr.id > 10');
 
+        $havingEqualQb = new QueryBuilder($em);
+        $havingEqualQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->groupBy('u.id')
+            ->having('login = :test');
+
+        $havingInQb = new QueryBuilder($em);
+        $havingInQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->groupBy('u.id')
+            ->having('login IN (?0)');
+
+        $havingLikeQb = new QueryBuilder($em);
+        $havingLikeQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->groupBy('u.id')
+            ->having('login LIKE :test');
+
+        $havingIsNullQb = new QueryBuilder($em);
+        $havingIsNullQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->groupBy('u.id')
+            ->having('login IS NULL');
+
+        $havingIsNotNullQb = new QueryBuilder($em);
+        $havingIsNotNullQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->groupBy('u.id')
+            ->having('login IS NOT NULL');
+
+        $havingInsteadWhereQb = new QueryBuilder($em);
+        $havingInsteadWhereQb->from('OroUserBundle:User', 'u')
+            ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+            ->having('login LIKE :test');
+
         self::$queryBuilders = array(
             'simple' => $simpleQb,
             'group_test' => $groupQb,
@@ -108,7 +145,13 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             'with_inner_join' => $withInnerJoinQb,
             'inner_with_2_left_group' => $withInnerJoinAndTwoLeftGroupQb,
             'inner_with_2_left_having' => $withInnerJoinAndTwoLeftHavingQb,
-            'third_join_in_on' => $thirdLeftJoinInOnQb
+            'third_join_in_on' => $thirdLeftJoinInOnQb,
+            'having_equal' => $havingEqualQb,
+            'having_in' => $havingInQb,
+            'having_like' => $havingLikeQb,
+            'having_is_null' => $havingIsNullQb,
+            'having_is_not_null' => $havingIsNotNullQb,
+            'having_instead_where' => $havingInsteadWhereQb
         );
     }
 
@@ -130,6 +173,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function queryBuilderDataProvider()
@@ -149,7 +193,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ),
             'one_table' => array(
                 'one_table',
-                'SELECT u.id FROM OroUserBundle:User u '
+                'SELECT u.id, u.username as _havingField0 FROM OroUserBundle:User u '
                 . 'WHERE u.id=10 AND LOWER(u.username) LIKE :testParameter '
                 . 'GROUP BY u.id '
                 . 'HAVING u.username = :testParameter'
@@ -171,7 +215,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ),
             'inner_with_2_left_group' => array(
                 'inner_with_2_left_group',
-                'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                'SELECT DISTINCT u.id, u.username as _havingField0 FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr '
@@ -180,7 +224,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             ),
             'inner_with_2_left_having' => array(
                 'inner_with_2_left_having',
-                'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                'SELECT DISTINCT u.id, gr.label as _havingField0 FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr '
@@ -195,6 +239,40 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
                     . 'LEFT JOIN u.api api '
                     . 'WHERE gr.id > 10'
+            ),
+            'having_equal' => array(
+                'having_equal',
+                'SELECT u.id, u.username as login FROM OroUserBundle:User u '
+                    . 'GROUP BY u.id '
+                    . 'HAVING login = :test'
+            ),
+            'having_in' => array(
+                'having_in',
+                'SELECT u.id, u.username as login FROM OroUserBundle:User u '
+                . 'GROUP BY u.id '
+                . 'HAVING login IN (?0)'
+            ),
+            'having_like' => array(
+                'having_like',
+                'SELECT u.id, u.username as login FROM OroUserBundle:User u '
+                . 'GROUP BY u.id '
+                . 'HAVING u.username LIKE :test'
+            ),
+            'having_is_null' => array(
+                'having_is_null',
+                'SELECT u.id, u.username as login FROM OroUserBundle:User u '
+                . 'GROUP BY u.id '
+                . 'HAVING u.username IS NULL'
+            ),
+            'having_is_not_null' => array(
+                'having_is_not_null',
+                'SELECT u.id, u.username as login FROM OroUserBundle:User u '
+                . 'GROUP BY u.id '
+                . 'HAVING u.username IS NOT NULL'
+            ),
+            'having_instead_where' => array(
+                'having_instead_where',
+                'SELECT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
             )
         );
     }
