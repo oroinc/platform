@@ -1,4 +1,8 @@
 @import "mixins";
+.responsive-block{
+  min-width: 350px;
+}
 .responsive-cell {
-  //.forScreenWithSideBar(@smallScreen, background, red);
+  .forScreenWithSideBar(@smallScreen, float, left);
+  .forScreenWithSideBar(@smallScreen, width, 100%);
 }
