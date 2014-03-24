@@ -7,6 +7,15 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 class ConfigHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @dataProvider isConfigModelEntityProvider
+     */
+    public function testIsConfigModelEntity($className, $expected)
+    {
+        $result = ConfigHelper::isConfigModelEntity($className);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @dataProvider getTranslationKeyProvider
      */
     public function testGetTranslationKey($expected, $propertyName, $className, $fieldName)
@@ -23,6 +32,17 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
         $this->assertEquals($expectedModuleName, $moduleName);
         $this->assertEquals($expectedEntityName, $entityName);
+    }
+
+    public function isConfigModelEntityProvider()
+    {
+        return [
+            ['Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel', true],
+            ['Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel', true],
+            ['Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true],
+            ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue', true],
+            ['Test\Other', false],
+        ];
     }
 
     public function getTranslationKeyProvider()
