@@ -327,7 +327,6 @@ datagrid:
                 has_role:
                     type: boolean
                     data_name: has_role
-                    filter_by_having: true
                 firstName:
                     type: string
                     data_name: u.firstName
@@ -392,7 +391,6 @@ datagrid:
                 has_group:
                     type: boolean
                     data_name: has_group
-                    filter_by_having: true
                 username:
                     type: string
                     data_name: u.username
