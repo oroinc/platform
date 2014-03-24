@@ -8,9 +8,8 @@ define(
         return {
             /**
              * @param {integer} id Current user id
-             * @param {string} oldReminders object[] in JSON
              */
-            init: function (id, oldReminders) {
+            init: function (id) {
                 var self = this;
 
                 sync.subscribe('oro/reminder/remind_user_' + id, function (messageParams) {
@@ -18,8 +17,6 @@ define(
                     $('.reminders_dismiss_link[data-unique-id="' + messageParams.uniqueId + '"]').trigger('click');
                     self.showReminders([messageParams]);
                 });
-
-                self.showReminders(oldReminders);
             },
 
             /**
@@ -27,21 +24,17 @@ define(
              * @return {object}
              */
             removeDuplicate: function (messageParamsArray) {
-                var url = routing.generate('oro_reminder_shown');
-                var reminderIds = [];
                 var uniqueReminders = {};
-                messageParamsArray.reduce(function (previouse, current) {
-                    if (previouse[current.uniqueId]) {
-                        reminderIds.push(uniqueReminders[current.uniqueId].id);
+                messageParamsArray.reduce(function (previous, current) {
+                    if (previous[current.uniqueId]) {
+                        previous[current.uniqueId].duplicateIds.push(current.id);
+                    } else {
+                        current.duplicateIds = [];
+                        previous[current.uniqueId] = current;
                     }
-                    previouse[current.uniqueId] = current;
-
-                    return previouse;
+                    return previous;
                 }, uniqueReminders);
-                if (reminderIds.length > 0) {
-                    $.post(url, { 'ids': reminderIds });
-                }
-                return uniqueReminders;
+                return _.toArray(uniqueReminders);
             },
 
             /**
@@ -55,12 +48,19 @@ define(
 
                     var actions = messenger.notificationFlashMessage('reminder', message, {delay: false, flash: false});
 
-                    $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind('click', actions, function (eventObject) {
-                        var url = routing.generate('oro_reminder_shown');
-                        var reminderId = $(this).data('id');
-                        eventObject.data.close();
-                        $.post(url, { 'ids': [reminderId] });
-                    });
+                    $('.reminders_dismiss_link[data-id="' + messageObject.id + '"]').bind(
+                        'click',
+                        {
+                            actions: actions,
+                            messageObject: messageObject
+                        },
+                        function (eventObject) {
+                            var url = routing.generate('oro_api_post_reminder_shown');
+                            var messageObject = eventObject.data.messageObject;
+                            $.post(url, { 'ids': [messageObject.id].concat(messageObject.duplicateIds) });
+                            eventObject.data.actions.close();
+                        }
+                    );
 
                 }, this);
 
@@ -93,18 +93,6 @@ define(
                 } catch (Exception){}
 
                 return message;
-            },
-
-            /**
-             * Reloads reminders from server
-             * It need for actualisation data
-             */
-            reloadReminders: function () {
-                var url = routing.generate('oro_reminder_requested') + '?r=' + Math.random();
-                var self = this;
-                $.getJSON(url, function(messageParams) {
-                    self.showReminders(messageParams);
-                });
             }
         };
     });

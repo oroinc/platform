@@ -3,17 +3,15 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class DoctrineSubscriber implements EventSubscriber
@@ -54,7 +52,7 @@ class DoctrineSubscriber implements EventSubscriber
         $configProvider = $em->getExtendConfigProvider();
         $className      = $event->getClassMetadata()->getName();
 
-        if ($configProvider->hasConfig($className)) {
+        if (!ConfigHelper::isConfigModelEntity($className) && $configProvider->hasConfig($className)) {
             $config = $configProvider->getConfig($className);
             if ($config->is('is_extend')) {
                 $cmBuilder = new ClassMetadataBuilder($event->getClassMetadata());
