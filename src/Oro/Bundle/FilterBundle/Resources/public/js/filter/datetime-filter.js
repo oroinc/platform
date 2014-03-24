@@ -97,7 +97,7 @@ function ($, _, DateFilter, localeSettings) {
         },
 
         /**
-         * Format datetimes in a valut to another format
+         * Format datetimes in a value to another format
          *
          * @param {Object} value
          * @param {String} dateFromFormat
