@@ -19,9 +19,15 @@ class CountQueryBuilderOptimizer
     /** @var QueryBuilderTools */
     protected $qbTools;
 
-    public function __construct()
+    /**
+     * @param QueryBuilderTools|null $qbTools
+     */
+    public function __construct(QueryBuilderTools $qbTools = null)
     {
-        $this->qbTools = new QueryBuilderTools();
+        if (!$qbTools) {
+            $qbTools = new QueryBuilderTools();
+        }
+        $this->qbTools = $qbTools;
     }
 
     /**
