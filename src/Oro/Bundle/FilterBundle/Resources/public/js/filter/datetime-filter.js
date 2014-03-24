@@ -145,7 +145,7 @@ function ($, _, DateFilter, localeSettings) {
                 };
 
                 if (dateFromFormat == this.dateWidgetOptions.altFormat) {
-                    separator = $.timepicker._defaults.separator;
+                    separator = localeSettings.getDateTimeFormatSeparator();
                     timeSettings.separator = this.dateWidgetOptions.altSeparator;
                 }
 
