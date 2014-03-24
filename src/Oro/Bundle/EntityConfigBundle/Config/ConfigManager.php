@@ -325,26 +325,40 @@ class ConfigManager
      */
     public function getId($scope, $className, $fieldName = null)
     {
-        if (!$this->modelManager->checkDatabase()) {
-            throw $this->createDatabaseNotSyncedException();
-        }
-
         if ($fieldName) {
-            $fieldModel = $this->modelManager->getFieldModel($className, $fieldName);
+            // at first try to find a model in the local cache
+            $configId  = new FieldConfigId($scope, $className, $fieldName);
+            $configKey = $this->buildConfigKey($configId);
+            if (isset($this->localCache[$configKey])) {
+                // if found, use field config id from the local cache
+                $configId = $this->localCache[$configKey]->getId();
+            } else {
+                // next try to find a model in the cache
+                $config = null !== $this->cache
+                    ? $this->cache->loadConfigFromCache($configId)
+                    : null;
+                if ($config) {
+                    // if found, use field config id from the cache
+                    $configId = $config->getId();
+                    $this->localCache[$configKey] = $config;
+                } else {
+                    // if a cached model was not found use the model manager to get field config id
+                    if (!$this->modelManager->checkDatabase()) {
+                        throw $this->createDatabaseNotSyncedException();
+                    }
+                    $fieldModel = $this->modelManager->getFieldModel($className, $fieldName);
+                    $configId   = new FieldConfigId(
+                        $scope,
+                        $className,
+                        $fieldModel->getFieldName(),
+                        $fieldModel->getType()
+                    );
+                }
+            }
 
-            return new FieldConfigId(
-                $scope,
-                $className,
-                $fieldModel->getFieldName(),
-                $fieldModel->getType()
-            );
+            return $configId;
         } else {
-            $entityModel = $this->modelManager->getEntityModel($className);
-
-            return new EntityConfigId(
-                $scope,
-                $entityModel->getClassName()
-            );
+            return new EntityConfigId($scope, $className);
         }
     }
 

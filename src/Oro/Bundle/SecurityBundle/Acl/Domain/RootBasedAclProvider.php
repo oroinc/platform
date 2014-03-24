@@ -63,6 +63,7 @@ class RootBasedAclProvider implements AclProviderInterface
                 // Try to get ACL for underlying object
                 $underlyingOid = $this->objectIdentityFactory->underlying($oid);
                 $acl = $this->getAcl($underlyingOid, $sids, $rootOid);
+                $this->baseAclProvider->cacheWithUnderlyingAcl($oid);
             } catch (\Exception $noUnderlyingAcl) {
                 // Try to get ACL for root object
                 try {
@@ -101,12 +102,20 @@ class RootBasedAclProvider implements AclProviderInterface
     protected function getAcl(ObjectIdentityInterface $oid, array $sids, ObjectIdentityInterface $rootOid)
     {
         $acl = $this->baseAclProvider->findAcl($oid, $sids);
+        if ($this->baseAclProvider->isReplaceWithUnderlyingAcl($acl)) {
+            $underlyingOid = $this->objectIdentityFactory->underlying($oid);
+            return $this->getAcl($underlyingOid, $sids, $rootOid);
+        }
+
         try {
             $rootAcl = $this->baseAclProvider->findAcl($rootOid, $sids);
+            if ($this->baseAclProvider->isEmptyAcl($acl)) {
+                return $rootAcl;
+            } else {
+                return new RootBasedAclWrapper($acl, $rootAcl);
+            }
         } catch (AclNotFoundException $noRootAcl) {
             return $acl;
         }
-
-        return new RootBasedAclWrapper($acl, $rootAcl);
     }
 }

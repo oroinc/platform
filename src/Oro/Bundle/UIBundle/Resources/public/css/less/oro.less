@@ -1154,13 +1154,13 @@ footer {
       padding-top:1px;
       button {
         color:#666;
-        font-size:12px;
+        font-size: 14px;
       }
     }
     .select-filter-widget .caret { margin-top:8px; }
     .choicefilter {
       input[type='text'] {
-        margin-right:-7px;
+        margin-right: -3px;
         .border-radius(0);
       }
       .filter-update {
@@ -2192,17 +2192,17 @@ textarea {
     }
   }
 }
-.filter-box .filter-item .filter-criteria {
+.filter-box .filter-item.open-filter {
   top: 125%;
   &:before {
-    border-bottom: 9px solid rgba(0, 0, 0, 0.2);
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
+    border-bottom: 11px solid rgba(0, 0, 0, 0.2);
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
     content: "";
     display: inline-block;
-    left: 11px;
+    left: 9px;
     position: absolute;
-    top: -9px;
+    bottom: -8px;
   }
   &:after {
     border-bottom: 10px solid #FFFFFF;
@@ -2212,7 +2212,8 @@ textarea {
     display: inline-block;
     left: 10px;
     position: absolute;
-    top: -8px;
+    bottom: -8px;
+    z-index: 701;
   }
 }
 .filter-box .filter-select-oro {
@@ -2937,9 +2938,6 @@ label.radio.error {
     margin: 0 0 0 4px;
   }
 }
-button.filter-update {
-  margin: 0 0 0 6px;
-}
 .choicefilter {
   select,
   textarea,
@@ -3319,4 +3317,7 @@ i.pin-status {
 .oro-subtitle, .title,
 .breadcrumb li {
   text-transform: capitalize;
+}
+.pull-left-extra{
+  margin-left: 20px;
 }

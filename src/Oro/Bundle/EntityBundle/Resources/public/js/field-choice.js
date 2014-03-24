@@ -8,13 +8,28 @@ define(['jquery', 'underscore', './entity-field-select-util', './entity-field-vi
     function filterFields(fields, exclude) {
         fields = _.filter(fields, function (item) {
             var result;
-            if (item.children) {
+
+            // filter children only if we filtering by data
+            if (item.children && !_.isString(exclude[0])) {
                 item.children = filterFields(item.children, exclude);
                 result = !_.isEmpty(item.children);
             } else {
+                // otherwise - we filter by object keys or not filtering at all
                 result = !_.some(exclude, function (rule) {
-                    var cut = _.pick(item, _.keys(rule));
-                    return _.isEqual(cut, rule);
+                    var result;
+                    // exclude can be a property name
+                    if (_.isString(rule)) {
+                        result = _.intersection(
+                            [rule],
+                            _.keys(item)
+                        ).length > 0;
+                    } else {
+                        // or exclude can be an object with data to compare
+                        var cut = _.pick(item, _.keys(rule));
+                        result  = _.isEqual(cut, rule);
+                    }
+
+                    return result;
                 });
             }
             return result;

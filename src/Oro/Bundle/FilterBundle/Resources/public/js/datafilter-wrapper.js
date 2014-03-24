@@ -24,7 +24,7 @@ define(['jquery', 'underscore'], function ($, _) {
                 criteriaHint: this._getCriteriaHint(),
                 nullLink: this.nullLink,
                 canDisable: this.canDisable,
-                isEmpty: this.isEmpty()
+                isEmpty: this.isEmptyValue()
             }));
 
             this.$(this.criteriaSelector).append($filter);
