@@ -14,7 +14,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
         options: _.extend(
             _.extend({}, AbstractWidget.prototype.options),
             {
-                cssClass: 'pull-left btn-group icons-holder',
+                cssClass: 'pull-left icons-holder',
                 type: 'buttons',
                 loadingMaskEnabled: false
             }
