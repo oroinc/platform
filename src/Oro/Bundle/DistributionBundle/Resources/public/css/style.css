@@ -284,3 +284,17 @@ table.table {
 #alerts ul{
     margin-left: 50px;
 }
+
+.control-group label,
+.control-group .controls,
+.control-group .actions {
+    float: left;
+}
+
+.control-group label {
+    padding-top: 5px;
+}
+.control-group .controls,
+.control-group .actions {
+    padding-left: 10px;
+}
