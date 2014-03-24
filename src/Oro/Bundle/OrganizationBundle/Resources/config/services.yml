@@ -88,7 +88,6 @@ services:
 
     oro_organization.form.type.business_unit_tree_select_type:
         class:                        %oro_organization.form.type.business_unit_tree_select_type.class%
-        arguments:                    ["@oro_organization.form.transformer.business_unit_select"]
         tags:
             - { name: form.type, alias: oro_business_unit_tree_select }
 

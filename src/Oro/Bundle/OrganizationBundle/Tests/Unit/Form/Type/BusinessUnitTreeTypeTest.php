@@ -12,12 +12,14 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $formType;
 
+    protected $buManager;
+
     public function setUp()
     {
-        $buManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
+        $this->buManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formType = new BusinessUnitTreeType($buManager);
+        $this->formType  = new BusinessUnitTreeType($this->buManager);
     }
 
     public function testParent()
@@ -32,6 +34,25 @@ class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testOptions()
     {
+        $this->buManager->expects($this->once())
+            ->method('getBusinessUnitsTree')
+            ->will(
+                $this->returnValue(
+                    [
+                        [
+                            'id'       => 1,
+                            'name'     => 'Root',
+                            'children' => [
+                                [
+                                    'id'   => 2,
+                                    'name' => 'Child',
+                                ]
+                            ]
+                        ]
+                    ]
+                )
+            );
+
         $resolver = new OptionsResolver();
         $this->formType->setDefaultOptions($resolver);
         $this->assertTrue($resolver->isKnown('choices'));

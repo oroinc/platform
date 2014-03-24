@@ -388,14 +388,12 @@ class OwnerFormExtension extends AbstractTypeExtension
             /**
              * If assign permission is granted, showing all available business units
              */
-            $businessUnits = $this->businessUnitManager->getFormattedBusinessUnitsTree();
             $builder->add(
                 $this->fieldName,
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
                         'empty_value' => $this->translator->trans('oro.business_unit.form.choose_business_user'),
-                        'choices' => $businessUnits,
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
@@ -444,7 +442,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         // if assign is granted then only allowed business units can be used
-        $allowedBusinessUnits = array_keys($this->businessUnitManager->getFormattedBusinessUnitsTree());
+        $allowedBusinessUnits = $this->businessUnitManager->getBusinessUnitIds();
 
         /** @var BusinessUnit $businessUnit */
         foreach ($businessUnits as $businessUnit) {

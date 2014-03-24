@@ -79,29 +79,11 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $businessUnitsTree = array(
-            array(
-                'id' => 1,
-                'name' => 'Root',
-                'children' => array(
-                    array(
-                        'id' => 2,
-                        'name' => 'Child',
-                    )
-                )
-            )
-        );
         $this->businessUnitManager->expects($this->any())
-            ->method('getBusinessUnitsTree')
-            ->will($this->returnValue($businessUnitsTree));
-        $this->businessUnitManager->expects($this->any())
-            ->method('getFormattedBusinessUnitsTree')
+            ->method('getBusinessUnitIds')
             ->will(
                 $this->returnValue(
-                    array(
-                        1 => 'Root',
-                        2 => '&nbsp;&nbsp;&nbsp;Child'
-                    )
+                    array(1, 2)
                 )
             );
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
@@ -234,16 +216,12 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function testBusinessUnitOwnerBuildFormGranted()
     {
         $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
-        $businessUnits = array(
-            1 => "Root",
-            2 => "&nbsp;&nbsp;&nbsp;Child"
-        );
+
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
             'oro_business_unit_tree_select',
             array(
                 'empty_value' => null,
-                'choices' => $businessUnits,
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),

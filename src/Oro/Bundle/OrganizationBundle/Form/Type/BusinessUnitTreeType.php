@@ -1,11 +1,12 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 
 class BusinessUnitTreeType extends AbstractType
 {
@@ -48,8 +49,29 @@ class BusinessUnitTreeType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices' => $this->businessUnitManager->getFormattedBusinessUnitsTree()
+                'choices' => $this->getTreeOptions($this->businessUnitManager->getBusinessUnitsTree())
             )
         );
+    }
+
+    /**
+     * Prepare choice options for a hierarchical select
+     *
+     * @param $options
+     * @param int $level
+     * @return array
+     */
+    protected function getTreeOptions($options, $level = 0)
+    {
+        $choices = array();
+        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
+        foreach ($options as $option) {
+            $choices += array($option['id'] => $blanks . $option['name']);
+            if (isset($option['children'])) {
+                $choices += $this->getTreeOptions($option['children'], $level + 1);
+            }
+        }
+
+        return $choices;
     }
 }
