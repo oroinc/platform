@@ -111,14 +111,12 @@ datagrid:
                 ownerName:
                     type: choice
                     data_name: ownerName
-                    filter_by_having: true
                     options:
                           field_options:
                               choices: @oro_organization.provider.business_units_grid->getOwnerChoices
                 organizationName:
                     type: choice
                     data_name: organizationName
-                    filter_by_having: true
                     options:
                           field_options:
                               choices: @oro_organization.provider.business_units_grid->getOrganizationChoices
@@ -158,7 +156,6 @@ datagrid:
                 hasCurrentBusinessUnit:
                     type: boolean
                     data_name: hasCurrentBusinessUnit
-                    filter_by_having: true
                 firstName:
                     type: string
                     data_name: u.firstName
