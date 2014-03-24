@@ -86,8 +86,10 @@
 {%  endblock %}
 
 {% block oro_address_widget %}
-    {{ block('oro_address_rows') }}
-{%  endblock %}
+    <div {{ block('widget_container_attributes') }}>
+        {{ block('oro_address_rows') }}
+    </div>
+{% endblock %}
 
 {% block oro_address_rows %}
     {{ form_row(form.id) }}
