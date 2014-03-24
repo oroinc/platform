@@ -34,9 +34,25 @@
                     var me = $(this);
                     var action = me.data('action');
                     var params = me.data('params');
+                    var actionParams = {};
+                    for (var key in params) {
+                        if (params.hasOwnProperty(key)) {
+                            if (params[key].indexOf('#') === 0) {
+                                var $el = $(params[key]);
+                                var val = $el.val();
+                                if ($el.attr('required') && (!val || /^\s*$/.test(val))) {
+                                    util.error($el.data('required-message'));
+                                    return;
+                                }
+                                actionParams[key] = val;
+                            } else {
+                                actionParams[key] = params[key];
+                            }
+                        }
+                    }
                     loader.setClickedElement(me);
                     loader.displayLoadingProgress();
-                    pm[action](params, function () {
+                    pm[action](actionParams, function () {
                         loader.displayOriginalElement();
                     });
 
