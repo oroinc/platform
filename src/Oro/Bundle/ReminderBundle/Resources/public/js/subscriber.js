@@ -70,6 +70,7 @@ define(
             showReminders: function (messageParamsArray) {
                 var self = this;
                 messageParamsArray = this.removeDuplicate(this.removePhantomReminders(messageParamsArray));
+                $('.alert-reminder').remove();
                 _.each(messageParamsArray, function (messageObject) {
                     var message = this.reminderTextConstructor(messageObject);
                     message += '(<a class="reminders_dismiss_link" data-id="' + messageObject.id + '" data-unique-id="'
