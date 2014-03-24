@@ -3236,6 +3236,57 @@ i.pin-status {
   }
 }
 
+.control-group.create-select-entity {
+  max-width: inherit;
+}
+
+.create-select-entity-container {
+  padding: 5px 30px 30px 30px;
+  border: 1px solid #e6e6e6;
+  .border-radius(3px);
+
+  .buttons-container {
+    margin-left: -20px;
+    margin-bottom: 30px;
+    a {
+      margin-right: 20px;
+    }
+  }
+
+  .control-label {
+    width: 160px !important;
+  }
+
+  .box-type1 .title {
+    padding-left: 0;
+    padding-top: 0;
+  }
+}
+
+/** Gray line after title centered vertically */
+.create-select-entity .box-type1 .title,
+.create-select-entity h5 {
+  height: 1px;
+  margin-bottom: 20px;
+  padding: 0;
+  position: relative;
+  text-align: left;
+  border-bottom: #e6e6e6 1px solid;
+  overflow: visible;
+  width: 90%;
+}
+
+.create-select-entity .box-type1 .title .widget-title,
+.create-select-entity h5 span {
+  background: white;
+  display: inline-block;
+  line-height: 15px;
+  padding-right: 15px;
+  position: relative;
+  top: -0.6em;
+}
+
+/** create-select buttons visibility */
 .create-select-entity .entity-create-block,
 .create-select-entity .entity-select-block,
 .create-select-entity .entity-view-block
