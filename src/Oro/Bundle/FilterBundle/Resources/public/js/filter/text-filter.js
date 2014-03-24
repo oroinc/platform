@@ -227,7 +227,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _alignCriteria: function () {
             var $container = $(this.limitCriteriaTo),
                 $criteria = this.$(this.criteriaSelector),
-                shift = $container.width() + $container.offset().left - this.$el.offset().left - $criteria.outerWidth();
+                shift = $container.prop('clientWidth') + $container.offset().left -
+                    this.$el.offset().left - $criteria.outerWidth();
             $criteria.css('margin-left', shift < 0 ? shift : 0);
         },
 
