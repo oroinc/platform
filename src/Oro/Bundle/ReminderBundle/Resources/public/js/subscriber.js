@@ -6,7 +6,6 @@ define(
          * @export ororeminder/js/subscriber
          */
         return {
-
             deletedList: {},
 
             /**
@@ -44,25 +43,25 @@ define(
              * @param {Array} messageParamsArray
              * @return {Array}
              */
-            removePhantomReminders: function(messageParamsArray){
-                var list = [];
+            removePhantomReminders: function(messageParamsArray) {
+                var result = [];
                 var currentDate = new Date();
                 var currentTime = currentDate.getTime();
                 _.each(messageParamsArray, function(element){
-                    if(!this.deletedList[element.id]){
-                        list.push(element);
-                    }else if($.type(this.deletedList[element.id]) == 'date' && this.deletedList[element.id].getTime){
+                    if (!this.deletedList[element.id]) {
+                        result.push(element);
+                    } else if ($.type(this.deletedList[element.id]) == 'date' && this.deletedList[element.id].getTime) {
                         var dismissTime = this.deletedList[element.id].getTime();
                         var timeDifference = currentTime - dismissTime;
 
-                        //if dismissed more then one minutes ago show it
-                        if(timeDifference > 60000){
-                            list.push(element);
+                        // if dismissed more then one minutes ago show it
+                        if (timeDifference > 60000) {
+                            result.push(element);
                         }
                     }
                 }, this);
 
-                return list;
+                return result;
             },
 
             /**
@@ -92,7 +91,7 @@ define(
 
                             $.post(url, { 'ids': deletingList });
 
-                            deletingList.reduce(function(previousState, currentElement){
+                            deletingList.reduce(function(previousState, currentElement) {
                                 previousState[currentElement] = new Date();
                                 return previousState;
                             }, self.deletedList);
