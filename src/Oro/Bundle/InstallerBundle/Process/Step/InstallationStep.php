@@ -27,7 +27,10 @@ class InstallationStep extends AbstractStep
             case 'localization':
                 return $this->handleAjaxAction('oro:localization:dump');
             case 'assets':
-                return $this->handleAjaxAction('assets:install', array('target' => './'));
+                return $this->handleAjaxAction(
+                    'oro:assets:install',
+                    array('target' => './', '--exclude' => ['OroInstallerBundle'])
+                );
             case 'assetic':
                 return $this->handleAjaxAction('assetic:dump');
             case 'translation':

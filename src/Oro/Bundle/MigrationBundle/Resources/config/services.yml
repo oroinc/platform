@@ -1,11 +1,13 @@
 parameters:
-    oro_migration.db_id_name_generator.class:            Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
-    oro_migration.data_fixtures.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
-    oro_migration.migrations.loader.class:               Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
-    oro_migration.migrations.query_loader.class:         Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator
-    oro_migration.migration.pre_up.listener.class:       Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
-    oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
-    oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
+    oro_migration.db_id_name_generator.class:          Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
+    oro_migration.data_fixtures.loader.class:          Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
+    oro_migration.migrations.loader.class:             Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
+    oro_migration.migrations.query_executor.class:     Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
+    oro_migration.migrations.executor.class:           Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
+    oro_migration.migration.pre_up.listener.class:     Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
+    oro_migration.migrations.extension_manager.class:  Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
+    oro_migration.migration.extension.rename.class:    Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
+    oro_migration.listener.release_data_fixture.class: Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
     oro_migration.migration.extension.index_limit.class: Oro\Bundle\MigrationBundle\Migration\Extension\IndexLimitExtension
 services:
     oro_migration.db_id_name_generator:
@@ -25,10 +27,15 @@ services:
             - @service_container
             - @event_dispatcher
 
-    oro_migration.migrations.query_loader:
-        class: %oro_migration.migrations.query_loader.class%
+    oro_migration.migrations.query_executor:
+        class: %oro_migration.migrations.query_executor.class%
         arguments:
             - @doctrine.dbal.default_connection
+
+    oro_migration.migrations.executor:
+        class: %oro_migration.migrations.executor.class%
+        arguments:
+            - @oro_migration.migrations.query_executor
         calls:
             - [setExtensionManager, [@oro_migration.migrations.extension_manager]]
             - [setNameGenerator, [@oro_migration.db_id_name_generator]]
@@ -37,6 +44,12 @@ services:
         class: %oro_migration.migration.pre_up.listener.class%
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+
+    oro_migration.listener.release_data_fixture:
+        class: %oro_migration.listener.release_data_fixture.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
 
     oro_migration.migrations.extension_manager:
         class: %oro_migration.migrations.extension_manager.class%

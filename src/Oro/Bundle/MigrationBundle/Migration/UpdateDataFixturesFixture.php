@@ -10,14 +10,16 @@ use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 class UpdateDataFixturesFixture extends AbstractFixture
 {
     /**
-     * @var string[]
+     * @var array
+     *  key - class name
+     *  value - current loaded version
      */
     protected $dataFixturesClassNames;
 
     /**
      * Set a list of data fixtures to be updated
      *
-     * @param string[] $classNames
+     * @param array $classNames
      */
     public function setDataFixtures($classNames)
     {
@@ -31,10 +33,20 @@ class UpdateDataFixturesFixture extends AbstractFixture
     {
         if (!empty($this->dataFixturesClassNames)) {
             $loadedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-            foreach ($this->dataFixturesClassNames as $className) {
-                $dataFixture = new DataFixture();
+            foreach ($this->dataFixturesClassNames as $className => $version) {
+                $dataFixture = null;
+                if ($version !== null) {
+                    $dataFixture = $manager
+                        ->getRepository('OroMigrationBundle:DataFixture')
+                        ->findOneBy(['className' => $className]);
+                }
+                if (!$dataFixture) {
+                    $dataFixture = new DataFixture();
+                    $dataFixture->setClassName($className);
+                }
+
                 $dataFixture
-                    ->setClassName($className)
+                    ->setVersion($version)
                     ->setLoadedAt($loadedAt);
                 $manager->persist($dataFixture);
             }

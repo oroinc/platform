@@ -1,0 +1,19 @@
+<script>
+    require(['jquery'], function ($) {
+        $(function () {
+            var options = {
+                dataType: 'script',
+                cache:     true,
+                url:       'http://crm.orocrm.com/bundles/orocrmrequest/js/embed.form.js',
+                timeout:   2000
+            };
+
+            $.ajax(options).done(function() {
+                var options = {
+                    version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION')|json_encode|raw }}
+                };
+                new ORO.EmbedRequestForm(options);
+            });
+        });
+    });
+</script>

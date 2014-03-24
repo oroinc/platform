@@ -1,5 +1,5 @@
 css:
-  'grids':
+  'orodatagrid':
       - 'bundles/orodatagrid/lib/backgrid/backgrid.css'
       - 'bundles/orodatagrid/lib/backgrid/extensions/paginator/backgrid-paginator.css'
       - 'bundles/orodatagrid/css/oro.grid.css'

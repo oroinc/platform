@@ -146,7 +146,7 @@ services:
     oro_user.form.handler.user:
         class:                        %oro_user.form.handler.user.class%
         scope:                        request
-        arguments:                    ["@oro_user.form.user", "@request", "@oro_user.manager"]
+        arguments:                    ["@oro_user.form.user", "@request", "@oro_user.manager", "@templating", %oro_user.email%, "@mailer"]
         tags:
             - { name: oro_tag.tag_manager }
         calls:
@@ -155,7 +155,7 @@ services:
     oro_user.form.handler.user.api:
         class:                        %oro_user.form.handler.user.class%
         scope:                        request
-        arguments:                    ["@oro_user.form.user.api", "@request", "@oro_user.manager"]
+        arguments:                    ["@oro_user.form.user.api", "@request", "@oro_user.manager", "@templating", %oro_user.email%, "@mailer"]
         tags:
             - { name: oro_tag.tag_manager }
 

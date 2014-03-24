@@ -45,8 +45,8 @@ abstract class AbstractDateAction extends AbstractAction
     }
 
     /**
-     * @param string $value
-     * @return string|void
+     * @param mixed $value
+     * @return string
      */
     protected function getClassOrType($value)
     {
