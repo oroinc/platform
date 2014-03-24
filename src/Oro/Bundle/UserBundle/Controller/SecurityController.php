@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -19,6 +20,10 @@ class SecurityController extends Controller
     public function loginAction()
     {
         $request = $this->getRequest();
+        // 302 redirect does not processed by Backbone.sync handler, but 401 error does.
+        if ($request->isXmlHttpRequest()) {
+            return new Response(null, 401);
+        }
         $session = $request->getSession();
 
         // get the error if any (works with forward and redirect -- see below)
