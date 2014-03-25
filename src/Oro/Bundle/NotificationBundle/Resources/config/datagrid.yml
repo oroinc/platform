@@ -117,7 +117,7 @@ datagrid:
 
                 recipientUsersList:
                     type: choice
-                    data_name: recipientUsersList
+                    data_name: recipientUsersList.id
                     options:
                         field_options:
                             multiple: true
@@ -125,7 +125,7 @@ datagrid:
 
                 recipientGroupsList:
                     type: choice
-                    data_name: recipientGroupsList
+                    data_name: recipientGroupsList.id
                     options:
                         field_options:
                             multiple: true
