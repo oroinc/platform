@@ -90,19 +90,25 @@ class SecurityFacade
     }
 
     /**
-     * Get permission for given class and method from the ACL annotation
+     * Get class name and permission for given class and method from the ACL annotation
      *
-     * @param $class
-     * @param $method
-     * @return string
+     * @param string $class
+     * @param string $method
+     * @return array with class name and permission
      */
-    public function getClassMethodAnnotationPermission($class, $method)
+    public function getClassMethodAnnotationData($class, $method)
     {
         $annotation = $this->annotationProvider->findAnnotation($class, $method);
 
+        $result = [];
         if ($annotation) {
-            return $annotation->getPermission();
+            $result = [
+                $annotation->getClass(),
+                $annotation->getPermission()
+            ];
         }
+
+        return $result;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request\ParamConverter;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -25,6 +26,8 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityFacade;
 
+    protected $entityClassResolver;
+
     public function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ManagerRegistry')) {
@@ -34,12 +37,17 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade->expects($this->any())
-            ->method('getClassMethodAnnotationPermission')
-            ->will($this->returnValue('EDIT'));
 
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->converter = new DoctrineParamConverter($this->registry, $this->securityFacade);
+        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->registry  = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->converter = new DoctrineParamConverter(
+            $this->registry,
+            $this->securityFacade,
+            $this->entityClassResolver
+        );
     }
 
     public function createConfiguration($class = null, array $options = null, $name = 'arg', $isOptional = false)
@@ -79,47 +87,58 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider idsProvider
      */
-    public function testApply($isGranted)
+    public function testApply($object, $isGranted, $class, $isCorrectClass)
     {
+        $this->securityFacade->expects($this->any())
+            ->method('getClassMethodAnnotationData')
+            ->will($this->returnValue([$class, 'EDIT']));
+
+        $this->entityClassResolver->expects($this->any())
+            ->method('isEntity')
+            ->will($this->returnValue(true));
+
+        $this->entityClassResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->will($this->returnValue($class));
+
         $request = new Request();
         $request->attributes->set('id', 1);
         $request->attributes->set('_controller', 'Oro\Test::test');
 
-        $config = $this->createConfiguration('stdClass', array('id' => 'id'), 'arg');
+        $config = $this->createConfiguration(get_class($object), array('id' => 'id'), 'arg');
 
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager          = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $objectRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with('stdClass')
             ->will($this->returnValue($manager));
 
         $manager->expects($this->once())
             ->method('getRepository')
-            ->with('stdClass')
             ->will($this->returnValue($objectRepository));
 
         $objectRepository->expects($this->any())
             ->method('find')
-            ->will($this->returnValue($object = new \stdClass));
+            ->will($this->returnValue($object));
 
+        if ($isCorrectClass) {
+            $this->securityFacade->expects($this->once())
+                ->method('isGranted')
+                ->will($this->returnValue($isGranted));
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->will($this->returnValue($isGranted));
-
-        if (!$isGranted) {
-            $this->setExpectedException(
-                'Symfony\Component\Security\Core\Exception\AccessDeniedException',
-                'You do not get EDIT permission for this object'
-            );
+            if (!$isGranted) {
+                $this->setExpectedException(
+                    'Symfony\Component\Security\Core\Exception\AccessDeniedException',
+                    'You do not get EDIT permission for this object'
+                );
+            }
         }
 
         $this->converter->apply($request, $config);
 
-        $this->assertTrue($request->attributes->get('_oro_access_checked'));
+        $this->assertTrue($request->attributes->has('_oro_access_checked'));
 
-        if (!$isGranted) {
+        if (!$isGranted || !$isCorrectClass) {
             $this->assertFalse($request->attributes->get('_oro_access_checked'));
         } else {
             $this->assertTrue($request->attributes->get('_oro_access_checked'));
@@ -129,9 +148,11 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
 
     public function idsProvider()
     {
-        return array(
-            array(true),
-            array(false),
-        );
+        return [
+            [new CmsAddress(), true, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress', true],
+            [new CmsAddress(), false, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress', true],
+            [new CmsAddress(), true, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\wrongClass', false],
+            [new CmsAddress(), false, 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\wrongClass', false],
+        ];
     }
 }

@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Request\ParamConverter;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
+use Doctrine\Common\Util\ClassUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
  * Class DoctrineParamConverter
@@ -23,20 +25,31 @@ class DoctrineParamConverter extends BaseParamConverter
     protected $securityFacade;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param SecurityFacade $securityFacade
+     * @var EntityClassResolver
      */
-    public function __construct(ManagerRegistry $registry = null, SecurityFacade $securityFacade = null)
-    {
+    protected $entityClassResolver;
+
+    /**
+     * @param ManagerRegistry     $registry
+     * @param SecurityFacade      $securityFacade
+     * @param EntityClassResolver $entityClassResolver
+     */
+    public function __construct(
+        ManagerRegistry $registry = null,
+        SecurityFacade $securityFacade = null,
+        EntityClassResolver $entityClassResolver = null
+    ) {
         parent::__construct($registry);
-        $this->securityFacade = $securityFacade;
+        $this->securityFacade      = $securityFacade;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
      * Stores the object in the request.
      *
-     * @param Request $request
+     * @param Request                $request
      * @param ConfigurationInterface $configuration
+     *
      * @return bool
      * @throws AccessDeniedException When User doesn't have permission to the object
      * @throws NotFoundHttpException When object not found
@@ -47,17 +60,23 @@ class DoctrineParamConverter extends BaseParamConverter
         $request->attributes->set('_oro_access_checked', false);
         $isSet = parent::apply($request, $configuration);
 
-        if ($isSet) {
-            $object = $request->attributes->get($configuration->getName());
+        if ($this->securityFacade && $this->entityClassResolver && $isSet) {
+            $object     = $request->attributes->get($configuration->getName());
             $controller = $request->attributes->get('_controller');
             if ($object && strpos($controller, '::') !== false) {
                 $controllerData = explode('::', $controller);
-                $permission = $this->securityFacade->getClassMethodAnnotationPermission(
+                list($class, $permission) = $this->securityFacade->getClassMethodAnnotationData(
                     $controllerData[0],
                     $controllerData[1]
                 );
 
-                if ($permission) {
+                if ($permission
+                    && $class
+                    && $this->entityClassResolver->isEntity($class)
+                    && $this->entityClassResolver->getEntityClass($class) == ClassUtils::getRealClass(
+                        get_class($object)
+                    )
+                ) {
                     if (!$this->securityFacade->isGranted($permission, $object)) {
                         throw new AccessDeniedException(
                             'You do not get ' . $permission . ' permission for this object'
