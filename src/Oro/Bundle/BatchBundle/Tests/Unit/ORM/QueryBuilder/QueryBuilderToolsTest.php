@@ -115,6 +115,10 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                 'someTable.field'
             ),
             array(
+                'table.alias1',
+                'table.alias1'
+            ),
+            array(
                 ' alias1',
                 'someTable.field'
             ),
@@ -129,6 +133,10 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
             array(
                 'alias1 > 123 AND UPPER(alias2)=:alias1 OR eData=alias1',
                 'someTable.field > 123 AND UPPER(someTable.field2)=:alias1 OR e.data=someTable.field'
+            ),
+            array(
+                'table.alias1 > 123 AND UPPER(table.alias2)=:alias1 OR eData=table.alias1',
+                'table.alias1 > 123 AND UPPER(table.alias2)=:alias1 OR e.data=table.alias1'
             )
         );
     }

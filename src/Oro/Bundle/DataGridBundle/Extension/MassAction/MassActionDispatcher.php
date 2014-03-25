@@ -98,6 +98,10 @@ class MassActionDispatcher
         $massAction     = $this->getMassActionByName($actionName, $datagrid);
         $identifier     = $this->getIdentifierField($massAction);
         $qb             = $this->getDatagridQuery($datagrid, $identifier, $inset, $values);
+
+        //prepare query builder
+        $qb->setMaxResults(null);
+
         $resultIterator = $this->getResultIterator($qb);
         $handlerArgs    = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
 

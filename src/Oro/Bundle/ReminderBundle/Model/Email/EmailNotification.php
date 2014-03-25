@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Model\Email;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -16,7 +17,7 @@ use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 class EmailNotification implements EmailNotificationInterface
 {
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
-    const CONFIG_FIELD = 'reminder_template_name';
+    const CONFIG_FIELD    = 'reminder_template_name';
 
     /**
      * @var ObjectManager
@@ -58,26 +59,14 @@ class EmailNotification implements EmailNotificationInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplate($locale = null)
+    public function getTemplate()
     {
         $className    = $this->getReminder()->getRelatedEntityClassName();
         $templateName = $this->configProvider
             ->getConfig($className)
             ->get(self::CONFIG_FIELD, true);
 
-        $template = $this->loadTemplate($className, $templateName);
-
-        if (!is_null($locale)) {
-            foreach ($template->getTranslations() as $translation) {
-                /* @var EmailTemplateTranslation $translation */
-                if ($locale == $translation->getLocale()) {
-                    $template->{'set' . ucfirst($translation->getField())}($translation->getContent());
-                }
-            }
-            $template->setLocale($locale);
-        }
-
-        return $template;
+        return $this->loadTemplate($className, $templateName);
     }
 
     /**
