@@ -4,11 +4,11 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Migration\v1_0\Test1BundleMigration10;
 use Migration\v1_1\Test1BundleMigration11;
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
-use TestPackage\src\WrongTableNameMigration;
-use TestPackage\src\WrongColumnNameMigration;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration;
 
 class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecutor
 {
@@ -31,8 +31,6 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testExecuteUp()
     {
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
         $migrations = [
             new Test1BundleMigration10(),
             new Test1BundleMigration11()
@@ -68,8 +66,6 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testExecuteUpWithDryRun()
     {
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
         $migrations = [
             new Test1BundleMigration10(),
             new Test1BundleMigration11()
@@ -95,15 +91,15 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testWrongTableNameQuery()
     {
-        $this->IncludeFile('WrongTableNameMigration.php');
-        $migrations = [new WrongTableNameMigration()];
+        $migration = new WrongTableNameMigration();
+        $migrations = [$migration];
         $this->setExpectedException(
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max table name length is %s. Please correct "%s" table in "%s" migration',
                 $this->nameGenerator->getMaxIdentifierSize(),
                 'extra_long_table_name_bigger_than_30_chars',
-                'TestPackage\src\WrongTableNameMigration'
+                get_class($migration)
             )
         );
         $this->executor->executeUp($migrations);
@@ -111,8 +107,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testWrongColumnNameQuery()
     {
-        $this->includeFile('WrongColumnNameMigration.php');
-        $migrations = [new WrongColumnNameMigration()];
+        $migration = new WrongColumnNameMigration();
+        $migrations = [$migration];
         $this->setExpectedException(
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
@@ -120,7 +116,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
                 $this->nameGenerator->getMaxIdentifierSize(),
                 'wrong_table',
                 'extra_long_column_bigger_30_chars',
-                'TestPackage\src\WrongColumnNameMigration'
+                get_class($migration)
             )
         );
         $this->executor->executeUp($migrations);
