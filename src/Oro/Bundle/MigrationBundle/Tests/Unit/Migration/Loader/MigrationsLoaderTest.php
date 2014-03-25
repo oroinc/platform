@@ -99,9 +99,9 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function getMigrationsProvider()
     {
-        $test1Bundle = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\Test1Bundle\\Migrations\\Schema';
-        $test2Bundle = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\Test2Bundle\\Migrations\\Schema';
-        $test3Bundle = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\Test3Bundle\\Migrations\\Schema';
+        $testPackage = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\';
+        $test1Bundle = $testPackage . 'Test1Bundle\\Migrations\\Schema';
+        $test2Bundle = $testPackage . 'Test2Bundle\\Migrations\\Schema';
 
         return [
             [
