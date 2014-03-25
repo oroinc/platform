@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
-use Migration\v1_0\Test1BundleMigration10;
-
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendMigrationExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\v1_0\Test1BundleMigration10;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\AbstractTestMigrationExecutor;
 
 class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
@@ -45,9 +44,9 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
             $this->executor
         );
 
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
+        $migration = new Test1BundleMigration10();
         $migrations = [
-            new Test1BundleMigration10()
+            $migration
         ];
 
         $this->connection->expects($this->once())
@@ -58,7 +57,7 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
         $messages = $this->logger->getMessages();
         $this->assertEquals(
             [
-                '> Migration\v1_0\Test1BundleMigration10',
+                '> ' . get_class($migration),
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
             ],
             $messages
