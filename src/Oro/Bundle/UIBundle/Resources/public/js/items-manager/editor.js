@@ -81,6 +81,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
             attrs = this._collectAttrs();
             if (this.model) {
                 this.model.set(attrs);
+                this.options.collection.trigger('add remove sort');
             } else {
                 model = new (this.options.collection.model)(attrs);
                 this.options.collection.add(model);
