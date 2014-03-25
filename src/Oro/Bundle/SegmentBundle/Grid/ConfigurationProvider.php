@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
@@ -19,6 +20,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var DatagridConfiguration */
     private $configuration = null;
 
@@ -27,11 +31,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      *
      * @param FunctionProviderInterface $functionProvider
      * @param ManagerRegistry           $doctrine
+     * @param ConfigManager             $configManager
      */
-    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
-    {
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        ManagerRegistry $doctrine,
+        ConfigManager $configManager
+    ) {
         $this->functionProvider = $functionProvider;
         $this->doctrine         = $doctrine;
+        $this->configManager    = $configManager;
     }
 
     /**
@@ -55,7 +64,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface
                 $gridName,
                 $segment,
                 $this->functionProvider,
-                $this->doctrine
+                $this->doctrine,
+                $this->configManager
             );
 
             $this->configuration = $builder->getConfiguration();

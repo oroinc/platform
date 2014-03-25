@@ -13,15 +13,60 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
     {
         $segment  = $this->getSegment();
         $doctrine = $this->getDoctrine([self::TEST_ENTITY => []], [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()->getMock();
+        $entityMetadata->routeView = 'route';
+
+        $configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($segment->getEntity())
+            ->will($this->returnValue($entityMetadata));
+
         $builder  = new SegmentDatagridConfigurationBuilder(
             self::TEST_GRID_NAME,
             $segment,
             $this->getFunctionProvider(),
-            $doctrine
+            $doctrine,
+            $configManager
         );
 
         $result   = $builder->getConfiguration()->toArray();
-        $expected = [
+        $expected = $this->getExpectedDefinition('route');
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test grid definition when no route exists for entity in config
+     * no grid actions should be added
+     */
+    public function testNoRouteConfiguration()
+    {
+        $segment  = $this->getSegment();
+        $doctrine = $this->getDoctrine([self::TEST_ENTITY => []], [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $builder  = new SegmentDatagridConfigurationBuilder(
+            self::TEST_GRID_NAME,
+            $segment,
+            $this->getFunctionProvider(),
+            $doctrine,
+            $configManager
+        );
+
+        $result   = $builder->getConfiguration()->toArray();
+        $expected = $this->getExpectedDefinition();
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function getExpectedDefinition($route = null)
+    {
+        $definition = [
             'name'    => self::TEST_GRID_NAME,
             'columns' => ['c1' => ['label' => 'User name', 'translatable' => false, 'frontend_type' => 'string']],
             'sorters' => ['columns' => ['c1' => ['data_name' => 'c1']]],
@@ -45,9 +90,33 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'type'         => 'orm',
                 'acl_resource' => 'oro_segment_view',
             ],
-            'options' => ['export' => true]
+            'options' => ['export' => true],
         ];
 
-        $this->assertSame($expected, $result);
+        if (!empty($route)) {
+            $definition = array_merge($definition, [
+                'properties' => [
+                    'id' => null,
+                    'view_link' => [
+                        'type' => 'url',
+                        'route' => 'route',
+                        'params' => ['id']
+                    ]
+                ],
+                'actions'    => [
+                    'view' => [
+                        'type'         => 'navigate',
+                        'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
+                        'label'        => 'View',
+                        'icon'         => 'user',
+                        'link'         => 'view_link',
+                        'rowAction'    => true,
+                    ],
+                ],
+            ]);
+            $definition['source']['query']['select'] = ['t1.userName as c1', 't1.'.self::TEST_IDENTIFIER_NAME];
+        }
+
+        return $definition;
     }
 }

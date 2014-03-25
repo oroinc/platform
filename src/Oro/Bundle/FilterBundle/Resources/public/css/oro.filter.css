@@ -2,7 +2,7 @@
     overflow-x: visible;
 }
 .filter-item {
-    padding-right: 7px;
+    margin-right: 7px;
     margin-bottom: 7px;
     position: relative;
     display: inline-block;
@@ -38,7 +38,6 @@
 }
 
 .filter-box .filter-select {
-    padding-right: 4px;
     height: 29px;
 }
 
@@ -54,7 +53,8 @@
     border: 1px solid #d3d3d3;
     display: none;
     z-index: 700;
-    left: 5px;
+    margin-top: 7px;
+    top: auto;
 }
 .filter-box .filter-item .filter-criteria select,
 .filter-box .filter-item .filter-criteria textarea,

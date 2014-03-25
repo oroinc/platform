@@ -20,6 +20,11 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     protected $localeSettings;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $transListener;
+
+    /**
      * @var string
      */
     protected $defaultLocale;
@@ -29,8 +34,8 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->transListener = $this->getMock('Gedmo\Translatable\TranslatableListener');
 
-        $this->listener = new LocaleListener($this->localeSettings, true);
         $this->defaultLocale = \Locale::getDefault();
     }
 
@@ -53,7 +58,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->setDefaultLocale($this->defaultLocale);
 
         if ($isSetLocale) {
-            $this->localeSettings->expects($this->once())->method('getLanguage')
+            $this->localeSettings->expects($this->exactly(2))->method('getLanguage')
                 ->will($this->returnValue($customLanguage));
             $this->localeSettings->expects($this->once())->method('getLocale')
                 ->will($this->returnValue($customLocale));
@@ -62,7 +67,11 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
             $this->localeSettings->expects($this->never())->method('getLocale');
         }
 
-        $this->listener = new LocaleListener($this->localeSettings, $installed);
+        $this->listener = new LocaleListener(
+            $this->localeSettings,
+            $this->transListener,
+            $installed
+        );
         $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
         if ($isSetLocale) {
@@ -94,6 +103,35 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
                 'isSetLocale' => true,
             ),
         );
+    }
+
+    public function testOnConsoleCommand()
+    {
+        $this->listener = new LocaleListener(
+            $this->localeSettings,
+            $this->transListener,
+            true
+        );
+
+        $event = $this
+            ->getMockBuilder('Symfony\Component\Console\Event\ConsoleCommandEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->localeSettings
+            ->expects($this->once())
+            ->method('getLocale');
+
+
+        $this->localeSettings
+            ->expects($this->once())
+            ->method('getLanguage');
+
+        $this->transListener
+            ->expects($this->once())
+            ->method('setTranslatableLocale');
+
+        $this->listener->onConsoleCommand($event);
     }
 
     /**
