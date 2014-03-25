@@ -102,8 +102,8 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                               - Inactive
-                               - Active
+                                false: Inactive
+                                true:  Active
 
         actions:
             view:

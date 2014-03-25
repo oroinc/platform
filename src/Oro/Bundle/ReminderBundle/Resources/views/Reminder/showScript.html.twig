@@ -1,8 +1,9 @@
-{% if app.user %}
+{% set remindersData = oro_reminder_get_requested_reminders_data() %}
+{% if app.user and remindersData|length %}
     <script type="text/javascript">
         require(['ororeminder/js/subscriber', 'oroui/js/mediator'], function(subscriber, mediator){
-            mediator.once('page-rendered hash_navigation_request:complete', function () {
-                subscriber.showReminders({{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
+            mediator.on('page-rendered hash_navigation_request:complete', function () {
+                subscriber.showReminders({{ remindersData|json_encode|raw }});
             });
         });
     </script>
