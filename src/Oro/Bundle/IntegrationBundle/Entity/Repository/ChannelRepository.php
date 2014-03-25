@@ -65,15 +65,8 @@ class ChannelRepository extends EntityRepository
         $uow = $this->getEntityManager()->getUnitOfWork();
 
         if (!isset($this->loadedInstances[$id])) {
-            $this->loadedInstances[$id] = $this->createQueryBuilder('c')
-                ->select('c')
-                ->where('c.id = :id')
-                ->setParameter('id', $id)
-                ->getQuery()
-                ->getSingleResult();
-        } elseif ($this->loadedInstances[$id]
-            && $uow->getEntityState($this->loadedInstances[$id]) != UnitOfWork::STATE_MANAGED
-        ) {
+            $this->loadedInstances[$id] = $this->findOneBy(['id' => $id]);
+        } else {
             $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
         }
 
