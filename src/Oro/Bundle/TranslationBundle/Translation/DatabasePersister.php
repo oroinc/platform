@@ -52,13 +52,15 @@ class DatabasePersister
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
                     if (strlen($key) <= MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
-                        $writeCount++;
-                        $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
-                        if (0 === $writeCount % $this->batchSize) {
-                            $this->write($this->toWrite);
+                        continue;
+                    }
 
-                            $this->toWrite = [];
-                        }
+                    $writeCount++;
+                    $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
+                    if (0 === $writeCount % $this->batchSize) {
+                        $this->write($this->toWrite);
+
+                        $this->toWrite = [];
                     }
                 }
             }
