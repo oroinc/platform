@@ -18,9 +18,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
         render: function () {
             var view = this;
             var settings = view.model.get('settings') || {};
-            var content = String(settings.content);
-            content = content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/\n/g, "<br/>");
+            var content = _.escape(String(settings.content)).replace(/\r?\n/g, '<br/>');
             view.$el.html(content);
             return view;
         }
