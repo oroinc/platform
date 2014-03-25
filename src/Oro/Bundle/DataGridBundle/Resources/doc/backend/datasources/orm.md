@@ -50,10 +50,15 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial g.{id, label}
+                    - c
                 from:
-                    - { table: OroCRMContactBundle:Group, alias: g }
+                    - { table: %orocrm_contact.entity.class%, alias: c }
+                join:
+                    left:
+                        - { join: c.addresses, alias: address, conditionType: WITH, condition: 'address.primary = true' }
+                        - { join: address.country, alias: country }
+                        - { join: address.region, alias: region }
             hints:
-                - { name: HINT_FORCE_PARTIAL_LOAD, value: true }
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: %oro_translation.translation_walker.class%}
 ```
 
