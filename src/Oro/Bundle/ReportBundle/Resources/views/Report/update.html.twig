@@ -45,8 +45,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'New Report'|trans %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.report.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

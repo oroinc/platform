@@ -169,7 +169,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape('html_attr') }}">{{ title|escape }}</a>
+            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
