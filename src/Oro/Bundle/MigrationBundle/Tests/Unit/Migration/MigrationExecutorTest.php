@@ -33,7 +33,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
     /**
      * @expectedException \Oro\Bundle\MigrationBundle\Exception\InvalidNameException
-     * @expectedExceptionMessage Max index size is 255.
+     * @expectedExceptionMessage Could not create index for column with length more than 255.
      * @dataProvider invalidMigrationsProvider
      */
     public function testIndexesFailed($migrations)
