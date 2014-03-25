@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
 {
@@ -71,5 +71,23 @@ class ChannelRepository extends EntityRepository
         }
 
         return $this->loadedInstances[$id];
+    }
+
+    /**
+     * Adds status to channel, manual persist of newly created statuses
+     *
+     * @param Channel $channel
+     * @param Status  $status
+     */
+    public function addStatus(Channel $channel, Status $status)
+    {
+        if ($this->getEntityManager()->isOpen()) {
+            $channel = $this->getEntityManager()->merge($channel);
+
+            $this->getEntityManager()->persist($status);
+            $channel->addStatus($status);
+
+            $this->getEntityManager()->flush();
+        }
     }
 }

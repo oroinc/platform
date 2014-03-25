@@ -73,7 +73,8 @@ class SyncProcessor
                     ->setMessage($e->getMessage())
                     ->setConnector($connector);
 
-                $this->addChannelStatus($channel, $status);
+                $this->em->getRepository('OroIntegrationBundle:Channel')
+                    ->addStatus($channel, $status);
                 continue;
             }
             $jobName = $realConnector->getImportJobName();
@@ -101,22 +102,6 @@ class SyncProcessor
     public function getLoggerStrategy()
     {
         return $this->logger;
-    }
-
-    /**
-     * @param Channel $channel
-     * @param Status  $status
-     */
-    protected function addChannelStatus(Channel $channel, Status $status)
-    {
-        if ($this->em->isOpen()) {
-            $channel = $this->em->merge($channel);
-
-            $this->em->persist($status);
-            $channel->addStatus($status);
-
-            $this->em->flush();
-        }
     }
 
     /**
@@ -181,6 +166,7 @@ class SyncProcessor
 
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
-        $this->addChannelStatus($channel, $status);
+        $this->em->getRepository('OroIntegrationBundle:Channel')
+            ->addStatus($channel, $status);
     }
 }
