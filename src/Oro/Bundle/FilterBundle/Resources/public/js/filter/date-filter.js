@@ -125,11 +125,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          */
         dateParts: [],
 
+        hasPartsElement: false,
+
         /**
          * @inheritDoc
          */
         initialize: function () {
             _.extend(this.dateWidgetOptions, this.externalWidgetOptions);
+
+            //parts rendered only if theme exist
+            this.hasPartsElement = (this.templateTheme != "");
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -490,11 +495,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @inheritDoc
          */
         _readDOMValue: function () {
-            var part = this._getInputValue(this.criteriaValueSelectors.part);
-
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
-                part: part === undefined ? 'value' : part,
+                //empty default parts value if parts not exist
+                part: this.hasPartsElement ? this._getInputValue(this.criteriaValueSelectors.part) : 'value',
                 value: {
                     start: this._getInputValue(this.criteriaValueSelectors.value.start),
                     end:   this._getInputValue(this.criteriaValueSelectors.value.end)
