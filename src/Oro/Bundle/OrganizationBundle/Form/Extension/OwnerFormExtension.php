@@ -388,14 +388,12 @@ class OwnerFormExtension extends AbstractTypeExtension
             /**
              * If assign permission is granted, showing all available business units
              */
-            $businessUnits = $this->getTreeOptions($this->businessUnitManager->getBusinessUnitsTree());
             $builder->add(
                 $this->fieldName,
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
                         'empty_value' => $this->translator->trans('oro.business_unit.form.choose_business_user'),
-                        'choices' => $businessUnits,
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
@@ -444,7 +442,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         // if assign is granted then only allowed business units can be used
-        $allowedBusinessUnits = array_keys($this->getTreeOptions($this->businessUnitManager->getBusinessUnitsTree()));
+        $allowedBusinessUnits = $this->businessUnitManager->getBusinessUnitIds();
 
         /** @var BusinessUnit $businessUnit */
         foreach ($businessUnits as $businessUnit) {
@@ -517,27 +515,6 @@ class OwnerFormExtension extends AbstractTypeExtension
             $fieldOptions['choices'] = $organizations;
         }
         $builder->add($this->fieldName, 'entity', $fieldOptions);
-    }
-
-    /**
-     * Prepare choice options for a hierarchical select
-     *
-     * @param $options
-     * @param int $level
-     * @return array
-     */
-    protected function getTreeOptions($options, $level = 0)
-    {
-        $choices = array();
-        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
-        foreach ($options as $option) {
-            $choices += array($option['id'] => $blanks . $option['name']);
-            if (isset($option['children'])) {
-                $choices += $this->getTreeOptions($option['children'], $level + 1);
-            }
-        }
-
-        return $choices;
     }
 
     /**
