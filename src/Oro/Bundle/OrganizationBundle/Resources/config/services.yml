@@ -11,7 +11,6 @@ parameters:
     oro_organization.form.type.business_unit_tree_select_type.class:    Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
     oro_organization.form.type.business_unit_tree_type.class:           Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
     oro_organization.form.extension.owner.class:                        Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
-    oro_organization.form.transformer.business_unit_select.class:       Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTransformer
     oro_organization.form.listener.class:                               Oro\Bundle\OrganizationBundle\Event\FormListener
     oro_organization.twig.get_owner.class:                              Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension
     oro_organization.listener.config_subscriber.class:                  Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
@@ -111,10 +110,6 @@ services:
             - @oro_security.ownership_tree_provider
         tags:
             - { name: form.type_extension, alias: form }
-
-    oro_organization.form.transformer.business_unit_select:
-        class: %oro_organization.form.transformer.business_unit_select.class%
-        arguments: [@oro_organization.business_unit_manager]
 
     oro_organization.form.listener:
         class: %oro_organization.form.listener.class%

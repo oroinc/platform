@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -36,17 +35,6 @@ class BusinessUnitManager
     public function getBusinessUnitsTree(User $entity = null)
     {
         return $this->getBusinessUnitRepo()->getBusinessUnitsTree($entity);
-    }
-
-    /**
-     * Get Business Units list with formatted labels
-     *
-     * @param User $entity
-     * @return array
-     */
-    public function getFormattedBusinessUnitsTree(User $entity = null)
-    {
-        return $this->getTreeOptions($this->getBusinessUnitsTree($entity));
     }
 
     /**

@@ -31,7 +31,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
     {
         if (null === $value) {
             return null;
-        } elseif (is_array($value) || (is_object($value) && $value instanceof Collection)) {
+        } elseif (is_array($value)) {
             return $this->manager->getBusinessUnitRepo()->findBy(['id' => $value]);
         }
 
