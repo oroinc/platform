@@ -29,8 +29,8 @@ class UserType extends AbstractType
     protected $isMyProfilePage;
 
     /**
-     * @param SecurityContextInterface $security        Security context
-     * @param Request $request         Request
+     * @param SecurityContextInterface $security Security context
+     * @param Request                  $request  Request
      */
     public function __construct(
         SecurityContextInterface $security,
@@ -67,43 +67,53 @@ class UserType extends AbstractType
                 'entity',
                 array(
                     'property_path' => 'rolesCollection',
-                    'label' => 'oro.user.roles.label',
-                    'class' => 'OroUserBundle:Role',
-                    'property' => 'label',
+                    'label'         => 'oro.user.roles.label',
+                    'class'         => 'OroUserBundle:Role',
+                    'property'      => 'label',
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
                             ->setParameter('anon', User::ROLE_ANONYMOUS);
                     },
-                    'multiple' => true,
-                    'expanded' => true,
-                    'required' => !$this->isMyProfilePage,
-                    'read_only' => $this->isMyProfilePage,
-                    'disabled' => $this->isMyProfilePage,
+                    'multiple'      => true,
+                    'expanded'      => true,
+                    'required'      => !$this->isMyProfilePage,
+                    'read_only'     => $this->isMyProfilePage,
+                    'disabled'      => $this->isMyProfilePage,
                 )
             )
             ->add(
                 'groups',
                 'entity',
                 array(
-                    'label' => 'oro.user.groups.label',
-                    'class' => 'OroUserBundle:Group',
-                    'property' => 'name',
+                    'label'     => 'oro.user.groups.label',
+                    'class'     => 'OroUserBundle:Group',
+                    'property'  => 'name',
+                    'multiple'  => true,
+                    'expanded'  => true,
+                    'required'  => false,
+                    'read_only' => $this->isMyProfilePage,
+                    'disabled'  => $this->isMyProfilePage
+                )
+            )
+            ->add(
+                'businessUnits',
+                'oro_business_unit_tree',
+                array(
                     'multiple' => true,
                     'expanded' => true,
                     'required' => false,
-                    'read_only' => $this->isMyProfilePage,
-                    'disabled' => $this->isMyProfilePage
+                    'label'    => 'oro.user.business_units.label'
                 )
             )
             ->add(
                 'plainPassword',
                 'repeated',
                 array(
-                    'label' => 'oro.user.password.label',
-                    'type' => 'password',
-                    'required' => true,
-                    'first_options' => array('label' => 'Password'),
+                    'label'          => 'oro.user.password.label',
+                    'type'           => 'password',
+                    'required'       => true,
+                    'first_options'  => array('label' => 'Password'),
                     'second_options' => array('label' => 'Re-enter password'),
                 )
             )
@@ -111,13 +121,13 @@ class UserType extends AbstractType
                 'emails',
                 'collection',
                 array(
-                    'type' => 'oro_user_email',
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'by_reference' => false,
-                    'prototype' => true,
+                    'type'           => 'oro_user_email',
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
+                    'by_reference'   => false,
+                    'prototype'      => true,
                     'prototype_name' => 'tag__name__',
-                    'label' => ' '
+                    'label'          => ' '
                 )
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
@@ -134,9 +144,9 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\Bundle\UserBundle\Entity\User',
-                'intention' => 'user',
-                'validation_groups' => function ($form) {
+                'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
+                'intention'            => 'user',
+                'validation_groups'    => function ($form) {
                     if ($form instanceof FormInterface) {
                         $user = $form->getData();
                     } elseif ($form instanceof FormView) {
@@ -150,7 +160,7 @@ class UserType extends AbstractType
                         : array('Registration', 'Roles', 'Default');
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation' => true
+                'cascade_validation'   => true
             )
         );
     }
@@ -179,7 +189,7 @@ class UserType extends AbstractType
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false ]);
+            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false]);
     }
 
     /**
@@ -193,11 +203,11 @@ class UserType extends AbstractType
             'inviteUser',
             'checkbox',
             [
-                'label' => 'oro.user.invite.label',
-                'mapped' => false,
+                'label'    => 'oro.user.invite.label',
+                'mapped'   => false,
                 'required' => false,
-                'tooltip' => 'oro.user.invite.tooltip',
-                'data' => true
+                'tooltip'  => 'oro.user.invite.tooltip',
+                'data'     => true
             ]
         );
     }

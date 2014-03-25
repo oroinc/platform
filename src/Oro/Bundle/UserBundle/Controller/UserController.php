@@ -162,7 +162,6 @@ class UserController extends Controller
         return array(
             'entity'        => $entity,
             'form'          => $this->get('oro_user.form.user')->createView(),
-            'businessUnits' => $this->getBusinessUnitManager()->getBusinessUnitsTree($entity),
             'editRoute'     => $updateRoute,
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before
