@@ -253,6 +253,8 @@
             {%- endif -%}
             {%- if is_translated_label is defined and is_translated_label -%}
                 {{ label }}
+            {%- elseif raw_label is defined and raw_label -%}
+                {{ label|raw }}
             {%- else -%}
                 {{ label|trans({}, translation_domain)|capitalize }}
             {%- endif -%}

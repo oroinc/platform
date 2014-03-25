@@ -4,4 +4,6 @@ module: "orosidebar/widget/hello-world"
 placement: "both"
 cssClass: 'sidebar-widget-hello-world'
 settings:
-    content: 'Welcome to OroCRM!<br/>OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at <a href="http://orocrm.com">orocrm.com</a>'
+    content: |+
+        Welcome to OroCRM!
+        OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at www.orocrm.com

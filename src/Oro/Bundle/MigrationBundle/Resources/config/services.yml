@@ -8,7 +8,6 @@ parameters:
     oro_migration.migrations.extension_manager.class:  Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
     oro_migration.migration.extension.rename.class:    Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
     oro_migration.listener.release_data_fixture.class: Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
-
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
