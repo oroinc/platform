@@ -7,7 +7,6 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 
 class ReminderExtension extends \Twig_Extension
@@ -62,10 +61,8 @@ class ReminderExtension extends \Twig_Extension
      */
     public function getRequestedRemindersData()
     {
-        /**
-         * @var User|null
-         */
-        $user = $this->securityContext->getToken()->getUser();
+        /** @var User|null */
+        $user = $this->securityContext->getToken() ? $this->securityContext->getToken()->getUser() : null;
 
         if (is_object($user) && $user instanceof User) {
             $reminders = $this->entityManager

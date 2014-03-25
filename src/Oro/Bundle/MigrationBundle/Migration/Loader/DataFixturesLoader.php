@@ -86,7 +86,7 @@ class DataFixturesLoader extends ContainerAwareLoader
                 ->findAll();
             /** @var DataFixture $fixture */
             foreach ($loadedFixtures as $fixture) {
-                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getVersion() ? : '';
+                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getVersion() ? : '0.0';
             }
         }
 
