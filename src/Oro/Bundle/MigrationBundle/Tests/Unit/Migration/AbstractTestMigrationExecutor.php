@@ -48,16 +48,6 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $filePath
-     */
-    protected function includeFile($filePath)
-    {
-        $fileName = __DIR__ . '/../Fixture/src/TestPackage/src/' . $filePath;
-        $this->assertFileExists($fileName);
-        include_once $fileName;
-    }
-
-    /**
      * @return array
      */
     protected function getTables()

@@ -6,10 +6,11 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
-use TestPackage\src\IndexMigration;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\IndexMigration;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class MigrationExecutorTest extends AbstractTestMigrationExecutor
 {
@@ -26,8 +27,6 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
     public function testIndexesSuccessful()
     {
-        $this->includeFile('IndexMigration.php');
-
         $migrations = [
             new IndexMigration(),
         ];
@@ -44,8 +43,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     {
         $migrationsToExecute = [];
         foreach ($migrations as $migration) {
-            $this->includeFile($migration . '.php');
-            $migrationClass = 'TestPackage\\src\\' . $migration;
+            $migrationClass = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\' . $migration;
             $migrationsToExecute[] = new $migrationClass();
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace TestPackage\src;
+namespace Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
