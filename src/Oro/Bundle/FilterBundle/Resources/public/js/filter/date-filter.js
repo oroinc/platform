@@ -490,9 +490,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @inheritDoc
          */
         _readDOMValue: function () {
+            var part = this._getInputValue(this.criteriaValueSelectors.part);
+
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
-                part: this._getInputValue(this.criteriaValueSelectors.part),
+                part: part === undefined ? 'value' : part,
                 value: {
                     start: this._getInputValue(this.criteriaValueSelectors.value.start),
                     end:   this._getInputValue(this.criteriaValueSelectors.value.end)
