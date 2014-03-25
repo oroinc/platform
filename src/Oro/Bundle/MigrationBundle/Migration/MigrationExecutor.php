@@ -241,10 +241,11 @@ class MigrationExecutor
             if ($table->getColumn($columnName)->getLength() > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
                 throw new InvalidNameException(
                     sprintf(
-                        'Max index size is %s. Please correct "%s:%s" column size in "%s" migration',
+                        'Could not create index for column with length more than %s. ' .
+                        'Please correct "%s" column length "%s" in table in "%s" migration',
                         MySqlPlatform::LENGTH_LIMIT_TINYTEXT,
-                        $table->getName(),
                         $columnName,
+                        $table->getName(),
                         get_class($migration)
                     )
                 );
