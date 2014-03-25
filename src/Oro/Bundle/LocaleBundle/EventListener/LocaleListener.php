@@ -87,7 +87,9 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        if ($this->isInstalled) {
+        $isForced = $event->getInput()->hasParameterOption('--force');
+
+        if (!$isForced && $this->isInstalled) {
             $this->setPhpDefaultLocale(
                 $this->localeSettings->getLocale()
             );
