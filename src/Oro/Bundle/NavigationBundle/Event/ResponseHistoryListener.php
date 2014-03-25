@@ -51,7 +51,7 @@ class ResponseHistoryListener
     }
 
     /**
-     * Process onReslonse event, updates user history information
+     * Process onResponse event, updates user history information
      *
      * @param  FilterResponseEvent $event
      * @return bool|void

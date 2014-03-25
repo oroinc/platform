@@ -4,8 +4,7 @@
            class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
-            <span class="reset-filter"
-                title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
                 ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
             <span class="caret"></span>
         </a>
@@ -93,28 +92,33 @@
     </div>
 </script>
 <script type="text/template" id="select-filter-template">
-    <div class="btn-group filter-item oro-drop">
-        <div class="btn filter-select filter-criteria-selector">
+    <div class="filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <select>
                 <% _.each(options, function (option) { %>
-                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>>
+                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>
+                    title="<%- option.label %>">
                     <%- option.label %>
                 </option>
                 <% }); %>
             </select>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
         </div>
-        <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
     </div>
 </script>
 <script type="text/template" id="multiselect-filter-template">
-    <div class="btn-group filter-item oro-drop">
-        <div class="btn filter-select filter-criteria-selector">
+    <div class="filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
             <select multiple>
-                <% _.each(options, function (option) { %><option value="<%= option.value %>"><%- option.label %></option><% }); %>
-                </select>
-            </div>
-        <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+                <% _.each(options, function (option) { %><option value="<%= option.value %>" title="<%- option.label %>">
+                    <%- option.label %>
+                </option><% }); %>
+            </select>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+        </div>
     </div>
 </script>

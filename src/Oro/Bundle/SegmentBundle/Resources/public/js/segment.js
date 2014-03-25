@@ -243,7 +243,9 @@ define(function (require) {
         if (isGrouping) {
             initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
         }
-        initColumn(options.column, options.metadata, fieldChoiceOptions);
+
+        var gridFieldChoiceOptions = _.extend(_.clone(fieldChoiceOptions), options.gridFieldChoiceOptions);
+        initColumn(options.column, options.metadata, gridFieldChoiceOptions);
         configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
         $(options.entityChoice)
