@@ -3,9 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use OroCRM\Bundle\ContactBundle\Migrations\Schema\v1_0\OroCRMContactBundle;
 
 class OroTranslationBundleInstaller implements Installation
 {
