@@ -20,7 +20,10 @@ class BusinessUnitTreeSelectType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'configs' => array(),
+                'configs' => array(
+                    'is_translated_option' => false,
+                    'is_safe'              => false,
+                ),
                 'business_unit_ids' => array(),
             )
         );
