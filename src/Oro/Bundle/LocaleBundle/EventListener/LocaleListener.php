@@ -10,7 +10,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleListener implements EventSubscriberInterface
