@@ -122,6 +122,7 @@ services:
         class: %oro_locale.locale_listener.class%
         arguments:
             - @oro_locale.settings
+            - @stof_doctrine_extensions.listener.translatable
             - %installed%
         calls:
             - [ setRequest, [@?request=] ]
