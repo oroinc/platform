@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Guzzle\Http\Url;
+
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -83,18 +85,25 @@ abstract class SOAPTransport implements TransportInterface
     }
 
     /**
-     * @param string $wsdl_url
+     * @param string $wsdlUrl
      * @param bool   $isDebug
      *
      * @return \SoapClient
      */
-    protected function getSoapClient($wsdl_url, $isDebug = false)
+    protected function getSoapClient($wsdlUrl, $isDebug = false)
     {
         $options = [];
         if ($isDebug) {
             $options['trace'] = true;
         }
+        $urlParts = parse_url($wsdlUrl);
+        if (isset($urlParts['user'], $urlParts['pass'])) {
+            $options['login']    = $urlParts['user'];
+            $options['password'] = $urlParts['pass'];
+            unset($urlParts['user'], $urlParts['pass']);
+        }
+        $wsdlUrl = Url::buildUrl($urlParts);
 
-        return new \SoapClient($wsdl_url, $options);
+        return new \SoapClient($wsdlUrl, $options);
     }
 }
