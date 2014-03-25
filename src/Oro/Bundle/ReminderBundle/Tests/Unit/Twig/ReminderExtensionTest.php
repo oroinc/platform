@@ -48,7 +48,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->getMockForAbstractClass();
         $token->expects($this->once())->method('getUser')->will($this->returnValue(null));
-        $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
+        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
         $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals(array(), $actual);
@@ -59,7 +59,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->getMockForAbstractClass();
         $token->expects($this->once())->method('getUser')->will($this->returnValue(new \stdClass()));
-        $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
+        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
         $actual = $this->target->getRequestedRemindersData();
         $this->assertEquals(array(), $actual);
@@ -94,7 +94,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($reminders));
         $this->entityManager->expects($this->once())
             ->method('getRepository')->will($this->returnValue($repository));
-        $this->securityContext->expects($this->once())->method('getToken')->will($this->returnValue($token));
+        $this->securityContext->expects($this->atLeastOnce())->method('getToken')->will($this->returnValue($token));
 
         $this->paramsProvider->expects($this->once())
             ->method('getMessageParamsForReminders')
