@@ -98,7 +98,7 @@ define(function (require) {
         $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, metadata.grouping, {select2: {}}));
 
         collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
-        collection.on('add remove sort', function () {
+        collection.on('add remove sort change', function () {
             save(collection.toJSON(), 'grouping_columns');
         });
 
