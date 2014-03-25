@@ -4,14 +4,14 @@
   .desktop-version &{
     .forScreen (@size; @_; @value);
   }
-  .desktop-version .sidebar-on &{
+  .desktop-version .sidebar-left-minimized.sidebar-right-minimized &{
     .forScreen (@size + @sideBarClosedWidth * 2; @_; @value);
   }
-  .desktop-version .sidebar-on.left-sidebar-open &,
-  .desktop-version .sidebar-on.right-sidebar-open &{
+  .desktop-version .sidebar-left-minimized.sidebar-right-maximized &,
+  .desktop-version .sidebar-left-maximized.sidebar-right-minimized &{
       .forScreen (@size + @sideBarClosedWidth + @sideBarOpenedWidth; @_; @value);
   }
-  .desktop-version .sidebar-on.left-sidebar-open.right-sidebar-open &{
+  .desktop-version .sidebar-left-maximized.sidebar-right-maximized &{
     .forScreen (@size + @sideBarOpenedWidth * 2; @_; @value);
   }
 }

@@ -1,3 +1,16 @@
+#main.sidebar-left-minimized {
+    margin-left: 33px;
+}
+#main.sidebar-right-minimized {
+    margin-right: 33px;
+}
+#main.sidebar-left-maximized {
+    margin-left: 200px;
+}
+#main.sidebar-right-maximized {
+    margin-right: 200px;
+}
+
 .sidebar {
     background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
     top: 66px;
