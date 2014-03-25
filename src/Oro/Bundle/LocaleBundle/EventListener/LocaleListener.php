@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleListener implements EventSubscriberInterface
@@ -87,7 +88,9 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        if ($this->isInstalled) {
+        $isForced = $event->getInput()->hasParameterOption('--force');
+
+        if (!$isForced && $this->isInstalled) {
             $this->setPhpDefaultLocale(
                 $this->localeSettings->getLocale()
             );
