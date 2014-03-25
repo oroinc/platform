@@ -118,10 +118,24 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $input = $this
+            ->getMockBuilder('Symfony\Component\Console\Input\InputInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event
+            ->expects($this->once())
+            ->method('getInput')
+            ->will($this->returnValue($input));
+
+        $input
+            ->expects($this->once())
+            ->method('hasParameterOption')
+            ->will($this->returnValue(false));
+
         $this->localeSettings
             ->expects($this->once())
             ->method('getLocale');
-
 
         $this->localeSettings
             ->expects($this->once())
