@@ -16,14 +16,9 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     /** @var MigrationExecutor */
     protected $executor;
 
-    /** @var DbIdentifierNameGenerator */
-    protected $nameGenerator;
-
-    public function setUp($tables = [])
+    protected function setUp()
     {
-        parent::setUp($this->getTables());
-
-        $this->nameGenerator = new DbIdentifierNameGenerator();
+        parent::setUp();
 
         $this->executor = new MigrationExecutor($this->queryExecutor);
         $this->executor->setLogger($this->logger);
@@ -31,7 +26,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
     public function testIndexesSuccessful()
     {
-        $this->IncludeFile('IndexMigration.php');
+        $this->includeFile('IndexMigration.php');
 
         $migrations = [
             new IndexMigration(),
@@ -49,7 +44,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     {
         $migrationsToExecute = [];
         foreach ($migrations as $migration) {
-            $this->IncludeFile($migration . '.php');
+            $this->includeFile($migration . '.php');
             $migrationClass = 'TestPackage\\src\\' . $migration;
             $migrationsToExecute[] = new $migrationClass();
         }

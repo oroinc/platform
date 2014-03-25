@@ -18,9 +18,9 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
     /** @var DbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp($tables = [])
+    public function setUp()
     {
-        parent::setUp($tables);
+        parent::setUp();
 
         $this->nameGenerator = new DbIdentifierNameGenerator();
 
@@ -31,8 +31,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testExecuteUp()
     {
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
+        $this->includeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
+        $this->includeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
         $migrations = [
             new Test1BundleMigration10(),
             new Test1BundleMigration11()
@@ -68,8 +68,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testExecuteUpWithDryRun()
     {
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
-        $this->IncludeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
+        $this->includeFile('Test1Bundle/Migrations/Schema/v1_0/Test1BundleMigration10.php');
+        $this->includeFile('Test1Bundle/Migrations/Schema/v1_1/Test1BundleMigration11.php');
         $migrations = [
             new Test1BundleMigration10(),
             new Test1BundleMigration11()
@@ -95,7 +95,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
     public function testWrongTableNameQuery()
     {
-        $this->IncludeFile('WrongTableNameMigration.php');
+        $this->includeFile('WrongTableNameMigration.php');
         $migrations = [new WrongTableNameMigration()];
         $this->setExpectedException(
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
