@@ -59,9 +59,9 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', '../../pageable-collecti
                 direction = null;
                 columnName = this.column.get('name');
                 if (this.column.get('sortable') && _.has(state.sorters, columnName)) {
-                    if (1 === state.sorters[columnName]) {
+                    if (1 === parseInt(state.sorters[columnName])) {
                         direction = 'descending';
-                    } else if (-1 === state.sorters[columnName]) {
+                    } else if (-1 === parseInt(state.sorters[columnName])) {
                         direction = 'ascending';
                     }
                 }
