@@ -2,10 +2,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId
-    ? 'oro.user.role.edit_entity'|trans
-    : 'oro.user.role.new_entity'|trans
-%}
 {% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
 {% set gridName = 'role-users-grid' %}
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
@@ -50,7 +46,7 @@
         %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.user.role.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

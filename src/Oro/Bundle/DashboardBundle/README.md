@@ -1,7 +1,10 @@
-Oro Dashboard Bundle
-====================
+OroDashboardBundle
+==================
 
-This bundle allows you to manage dashboards for your application created using ORO Platform. You can have any number of dashboards in you application. The dashboard is a page is displayed as a first page of your application and contains a set of blocks (named as `widgets`) contain important or useful information for your customers.
+This bundle allows you to manage dashboards for your application created using ORO Platform. You can have any number
+of dashboards in you application. The dashboard is a page and contains a set of blocks (named as `widgets`) with
+important or useful information for your customers.
+
 Currently the following widgets are available:
 
  - Grid

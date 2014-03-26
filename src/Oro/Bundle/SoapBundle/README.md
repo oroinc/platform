@@ -1,7 +1,7 @@
-SoapBundle
-==========
+OroSoapBundle
+=============
 
-Bundle add support for multiply SOAP controller classes work from one WSDL file.
+Bundle adds support of SOAP controller classes and builds a single WSDL file for SOAP API definition.
 
 Configuration in app/config/config.yml file:
 

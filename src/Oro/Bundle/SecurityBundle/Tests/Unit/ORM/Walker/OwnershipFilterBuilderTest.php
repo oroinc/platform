@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
@@ -235,7 +236,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('org3', 'org4')
+                    array('org3', 'org4'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -247,7 +249,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu31', 'bu3a', 'bu3a1', 'bu4', 'bu41', 'bu411')
+                    array('bu3', 'bu31', 'bu3a', 'bu3a1', 'bu4', 'bu41', 'bu411'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -259,7 +262,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user31', 'user4', 'user41', 'user411')
+                    array('user3', 'user31', 'user4', 'user41', 'user411'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -271,7 +275,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('org3', 'org4')
+                    array('org3', 'org4'),
+                    PathExpression::TYPE_STATE_FIELD
                 )
             ),
             array('user4', true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -285,7 +290,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411')
+                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -297,7 +303,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user4', 'user31', 'user41', 'user411')
+                    array('user3', 'user4', 'user31', 'user41', 'user411'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -309,7 +316,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411')
+                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
+                    PathExpression::TYPE_STATE_FIELD
                 )
             ),
             array('user4', true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -323,7 +331,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu4')
+                    array('bu3', 'bu4'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -335,7 +344,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user4')
+                    array('user3', 'user4'),
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -347,7 +357,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('bu3', 'bu4')
+                    array('bu3', 'bu4'),
+                    PathExpression::TYPE_STATE_FIELD
                 )
             ),
             array('user4', true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -362,7 +373,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    'user4'
+                    'user4',
+                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
             array(
@@ -374,7 +386,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    'user4'
+                    'user4',
+                    PathExpression::TYPE_STATE_FIELD
                 )
             )
         );

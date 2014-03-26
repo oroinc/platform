@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class SecurityFacade
 {
@@ -90,19 +91,15 @@ class SecurityFacade
     }
 
     /**
-     * Get permission for given class and method from the ACL annotation
+     * Gets ACL annotation is bound to the given class/method
      *
-     * @param $class
-     * @param $method
-     * @return string
+     * @param string $class
+     * @param string $method
+     * @return Acl|null
      */
-    public function getClassMethodAnnotationPermission($class, $method)
+    public function getClassMethodAnnotation($class, $method)
     {
-        $annotation = $this->annotationProvider->findAnnotation($class, $method);
-
-        if ($annotation) {
-            return $annotation->getPermission();
-        }
+        return $this->annotationProvider->findAnnotation($class, $method);
     }
 
     /**

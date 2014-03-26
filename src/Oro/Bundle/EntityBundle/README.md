@@ -1,5 +1,7 @@
 OroEntityBundle
-========================
+===============
+
+Entity and entity field selectors, extended functionality of Doctrine entity manager.
 
 - [Form Components Overview](./Resources/doc/form_components.md)
 
