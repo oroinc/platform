@@ -115,6 +115,7 @@ oro:
             steps_display_ordered.label:  Display steps ordered
             active.label:                 Active
             clone_label_prefix:           'Copy of '
+            new_entity:                   New Workflow
 
             datagrid:
                 update: Update

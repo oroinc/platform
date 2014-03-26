@@ -32,19 +32,9 @@ class EmailNotificationAdapter implements EmailNotificationInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplate($locale = null)
+    public function getTemplate()
     {
-        $template = $this->template;
-        if (!is_null($locale)) {
-            foreach ($template->getTranslations() as $translation) {
-                if ($locale == $translation->getLocale()) {
-                    $template->{'set' . ucfirst($translation->getField())}($translation->getContent());
-                }
-            }
-            $template->setLocale($locale);
-        }
-
-        return $template;
+        return $this->template;
     }
 
     /**

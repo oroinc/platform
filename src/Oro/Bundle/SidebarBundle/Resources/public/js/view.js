@@ -23,6 +23,10 @@ define(function (require) {
 
     var WIDGET_SORT_DELAY = 100;
 
+    function stateToClass(position, state) {
+        return position.toLowerCase().replace('_', '-') + '-' + state.slice(8).toLowerCase();
+    }
+
     /**
      * @export  orosidebar/js/view
      * @class   orosidebar.View
@@ -50,8 +54,6 @@ define(function (require) {
             view.iconViews = {};
             view.hoverViews = {};
             view.widgetViews = {};
-
-            view.padding = model.get('position') === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
 
             view.listenTo(model, 'change', view.render);
 
@@ -84,18 +86,16 @@ define(function (require) {
         render: function () {
             var view = this;
             var model = view.model;
+            var $main = view.options.$main;
+            var maximized = model.get('state') === constants.SIDEBAR_MAXIMIZED;
+            var minimized = model.get('state') === constants.SIDEBAR_MINIMIZED;
 
             view.$el.html(view.template(model.toJSON()));
+            view.$el.toggleClass('sidebar-maximized', maximized);
+            $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MAXIMIZED), maximized);
+            $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MINIMIZED), minimized);
 
-            if (model.get('state') === constants.SIDEBAR_MAXIMIZED) {
-                view.$el.addClass('sidebar-maximized');
-            } else {
-                view.$el.removeClass('sidebar-maximized');
-            }
-
-            view.options.$main.css(view.padding, view.$el.width() + 'px');
-
-            if (model.get('state') === constants.SIDEBAR_MINIMIZED) {
+            if (minimized) {
                 view.renderIcons();
             } else {
                 view.renderWidgets();

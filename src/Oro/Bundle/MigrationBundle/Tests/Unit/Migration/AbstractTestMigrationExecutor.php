@@ -17,7 +17,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
     /** @var MigrationQueryExecutor */
     protected $queryExecutor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -30,11 +30,11 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $sm->expects($this->once())
             ->method('listTables')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue($this->getTables()));
         $sm->expects($this->once())
             ->method('createSchemaConfig')
             ->will($this->returnValue(null));
-        $this->connection->expects($this->once())
+        $this->connection->expects($this->atLeastOnce())
             ->method('getSchemaManager')
             ->will($this->returnValue($sm));
         $this->connection->expects($this->once())
@@ -48,12 +48,10 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $filePath
+     * @return array
      */
-    protected function includeFile($filePath)
+    protected function getTables()
     {
-        $fileName = __DIR__ . '/../Fixture/src/TestPackage/src/' . $filePath;
-        $this->assertFileExists($fileName);
-        include_once $fileName;
+        return [];
     }
 }

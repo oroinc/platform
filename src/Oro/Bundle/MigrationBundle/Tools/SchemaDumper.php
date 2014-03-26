@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Tools;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
 
@@ -21,9 +20,12 @@ class SchemaDumper extends AbstractVisitor
     protected $twig;
 
     /**
-     * @var SchemaDumperTwigExtension
+     * @param \Twig_Environment $twig
      */
-    protected $twigExtension;
+    public function __construct(\Twig_Environment $twig)
+    {
+        $this->twig = $twig;
+    }
 
     /**
      * {@inheritdoc}
@@ -33,20 +35,9 @@ class SchemaDumper extends AbstractVisitor
         $this->schema = $schema;
     }
 
-    public function setTwig(\Twig_Environment $twig)
-    {
-        $this->twig = $twig;
-
-        $this->ensureTwigExtensionCreated();
-        $this->twig->addExtension($this->twigExtension);
-    }
-
-    public function setPlatform(AbstractPlatform $platform)
-    {
-        $this->ensureTwigExtensionCreated();
-        $this->twigExtension->setPlatform($platform);
-    }
-
+    /**
+     * @return string
+     */
     public function dump()
     {
         $content = $this->twig->render(
@@ -57,12 +48,5 @@ class SchemaDumper extends AbstractVisitor
         );
 
         return $content;
-    }
-
-    protected function ensureTwigExtensionCreated()
-    {
-        if (!$this->twigExtension) {
-            $this->twigExtension = new SchemaDumperTwigExtension();
-        }
     }
 }

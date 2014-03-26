@@ -35,7 +35,6 @@ parameters:
 
     oro_notification.event_listener.email_notification_service.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
 
-    oro_notification.locale_listener.class: Oro\Bundle\NotificationBundle\EventListener\LocaleListener
     oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
 
 services:
@@ -136,7 +135,6 @@ services:
             - @oro_notification.entity_spool
             - @oro_email.email_renderer
             - @swiftmailer.mailer.db_spool_mailer
-            - @oro_locale.settings
             - %oro_notification.send_from%
         calls:
             - [ setEnv, ['prod'] ]
@@ -181,16 +179,6 @@ services:
         class: %oro_notification.event_listener.email_notification_service.class%
         arguments:
             - @doctrine.orm.entity_manager
-
-    oro_notification.locale_listener:
-        class: %oro_notification.locale_listener.class%
-        arguments:
-            - @stof_doctrine_extensions.listener.translatable
-            - %installed%
-        calls:
-            - [ setRequest, [@?request=] ]
-        tags:
-            - { name: kernel.event_subscriber }
 
     oro_notification.email_notification_entity_provider:
         class: %oro_notification.email_notification_entity_provider.class%

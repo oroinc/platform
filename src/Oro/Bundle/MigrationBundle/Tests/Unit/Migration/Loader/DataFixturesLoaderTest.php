@@ -4,9 +4,9 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Loader;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
-use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test1Bundle\TestPackageTest1Bundle;
-use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test2Bundle\TestPackageTest2Bundle;
-use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test3Bundle\TestPackageTest3Bundle;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test3Bundle\TestPackageTest3Bundle;
 
 class DataFixturesLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -92,9 +92,9 @@ class DataFixturesLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function getFixturesProvider()
     {
-        $test1BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test1Bundle';
-        $test2BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test2Bundle';
-        $test3BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\src\TestPackage\src\Test3Bundle';
+        $test1BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle';
+        $test2BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle';
+        $test3BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test3Bundle';
 
         return [
             [

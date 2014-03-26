@@ -3,10 +3,6 @@
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
-{% set title = entity.name
-    ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
-    : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
-%}
 {# API REST route for POST used both for create and update #}
 {% if entity.name %}
     {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
@@ -52,7 +48,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.workflow.workflowdefinition.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

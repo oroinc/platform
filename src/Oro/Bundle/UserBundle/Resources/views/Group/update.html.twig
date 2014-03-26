@@ -2,9 +2,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId
-    ? 'oro.user.group.edit_entity'|trans
-    : 'oro.user.group.new_entity'|trans %}
 {% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}
@@ -39,7 +36,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.user.group.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 
