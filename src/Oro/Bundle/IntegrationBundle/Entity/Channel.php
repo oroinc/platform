@@ -67,8 +67,10 @@ class Channel
 
     /**
      * @var Status[]|ArrayCollection
+     *
+     * Cascade persisting is not used due to lots of detach/merge
      * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Status",
-     *     cascade={"all"}, orphanRemoval=true, mappedBy="channel"
+     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel"
      * )
      * @ORM\OrderBy({"date" = "DESC"})
      */

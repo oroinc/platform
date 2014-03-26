@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
  * @ORM\Table(name="oro_translation", indexes={
- *      @ORM\Index(name="MESSAGE_IDX", columns={"locale", "domain", "`key`", "scope"})
+ *      @ORM\Index(name="MESSAGE_IDX", columns={"`key`"}),
+ *      @ORM\Index(name="MESSAGES_IDX", columns={"locale", "domain"})
  * })
  */
 class Translation
