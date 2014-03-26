@@ -121,8 +121,11 @@ define(function (require) {
              */
             afterBuild: function () {
                 mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
-                mediator.once('datagrid_filters:rendered', methods.showGrid);
-                $(this.$el).hide();
+
+                if (this.metadata.hasOwnProperty('filters')) {
+                    mediator.once('datagrid_filters:rendered', methods.showGrid);
+                    this.$el.hide();
+                }
             },
 
             /**
@@ -132,7 +135,7 @@ define(function (require) {
              * @param {Object} $el
              */
             showGrid: function(collection, $el) {
-                $($el).show();
+                $el.show();
             },
 
             /**
