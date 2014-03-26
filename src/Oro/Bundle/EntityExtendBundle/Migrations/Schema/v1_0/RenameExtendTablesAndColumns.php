@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -146,6 +147,8 @@ class RenameExtendTablesAndColumns implements
     ) {
         /** @var EntityMetadataHelper $entityMetadataHelper */
         $entityMetadataHelper = $this->container->get('oro_entity_extend.migration.entity_metadata_helper');
+
+        $configManager->clearConfigurableCache();
 
         /** @var EntityConfigId[] $entityConfigIds */
         $entityConfigIds = $configManager->getIds('extend');
