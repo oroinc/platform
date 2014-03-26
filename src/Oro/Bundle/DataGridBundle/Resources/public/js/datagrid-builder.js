@@ -129,7 +129,7 @@ define(function (require) {
             },
 
             /**
-             * Show is already rendered grid
+             * Show grid
              *
              * @param {Object} collection
              * @param {Object} $el
