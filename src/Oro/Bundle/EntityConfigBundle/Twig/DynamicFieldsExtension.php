@@ -202,7 +202,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     protected function getValueForCollection(Collection $collection, ConfigIdInterface $fieldConfig)
     {
         $extendConfig = $this->extendProvider->getConfigById($fieldConfig);
-
         $titleFieldName = $extendConfig->get('target_title');
         $targetEntity = $extendConfig->get('target_entity');
 
