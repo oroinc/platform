@@ -24,9 +24,9 @@ Now it protects view permission for records.
 
 ###Protection with Param Converters.
 
-When developer use Sensio Param converter in actions, and this action have ACL annotation, when will be run additional security check for the input parameters.
+When a developer uses Sensio Param Converter in controller's actions and this action has ACL annotation an additional security check will be run for the input parameters.
 
-If in input action objects where is doctrine entity object which class name was described in ACL annotation for this action, this object will be checked on permission from the ACL annotation.  
+If input parameters for this action contain a doctrine entity object whose class name was described in the ACL annotation, the permissions for this object will be checked against the ACL annotation.
 
 If Param converter ACL access level check can't protect the entity, then was turn on protection on class level from action ACL annotation.
 

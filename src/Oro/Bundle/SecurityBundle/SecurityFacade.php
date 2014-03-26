@@ -91,7 +91,7 @@ class SecurityFacade
     }
 
     /**
-     * Gets an annotation bound to the given class/method
+     * Gets ACL annotation is bound to the given class/method
      *
      * @param string $class
      * @param string $method
