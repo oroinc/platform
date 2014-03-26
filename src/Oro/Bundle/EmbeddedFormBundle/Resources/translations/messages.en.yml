@@ -2,7 +2,7 @@ oro:
     embeddedform:
         entity_label:        Embedded Form
         entity_plural_label: Embedded Forms
-        create_entity:       New Embedded Form
+        create_entity:       Create Embedded Form
         id:
             label: ID
         title:
