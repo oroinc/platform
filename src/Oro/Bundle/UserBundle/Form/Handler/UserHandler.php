@@ -74,7 +74,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         FormInterface $form,
         Request $request,
         UserManager $manager,
-        DelegatingEngine $templating,
+        DelegatingEngine $templating = null,
         $platformEmail = null,
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,

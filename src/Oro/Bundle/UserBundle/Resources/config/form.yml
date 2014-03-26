@@ -168,7 +168,6 @@ services:
             - @oro_user.form.user.api
             - @request
             - @oro_user.manager
-            - @templating
         tags:
             - { name: oro_tag.tag_manager }
 
