@@ -122,11 +122,14 @@
                                         <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
                                         <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
                                         >
+                                        <option value=""></option>
                                         <% _.each(allowedStepsFrom, function (step) { %>
                                         <option
-                                                value="<%= step.get('name') %>"
-                                        <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
-                                        ><%= step.get('label') %></option>
+                                            value="<%= step.get('name') %>"
+                                            <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
+                                        >
+                                            <%= step.get('label') %>
+                                        </option>
                                         <% }); %>
                                         </select>
                                     </div>
@@ -137,12 +140,14 @@
                                     <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
                                     <div class="controls">
                                         <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
-                                            <option value=""></value>
+                                            <option value=""></option>
                                                 <% _.each(allowedStepsTo, function (step) { %>
                                             <option
-                                                    value="<%= step.get('name') %>"
-                                            <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
-                                            ><%= step.get('label') %></option>
+                                                value="<%= step.get('name') %>"
+                                                <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
+                                            >
+                                                <%= step.get('label') %>
+                                            </option>
                                             <% }); %>
                                         </select>
                                     </div>
