@@ -288,6 +288,13 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
 
             $this->subscriber->postFlush();
+
+            $expectedSchedule = array(
+                0 => array(),
+                1 => array(),
+            );
+            $this->assertAttributeEquals(1, 'deepLevel', $this->subscriber);
+            $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
         };
 
         $this->workflowManager->expects($this->at(0))
@@ -299,6 +306,13 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($childWorkflow, $childEntity);
 
         $this->subscriber->postFlush();
+
+        $expectedSchedule = array(
+            0 => array(),
+            1 => array(),
+        );
+        $this->assertAttributeEquals(0, 'deepLevel', $this->subscriber);
+        $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
     }
 
     /**
