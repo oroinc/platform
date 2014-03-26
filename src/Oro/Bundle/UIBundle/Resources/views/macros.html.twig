@@ -190,7 +190,8 @@
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
         {% set options = parameters.options|default({})|merge({
-            groupKey: parameters.groupKey
+            groupKey: parameters.groupKey,
+            useMainButtonsClone: true
         }) %}
         <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
             {{ parameters.html|raw }}
