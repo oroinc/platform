@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\AST\PathExpression;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
@@ -60,7 +61,7 @@ class AclHelperTest extends OrmTestCase
             );
 
         $this->helper = new AclHelper($this->conditionBuilder);
-        $query = $this->helper->apply($queryBuilder);
+        $query        = $this->helper->apply($queryBuilder);
         $this->$resultHandler($query->getHints());
 
         $parserResult = $this->getMockBuilder('Doctrine\ORM\Query\ParserResult')
@@ -69,7 +70,7 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals($query->getDQL(), $queryBuilder->getDQL());
 
         $this->walker = new AclWalker($query, $parserResult, []);
-        $resultAst = $this->walker->walkSelectStatement($query->getAST());
+        $resultAst    = $this->walker->walkSelectStatement($query->getAST());
 
         $this->$walkerResult($resultAst);
     }
@@ -84,10 +85,18 @@ class AclHelperTest extends OrmTestCase
                 'resultWalker0'
             ],
             [
-               $this->getRequest1(),
+                $this->getRequest1(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [1 ,2, 3], 4],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1], 4]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
+                        'id',
+                        [1, 2, 3],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
+                        'id',
+                        [1],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ]
                 ],
                 'resultHelper1',
                 'resultWalker1'
@@ -95,8 +104,12 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest2(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => [],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1], 4]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
+                        'id',
+                        [1],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ]
                 ],
                 'resultHelper2',
                 'resultWalker2'
@@ -104,10 +117,26 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest3(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10], 4],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => ['id', [100], 4],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1], 4],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [150], 4]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                        'id',
+                        [10],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
+                        'id',
+                        [100],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
+                        'id',
+                        [3, 2, 1],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
+                        'id',
+                        [150],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ]
                 ],
                 'resultHelper3',
                 'resultWalker3'
@@ -116,8 +145,16 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest4(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10], 4],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                        'id',
+                        [10],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
+                        'id',
+                        [3, 2, 1],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                    ],
                 ],
                 'resultHelper4',
                 'resultWalker4'
@@ -149,7 +186,7 @@ class AclHelperTest extends OrmTestCase
             ->conditionalFactors[0]
             ->simpleConditionalExpression;
 
-        $leftExpression = $expression->leftExpression;
+        $leftExpression  = $expression->leftExpression;
         $rightExpression = $expression->rightExpression;
         $this->assertEquals(1, $leftExpression->simpleArithmeticExpression->value);
         $this->assertEquals('=', $expression->operator);
@@ -283,7 +320,7 @@ class AclHelperTest extends OrmTestCase
             ->conditionalFactors[1]
             ->simpleConditionalExpression;
         $this->assertEquals([3, 2, 1], $this->collectLiterals($whereExpression->literals));
-        $subselect = $resultAst->whereClause
+        $subselect  = $resultAst->whereClause
             ->conditionalExpression
             ->conditionalFactors[0]
             ->simpleConditionalExpression
@@ -316,8 +353,8 @@ class AclHelperTest extends OrmTestCase
     protected function resultHelper4($hints)
     {
         $whereCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions()[0];
-        $joinCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
-        $subRequest = $hints[AclWalker::ORO_ACL_CONDITION]->getSubRequests()[0];
+        $joinCondition  = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
+        $subRequest     = $hints[AclWalker::ORO_ACL_CONDITION]->getSubRequests()[0];
         $this->assertEquals([3, 2, 1], $whereCondition->getValue());
         $this->assertEquals([10], $joinCondition->getValue());
         $this->assertEquals(1, $subRequest->getFactorId());
@@ -325,7 +362,7 @@ class AclHelperTest extends OrmTestCase
 
     protected function resultWalker4(SelectStatement $resultAst)
     {
-        $subselect = $resultAst->whereClause
+        $subselect  = $resultAst->whereClause
             ->conditionalExpression
             ->conditionalTerms[1]
             ->simpleConditionalExpression
