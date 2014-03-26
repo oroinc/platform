@@ -1,5 +1,6 @@
-EntityConfigBundle
-==================
+OroEntityConfigBundle
+=====================
+
 - Allows to add metadata (configuration) to any entity class
 - Provides functionality to manage this metadata
 
