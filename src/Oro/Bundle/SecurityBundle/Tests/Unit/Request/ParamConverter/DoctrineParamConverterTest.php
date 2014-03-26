@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request\ParamConverter;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -89,9 +90,17 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply($object, $isGranted, $class, $isCorrectClass)
     {
+        $annotation = new Acl(
+            [
+                'id'         => 1,
+                'type'       => 'entity',
+                'class'      => $class,
+                'permission' => 'EDIT'
+            ]
+        );
         $this->securityFacade->expects($this->any())
-            ->method('getClassMethodAnnotationData')
-            ->will($this->returnValue([$class, 'EDIT']));
+            ->method('getClassMethodAnnotation')
+            ->will($this->returnValue($annotation));
 
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')

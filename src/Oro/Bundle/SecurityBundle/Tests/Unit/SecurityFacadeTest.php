@@ -391,40 +391,4 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
         $result = $this->facade->isGranted('PERMISSION', $obj);
         $this->assertTrue($result);
     }
-
-    public function testGetClassMethodAnnotationData()
-    {
-        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $annotation->expects($this->once())
-            ->method('getClass')
-            ->will($this->returnValue('OroTestBundle:TestEntity'));
-        $annotation->expects($this->once())
-            ->method('getPermission')
-            ->will($this->returnValue('Edit'));
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with('testController', 'testAction')
-            ->will($this->returnValue($annotation));
-        $this->assertEquals(
-            [
-                'OroTestBundle:TestEntity',
-                'Edit'
-            ],
-            $this->facade->getClassMethodAnnotationData('testController', 'testAction')
-        );
-    }
-
-    public function testGetClassMethodWrongAnnotation()
-    {
-        $this->annotationProvider->expects($this->once())
-            ->method('findAnnotation')
-            ->with('testController', 'testAction')
-            ->will($this->returnValue(null));
-        $this->assertEquals(
-            [],
-            $this->facade->getClassMethodAnnotationData('testController', 'testAction')
-        );
-    }
 }

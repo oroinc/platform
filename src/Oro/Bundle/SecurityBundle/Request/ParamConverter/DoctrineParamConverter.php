@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Request\ParamConverter;
 
-use Doctrine\Common\Util\ClassUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,11 +48,9 @@ class DoctrineParamConverter extends BaseParamConverter
      *
      * @param Request                $request
      * @param ConfigurationInterface $configuration
-     *
      * @return bool
      * @throws AccessDeniedException When User doesn't have permission to the object
-     * @throws NotFoundHttpException When object not found
-     * @throws \LogicException       When unable to guess how to get a Doctrine instance from the request information
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function apply(Request $request, ConfigurationInterface $configuration)
     {
@@ -65,24 +62,26 @@ class DoctrineParamConverter extends BaseParamConverter
             $controller = $request->attributes->get('_controller');
             if ($object && strpos($controller, '::') !== false) {
                 $controllerData = explode('::', $controller);
-                list($class, $permission) = $this->securityFacade->getClassMethodAnnotationData(
+                $aclAnnotation  = $this->securityFacade->getClassMethodAnnotation(
                     $controllerData[0],
                     $controllerData[1]
                 );
+                if ($aclAnnotation) {
+                    $class      = $aclAnnotation->getClass();
+                    $permission = $aclAnnotation->getPermission();
 
-                if ($permission
-                    && $class
-                    && $this->entityClassResolver->isEntity($class)
-                    && $this->entityClassResolver->getEntityClass($class) == ClassUtils::getRealClass(
-                        get_class($object)
-                    )
-                ) {
-                    if (!$this->securityFacade->isGranted($permission, $object)) {
-                        throw new AccessDeniedException(
-                            'You do not get ' . $permission . ' permission for this object'
-                        );
-                    } else {
-                        $request->attributes->set('_oro_access_checked', true);
+                    if ($permission
+                        && $class
+                        && $this->entityClassResolver->isEntity($class)
+                        && is_a($object, $this->entityClassResolver->getEntityClass($class))
+                    ) {
+                        if (!$this->securityFacade->isGranted($permission, $object)) {
+                            throw new AccessDeniedException(
+                                'You do not get ' . $permission . ' permission for this object'
+                            );
+                        } else {
+                            $request->attributes->set('_oro_access_checked', true);
+                        }
                     }
                 }
             }
