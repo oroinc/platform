@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
 {
@@ -65,18 +65,29 @@ class ChannelRepository extends EntityRepository
         $uow = $this->getEntityManager()->getUnitOfWork();
 
         if (!isset($this->loadedInstances[$id])) {
-            $this->loadedInstances[$id] = $this->createQueryBuilder('c')
-                ->select('c')
-                ->where('c.id = :id')
-                ->setParameter('id', $id)
-                ->getQuery()
-                ->getSingleResult();
-        } elseif ($this->loadedInstances[$id]
-            && $uow->getEntityState($this->loadedInstances[$id]) != UnitOfWork::STATE_MANAGED
-        ) {
+            $this->loadedInstances[$id] = $this->findOneBy(['id' => $id]);
+        } else {
             $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
         }
 
         return $this->loadedInstances[$id];
+    }
+
+    /**
+     * Adds status to channel, manual persist of newly created statuses
+     *
+     * @param Channel $channel
+     * @param Status  $status
+     */
+    public function addStatus(Channel $channel, Status $status)
+    {
+        if ($this->getEntityManager()->isOpen()) {
+            $channel = $this->getEntityManager()->merge($channel);
+
+            $this->getEntityManager()->persist($status);
+            $channel->addStatus($status);
+
+            $this->getEntityManager()->flush();
+        }
     }
 }

@@ -56,6 +56,15 @@ $.widget( "ui.dialog", $.ui.dialog, {
 
         this._verifySettings();
         this._initBottomLine();
+
+        this._onBackspacePress = $.proxy(this._onBackspacePress, this);
+        this._windowResizeHandler = $.proxy(this._windowResizeHandler, this);
+
+        // prevents history navigation over backspace while dialog is opened
+        $(document).bind('keydown.dialog', this._onBackspacePress);
+
+        // Handle window resize
+        $(window).bind('resize.dialog', this._windowResizeHandler);
     },
 
     _limitTo: function() {
@@ -74,9 +83,14 @@ $.widget( "ui.dialog", $.ui.dialog, {
         this._initializeContainer();
         this._initializeState(this.options.state);
         this.adjustContentSize();
+    },
 
-        // Handle window resize
-        $(window).bind('resize.dialog', $.proxy(this._windowResizeHandler, this));
+    _destroy: function () {
+        this._super();
+
+        // remove custom handler
+        $(document).unbind('keydown.dialog', this._onBackspacePress);
+        $(window).unbind('resize.dialog', this._windowResizeHandler);
     },
 
     _makeDraggable: function() {
@@ -422,7 +436,7 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _windowResizeHandler: function(e) {
-        if (e.target == window) {
+        if (e.target === window) {
             switch (this.state()) {
                 case 'maximized':
                     this._calculateNewMaximizedDimensions();
@@ -431,6 +445,13 @@ $.widget( "ui.dialog", $.ui.dialog, {
                     this._moveToVisible();
                     break;
             }
+        }
+    },
+
+    _onBackspacePress: function (e) {
+        // prevents history navigation over backspace while dialog is opened
+        if (this._isOpen && e.keyCode === 8 && !$(e.target).is(':input')) {
+            e.preventDefault();
         }
     },
 

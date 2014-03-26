@@ -253,6 +253,8 @@
             {%- endif -%}
             {%- if is_translated_label is defined and is_translated_label -%}
                 {{ label }}
+            {%- elseif raw_label is defined and raw_label -%}
+                {{ label|raw }}
             {%- else -%}
                 {{ label|trans({}, translation_domain)|capitalize }}
             {%- endif -%}
@@ -450,16 +452,90 @@
 
 {% block oro_entity_create_or_select_row %}
     {% set currentMode = form.mode.vars.value|default('create') %}
+    {% set viewsContainerId = form.vars.id ~ '-container' %}
+
+    {% spaceless %}
+        <div class="control-group create-select-entity {{ currentMode }}
+            {% if attr.class is defined %} {{ attr.class }}{% endif %}"
+            id="{{ viewsContainerId }}"
+        >
+            {% if label is not sameas(false) %}
+                {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
+            {% endif %}
+            <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
+                {{ form_widget(form) }}
+                {{ form_errors(form) }}
+            </div>
+        </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block oro_entity_create_or_select_widget %}
+    {% set currentMode = form.mode.vars.value|default('create') %}
     {% set btnGroupId = form.vars.id ~ '-btn-group' %}
     {% set viewsContainerId = form.vars.id ~ '-container' %}
     {% set gridWidgetAlias = form.vars.id ~ '-grid' %}
 
-    {{ form_errors(form) }}
-    <div id="{{ viewsContainerId }}" class="responsive-section create-select-entity {{ currentMode }} clearfix">
-        {{ block('oro_entity_create_or_select_label') }}
-        {{ block('oro_entity_create_or_select_widget') }}
-    </div>
+    <div class="create-select-entity-container">
+        <div id="{{ btnGroupId }}" class="buttons-container">
+            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}">
+                <span
+                    data-label="{{ 'Choose Existing'|trans }}"
+                    data-alt-label-view="{{ 'Choose Another'|trans }}"
+                >
+                    {% if currentMode == 'view' %}
+                        {{ 'Choose Another'|trans }}
+                    {% else %}
+                        {{ 'Choose Existing'|trans }}
+                    {% endif %}
+                </span>
+            </a>
 
+            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}">
+                <span>{{ 'Create New'|trans }}</span>
+            </a>
+
+            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}">
+                <span>{{ 'Cancel'|trans }}</span>
+            </a>
+        </div>
+
+        <div class="entity-create-block"
+            {% if not form.vars.required %}data-validation-optional-group=""{% endif %}
+            {% if currentMode != 'create' %}data-validation-ignore=""{% endif %}
+        >
+            {{ form_widget(form.new_entity) }}
+        </div>
+
+        <div class="entity-select-block">
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'loadingElement': '#' ~ viewsContainerId ~ ' .create-select-entity-container',
+                'elementFirst': currentMode == 'grid',
+                'url': path('oro_datagrid_widget', {'gridName': form.vars.grid_name}),
+                'alias': gridWidgetAlias
+            }) }}
+        </div>
+
+        <div class="entity-view-block {% if view_widgets|length > 1 %}row-fluid row-fluid-divider{% endif %}">
+            {% for view_widget in view_widgets %}
+                <div class="responsive-cell">
+                    {% set routeParameters = view_widget.route_parameters %}
+                    {{ oro_widget_render({
+                        'widgetType': 'block',
+                        'loadingElement': '#' ~ viewsContainerId ~ ' .create-select-entity-container',
+                        'elementFirst': currentMode == 'view',
+                        'url': currentMode == 'view' ? path(view_widget.route_name, routeParameters) : null,
+                        'alias': view_widget.widget_alias,
+                        'title': view_widget.title is defined ? view_widget.title|trans : null
+                    }) }}
+                </div>
+            {% endfor %}
+        </div>
+
+        {{ form_widget(form.existing_entity) }}
+        {{ form_widget(form.mode) }}
+    </div>
     <script type="text/javascript">
         require(['jquery', 'oroform/js/create-select-type-handler'],
         function ($, createSelectTypeHandler) {
@@ -476,81 +552,4 @@
             });
         });
     </script>
-{% endblock %}
-
-{% block oro_entity_create_or_select_label %}
-    {% spaceless %}
-        {% if label is not sameas(false) %}
-            {% if label is empty %}
-                {% set label = name|humanize %}
-            {% endif %}
-            <h5 class="user-fiedset">
-                <span>{{ label|trans({}, translation_domain) }}</span>
-                <div class="pull-right" id="{{ btnGroupId }}">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-small entity-select-btn">
-                            <span
-                                data-label="{{ 'Select Existing'|trans }}"
-                                data-alt-label-view="{{ 'Select Another'|trans }}"
-                            >
-                                {% if currentMode == 'view' %}
-                                {{ 'Select Another'|trans }}
-                                {% else %}
-                                {{ 'Select Existing'|trans }}
-                                {% endif %}
-                            </span>
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-small entity-cancel-btn">
-                            <span>{{ 'Cancel'|trans }}</span>
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-small entity-create-btn btn-primary">
-                            <span>{{ 'Create New'|trans }}</span>
-                        </button>
-                    </div>
-                </div>
-            </h5>
-        {% endif %}
-    {% endspaceless %}
-{% endblock %}
-
-{% block oro_entity_create_or_select_widget %}
-    <div class="entity-create-block"
-        {% if not form.vars.required %}data-validation-optional-group=""{% endif %}
-        {% if currentMode != 'create' %}data-validation-ignore=""{% endif %}
-    >
-        {{ form_widget(form.new_entity) }}
-    </div>
-
-    <div class="entity-select-block">
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'loadingElement': '#' ~ viewsContainerId,
-            'elementFirst': currentMode == 'grid',
-            'url': path('oro_datagrid_widget', {'gridName': form.vars.grid_name}),
-            'alias': gridWidgetAlias
-        }) }}
-    </div>
-
-    <div class="entity-view-block responsive-section">
-        {% for view_widget in view_widgets %}
-            <div class="responsive-block">
-                {% set routeParameters = view_widget.route_parameters %}
-                {{ oro_widget_render({
-                    'widgetType': 'block',
-                    'loadingElement': '#' ~ viewsContainerId,
-                    'elementFirst': currentMode == 'view',
-                    'url': currentMode == 'view' ? path(view_widget.route_name, routeParameters) : null,
-                    'alias': view_widget.widget_alias,
-                    'title': view_widget.title is defined ? view_widget.title|trans : null
-                }) }}
-            </div>
-        {% endfor %}
-    </div>
-
-    {{ form_widget(form.existing_entity) }}
-    {{ form_widget(form.mode) }}
 {% endblock %}

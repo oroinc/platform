@@ -10,8 +10,6 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     var helloWorld = {};
 
     helloWorld.ContentView = Backbone.View.extend({
-        template: _.template('<span><%= settings.content %></span>'),
-
         initialize: function () {
             var view = this;
             view.listenTo(view.model, 'change', view.render);
@@ -19,14 +17,9 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         render: function () {
             var view = this;
-            try {
-                view.$el.html(view.template(view.model.toJSON()));
-            } catch (ex) {
-                // Supressing exceptions for possible syntax errors
-                if (console && (typeof console.log === 'function')) {
-                    console.log(ex);
-                }
-            }
+            var settings = view.model.get('settings') || {};
+            var content = _.escape(String(settings.content)).replace(/\r?\n/g, '<br/>');
+            view.$el.html(content);
             return view;
         }
     });

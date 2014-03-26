@@ -49,7 +49,7 @@ class NavigationItemBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
-        $user = $this->securityContext->getToken()->getUser();
+        $user = $this->securityContext->getToken() ? $this->securityContext->getToken()->getUser() : null;
         $menu->setExtra('type', $alias);
         if (is_object($user)) {
             /** @var $entity NavigationItemInterface */

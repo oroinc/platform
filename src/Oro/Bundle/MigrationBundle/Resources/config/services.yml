@@ -8,7 +8,8 @@ parameters:
     oro_migration.migrations.extension_manager.class:  Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
     oro_migration.migration.extension.rename.class:    Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
     oro_migration.listener.release_data_fixture.class: Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
-
+    oro_migration.tools.schema_dumper.class:           Oro\Bundle\MigrationBundle\Tools\SchemaDumper
+    oro_migration.twig.schema_dumper.class:            Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
@@ -58,3 +59,15 @@ services:
         class: %oro_migration.migration.extension.rename.class%
         tags:
             - { name: oro_migration.extension, extension_name: rename }
+
+    oro_migration.tools.schema_dumper:
+        class: %oro_migration.tools.schema_dumper.class%
+        arguments:
+            - @twig
+
+    oro_migration.twig.schema_dumper:
+        class: %oro_migration.twig.schema_dumper.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: twig.extension }
