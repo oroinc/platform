@@ -1,47 +1,16 @@
 OroNavigationBundle
-========================
+===================
+
 The `OroNavigationBundle` add ability to define menus in different bundles with builders or YAML files
 to the [KnpMenuBundle](https://github.com/KnpLabs/KnpMenuBundle). It is also has integrated support of
 ACL implementation from Oro UserBundle.
 
 **Basic Docs**
 
-* [Installation](#installation)
 * [Your first menu](#first-menu)
 * [Rendering Menus](#rendering-menus)
 * [Hash Navigation](#hash-navigation)
 * [Content outdating notifications](./Resources/doc/content_outdating.md)
-
-<a name="installation"></a>
-
-## Installation
-
-### Step 1) Get the bundle and the library
-
-Add on composer.json (see http://getcomposer.org/)
-
-    "require" :  {
-        // ...
-        "oro/OroMenu": "dev-master",
-    }
-
-### Step 2) Register the bundle
-
-To start using the bundle, register it in your Kernel:
-
-``` php
-<?php
-// app/AppKernel.php
-
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Oro\Bundle\NavigationBundle\OroNavigationBundle(),
-    );
-    // ...
-}
-```
 
 <a name="first-menu"></a>
 

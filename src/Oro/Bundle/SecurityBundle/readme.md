@@ -1,5 +1,5 @@
 OroSecurityBundle
-========================
+=================
 
 The `OroSecurityBundle` provides flexible security model which allows to protect data integrity and privacy. The goals of this bundle are as follows:
 

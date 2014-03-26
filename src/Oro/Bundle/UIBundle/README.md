@@ -1,5 +1,6 @@
-Platform User Interface
-=======================
+OroUIBundle
+===========
+
 User interface layouts and controls.
 
 ## Table of Contents
