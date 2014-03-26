@@ -86,8 +86,8 @@ class AclHelperTest extends OrmTestCase
             [
                $this->getRequest1(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [1 ,2, 3]],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [1 ,2, 3], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1], 4]
                 ],
                 'resultHelper1',
                 'resultWalker1'
@@ -96,7 +96,7 @@ class AclHelperTest extends OrmTestCase
                 $this->getRequest2(),
                 [
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => [],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1], 4]
                 ],
                 'resultHelper2',
                 'resultWalker2'
@@ -104,10 +104,10 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest3(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10]],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => ['id', [100]],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [150]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => ['id', [100], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [150], 4]
                 ],
                 'resultHelper3',
                 'resultWalker3'
@@ -116,8 +116,8 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest4(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10]],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10], 4],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1], 4],
                 ],
                 'resultHelper4',
                 'resultWalker4'

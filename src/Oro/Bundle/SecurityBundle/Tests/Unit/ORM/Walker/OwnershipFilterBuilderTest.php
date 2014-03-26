@@ -235,7 +235,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('org3', 'org4')
+                    array('org3', 'org4'),
+                    4
                 )
             ),
             array(
@@ -247,7 +248,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu31', 'bu3a', 'bu3a1', 'bu4', 'bu41', 'bu411')
+                    array('bu3', 'bu31', 'bu3a', 'bu3a1', 'bu4', 'bu41', 'bu411'),
+                    4
                 )
             ),
             array(
@@ -259,7 +261,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user31', 'user4', 'user41', 'user411')
+                    array('user3', 'user31', 'user4', 'user41', 'user411'),
+                    4
                 )
             ),
             array(
@@ -271,7 +274,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('org3', 'org4')
+                    array('org3', 'org4'),
+                    8
                 )
             ),
             array('user4', true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -285,7 +289,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411')
+                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
+                    4
                 )
             ),
             array(
@@ -297,7 +302,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user4', 'user31', 'user41', 'user411')
+                    array('user3', 'user4', 'user31', 'user41', 'user411'),
+                    4
                 )
             ),
             array(
@@ -309,7 +315,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411')
+                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
+                    8
                 )
             ),
             array('user4', true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -323,7 +330,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('bu3', 'bu4')
+                    array('bu3', 'bu4'),
+                    4
                 )
             ),
             array(
@@ -335,7 +343,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    array('user3', 'user4')
+                    array('user3', 'user4'),
+                    4
                 )
             ),
             array(
@@ -347,7 +356,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    array('bu3', 'bu4')
+                    array('bu3', 'bu4'),
+                    8
                 )
             ),
             array('user4', true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, '', []),
@@ -362,7 +372,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'owner',
-                    'user4'
+                    'user4',
+                    4
                 )
             ),
             array(
@@ -374,7 +385,8 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
                 '',
                 array(
                     'id',
-                    'user4'
+                    'user4',
+                    8
                 )
             )
         );
