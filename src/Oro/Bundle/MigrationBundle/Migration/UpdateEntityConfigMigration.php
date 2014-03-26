@@ -44,24 +44,24 @@ class UpdateEntityConfigMigration implements Migration
                field_id IN (
                  SELECT id FROM oro_entity_config_field WHERE entity_id = (
                    SELECT id FROM oro_entity_config
-                   WHERE class_name = \'OroCRM\\Bundle\\ReportBundle\\Entity\\OpportunityByWorkflowItem\'
+                   WHERE class_name = \'OroCRM\\\\Bundle\\\\ReportBundle\\\\Entity\\\\OpportunityByWorkflowItem\'
                  )
                )
                OR
                entity_id = (
                  SELECT id FROM oro_entity_config
-                 WHERE class_name = \'OroCRM\\Bundle\\ReportBundle\\Entity\\OpportunityByWorkflowItem\'
+                 WHERE class_name = \'OroCRM\\\\Bundle\\\\ReportBundle\\\\Entity\\\\OpportunityByWorkflowItem\'
                )'
         );
         $queries->addQuery(
             'DELETE FROM oro_entity_config_field WHERE entity_id = (
               SELECT id FROM oro_entity_config
-              WHERE class_name = \'OroCRM\\Bundle\\ReportBundle\\Entity\\OpportunityByWorkflowItem\'
+              WHERE class_name = \'OroCRM\\\\Bundle\\\\ReportBundle\\\\Entity\\\\OpportunityByWorkflowItem\'
             )'
         );
         $queries->addQuery(
             'DELETE FROM oro_entity_config
-             WHERE class_name = \'OroCRM\\Bundle\\ReportBundle\\Entity\\OpportunityByWorkflowItem\''
+             WHERE class_name = \'OroCRM\\\\Bundle\\\\ReportBundle\\\\Entity\\\\OpportunityByWorkflowItem\''
         );
     }
 }
