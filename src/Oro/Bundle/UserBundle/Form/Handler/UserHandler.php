@@ -75,11 +75,11 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         Request $request,
         UserManager $manager,
         DelegatingEngine $templating,
-        $platformEmail,
-        \Swift_Mailer $mailer,
-        FlashBagInterface $flashBag,
-        Translator $translator,
-        LoggerInterface $logger
+        $platformEmail = null,
+        \Swift_Mailer $mailer = null,
+        FlashBagInterface $flashBag = null,
+        Translator $translator = null,
+        LoggerInterface $logger = null
     ) {
         parent::__construct($form, $request, $manager);
 
