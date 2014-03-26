@@ -30,13 +30,12 @@ Ok: Ok
 'This value should be {{ limit }} or less.': 'This value should be {{ limit }} or less.'
 'This value should be a valid number.': 'This value should be a valid number.'
 Name: Name
-Order: Order
 Final: Final
 Transitions: Transitions
 'Add transition': 'Add transition'
 'Add transition to this step': 'Add transition to this step'
 'Step name': 'Step name'
-Poisition: Poisition
+Position: Position
 'Update this step': 'Update this step'
 'Clone this step': 'Clone this step'
 'Delete this step': 'Delete this step'
