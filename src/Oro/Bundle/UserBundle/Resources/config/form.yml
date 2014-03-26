@@ -144,9 +144,18 @@ services:
             - { name: form.type, alias: oro_gender }
 
     oro_user.form.handler.user:
-        class:                        %oro_user.form.handler.user.class%
-        scope:                        request
-        arguments:                    ["@oro_user.form.user", "@request", "@oro_user.manager", "@templating", %oro_user.email%, "@mailer"]
+        class: %oro_user.form.handler.user.class%
+        scope: request
+        arguments:
+            - @oro_user.form.user
+            - @request
+            - @oro_user.manager
+            - @templating
+            - %oro_user.email%
+            - @oro_email.direct_mailer
+            - @session.flash_bag
+            - @translator
+            - @logger
         tags:
             - { name: oro_tag.tag_manager }
         calls:

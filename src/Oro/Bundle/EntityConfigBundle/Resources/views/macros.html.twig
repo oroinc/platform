@@ -3,11 +3,13 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for item in dynamicFields %}
+            {% set hasLink = false %}
             {% set itemValue = item.value %}
             {% if itemValue is iterable %}
                 {% set data = '' %}
                 {% for value in itemValue.values %}
                     {% if value.link is defined and value.link != false  %}
+                        {% set hasLink = true %}
                         {% set data = data ~ ui.renderUrl(value.link, value.title) %}
                     {% else %}
                         {% set data = data ~ value.title|escape %}
@@ -27,7 +29,7 @@
                 {% set itemValue = itemValue | oro_format_currency %}
             {% elseif item.type == 'percent' %}
                 {% set itemValue = itemValue | oro_format_percent %}
-            {% else %}
+            {% elseif not hasLink %}
                 {% set itemValue = itemValue|escape %}
             {% endif %}
 

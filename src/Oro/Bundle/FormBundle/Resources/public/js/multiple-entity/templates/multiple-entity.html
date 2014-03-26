@@ -23,7 +23,7 @@
         <% _.each(extraData, function(item) { %>
         <% if (!_.isUndefined(item.label)) { %>
             <% if (!item.hasOwnProperty('value') || !item.value) { item.value = _.__('N/A'); } %>
-            <div><%= _.escape(_.__(item.label)) %>: <%= _.escape(item.value) %></div>
+            <div><%= _.escape(item.label) %>: <%= _.escape(item.value) %></div>
         <% } %>
         <% }); %>
     </div>

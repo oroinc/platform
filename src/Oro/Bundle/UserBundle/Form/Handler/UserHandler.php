@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
@@ -16,9 +20,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 {
     /**
-     * @var \Swift_Mailer
+     * @var DelegatingEngine
      */
-    protected $mailer;
+    protected $templating;
 
     /**
      * @var string
@@ -26,9 +30,24 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected $platformEmail;
 
     /**
-     * @var DelegatingEngine
+     * @var \Swift_Mailer
      */
-    protected $templating;
+    protected $mailer;
+
+    /**
+     * @var FlashBagInterface
+     */
+    protected $flashBag;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @var TagManager
@@ -41,12 +60,15 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected $businessUnitManager;
 
     /**
-     * @param FormInterface    $form
-     * @param Request          $request
-     * @param UserManager      $manager
-     * @param DelegatingEngine $templating
-     * @param string           $platformEmail
-     * @param \Swift_Mailer    $mailer
+     * @param FormInterface     $form
+     * @param Request           $request
+     * @param UserManager       $manager
+     * @param DelegatingEngine  $templating
+     * @param string            $platformEmail
+     * @param \Swift_Mailer     $mailer
+     * @param FlashBagInterface $flashBag
+     * @param Translator        $translator
+     * @param LoggerInterface   $logger
      */
     public function __construct(
         FormInterface $form,
@@ -54,14 +76,19 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         UserManager $manager,
         DelegatingEngine $templating,
         $platformEmail,
-        \Swift_Mailer $mailer = null
+        \Swift_Mailer $mailer,
+        FlashBagInterface $flashBag,
+        Translator $translator,
+        LoggerInterface $logger
     ) {
-        $this->form          = $form;
-        $this->request       = $request;
-        $this->manager       = $manager;
+        parent::__construct($form, $request, $manager);
+
+        $this->templating    = $templating;
         $this->platformEmail = $platformEmail;
         $this->mailer        = $mailer;
-        $this->templating    = $templating;
+        $this->flashBag      = $flashBag;
+        $this->translator    = $translator;
+        $this->logger        = $logger;
     }
 
     /**
@@ -113,7 +140,15 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
             && $this->form->get('inviteUser')->getViewData()
             && $this->form->get('plainPassword')->getViewData()
         ) {
-            $this->sendInviteMail($user, $this->form->get('plainPassword')->getViewData()['first']);
+            try {
+                $this->sendInviteMail($user, $this->form->get('plainPassword')->getViewData()['first']);
+            } catch (\Exception $ex) {
+                $this->logger->error('Invitation email sending failed.', array('exception' => $ex));
+                $this->flashBag->add(
+                    'warning',
+                    $this->translator->trans('oro.user.controller.invite.fail.message')
+                );
+            }
         }
 
         // Reloads the user to reset its username. This is needed when the

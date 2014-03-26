@@ -8,10 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -55,11 +54,13 @@ class CustomEntityType extends AbstractType
     /**
      * @param ConfigManager $configManager
      * @param Router $router
+     * @param Translator $translator
      */
-    public function __construct(ConfigManager $configManager, Router $router)
+    public function __construct(ConfigManager $configManager, Router $router, Translator $translator)
     {
         $this->configManager = $configManager;
         $this->router        = $router;
+        $this->translator    = $translator;
     }
 
     /**
@@ -267,7 +268,7 @@ class CustomEntityType extends AbstractType
                     ->get('label');
 
                 $extraData[] = [
-                    'label' => $label,
+                    'label' => $this->translator->trans($label),
                     'value' => $entity->{Inflector::camelize('get_' . $fieldName)}()
                 ];
             }
