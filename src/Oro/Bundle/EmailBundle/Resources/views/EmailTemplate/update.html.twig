@@ -4,10 +4,6 @@
     'OroEmailBundle:Form:fields.html.twig',
 ]%}
 {% import 'OroEmailBundle::macros.html.twig' as _emailMacros %}
-{% set title = form.vars.value.id
-    ? 'Edit email template "%name%"'|trans({'%name%': form.vars.value.name})
-    : isClone ? 'Clone Email Template'|trans : 'New Email Template'|trans
-%}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%name%": form.vars.value.name} }) %}
 {% endif %}
@@ -72,11 +68,12 @@
             'entity':      form.vars.value,
             'indexPath':   path('oro_email_emailtemplate_index'),
             'indexLabel':  'oro.email.emailtemplate.entity_plural_label'|trans,
-            'entityTitle': title
+            'entityTitle': 'oro.email.emailtemplate.edit_entity'|trans({'%name%': form.vars.value.name})
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% set title = isClone ? 'oro.email.emailtemplate.clone_entity'|trans : 'oro.email.emailtemplate.new_entity'|trans %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
@@ -96,7 +93,7 @@
             }]
         },
         {
-            'title': 'Template data',
+            'title': 'Template data'|trans,
             'subblocks': [
             {
                 'title': '',

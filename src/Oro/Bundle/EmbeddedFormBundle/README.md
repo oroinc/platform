@@ -1,5 +1,5 @@
-Oro Embedded Form Bundle
-=======================
+OroEmbeddedFormBundle
+=====================
 
 Bundle provides mechanism to create forms, embed them into third party sites and store and view data submitted via them.
 Basically `EmbeddedForm` is `Channel` plus `FormType`. Also it contains custom css and success message.
