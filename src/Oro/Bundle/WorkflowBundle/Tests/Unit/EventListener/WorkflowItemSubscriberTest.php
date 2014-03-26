@@ -245,8 +245,68 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testStartWorkflowForNewEntity()
     {
         $entity = new \stdClass();
+        $childEntity = new \DateTime();
 
-        // Pre persist scheduling test
+        list($event, $workflow) = $this->prepareEventForWorkflow($entity);
+        $this->workflowManager->expects($this->at(0))
+            ->method('getApplicableWorkflow')
+            ->with($entity)
+            ->will($this->returnValue($workflow));
+
+        list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity);
+        $this->workflowManager->expects($this->at(2))
+            ->method('getApplicableWorkflow')
+            ->with($childEntity)
+            ->will($this->returnValue($childWorkflow));
+
+        $this->subscriber->postPersist($event);
+
+        $expectedSchedule = array(
+            0 => array(
+                array(
+                    'entity' => $entity,
+                    'workflow' => $workflow
+                ),
+            ),
+        );
+        $this->assertAttributeEquals(0, 'deepLevel', $this->subscriber);
+        $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
+
+        $startChildWorkflow = function () use ($childEvent, $childEntity, $childWorkflow) {
+            $this->subscriber->postPersist($childEvent);
+
+            $expectedSchedule = array(
+                0 => array(),
+                1 => array(
+                    array(
+                        'entity' => $childEntity,
+                        'workflow' => $childWorkflow
+                    ),
+                ),
+            );
+            $this->assertAttributeEquals(1, 'deepLevel', $this->subscriber);
+            $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
+
+            $this->subscriber->postFlush();
+        };
+
+        $this->workflowManager->expects($this->at(0))
+            ->method('startWorkflow')
+            ->with($workflow, $entity)
+            ->will($this->returnCallback($startChildWorkflow));
+        $this->workflowManager->expects($this->at(1))
+            ->method('startWorkflow')
+            ->with($childWorkflow, $childEntity);
+
+        $this->subscriber->postFlush();
+    }
+
+    /**
+     * @param object $entity
+     * @return array
+     */
+    protected function prepareEventForWorkflow($entity)
+    {
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -270,24 +330,7 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->once())
             ->method('getDefinition')
             ->will($this->returnValue($definition));
-        $this->workflowManager->expects($this->atLeastOnce())
-            ->method('getApplicableWorkflow')
-            ->with($entity)
-            ->will($this->returnValue($workflow));
 
-        $this->subscriber->postPersist($event);
-        $expectedSchedule = array(
-            array(
-                'entity' => $entity,
-                'workflow' => $workflow
-            )
-        );
-        $this->assertAttributeEquals($expectedSchedule, 'entitiesScheduledForWorkflowStart', $this->subscriber);
-
-        // postFlush saving
-        $this->workflowManager->expects($this->once())
-            ->method('startWorkflow')
-            ->with($workflow, $entity);
-        $this->subscriber->postFlush();
+        return array($event, $workflow);
     }
 }
