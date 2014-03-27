@@ -40,12 +40,13 @@
                 'entity':      form.vars.value,
                 'indexPath':   path('oro_notification_emailnotification_index'),
                 'indexLabel':  'oro.notification.emailnotification.entity_plural_label'|trans,
-                'entityTitle': 'oro.notification.emailnotification.edit_entity'|trans ~ ' ' ~ form.vars.value.id
+                'entityTitle': 'oro.notification.emailnotification.edit_entity'|trans({'%name%': form.vars.value.id})
             }
         %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.notification.emailnotification.new_entity'|trans } %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.notification.emailnotification.new_entity'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 

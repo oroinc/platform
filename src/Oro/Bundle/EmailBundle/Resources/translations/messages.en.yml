@@ -44,7 +44,6 @@ oro:
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
-            new_entity:          New email template
             edit_entity:         Edit email template "%name%"
             clone_entity:        Clone email template
             entity_description:  Represent email template

@@ -5,3 +5,12 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Get help": "Get help"
 "Communications": "Communications"
 "Additional Information": "Additional Information"
+
+oro:
+    ui:
+        delete: Delete
+        delete_entity: Delete %entityName%
+        edit: Edit
+        edit_entity: Edit %entityName%
+        create: Create
+        create_entity: Create %entityName%

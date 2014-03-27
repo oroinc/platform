@@ -106,8 +106,6 @@ oro:
         entity_label:        User
         entity_plural_label: Users
         entity_description:  Represent user profile
-        edit_entity:         Update User
-        new_entity:          New User
         id.label:          Id
         username.label:    Username
         email.label:       Email
@@ -147,8 +145,6 @@ oro:
             entity_label:        Group
             entity_plural_label: Groups
             entity_description:  Group of roles
-            edit_entity:         Update Group
-            new_entity:          New Group
             id.label:    Id
             name.label:  Name
             roles.label: Roles
@@ -160,8 +156,6 @@ oro:
             entity_label:        Role
             entity_plural_label: Roles
             entity_description:  User's role
-            edit_entity:         Update Role
-            new_entity:          New Role
             id.label:     Id
             role.label:   Role
             label.label:  Label

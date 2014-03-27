@@ -10,7 +10,6 @@ oro:
 
         entity_label:        Tag
         entity_plural_label: Tags
-        new_entity:          New tag
         entity_description:  Show records tagged by this tag
         id.label:         Id
         name.label:       Tag

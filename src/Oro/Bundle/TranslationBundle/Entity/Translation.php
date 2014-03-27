@@ -26,7 +26,7 @@ class Translation
     protected $id;
 
     /**
-     * @ORM\Column(name="`key`", type="string", length=500)
+     * @ORM\Column(name="`key`", type="string", length=255)
      */
     protected $key;
 

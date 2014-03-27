@@ -1,7 +1,11 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
-{% oro_title_set({params : {"%entityName%": entity.id ? 'Item #'~entity.id : 'New '~entity_config.get('label')|trans }}) %}
+{% set entityName = entity.id
+    ? 'Item #'~entity.id
+    : 'oro.ui.create_entity'|trans({'%entityName%': entity_config.get('label')|trans})
+%}
+{% oro_title_set({params : {"%entityName%": entityName %}
 
 {% set formAction = path('oro_entity_update', {'entity_id': entity_id, id: entity.id}) %}
 
@@ -23,7 +27,7 @@
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
         'indexLabel': 'Entities',
-        'entityTitle': entity.id ? 'Item #'~entity.id|default('N/A') : 'New '~entity_config.get('label')|trans,
+        'entityTitle': entityName,
         'additional': [
             {
                 'indexPath'  : path('oro_entity_index', {id: entity_id}),

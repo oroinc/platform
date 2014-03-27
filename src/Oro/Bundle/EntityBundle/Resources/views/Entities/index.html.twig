@@ -18,16 +18,16 @@
             'indexPath'  : path('oro_entity_index', {id: parent}),
             'indexLabel' : entity_config.get('label')|default('N/A')
         }]
-    }%}
+    } %}
 
     {{ parent() }}
 {% endblock pageHeader %}
 
 {% block navButtons %}
-    {% if resource_granted('CREATE', 'entity:'~entity_class) %}
+    {% if resource_granted('CREATE', 'entity:' ~ entity_class) %}
         {{ UI.addButton({
             'path': path('oro_entity_update', {'entity_id': entity_id}),
-            'entity_label':  label|trans,
+            'entity_label': 'oro.ui.create_entity'|trans({'%entityName%': label|trans}),
         }) }}
     {% endif %}
 {% endblock %}

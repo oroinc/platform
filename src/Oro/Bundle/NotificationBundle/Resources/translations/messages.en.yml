@@ -26,8 +26,7 @@ oro:
             entity_label:        Notification
             entity_plural_label: Notifications
             entity_description:  Represent email notification
-            edit_entity:         Edit notification rule
-            new_entity:          New notification rule
+            edit_entity:         Edit notification rule "%name%"
             id.label:             Id
             entity_name.label:    Entity name
             event.label:          Event name

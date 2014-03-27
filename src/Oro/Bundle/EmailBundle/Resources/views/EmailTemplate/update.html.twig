@@ -72,7 +72,9 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = isClone ? 'oro.email.emailtemplate.clone_entity'|trans : 'oro.email.emailtemplate.new_entity'|trans %}
+        {% set title = isClone
+            ? 'oro.email.emailtemplate.clone_entity'|trans
+            : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.email.emailtemplate.entity_label'|trans}) %}
         {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
