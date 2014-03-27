@@ -5,7 +5,7 @@
     ? 'Item #'~entity.id
     : 'oro.ui.create_entity'|trans({'%entityName%': entity_config.get('label')|trans})
 %}
-{% oro_title_set({params : {"%entityName%": entityName %}
+{% oro_title_set({params : {"%entityName%": entityName} }) %}
 
 {% set formAction = path('oro_entity_update', {'entity_id': entity_id, id: entity.id}) %}
 
