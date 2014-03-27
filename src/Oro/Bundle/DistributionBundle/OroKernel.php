@@ -56,6 +56,7 @@ abstract class OroKernel extends Kernel
                     $this->getRootDir() . '/../vendor',
                 )
             )
+            ->followLinks()
             ->name('bundles.yml');
 
         foreach ($finder as $file) {
