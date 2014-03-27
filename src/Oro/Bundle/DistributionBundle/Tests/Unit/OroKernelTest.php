@@ -100,6 +100,18 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                 [
                     'OroFirstBundle', 'OroSecondBundle'
                 ]
+            ],
+            [
+                [
+                    ['name' => 'AcmeLastBundle', 'priority' => 100],
+                    ['name' => 'OroCRMAnotherBundle', 'priority' => 30],
+                    ['name' => 'AcmeTestBundle', 'priority' => 1],
+                    ['name' => 'OroSomeBundle', 'priority' => 30],
+                    ['name' => 'AcmeDemoBundle', 'priority' => 100],
+                ],
+                [
+                    'AcmeTestBundle', 'OroSomeBundle', 'OroCRMAnotherBundle', 'AcmeDemoBundle', 'AcmeLastBundle',
+                ]
             ]
         ];
     }
