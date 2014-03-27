@@ -30,8 +30,7 @@ class CommandListener
      */
     public function afterExecute(ConsoleTerminateEvent $event)
     {
-        switch ($event->getCommand()
-            ->getName()) {
+        switch ($event->getCommand()->getName()) {
             case CommandListener::LEXIK_MAINTENANCE_LOCK:
                 $this->dispatcher->dispatch(Events::MAINTENANCE_ON);
                 break;
