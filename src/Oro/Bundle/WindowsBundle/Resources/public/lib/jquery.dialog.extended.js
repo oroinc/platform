@@ -450,7 +450,8 @@ $.widget( "ui.dialog", $.ui.dialog, {
 
     _onBackspacePress: function (e) {
         // prevents history navigation over backspace while dialog is opened
-        if (this._isOpen && e.keyCode === 8 && !$(e.target).is(':input')) {
+        var exclude = ':button,:reset,:submit,:checkbox,:radio,select,[type=image],[type=file]';
+        if (this._isOpen && e.keyCode === 8 && !$(e.target).not(exclude).is(':input')) {
             e.preventDefault();
         }
     },

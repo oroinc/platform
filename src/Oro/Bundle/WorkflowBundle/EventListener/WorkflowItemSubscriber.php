@@ -6,9 +6,9 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -33,6 +33,11 @@ class WorkflowItemSubscriber implements EventSubscriber
      * @var array
      */
     protected $entitiesScheduledForWorkflowStart = array();
+
+    /**
+     * @var int
+     */
+    protected $deepLevel = 0;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -82,7 +87,7 @@ class WorkflowItemSubscriber implements EventSubscriber
         $entity = $args->getEntity();
         $activeWorkflow = $this->workflowManager->getApplicableWorkflow($entity);
         if ($activeWorkflow && $activeWorkflow->getDefinition()->getStartStep()) {
-            $this->entitiesScheduledForWorkflowStart[] = array(
+            $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
                 'entity' => $entity,
                 'workflow' => $activeWorkflow
             );
@@ -116,12 +121,18 @@ class WorkflowItemSubscriber implements EventSubscriber
      */
     public function postFlush()
     {
-        if ($this->entitiesScheduledForWorkflowStart) {
-            while ($entityData = array_shift($this->entitiesScheduledForWorkflowStart)) {
+        $currentDeepLevel = $this->deepLevel;
+
+        if (!empty($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
+            while ($entityData = array_shift($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
+                $this->deepLevel++;
+
                 $this->workflowManager->startWorkflow(
                     $entityData['workflow'],
                     $entityData['entity']
                 );
+
+                $this->deepLevel--;
             }
         }
     }

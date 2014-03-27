@@ -1,5 +1,5 @@
 OroWindowsBundle
-========================
+================
 
 This bundle consists of set of tools for manipulating dialog windows and their states.
 
