@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 
 class WorkflowEntityVoter implements VoterInterface
 {
@@ -108,14 +108,15 @@ class WorkflowEntityVoter implements VoterInterface
             return self::ACCESS_ABSTAIN;
         }
 
-        // skip request
-        if ($object instanceof Request) {
+        // both entity and identity objects are supported
+        $class = $this->getEntityClass($object);
+
+        try {
+            $identifier = $this->getEntityIdentifier($object);
+        } catch (NotManageableEntityException $e) {
             return self::ACCESS_ABSTAIN;
         }
 
-        // both entity and identity objects are supported
-        $class = $this->getEntityClass($object);
-        $identifier = $this->getEntityIdentifier($object);
         if (null === $identifier) {
             return self::ACCESS_ABSTAIN;
         }
