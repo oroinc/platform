@@ -1,10 +1,8 @@
-{% set remindersData = oro_reminder_get_requested_reminders_data() %}
-{% if app.user and remindersData|length %}
+{% if app.user %}
     <script type="text/javascript">
-        require(['ororeminder/js/subscriber', 'oroui/js/mediator'], function(subscriber, mediator){
-            mediator.on('page-rendered hash_navigation_request:complete', function () {
-                subscriber.showReminders({{ remindersData|json_encode|raw }});
-            });
+        require(['ororeminder/js/reminder-handler'], function(reminderHandler) {
+            reminderHandler.setReminders({{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
+            reminderHandler.showReminders();
         });
     </script>
 {% endif %}

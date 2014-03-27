@@ -30,15 +30,15 @@ Ok: Ok
 'This value should be {{ limit }} or less.': 'This value should be {{ limit }} or less.'
 'This value should be a valid number.': 'This value should be a valid number.'
 Name: Name
-Order: Order
 Final: Final
 Transitions: Transitions
 'Add transition': 'Add transition'
-'Step name': 'Step name'
-Poisition: Poisition
-'Update step': 'Update step'
-'Clone step': 'Clone step'
-'Delete step': 'Delete step'
+'Add transition to this step': 'Add transition to this step'
+'Step': 'Step'
+Position: Position
+'Update this step': 'Update this step'
+'Clone this step': 'Clone this step'
+'Delete this step': 'Delete this step'
 'Entity field': 'Entity field'
 Label: Label
 'Leave empty for system value': 'Leave empty for system value'
@@ -49,10 +49,9 @@ system: system
 yes: yes
 'Update field': 'Update field'
 'Delete field': 'Delete field'
-'Step to': 'Step to'
-'Update transition': 'Update transition'
-'Clone transition': 'Clone transition'
-'Delete transition': 'Delete transition'
+'Update this transition': 'Update this transition'
+'Clone this transition': 'Clone this transition'
+'Delete this transition': 'Delete this transition'
 General: General
 'Add step': 'Add step'
 Designer: Designer
@@ -116,6 +115,30 @@ oro:
             active.label:                 Active
             clone_label_prefix:           'Copy of '
             new_entity:                   New Workflow
+            name.tooltip:                 "The name of the workflow"
+            related_entity.tooltip:       "The related entity is the entity for which the workflow is created. When the workflow is active, it can be launched and executed on the records of its related entity."
+            steps_display_ordered.tooltip: "When this box is selected, all workflow steps will be shown on the Related entity view page so the entire progression path can be seen. Otherwise, only the current step and the past steps of the workflow will be shown.<br/><strong>Note:</strong> We recommend not to check this box for non-linear workflows where two or more steps have the same priority to avoid confusion."
+            start_step.tooltip:           "When a default step is specified, all newly created records of the Related entity will have a workflow associated to them; and the workflow will be in the default step. If no step is selected, all newly created records will have no workflow associated to them, and it must be launched with one of the starting transitions."
+
+            attribute:
+                property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
+                label.tooltip:            "Use this if you want to re-label the entity field on the view form of the transition. If you leave this field blank, a system value will be used as a label."
+                required.tooltip:         "Check this box if you want to require the user to add some information to this entity field. Note that this requirement applies to the view form of transition only, and has no effect on entity attributes."
+
+            transition:
+                name.tooltip:             "The name of the transition that will be displayed on its button."
+                step_from.tooltip:        "The workflow step, for which the transition button should appear on the entity page."
+                step_to.tooltip:          "The step to which the workflow will progress after the transition is performed."
+                display_type.tooltip:     "Transition attributes can appear in one of two available forms: In the popup window, which is a default transition behavior suitable for most cases, or on the separate page, which should be used with care and only for attribute-heavy transitions."
+                message.tooltip:          "If you want to show a warning popup message to the user before transition is executed, put the text of the warning into this field."
+                icon.tooltip:             "An icon that will appear on the transition button before the transition name."
+                button_color.tooltip:     "This control specifies the visual style of the transition button."
+                button_preview.tooltip:   "This is the live preview of the transition button as it will appear on the entity page."
+
+            step:
+                name.tooltip:             "The name of the step that will be displayed on the entity record."
+                order.tooltip:            "A number that determines the position of the step in the workflow. The higher is the number, the further is the step from the start"
+                is_final.tooltip:         'This option marks the step as the logical "end" or the outcome of the workflow. This is a purely logical property that is needed to distinguish such steps for drawing the funnel charts or creating reports on the workflow data. Marking the step as final has no effect on the flow itself.'
 
             datagrid:
                 update: Update
