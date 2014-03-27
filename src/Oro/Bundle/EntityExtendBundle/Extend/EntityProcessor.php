@@ -111,7 +111,7 @@ class EntityProcessor
                 function (ConfigInterface $config) {
                     return
                         $config->is('is_extend')
-                        && !in_array($config->get('state'), [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED]);
+                        && ! $config->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED]);
                 }
             );
 
