@@ -16,7 +16,7 @@ config:
         'orosidebar/js/widget-container/icon-view': 'bundles/orosidebar/js/widget-container/icon-view.js'
         'orosidebar/js/widget-container/widget-add-view': 'bundles/orosidebar/js/widget-container/widget-add-view.js'
         'orosidebar/js/widget-container/widget-setup-view': 'bundles/orosidebar/js/widget-container/widget-setup-view.js'
-        'orosidebar/widget/sticky-note': 'bundles/orosidebar/sidebar_widgets/sticky_note/js/widget.js'
+        'orosidebar/widget/hello-world': 'bundles/orosidebar/sidebar_widgets/hello_world/js/widget.js'
 build:
     paths:
         'orosidebar/js/templates/template.html': 'empty:'
