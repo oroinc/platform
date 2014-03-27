@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\EventListener\Console;
 
-use Oro\Bundle\PlatformBundle\EventListener\Console\CommandListener;
+use Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener;
 use Oro\Bundle\PlatformBundle\Maintenance\Events;
 
-class CommandListenerTest extends \PHPUnit_Framework_TestCase
+class DriverLockCommandListenerTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
-     * @var CommandListener
+     * @var DriverLockCommandListener
      */
     protected $target;
 
@@ -41,14 +40,14 @@ class CommandListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->target = new CommandListener($this->dispatcherInterface);
+        $this->target = new DriverLockCommandListener($this->dispatcherInterface);
     }
 
     public function testAfterExecuteShouldDispatchMaintenanceOnEvent()
     {
         $this->command->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue(CommandListener::LEXIK_MAINTENANCE_LOCK));
+            ->will($this->returnValue(DriverLockCommandListener::LEXIK_MAINTENANCE_LOCK));
 
         $this->dispatcherInterface->expects($this->once())->method('dispatch')->with(Events::MAINTENANCE_ON);
 
@@ -61,9 +60,23 @@ class CommandListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->command->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue(CommandListener::LEXIK_MAINTENANCE_UNLOCK));
+            ->will($this->returnValue(DriverLockCommandListener::LEXIK_MAINTENANCE_UNLOCK));
 
         $this->dispatcherInterface->expects($this->once())->method('dispatch')->with(Events::MAINTENANCE_OFF);
+
+        $this->event->expects($this->once())->method('getCommand')->will($this->returnValue($this->command));
+
+        $this->target->afterExecute($this->event);
+    }
+
+    public function testNoEventDispatchedIfNotMaintenanceCommand()
+    {
+        $unknownCommand = 'UnknownCommand';
+        $this->command->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($unknownCommand));
+
+        $this->dispatcherInterface->expects($this->never())->method('dispatch');
 
         $this->event->expects($this->once())->method('getCommand')->will($this->returnValue($this->command));
 
