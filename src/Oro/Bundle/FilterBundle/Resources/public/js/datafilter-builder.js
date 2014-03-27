@@ -31,7 +31,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
                 options.collection = this.collection;
                 var filtersList = new FiltersManager(options);
                 this.$el.prepend(filtersList.render().$el);
-                mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
+                mediator.trigger('datagrid_filters:rendered', this.collection);
                 this.metadata.state.filters = this.metadata.state.filters || [];
                 if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                     filtersList.$el.hide();

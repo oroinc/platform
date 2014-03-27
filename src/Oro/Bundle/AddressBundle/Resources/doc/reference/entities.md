@@ -1,7 +1,7 @@
 Address Entities
 ----------------
 
-OroAddressBunle provides several entities to work with addresses.
+OroAddressBundle provides several entities to work with addresses.
 
 ### Classes Description
 

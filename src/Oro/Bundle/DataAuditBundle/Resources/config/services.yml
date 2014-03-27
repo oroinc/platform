@@ -56,7 +56,7 @@ services:
             - @oro_datagrid.datagrid.request_params
             - [objectClass, objectId]
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.audit-history-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.audit-history-grid, method: onBuildAfter }
 
     oro_dataaudit.twig.extension.auditable:
         class: %oro_dataaudit.twig.extension.auditable.class%
