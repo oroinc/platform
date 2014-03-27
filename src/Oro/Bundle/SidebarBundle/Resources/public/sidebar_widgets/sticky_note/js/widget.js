@@ -5,11 +5,11 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     'use strict';
 
     /**
-     * @export  orosidebar/widget/hello-world
+     * @export  orosidebar/widget/sticky-note
      */
-    var helloWorld = {};
+    var stickyNote = {};
 
-    helloWorld.ContentView = Backbone.View.extend({
+    stickyNote.ContentView = Backbone.View.extend({
         initialize: function () {
             var view = this;
             view.listenTo(view.model, 'change', view.render);
@@ -24,8 +24,8 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
         }
     });
 
-    helloWorld.SetupView = Backbone.View.extend({
-        template: _.template('<h3>Hello world settings</h3><textarea style="width: 400px; height: 150px;"><%= settings.content %></textarea>'),
+    stickyNote.SetupView = Backbone.View.extend({
+        template: _.template('<h3>Sticky Note settings</h3><textarea style="width: 400px; height: 150px;"><%= settings.content %></textarea>'),
 
         initialize: function () {
             this.on('ok', this.onSubmit);
@@ -55,5 +55,5 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
         }
     });
 
-    return helloWorld;
+    return stickyNote;
 });
