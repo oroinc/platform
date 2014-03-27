@@ -36,7 +36,7 @@ abstract class AbstractConfigurationProvider
 
         // prepare finder
         $finder = new Finder();
-        $finder->in($configDirectories)->name($this->getConfigFilePattern());
+        $finder->in($configDirectories)->followLinks()->name($this->getConfigFilePattern());
 
         if ($directoriesWhiteList) {
             $finder->filter(

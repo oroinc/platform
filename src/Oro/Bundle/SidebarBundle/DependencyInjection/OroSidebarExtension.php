@@ -51,6 +51,7 @@ class OroSidebarExtension extends Extension
             $finder
                 ->files()
                 ->path('#^Resources/public/sidebar_widgets/\w+/widget.yml#')
+                ->followLinks()
                 ->in($bundlePath);
 
             /** @var SplFileInfo $file */

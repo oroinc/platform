@@ -35,7 +35,7 @@ abstract class AbstractEmailFixture extends AbstractFixture
     {
         if (is_dir($dir)) {
             $finder = new Finder();
-            $files = $finder->files()->in($dir);
+            $files = $finder->files()->followLinks()->in($dir);
         } else {
             $files = array();
         }

@@ -155,7 +155,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
 
         $finder = new Finder();
-        $finder->name('AppKernel.php')->depth(0)->in($dir);
+        $finder->name('AppKernel.php')->depth(0)->followLinks()->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
             throw new \RuntimeException(
