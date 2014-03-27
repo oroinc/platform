@@ -29,6 +29,8 @@
                 {% set itemValue = itemValue | oro_format_currency %}
             {% elseif item.type == 'percent' %}
                 {% set itemValue = itemValue | oro_format_percent %}
+            {% elseif item.type == 'date' %}
+                {% set itemValue = itemValue | oro_format_date %}
             {% elseif not hasLink %}
                 {% set itemValue = itemValue|escape %}
             {% endif %}
