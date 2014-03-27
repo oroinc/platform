@@ -10,7 +10,7 @@ oro:
                 bigint:             BigInt
                 boolean:            Boolean
                 decimal:            Decimal
-                date:               SmallInt
+                date:               Date
                 text:               Text
                 float:              Float
                 money:              Currency

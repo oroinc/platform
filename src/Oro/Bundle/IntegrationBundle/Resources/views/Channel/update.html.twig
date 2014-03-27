@@ -39,7 +39,6 @@
 {% endblock navButtons %}
 
 {% block pageHeader %}
-    {% set title = 'oro.integration.channel.create_entity'|trans %}
     {% if entity.id %}
         {% set breadcrumbs = {
             'entity':      entity,
@@ -49,7 +48,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.integration.channel.create_entity'|trans }%}
     {% endif %}
 {% endblock pageHeader %}
 

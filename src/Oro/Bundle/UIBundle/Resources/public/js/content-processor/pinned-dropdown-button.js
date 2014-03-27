@@ -14,7 +14,7 @@ define(['./dropdown-button'], function ($) {
         _create: function () {
             this._super();
             this._on({
-                'click [button-index]': this._onButtonClick
+                'click [data-button-index]': this._onButtonClick
             });
         },
 
@@ -27,13 +27,13 @@ define(['./dropdown-button'], function ($) {
         _collectButtons: function () {
             var $buttons = this._super();
             $buttons.filter(':not(.divider)').each(function (i) {
-                $(this).attr('button-index', '').data('button-index', i);
+                $(this).attr('data-button-index', '').data('button-index', i);
             });
             return $buttons;
         },
 
         /**
-         * Fetches main buttons
+         * Defines main buttons
          *
          * @param {jQuery} $buttons
          * @returns {jQuery}
@@ -41,7 +41,7 @@ define(['./dropdown-button'], function ($) {
          */
         _mainButtons: function ($buttons) {
             var index = localStorage.getItem(this.keyPreffix + this.options.groupKey) || 0;
-            return $buttons.get(index) || this._superApply(arguments);
+            return $($buttons.get(index)) || this._superApply(arguments);
         },
 
         /**
@@ -51,7 +51,7 @@ define(['./dropdown-button'], function ($) {
          * @private
          */
         _onButtonClick: function (e) {
-            localStorage.setItem(this.keyPreffix + this.options.groupKey, $(e.target).data('button-index'));
+            localStorage.setItem(this.keyPreffix + this.options.groupKey, $(e.target).data('button-index') || 0);
         }
     });
 

@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\MigrationBundle\Tools;
+namespace Oro\Bundle\MigrationBundle\Twig;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
-class SchemaDumperTwigExtension extends \Twig_Extension
+class SchemaDumperExtension extends \Twig_Extension
 {
     /**
      * @var AbstractPlatform
@@ -27,23 +28,29 @@ class SchemaDumperTwigExtension extends \Twig_Extension
     }
 
     /**
+     * @param ManagerRegistry $doctrine
+     */
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $doctrine->getConnection();
+        $this->platform = $connection->getDatabasePlatform();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
     {
         return array(
-            'getColumnOptions' => new \Twig_Function_Method($this, 'getColumnOptions'),
+            'oro_migration_get_schema_column_options' => new \Twig_Function_Method($this, 'getColumnOptions'),
         );
     }
 
     /**
-     * @param AbstractPlatform $platform
+     * @param Column $column
+     * @return array
      */
-    public function setPlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
-
     public function getColumnOptions(Column $column)
     {
         if (!$this->defaultColumn) {
@@ -80,6 +87,11 @@ class SchemaDumperTwigExtension extends \Twig_Extension
         return $options;
     }
 
+    /**
+     * @param Column $column
+     * @param string $optionName
+     * @return mixed
+     */
     protected function getColumnOption(Column $column, $optionName)
     {
         $method = "get" . $optionName;

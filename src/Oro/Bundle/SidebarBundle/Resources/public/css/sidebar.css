@@ -27,6 +27,12 @@
     -ms-user-select: none;
     user-select: none;
 }
+.sidebar{
+    margin-bottom: 33px;
+}
+.dev-mode .sidebar{
+    margin-bottom: 72px;
+}
 
 .sidebar-maximized .sidebar-widget-close{
     display: none;

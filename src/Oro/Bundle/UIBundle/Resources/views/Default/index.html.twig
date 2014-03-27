@@ -36,7 +36,7 @@
             {% endblock %}
         {% endblock %}
     </head>
-    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
+    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
         <h3>{% trans %}Loading ...{% endtrans %}</h3>
