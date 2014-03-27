@@ -722,6 +722,14 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ),
                 array('step1', 'step3')
             ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step2'),
+                ),
+                array('step1', 'step3', 'step2')
+            ),
         );
     }
 

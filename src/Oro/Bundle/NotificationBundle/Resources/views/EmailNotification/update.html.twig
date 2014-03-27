@@ -5,10 +5,6 @@
     'OroNotificationBundle:Form:fields.html.twig',
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
-{% set title = form.vars.value.id
-    ? 'oro.notification.emailnotification.edit_entity'|trans ~ ' ' ~ form.vars.value.id
-    : 'oro.notification.emailnotification.new_entity'|trans
-%}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
 {% endif %}
@@ -44,12 +40,12 @@
                 'entity':      form.vars.value,
                 'indexPath':   path('oro_notification_emailnotification_index'),
                 'indexLabel':  'oro.notification.emailnotification.entity_plural_label'|trans,
-                'entityTitle': title
+                'entityTitle': 'oro.notification.emailnotification.edit_entity'|trans ~ ' ' ~ form.vars.value.id
             }
         %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.notification.emailnotification.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

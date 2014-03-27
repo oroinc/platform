@@ -1,5 +1,6 @@
-Sidebars
-========
+OroSidebarBundle
+================
+
 Sidebars layout and Widget containers
 
 ## Sidebar initializing

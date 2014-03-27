@@ -5,12 +5,15 @@ datagrid:
             acl_resource: oro_jobs
             query:
                 select:
-                    - j
+                    - partial j.{id, command, args, state, runtime, memoryUsageReal, createdAt}
                 from:
                     - { table: JMSJobQueueBundle:Job , alias: j }
                 where:
                     and:
                         - j.originalJob IS NULL
+            hints:
+                - HINT_FORCE_PARTIAL_LOAD
+
         columns:
             command:
                 label: oro.cron.header.command

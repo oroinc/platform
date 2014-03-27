@@ -51,7 +51,7 @@ class DatabasePersister
             $this->em->beginTransaction();
             foreach ($data as $domain => $domainData) {
                 foreach ($domainData as $key => $translation) {
-                    if (strlen($key) <= MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+                    if (strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
                         continue;
                     }
 
