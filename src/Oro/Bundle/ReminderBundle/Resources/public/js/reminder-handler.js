@@ -166,8 +166,11 @@ define(
                         template = $('.reminder_templates[data-identifier="default"]').html();
                     }
                     message += _.template(template, reminder);
-                } catch (Exception) {
+                } catch (ex) {
                     // Suppress possible exceptions during template processing
+                    if (console && (typeof console.log === 'function')) {
+                        console.log('Exception occurred when compiling reminder template', ex);
+                    }
                 }
                 return message;
             }
