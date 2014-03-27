@@ -153,8 +153,8 @@ services:
         calls:
           - [setEmailSync, [@?oro_imap.email_synchronizer=]]
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.users-email-grid, method: onBuildAfter }
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-email-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
 
     oro_user.event_listener.without_from_user_email_grid_listener:
         class: %oro_user.event_listener.user_email_grid_listener.class%
@@ -164,7 +164,7 @@ services:
         calls:
           - [setEmailSync, [@?oro_imap.email_synchronizer=]]
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
 
     oro_user.event_listener.role_users_grid_listener:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
@@ -172,7 +172,7 @@ services:
           - role_id
           - @oro_datagrid.datagrid.request_params
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.role-users-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.role-users-grid, method: onBuildAfter }
 
     oro_user.event_listener.group_users_grid_listener:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
@@ -180,7 +180,7 @@ services:
           - group_id
           - @oro_datagrid.datagrid.request_params
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.group-users-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.group-users-grid, method: onBuildAfter }
 
     oro_user.handler.delete:
         class: %oro_user.handler.delete.class%

@@ -4,12 +4,13 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
-use Oro\Bundle\MigrationBundle\Tools\SchemaDumperTwigExtension;
 
-class SchemaDumperTwigExtensionTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
+
+class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var SchemaDumperTwigExtension
+     * @var SchemaDumperExtension
      */
     protected $extension;
 
@@ -24,8 +25,18 @@ class SchemaDumperTwigExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['isCommentedDoctrineType'])
             ->getMockForAbstractClass();
-        $this->extension = new SchemaDumperTwigExtension();
-        $this->extension->setPlatform($this->platform);
+
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue($this->platform));
+
+        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $managerRegistry->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection));
+
+        $this->extension = new SchemaDumperExtension($managerRegistry);
     }
 
     public function testGetName()

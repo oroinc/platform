@@ -1,5 +1,6 @@
-EntityExtendBundle
-==================
+OroEntityExtendBundle
+=====================
+
 - Allows to add an additional fields into existing entities through UI or using configuration files
 - Allows to add new entities through UI or using configuration files
 

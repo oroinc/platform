@@ -37,30 +37,24 @@ class WidgetController extends Controller
      */
     public function stepsAction($entityClass, $entityId)
     {
-        /** @var EntityConnector $entityConnector */
-        $entityConnector = $this->get('oro_workflow.entity_connector');
         $entity = $this->getEntityReference($entityClass, $entityId);
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflowItem = $entityConnector->getWorkflowItem($entity);
-        $currentStep = $entityConnector->getWorkflowStep($entity);
+        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+
         $steps = array();
+        $currentStep = null;
         if ($workflowItem) {
             $workflow = $workflowManager->getWorkflow($workflowItem);
 
-            $workflowDefinition = $workflow->getDefinition();
-
-            if ($workflowDefinition->isStepsDisplayOrdered()) {
+            if ($workflow->getDefinition()->isStepsDisplayOrdered()) {
                 $steps = $workflow->getStepManager()->getOrderedSteps();
             } else {
                 $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
             }
 
-            if (!$currentStep) {
-                $currentStepName = $workflowItem->getCurrentStep()->getName();
-                $currentStep = $workflow->getStepManager()->getStep($currentStepName);
-            }
+            $currentStep = $workflowItem->getCurrentStep();
         }
 
         return array(

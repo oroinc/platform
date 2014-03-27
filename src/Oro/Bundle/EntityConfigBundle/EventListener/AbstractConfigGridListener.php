@@ -54,8 +54,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'oro_datagrid.datgrid.build.after.' . static::GRID_NAME  => 'onBuildAfter',
-            'oro_datagrid.datgrid.build.before.' . static::GRID_NAME => 'onBuildBefore',
+            'oro_datagrid.datagrid.build.after.' . static::GRID_NAME  => 'onBuildAfter',
+            'oro_datagrid.datagrid.build.before.' . static::GRID_NAME => 'onBuildBefore',
         );
     }
 

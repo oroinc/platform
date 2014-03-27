@@ -13,6 +13,7 @@ define(['jquery', 'jquery-ui'], function ($) {
             includeButtons: '.btn, .divider, .dropdown-menu>li>*',
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
+            useMainButtonsClone: false,
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
@@ -32,6 +33,9 @@ define(['jquery', 'jquery-ui'], function ($) {
             }
 
             $main = this._mainButtons($elems);
+            if (this.options.useMainButtonsClone) {
+                $main = $main.clone(true);
+            }
             $group.append($main);
 
             // pushes rest buttons to dropdown
@@ -62,7 +66,7 @@ define(['jquery', 'jquery-ui'], function ($) {
         },
 
         /**
-         * Fetches main buttons
+         * Defines main buttons
          *
          * @param {jQuery} $buttons
          * @returns {jQuery}
