@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -63,7 +64,7 @@ class WorkflowRegistry
             return $this->getAssembledWorkflow($workflowDefinition);
         }
 
-        return $this->workflowByName[$workflowName];
+        return $this->updateDbEntities($this->workflowByName[$workflowName]);
     }
 
     /**
@@ -80,7 +81,7 @@ class WorkflowRegistry
             $this->workflowByName[$workflowName] = $workflow;
         }
 
-        return $this->workflowByName[$workflowName];
+        return $this->updateDbEntities($this->workflowByName[$workflowName]);
     }
 
     /**
@@ -166,5 +167,33 @@ class WorkflowRegistry
     protected function getWorkflowDefinitionRepository()
     {
         return $this->managerRegistry->getRepository('OroWorkflowBundle:WorkflowDefinition');
+    }
+
+    /**
+     * Ensure that all database entities in workflow are still in Doctrine Unit of Work
+     *
+     * @param Workflow $workflow
+     * @return Workflow
+     * @throws WorkflowNotFoundException
+     */
+    protected function updateDbEntities(Workflow $workflow)
+    {
+        $oldDefinition = $workflow->getDefinition();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->managerRegistry->getManagerForClass('OroWorkflowBundle:WorkflowDefinition');
+
+        if (!$entityManager->getUnitOfWork()->isInIdentityMap($oldDefinition)) {
+            $definitionName = $oldDefinition->getName();
+
+            $newDefinition = $this->getWorkflowDefinitionRepository()->find($definitionName);
+            if (!$newDefinition) {
+                throw new WorkflowNotFoundException($definitionName);
+            }
+
+            $workflow->setDefinition($newDefinition);
+        }
+
+        return $workflow;
     }
 }
