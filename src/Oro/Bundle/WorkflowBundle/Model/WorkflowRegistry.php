@@ -64,7 +64,7 @@ class WorkflowRegistry
             return $this->getAssembledWorkflow($workflowDefinition);
         }
 
-        return $this->updateDbEntities($this->workflowByName[$workflowName]);
+        return $this->refreshWorkflowDefinitionEntity($this->workflowByName[$workflowName]);
     }
 
     /**
@@ -81,7 +81,7 @@ class WorkflowRegistry
             $this->workflowByName[$workflowName] = $workflow;
         }
 
-        return $this->updateDbEntities($this->workflowByName[$workflowName]);
+        return $this->refreshWorkflowDefinitionEntity($this->workflowByName[$workflowName]);
     }
 
     /**
@@ -176,7 +176,7 @@ class WorkflowRegistry
      * @return Workflow
      * @throws WorkflowNotFoundException
      */
-    protected function updateDbEntities(Workflow $workflow)
+    protected function refreshWorkflowDefinitionEntity(Workflow $workflow)
     {
         $oldDefinition = $workflow->getDefinition();
 
