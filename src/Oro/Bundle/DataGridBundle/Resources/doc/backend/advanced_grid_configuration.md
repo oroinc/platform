@@ -26,7 +26,7 @@ This param will be passed to request and could be applied to datasource in build
           - @oro_datagrid.datagrid.request_params
           - false   # edit mode disabled
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.GRID_NAME, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.GRID_NAME, method: onBuildAfter }
 ```
 #### Problem:
 Let's take previous problem, but in additional we need to fill some form field dependent on grid state.

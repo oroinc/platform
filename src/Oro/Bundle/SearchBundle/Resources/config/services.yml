@@ -92,7 +92,7 @@ services:
         arguments:
           - @oro_datagrid.datagrid.request_params
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.search-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.search-grid, method: onBuildAfter }
 
     oro_search.datasource.search:
         class: %oro_search.datasource.search.class%

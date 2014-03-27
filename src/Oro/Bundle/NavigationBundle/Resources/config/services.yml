@@ -320,4 +320,4 @@ services:
         arguments:
             - @oro_navigation.content.tag_generator_chain
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after, method: buildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }

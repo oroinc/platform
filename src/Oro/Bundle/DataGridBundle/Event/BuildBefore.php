@@ -16,7 +16,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
  */
 class BuildBefore extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.datgrid.build.before';
+    const NAME = 'oro_datagrid.datagrid.build.before';
 
     /** @var DatagridInterface */
     protected $datagrid;
