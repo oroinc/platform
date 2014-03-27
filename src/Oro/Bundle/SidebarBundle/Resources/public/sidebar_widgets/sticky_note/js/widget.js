@@ -25,7 +25,8 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     });
 
     stickyNote.SetupView = Backbone.View.extend({
-        template: _.template('<h3>Sticky Note settings</h3><textarea style="width: 400px; height: 150px;"><%= settings.content %></textarea>'),
+        template: _.template('<h3>Sticky Note settings</h3>' +
+            '<textarea class="sidebar-widget-sticky-note-settings"><%= settings.content %></textarea>'),
 
         initialize: function () {
             this.on('ok', this.onSubmit);
