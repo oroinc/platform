@@ -31,12 +31,7 @@ class PhpCodeExtractor implements ExtractorInterface
     public function extract($directory, MessageCatalogue $catalog)
     {
         $finder = new Finder();
-        $files = $finder
-            ->files()
-            ->name('*.php')
-            ->in($directory. '/../../')
-            ->followLinks()
-            ->exclude(array('Tests', 'Resources'));
+        $files = $finder->files()->name('*.php')->in($directory. '/../../')->exclude(array('Tests', 'Resources'));
         foreach ($files as $file) {
             $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
         }

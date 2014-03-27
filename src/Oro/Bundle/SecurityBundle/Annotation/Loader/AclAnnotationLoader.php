@@ -152,7 +152,6 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
             ->files()
             ->name($filePattern)
             ->in($dirs)
-            ->followLinks()
             ->ignoreVCS(true);
 
         $result = array();

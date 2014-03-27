@@ -57,7 +57,6 @@ class OroThemeExtension extends Extension
             $finder
                 ->files()
                 ->path('#^Resources/public/themes/\w+/settings.yml#')
-                ->followLinks()
                 ->in($bundlePath);
 
             /** @var SplFileInfo $file */

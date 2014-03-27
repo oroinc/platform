@@ -135,7 +135,6 @@ class Runner
         $finder = new Finder();
         $finder->files()
             ->in($this->applicationRootDir)
-            ->followLinks()
             ->name('bundles.php')
             ->name('*ProjectContainer.php');
 
@@ -247,7 +246,6 @@ class Runner
             ->files()
             ->in($this->installationManager->getInstallPath($updatedPackage))
             ->depth(0)
-            ->followLinks()
             ->name('update_*.php');
         $files = [];
         foreach ($iterator as $file) {

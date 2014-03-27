@@ -149,7 +149,6 @@ class AnnotationsReader implements ReaderInterface
             ->files()
             ->name($filePattern)
             ->in($dirs)
-            ->followLinks()
             ->ignoreVCS(true);
 
         $result = [];

@@ -83,7 +83,7 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
             $domainFileRegExp = $this->getDomainFileRegExp();
 
             $finder = new Finder();
-            $finder->in($translationDirectories)->name($domainFileRegExp)->followLinks();
+            $finder->in($translationDirectories)->name($domainFileRegExp);
 
             $this->translationLocales = array();
             /** @var $file \SplFileInfo */

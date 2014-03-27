@@ -160,7 +160,7 @@ class MigrationsLoader
 
                 // get directories contain versioned migration scripts
                 $finder = new Finder();
-                $finder->directories()->depth(0)->followLinks()->in($bundleMigrationPath);
+                $finder->directories()->depth(0)->in($bundleMigrationPath);
                 /** @var SplFileInfo $directory */
                 foreach ($finder as $directory) {
                     $bundleMigrationDirectories[$directory->getRelativePathname()] = $directory->getPathname();
@@ -211,7 +211,7 @@ class MigrationsLoader
         foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
             foreach ($bundleMigrationDirectories as $migrationVersion => $migrationPath) {
                 $fileFinder = new Finder();
-                $fileFinder->depth(0)->files()->name('*.php')->followLinks()->in($migrationPath);
+                $fileFinder->depth(0)->files()->name('*.php')->in($migrationPath);
                 foreach ($fileFinder as $file) {
                     /** @var SplFileInfo $file */
                     $filePath = $file->getPathname();
