@@ -55,7 +55,14 @@ body {
       tbody tr:hover{
         background: none;
       }
-
+      .ui-datepicker-today{
+        a.ui-state-default{
+          border-color: lighten(#ccc, 10%);
+          &:hover{
+            border-color: #ccc;
+          }
+        }
+      }
       a.ui-state-default{
         background:none;
         font-size: 13px;
@@ -67,11 +74,9 @@ body {
           #gradient > .vertical(#ffffff, #fafafa);
           border-color: #ccc;
         }
-      }
-      .ui-datepicker-today{
-        a.ui-state-default{
-          #gradient > .vertical(#ffffff, #fafafa);
-          border-color: #ccc;
+        &.ui-state-active {
+          color: black;
+          font-weight: bold;
         }
       }
     }
