@@ -1,5 +1,6 @@
 OroOrganizationBundle
-========================
+=====================
+
 The `OroOrganizationBundle` introduced 2 entities: Organization and Business Units that will help with data
 responsibility and configuration.
 

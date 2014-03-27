@@ -29,6 +29,7 @@ class AclConfigurationPass implements CompilerPassInterface
     const DOCTRINE_CONVERTER = 'sensio_framework_extra.converter.doctrine.orm';
     const DOCTRINE_CONVERTER_CLASS = 'Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter';
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
+    const ENTITY_CLASS_RESOLVER = 'oro_entity.orm.entity_class_resolver';
 
     /**
      * {@inheritDoc}
@@ -42,12 +43,18 @@ class AclConfigurationPass implements CompilerPassInterface
         $this->configureParamConverter($container);
     }
 
+    /**
+     * Change configuration for doctrine param converter
+     *
+     * @param ContainerBuilder $container
+     */
     protected function configureParamConverter(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::DOCTRINE_CONVERTER)) {
             $paramConverterDef = $container->getDefinition(self::DOCTRINE_CONVERTER);
             $paramConverterDef->setClass(self::DOCTRINE_CONVERTER_CLASS);
             $paramConverterDef->addArgument(new Reference(self::SECURITY_FACADE_SERVICE));
+            $paramConverterDef->addArgument(new Reference(self::ENTITY_CLASS_RESOLVER));
         }
     }
 
