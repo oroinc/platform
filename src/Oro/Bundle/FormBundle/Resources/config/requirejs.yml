@@ -29,3 +29,4 @@ config:
         'oroform/js/multiple-entity/model': 'bundles/oroform/js/multiple-entity/model.js'
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
         'oroform/js/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'
+        'oroform/js/select2_relevancy_order_handler': 'bundles/oroform/js/select2-relevancy-order-handler.js'
