@@ -21,11 +21,14 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_notification');
+        $rootNode    = $treeBuilder->root('oro_notification');
 
         SettingsBuilder::append(
             $rootNode,
-            ['send_from' => ['value' => 'no-reply@localhost']] // default value
+            [
+                'email_notification_sender_email' => ['value' => sprintf('no-reply@%s.example', gethostname())],
+                'email_notification_sender_name'  => ['value' => 'OroCRM']
+            ]
         );
         return $treeBuilder;
     }

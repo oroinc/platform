@@ -10,10 +10,11 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\Translator;
 
-use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
@@ -24,10 +25,8 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      */
     protected $templating;
 
-    /**
-     * @var string
-     */
-    protected $platformEmail;
+    /** ConfigManager */
+    protected $cm;
 
     /**
      * @var \Swift_Mailer
@@ -64,7 +63,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      * @param Request           $request
      * @param UserManager       $manager
      * @param DelegatingEngine  $templating
-     * @param string            $platformEmail
+     * @param ConfigManager     $cm
      * @param \Swift_Mailer     $mailer
      * @param FlashBagInterface $flashBag
      * @param Translator        $translator
@@ -74,8 +73,8 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         FormInterface $form,
         Request $request,
         UserManager $manager,
+        ConfigManager $cm = null,
         DelegatingEngine $templating = null,
-        $platformEmail = null,
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
         Translator $translator = null,
@@ -83,12 +82,12 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     ) {
         parent::__construct($form, $request, $manager);
 
-        $this->templating    = $templating;
-        $this->platformEmail = $platformEmail;
-        $this->mailer        = $mailer;
-        $this->flashBag      = $flashBag;
-        $this->translator    = $translator;
-        $this->logger        = $logger;
+        $this->templating = $templating;
+        $this->cm         = $cm;
+        $this->mailer     = $mailer;
+        $this->flashBag   = $flashBag;
+        $this->translator = $translator;
+        $this->logger     = $logger;
     }
 
     /**
@@ -160,14 +159,22 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /**
      * Send invite email to new user
      *
-     * @param User $user
+     * @param User   $user
      * @param string $plainPassword
+     *
+     * @throws \RuntimeException
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
+        if (in_array(null, [$this->cm, $this->mailer, $this->templating], true)) {
+            throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
+        }
+        $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
+        $senderName  = $this->cm->get('oro_notification.email_notification_sender_email');
+
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')
-            ->setFrom($this->platformEmail)
+            ->setFrom($senderEmail, $senderName)
             ->setTo($user->getEmail())
             ->setBody(
                 $this->templating->render(
