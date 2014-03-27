@@ -296,9 +296,9 @@
         <div class="grid-container steps-list">
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
-                    <th class="label-column"><span>{{ "Step name"|trans }}</span></th>
+                    <th class="label-column"><span>{{ "Step"|trans }}</span></th>
                     <th><span>{{ "Transitions"|trans }}</span></th>
-                    <th><span>{{ "Position"|trans }}</span></th>
+                    <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">{{ "Position"|trans }}</span></th>
                     <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                 </thead>
                 <tbody class="item-container"></tbody>
@@ -313,10 +313,10 @@
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%= label %></a>
             <% } %>
-            <% if (is_final) { %>&nbsp;<strong>({{ "Final"|trans }})</strong><% } %>
+            <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans }}">({{ "Final"|trans }})</strong><% } %>
         </td>
         <td class="step-transitions"></td>
-        <td><%= order %></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}"><%= order %></span></td>
         <td class="step-actions">
             <div class="pull-right">
                 <a href="#" class="add-step-transition" title="{{ 'Add transition to this step'|trans}}" class="action"><i class="icon-plus-sign hide-text"/></a>
@@ -334,7 +334,7 @@
         <a href="#" class="clone-transition action" title="{{ 'Clone this transition'|trans }}"><i class="icon-copy hide-text"></i></a>
         <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"></i></a>
         <i class="icon-long-arrow-right"/>
-        <span><%= stepToLabel %></span>
+        <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%= stepToLabel %></span>
     </script>
 
     <script type="text/template" id="attribute-form-option-edit-template">
@@ -417,8 +417,8 @@
         <div class="grid-container transition-list">
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
-                <th><span>{{ "Transition name"|trans }}</span></th>
-                <th><span>{{ "Step to"|trans }}</span></th>
+                <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}">{{ "Transition name"|trans }}</span></th>
+                <th><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ "To step"|trans }}</span></th>
                 <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                 </thead>
                 <tbody class="item-container">
@@ -436,9 +436,9 @@
 
     <script type="text/template" id="transition-row-template">
         <td class="transition-name">
-            <%= label %>
+            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}"><%= label %></span>
         </td>
-        <td><%= stepToLabel %></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%= stepToLabel %></span></td>
         <td class="transition-actions">
             <div class="pull-right">
                 <a href="#" class="delete-transition action" title="{{ 'Delete this transition'|trans }}"><i class="icon-trash hide-text"/></a>

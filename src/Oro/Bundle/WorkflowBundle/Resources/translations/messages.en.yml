@@ -34,7 +34,7 @@ Final: Final
 Transitions: Transitions
 'Add transition': 'Add transition'
 'Add transition to this step': 'Add transition to this step'
-'Step name': 'Step name'
+'Step': 'Step'
 Position: Position
 'Update this step': 'Update this step'
 'Clone this step': 'Clone this step'
@@ -49,7 +49,6 @@ system: system
 yes: yes
 'Update field': 'Update field'
 'Delete field': 'Delete field'
-'Step to': 'Step to'
 'Update this transition': 'Update this transition'
 'Clone this transition': 'Clone this transition'
 'Delete this transition': 'Delete this transition'
@@ -139,7 +138,7 @@ oro:
             step:
                 name.tooltip:             "The name of the step that will be displayed on the entity record."
                 order.tooltip:            "A number that determines the position of the step in the workflow. The higher is the number, the further is the step from the start"
-                is_final.tooltip:         Checking this box marks the step as the logical "end" or the outcome of the workflow. This is a purely logical property that is needed to distinguish such steps for drawing the funnel charts or creating reports on the workflow data. Marking the step as final has no effect on the flow itself.
+                is_final.tooltip:         'This option marks the step as the logical "end" or the outcome of the workflow. This is a purely logical property that is needed to distinguish such steps for drawing the funnel charts or creating reports on the workflow data. Marking the step as final has no effect on the flow itself.'
 
             datagrid:
                 update: Update
