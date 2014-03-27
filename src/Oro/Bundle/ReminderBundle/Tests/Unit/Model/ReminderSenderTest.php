@@ -26,7 +26,7 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
         $this->sender = new ReminderSender($this->registry);
     }
 
-    public function testSend()
+    public function testPush()
     {
         $method = 'foo_method';
 
@@ -44,9 +44,27 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($processor));
 
         $processor->expects($this->once())
-            ->method('process')
+            ->method('push')
             ->with($reminder);
 
-        $this->sender->send($reminder);
+        $this->sender->push($reminder);
+    }
+
+    public function testSend()
+    {
+        $fooProcessor = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
+        $barProcessor = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
+
+        $this->registry->expects($this->once())
+            ->method('getProcessors')
+            ->will($this->returnValue(array($fooProcessor, $barProcessor)));
+
+        $fooProcessor->expects($this->once())
+            ->method('process');
+
+        $barProcessor->expects($this->once())
+            ->method('process');
+
+        $this->sender->send();
     }
 }
