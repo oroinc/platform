@@ -304,7 +304,7 @@ function(_, Backbone, messanger, __,
         _createStartingPoint: function() {
             var startStepModel = new StepModel({
                 'name': 'step:starting_point',
-                'label': __('(Starting point)'),
+                'label': __('(Start)'),
                 'order': -1,
                 '_is_start': true
             });
@@ -357,13 +357,23 @@ function(_, Backbone, messanger, __,
             this.openManageTransitionForm(transition, step);
         },
 
+        _showModalMessage: function(message, title, okText) {
+            var confirm = new Confirmation({
+                title: title || '',
+                content: message,
+                okText: okText || __('Ok'),
+                allowCancel: false
+            });
+            confirm.open();
+        },
+
         openManageTransitionForm: function(transition, step_from) {
             if (this.model.get('steps').length == 1) {
-                messanger.notificationFlashMessage('error', __('At least one step should be added to add transition.'));
+                this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
                 return;
             }
             if (!this.$entitySelectEl.val()) {
-                messanger.notificationFlashMessage('error', __('Related entity must be selected to add transition.'));
+                this._showModalMessage(__('Related entity must be selected to add transition.'), __('Warning'));
                 return;
             }
 
@@ -398,7 +408,7 @@ function(_, Backbone, messanger, __,
 
         openManageStepForm: function(step) {
             if (!this.$entitySelectEl.val()) {
-                messanger.notificationFlashMessage('error', __('Related entity must be selected to add step.'));
+                this._showModalMessage(__('Related entity must be selected to add step.'), __('Warning'));
                 return;
             }
 

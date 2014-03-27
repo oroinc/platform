@@ -23,6 +23,11 @@ class OrmDatasource implements DatasourceInterface
     /** @var QueryBuilder */
     protected $qb;
 
+    /**
+     * @var array
+     */
+    protected $queryHints;
+
     /** @var EntityManager */
     protected $em;
 
@@ -78,6 +83,10 @@ class OrmDatasource implements DatasourceInterface
             throw new \Exception(get_class($this).' expects to be configured with query or repository method');
         }
 
+        if (isset($config['hints'])) {
+            $this->processQueryHints($config['hints']);
+        }
+
         $grid->setDatasource(clone $this);
     }
 
@@ -87,6 +96,8 @@ class OrmDatasource implements DatasourceInterface
     public function getResults()
     {
         $query = $this->qb->getQuery();
+
+        $this->setQueryHints($query);
 
         $event = new OrmResultBefore($this->datagrid, $query);
         $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
@@ -127,5 +138,41 @@ class OrmDatasource implements DatasourceInterface
         $this->qb = $qb;
 
         return $this;
+    }
+
+    /**
+     * Parses 'hints' configuration and save it in $this->queryHints
+     *
+     * @param array $config
+     */
+    protected function processQueryHints(array $config)
+    {
+        if (!empty($config)) {
+            $this->queryHints = [];
+            foreach ($config as $hint) {
+                if (is_array($hint)) {
+                    $this->queryHints[$hint['name']] = isset($hint['value']) ? $hint['value'] : true;
+                } elseif (is_string($hint)) {
+                    $this->queryHints[$hint] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets hints for result query
+     *
+     * @param Query $query
+     */
+    protected function setQueryHints(Query $query)
+    {
+        if (!empty($this->queryHints)) {
+            foreach ($this->queryHints as $name => $value) {
+                if (defined("Doctrine\\ORM\\Query::$name")) {
+                    $name = constant("Doctrine\\ORM\\Query::$name");
+                }
+                $query->setHint($name, $value);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
-{% set title = form.vars.value.id ? form.vars.value.name|default('N/A') : 'New Tag'|trans %}
+
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%tag.name%": form.vars.value.name} }) %}
 {% endif %}
@@ -32,7 +32,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.tag.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

@@ -2,6 +2,7 @@ oro:
     segment:
         entity_label:        Segment
         entity_plural_label: Segments
+        new_entity:          New segment
         id:
             label:   Id
         name:
