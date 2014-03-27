@@ -121,24 +121,6 @@ define(function (require) {
              */
             afterBuild: function () {
                 mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
-
-                if (
-                    this.metadata.hasOwnProperty('filters') && this.metadata.filters.length &&
-                    this.grid.collection.length && !this.grid.noColumnsFlag
-                ) {
-                    mediator.once('datagrid_filters:rendered', methods.showGrid);
-                    this.$el.hide();
-                }
-            },
-
-            /**
-             * Show is already rendered grid
-             *
-             * @param {Object} collection
-             * @param {Object} $el
-             */
-            showGrid: function(collection, $el) {
-                $el.show();
             },
 
             /**
