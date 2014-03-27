@@ -183,7 +183,7 @@
                 <div class="accordion-body in collapse" id="{{ accordionId }}" >
                     <div class="accordion-inner">
                         {% if scrollBlock.description is defined and scrollBlock.description != '' %}
-                            <p>{{ scrollBlock.description }}</p>
+                            <p>{{ scrollBlock.description|trans }}</p>
                         {% endif %}
 
                         {% for subblock in scrollBlock.subblocks %}
