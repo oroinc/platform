@@ -20,7 +20,7 @@ function($, __, localeSettings) {
         millisecText: __('Millisecond'),
         microsecText: __('Microsecond'),
         timezoneText: __('Time Zone'),
-        defaultTimezone: localeSettings.getTimeZoneOffset().replace(':', ''),
+        timezone: localeSettings.getTimeZoneOffset().replace(':', ''),
         separator: localeSettings.getDateTimeFormatSeparator()
     };
     $.timepicker.setDefaults($.timepicker.regional[locale]);
