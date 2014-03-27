@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -104,6 +105,11 @@ class WorkflowEntityVoter implements VoterInterface
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         if (!$object || !is_object($object)) {
+            return self::ACCESS_ABSTAIN;
+        }
+
+        // skip request
+        if ($object instanceof Request) {
             return self::ACCESS_ABSTAIN;
         }
 
