@@ -345,9 +345,7 @@
     <script type="text/javascript">
         require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui-timepicker'],
         function($, datetimeFormatter) {
-            console.log('datetimepicker');
             var selector = $("#{{ selector_id }}");
-            selector.css('zIndex', 800);
             var actual = $("#{{ actual_id }}");
             var sync = function() {
                 selector.val(datetimeFormatter.formatDateTime(actual.val()));
