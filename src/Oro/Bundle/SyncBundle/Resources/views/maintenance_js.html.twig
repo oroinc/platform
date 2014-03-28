@@ -1,12 +1,15 @@
 <script type="text/javascript">
     require(['orosync/js/sync', 'oroui/js/modal', 'orotranslation/js/translator'],
-    function(sync, Modal, __){
-        // captured outer variable
+    function(sync, Modal, __) {
         var dialog = null;
 
         sync.subscribe('oro/maintenance', function (response) {
             if (response.isOn) {
                 var regExp = new RegExp('\n', 'g');
+                if (dialog) {
+                    dialog.close();
+                    dialog.remove();
+                }
                 dialog = new Modal({
                     'content': __('oro.platform.maintenance_mode_on_message').replace(regExp, '<br/>'),
                     'className': 'modal oro-modal-danger oro-modal-maintenance',
