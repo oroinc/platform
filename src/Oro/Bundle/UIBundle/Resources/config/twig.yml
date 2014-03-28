@@ -57,6 +57,7 @@ services:
         arguments:
             - @oro_menu.twig.extension
             - @router
+            - @oro_security.security_facade
         tags:
             - { name: twig.extension }
 

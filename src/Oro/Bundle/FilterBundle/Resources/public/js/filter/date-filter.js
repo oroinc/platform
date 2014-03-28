@@ -247,6 +247,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 })
             );
             this._wrap($filter);
+            this.$(this.criteriaSelector).attr('tabindex', '0');
 
             this.changeFilterType(value.type);
 
@@ -509,7 +510,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         /**
          * @inheritDoc
          */
-        _focusCriteria: function () {},
+        _focusCriteria: function () {
+            this.$(this.criteriaSelector).focus();
+        },
 
         /**
          * @inheritDoc

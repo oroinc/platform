@@ -195,6 +195,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
 
             this.selectWidget.setViewDesign(this);
             this.$(this.buttonSelector).append('<span class="caret"></span>');
+            this.selectWidget.getWidget().on('keyup', _.bind(function (e) {
+                if (e.keyCode === 27) {
+                    this._onClickFilterArea(e);
+                }
+            }, this));
         },
 
         /**

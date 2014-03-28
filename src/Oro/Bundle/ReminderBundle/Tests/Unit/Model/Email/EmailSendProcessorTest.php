@@ -34,6 +34,7 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
         $this->emailNotification = $this
             ->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Model\\Email\\EmailNotification')
             ->disableOriginalConstructor()
+            ->setMethods(array('setReminder', 'getEntity'))
             ->getMock();
 
         $this->processor = new EmailSendProcessor(
@@ -42,40 +43,106 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testPush()
+    {
+        $fooReminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $barReminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+
+        $this->processor->push($fooReminder);
+        $this->processor->push($barReminder);
+
+        $this->assertAttributeEquals(
+            array($fooReminder, $barReminder),
+            'reminders',
+            $this->processor
+        );
+    }
+
     public function testProcess()
     {
-        $reminder = new Reminder();
+        $fooEntity = $this->getMock('Test_Foo_Entity');
+        $fooReminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $barEntity = $this->getMock('Test_Bar_Entity');
+        $barReminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
 
         $this->emailNotification
-            ->expects($this->once())
-            ->method('setReminder');
+            ->expects($this->at(0))
+            ->method('setReminder')
+            ->with($fooReminder);
+
+        $this->emailNotification
+            ->expects($this->at(1))
+            ->method('getEntity')
+            ->will($this->returnValue($fooEntity));
+
+        $this->emailNotification
+            ->expects($this->at(2))
+            ->method('setReminder')
+            ->with($barReminder);
+
+        $this->emailNotification
+            ->expects($this->at(3))
+            ->method('getEntity')
+            ->will($this->returnValue($barEntity));
 
         $this->emailNotificationProcessor
-            ->expects($this->once())
-            ->method('process');
+            ->expects($this->at(0))
+            ->method('process')
+            ->with($fooEntity, array($this->emailNotification));
 
-        $this->processor->process($reminder);
+        $this->emailNotificationProcessor
+            ->expects($this->at(1))
+            ->method('process')
+            ->with($barEntity, array($this->emailNotification));
 
-        $this->assertEquals(Reminder::STATE_SENT, $reminder->getState());
+        $fooReminder->expects($this->once())
+            ->method('setState')
+            ->with(Reminder::STATE_SENT);
+
+        $barReminder->expects($this->once())
+            ->method('setState')
+            ->with(Reminder::STATE_SENT);
+
+        $this->processor->push($fooReminder);
+        $this->processor->push($barReminder);
+
+        $this->processor->process();
     }
 
     public function testProcessFailed()
     {
-        $reminder = new Reminder();
+        $fooEntity = $this->getMock('Test_Foo_Entity');
+        $fooReminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
 
         $this->emailNotification
-            ->expects($this->once())
-            ->method('setReminder');
+            ->expects($this->at(0))
+            ->method('setReminder')
+            ->with($fooReminder);
+
+        $this->emailNotification
+            ->expects($this->at(1))
+            ->method('getEntity')
+            ->will($this->returnValue($fooEntity));
+
+        $exception = new \Exception();
 
         $this->emailNotificationProcessor
             ->expects($this->once())
             ->method('process')
-            ->will($this->throwException(new \Exception(self::EXCEPTION_MESSAGE)));
+            ->with($fooEntity, array($this->emailNotification))
+            ->will($this->throwException($exception));
 
-        $this->processor->process($reminder);
+        $fooReminder->expects($this->once())
+            ->method('setState')
+            ->with(Reminder::STATE_FAIL);
 
-        $this->assertEquals(Reminder::STATE_FAIL, $reminder->getState());
-        $this->assertEquals(self::EXCEPTION_MESSAGE, $reminder->getFailureException()['message']);
+        $fooReminder->expects($this->once())
+            ->method('setFailureException')
+            ->with($exception);
+
+        $this->processor->push($fooReminder);
+
+        $this->processor->process();
     }
 
     public function testGetName()
