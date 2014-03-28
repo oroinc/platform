@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -25,7 +26,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         return '7 0 * * *'; // every day
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -48,9 +48,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $logger = new OutputLogger($output);
-        $qb = $this->getContainer()
-            ->get('doctrine.orm.entity_manager')
-            ->createQueryBuilder();
+        $em = $this->getContainer()
+            ->get('doctrine.orm.entity_manager');
+        $qb = $em->createQueryBuilder();
 
         if ($input->getOption('dry-run')) {
             $result = $this
@@ -60,8 +60,41 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $message = 'Will be removed %d rows';
         } else {
-            $result = $this
-                ->applyCriteria($qb->delete())
+            $query = $this->applyCriteria($qb->select('j.id'))
+                ->getQuery();
+            $sql = $query->getSQL();
+
+            $params = $query->getParameters()->toArray();
+            $bindParams = [];
+
+            /** @var Parameter $param */
+            foreach ($params as $param) {
+                $bindParams[] = $param->getValue();
+            }
+
+            $con = $em->getConnection();
+
+            $con->executeUpdate(
+                sprintf("DELETE FROM jms_job_related_entities WHERE job_id IN (%s)", $sql),
+                $bindParams
+            );
+
+            $con->executeUpdate(
+                sprintf("DELETE FROM jms_job_statistics WHERE job_id IN (%s)", $sql),
+                $bindParams
+            );
+
+            $con->executeUpdate(
+                sprintf(
+                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s) OR dest_job_id IN (%s)",
+                    $sql,
+                    $sql
+                ),
+                array_merge($bindParams, $bindParams)
+            );
+
+            $qb = $em->createQueryBuilder();
+            $result = $this->applyCriteria($qb->delete())
                 ->getQuery()
                 ->execute();
 

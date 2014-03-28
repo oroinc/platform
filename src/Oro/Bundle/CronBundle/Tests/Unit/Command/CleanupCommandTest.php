@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Oro\Bundle\CronBundle\Tests\Unit\Stub\MemoryOutput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\CronBundle\Tests\Unit\Stub\MemoryOutput;
 
 class CleanupCommandTest extends \PHPUnit_Framework_TestCase
 {
