@@ -7,14 +7,14 @@
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['underscore', 'jquery', 'oroform/js/select2-config'
+        require(['underscore', 'jquery', 'oroform/js/select2-config', 'oroform/js/select2_relevancy_order_handler'
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for path in configs.extra_modules -%}
                     , '{{ path }}'
                 {%- endfor -%}
             {% endif -%}
             , 'jquery.select2'],
-        function(_, $, Select2Config
+        function(_, $, Select2Config, orderHandler
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for name in configs.extra_modules|keys -%}
                     , {{ name }}
@@ -40,6 +40,8 @@
                 {% if configs.extra_config is defined and configs.extra_config %}
                     {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
                 {% endif %}
+
+                orderHandler.handle(select2Config);
 
                 {% if excluded is not defined %}
                     {% set excluded = [] %}
