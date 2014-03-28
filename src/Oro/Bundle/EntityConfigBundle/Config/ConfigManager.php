@@ -471,10 +471,6 @@ class ConfigManager
                 $models[$configKey] = $model;
             }
 
-            if ($model instanceof FieldConfigModel && $model->getType() == 'optionSet' && $config->has('set_options')) {
-                $model->setOptions($config->get('set_options'));
-            }
-
             $indexedValues = $this->getProvider($config->getId()->getScope())
                 ->getPropertyConfig()
                 ->getIndexedValues($config->getId());

@@ -24,7 +24,7 @@ class OptionSet
     /**
      * @var FieldConfigModel
      * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="options", cascade={"persist"})
-     * @ORM\JoinColumn(referencedColumnName="id")
+     * @ORM\JoinColumn(name="field_id", referencedColumnName="id")
      */
     protected $field;
 

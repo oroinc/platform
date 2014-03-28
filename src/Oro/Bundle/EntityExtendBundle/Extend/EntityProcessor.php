@@ -38,14 +38,14 @@ class EntityProcessor
      * @var array
      */
     protected $commands = [
-        'update'         => 'oro:entity-extend:update-config',
-        'schemaUpdate'   => 'oro:entity-extend:update-schema',
+        'oro:entity-extend:update-config' => [],
+        'oro:entity-extend:update-schema' => [],
         // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
-        'doctrineUpdate' => 'doctrine:schema:update',
+        'doctrine:schema:update'          => ['--force' => true],
         // TODO: Update extended entity cache after during schema update
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
-        'cacheClear'     => 'cache:clear',
+        'cache:clear'                     => [],
     ];
 
     /**
@@ -88,10 +88,10 @@ class EntityProcessor
         );
 
         $exitCode = 0;
-        foreach ($this->commands as $command) {
+        foreach ($this->commands as $command => $options) {
             $code = $this->commandExecutor->runCommand(
                 $command,
-                ['--process-timeout' => 300],
+                array_merge($options, ['--process-timeout' => 300]),
                 $this->logger
             );
 
