@@ -190,7 +190,11 @@ class UserType extends AbstractType
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false]);
+            ->add(
+                'imageFile',
+                'file',
+                ['label' => 'oro.user.image.label', 'required' => false, 'tooltip' => 'oro.user.image.tooltip']
+            );
     }
 
     /**
