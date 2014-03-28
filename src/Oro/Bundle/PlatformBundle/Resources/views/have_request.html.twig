@@ -13,6 +13,10 @@
                     version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION')|json_encode|raw }}
                 };
                 new ORO.EmbedRequestForm(options);
+            }).error(function() {
+                if (typeof(console) != 'undefined' && console.hasOwnProperty('error')) {
+                    console.error('Unable to load external script.');
+                }
             });
         });
     });
