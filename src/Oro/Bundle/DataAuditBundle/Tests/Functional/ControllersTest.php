@@ -53,8 +53,8 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[lastName]'] = $this->userData['lastName'];
         $form['oro_user_user_form[birthday]'] = $this->userData['birthday'];
         $form['oro_user_user_form[email]'] = $this->userData['email'];
-        $form['oro_user_user_form[groups][1]'] = 2;
-        $form['oro_user_user_form[roles][1]'] = true;
+        $form['oro_user_user_form[groups][1]']->tick();
+        $form['oro_user_user_form[roles][0]']->tick();
         $form['oro_user_user_form[owner]'] = 1;
 
         $this->client->followRedirects(true);
@@ -102,7 +102,6 @@ class ControllersTest extends WebTestCase
      */
     public function testAuditHistory($result)
     {
-
         $result = ToolsAPI::getEntityGrid(
             $this->client,
             'audit-history-grid',
