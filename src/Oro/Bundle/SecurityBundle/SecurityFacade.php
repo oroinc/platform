@@ -105,7 +105,8 @@ class SecurityFacade
     /**
      * Checks if an access to a resource is granted to the caller
      *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     *                                    string in format "permission;descriptor"
      *                                    or something else, it depends on registered security voters
      * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
      * @return bool
@@ -136,6 +137,11 @@ class SecurityFacade
                 $this->objectIdentityFactory->get($object)
             );
         } else {
+            $delimiter = strpos($attributes, ';');
+            if ($delimiter) {
+                $object = substr($attributes, $delimiter + 1);
+                $attributes = substr($attributes, 0, $delimiter);
+            }
             $isGranted = $this->securityContext->isGranted($attributes, $object);
         }
 
