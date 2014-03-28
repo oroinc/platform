@@ -86,7 +86,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $con->executeUpdate(
                 sprintf(
-                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s) OR dest_job_id IN (%s)",
+                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s)",
                     $sql,
                     $sql
                 ),
@@ -94,9 +94,31 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             );
 
             $qb = $em->createQueryBuilder();
-            $result = $this->applyCriteria($qb->delete())
-                ->getQuery()
-                ->execute();
+            $query = $this->applyCriteria($qb->select('j'))
+                ->getQuery();
+
+            $jobs = $query
+                ->setMaxResults(1000)
+                ->getResult();
+
+            $result = 0;
+            foreach ($jobs as $job) {
+                /** @var Job $job */
+
+                $incomingDepsCount = (integer)$em->createQuery(
+                    "SELECT COUNT(j) FROM JMSJobQueueBundle:Job j WHERE :job MEMBER OF j.dependencies"
+                )
+                    ->setParameter('job', $job)
+                    ->getSingleScalarResult();
+
+                if ($incomingDepsCount > 0) {
+                    continue;
+                }
+
+                $em->remove($job);
+                $result++;
+            }
+            $em->flush();
 
             $message = 'Removed %d rows';
         }
