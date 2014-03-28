@@ -52,12 +52,12 @@ define(function (require) {
         };
         container.find('[data-toggle="popover"]')
             .popover({
-                animation: true,
+                animation: false,
                 delay: { show: 0, hide: 0 },
                 html: true,
                 trigger: 'manual'
             })
-            .mouseover(function () {
+            .click(function () {
                 var popoverEl = $(this);
                 clearTimeout(popoverEl.data('popover-timer'));
                 if (!popoverEl.data('popover-active')) {
