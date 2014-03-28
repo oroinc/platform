@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\MemoryOutput;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
-class CleanupCommandTest extends \PHPUnit_Framework_TestCase
+class CleanupCommandTest extends OrmTestCase
 {
     /** @var CleanupCommand */
     protected $command;
@@ -85,53 +88,37 @@ class CleanupCommandTest extends \PHPUnit_Framework_TestCase
     public function testExecution()
     {
         $this->markTestSkipped();
+        $con = $this->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()->getMock();
+
+        $em = $this->getTestEntityManager($con);
+        $reader         = new AnnotationReader();
+        $metadataDriver = new AnnotationDriver(
+            $reader,
+            'Oro\Bundle\CronBundle\Tests\Unit\Stub'
+        );
+
+        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $em->getConfiguration()->setEntityNamespaces(
+            [
+                'JMSJobQueueBundle' => 'Oro\Bundle\CronBundle\Tests\Unit\Stub'
+            ]
+        );
+
+        $conn = $this->getMock('\Doctrine\DBAL\Driver\Connection');
+        /** @var DriverMock $driver */
+        $driver = $em->getConnection()->getDriver();
+        $driver->setDriverConnection($conn);
+
+
         $params    = [];
         $input     = new ArrayInput($params, $this->command->getDefinition());
         $output    = new MemoryOutput();
 
-        $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['execute', 'getParameters', 'setMaxResults', 'getResult'])
-            ->getMockForAbstractClass();
-
-        $queryMock->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue(1));
-        $queryMock->expects($this->once())
-            ->method('getSQL')
-            ->will($this->returnValue('SELECT :test'));
-
-        $params = new ArrayCollection([new Parameter('test', 1)]);
-        $queryMock->expects($this->once())
-            ->method('getParameters')
-            ->will($this->returnValue($params));
-
-        $queryMock->expects($this->once())
-            ->method('setMaxResults')
-            ->will($this->returnSelf());
-
-        $queryMock->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue([]));
-
-        $qbMock = $this->getQueryBuilderMock();
-        $qbMock->expects($this->exactly(2))
-            ->method('select')
-            ->will($this->returnSelf());
-
-        $qbMock->expects($this->exactly(2))
-            ->method('getQuery')
-            ->will($this->returnValue($queryMock));
-
-        $con = $this->getMockBuilder('\Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()->getMock();
-
-        $con->expects($this->exactly(2))
-            ->method('executeUpdate');
-
-        $this->emMock->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($con));
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('doctrine.orm.entity_manager')
+            ->will($this->returnValue($em));
 
         $this->command->execute($input, $output);
     }
