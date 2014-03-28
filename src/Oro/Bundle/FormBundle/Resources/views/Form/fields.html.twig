@@ -14,7 +14,7 @@
                 {%- endfor -%}
             {% endif -%}
             , 'jquery.select2'],
-        function(_, $, Select2Config, select2_relevancy_order_handler,
+        function(_, $, Select2Config, select2_relevancy_order_handler
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for name in configs.extra_modules|keys -%}
                     , {{ name }}
