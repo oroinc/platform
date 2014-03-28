@@ -61,6 +61,29 @@ class ConfigType extends AbstractType
             $fieldName  = $configModel->getFieldName();
             $fieldType  = $configModel->getType();
             $configType = PropertyConfigContainer::TYPE_FIELD;
+
+            /**
+             * Add read only field name and field type
+             */
+            $builder->add(
+                'fieldName',
+                'text',
+                array(
+                    'block'     => 'entity',
+                    'read_only' => true,
+                    'data'      => $fieldName,
+                )
+            );
+            $builder->add(
+                'type',
+                'choice',
+                array(
+                    'choices'     => [],
+                    'block'       => 'entity',
+                    'disabled'    => true,
+                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
+                )
+            );
         } else {
             $className  = $configModel->getClassName();
             $fieldName  = null;
