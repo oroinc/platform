@@ -28,7 +28,6 @@ class OroDataAuditBundle implements Migration
         $table->addColumn('data', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_5FBA427CA76ED395', []);
-        $table->addIndex(['logged_at'], 'idx_oro_audit_logged_at', []);
         /** End of generate table oro_audit **/
 
         /** Generate foreign keys for table oro_audit **/
