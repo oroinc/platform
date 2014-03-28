@@ -117,7 +117,7 @@ oro:
         name_suffix.label: Name suffix
         birthday.label:    Birthday
         image.label:       Avatar
-        image.tooltip: "The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size"
+        image.tooltip:     The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
         enabled.label:     Status
         salt.label:        Salt
         password.label:    Password
