@@ -69,10 +69,6 @@ class VariablesProvider
             }
         }
 
-        if (empty($allowedData['user']) && empty($allowedData['entity'])) {
-            $allowedData = [];
-        }
-
         return $allowedData;
     }
 

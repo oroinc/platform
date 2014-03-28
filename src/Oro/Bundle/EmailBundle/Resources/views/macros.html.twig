@@ -1,4 +1,4 @@
-{% macro renderAvailableVariablesWidget(entityName, dependentFieldId, variables) %}
+{% macro renderAvailableVariablesWidget(entityName, dependentFieldId) %}
     <script type="text/javascript">
         require(['jquery', 'oroemail/js/email/variable/view', 'oroemail/js/email/variable/model'],
         function($, View, Model){
@@ -8,7 +8,7 @@
                     el:       $('#oro-email-available-variables'),
                     template: $('#available-variables-lists-template'),
                     target:   $('#{{ dependentFieldId }}'),
-                    model:    new Model({{ variables|raw }})
+                    model:    new Model({{ render(path('oro_api_get_emailtemplate_available_variables', { 'entityName': entityName }))}})
                 });
             });
         });

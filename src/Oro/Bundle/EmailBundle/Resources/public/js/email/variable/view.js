@@ -48,12 +48,21 @@ define(['jquery', 'underscore', 'backbone'
          * @returns {*}
          */
         render: function () {
-            var html = _.template(this.options.template.html(), {
-                userVars: this.model.get('user'),
-                entityVars: this.model.get('entity')
-            });
+            var userVars   = this.model.get('user'),
+                entityVars = this.model.get('entity'),
+                $el        = $(this.el);
 
-            $(this.el).html(html);
+            if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
+                $el.parent().hide();
+            } else {
+                var html = _.template(this.options.template.html(), {
+                    userVars: this.model.get('user'),
+                    entityVars: this.model.get('entity')
+                });
+
+                $el.html(html);
+                $el.parent().show();
+            }
 
             return this;
         },
