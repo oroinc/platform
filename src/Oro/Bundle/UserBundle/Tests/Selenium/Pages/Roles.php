@@ -24,7 +24,7 @@ class Roles extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXpath("//a[@title='Create role']")->click();
+        $this->test->byXpath("//a[@title='Create Role']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new Role($this->test);

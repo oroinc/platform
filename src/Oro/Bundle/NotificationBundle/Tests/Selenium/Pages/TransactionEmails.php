@@ -28,7 +28,7 @@ class TransactionEmails extends AbstractPageFilteredGrid
      */
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create notification rule']")->click();
+        $this->test->byXPath("//a[@title='Create Notification Rule']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 

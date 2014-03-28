@@ -319,7 +319,7 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
-    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label|lower : 'oro.ui.item'|trans %}
+    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'oro.ui.item'|trans %}
     {% set label = parameters.label is defined
         ? parameters.label
         : 'oro.ui.delete'|trans

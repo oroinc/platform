@@ -172,7 +172,7 @@ class TagsAcl extends Selenium2TestCase
             ->setPassword('123123q')
             ->submit()
             ->openTags('Oro\Bundle\TagBundle')
-            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create tag')]");
+            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create Tag')]");
     }
 
     public function viewListAcl($login, $role, $username)
