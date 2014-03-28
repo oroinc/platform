@@ -128,7 +128,6 @@ oro:
         owner.label:       Owner
         roles.label:       Roles
         groups.label:      Groups
-        business_units.label:      Groups
         api.label:         API key
         api.tooltip_text: >
             API key could be used for authentication in third party software.
