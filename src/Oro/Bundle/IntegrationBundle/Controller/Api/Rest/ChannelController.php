@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -40,8 +41,10 @@ class ChannelController extends FOSRestController
      */
     public function deleteAction($id)
     {
-        $entity = $this->getManager()->find($id);
-        if (!$entity) {
+        $entity   = $this->getManager()->find($id);
+        $isSynced = ChannelFormSubscriber::wasChannelSynced($entity);
+
+        if (!$entity || $isSynced) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
 

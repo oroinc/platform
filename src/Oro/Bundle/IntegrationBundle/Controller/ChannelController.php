@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -111,8 +112,9 @@ class ChannelController extends Controller
         $form = $this->getForm();
 
         return [
-            'entity' => $channel,
-            'form' => $form->createView()
+            'entity'   => $channel,
+            'form'     => $form->createView(),
+            'isSynced' => ChannelFormSubscriber::wasChannelSynced($channel),
         ];
     }
 

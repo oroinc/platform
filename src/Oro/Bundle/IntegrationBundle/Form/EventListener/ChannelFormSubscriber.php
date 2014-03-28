@@ -251,14 +251,25 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $atLeastOneSync = $channel->getStatuses()->exists(
+        if (static::wasChannelSynced($channel)) {
+            // disable type field
+            FormUtils::replaceField($form, 'type', ['disabled' => true]);
+        }
+    }
+
+    /**
+     * Return true if channel was synced at least once
+     *
+     * @param Channel $channel
+     *
+     * @return bool
+     */
+    public static function wasChannelSynced(Channel $channel)
+    {
+        return $channel->getStatuses()->exists(
             function ($key, Status $status) {
                 return intval($status->getCode()) === Status::STATUS_COMPLETED;
             }
         );
-        if ($atLeastOneSync) {
-            // disable type field
-            FormUtils::replaceField($form, 'type', ['disabled' => true]);
-        }
     }
 }
