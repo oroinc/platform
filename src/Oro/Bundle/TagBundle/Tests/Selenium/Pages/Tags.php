@@ -28,7 +28,7 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function add($new = true)
     {
-        $this->test->byXPath("//a[@title='Create tag']")->click();
+        $this->test->byXPath("//a[@title='Create Tag']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $tag = new Tag($this->test);

@@ -98,8 +98,7 @@ class GridTest extends Selenium2TestCase
         $countOfRecords = $users->getRowsCount();
         $this->assertEquals(
             $countOfRecords,
-            $users->removeFilter('Email')
-                ->getRowsCount()
+            $users->getRowsCount()
         );
 
         $this->assertEquals(

@@ -26,7 +26,7 @@ class EmailTemplates extends AbstractPageFilteredGrid
      */
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create template']")->click();
+        $this->test->byXPath("//a[@title='Create Template']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 

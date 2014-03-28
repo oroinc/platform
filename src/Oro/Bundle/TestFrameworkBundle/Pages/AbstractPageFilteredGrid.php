@@ -20,7 +20,7 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[button[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
+            . "[a[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
         )->click();
         $this->waitForAjax();
         return $this;
@@ -65,12 +65,12 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "/button[contains(.,'{$filterName}')]"
+            . "/a[contains(.,'{$filterName}')]"
         )->click();
 
         $criteria = $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[button[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
+            . "[a[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
         );
         $input = $criteria->element($this->test->using('xpath')->value("div/div/div/input[@name='value']"));
 
