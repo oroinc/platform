@@ -81,7 +81,7 @@ class ConfigType extends AbstractType
                     'choices'     => [],
                     'block'       => 'entity',
                     'disabled'    => true,
-                    'empty_value' => $this->translator->trans('oro.entity_extend.form.data_type.' . $fieldType),
+                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
                 )
             );
         } else {
