@@ -124,11 +124,11 @@ class DynamicFieldsExtension extends \Twig_Extension
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             /** Prepare OptionSet field type */
-            if ($fieldConfigId->getFieldType() == 'optionSet') {
+            if ($value && $fieldConfigId->getFieldType() == 'optionSet') {
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
             }
 
-            if ($fieldConfigId->getFieldType() == 'manyToOne') {
+            if ($value && $fieldConfigId->getFieldType() == 'manyToOne') {
                 $value = $this->propertyAccessor->getValue(
                     $entity->{Inflector::camelize('get_' . $fieldName)}(),
                     $field->get('target_field')
@@ -136,7 +136,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             }
 
             /** Prepare Relation field type */
-            if ($value instanceof Collection) {
+            if ($value && $value instanceof Collection) {
                 $value = $this->getValueForCollection($value, $fieldConfigId);
             }
 
