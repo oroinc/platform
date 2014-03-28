@@ -6,20 +6,16 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ConfigExtension extends \Twig_Extension
 {
-    /**
-     * @var ConfigManager
-     */
-    protected $userConfigManager;
+    /** @var ConfigManager */
+    protected $cm;
 
-    /**
-     * @var array
-     */
+    /** array **/
     protected $entityOutput;
 
-    public function __construct(ConfigManager $userConfigManager, $entityOutput = array())
+    public function __construct(ConfigManager $cm, $entityOutput = array())
     {
-        $this->userConfigManager = $userConfigManager;
-        $this->entityOutput      = $entityOutput;
+        $this->cm           = $cm;
+        $this->entityOutput = $entityOutput;
     }
 
     /**
@@ -30,7 +26,7 @@ class ConfigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'oro_config_value'  => new \Twig_Function_Method($this, 'getUserValue'),
+            'oro_config_value'  => new \Twig_Function_Method($this, 'getConfigValue'),
             'oro_config_entity' => new \Twig_Function_Method($this, 'getEntityOutput'),
         );
     }
@@ -40,9 +36,9 @@ class ConfigExtension extends \Twig_Extension
      *
      * @return mixed
      */
-    public function getUserValue($name)
+    public function getConfigValue($name)
     {
-        return $this->userConfigManager->get($name);
+        return $this->cm->get($name);
     }
 
     /**
