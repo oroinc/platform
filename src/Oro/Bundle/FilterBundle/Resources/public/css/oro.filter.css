@@ -195,6 +195,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-criteria .datetime-visual-element {
     width: 120px;
 }
+.filter-criteria:focus {
+    outline: none;
+}
 
 .ui-multiselect.select-filter-widget {
     width: auto !important;

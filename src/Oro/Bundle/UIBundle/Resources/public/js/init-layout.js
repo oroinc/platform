@@ -135,12 +135,19 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         dropdownToggles.click(function (e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
+                $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
         $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
+
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+            if (e.keyCode === 27) {
+                $(e.currentTarget).parent().removeClass('open');
+            }
+        });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
