@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         }, this),
                         error: _.bind(function (collection, response) {
                             savingMsg.close();
-                            this.showAddError(response.responseJSON);
+                            this.showAddError(response.responseJSON || {});
                         }, this)
                     });
                 } catch (err) {
@@ -134,7 +134,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     }, this),
                     error: _.bind(function (model, response) {
                         deletingMsg.close();
-                        this.showDeleteError(response.responseJSON);
+                        this.showDeleteError(response.responseJSON || {});
                     }, this)
                 });
             } catch (err) {
