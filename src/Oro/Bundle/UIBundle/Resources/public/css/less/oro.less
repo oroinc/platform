@@ -98,11 +98,18 @@ label, input, button, select, textarea { font-size:13px;}
     }
     .controls {
       margin-left:170px;
+      &.autocomplete-box{
+        margin-bottom: 10px;
+        margin-top: 10px;
+      }
       .control-label {
         width: auto;
       }
     }
   }
+}
+.ui-widget-overlay {
+  z-index: 150;
 }
 .form-horizontal-large{
   .control-group{
@@ -3207,11 +3214,11 @@ span.validation-failed {
       line-height: 21px;
     }
   }
- .filter-box {
+  .filter-box {
     padding: 5px 20px 5px 130px;
     margin: 5px;
   }
-  .tab-container{
+  /*.tab-container{
     .nav-tabs > li > a{
       color: #577bd5;
       font-size: 13px;
@@ -3231,6 +3238,24 @@ span.validation-failed {
       border: 0;
       font-weight: bold;
       text-decoration: underline;
+    }
+  }*/
+  .dashboard-widget-content{
+    .tab-container{
+      .nav-tabs > li{
+        &:first-child a{
+          border-left: 0 !important;
+        }
+        &.active a{
+          border-left: 0 !important;
+        }
+
+      }
+    }
+    .tab-content{
+       .no-data{
+         background-color: #fff;
+       }
     }
   }
 }
@@ -3393,4 +3418,7 @@ i.pin-status {
 
 label .popover-content {
   text-transform: none;
+}
+.recent-emails-widget-content{
+
 }
