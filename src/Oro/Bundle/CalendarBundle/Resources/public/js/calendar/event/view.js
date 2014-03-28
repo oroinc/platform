@@ -154,7 +154,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         _handleResponseError: function (model, response) {
-            this.showError(response.responseJSON);
+            this.showError(response.responseJSON || {});
         },
 
         showError: function (err) {

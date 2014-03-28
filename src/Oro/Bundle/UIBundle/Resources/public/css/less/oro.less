@@ -68,6 +68,11 @@ form {
     right: 5px;
     top: 9px;
   }
+  & > li > a{
+      & > i[class^="icon-"]{
+     	 min-width: 17px;
+	  }
+  }
 }
 .dark {
   background-color: #f6f5f5;
@@ -1380,7 +1385,7 @@ footer {
 }
 .loading-wrapper {
   background: #000;
-  opacity: 0.6;
+  opacity: 0.3;
   position: absolute;
   top: 0;
   left: 0;
@@ -3082,6 +3087,7 @@ label.radio.error {
 .breadcrumb-pin {
   border-bottom: 1px solid #f2f2f2;
   padding:0;
+  background-color: #fff;
   #pin-button-div{
     float: right;
   }
@@ -3392,4 +3398,14 @@ i.pin-status {
 
 label .popover-content {
   text-transform: none;
+}
+.dashboard-container{
+  .responsive-cell{
+    .box-type1{
+      border: 1px solid #ccc;
+      .calendar-events{
+        margin: 0 0 10px 10px;
+      }
+    }
+  }
 }

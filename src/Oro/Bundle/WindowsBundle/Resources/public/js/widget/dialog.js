@@ -98,10 +98,10 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
         closeHandler: function() {
             if (this.model) {
                 this.model.destroy({
-                    error: _.bind(function(model, xhr, options) {
+                    error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
                         if (xhr.status != 404 || app.debug) {
-                            error.dispatch(model, xhr, options);
+                            error.handle({}, xhr, {enforce: true});
                         }
                     }, this)
                 });

@@ -150,7 +150,9 @@ define(function (require) {
             }
 
             opts.columns.push(this._createActionsColumn());
-            opts.columns.unshift(this._getSelectRowColumn());
+            if (!_.isEmpty(this.massActions)) {
+                opts.columns.unshift(this._getSelectRowColumn());
+            }
 
             this.loadingMask = this._createLoadingMask();
             this.toolbar = this._createToolbar(this.toolbarOptions);
@@ -201,7 +203,7 @@ define(function (require) {
                 this.selectRowColumn = new Backgrid.Column({
                     name:       "massAction",
                     label:      __("Selected Rows"),
-                    renderable: !_.isEmpty(this.massActions),
+                    renderable: true,
                     sortable:   false,
                     editable:   false,
                     cell:       SelectRowCell,
@@ -304,7 +306,9 @@ define(function (require) {
                 });
 
                 mediator.on('datagrid:doRefresh:' + grid.name, function () {
-                    grid.refreshAction.execute();
+                    if (grid.$el.is(':visible')) {
+                        grid.refreshAction.execute();
+                    }
                 });
 
                 grid.refreshAction.on('preExecute', function (action, options) {
@@ -334,7 +338,9 @@ define(function (require) {
                 });
 
                 mediator.on('datagrid:doReset:' + grid.name, function () {
-                    grid.resetAction.execute();
+                    if (grid.$el.is(':visible')) {
+                        grid.resetAction.execute();
+                    }
                 });
 
                 grid.resetAction.on('preExecute', function (action, options) {
