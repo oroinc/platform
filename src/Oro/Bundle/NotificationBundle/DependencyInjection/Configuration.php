@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'email_notification_sender_email' => ['value' => sprintf('no-reply@%s.example', gethostname())],
-                'email_notification_sender_name'  => ['value' => 'OroCRM']
+                'email_notification_sender_name'  => ['value' => 'Oro']
             ]
         );
         return $treeBuilder;
