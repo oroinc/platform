@@ -20,9 +20,9 @@ class CountryType extends AbstractType
                 'configs' => array(
                     'placeholder'   => 'oro.address.form.choose_country',
                     'extra_modules' => array(
-                        'select2_relevancy_order_handler' => 'oroform/js/select2_relevancy_order_handler'
+                        'country_select2_handler' => 'oroaddress/js/country/select2_handler'
                     ),
-                    'extra_config'  => 'select2_relevancy_order'
+                    'extra_config'  => 'country_select'
                 ),
                 'empty_value' => '',
                 'empty_data'  => null
