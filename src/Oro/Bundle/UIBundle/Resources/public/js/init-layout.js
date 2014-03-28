@@ -27,7 +27,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl()) {
+        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
             if ($('#page-title').size()) {
                 document.title = _.unescape($('#page-title').text());
             }
