@@ -69,7 +69,7 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js
                                 // Suppress error if it's 404 response and not debug mode
                                 self.inactivate();
                             } else {
-                                error.modalHandler(xhr);
+                                error.handle({}, xhr, {enforce: true});
                             }
                         }
                     });

@@ -60,7 +60,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
                         // Suppress error if it's 404 response and not debug mode
                         this.removeItem();
                     } else {
-                        error.modalHandler(xhr);
+                        error.handle({}, xhr, {enforce: true});
                     }
                 }, this)
             });

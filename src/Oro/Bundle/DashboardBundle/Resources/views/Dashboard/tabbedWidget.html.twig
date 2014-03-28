@@ -43,7 +43,7 @@
                         loadingMask.hide();
                         $currentTab.removeClass('active');
                         $prevTab.addClass('active');
-                        error.modalHandler(jqXHR);
+                        error.handle({}, jqXHR, {enforce: true});
                     },
                     success: function(data) {
                         loadingMask.hide();
