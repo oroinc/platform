@@ -27,7 +27,7 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
         $this->topicPublisher
             ->expects($this->once())
             ->method('send')
-            ->with('oro/maintenance', array('isOn' => true, 'msg' => 'Maintenance mode is ON'));
+            ->with('oro/maintenance', array('isOn' => true));
         /** @var MaintenanceListener $publisher */
         $publisher = new MaintenanceListener($this->topicPublisher);
         $publisher->onModeOn();
@@ -38,7 +38,7 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
         $this->topicPublisher
             ->expects($this->once())
             ->method('send')
-            ->with('oro/maintenance', array('isOn' => false, 'msg' => 'Maintenance mode is OFF'));
+            ->with('oro/maintenance', array('isOn' => false));
         /** @var MaintenanceListener $publisher */
         $publisher = new MaintenanceListener($this->topicPublisher);
         $publisher->onModeOff();
