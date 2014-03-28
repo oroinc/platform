@@ -140,7 +140,7 @@ class SecurityFacade
                 $this->objectIdentityFactory->get($object)
             );
         } else {
-            if (is_string($attributes)) {
+            if (is_string($attributes) && $object == null) {
                 $delimiter = strpos($attributes, ';');
                 if ($delimiter) {
                     $object = substr($attributes, $delimiter + 1);
