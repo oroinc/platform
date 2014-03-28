@@ -1,9 +1,9 @@
-title: "Welcome Oro"
-icon: "bundles/orosidebar/sidebar_widgets/hello_world/img/icon.ico"
-module: "orosidebar/widget/hello-world"
+title: "Sticky Note"
+icon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon.ico"
+module: "orosidebar/widget/sticky-note"
 placement: "both"
-cssClass: 'sidebar-widget-hello-world'
+cssClass: 'sidebar-widget-sticky-note'
 settings:
-    content: |+
+    content: |
         Welcome to OroCRM!
         OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at www.orocrm.com

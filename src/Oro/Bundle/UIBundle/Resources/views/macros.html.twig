@@ -44,15 +44,15 @@
     {% macro attribute_data(value, additionalData) %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
-                <p class="control-label">{{ value }}</p>
+                <div class="control-label">{{ value }}</div>
             {% else %}
-                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
             {% for data in additionalData.data %}
                 <div class="clearfix-oro">
-                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                    <div class="control-label">{{ attribute(data, additionalData.field) }}</div>
                 </div>
             {% endfor %}
         {% endif %}
@@ -92,7 +92,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -108,13 +108,19 @@
         ]
 #}
 {% macro link(parameters) %}
+    {# need to remove spaces just before label #}
+    {% set iconHtml = '' %}
+    {% if parameters.iCss is defined %}
+        {% set iconHtml %}
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endset %}
+    {% else %}
+    {% endif %}
+    {% spaceless %}
     <a href="{{ parameters.path }}"
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       title="{{ parameters.title|trans }}">
-        {% if parameters.iCss is defined %}
-            <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
-        {% endif %}{{ parameters.label|trans }}
-    </a>
+           title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+    {% endspaceless %}
 {% endmacro %}
 
 {#

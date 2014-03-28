@@ -60,7 +60,11 @@
     }
   }
   .page-size {
-    .control-label { text-align:right; }
+    .control-label {
+      text-align:right;
+      width: auto;
+      padding-top: 7px;
+    }
   }
   .btn-group {
     .btn {
@@ -256,9 +260,17 @@
   }
 }
 .widget-content .grid-toolbar {
+  label.dib{
+    line-height: 29px;
+  }
+}
+.responsive-cell .widget-content .grid-toolbar{
   .pagination-centered {
     white-space: nowrap;
     float: left;
     width: auto;
   }
+}
+.filter-criteria-hint {
+  text-transform: none;
 }

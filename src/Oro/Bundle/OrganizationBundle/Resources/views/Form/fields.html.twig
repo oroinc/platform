@@ -20,7 +20,7 @@
         {% if value or disabled %}
             {% for choice in choices %}
                 {% if choice.value == value|default('NONE') %}
-                    <p class="control-label">{{ choice.label }}</p>
+                    <div class="control-label">{{ choice.label }}</div>
                 {% endif %}
             {% endfor %}
             {{ block('hidden_widget') }}
