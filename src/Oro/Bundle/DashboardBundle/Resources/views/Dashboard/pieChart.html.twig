@@ -32,9 +32,9 @@
                 return false;
             };
             var setChartContainerSize = function () {
-                $chartLegendTable = $chartLegend.find('table');
-                $td = $chartLegendTable.find('td');
-                padding = parseInt($td.css('padding-bottom'));
+                var $chartLegendTable = $chartLegend.find('table');
+                var $td = $chartLegendTable.find('td');
+                var padding = parseInt($td.css('padding-bottom'));
                 if (padding > 0 && ($chartLegendTable.height() + 20) > $chartLegend.height()) {
                     while (($chartLegendTable.height() + 20) > $chartLegend.height()) {
                         padding = padding - 1;
@@ -62,18 +62,18 @@
                 if (!$chart.get(0).clientWidth) {
                     return;
                 }
-                var data = [
-                    {# build chart data #}
-                    {% block data %}
+                var data = [];
+                {# build chart data #}
+                {% block data %}
                     {%- for item in data -%}
-                    {
-                        data : [[0, {{ item.fraction|json_encode|raw }}]],
-                        label : {{ item.label|json_encode|raw }}
-                    }{{ loop.last ? '' : ',' }}
+                        {% set rowData = {
+                            data: [[0, item.fraction]],
+                            label: item.label
+                        } %}
+                        data.push({{ rowData|json_encode|raw }});
                     {%- endfor -%}
-                    {% endblock %}
-                ];
-                var graph = Flotr.draw(
+                {% endblock %}
+                Flotr.draw(
                     $chart.get(0),
                     data,
                     {
