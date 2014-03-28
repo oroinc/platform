@@ -47,11 +47,7 @@ class RegionType extends AbstractType
                     'country'       => null,
                     'country_field' => null,
                     'configs' => array(
-                        'placeholder' => 'oro.address.form.choose_region',
-                        'extra_modules' => array(
-                            'select2_relevancy_order_handler' => 'oroform/js/select2_relevancy_order_handler'
-                        ),
-                        'extra_config'  => 'select2_relevancy_order'
+                        'placeholder' => 'oro.address.form.choose_region'
                     ),
                     'empty_value' => '',
                     'empty_data'  => null

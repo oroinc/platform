@@ -18,11 +18,7 @@ class CountryType extends AbstractType
                         ->orderBy('c.name', 'ASC');
                 },
                 'configs' => array(
-                    'placeholder'   => 'oro.address.form.choose_country',
-                    'extra_modules' => array(
-                        'select2_relevancy_order_handler' => 'oroform/js/select2_relevancy_order_handler'
-                    ),
-                    'extra_config'  => 'select2_relevancy_order'
+                    'placeholder'   => 'oro.address.form.choose_country'
                 ),
                 'empty_value' => '',
                 'empty_data'  => null
