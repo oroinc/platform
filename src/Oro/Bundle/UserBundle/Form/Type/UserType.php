@@ -73,7 +73,8 @@ class UserType extends AbstractType
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
-                            ->setParameter('anon', User::ROLE_ANONYMOUS);
+                            ->setParameter('anon', User::ROLE_ANONYMOUS)
+                            ->orderBy('r.label');
                     },
                     'multiple'      => true,
                     'expanded'      => true,
