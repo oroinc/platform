@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use BeSimple\SoapCommon\Type\KeyValue\DateTime;
 use Oro\Bundle\UIBundle\Twig\DateExtension;
 
 class DateExtensionTest extends \PHPUnit_Framework_TestCase
@@ -107,6 +106,12 @@ class DateExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 $inFuture, array('default' => 'N/A'), null
+            ),
+            array(
+                null, array(), null
+            ),
+            array(
+                '', array(), null
             ),
         );
     }

@@ -4,7 +4,7 @@
             var options = {
                 dataType: 'script',
                 cache:     true,
-                url:       'http://crm.orocrm.com/bundles/orocrmrequest/js/embed.form.js',
+                url:       {{ (app.request.scheme ~ '://crm.orocrm.com/bundles/orocrmrequest/js/embed.form.js')|json_encode|raw }},
                 timeout:   2000
             };
 
