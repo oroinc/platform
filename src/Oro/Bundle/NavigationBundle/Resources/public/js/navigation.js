@@ -40,6 +40,10 @@ define(function (require) {
         },
 
         getObjectCache: function(type) {
+            // todo: temporary disable states for grid because it should be allowed to work with several grids on a page
+            // https://magecore.atlassian.net/browse/BAP-3758
+            if (type == 'grid') { return {}; }
+
             return this.state[type];
         }
     };

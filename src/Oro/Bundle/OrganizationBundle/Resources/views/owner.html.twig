@@ -1,3 +1,7 @@
 {% if form.owner is defined %}
-    {{ form_row(form.owner, {'label': label is not same as(false) ? label|trans : ''}) }}
+    {% if form.owner.vars.label == 'oro.organization.businessunit.parent.label' %}
+        {{ form_row(form.owner) }}
+    {% else %}
+        {{ form_row(form.owner, {'label': label is not same as(false) ? label|trans : ''}) }}
+    {% endif %}
 {% endif %}
