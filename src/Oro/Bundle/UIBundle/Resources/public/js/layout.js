@@ -48,17 +48,26 @@ define(function (require) {
             e.preventDefault();
         });
 
-        $('body').on('click.popover-hide', function (e) {
-            $items.each(function () {
-                //the 'is' for buttons that trigger popups
-                //the 'has' for icons within a button that triggers a popup
-                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                    $(this).popover('hide');
+        $('body')
+            .on('click.popover-hide', function (e) {
+                $items.each(function () {
+                    //the 'is' for buttons that trigger popups
+                    //the 'has' for icons within a button that triggers a popup
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    }
+                });
+            })
+            .on('click.popover-prevent', '.popover', function(e) {
+                if (e.target.tagName.toLowerCase() != 'a') {
+                    e.preventDefault();
                 }
             });
-        });
+
         mediator.once('hash_navigation_request:start', function () {
-            $('body').off('click.popover-hide');
+            $('body')
+                .off('click.popover-hide')
+                .off('click.popover-prevent');
         });
     };
 
