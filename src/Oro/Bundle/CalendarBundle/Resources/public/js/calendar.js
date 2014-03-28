@@ -193,7 +193,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                         {
                             success: _.bind(this._hideMask, this),
                             error: _.bind(function (model, response) {
-                                this.showSaveEventError(response.responseJSON);
+                                this.showSaveEventError(response.responseJSON || {});
                             }, this)
                         }
                     );
@@ -221,7 +221,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                         success: onEventsLoad,
                         error: _.bind(function (collection, response) {
                             callback({});
-                            this.showLoadEventsError(response.responseJSON);
+                            this.showLoadEventsError(response.responseJSON || {});
                         }, this)
                     });
                 } else {

@@ -47,6 +47,11 @@ class SearchHandler implements SearchHandlerInterface
     private $hasMore;
 
     /**
+     * @var EntityManager $manager
+     */
+    protected $manager;
+
+    /**
      * @param string $entityName
      * @param array $properties
      */
@@ -125,8 +130,13 @@ class SearchHandler implements SearchHandlerInterface
         $page = (int)$page > 0 ? (int)$page : 1;
         $perPage = (int)$perPage > 0 ? (int)$perPage : 10;
         $perPage += 1;
+        $firstResult = ($page - 1) * $perPage;
 
-        $items = $this->searchEntities($query, ($page - 1) * $perPage, $perPage);
+        if ($query == '') {
+            $items = $this->manager->getRepository($this->entityName)->findBy(array(), null, $perPage, $firstResult);
+        } else {
+            $items = $this->searchEntities($query, $firstResult, $perPage);
+        }
 
         $this->hasMore = count($items) == $perPage;
         if ($this->hasMore) {
@@ -265,5 +275,13 @@ class SearchHandler implements SearchHandlerInterface
     public function getEntityName()
     {
         return $this->entityName;
+    }
+
+    /**
+     * @param EntityManager $manager
+     */
+    public function setEntityManager(EntityManager $manager)
+    {
+        $this->manager = $manager;
     }
 }

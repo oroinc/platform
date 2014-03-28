@@ -6,6 +6,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\FileLocator;
+
 class OroIconType extends AbstractType
 {
     /**
@@ -15,11 +18,11 @@ class OroIconType extends AbstractType
     {
         parent::buildView($view, $form, $options);
 
-        $vars = array('configs' => $options['configs']);
+        $vars = ['configs' => $options['configs']];
         if ($form->getData()) {
-            $vars['attr'] = array(
-                'data-selected-data' => json_encode(array(array('id' => $form->getData(), 'text' => $form->getData())))
-            );
+            $vars['attr'] = [
+                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData()]])
+            ];
         }
 
         $view->vars = array_replace_recursive($view->vars, $vars);
@@ -30,20 +33,21 @@ class OroIconType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $fileLocator = new FileLocator(__DIR__ . '/../../Resources/config');
+        $config      = Yaml::parse($fileLocator->locate('config_icon.yml'));
+        $choices     =  array_flip($config['oro_icon_select']);
+
         $resolver->setDefaults(
-            array(
-                'placeholder'        => 'oro.form.choose_value',
-                'allowClear'         => true,
-                'configs'            => array(
+            [
+                'placeholder' => 'oro.form.choose_value',
+                'choices'     => $choices,
+                'empty_value' => '',
+                'configs'     => [
                     'placeholder'             => 'oro.form.choose_value',
                     'result_template_twig'    => 'OroFormBundle:Autocomplete:icon/result.html.twig',
                     'selection_template_twig' => 'OroFormBundle:Autocomplete:icon/selection.html.twig',
-                    'extra_config'            => 'autocomplete',
-                    'route_name'              => 'oro_form_autocomplete_config',
-                    'autocomplete_alias'      => 'config_icon',
-                    'properties'              => array('id', 'text')
-                )
-            )
+                ]
+            ]
         );
     }
 
@@ -52,7 +56,7 @@ class OroIconType extends AbstractType
      */
     public function getParent()
     {
-        return 'genemu_jqueryselect2_hidden';
+        return 'genemu_jqueryselect2_choice';
     }
 
     /**
