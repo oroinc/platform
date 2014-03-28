@@ -39,13 +39,13 @@
                 $.ajax({
                     url: $el.data('url'),
                     dataType: 'html',
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR) {
                         loadingMask.hide();
                         $currentTab.removeClass('active');
                         $prevTab.addClass('active');
-                        error.dispatch(null, jqXHR);
+                        error.handle({}, jqXHR, {enforce: true});
                     },
-                    success: function(data, textStatus, jqXHR) {
+                    success: function(data) {
                         loadingMask.hide();
                         $tabContent.find('.content').html(data);
                     }
