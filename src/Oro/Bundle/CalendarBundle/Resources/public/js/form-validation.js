@@ -89,12 +89,22 @@ function($, _, __, app) {
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          */
         removeFieldErrors: function (field) {
-            var target = _.isString(field) ? $(field) : field;
-            if (target.parent().filter('.error').length) {
-                target = target.parent();
+            var targets = [_.isString(field) ? $(field) : field];
+
+            if (!targets[0].parent().is(':visible')) {
+                var fakeTarget = targets[0].closest('div.controls').children(':input');
+                if (fakeTarget.length) {
+                    targets.push(fakeTarget);
+                }
             }
-            target.siblings('.validation-failed').remove();
-            target.removeClass('error').parent().filter('.controls').removeClass('validation-error');
+
+            _.each(targets, function(target) {
+                if (target.parent().filter('.error').length) {
+                    target = target.parent();
+                }
+                target.siblings('.validation-failed').remove();
+                target.removeClass('error').parent().filter('.controls').removeClass('validation-error');
+             });
         },
 
         /**
@@ -104,16 +114,29 @@ function($, _, __, app) {
          * @param errorMessages {string[]|string} The localized error string(s).
          */
         addFieldErrors: function (field, errorMessages) {
-            var target = _.isString(field) ? $(field) : field;
-            if (target.parent().filter('.selector').length || target.parent().filter('.uploader').length) {
-                target = target.parent();
+            var targets = [_.isString(field) ? $(field) : field];
+
+            if (!targets[0].parent().is(':visible')) {
+                var fakeTarget = targets[0].closest('div.controls').children(':input');
+                if (fakeTarget.length) {
+                    targets.push(fakeTarget);
+                }
             }
-            if (!target.siblings('.validation-failed').length) {
-                $('<span class="validation-failed"></span>').insertAfter(target);
-            }
-            target.siblings('.validation-failed').text(
-                _.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages);
-            target.addClass('error').parent().filter('.controls').addClass('validation-error');
+
+            _.each(targets, function(target) {
+                if (target.parent().filter('.selector').length || target.parent().filter('.uploader').length) {
+                    target = target.parent();
+                }
+
+                if (!target.siblings('.validation-failed').length) {
+                    $('<span class="validation-failed"></span>').insertAfter(target);
+                }
+
+                target.siblings('.validation-failed').text(
+                    _.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages
+                );
+                target.addClass('error').parent().filter('.controls').addClass('validation-error');
+            });
         },
 
         /**
