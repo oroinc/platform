@@ -88,8 +88,12 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', '../../pageable-collecti
                 this.$el.width(this.column.get('width'));
             }
 
-            if (this.column.attributes.cell.prototype.className) {
+            if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
                 this.$el.addClass(this.column.attributes.cell.prototype.className);
+            }
+
+            if (this.column.has('align')) {
+                this.$el.css('text-align', this.column.get('align'));
             }
 
             return this;

@@ -10,5 +10,8 @@ define(['./datetime-cell'
      * @class   orodatagrid.datagrid.cell.DateCell
      * @extends orodatagrid.datagrid.cell.DateTimeCell
      */
-    return DatagridDateTimeCell.extend({type: 'date'});
+    return DatagridDateTimeCell.extend({
+        type: 'date',
+        className: 'date-cell'
+    });
 });

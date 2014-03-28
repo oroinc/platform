@@ -22,6 +22,11 @@ define(['./string-cell', '../formatter/datetime-formatter'
         type: 'dateTime',
 
         /**
+         * @property {string}
+         */
+        className: 'datetime-cell',
+
+        /**
          * @inheritDoc
          */
         initialize: function (options) {
