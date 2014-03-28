@@ -14,7 +14,7 @@
                 {%- endfor -%}
             {% endif -%}
             , 'jquery.select2'],
-        function(_, $, Select2Config, select2_relevancy_order_handler
+        function(_, $, Select2Config, orderHandler
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for name in configs.extra_modules|keys -%}
                     , {{ name }}
@@ -41,7 +41,7 @@
                     {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
                 {% endif %}
 
-                select2_relevancy_order_handler.handle(select2Config);
+                orderHandler.handle(select2Config);
 
                 {% if excluded is not defined %}
                     {% set excluded = [] %}
