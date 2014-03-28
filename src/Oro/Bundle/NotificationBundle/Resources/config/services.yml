@@ -135,7 +135,7 @@ services:
             - @oro_notification.entity_spool
             - @oro_email.email_renderer
             - @swiftmailer.mailer.db_spool_mailer
-            - %oro_notification.send_from%
+            - @oro_config.global
         calls:
             - [ setEnv, ['prod'] ]
             - [ setMessageLimit, [100] ]
