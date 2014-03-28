@@ -64,9 +64,10 @@ services:
     oro_entity_extend.extend.entity_processor:
         class: %oro_entity_extend.extend.entity_processor.class%
         arguments:
-            - @kernel
             - @oro_platform.maintenance
             - @oro_entity_config.config_manager
+            - @oro_entity_config.tools.command_executor
+            - @logger
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
