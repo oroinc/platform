@@ -22,7 +22,7 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
                 // enforce handling in case when called manually from user handler
                 var force = settings.enforce || false;
 
-                if (xhr.status === 401 || xhr.status === 403) {
+                if (xhr.status === 401) {
                     this._processRedirect();
                 } else if (xhr.readyState === 4 && (app.debug || (typeof xhr.error !== 'function' || force))) {
                     // show error in modal window in following cases:
