@@ -40,6 +40,10 @@ define(function (require) {
         },
 
         getObjectCache: function(type) {
+            // todo: temporary disable states for grid because it should be allowed to work with several grids on a page
+            // https://magecore.atlassian.net/browse/BAP-3758
+            if (type == 'grid') { return {}; }
+
             return this.state[type];
         }
     };
@@ -187,6 +191,11 @@ define(function (require) {
             contentManager.init(this.url, options.userName || false);
 
             Backbone.Router.prototype.initialize.apply(this, arguments);
+        },
+
+        isMaintenancePage: function(){
+            var metaError = $('meta[name="error"]');
+            return metaError.length && metaError.attr('content') == 503;
         },
 
         /**

@@ -73,7 +73,8 @@ class UserType extends AbstractType
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
-                            ->setParameter('anon', User::ROLE_ANONYMOUS);
+                            ->setParameter('anon', User::ROLE_ANONYMOUS)
+                            ->orderBy('r.label');
                     },
                     'multiple'      => true,
                     'expanded'      => true,
@@ -189,7 +190,16 @@ class UserType extends AbstractType
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false]);
+            ->add(
+                'imageFile',
+                'file',
+                [
+                    'label' => 'oro.user.image.label',
+                    'required' => false,
+                    'tooltip' => 'oro.user.image.tooltip',
+                    'tooltip_parameters' => ['%file_size%' => ini_get("upload_max_filesize")]
+                ]
+            );
     }
 
     /**

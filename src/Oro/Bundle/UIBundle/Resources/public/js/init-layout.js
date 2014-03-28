@@ -27,7 +27,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl()) {
+        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
             if ($('#page-title').size()) {
                 document.title = _.unescape($('#page-title').text());
             }
@@ -135,12 +135,19 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         dropdownToggles.click(function (e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
+                $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
         $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
+
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+            if (e.keyCode === 27) {
+                $(e.currentTarget).parent().removeClass('open');
+            }
+        });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
@@ -283,9 +290,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         mediator.bind('layout:adjustReloaded', adjustReloaded);
         mediator.bind('layout:adjustHeight', adjustHeight);
 
-        if ($('body').hasClass('error-page')) {
+        $(function () {
             adjustHeight();
-        }
+        });
     }());
 
     /* ============================================================

@@ -18,7 +18,6 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->createEmptyConfiguration();
 
-        $this->assertParameter(array('no-reply@example.com' => 'Oro Admin'), 'oro_user.email');
         $this->assertParameter(86400, 'oro_user.reset.ttl');
     }
 
@@ -26,7 +25,6 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->createFullConfiguration();
 
-        $this->assertParameter(array('admin@acme.org' => 'Acme Corp'), 'oro_user.email');
         $this->assertParameter(1800, 'oro_user.reset.ttl');
     }
 
@@ -68,9 +66,6 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
     protected function getFullConfig()
     {
         $yaml = <<<EOF
-email:
-    address: admin@acme.org
-    name: Acme Corp
 reset:
     ttl: 1800
 EOF;
