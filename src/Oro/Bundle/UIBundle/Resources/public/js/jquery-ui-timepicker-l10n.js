@@ -24,4 +24,11 @@ function($, __, localeSettings) {
         separator: localeSettings.getDateTimeFormatSeparator()
     };
     $.timepicker.setDefaults($.timepicker.regional[locale]);
+
+    $.datepicker._orig_gotoToday = $.datepicker._gotoToday;
+    $.datepicker._gotoToday = function(id) {
+        var inst = this._getInst($(id)[0]);
+        this._base_gotoToday(id);
+        this._setTime(inst, inst.today);
+    };
 });
