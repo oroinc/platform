@@ -193,7 +193,12 @@ class UserType extends AbstractType
             ->add(
                 'imageFile',
                 'file',
-                ['label' => 'oro.user.image.label', 'required' => false, 'tooltip' => 'oro.user.image.tooltip']
+                [
+                    'label' => 'oro.user.image.label',
+                    'required' => false,
+                    'tooltip' => 'Avatar info %file_size%',
+                    'tooltip_parameters' => ['%file_size%' => ini_get("upload_max_filesize")]
+                ]
             );
     }
 

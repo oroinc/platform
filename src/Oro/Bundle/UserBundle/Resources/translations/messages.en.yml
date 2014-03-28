@@ -84,7 +84,7 @@ Login: Login
 "View role": "View role"
 "Remove role": "Remove role"
 "Template controller": "Template controller"
-
+"Avatar info %file_size%": "The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size"
 oro:
     dashboard:
         recent_emails:
@@ -118,7 +118,6 @@ oro:
         name_suffix.label: Name suffix
         birthday.label:    Birthday
         image.label:       Avatar
-        image.tooltip:     The avatar must be in BMP, JPEG or PNG formats, and file must be less than 2 MB in size
         enabled.label:     Status
         salt.label:        Salt
         password.label:    Password
