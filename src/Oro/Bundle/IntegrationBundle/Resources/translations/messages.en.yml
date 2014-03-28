@@ -24,7 +24,6 @@ oro:
             entity_label:        Channel
             entity_plural_label: Channels
             entity_description:  Represent channel
-            create_entity:       New Channel
             id.label:         Id
             type.label:       Type
             transport.label:  Transport type

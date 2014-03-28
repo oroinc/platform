@@ -246,10 +246,14 @@
     {% if parameters.aCss is defined %}
         {% set aCss = parameters.aCss|split(' ')|merge(aCss) %}
     {% endif %}
-    {% set title = parameters.title is defined
-        ? parameters.title
-        : 'oro.ui.edit_entity'|trans({'%entityName%': parameters.entity_label is defined ? parameters.entity_label : ''})
-    %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.edit_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.edit'|trans
+        %}
+    {% endif %}
     {% set label = parameters.label is defined
         ? parameters.label
         : 'oro.ui.edit'|trans
@@ -275,20 +279,27 @@
         ]
 #}
 {% macro addButton(parameters) %}
-    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : ''|trans %}
-    {% set label = parameters.label is defined
-        ? parameters.label
-        : 'oro.ui.create'|trans
-    %}
-    {% set title = parameters.title is defined
-        ? parameters.title
-        : 'oro.ui.create_entity'|trans({'%entityName%': entityLabel})
-    %}
+    {% if parameters.label is defined %}
+        {% set label = parameters.label %}
+    {% else %}
+        {% set label = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
     <a href="{{ parameters.path }}"
         class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
-        title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+        title="{{ title }}"
     >
-        {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
+        {{ label }}
     </a>
 {% endmacro %}
 
@@ -308,15 +319,19 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
-    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'item'|trans %}
+    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : '' %}
     {% set label = parameters.label is defined
         ? parameters.label
         : 'oro.ui.delete'|trans
     %}
-    {% set title = parameters.title is defined
-        ? parameters.title
-        : 'oro.ui.delete_entity'|trans({'%entityName%': entityLabel})
-    %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.delete_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.delete'|trans
+        %}
+    {% endif %}
     <div class="pull-left btn-group icons-holder">
         <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}{{ parameters.disabled is defined and parameters.disabled ? ' disabled' : ''}}"
             {% if (parameters.id is defined) %}
