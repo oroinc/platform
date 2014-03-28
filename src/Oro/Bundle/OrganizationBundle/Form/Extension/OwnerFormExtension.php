@@ -180,7 +180,9 @@ class OwnerFormExtension extends AbstractTypeExtension
             $defaultOwner = $user;
         } elseif ($metadata->isBusinessUnitOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
-            $defaultOwner = $this->getCurrentBusinessUnit();
+            if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
+                $defaultOwner = $this->getCurrentBusinessUnit();
+            }
         } elseif ($metadata->isOrganizationOwned()) {
             $this->addOrganizationOwnerField($builder, $user);
             $defaultOwner = $this->getCurrentOrganization();
@@ -362,6 +364,22 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
+     * Check if current entity is BusinessUnit
+     *
+     * @param string $className
+     * @return bool
+     */
+    protected function checkIsBusinessUnitEntity($className)
+    {
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
+        if ($className != $businessUnitClass && !is_subclass_of($className, $businessUnitClass)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param User $user
      * @param string $className
@@ -371,17 +389,18 @@ class OwnerFormExtension extends AbstractTypeExtension
         /**
          * Owner field is required for all entities except business unit
          */
-        $businessUnitClass = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
-        if ($className != $businessUnitClass && !is_subclass_of($className, $businessUnitClass)) {
+        if (!$this->checkIsBusinessUnitEntity($className)) {
             $validation = array(
                 'constraints' => array(new NotBlank()),
                 'required' => true,
             );
+            $emptyValueLabel = 'oro.business_unit.form.choose_business_user';
         } else {
             $validation = array(
                 'required' => false
             );
-            $this->fieldLabel = 'Parent';
+            $emptyValueLabel = 'oro.business_unit.form.none_business_user';
+            $this->fieldLabel = 'oro.organization.businessunit.parent.label';
         }
 
         if ($this->isAssignGranted) {
@@ -393,7 +412,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value' => $this->translator->trans('oro.business_unit.form.choose_business_user'),
+                        'empty_value' => $this->translator->trans($emptyValueLabel),
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),

@@ -30,10 +30,6 @@ config:
         'flotr2':
             deps:
                 - 'jquery'
-        'flotr2/funnel':
-            deps:
-                - 'flotr2'
-                - 'jquery'
         'bootstrap':
             deps:
                 - 'jquery'
@@ -85,7 +81,6 @@ config:
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'flotr2': 'bundles/oroui/lib/flotr2/flotr2.amd.js'
-        'flotr2/funnel': 'bundles/oroui/js/funnel.js'
         'bean': 'bundles/oroui/lib/flotr2/bean.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
         'bootstrap-tooltip': 'bundles/oroui/lib/bootstrap/js/bootstrap-tooltip.js'
@@ -122,3 +117,4 @@ config:
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
+        'oroui/js/flotr2/funnel': 'bundles/oroui/js/flotr2/funnel.js'

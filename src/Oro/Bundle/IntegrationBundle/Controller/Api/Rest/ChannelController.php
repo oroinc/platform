@@ -11,9 +11,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
  * @RouteResource("channel")
@@ -40,9 +40,15 @@ class ChannelController extends FOSRestController
      */
     public function deleteAction($id)
     {
-        $entity = $this->getManager()->find($id);
+        $entity   = $this->getManager()->find($id);
+
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        }
+
+        // do not allow to remove synced channel
+        if (ChannelFormSubscriber::wasChannelSynced($entity)) {
+            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager()->getObjectManager();
