@@ -108,13 +108,19 @@
         ]
 #}
 {% macro link(parameters) %}
+    {# need to remove spaces just before label #}
+    {% set iconHtml = '' %}
+    {% if parameters.iCss is defined %}
+        {% set iconHtml %}
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endset %}
+    {% else %}
+    {% endif %}
+    {% spaceless %}
     <a href="{{ parameters.path }}"
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       title="{{ parameters.title|trans }}">
-        {% if parameters.iCss is defined %}
-            <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
-        {% endif %}{{ parameters.label|trans }}
-    </a>
+           title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+    {% endspaceless %}
 {% endmacro %}
 
 {#
