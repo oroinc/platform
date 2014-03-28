@@ -1,8 +1,8 @@
 /*global define*/
 define([], function(){
     /**
-     * @export  oroaddress/js/country/select2-handler
-     * @class   oroaddress.country.select2Handler
+     * @export  oroform/js/select2-relevancy-order-handler
+     * @class   oroform.select2RelevancyOrderHandler
      */
     return {
         handle: function(configs){
@@ -26,7 +26,7 @@ define([], function(){
                     }
 
                     return inFirst - inSecond;
-                }
+                };
 
                 return results.sort(sortIteratorDelegate);
             }
