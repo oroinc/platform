@@ -73,12 +73,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             }
 
             $con = $em->getConnection();
-
-            $con->executeUpdate(
-                sprintf("DELETE FROM jms_job_related_entities WHERE job_id IN (%s)", $sql),
-                $bindParams
-            );
-
             $con->executeUpdate(
                 sprintf("DELETE FROM jms_job_statistics WHERE job_id IN (%s)", $sql),
                 $bindParams
@@ -118,7 +112,10 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 $em->remove($job);
                 $result++;
             }
-            $em->flush();
+
+            if ($result > 0) {
+                $em->flush();
+            }
 
             $message = 'Removed %d rows';
         }
