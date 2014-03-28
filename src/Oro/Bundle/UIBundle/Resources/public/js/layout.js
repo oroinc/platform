@@ -36,16 +36,17 @@ define(function (require) {
     };
 
     layout.initPopover = function (container) {
-        container.find('[data-toggle="popover"]')
-            .popover({
-                animation: false,
-                delay: { show: 0, hide: 0 },
-                html: true,
-                trigger: 'click'
-            });
+        var $items = container.find('[data-toggle="popover"]');
+
+        $items.popover({
+            animation: false,
+            delay: { show: 0, hide: 0 },
+            html: true,
+            trigger: 'click'
+        });
 
         $('body').on('click.popover-hide', function (e) {
-            $('[data-toggle="popover"]').each(function () {
+            $items.each(function () {
                 //the 'is' for buttons that trigger popups
                 //the 'has' for icons within a button that triggers a popup
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
