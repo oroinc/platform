@@ -306,7 +306,9 @@ define(function (require) {
                 });
 
                 mediator.on('datagrid:doRefresh:' + grid.name, function () {
-                    grid.refreshAction.execute();
+                    if (grid.$el.is(':visible')) {
+                        grid.refreshAction.execute();
+                    }
                 });
 
                 grid.refreshAction.on('preExecute', function (action, options) {
@@ -336,7 +338,9 @@ define(function (require) {
                 });
 
                 mediator.on('datagrid:doReset:' + grid.name, function () {
-                    grid.resetAction.execute();
+                    if (grid.$el.is(':visible')) {
+                        grid.resetAction.execute();
+                    }
                 });
 
                 grid.resetAction.on('preExecute', function (action, options) {
