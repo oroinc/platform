@@ -67,3 +67,22 @@ table.grid tbody tr.row-click-action {
     background:#f9f9f9;
     margin:10px 0;
 }
+
+table.grid tr .string-cell,
+table.grid tr .uri-cell,
+table.grid tr .email-cell {
+    text-align: left;
+}
+
+table.grid tr .number-cell,
+table.grid tr .integer-cell {
+    text-align: right;
+}
+
+table.grid tr .date-cell,
+table.grid tr .time-cell,
+table.grid tr .datetime-cell,
+table.grid tr .boolean-cell,
+table.grid tr .select-cell {
+    text-align: center;
+}

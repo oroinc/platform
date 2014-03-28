@@ -60,6 +60,10 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
                 })));
             }
 
+            if (this.column.attributes.cell.prototype.className) {
+                this.$el.addClass(this.column.attributes.cell.prototype.className);
+            }
+
             return this;
         }
     });

@@ -88,6 +88,10 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', '../../pageable-collecti
                 this.$el.width(this.column.get('width'));
             }
 
+            if (this.column.attributes.cell.prototype.className) {
+                this.$el.addClass(this.column.attributes.cell.prototype.className);
+            }
+
             return this;
         },
 
