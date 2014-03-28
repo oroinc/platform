@@ -16,24 +16,28 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
              *
              * @param {Object} event
              * @param {Object} xhr
+             * @param {Object} settings
              */
-            handle: function (event, xhr) {
+            handle: function (event, xhr, settings) {
+                // enforce handling in case when called manually from user handler
+                var force = settings.enforce || false;
+
                 if (xhr.status === 401 || xhr.status === 403) {
                     this._processRedirect();
-                } else if (xhr.readyState === 4 && (app.debug || typeof xhr.error !== 'function')) {
+                } else if (xhr.readyState === 4 && (app.debug || (typeof xhr.error !== 'function' || force))) {
                     // show error in modal window in following cases:
                     // when custom error handling is not added
                     // when in debug mode
-                    this._processModal(xhr);
+                    this.modalHandler(xhr);
                 }
             },
 
             /**
              * Shows modal window
+             *
              * @param {Object} xhr
-             * @private
              */
-            _processModal: function (xhr) {
+            modalHandler: function (xhr) {
                 var modal,
                     message = defaults.message;
                 if (app.debug) {
