@@ -28,6 +28,10 @@ define(['jquery', 'underscore', 'backbone'
 
             $('input[name*="subject"], textarea[name*="content"]')
                 .on('blur', _.bind(this._updateElementsMetaData, this));
+
+            // set default to content
+            this.lastElement = $('textarea[name*="content"]');
+
             this.render();
         },
 
