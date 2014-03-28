@@ -259,8 +259,10 @@ function(_, Backbone, messanger, __,
                 }, this),
                 'error': function(model, response) {
                     navigation.hideLoading();
-                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(response.responseJSON.error)) {
-                        console.error(response.responseJSON.error);
+                    var jsonResponse = response.responseJSON || {};
+
+                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
+                        console.error(jsonResponse.error);
                     }
                     messanger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
