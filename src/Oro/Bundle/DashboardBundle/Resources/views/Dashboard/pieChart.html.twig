@@ -23,8 +23,8 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', 'flotr2'],
-        function ($, Flotr) {
+        require(['jquery', 'oroui/js/layout', 'flotr2'],
+        function ($, layout, Flotr) {
             $(function () {
                 var ratio = {{ isMobileVersion() ? '0.8' : '0.35' }};
                 var $widgetContent = $('#{{ widgetContentId }}');
@@ -128,7 +128,7 @@
                     );
                 };
 
-                $(function () {
+                layout.onPageRendered(function () {
                     setChartSize();
                     drawChart();
                     setChartContainerSize();
