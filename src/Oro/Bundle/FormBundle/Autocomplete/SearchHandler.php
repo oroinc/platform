@@ -277,6 +277,9 @@ class SearchHandler implements SearchHandlerInterface
         return $this->entityName;
     }
 
+    /**
+     * @param EntityManager $manager
+     */
     public function setEntityManager(EntityManager $manager)
     {
         $this->manager = $manager;

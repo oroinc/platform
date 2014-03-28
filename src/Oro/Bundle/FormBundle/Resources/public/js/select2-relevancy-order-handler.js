@@ -6,7 +6,7 @@ define([], function(){
      */
     return {
         handle: function(configs){
-            if(configs['ajax']){
+            if (configs['ajax']) {
                 configs.minimumInputLength = 0;
                 return;
             }
