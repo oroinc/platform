@@ -7,8 +7,8 @@
     {% if resource_granted('oro_workflow_definition_create') %}
         <div class="btn-group">
             {{ UI.addButton({
-            'path' : path('oro_workflow_definition_create'),
-            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans,
+                'path' : path('oro_workflow_definition_create'),
+                'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans,
             }) }}
         </div>
     {% endif %}
