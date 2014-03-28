@@ -283,9 +283,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         mediator.bind('layout:adjustReloaded', adjustReloaded);
         mediator.bind('layout:adjustHeight', adjustHeight);
 
-        if ($('body').hasClass('error-page')) {
+        $(function () {
             adjustHeight();
-        }
+        });
     }());
 
     /* ============================================================
