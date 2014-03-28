@@ -68,6 +68,11 @@ form {
     right: 5px;
     top: 9px;
   }
+  & > li > a{
+      & > i[class^="icon-"]{
+     	 min-width: 17px;
+	  }
+  }
 }
 .dark {
   background-color: #f6f5f5;
@@ -803,6 +808,7 @@ footer {
       margin: 0;
       padding: 0;
       width: 415px;
+      outline: none;
       .tabs-left {
         > .nav-tabs {
           border:0;
@@ -1365,10 +1371,21 @@ footer {
       }
     }
   }
+  /* fix for IE10 in Win8, otherwise breaks actions column */
+  .dropdown:not(.open) {
+    .launchers-dropdown-menu {
+      min-width: 0;
+      display: block;
+      height: 0;
+      width: 0;
+      overflow: hidden;
+      border-width: 0;
+    }
+  }
 }
 .loading-wrapper {
   background: #000;
-  opacity: 0.6;
+  opacity: 0.3;
   position: absolute;
   top: 0;
   left: 0;
@@ -3380,4 +3397,14 @@ i.pin-status {
 
 label .popover-content {
   text-transform: none;
+}
+.dashboard-container{
+  .responsive-cell{
+    .box-type1{
+      border: 1px solid #ccc;
+      .calendar-events{
+        margin: 0 0 10px 10px;
+      }
+    }
+  }
 }

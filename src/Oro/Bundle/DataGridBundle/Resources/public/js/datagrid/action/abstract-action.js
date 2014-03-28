@@ -192,8 +192,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
             });
         },
 
-        _onAjaxError: function (jqXHR, textStatus, errorThrown) {
-            error.dispatch(null, jqXHR);
+        _onAjaxError: function (jqXHR) {
+            error.handle({}, jqXHR, {enforce: true});
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
