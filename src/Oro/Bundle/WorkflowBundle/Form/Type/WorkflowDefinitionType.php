@@ -21,6 +21,7 @@ class WorkflowDefinitionType extends AbstractType
                     'label' => 'oro.workflow.workflowdefinition.name.label',
                     'required' => true,
                     'constraints' => array(array('NotBlank' => null)),
+                    'tooltip' => 'oro.workflow.workflowdefinition.name.tooltip'
                 )
             )
             ->add(
@@ -30,6 +31,7 @@ class WorkflowDefinitionType extends AbstractType
                     'label' => 'oro.workflow.workflowdefinition.related_entity.label',
                     'required' => true,
                     'constraints' => array(array('NotBlank' => null)),
+                    'tooltip' => 'oro.workflow.workflowdefinition.related_entity.tooltip'
                 )
             )
             ->add(
@@ -38,6 +40,7 @@ class WorkflowDefinitionType extends AbstractType
                 array(
                     'label' => 'oro.workflow.workflowdefinition.steps_display_ordered.label',
                     'required' => false,
+                    'tooltip' => 'oro.workflow.workflowdefinition.steps_display_ordered.tooltip'
                 )
             )
             ->add(
@@ -45,7 +48,8 @@ class WorkflowDefinitionType extends AbstractType
                 'oro_icon_select',
                 array(
                     'label' => 'Button icon',
-                    'mapped' => false
+                    'mapped' => false,
+                    'tooltip' => 'oro.workflow.workflowdefinition.transition.icon.tooltip'
                 )
             );
     }

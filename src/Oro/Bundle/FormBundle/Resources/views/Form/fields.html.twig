@@ -247,8 +247,7 @@
                     {% set tooltip = tooltip
                         ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">' ~ 'Read more'|trans ~ '</a></div></div>' %}
                 {% endif %}
-                <i class="icon-info-sign"
-                    style="color: #6b92d0;font-size: 13px;"
+                <i class="icon-info-sign tooltip-icon"
                     {% if tooltip_placement is defined %}data-placement="{{ tooltip_placement }}"{% endif %}
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>

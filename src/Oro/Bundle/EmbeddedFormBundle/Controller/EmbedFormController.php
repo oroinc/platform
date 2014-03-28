@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -26,8 +25,6 @@ class EmbedFormController extends Controller
     {
         $response = new Response();
         $response->setPublic();
-        $response->setMaxAge(30);
-        $response->setLastModified($formEntity->getUpdatedAt());
         $response->setEtag($formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601));
         if ($response->isNotModified($request)) {
             return $response;

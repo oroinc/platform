@@ -46,8 +46,7 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'New Segment'|trans %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.segment.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

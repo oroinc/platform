@@ -50,7 +50,7 @@
                     var iframe = $('<iframe />', {
                         name: iframeId,
                         id: iframeId,
-                        class: "scrollable-container",
+                        'class': "scrollable-container",
                         frameborder: 0,
                         marginwidth: 0,
                         marginheight: 0,
@@ -62,14 +62,11 @@
                     var form = $('#{{ formName }}');
                     var formAction = form.attr('action');
 
-                    form.submit(function(e) {
-                        if (!$(this).data('preview')) {
-                            return;
-                        }
-
+                    form.one('submit', function(e) {
+                        var loader;
                         var confirmModal = new Modal({
                             title: __('Preview'),
-                            content: '<div class="loading-content">Loading...</div>',
+                            content: '<div class="loading-content">' + __('Loading...') + '</div>',
                             okText: __('Ok'),
                             className: 'modal oro-modal-normal',
                             template: _.template('<% if (title) { %>' +
@@ -85,23 +82,20 @@
                         });
                         confirmModal.open();
                         confirmModal.$content.append(iframe);
-                        $('.modal-body .loading-content').show();
+                        loader = confirmModal.$content.find('.loading-content');
 
+                        loader.show();
                         form.attr('target', iframeId);
                         form.attr('action', $(el).attr('href'));
 
+                        iframe.one('load', function() {
+                            loader.hide();
+                            form.removeAttr('target');
+                            form.attr('action', formAction);
+                        });
+
                         // prevent hash navigation form processing
                         e.stopImmediatePropagation();
-                    });
-                    form.data('preview', true);
-
-                    iframe.load(function() {
-                        $(this).show();
-                        form.attr('action', formAction);
-                        form.removeAttr('target');
-                        form.data('preview', false);
-
-                        $('.modal-body .loading-content').hide();
                     });
 
                     form.submit();
@@ -169,7 +163,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape('html_attr') }}">{{ title|escape }}</a>
+            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}

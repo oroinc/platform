@@ -56,7 +56,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->will($this->returnValue($user));
 
-        $this->securityContext->expects($this->once())
+        $this->securityContext->expects($this->atLeastOnce())
             ->method('getToken')
             ->will($this->returnValue($token));
 

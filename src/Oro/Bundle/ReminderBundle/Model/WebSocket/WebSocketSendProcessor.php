@@ -11,6 +11,11 @@ class WebSocketSendProcessor implements SendProcessorInterface
     const NAME = 'web_socket';
 
     /**
+     * @var array
+     */
+    protected $remindersByRecipient = array();
+
+    /**
      * @var TopicPublisher
      */
     protected $topicPublisher;
@@ -31,33 +36,71 @@ class WebSocketSendProcessor implements SendProcessorInterface
     }
 
     /**
-     * Send reminder using WebSocket
-     *
-     * @param Reminder $reminder
-     * @return string
+     * {@inheritdoc}
      */
-    public function process(Reminder $reminder)
+    public function push(Reminder $reminder)
     {
-        $message = $this->messageParamsProvider->getMessageParams($reminder);
-
-        $this->sendMessage($reminder, $message);
-
-        $reminder->setState(Reminder::STATE_REQUESTED);
+        $recipientId = $reminder->getRecipient()->getId();
+        if (!isset($this->remindersByRecipient[$recipientId])) {
+            $this->remindersByRecipient[$recipientId] = array();
+        }
+        $this->remindersByRecipient[$recipientId][] = $reminder;
     }
 
     /**
-     * @param Reminder $reminder
-     * @param array    $messageParams
+     * Send reminders using WebSocket
+     */
+    public function process()
+    {
+        foreach ($this->remindersByRecipient as $recipientId => $reminders) {
+            $this->processRecipientReminders($reminders, $recipientId);
+        }
+
+        $this->remindersByRecipient = array();
+    }
+
+    /**
+     * Send group of reminders to recipient
+     *
+     * @param Reminder[] $reminders
+     * @param integer $recipientId
+     */
+    protected function processRecipientReminders(array $reminders, $recipientId)
+    {
+        $messageData = array();
+
+        // Collect message data
+
+        foreach ($reminders as $reminder) {
+            $messageData[] = $this->messageParamsProvider->getMessageParams($reminder);
+        }
+
+        // Send message
+        try {
+            $this->sendMessage($messageData, $recipientId);
+
+            // Change state
+            foreach ($reminders as $reminder) {
+                $reminder->setState(Reminder::STATE_REQUESTED);
+            }
+        } catch (\Exception $exception) {
+            foreach ($reminders as $reminder) {
+                $reminder->setState(Reminder::STATE_FAIL);
+                $reminder->setFailureException($exception);
+            }
+        }
+    }
+
+    /**
+     * @param array $messageData
+     * @param int $recipientId
      * @return bool
      */
-    protected function sendMessage(Reminder $reminder, array $messageParams)
+    protected function sendMessage(array $messageData, $recipientId)
     {
         return $this->topicPublisher->send(
-            sprintf(
-                'oro/reminder/remind_user_%s',
-                $reminder->getRecipient()->getId()
-            ),
-            json_encode($messageParams)
+            sprintf('oro/reminder/remind_user_%s', $recipientId),
+            json_encode($messageData)
         );
     }
 

@@ -18,5 +18,5 @@ oro_menu_config:
 oro_titles:
     oro_embedded_form_list:    ~
     oro_embedded_form_view:    %%form.title%%
-    oro_embedded_form_create:  Create embedded form
+    oro_embedded_form_create:  oro.embeddedform.create_entity
     oro_embedded_form_update:  %%form.title%% - Edit

@@ -4,10 +4,6 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroTagBundle:Form:fields.html.twig'] %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId
-    ? 'oro.organization.businessunit.edit_entity'|trans
-    : 'oro.organization.businessunit.new_entity'|trans
-%}
 {% oro_title_set({params : { "%business_unit.name%": form.vars.value.name } }) %}
 {% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
 {% set gridName = 'bu-update-users-grid' %}
@@ -51,12 +47,12 @@
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_business_unit_index'),
-            'indexLabel': 'oro.organization.businessunit.entity_plural_label',
+            'indexLabel': 'oro.organization.businessunit.entity_plural_label'|trans,
             'entityTitle': form.vars.value.name
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.organization.businessunit.new_entity'|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 

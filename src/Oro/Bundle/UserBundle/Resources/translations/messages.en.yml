@@ -99,6 +99,7 @@ oro:
             role.message.saved: "Role saved"
             user.message.saved: "User saved"
             status.message.saved: "Status saved"
+            invite.fail.message: An invitation email sending was failed
         #
         # Oro/Bundle/UserBundle/Entity/User
         #

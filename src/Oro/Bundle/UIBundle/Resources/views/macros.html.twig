@@ -190,7 +190,8 @@
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
         {% set options = parameters.options|default({})|merge({
-            groupKey: parameters.groupKey
+            groupKey: parameters.groupKey,
+            useMainButtonsClone: true
         }) %}
         <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
             {{ parameters.html|raw }}
@@ -672,15 +673,17 @@
 {% endmacro %}
 
 {%- macro renderUrl(url, title, class) -%}
-    {% if title is empty %}
-        {% set title = url %}
-    {% endif %}
-    {% if class is empty %}
-        {% set class = '' %}
-    {% endif %}
-    {% if url is not empty %}
-        <a href="{{ url|raw }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title|escape }}</a>
-    {% endif %}
+    {% spaceless %}
+        {% if title is empty %}
+            {% set title = url %}
+        {% endif %}
+        {% if class is empty %}
+            {% set class = '' %}
+        {% endif %}
+        {% if url is not empty %}
+            <a href="{{ url|raw }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title|escape }}</a>
+        {% endif %}
+    {% endspaceless %}
 {%- endmacro -%}
 
 {%- macro renderPhone(phone, title) -%}

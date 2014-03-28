@@ -48,7 +48,7 @@ class AllMigration implements Migration
 
 {% macro dumpColumnOptions(column) %}
 {% spaceless %}
-{% set options = getColumnOptions(column) %}
+{% set options = oro_migration_get_schema_column_options(column) %}
 {% set items = [] %}
 {% if options.default is defined %}{% set items = items|merge(["'default' => " ~ _self.dumpString(options.default)]) %}{% endif -%}
 {% if options.notnull is defined %}{% set items = items|merge(["'notnull' => " ~ _self.dumpBoolean(options.notnull)]) %}{% endif -%}

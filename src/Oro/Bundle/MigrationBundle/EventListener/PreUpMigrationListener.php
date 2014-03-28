@@ -3,9 +3,12 @@
 namespace Oro\Bundle\MigrationBundle\EventListener;
 
 use Symfony\Component\Yaml\Yaml;
+
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
+
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
+use Oro\Bundle\MigrationBundle\Migration\UpdateEntityConfigMigration;
 
 class PreUpMigrationListener
 {
@@ -40,6 +43,7 @@ class PreUpMigrationListener
                     $event->setLoadedVersion($bundleName, $version);
                 }
                 $event->addMigration(new UpdateBundleVersionMigration($bundleVersions));
+                $event->addMigration(new UpdateEntityConfigMigration());
             }
         }
     }

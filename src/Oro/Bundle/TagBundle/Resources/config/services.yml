@@ -141,7 +141,7 @@ services:
         arguments:
           - @oro_datagrid.datagrid.request_params
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.tag-results-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
 
     oro_tag.owner_assignment_checker.tag:
         class: %oro_tag.owner_assignment_checker.tag.class%
