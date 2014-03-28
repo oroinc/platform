@@ -102,6 +102,9 @@ abstract class OroKernel extends Kernel
 
             // make sure OroCRM bundles follow Oro bundles
             if (strpos($n1, 'Oro') === 0 && strpos($n2, 'Oro') === 0) {
+                if ((strpos($n1, 'OroCRM') === 0) && (strpos($n2, 'OroCRM') === 0)) {
+                    return strcasecmp($n1, $n2);
+                }
                 if (strpos($n1, 'OroCRM') === 0) {
                     return 1;
                 }
