@@ -10,7 +10,9 @@
 
         sync(new Wamp({
             host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
-            port: {{ ws.port }}
+            port: {{ ws.port }},
+            maxRetries: 3,
+            retryDelay: 30000
         }));
 
         /*mediator.on('datagrid_collection_set_after', function(obj) {
