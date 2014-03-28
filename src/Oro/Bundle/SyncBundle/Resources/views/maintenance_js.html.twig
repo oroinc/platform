@@ -5,7 +5,7 @@
         var dialog = null;
 
         sync.subscribe('oro/maintenance', function (response) {
-            if(response.isOn){
+            if (response.isOn) {
                 var regExp = new RegExp('\n', 'g');
                 dialog = new Modal({
                     'content': __('oro.platform.maintenance_mode_on_message').replace(regExp, '<br/>'),
@@ -14,7 +14,7 @@
                     'title': __('oro.platform.maintenance_mode_on_title')
                 });
                 dialog.open();
-            } else if(dialog) {
+            } else if (dialog) {
                 dialog.close();
             }
         });
