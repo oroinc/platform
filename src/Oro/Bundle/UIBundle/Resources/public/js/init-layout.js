@@ -142,6 +142,12 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+            if (e.keyCode === 27) {
+                $(e.currentTarget).parent().removeClass('open');
+            }
+        });
+
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
             var $target = $(e.target),
