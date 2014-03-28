@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
+    ], function ($, _, Backbone, __) {
     'use strict';
 
     /**
@@ -61,11 +61,22 @@ define(['jquery', 'underscore', 'backbone'
             } else {
                 var html = _.template(this.options.template.html(), {
                     userVars: this.model.get('user'),
-                    entityVars: this.model.get('entity')
+                    entityVars: this.model.get('entity'),
+                    'notice': __('Click to insert variable.')
                 });
 
                 $el.html(html);
                 $el.parent().show();
+
+                $('input[name*="subject"], textarea[name*="content"]')
+                    .bind("dragenter dragover", function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                    })
+                    .bind("dragleave dragexit", function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
             }
 
             return this;

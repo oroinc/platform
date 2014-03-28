@@ -20,7 +20,7 @@
             <h4>{{ 'Logged in user:'|trans }}</h4>
             <ul class="nav nav-list">
                 <% _.each(userVars, function(variable, i) { %>
-                    <li><a href="javascript:void(0);">{% verbatim %}{{ user.<%= variable %> }}{% endverbatim %}</a></li>
+                    <li><a href="javascript:void(0);" title="<%= notice %>">{% verbatim %}{{ user.<%= variable %> }}{% endverbatim %}</a></li>
                 <% }); %>
             </ul>
         </div>
@@ -30,7 +30,7 @@
             <h4>{{ 'Related entity:'|trans }}</h4>
             <ul class="nav nav-list">
                 <% _.each(entityVars, function(variable, i) { %>
-                    <li><a href="javascript:void(0);">{% verbatim %}{{ entity.<%= variable %> }}{% endverbatim %}</a></li>
+                    <li><a href="javascript:void(0);" title="<%= notice %>">{% verbatim %}{{ entity.<%= variable %> }}{% endverbatim %}</a></li>
                 <% }); %>
             </ul>
         </div>
