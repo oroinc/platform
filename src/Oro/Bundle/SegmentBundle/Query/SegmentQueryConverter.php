@@ -59,6 +59,56 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function prepareTableAliases()
+    {
+        parent::prepareTableAliases();
+    }
+
+    /**
+     * A factory method provides an algorithm used to convert a query
+     */
+    protected function buildQuery()
+    {
+        // parse filters to detect one-way relations and convert them to sub-requests
+        $filterDefinitions = $this->definition['filters'];
+        $this->definition['subrequestFilters'] = [];
+        foreach ($filterDefinitions as $i => $item) {
+            $filterColumns = [];
+            if (is_array($item) && isset($item['columnName'])) {
+                $filterColumns = $this->getJoinIdentifiers($item['columnName']);
+            }
+
+            // @TODO: find a better way to filter not existing filter columns that should be treated as sub-requests
+            if (!empty($filterColumns)) {
+                $fieldName  = explode('::', $filterColumns[0]);
+                $entityName = $fieldName[0];
+                $fieldName  = $fieldName[1];
+
+                if (!property_exists($entityName, $fieldName)) {
+                    $this->definition['subrequestFilters'][] = $item;
+                    unset($this->definition['filters'][$i]);
+                }
+            }
+        }
+
+
+        $this->prepareTableAliases();
+        $this->prepareColumnAliases();
+
+        $this->addSelectStatement();
+        $this->addFromStatements();
+        $this->addJoinStatements();
+        $this->addWhereStatement();
+        $this->addGroupByStatement();
+        $this->addOrderByStatement();
+
+        $this->saveTableAliases($this->tableAliases);
+        $this->saveColumnAliases($this->columnAliases);
+    }
+
+    /**
      * Generates and saves aliases for the given joins
      *
      * @param string[] $joinIds
@@ -132,6 +182,25 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
                 $this->filters,
                 new GroupingOrmFilterDatasourceAdapter($this->qb)
             );
+        }
+
+        if (!empty($this->definition['subrequestFilters'])) {
+            $subFilters = $this->definition['subrequestFilters'];
+
+            foreach ($subFilters as $subFilter) {
+                $qb = $this->qb;
+                //$qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
+//
+//                $qb->select('m.id')
+//                    ->from('Custom\Entity\MembreService', 'ms')
+//                    ->leftJoin('ms.membre', 'm')
+//                    ->where('ms.id != ?1');
+
+            }
+
+
+
+            //$this->qb->addCriteria($criteria);
         }
     }
 

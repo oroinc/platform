@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -130,6 +131,16 @@ class EntityFieldProvider
                 $lastDeepLevelRelations,
                 $translate
             );
+
+            $this->addOneWayRelations(
+                $result,
+                $className,
+                $em,
+                $withEntityDetails,
+                $deepLevel - 1,
+                $lastDeepLevelRelations,
+                $translate
+            );
         }
         $this->sortFields($result);
 
@@ -208,40 +219,115 @@ class EntityFieldProvider
         $translate
     ) {
         // only configurable entities are supported
-        if ($this->entityConfigProvider->hasConfig($className)) {
-            $metadata = $em->getClassMetadata($className);
-            foreach ($metadata->getAssociationNames() as $associationName) {
-                $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                    // skip 'default_' extend field
-                    if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-                        $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-                        if ($this->isExtendField($className, $guessedFieldName)) {
-                            continue;
-                        }
-                    }
+        if (!$this->entityConfigProvider->hasConfig($className)) {
+            return;
+        }
 
-                    $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
-                    $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel      = $this->getFieldLabel($className, $associationName);
-                    $relationData    = array(
-                        'name'                => $associationName,
-                        'type'                => $targetMetadata->getTypeOfField($targetFieldName),
-                        'label'               => $fieldLabel,
-                        'relation_type'       => $this->getRelationType($className, $associationName),
-                        'related_entity_name' => $targetClassName
-                    );
-                    $this->addRelation(
-                        $result,
-                        $relationData,
-                        $withEntityDetails,
-                        $relationDeepLevel,
-                        $lastDeepLevelRelations,
-                        $translate
-                    );
+        $metadata = $em->getClassMetadata($className);
+        foreach ($metadata->getAssociationNames() as $associationName) {
+            $targetClassName = $metadata->getAssociationTargetClass($associationName);
+            if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                // skip 'default_' extend field
+                if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+                    $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+                    if ($this->isExtendField($className, $guessedFieldName)) {
+                        continue;
+                    }
                 }
+
+                $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
+                $targetMetadata  = $em->getClassMetadata($targetClassName);
+                $fieldLabel      = $this->getFieldLabel($className, $associationName);
+                $relationData    = array(
+                    'name'                => $associationName,
+                    'type'                => $targetMetadata->getTypeOfField($targetFieldName),
+                    'label'               => $fieldLabel,
+                    'relation_type'       => $this->getRelationType($className, $associationName),
+                    'related_entity_name' => $targetClassName
+                );
+                $this->addRelation(
+                    $result,
+                    $relationData,
+                    $withEntityDetails,
+                    $relationDeepLevel,
+                    $lastDeepLevelRelations,
+                    $translate
+                );
             }
         }
+    }
+
+    /**
+     * Adds remote entities relations to $className entity into $result
+     *
+     * @param array         $result
+     * @param string        $className
+     * @param EntityManager $em
+     * @param bool          $withEntityDetails
+     * @param int           $relationDeepLevel
+     * @param bool          $lastDeepLevelRelations
+     * @param bool          $translate
+     */
+    protected function addOneWayRelations(
+        array &$result,
+        $className,
+        EntityManager $em,
+        $withEntityDetails,
+        $relationDeepLevel,
+        $lastDeepLevelRelations,
+        $translate
+    ) {
+        // entities metadata that linked to className entity
+        $relatedMappingMetadata = $this->getRelatedMappingMetadata($em, $className);
+        foreach ($relatedMappingMetadata as $dataItem) {
+            if (!$this->entityConfigProvider->hasConfig($dataItem->getName())) {
+                continue;
+            }
+
+            $fieldName = str_replace($dataItem->namespace . '\\', '', $dataItem->getName());
+            $relationData = [
+                'name'                => strtolower($fieldName),
+                'type'                => null,
+                'label'               => $fieldName,
+                'relation_type'       => 'ref-many',
+                'related_entity_name' => $dataItem->getName()
+            ];
+
+            $this->addRelation(
+                $result,
+                $relationData,
+                $withEntityDetails,
+                $relationDeepLevel,
+                $lastDeepLevelRelations,
+                $translate
+            );
+        }
+    }
+
+    /**
+     * Return entities metadata that has one-way link to $className entity
+     *
+     * @param EntityManager $em
+     * @param string        $className
+     *
+     * @return ClassMetadata[]|array
+     */
+    protected function getRelatedMappingMetadata(EntityManager $em, $className)
+    {
+        $allMetadata = $em->getMetadataFactory()->getAllMetadata();
+        $resultMetadata = [];
+
+        foreach ($allMetadata as $metadata) {
+            /** @var ClassMetadata $metadata */
+            $targetMappings = $metadata->getAssociationsByTargetClass($className);
+            if (empty($targetMappings)) {
+                continue;
+            }
+
+            $resultMetadata[] = $metadata;
+        }
+
+        return $resultMetadata;
     }
 
     /**
