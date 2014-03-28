@@ -2,24 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
-
-use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 
 class EntityProcessor
 {
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
-
     /**
      * @var MaintenanceMode
      */
@@ -31,18 +25,45 @@ class EntityProcessor
     protected $configManager;
 
     /**
-     * @param KernelInterface $kernel
+     * @var CommandExecutor
+     */
+    protected $commandExecutor;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var array
+     */
+    protected $commands = [
+        'update'         => 'oro:entity-extend:update-config',
+        'schemaUpdate'   => 'oro:entity-extend:update-schema',
+        // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
+        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
+        'doctrineUpdate' => 'doctrine:schema:update',
+        // TODO: Update extended entity cache after during schema update
+        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
+        'cacheClear'     => 'cache:clear',
+    ];
+
+    /**
      * @param MaintenanceMode $maintenance
-     * @param ConfigManager $configManager
+     * @param ConfigManager   $configManager
+     * @param CommandExecutor $commandExecutor
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        KernelInterface $kernel,
         MaintenanceMode $maintenance,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        CommandExecutor $commandExecutor,
+        LoggerInterface $logger
     ) {
-        $this->kernel = $kernel;
-        $this->maintenance = $maintenance;
-        $this->configManager = $configManager;
+        $this->maintenance     = $maintenance;
+        $this->configManager   = $configManager;
+        $this->commandExecutor = $commandExecutor;
+        $this->logger          = $logger;
     }
 
     /**
@@ -54,20 +75,6 @@ class EntityProcessor
     public function updateDatabase($generateProxies = true)
     {
         set_time_limit(0);
-
-        $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
-        $env     = $this->kernel->getEnvironment();
-
-        $commands = array(
-            'update'         => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
-            'schemaUpdate'   => new Process($console . ' oro:entity-extend:update-schema --env ' . $env),
-            // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
-            // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
-            'doctrineUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
-            // TODO: Update extended entity cache after during schema update
-            // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
-            'cacheClear' => new Process($console . ' cache:clear --env ' . $env),
-        );
 
         // put system in maintenance mode
         $this->maintenance->on();
@@ -81,9 +88,13 @@ class EntityProcessor
         );
 
         $exitCode = 0;
-        foreach ($commands as $command) {
-            /** @var $command Process */
-            $code = $command->run();
+        foreach ($this->commands as $command) {
+            $code = $this->commandExecutor->runCommand(
+                $command,
+                ['--process-timeout' => 300],
+                $this->logger
+            );
+
             if ($code !== 0) {
                 $exitCode = $code;
             }
@@ -111,7 +122,7 @@ class EntityProcessor
                 function (ConfigInterface $config) {
                     return
                         $config->is('is_extend')
-                        && ! $config->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED]);
+                        && !$config->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED]);
                 }
             );
 
