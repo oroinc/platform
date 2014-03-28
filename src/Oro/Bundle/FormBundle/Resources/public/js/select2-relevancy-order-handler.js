@@ -6,6 +6,11 @@ define([], function(){
      */
     return {
         handle: function(configs){
+            if(configs['ajax']){
+                configs.minimumInputLength = 0;
+                return;
+            }
+
             configs['sortResults'] = function(results, container, query){
                 if (!query.term || query.term.length < 1) {
                     return results;
