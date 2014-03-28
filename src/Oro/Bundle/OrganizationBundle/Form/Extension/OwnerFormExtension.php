@@ -371,7 +371,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     protected function checkIsBusinessUnitEntity($className)
     {
-        $businessUnitClass = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
         if ($className != $businessUnitClass && !is_subclass_of($className, $businessUnitClass)) {
             return false;
         }
