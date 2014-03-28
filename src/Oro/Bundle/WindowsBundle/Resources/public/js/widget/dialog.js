@@ -101,7 +101,7 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
                     error: _.bind(function(model, xhr, options) {
                         // Suppress error if it's 404 response and not debug mode
                         if (xhr.status != 404 || app.debug) {
-                            error.dispatch(model, xhr, options);
+                            error.modalHandler(xhr);
                         }
                     }, this)
                 });

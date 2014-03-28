@@ -1,8 +1,8 @@
 /* jshint browser:true */
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
-        'oroui/js/app', '../navigation', 'oroui/js/mediator', 'oroui/js/error'
-    ], function ($, _, __, Backbone, app, Navigation, mediator, error) {
+        'oroui/js/app', '../navigation', 'oroui/js/mediator'
+    ], function ($, _, __, Backbone, app, Navigation, mediator) {
     'use strict';
 
     /**
@@ -59,8 +59,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
                     if (xhr.status == 404 && !app.debug) {
                         // Suppress error if it's 404 response and not debug mode
                         this.removeItem();
-                    } else {
-                        error.dispatch(model, xhr, options);
                     }
                 }, this)
             });

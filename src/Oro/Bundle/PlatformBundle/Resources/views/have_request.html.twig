@@ -14,7 +14,7 @@
                 };
                 new ORO.EmbedRequestForm(options);
             }).error(function() {
-                if (console && console.error) {
+                if (typeof(console) != 'undefined' && console.hasOwnProperty('error')) {
                     console.error('Unable to load external script.');
                 }
             });

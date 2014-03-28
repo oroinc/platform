@@ -24,16 +24,17 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
                     // show error in modal window in following cases:
                     // when custom error handling is not added
                     // when in debug mode
-                    this._processModal(xhr);
+                    this.modalHandler(xhr);
                 }
             },
 
             /**
              * Shows modal window
+             *
              * @param {Object} xhr
              * @private
              */
-            _processModal: function (xhr) {
+            modalHandler: function (xhr) {
                 var modal,
                     message = defaults.message;
                 if (app.debug) {

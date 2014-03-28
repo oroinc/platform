@@ -1,8 +1,8 @@
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation',
         'orotranslation/js/translator', 'oroui/js/mediator',
-        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
-    ], function ($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
+        'oroui/js/messenger', 'oroui/js/modal', '../action-launcher'],
+function ($, _, Backbone, routing, Navigation, __, mediator, messenger, Modal, ActionLauncher) {
     'use strict';
 
     /**
@@ -192,8 +192,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
             });
         },
 
-        _onAjaxError: function (jqXHR, textStatus, errorThrown) {
-            error.dispatch(null, jqXHR);
+        _onAjaxError: function () {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }

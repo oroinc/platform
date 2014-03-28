@@ -1,8 +1,7 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/error',
+define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator',
         '../abstract-view', '../model', '../collection'
-    ], function (_, Backbone, app, mediator, error,
-        AbstractView, NavigationModel, NavigationCollection) {
+    ], function (_, Backbone, app, mediator, AbstractView, NavigationModel, NavigationCollection) {
     'use strict';
 
     /**
@@ -68,8 +67,6 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js
                             if (xhr.status == 404 && !app.debug) {
                                 // Suppress error if it's 404 response and not debug mode
                                 self.inactivate();
-                            } else {
-                                error.dispatch(model, xhr, options);
                             }
                         }
                     });
