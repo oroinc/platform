@@ -55,7 +55,7 @@ class ResetController extends Controller
 
         $cm          = $this->get('oro_config.global');
         $senderEmail = $cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $cm->get('oro_notification.email_notification_sender_email');
+        $senderName  = $cm->get('oro_notification.email_notification_sender_name');
 
         /**
          * @todo Move to postUpdate lifecycle event handler as service

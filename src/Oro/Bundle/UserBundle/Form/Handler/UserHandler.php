@@ -170,7 +170,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
         $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->cm->get('oro_notification.email_notification_sender_email');
+        $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
 
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')
