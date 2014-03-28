@@ -44,7 +44,7 @@ define(function (require) {
                 trigger: 'click'
             });
 
-        $('body').on('click', function (e) {
+        $('body').on('click.popover-hide', function (e) {
             $('[data-toggle="popover"]').each(function () {
                 //the 'is' for buttons that trigger popups
                 //the 'has' for icons within a button that triggers a popup
@@ -52,6 +52,9 @@ define(function (require) {
                     $(this).popover('hide');
                 }
             });
+        });
+        mediator.once('hash_navigation_request:start', function () {
+            $('body').off('click.popover-hide');
         });
     };
 
