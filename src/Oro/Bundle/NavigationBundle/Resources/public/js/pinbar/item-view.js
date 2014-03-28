@@ -1,8 +1,8 @@
 /* jshint browser:true */
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
-        'oroui/js/app', '../navigation', 'oroui/js/mediator'
-    ], function ($, _, __, Backbone, app, Navigation, mediator) {
+        'oroui/js/app', '../navigation', 'oroui/js/mediator', 'oroui/js/error'
+    ], function ($, _, __, Backbone, app, Navigation, mediator, error) {
     'use strict';
 
     /**
@@ -55,10 +55,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
             mediator.trigger("pinbar_item_remove_before", this.model);
             this.model.destroy({
                 wait: true,
-                error: _.bind(function(model, xhr, options) {
+                error: _.bind(function(model, xhr) {
                     if (xhr.status == 404 && !app.debug) {
                         // Suppress error if it's 404 response and not debug mode
                         this.removeItem();
+                    } else {
+                        error.modalHandler(xhr);
                     }
                 }, this)
             });
