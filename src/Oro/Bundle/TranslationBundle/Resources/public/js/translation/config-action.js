@@ -137,6 +137,10 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             actionMediator.el.replaceWith($newButton);
 
             this.$el.val(JSON.stringify(config));
+
+            if (action == 'enable' || action == 'disable') {
+                this.$el.parents('form').submit();
+            }
         },
 
         /**

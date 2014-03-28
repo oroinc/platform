@@ -44,15 +44,15 @@
     {% macro attribute_data(value, additionalData) %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
-                <p class="control-label">{{ value }}</p>
+                <div class="control-label">{{ value }}</div>
             {% else %}
-                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
             {% for data in additionalData.data %}
                 <div class="clearfix-oro">
-                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                    <div class="control-label">{{ attribute(data, additionalData.field) }}</div>
                 </div>
             {% endfor %}
         {% endif %}
@@ -92,7 +92,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#

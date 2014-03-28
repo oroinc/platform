@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Controller;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -14,45 +13,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\FormBundle\Autocomplete\Security;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\FileLocator;
 
 /**
  * @Route("/autocomplete")
  */
 class AutocompleteController extends Controller
 {
-    /**
-     * @Route("/config", name="oro_form_autocomplete_config")
-     */
-    public function configAction(Request $request)
-    {
-        $fileLocator = new FileLocator(__DIR__ . '/../Resources/config');
-        $config      = Yaml::parse($fileLocator->locate('config_icon.yml'));
-        $query       = $request->get('query');
-        $result      = array('results' => array());
-
-        if ($query) {
-            $data = array_filter(
-                array_flip($config['oro_icon_select']),
-                function ($item) use ($query) {
-                    return strpos($item, $query) === 0;
-                }
-            );
-            foreach (array_flip($data) as $key => $value) {
-                $result['results'][] = array(
-                    'id'   => $value,
-                    'text' => $key
-                );
-            }
-        }
-
-        return new JsonResponse($result);
-    }
-
     /**
      * @Route("/search", name="oro_form_autocomplete_search")
      * AclAncestor("oro_search")
