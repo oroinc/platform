@@ -42,7 +42,10 @@ define(function (require) {
             animation: false,
             delay: { show: 0, hide: 0 },
             html: true,
-            trigger: 'click'
+            trigger: 'manual'
+        }).on('click.popover', false, function (e) {
+            $(this).popover('toggle');
+            e.preventDefault();
         });
 
         $('body').on('click.popover-hide', function (e) {
