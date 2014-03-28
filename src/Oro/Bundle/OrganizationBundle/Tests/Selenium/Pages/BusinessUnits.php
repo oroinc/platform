@@ -21,7 +21,7 @@ class BusinessUnits extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create business unit']")->click();
+        $this->test->byXPath("//a[@title='Create Business Unit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $businessUnit = new BusinessUnit($this->test);

@@ -24,7 +24,7 @@ class Groups extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXpath("//a[@title = 'Create group']")->click();
+        $this->test->byXpath("//a[@title = 'Create Group']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new Group($this->test);

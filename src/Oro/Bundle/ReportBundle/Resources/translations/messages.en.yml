@@ -43,7 +43,6 @@ oro:
 
         entity_label:        Report
         entity_plural_label: Reports
-        new_entity:          New report
         entity_description:  Represent Report
         id.label:           Id
         type.label:         Report type
