@@ -14,3 +14,6 @@ oro:
         edit_entity: Edit %entityName%
         create: Create
         create_entity: Create %entityName%
+        item: item
+        delete_confirm: Are you sure you want to delete this %entity_label%?
+        delete_message: %entity_label% deleted
