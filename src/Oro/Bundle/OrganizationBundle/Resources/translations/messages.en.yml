@@ -5,6 +5,7 @@ oro:
                 saved: "Business Unit saved"
         form:
             choose_business_user: "Choose a business unit..."
+            none_business_user: "None"
         datagrid:
             action:
                 view: "View"
@@ -33,6 +34,7 @@ oro:
             users.label:        Users
             phone.label:        Phone
             owner.label:        Owner
+            parent.label:       Parent Business Unit
             organization.label: Organization
             name.label:         Name
             fax.label:          Fax
