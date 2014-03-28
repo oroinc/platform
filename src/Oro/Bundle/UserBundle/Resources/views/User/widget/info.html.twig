@@ -48,6 +48,14 @@
             {% endfor %}
             {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
+            {% set roles = [] %}
+            {% for entityRole in entity.roles %}
+                {% set roles = roles|merge([entityRole.label]) %}
+            {% endfor %}
+            {{ ui.renderHtmlProperty('oro.user.roles.label'|trans, roles|join('<br />')) }}
+            {{ ui.renderHtmlProperty('oro.user.groups.label'|trans, entity.groups|join('<br />')) }}
+            {{ ui.renderHtmlProperty('oro.user.business_units.label'|trans, entity.businessUnits|join('<br />')) }}
+
             {{ entityConfig.renderDynamicFields(entity) }}
         </div>
 
