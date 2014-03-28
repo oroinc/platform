@@ -62,7 +62,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
                 var html = _.template(this.options.template.html(), {
                     userVars: this.model.get('user'),
                     entityVars: this.model.get('entity'),
-                    'notice': __('Click to insert variable.')
+                    title: __('Click to insert variable.')
                 });
 
                 $el.html(html);
