@@ -25,7 +25,7 @@ Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
                 - NotBlank:  ~
                 - Regex:
                     pattern: "/^[a-z]+[a-z0-9]*$/i"
-                    message: Value is not valid. You can use only lower alphabetic symbols, underscore and numbers
+                    message: Value is not valid. You can use only lower/upper alphabetic symbols, and numbers
                 - Length:
                     min:     5
                     max:     50
