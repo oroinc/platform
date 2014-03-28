@@ -70,7 +70,7 @@ class ConfigType extends AbstractType
                 'text',
                 array(
                     'block'     => 'entity',
-                    'read_only' => true,
+                    'disabled'  => true,
                     'data'      => $fieldName,
                 )
             );
