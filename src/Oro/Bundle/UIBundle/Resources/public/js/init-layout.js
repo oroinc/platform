@@ -135,6 +135,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         dropdownToggles.click(function (e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
+                $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
