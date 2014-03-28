@@ -1,8 +1,26 @@
 <script type="text/javascript">
-    require(['orosync/js/sync', 'oroui/js/messenger'],
-    function(sync, messenger){
+    require(['orosync/js/sync', 'oroui/js/modal'],
+    function(sync, Modal){
+        // captured outer variable
+        var dialog = null;
+
         sync.subscribe('oro/maintenance', function (response) {
-            messenger.notificationFlashMessage(response.isOn ? 'error' : 'success', response.msg);
+            if(response.isOn){
+                var maintenanceModal = Modal.extend({
+                    open: function(){
+                        Backbone.BootstrapModal.prototype.open.apply(this, arguments);
+                        this.$el.find('.modal-footer').hide();
+                    }
+                });
+
+                dialog = new maintenanceModal({
+                    'content': '<span class="text-error">' + response.msg + '</span>',
+                    'allowCancel': false
+                });
+                dialog.open();
+            } else if(dialog) {
+                dialog.close();
+            }
         });
     });
 </script>
