@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use FOS\Rest\Util\Codes;
+
 use JMS\JobQueueBundle\Entity\Job;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -17,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
  * @Route("/channel")
