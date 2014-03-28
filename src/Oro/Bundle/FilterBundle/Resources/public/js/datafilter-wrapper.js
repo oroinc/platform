@@ -36,6 +36,12 @@ define(['jquery', 'underscore'], function ($, _) {
             }, this);
 
             $('body').on('click', this._clickOutsideCriteriaCallback);
+
+            this.$el.on('keyup', '.dropdown-menu.filter-criteria', _.bind(function (e) {
+                if (e.keyCode === 27) {
+                    this._hideCriteria();
+                }
+            }, this));
         }
     };
 });

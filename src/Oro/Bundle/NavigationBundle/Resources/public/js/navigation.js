@@ -189,6 +189,11 @@ define(function (require) {
             Backbone.Router.prototype.initialize.apply(this, arguments);
         },
 
+        isMaintenancePage: function(){
+            var metaError = $('meta[name="error"]');
+            return metaError.length && metaError.attr('content') == 503;
+        },
+
         /**
          * Returns cached jQuery object by name
          * @param name

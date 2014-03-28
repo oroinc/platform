@@ -26,9 +26,11 @@
             {% elseif item.type == 'boolean' %}
                 {% set itemValue = itemValue ? 'Yes'|trans : 'No'|trans %}
             {% elseif item.type == 'money' %}
-                {% set itemValue = itemValue | oro_format_currency %}
+                {% set itemValue = itemValue ? itemValue | oro_format_currency : null %}
             {% elseif item.type == 'percent' %}
-                {% set itemValue = itemValue | oro_format_percent %}
+                {% set itemValue = itemValue ? itemValue | oro_format_percent : null %}
+            {% elseif item.type == 'date' %}
+                {% set itemValue = itemValue ? itemValue | oro_format_date : null %}
             {% elseif not hasLink %}
                 {% set itemValue = itemValue|escape %}
             {% endif %}
