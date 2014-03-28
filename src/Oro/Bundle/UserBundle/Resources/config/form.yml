@@ -150,8 +150,8 @@ services:
             - @oro_user.form.user
             - @request
             - @oro_user.manager
+            - @oro_config.global
             - @templating
-            - %oro_user.email%
             - @oro_email.direct_mailer
             - @session.flash_bag
             - @translator
