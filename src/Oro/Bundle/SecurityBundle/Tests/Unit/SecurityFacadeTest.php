@@ -380,10 +380,10 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     {
         $this->securityContext->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('testACL'), 'testACLDescriptor')
+            ->with($this->equalTo('VIEW'), 'entity:AcmeDemoBundle:Test')
             ->will($this->returnValue(true));
 
-        $result = $this->facade->isGranted('testACL;testACLDescriptor');
+        $result = $this->facade->isGranted('VIEW;entity:AcmeDemoBundle:Test');
         $this->assertTrue($result);
     }
 

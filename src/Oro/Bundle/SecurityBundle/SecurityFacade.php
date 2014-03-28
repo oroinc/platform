@@ -107,9 +107,12 @@ class SecurityFacade
      *
      * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
      *                                    string in format "permission;descriptor"
+     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
      * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
-     * @return bool
+     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     *
+*@return bool
      */
     public function isGranted($attributes, $object = null)
     {
@@ -137,11 +140,14 @@ class SecurityFacade
                 $this->objectIdentityFactory->get($object)
             );
         } else {
-            $delimiter = strpos($attributes, ';');
-            if ($delimiter) {
-                $object = substr($attributes, $delimiter + 1);
-                $attributes = substr($attributes, 0, $delimiter);
+            if (is_string($attributes)) {
+                $delimiter = strpos($attributes, ';');
+                if ($delimiter) {
+                    $object = substr($attributes, $delimiter + 1);
+                    $attributes = substr($attributes, 0, $delimiter);
+                }
             }
+
             $isGranted = $this->securityContext->isGranted($attributes, $object);
         }
 
