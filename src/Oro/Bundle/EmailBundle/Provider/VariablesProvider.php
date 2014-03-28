@@ -31,10 +31,7 @@ class VariablesProvider
     public function getTemplateVariables($entityName)
     {
         $userClassName = $this->getUser() ? get_class($this->getUser()) : false;
-        $allowedData = array(
-            'entity' => array(),
-            'user'   => array()
-        );
+        $allowedData = [];
 
         $ids = $this->configProvider->getIds();
         foreach ($ids as $entityConfigId) {
@@ -70,6 +67,10 @@ class VariablesProvider
                     $allowedData['user'] = $allowedData['entity'];
                 }
             }
+        }
+
+        if (empty($allowedData['user']) && empty($allowedData['entity'])) {
+            $allowedData = [];
         }
 
         return $allowedData;

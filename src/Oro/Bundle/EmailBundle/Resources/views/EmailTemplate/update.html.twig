@@ -79,6 +79,32 @@
 
 {% block content_data %}
     {% set id = 'emailtemplate-edit' %}
+    {% set variables = render(path('oro_api_get_emailtemplate_available_variables', { 'entityName': form.vars.value.entityName })) %}
+
+    {% set templateSubBlocks = [
+        {
+            'title': '',
+            'data': [
+                form_widget(form.translations)
+            ]
+        }
+    ] %}
+
+    {% if variables != '[]' %}
+    {% set templateSubBlocks = templateSubBlocks|merge(
+        [{
+            'title': 'Available variables'|trans,
+            'data': [
+                _emailMacros.renderAvailableVariablesWidget(
+                    form.vars.value.entityName,
+                    form.entityName.vars.id,
+                    variables
+                )
+            ]
+        }]
+    ) %}
+    {% endif %}
+
     {% set dataBlocks = [
         {
             'title': 'General',
@@ -94,19 +120,7 @@
         },
         {
             'title': 'Template data'|trans,
-            'subblocks': [
-            {
-                'title': '',
-                'data': [
-                    form_widget(form.translations)
-                ]
-            },
-            {
-                'title': 'Available variables'|trans,
-                'data': [
-                    _emailMacros.renderAvailableVariablesWidget(form.vars.value.entityName, form.entityName.vars.id)
-                ]
-            }]
+            'subblocks': templateSubBlocks
         }
     ] %}
 
