@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
+use Symfony\Component\DomCrawler\Form;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\DomCrawler\Form;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @outputBuffering enabled
@@ -46,7 +48,7 @@ class ControllersTest extends WebTestCase
         //$form['oro_user_user_form[tags][owner]'] = 'tags1';
         //$form['oro_user_user_form[tags][all]'] = null;
         $form['oro_user_user_form[groups][1]'] = 2;
-        $form['oro_user_user_form[roles][2]'] = 4;
+        $form['oro_user_user_form[roles][1]'] = 4;
         //$form['oro_user_user_form[values][company][varchar]'] = 'company';
         $form['oro_user_user_form[owner]'] = 1;
         $form['oro_user_user_form[inviteUser]'] = false;
@@ -88,7 +90,7 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[birthday]'] = '2013-01-02';
         $form['oro_user_user_form[email]'] = 'test@test.com';
         $form['oro_user_user_form[groups][1]'] = 2;
-        $form['oro_user_user_form[roles][2]'] = 4;
+        $form['oro_user_user_form[roles][1]'] = 4;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
