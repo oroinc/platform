@@ -36,41 +36,23 @@ define(function (require) {
     };
 
     layout.initPopover = function (container) {
-        var handlePopoverMouseout = function (e, popover) {
-            var popoverHandler = $(e.relatedTarget).closest('.popover');
-            if (!popoverHandler.length) {
-                popover.data('popover-timer',
-                    setTimeout(function () {
-                        popover.popover('hide');
-                        popover.data('popover-active', false);
-                    }, 500));
-            } else {
-                popoverHandler.one('mouseout', function (evt) {
-                    handlePopoverMouseout(evt, popover);
-                });
-            }
-        };
         container.find('[data-toggle="popover"]')
             .popover({
                 animation: false,
                 delay: { show: 0, hide: 0 },
                 html: true,
-                trigger: 'manual'
-            })
-            .click(function () {
-                var popoverEl = $(this);
-                clearTimeout(popoverEl.data('popover-timer'));
-                if (!popoverEl.data('popover-active')) {
-                    popoverEl.data('popover-active', true);
-                    $(this).popover('show');
-                }
-            })
-            .mouseout(function (e) {
-                var popover = $(this);
-                setTimeout(function () {
-                    handlePopoverMouseout(e, popover);
-                }, 500);
+                trigger: 'click'
             });
+
+        $('body').on('click', function (e) {
+            $('[data-toggle="popover"]').each(function () {
+                //the 'is' for buttons that trigger popups
+                //the 'has' for icons within a button that triggers a popup
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    $(this).popover('hide');
+                }
+            });
+        });
     };
 
     layout.hideProgressBar = function () {
