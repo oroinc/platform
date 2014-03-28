@@ -234,8 +234,10 @@ class UserType extends AbstractType
         switch(substr($value, -1)) {
             case 'G':
                 $value = (int)$value * 1024;
+                // break intentionally omitted
             case 'M':
                 $value = (int)$value * 1024;
+                // break intentionally omitted
             case 'K':
                 $value = (int)$value * 1024;
         }
