@@ -377,11 +377,13 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'constraints' => array(new NotBlank()),
                 'required' => true,
             );
+            $emptyValueLabel = 'oro.business_unit.form.choose_business_user';
         } else {
             $validation = array(
                 'required' => false
             );
-            $this->fieldLabel = 'Parent';
+            $emptyValueLabel = 'oro.business_unit.form.none_business_user';
+            $this->fieldLabel = 'oro.organization.businessunit.parent.label';
         }
 
         if ($this->isAssignGranted) {
@@ -393,7 +395,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value' => $this->translator->trans('oro.business_unit.form.choose_business_user'),
+                        'empty_value' => $this->translator->trans($emptyValueLabel),
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
