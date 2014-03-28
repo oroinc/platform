@@ -212,6 +212,14 @@ class UserType extends AbstractType
         $uploadMaxFilesize = ini_get('upload_max_filesize');
         $postMaxSize = ini_get('post_max_size');
 
+        if ($uploadMaxFilesize <= 0) {
+            return $postMaxSize;
+        }
+
+        if ($postMaxSize <= 0) {
+            return $uploadMaxFilesize;
+        }
+
         return $this->getBytes($uploadMaxFilesize) <= $this->getBytes($postMaxSize) ? $uploadMaxFilesize : $postMaxSize;
     }
 
