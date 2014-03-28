@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 use Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry;
 
@@ -15,7 +16,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
- * @ORM\Table(name="oro_audit")
+ * @ORM\Table(name="oro_audit", indexes={
+ *  @Index(name="idx_oro_audit_logged_at", columns={"logged_at"})
+ * })
  */
 class Audit extends AbstractLogEntry
 {
