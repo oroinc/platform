@@ -1,3 +1,5 @@
+{% import 'OroDataAuditBundle::macros.html.twig' as dataAudit %}
+
 <ul>
 {% for fieldKey, fieldValue in value %}
     {% if fieldKey == 'auditData' %}
@@ -13,16 +15,8 @@
     {% else %}
         <li>
             <b>{{ fieldKey }}:</b>
-            {% if fieldValue.old.timestamp is defined %}
-                <s>{{ fieldValue.old|oro_format_datetime }}</s>
-            {% else %}
-                <s>{% if fieldValue.old is iterable  %}{{ fieldValue.old|join(', ') }}{% else %}{{ fieldValue.old|default('') }}{% endif %}</s>
-            {% endif %}
-            {{
-                fieldValue.new.timestamp is defined
-                    ? fieldValue.new|oro_format_datetime
-                    : ( fieldValue.new is iterable ? fieldValue.new|join(', ') : fieldValue.new|default(''))
-            }}
+            <s>{{ dataAudit.renderFieldValue(fieldValue.old) }}</s>
+            {{ dataAudit.renderFieldValue(fieldValue.new) }}
         </li>
     {% endif %}
 {% endfor %}
