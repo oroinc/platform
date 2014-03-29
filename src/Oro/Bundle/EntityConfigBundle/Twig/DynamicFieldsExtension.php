@@ -124,7 +124,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             /** Prepare OptionSet field type */
-            if ($value && $fieldConfigId->getFieldType() == 'optionSet') {
+            if ($fieldConfigId->getFieldType() == 'optionSet') {
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
             }
 

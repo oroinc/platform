@@ -71,9 +71,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     );
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager     $configManager
      * @param RequestParameters $requestParameters
-     * @param Router $router
+     * @param Router            $router
      */
     public function __construct(
         ConfigManager $configManager,
@@ -82,7 +82,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     ) {
         $this->configManager = $configManager;
         $this->requestParams = $requestParameters;
-        $this->router = $router;
+        $this->router        = $router;
     }
 
     /**
@@ -141,7 +141,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         }
 
         // set entity to select from
-        $from = $config->offsetGetByPath(self::PATH_FROM, []);
+        $from    = $config->offsetGetByPath(self::PATH_FROM, []);
         $from[0] = array_merge($from[0], ['table' => $this->entityClass]);
         $config->offsetSetByPath('[source][query][from]', $from);
     }
@@ -151,7 +151,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     protected function getDynamicFields($alias = null, $itemsType = null)
     {
-        $fields = $select = [];
+        $columns = $selects = [];
 
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
@@ -162,32 +162,33 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 list($field, $selectField) = $this->getDynamicFieldItem($alias, $extendConfig);
 
                 if (!empty($field)) {
-                    $fields[] = $field;
+                    $columns[] = $field;
                 }
 
                 if (!empty($selectField)) {
-                    $select[] = $selectField;
+                    $selects[] = $selectField;
                 }
             }
         }
 
-        ksort($fields);
+        ksort($columns);
 
-        $orderedFields = $sorters = $filters = [];
+        $orderedColumns = $sorters = $filters = [];
         // compile field list with pre-defined order
-        foreach ($fields as $field) {
-            $orderedFields = array_merge($orderedFields, $field);
+        foreach ($columns as $field) {
+            $orderedColumns = array_merge($orderedColumns, $field);
         }
 
         $result = [
-            'columns' => $orderedFields,
+            'columns' => $orderedColumns,
         ];
 
-        if (!empty($select)) {
+        if (!empty($selects)) {
             $result = array_merge(
                 $result,
-                ['source' => [
-                    'query' => ['select' => $select],
+                [
+                    'source' => [
+                        'query' => ['select' => $selects],
                     ]
                 ]
             );
@@ -199,7 +200,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /**
      * Get dynamic field or empty array if field is not visible
      *
-     * @param $alias
+     * @param                 $alias
      * @param ConfigInterface $extendConfig
      * @return array
      */
@@ -216,7 +217,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         );
 
         $select = '';
-        $field = [];
+        $field  = [];
         if ($datagridConfig->is('is_visible')) {
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
@@ -225,10 +226,10 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 $fieldConfigId->getFieldName()
             );
 
-            $label = $entityConfig->get('label') ?: $fieldConfigId->getFieldName();
+            $label     = $entityConfig->get('label') ? : $fieldConfigId->getFieldName();
             $fieldName = $fieldConfigId->getFieldName();
 
-            $field = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfigId);
+            $field  = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfigId);
             $select = $alias . '.' . $fieldName;
         }
 
@@ -236,13 +237,13 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     }
 
     /**
-     * @param string $code
-     * @param $label
+     * @param string        $code
+     * @param               $label
      * @param FieldConfigId $fieldConfigId
      *
      * @return array
      */
-    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId)
+    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId, $isVisible = true)
     {
         // TODO: getting a field type from a model here is a temporary solution.
         // We need to use $fieldConfigId->getFieldType()
@@ -253,15 +254,16 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
         return [
             $code => [
-                'type'        => 'field',
-                'label'       => $label,
-                'field_name'  => $code,
-                'filter_type' => $this->filterMap[$fieldType],
-                'required'    => false,
-                'sortable'    => true,
-                'filterable'  => true,
-                'show_filter' => true,
-                'frontend_type' => $this->getFrontendFieldType($fieldConfigId->getFieldType())
+                'type'          => 'field',
+                'label'         => $label,
+                'field_name'    => $code,
+                'filter_type'   => $this->filterMap[$fieldType],
+                'required'      => false,
+                'sortable'      => true,
+                'filterable'    => true,
+                'show_filter'   => true,
+                'frontend_type' => $this->getFrontendFieldType($fieldConfigId->getFieldType()),
+                'renderable'    => $isVisible
             ]
         ];
     }
@@ -300,13 +302,13 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /**
      * @param string $gridName
      * @param string $keyName
-     * @param array $node
+     * @param array  $node
      *
      * @return callable
      */
     public function getLinkProperty($gridName, $keyName, $node)
     {
-        $router    = $this->router;
+        $router = $this->router;
         if (!isset($node['route'])) {
             return false;
         } else {
@@ -321,7 +323,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
                 $route,
                 array(
                     'entity_id' => str_replace('\\', '_', $className),
-                    'id' => $record->getValue('id')
+                    'id'        => $record->getValue('id')
                 )
             );
         };
@@ -332,7 +334,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - first from current request query
      * - then from master request attributes
      *
-     * @param $paramName
+     * @param      $paramName
      * @param bool $default
      * @return mixed
      */
