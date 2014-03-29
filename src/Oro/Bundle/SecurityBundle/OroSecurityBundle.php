@@ -6,6 +6,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OroDataCacheManagerPass;
 
 class OroSecurityBundle extends Bundle
 {
@@ -18,5 +19,6 @@ class OroSecurityBundle extends Bundle
 
         $container->addCompilerPass(new AclConfigurationPass());
         $container->addCompilerPass(new AclAnnotationProviderPass());
+        $container->addCompilerPass(new OroDataCacheManagerPass());
     }
 }

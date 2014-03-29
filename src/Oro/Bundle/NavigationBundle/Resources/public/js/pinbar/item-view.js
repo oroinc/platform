@@ -120,7 +120,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
 
         outdatedContentHandler: function (event) {
             var navigation = Navigation.getInstance(),
-                modelUrl = navigation.removeGridParams(this.model.get('url')) ,
+                modelUrl = this.cleanupUrl(navigation.removeGridParams(this.model.get('url'))),
                 $el = this.$el,
                 self = this,
                 refreshHandler = function (obj) {
@@ -132,7 +132,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
                     }
                 };
 
-            if (!event.isCurrentPage && modelUrl == event.url) {
+            if (!event.isCurrentPage && modelUrl == this.cleanupUrl(event.url)) {
                 var $noteEl = $el.find('.pin-status');
                 if (!$noteEl.is('.outdated')) {
                     this.markOutdated($noteEl);

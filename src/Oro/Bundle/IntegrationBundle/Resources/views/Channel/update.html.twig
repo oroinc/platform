@@ -43,12 +43,12 @@
         {% set breadcrumbs = {
             'entity':      entity,
             'indexPath':   path('oro_integration_channel_index'),
-            'indexLabel':  'oro.integration.channel.entity_label'|trans,
+            'indexLabel':  'oro.integration.channel.entity_plural_label'|trans,
             'entityTitle': entity.name|default('N/A')
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.integration.channel.entity_label'|trans}) %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.integration.channel.entity_plural_label'|trans}) %}
         {% include 'OroUIBundle::page_title_block.html.twig' with { title: title }%}
     {% endif %}
 {% endblock pageHeader %}
