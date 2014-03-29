@@ -49,14 +49,14 @@ class DateExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAgeAsStringInvertDiff()
     {
-        $date = new \DateTime('+1 year');
+        $date = new \DateTime('+1 year', new \DateTimeZone('UTC'));
         $this->assertEquals('', $this->extension->getAgeAsString($date, array()));
         $this->assertEquals('N/A', $this->extension->getAgeAsString($date, array('default' => 'N/A')));
     }
 
     public function testGetAgeAsString()
     {
-        $date = new \DateTime('-1 year -1 month');
+        $date = new \DateTime('-1 year -1 month', new \DateTimeZone('UTC'));
         $this->translator->expects($this->once())
             ->method('transChoice')
             ->with('oro.age', 1, array('%count%' => 1))
@@ -71,11 +71,12 @@ class DateExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function ageDataProvider()
     {
-        $oneYearAgo = new \DateTime('-1 year');
-        $oneMonthAgo = new \DateTime('-1 month');
-        $oneYearTwoMonthAgo = new \DateTime('-1 year -2 months');
-        $tenYearsAgo = new \DateTime('-10 years');
-        $inFuture = new \DateTime('+1 year');
+        $oneYearAgo = new \DateTime('-1 year', new \DateTimeZone('UTC'));
+        $oneMonthAgo = new \DateTime('-1 month', new \DateTimeZone('UTC'));
+        $oneYearTwoMonthAgo = new \DateTime('-1 year -2 months', new \DateTimeZone('UTC'));
+        $tenYearsAgo = new \DateTime('-10 years', new \DateTimeZone('UTC'));
+        $inFuture = new \DateTime('+1 year', new \DateTimeZone('UTC'));
+
         return array(
             array(
                 $oneYearAgo->format('Y-m-d'), array(), 1
