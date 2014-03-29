@@ -126,6 +126,27 @@ class CommandExecutor
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
+        $this->processResult($ignoreErrors);
+
+        return $this;
+    }
+
+    /**
+     * Gets an exit code of last executed command
+     *
+     * @return int
+     */
+    public function getLastCommandExitCode()
+    {
+        return $this->lastCommandExitCode;
+    }
+
+    /**
+     * @param bool $ignoreErrors
+     * @throws \RuntimeException
+     */
+    protected function processResult($ignoreErrors)
+    {
         if (0 !== $this->lastCommandExitCode) {
             if ($ignoreErrors) {
                 $this->output->writeln(
@@ -140,18 +161,6 @@ class CommandExecutor
                 );
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Gets an exit code of last executed command
-     *
-     * @return int
-     */
-    public function getLastCommandExitCode()
-    {
-        return $this->lastCommandExitCode;
     }
 
     /**

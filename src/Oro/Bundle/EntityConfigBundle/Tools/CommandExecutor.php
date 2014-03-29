@@ -60,16 +60,14 @@ class CommandExecutor
      *
      * @return integer The exit status code
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function runCommand($command, $params = [], LoggerInterface $logger = null)
     {
         $params = array_merge(
-            array(
+            [
                 'command'    => $command,
                 '--no-debug' => true,
-            ),
+            ],
             $params
         );
         if ($this->env && $this->env !== 'dev') {
@@ -82,7 +80,9 @@ class CommandExecutor
         }
 
         $pb = new ProcessBuilder();
-        $pb->add($this->getPhp())->add($this->consoleCmdPath);
+        $pb
+            ->add($this->getPhp())
+            ->add($this->consoleCmdPath);
 
         if (array_key_exists('--process-timeout', $params)) {
             $pb->setTimeout($params['--process-timeout']);
@@ -115,6 +115,19 @@ class CommandExecutor
             $this->dataCacheManager->sync();
         }
 
+        $this->processResult($exitCode, $ignoreErrors, $logger);
+
+        return $exitCode;
+    }
+
+    /**
+     * @param int             $exitCode
+     * @param bool            $ignoreErrors
+     * @param LoggerInterface $logger
+     * @throws \RuntimeException
+     */
+    protected function processResult($exitCode, $ignoreErrors, LoggerInterface $logger)
+    {
         if (0 !== $exitCode) {
             if ($ignoreErrors) {
                 $logger->warning(sprintf('The command terminated with an exit code: %u.', $exitCode));
@@ -122,8 +135,6 @@ class CommandExecutor
                 throw new \RuntimeException(sprintf('The command terminated with an exit code: %u.', $exitCode));
             }
         }
-
-        return $exitCode;
     }
 
     /**
