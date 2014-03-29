@@ -89,16 +89,8 @@ class CommandExecutor
             unset($params['--process-timeout']);
         }
 
-        foreach ($params as $param => $val) {
-            if ($param && '-' === $param[0]) {
-                if ($val === true) {
-                    $this->addParameter($pb, $param);
-                } else {
-                    $this->addParameter($pb, $param, $val);
-                }
-            } else {
-                $this->addParameter($pb, $val);
-            }
+        foreach ($params as $name => $val) {
+            $this->processParameter($pb, $name, $val);
         }
 
         $process = $pb
@@ -135,11 +127,29 @@ class CommandExecutor
     }
 
     /**
-     * @param ProcessBuilder    $processBuilder
+     * @param ProcessBuilder    $pb
      * @param string            $name
      * @param array|string|null $value
      */
-    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    protected function processParameter(ProcessBuilder $pb, $name, $value)
+    {
+        if ($name && '-' === $name[0]) {
+            if ($value === true) {
+                $this->addParameter($pb, $name);
+            } else {
+                $this->addParameter($pb, $name, $value);
+            }
+        } else {
+            $this->addParameter($pb, $value);
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $pb, $name, $value = null)
     {
         $parameters = array();
 
@@ -156,7 +166,7 @@ class CommandExecutor
         }
 
         foreach ($parameters as $parameter) {
-            $processBuilder->add($parameter);
+            $pb->add($parameter);
         }
     }
 

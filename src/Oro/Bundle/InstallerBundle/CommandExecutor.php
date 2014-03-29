@@ -5,6 +5,7 @@ namespace Oro\Bundle\InstallerBundle;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -73,10 +74,10 @@ class CommandExecutor
     public function runCommand($command, $params = array())
     {
         $params = array_merge(
-            array(
+            [
                 'command'    => $command,
                 '--no-debug' => true,
-            ),
+            ],
             $params
         );
         if ($this->env && $this->env !== 'dev') {
@@ -90,11 +91,9 @@ class CommandExecutor
 
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
-            $phpFinder = new PhpExecutableFinder();
-            $php       = $phpFinder->find();
-            $pb        = new ProcessBuilder();
+            $pb = new ProcessBuilder();
             $pb
-                ->add($php)
+                ->add($this->getPhp())
                 ->add($_SERVER['argv'][0]);
 
             if (array_key_exists('--process-timeout', $params)) {
@@ -102,16 +101,8 @@ class CommandExecutor
                 unset($params['--process-timeout']);
             }
 
-            foreach ($params as $param => $val) {
-                if ($param && '-' === $param[0]) {
-                    if ($val === true) {
-                        $this->addParameter($pb, $param);
-                    } else {
-                        $this->addParameter($pb, $param, $val);
-                    }
-                } else {
-                    $this->addParameter($pb, $val);
-                }
+            foreach ($params as $name => $val) {
+                $this->processParameter($pb, $name, $val);
             }
 
             $process = $pb
@@ -164,11 +155,29 @@ class CommandExecutor
     }
 
     /**
-     * @param ProcessBuilder $processBuilder
-     * @param string $name
+     * @param ProcessBuilder    $pb
+     * @param string            $name
      * @param array|string|null $value
      */
-    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    protected function processParameter(ProcessBuilder $pb, $name, $value)
+    {
+        if ($name && '-' === $name[0]) {
+            if ($value === true) {
+                $this->addParameter($pb, $name);
+            } else {
+                $this->addParameter($pb, $name, $value);
+            }
+        } else {
+            $this->addParameter($pb, $value);
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $pb, $name, $value = null)
     {
         $parameters = array();
 
@@ -185,7 +194,24 @@ class CommandExecutor
         }
 
         foreach ($parameters as $parameter) {
-            $processBuilder->add($parameter);
+            $pb->add($parameter);
         }
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    protected function getPhp()
+    {
+        $phpFinder = new PhpExecutableFinder();
+        $phpPath   = $phpFinder->find();
+        if (!$phpPath) {
+            throw new FileNotFoundException('The PHP executable could not be found.');
+        }
+
+        return $phpPath;
     }
 }
