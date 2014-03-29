@@ -126,8 +126,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         onEventAdded: function (eventModel) {
             var fcEvent = eventModel.toJSON();
-            //this.prepareViewModel(fcEvent);
-
+            this.prepareViewModel(fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -205,6 +204,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadEvents: function (start, end, callback) {
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.getCollection().toJSON();
+                _.each(fcEvents, function (fcEvent) {
+                    fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(new Date(fcEvent.start));
+                    fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(new Date(fcEvent.end));
+                });
                 this.prepareViewModels(fcEvents);
                 this._hideMask();
                 callback(fcEvents);
@@ -235,18 +238,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         prepareViewModels : function (fcEvents) {
-            _.each(
-                fcEvents,
-                _.bind(
-                    function(fcEvent) {
-                        fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
-                        fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
-                        this.prepareViewModel(fcEvent);
-                    },
-                    this
-                ),
-                this
-            );
+            _.each(fcEvents, this.prepareViewModel, this);
         },
 
         prepareViewModel : function (fcEvent) {

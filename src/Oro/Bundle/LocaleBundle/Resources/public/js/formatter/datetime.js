@@ -201,31 +201,21 @@ define(['../locale-settings', 'moment'
             return this.getMomentForFrontendDateTime(value, timezoneOffset).format(this.backendFormats.datetime);
         },
 
-        getDateStringWithSystemTimezone: function (value) {
-            return moment(value)
-                .format(this.backendFormats.datetime)
-                .replace(/[\+|-]\d+$/, this.timezoneOffset.replace(':', ''));
-        },
-
-        getDateStringWithBrowserTimezone: function (value) {
-            var browserTimezone = moment().format('Z');
-            return value.replace(/[\+|-](\d+|\d+:\d+)$/, browserTimezone);
-        },
-
         /**
          * Applies time zone diff to date object,
          *  subtracts/adds sum of diff local-zone and system-zone time shift
          *
-         * @param {Date} date
+         * @param {Date|string|number} date
          * @param {number=} sign -1|1 means add o remove time zones diff
          * @returns {Date}
          */
         applyTimeZoneCorrection: function (date, sign) {
-            var sign = sign ||  1,
-                localShift = localeSettings.getTimeZoneShift(),
-                systemShift = date.getTimezoneOffset();
-            date = new Date(date.getTime() + sign * (localShift + systemShift) * 60000);
-            return date
+            var localShift, systemShift;
+            sign = sign ||  1;
+            date = typeof date !== 'object' ? new Date(date) : date;
+            localShift = localeSettings.getTimeZoneShift();
+            systemShift = date.getTimezoneOffset();
+            return new Date(date.getTime() + sign * (localShift + systemShift) * 60000);
         },
 
         /**

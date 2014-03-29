@@ -65,7 +65,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function cgetAction()
     {
-        $dateTimeFormatter = $this->get('oro_locale.formatter.date_time');
         $calendarId  = (int)$this->getRequest()->get('calendar');
         $start       = new \DateTime($this->getRequest()->get('start'));
         $end         = new \DateTime($this->getRequest()->get('end'));
@@ -99,9 +98,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
         foreach ($items as $item) {
             $resultItem = array();
             foreach ($item as $field => $value) {
-                if ($field == 'start' || $field == 'end') {
-                    $value = $dateTimeFormatter->format($value);
-                }
                 $this->transformEntityField($field, $value);
                 $resultItem[$field] = $value;
             }

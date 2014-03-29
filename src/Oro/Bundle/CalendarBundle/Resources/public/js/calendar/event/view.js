@@ -1,9 +1,7 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model',
-    'orolocale/js/formatter/datetime',
-    'oroui/js/layout'
-], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel, dateTimeFormatter) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
+], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -56,33 +54,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 this.model = new EventModel();
             }
             modelData = this.model.toJSON();
-            var start = this.model.get('start');
-            var end = this.model.get('end');
-
-            var pad = function(number) {
-                var r = String(number);
-                if ( r.length === 1 ) {
-                    r = '0' + r;
-                }
-                return r;
-            };
-
-            var toStr = function(d) {
-                return d.getUTCFullYear()
-                    + '-' + pad( d.getMonth() + 1 )
-                    + '-' + pad( d.getDate() )
-                    + 'T' + pad( d.getHours() )
-                    + ':' + pad( d.getMinutes() )
-                    + ':' + pad( d.getSeconds() )
-                + dateTimeFormatter.timezoneOffset.replace(':', '')
-            };
-
-            if (start) {
-                modelData.start = toStr(dateTimeFormatter.getMomentForBackendDate(start).toDate())
-            }
-            if (end) {
-                modelData.end = toStr(dateTimeFormatter.getMomentForBackendDate(end).toDate())
-            }
             eventForm = this.template(modelData);
             eventForm = this.fillForm(eventForm, modelData);
 
