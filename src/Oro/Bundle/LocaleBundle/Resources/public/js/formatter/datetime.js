@@ -213,6 +213,22 @@ define(['../locale-settings', 'moment'
         },
 
         /**
+         * Applies time zone diff to date object,
+         *  subtracts/adds sum of diff local-zone and system-zone time shift
+         *
+         * @param {Date} date
+         * @param {number=} sign -1|1 means add o remove time zones diff
+         * @returns {Date}
+         */
+        applyTimeZoneCorrection: function (date, sign) {
+            var sign = sign ||  1,
+                localShift = localeSettings.getTimeZoneShift(),
+                systemShift = date.getTimezoneOffset();
+            date = new Date(date.getTime() + sign * (localShift + systemShift) * 60000);
+            return date
+        },
+
+        /**
          * Get moment object based on formatted frontend date string
          *
          * @param {string} value

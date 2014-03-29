@@ -257,8 +257,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         formatDateTimeForModel: function (date) {
-            return date;
-            //return dateTimeFormatter.convertDateTimeToBackendFormat(date);
+            date = dateTimeFormatter.applyTimeZoneCorrection(date, -1);
+            return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
         showSavingMask: function () {
