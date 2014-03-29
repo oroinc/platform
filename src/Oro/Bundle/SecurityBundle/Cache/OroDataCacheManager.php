@@ -28,7 +28,6 @@ class OroDataCacheManager
         foreach ($this->cacheProviders as $cacheProvider) {
             if ($cacheProvider instanceof SyncCacheInterface) {
                 $cacheProvider->sync();
-                var_dump($cacheProvider->getNamespace());
             }
         }
     }
