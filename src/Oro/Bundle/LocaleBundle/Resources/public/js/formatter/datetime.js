@@ -201,6 +201,17 @@ define(['../locale-settings', 'moment'
             return this.getMomentForFrontendDateTime(value, timezoneOffset).format(this.backendFormats.datetime);
         },
 
+        getDateStringWithSystemTimezone: function (value) {
+            return moment(value)
+                .format(this.backendFormats.datetime)
+                .replace(/[\+|-]\d+$/, this.timezoneOffset.replace(':', ''));
+        },
+
+        getDateStringWithBrowserTimezone: function (value) {
+            var browserTimezone = moment().format('Z');
+            return value.replace(/[\+|-](\d+|\d+:\d+)$/, browserTimezone);
+        },
+
         /**
          * Get moment object based on formatted frontend date string
          *

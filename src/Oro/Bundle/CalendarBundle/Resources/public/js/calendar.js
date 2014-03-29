@@ -126,7 +126,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         onEventAdded: function (eventModel) {
             var fcEvent = eventModel.toJSON();
-            this.prepareViewModel(fcEvent);
+            //this.prepareViewModel(fcEvent);
 
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
@@ -235,13 +235,21 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         prepareViewModels : function (fcEvents) {
-            _.each(fcEvents, this.prepareViewModel, this);
+            _.each(
+                fcEvents,
+                _.bind(
+                    function(fcEvent) {
+                        fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
+                        fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
+                        this.prepareViewModel(fcEvent);
+                    },
+                    this
+                ),
+                this
+            );
         },
 
         prepareViewModel : function (fcEvent) {
-            // convert start and end dates from backend formatted string to Date object
-            fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
-            fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
             fcEvent.textColor = colors.color;
@@ -249,7 +257,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         formatDateTimeForModel: function (date) {
-            return dateTimeFormatter.convertDateTimeToBackendFormat(date);
+            return date;
+            //return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
         showSavingMask: function () {
