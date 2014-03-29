@@ -4,10 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+
+use Oro\Bundle\SecurityBundle\Cache\OroDataCacheManager;
 
 class CommandExecutor
 {
@@ -22,15 +25,25 @@ class CommandExecutor
     protected $env;
 
     /**
+     * @var OroDataCacheManager
+     */
+    protected $dataCacheManager;
+
+    /**
      * Constructor
      *
-     * @param string $consoleCmdPath
-     * @param string $env
+     * @param string              $consoleCmdPath
+     * @param string              $env
+     * @param OroDataCacheManager $dataCacheManager
      */
-    public function __construct($consoleCmdPath, $env)
-    {
-        $this->consoleCmdPath = $consoleCmdPath;
-        $this->env            = $env;
+    public function __construct(
+        $consoleCmdPath,
+        $env,
+        OroDataCacheManager $dataCacheManager = null
+    ) {
+        $this->consoleCmdPath   = $consoleCmdPath;
+        $this->env              = $env;
+        $this->dataCacheManager = $dataCacheManager;
     }
 
     /**
@@ -104,6 +117,12 @@ class CommandExecutor
                 }
             }
         );
+
+        // synchronize all data caches
+        if ($this->dataCacheManager) {
+            $this->dataCacheManager->sync();
+        }
+
         if (0 !== $exitCode) {
             if ($ignoreErrors) {
                 $logger->warning(sprintf('The command terminated with an exit code: %u.', $exitCode));
