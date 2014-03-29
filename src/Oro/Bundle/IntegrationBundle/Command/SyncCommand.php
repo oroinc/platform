@@ -26,7 +26,7 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     public function getDefaultDefinition()
     {
-        return '0 1 * * *';
+        return '*/5 * * * *';
     }
 
     /**
