@@ -285,10 +285,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
 
         $(window).on('resize', adjustHeight);
 
-        mediator.bind("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("hash_navigation_request:complete", adjustReloaded);
 
-        mediator.bind('layout:adjustReloaded', adjustReloaded);
-        mediator.bind('layout:adjustHeight', adjustHeight);
+        mediator.on('layout:adjustReloaded', adjustReloaded);
+        mediator.on('layout:adjustHeight', adjustHeight);
+        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
 
         $(function () {
             adjustHeight();

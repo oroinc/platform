@@ -105,6 +105,7 @@ define(function (require) {
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
                 this.$el.data('datagrid', grid);
+                mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
                     // register router
