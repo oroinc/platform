@@ -192,22 +192,19 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-criteria .dropdown-menu a:hover {
   background:#3875d7;
 }
-.filter-criteria .dropdown-menu-calendar a:hover{
-    background-color: transparent;
-}
-.filter-criteria .dropdown-menu-calendar .nav-tab > li > a:hover,
-.filter-criteria .dropdown-menu-calendar .nav-tab > li > a:active,
-.filter-criteria .dropdown-menu-calendar .nav-tab > li > a:focus {
-    background:#efefef !important;
+.filter-criteria .nav-tabs-oro a:hover,
+.filter-criteria .nav-tabs-oro a:focus{
+    background: #efefef;
     color: #444;
-    opacity: 1 !important;
 }
-.filter-criteria .dropdown-menu-calendar .nav-tab > li.active > a:hover,
-.filter-criteria .dropdown-menu-calendar .nav-tab > li.active > a:focus,
-.filter-criteria .dropdown-menu-calendar .nav-tab > li.active > a:active{
-    background:#fff !important;
-    color: #444;
-    opacity: 1 !important;
+.filter-criteria .nav-tabs-oro .active a:hover,
+.filter-criteria .nav-tabs-oro .active a:focus{
+    background: #fff;
+    color: #6d6d6d;
+}
+.filter-criteria .tab-content a:hover,
+.filter-criteria .tab-content a:focus{
+    background: transparent;
 }
 .filter-criteria .datetime-visual-element {
     width: 120px;
