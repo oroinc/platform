@@ -42,10 +42,15 @@ define(function (require) {
             animation: false,
             delay: { show: 0, hide: 0 },
             html: true,
+            container: false,
             trigger: 'manual'
         }).on('click.popover', false, function (e) {
             $(this).popover('toggle');
             e.preventDefault();
+        }).on('click.popover-prevent', '.popover', function(e) {
+            if (e.target.tagName.toLowerCase() != 'a') {
+                e.preventDefault();
+            }
         });
 
         $('body')
@@ -57,17 +62,9 @@ define(function (require) {
                         $(this).popover('hide');
                     }
                 });
-            })
-            .on('click.popover-prevent', '.popover', function(e) {
-                if (e.target.tagName.toLowerCase() != 'a') {
-                    e.preventDefault();
-                }
             });
-
         mediator.once('hash_navigation_request:start', function () {
-            $('body')
-                .off('click.popover-hide')
-                .off('click.popover-prevent');
+            $('body').off('click.popover-hide');
         });
     };
 
