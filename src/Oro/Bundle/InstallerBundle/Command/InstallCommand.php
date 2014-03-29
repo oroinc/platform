@@ -43,7 +43,8 @@ class InstallCommand extends ContainerAwareCommand
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
-            $this->getApplication()
+            $this->getApplication(),
+            $this->getContainer()->get('oro.oro_data_cache_manager')
         );
 
         // if there is application is not installed or no --force option

@@ -8,6 +8,8 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
+use Oro\Bundle\SecurityBundle\Cache\OroDataCacheManager;
+
 class CommandExecutor
 {
     /**
@@ -26,6 +28,11 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var OroDataCacheManager
+     */
+    protected $dataCacheManager;
+
+    /**
      * @var int
      */
     protected $lastCommandExitCode;
@@ -33,15 +40,21 @@ class CommandExecutor
     /**
      * Constructor
      *
-     * @param string|null     $env
-     * @param OutputInterface $output
-     * @param Application     $application
+     * @param string|null         $env
+     * @param OutputInterface     $output
+     * @param Application         $application
+     * @param OroDataCacheManager $dataCacheManager
      */
-    public function __construct($env, OutputInterface $output, Application $application)
-    {
-        $this->env         = $env;
-        $this->output      = $output;
-        $this->application = $application;
+    public function __construct(
+        $env,
+        OutputInterface $output,
+        Application $application,
+        OroDataCacheManager $dataCacheManager = null
+    ) {
+        $this->env              = $env;
+        $this->output           = $output;
+        $this->application      = $application;
+        $this->dataCacheManager = $dataCacheManager;
     }
 
     /**
@@ -112,6 +125,11 @@ class CommandExecutor
                 }
             );
             $this->lastCommandExitCode = $process->getExitCode();
+
+            // synchronize all data caches
+            if ($this->dataCacheManager) {
+                $this->dataCacheManager->sync();
+            }
         } else {
             $this->application->setAutoExit(false);
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
