@@ -1,11 +1,10 @@
 /* global define */
-define(['jquery', 'orotranslation/js/translator', 'orolocale/js/locale-settings', 'jquery-ui'],
-function($, __, localeSettings) {
+define(['jquery', 'orotranslation/js/translator',
+        'orolocale/js/locale-settings','orolocale/js/formatter/datetime', 'jquery-ui'
+    ],  function($, __, localeSettings, dateTimeFormatter) {
     'use strict';
 
-    var locale = localeSettings.getLocale(),
-        tz = localeSettings.getTimeZoneOffset(),
-        offset = Number(tz.slice(0,1) + 1) + (Number(tz.slice(1,3)) * 60 + Number(tz.slice(4,6))) * 60000;
+    var locale = localeSettings.getLocale();
 
     $.datepicker.regional[locale] = {
         closeText: __("Done"), // Display text for close link
@@ -37,9 +36,7 @@ function($, __, localeSettings) {
     $.datepicker._orig_base_gotoToday = $.datepicker._base_gotoToday ||$.datepicker._gotoToday;
     $.datepicker._base_gotoToday = $.datepicker._gotoToday = function (id) {
         var inst = this._getInst($(id)[0]),
-            local = new Date(),
-            utc = local.getTime() + (local.getTimezoneOffset() * 60000),
-            now = new Date(utc + offset);
+            now = dateTimeFormatter.applyTimeZoneCorrection(new Date());
         inst.today = now;
         inst.currentDay = now.getDate();
         inst.currentMonth = now.getMonth();
