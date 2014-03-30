@@ -13,8 +13,8 @@
 >
 
     <testsuites>
-        <testsuite name="CronBundle Test Suite">
-            <directory>./Tests</directory>
+        <testsuite name="CronBundle Unit Test Suite">
+            <directory>./Tests/Unit</directory>
         </testsuite>
     </testsuites>
 
