@@ -3,6 +3,7 @@ CHANGELOG for 1.0.0
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0 versions.
 
 * 1.0.0 (2014-04-01)
+ * Workflow management UI
  * Segmentation
  * Reminders
  * Package management
