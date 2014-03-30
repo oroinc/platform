@@ -63,7 +63,7 @@ class RootBasedAclProvider implements AclProviderInterface
                 // Try to get ACL for underlying object
                 $underlyingOid = $this->objectIdentityFactory->underlying($oid);
                 $acl = $this->getAcl($underlyingOid, $sids, $rootOid);
-                // Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
+                // todo: Acl cache must be refactoring due task https://magecore.atlassian.net/browse/BAP-3649
                 //$this->baseAclProvider->cacheWithUnderlyingAcl($oid);
             } catch (\Exception $noUnderlyingAcl) {
                 // Try to get ACL for root object
