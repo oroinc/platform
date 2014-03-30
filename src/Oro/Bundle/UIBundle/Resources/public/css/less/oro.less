@@ -3442,6 +3442,20 @@ i.pin-status {
   font-size: 13px;
 }
 
+#container .popover {
+  // prevent menu and loading wrapper overlapping
+  z-index: 800;
+  .popover-content {
+    padding-right: 25px;
+  }
+  .popover-close {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    cursor: pointer;
+  }
+}
+
 label .popover-content {
   text-transform: none;
 }

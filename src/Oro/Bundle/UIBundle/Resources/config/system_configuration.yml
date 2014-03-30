@@ -1,0 +1,29 @@
+oro_system_configuration:
+    groups:
+        application_settings:
+            icon:   icon-desktop
+            title:  'Application Settings'
+        application_name_settings:
+            title:  'Name'
+    fields:
+        oro_ui.application_name:
+            type: text
+            options:
+                label: 'Short Name'
+        oro_ui.application_title:
+            type: text
+            options:
+                label: 'Full Name'
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            application_settings:
+                                priority: 260
+                                children:
+                                    application_name_settings:
+                                        children:
+                                            - oro_ui.application_name
+                                            - oro_ui.application_title
