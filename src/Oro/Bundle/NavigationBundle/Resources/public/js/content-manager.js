@@ -49,7 +49,13 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          * Notifier object
          * @type {{close: function()}}
          */
-        notifier;
+        notifier,
+
+        /**
+         * Pages that has been out dated
+         * @type {Array}
+         */
+        outdatedPageHandlers = {};
 
     /**
      * Remove restore params from url
@@ -138,21 +144,31 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
                 _.each(callbacks, function (callback) {
                     callback(url);
                 });
-
             } else {
-                // cached page is outdated - setup page changing handler
-                handler = function (obj) {
-                    if (url === obj.url) {
-                        _.each(callbacks, function (callback) {
-                            callback(url);
-                        });
-                        mediator.off('hash_navigation_request:refresh', handler);
-                    }
-                };
-                mediator.on('hash_navigation_request:refresh', handler);
+                if (!outdatedPageHandlers[url]) {
+                    handler = _.partial(refreshHandler, url, callbacks);
+
+                    outdatedPageHandlers[url] = handler;
+                    mediator.on('hash_navigation_request:refresh', handler);
+                }
             }
             mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === currentUrl() });
         });
+    }
+
+    /**
+     * Page refresh handler, check whenever
+     *
+     * @param {string} url
+     * @param {array} callbacks
+     * @param {object} obj
+     */
+    function refreshHandler(url, callbacks, obj) {
+        if (url === obj.url) {
+            _.each(callbacks, function (callback) {
+                callback(url);
+            });
+        }
     }
 
     /**
@@ -234,6 +250,12 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
                 url = clearUrl(url);
                 delete pagesCache[url];
                 delete pagesTags[url];
+
+                if (outdatedPageHandlers[url]) {
+                    console.log('test');
+                    mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
+                    delete outdatedPageHandlers[url];
+                }
             } else {
                 pagesCache = {};
             }
