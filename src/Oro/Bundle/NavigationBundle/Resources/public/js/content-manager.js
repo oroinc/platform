@@ -252,7 +252,6 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
                 delete pagesTags[url];
 
                 if (outdatedPageHandlers[url]) {
-                    console.log('test');
                     mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
                     delete outdatedPageHandlers[url];
                 }
