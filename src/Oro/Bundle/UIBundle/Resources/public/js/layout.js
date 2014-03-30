@@ -64,7 +64,6 @@ define(function (require) {
                 $items.each(function () {
                     //the 'is' for buttons that trigger popups
                     //the 'has' for icons within a button that triggers a popup
-                    console.log(e.target);
                     if (!$(this).is(e.target)
                         && $(this).has(e.target).length === 0
                         && ($('.popover').has(e.target).length === 0 || ~e.target.className.indexOf('popover-close'))) {
