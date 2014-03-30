@@ -37,11 +37,18 @@ define(function (require) {
 
     layout.initPopover = function (container) {
         var $items = container.find('[data-toggle="popover"]');
+        $items.not('[data-close="false"]').each(function(i, el) {
+            //append close link
+            var content = $(el).data('content');
+            content += '<i class="icon-remove popover-close"></i>';
+            $(el).data('content', content);
+        });
 
         $items.popover({
             animation: false,
             delay: { show: 0, hide: 0 },
             html: true,
+            container: false,
             trigger: 'manual'
         }).on('click.popover', false, function (e) {
             $(this).popover('toggle');
@@ -53,21 +60,19 @@ define(function (require) {
                 $items.each(function () {
                     //the 'is' for buttons that trigger popups
                     //the 'has' for icons within a button that triggers a popup
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    if (!$(this).is(e.target)
+                        && $(this).has(e.target).length === 0
+                        && ($('.popover').has(e.target).length === 0 || ~e.target.className.indexOf('popover-close'))) {
                         $(this).popover('hide');
                     }
                 });
-            })
-            .on('click.popover-prevent', '.popover', function(e) {
+            }).on('click.popover-prevent', '.popover', function(e) {
                 if (e.target.tagName.toLowerCase() != 'a') {
                     e.preventDefault();
                 }
             });
-
         mediator.once('hash_navigation_request:start', function () {
-            $('body')
-                .off('click.popover-hide')
-                .off('click.popover-prevent');
+            $('body').off('click.popover-hide').off('click.popover-prevent');
         });
     };
 

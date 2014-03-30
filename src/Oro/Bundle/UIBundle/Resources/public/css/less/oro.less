@@ -671,7 +671,7 @@ footer {
   box-shadow:0 1px 22px rgba(0,0,0,.4) !important;
   -webkit-box-shadow:0 1px 22px rgba(0,0,0,.4) !important;
   -moz-box-shadow:0 1px 22px rgba(0,0,0,.4) !important;
-  z-index: 998;
+  z-index: 990;
 }
 .ui-dialog-titlebar {
   .border-radius(@baseBorderRadius @baseBorderRadius 0 0);
@@ -773,7 +773,7 @@ footer {
   padding: 0 30px 0 0;
   #gradient > .vertical(@pinBarColorStart, @pinBarColorEnd);
   position: relative;
-  z-index: 998;
+  z-index: 990;
   .pin-menus {
     float:right;
     position: relative;
@@ -3440,6 +3440,20 @@ i.pin-status {
 .tooltip-icon {
   color: #6b92d0;
   font-size: 13px;
+}
+
+#container .popover {
+  // prevent menu and loading wrapper overlapping
+  z-index: 800;
+  .popover-content {
+    padding-right: 25px;
+  }
+  .popover-close {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    cursor: pointer;
+  }
 }
 
 label .popover-content {
