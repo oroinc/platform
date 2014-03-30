@@ -3,10 +3,8 @@
 namespace Oro\Bundle\CronBundle\Command;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -87,11 +85,7 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testExecution()
     {
-        $this->markTestSkipped();
-        $con = $this->getMockBuilder('\Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()->getMock();
-
-        $em = $this->getTestEntityManager($con);
+        $em = $this->getTestEntityManager();
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
@@ -105,11 +99,16 @@ class CleanupCommandTest extends OrmTestCase
             ]
         );
 
-        $conn = $this->getMock('\Doctrine\DBAL\Driver\Connection');
-        /** @var DriverMock $driver */
-        $driver = $em->getConnection()->getDriver();
-        $driver->setDriverConnection($conn);
-
+        $statement = $this->createFetchStatementMock([['id' => 1]]);
+        $this->getDriverConnectionMock($em)->expects($this->any())
+            ->method('prepare')
+            ->will(
+                $this->returnCallback(
+                    function ($prepareString) use (&$statement) {
+                        return $statement;
+                    }
+                )
+            );
 
         $params    = [];
         $input     = new ArrayInput($params, $this->command->getDefinition());
