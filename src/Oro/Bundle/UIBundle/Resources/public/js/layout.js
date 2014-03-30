@@ -53,10 +53,6 @@ define(function (require) {
         }).on('click.popover', false, function (e) {
             $(this).popover('toggle');
             e.preventDefault();
-        }).on('click.popover-prevent', '.popover', function(e) {
-            if (e.target.tagName.toLowerCase() != 'a') {
-                e.preventDefault();
-            }
         });
 
         $('body')
@@ -70,9 +66,13 @@ define(function (require) {
                         $(this).popover('hide');
                     }
                 });
+            }).on('click.popover-prevent', '.popover', function(e) {
+                if (e.target.tagName.toLowerCase() != 'a') {
+                    e.preventDefault();
+                }
             });
         mediator.once('hash_navigation_request:start', function () {
-            $('body').off('click.popover-hide');
+            $('body').off('click.popover-hide').off('click.popover-prevent');
         });
     };
 
