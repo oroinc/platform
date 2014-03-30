@@ -37,6 +37,12 @@ define(function (require) {
 
     layout.initPopover = function (container) {
         var $items = container.find('[data-toggle="popover"]');
+        $items.not('[data-close="false"]').each(function(i, el) {
+            //append close link
+            var content = $(el).data('content');
+            content += '<i class="icon-remove popover-close"></i>';
+            $(el).data('content', content);
+        });
 
         $items.popover({
             animation: false,
@@ -58,7 +64,10 @@ define(function (require) {
                 $items.each(function () {
                     //the 'is' for buttons that trigger popups
                     //the 'has' for icons within a button that triggers a popup
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    console.log(e.target);
+                    if (!$(this).is(e.target)
+                        && $(this).has(e.target).length === 0
+                        && ($('.popover').has(e.target).length === 0 || ~e.target.className.indexOf('popover-close'))) {
                         $(this).popover('hide');
                     }
                 });
