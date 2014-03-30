@@ -32,7 +32,7 @@ class OptionSetListener
         /** @var OroEntityManager $em */
         $em             = $event->getEntityManager();
         $entity         = $event->getEntity();
-        $configProvider = $em->getExtendManager()->getConfigProvider();
+        $configProvider = $em->getExtendConfigProvider();
 
         $className = get_class($entity);
         if ($configProvider->hasConfig($className)) {

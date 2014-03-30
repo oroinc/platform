@@ -6,16 +6,14 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('oro/translator');
-    var tools = require('oro/tools');
-    var mediator = require('oro/mediator');
-    var LoadingMask = require('oro/loading-mask');
-    var PageableCollection = require('oro/pageable-collection');
-    var Grid = require('oro/datagrid/grid');
-    var GridRouter = require('oro/datagrid/router');
-    var GridViewsView = require('oro/datagrid/grid-views/view');
-    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
-    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var PageableCollection = require('./pageable-collection');
+    var Grid = require('./datagrid/grid');
+    var GridRouter = require('./datagrid/router');
+    var GridViewsView = require('./datagrid/grid-views/view');
+    var mapActionModuleName = require('./map-action-module-name');
+    var mapCellModuleName = require('./map-cell-module-name');
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
@@ -101,9 +99,13 @@ define(function (require) {
 
                 // create grid
                 options = methods.combineGridOptions.call(this);
+                mediator.trigger('datagrid_create_before', options, collection);
                 grid = new Grid(_.extend({collection: collection}, options));
+                mediator.trigger('datagrid_create_after', grid);
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
+                this.$el.data('datagrid', grid);
+                mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
                     // register router
@@ -156,7 +158,7 @@ define(function (require) {
 
                 // columns
                 columns = _.map(metadata.columns, function (cell) {
-                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable'],
+                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'],
                         cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys))),
                         extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type'))),
                         cellType = modules[helpers.cellType(cell.type)];
@@ -204,8 +206,8 @@ define(function (require) {
     /**
      * Process datagirid's metadata and creates datagrid
      *
-     * @export oro/datagrid-builder
-     * @name   oro.datagridBuilder
+     * @export orodatagrid/js/datagrid-builder
+     * @name   orodatagrid.datagridBuilder
      */
     return function (builders) {
         $(gridSelector).each(function (i, el) {

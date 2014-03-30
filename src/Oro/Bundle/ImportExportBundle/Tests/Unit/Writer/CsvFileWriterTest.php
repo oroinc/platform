@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
 
 class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
@@ -192,7 +192,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
     {
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
 

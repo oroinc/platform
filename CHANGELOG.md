@@ -1,3 +1,24 @@
+CHANGELOG for 1.0.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0 versions.
+
+* 1.0.0 (2014-04-01)
+ * Segmentation
+ * Reminders
+ * Package management
+ * Page & Grand totals for grids
+ * Proper formatting of Money and Percent values
+ * Configurable Sidebars
+ * Notification of content changes in the Pinbar
+
+CHANGELOG for 1.0.0-rc3
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-rc3 versions.
+
+* 1.0.0-rc3 (2014-02-25)
+ * Embedded forms
+ * CSV export
+
 CHANGELOG for 1.0.0-rc2
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-rc2 versions.

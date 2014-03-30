@@ -5,7 +5,8 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var app = require('oro/app');
+    var app = require('oroui/js/app');
+    var mediator = require('oroui/js/mediator');
 
     var scrollspy = {};
 
@@ -20,9 +21,7 @@ define(function (require) {
         container.find('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
-            $(this).scrollspy('refresh');
-            $('.scrollspy-nav ul.nav li').removeClass('active');
-            $('.scrollspy-nav ul.nav li:first').addClass('active');
+            $('.scrollspy-nav ul.nav li').removeClass('active').first().addClass('active');
         });
     };
 
@@ -74,22 +73,11 @@ define(function (require) {
                 var $row = $(this);
                 var titleHeight = $row.find('.scrollspy-title').outerHeight();
                 var rowAdjHeight = (isMultipleRows ? titleHeight + spyHeight : spyHeight) - debugBarHeight;
+                var naturalHeight = $row.height('auto').height();
 
-                var rowOrigHeight = $row.data('originalHeight');
-                if (!rowOrigHeight) {
-                    rowOrigHeight = $row.height();
-                    $row.data('originalHeight', rowOrigHeight);
+                if (rowAdjHeight > naturalHeight) {
+                    $row.outerHeight(rowAdjHeight);
                 }
-
-                if ($row.height() === rowAdjHeight) {
-                    return;
-                }
-
-                if (rowAdjHeight < rowOrigHeight) {
-                    rowAdjHeight = rowOrigHeight;
-                }
-
-                $row.outerHeight(rowAdjHeight);
             });
 
             $spy.scrollspy('refresh');

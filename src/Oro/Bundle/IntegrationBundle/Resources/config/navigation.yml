@@ -1,17 +1,25 @@
 oro_menu_config:
     items:
+        channels_submenu:
+            label: Channels
+            uri: '#'
+            extras:
+                position: 50
         channels_list:
-            label: oro.integration.channel.entity_plural_label
+            label: Manage Channels
             route: oro_integration_channel_index
             extras:
-                routes: 'oro_integration_channel_*'
+                position: 10
+                routes:  'oro_integration_channel_*'
 
     tree:
         application_menu:
             children:
                 system_tab:
                     children:
-                        channels_list: ~
+                        channels_submenu:
+                            children:
+                                channels_list: ~
 
 oro_titles:
     oro_integration_channel_index:  ~

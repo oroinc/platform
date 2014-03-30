@@ -37,9 +37,15 @@ abstract class AbstractPageGrid extends AbstractPage
         $entityId = rand(1, $pageSize);
 
         $entity = $this->test
-            ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/tbody/tr[{$entityId}]/td"));
+            ->elements(
+                $this->test->using('xpath')
+                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/tbody/tr[{$entityId}]/td")
+            );
         $headers = $this->test
-            ->elements($this->test->using('xpath')->value("{$this->gridPath}//table/thead/tr/th"));
+            ->elements(
+                $this->test->using('xpath')
+                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/thead/tr/th")
+            );
 
         $entityData = array();
         for ($i=0; $i< count($headers); $i++) {
@@ -115,7 +121,7 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][2]")
             ->text();
-        preg_match('/of\s+(\d+)\s+\|\s+(\d+)\s+records/i', $pager, $result);
+        preg_match('/of\s+(\d+)/i', $pager, $result);
         return intval($result[1]);
     }
 
@@ -126,10 +132,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getRowsCount()
     {
-        $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][2]")
+        $pager = $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//label[@class='dib'][3]")
             ->text();
-        preg_match('/of\s+(\d+)\s+\|\s+(\d+)\s+records/i', $pager, $result);
-        return intval($result[2]);
+        preg_match('/of\s+(\d+)/i', $pager, $result);
+        return intval($result[1]);
     }
 
     /**

@@ -12,7 +12,7 @@
             {% endif %}
 
             {{ ui.renderProperty('Name'|trans, entity_name) }}
-            {{ ui.renderProperty('Icon'|trans, iconContent) }}
+            {{ ui.renderHtmlProperty('Icon'|trans, iconContent) }}
             {{ ui.renderProperty(
                 'Label'|trans,
                 (entity_config.get('label') == entity_config.get('label')|trans)

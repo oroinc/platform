@@ -1,0 +1,14 @@
+oro_segment:
+    resource:     "@OroSegmentBundle/Controller"
+    type:         annotation
+    prefix:       /segment
+
+oro_semengt_api:
+    resource:     "@OroSegmentBundle/Resources/config/oro/routing_api.yml"
+    type:         rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest

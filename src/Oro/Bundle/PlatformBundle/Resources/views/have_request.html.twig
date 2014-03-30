@@ -1,0 +1,23 @@
+<script>
+    require(['jquery'], function ($) {
+        $(function () {
+            var options = {
+                dataType: 'script',
+                cache:     true,
+                url:       {{ (app.request.scheme ~ '://crm.orocrm.com/bundles/orocrmrequest/js/embed.form.js')|json_encode|raw }},
+                timeout:   2000
+            };
+
+            $.ajax(options).done(function() {
+                var options = {
+                    version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION')|json_encode|raw }}
+                };
+                new ORO.EmbedRequestForm(options);
+            }).error(function() {
+                if (typeof(console) != 'undefined' && console.hasOwnProperty('error')) {
+                    console.error('Unable to load external script.');
+                }
+            });
+        });
+    });
+</script>

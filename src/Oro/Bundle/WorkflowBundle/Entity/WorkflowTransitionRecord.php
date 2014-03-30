@@ -37,7 +37,7 @@ class WorkflowTransitionRecord
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $stepFrom;
 
@@ -45,7 +45,7 @@ class WorkflowTransitionRecord
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="step_to_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="step_to_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $stepTo;
 

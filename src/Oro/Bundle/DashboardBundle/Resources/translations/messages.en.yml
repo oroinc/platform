@@ -3,3 +3,5 @@ oro:
         title:
             main: Dashboard
             quick_launchpad: Quick Launchpad
+
+        no_data_found:    No data found

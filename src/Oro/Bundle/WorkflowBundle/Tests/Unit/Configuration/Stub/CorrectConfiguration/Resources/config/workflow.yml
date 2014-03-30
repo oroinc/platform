@@ -1,7 +1,7 @@
 workflows:
     first_workflow:
         label: 'First Workflow'
-        enabled: true
+        is_system: true
         entity: First\Entity
         start_step: first_step
         entity_attribute: my_entity
@@ -70,22 +70,24 @@ workflows:
                     - @custom_post_action: ~
     second_workflow:
         label: 'Second Workflow'
-        enabled: false
         entity: Second\Entity
         start_step: second_step
         steps:
-            second_step:
+            -
+                name: second_step
                 label: 'Second Step'
                 order: 1
                 is_final: false
                 allowed_transitions: []
         attributes: []
         transitions:
-            second_transition:
+            -
+                name: second_transition
                 label: 'Second Transition'
                 step_to: second_step
                 transition_definition: second_transition_definition
                 frontend_options:
                     icon: bar
         transition_definitions:
-            second_transition_definition: []
+            -
+                name: second_transition_definition

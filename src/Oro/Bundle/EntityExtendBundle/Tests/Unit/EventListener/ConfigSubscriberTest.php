@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +27,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 Events::NEW_ENTITY_CONFIG    => 'updateEntityConfig',
                 Events::UPDATE_ENTITY_CONFIG => 'updateEntityConfig',
                 Events::NEW_FIELD_CONFIG     => 'newFieldConfig',
+                Events::RENAME_FIELD         => 'renameField',
             ],
             ConfigSubscriber::getSubscribedEvents()
         );
@@ -59,14 +60,14 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
-            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
+            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
             $this->getChangeSet()
         );
 
         /** @var ConfigManager $cm */
         $cm = $this->event->getConfigManager();
         $this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendManager::STATE_UPDATED])],
+            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATED])],
             'persistConfigs',
             $cm
         );
@@ -79,8 +80,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testPersistConfigScopeExtendActiveFieldActiveEntity()
     {
         $this->runPersistConfig(
-            $this->getEventConfigNewField(['state' => ExtendManager::STATE_ACTIVE]),
-            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
+            $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]),
+            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
             [
                 'length' => [0 => 255, 1 => 200]
             ]
@@ -90,7 +91,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $cm = $this->event->getConfigManager();
 
         $this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendManager::STATE_UPDATED])],
+            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATED])],
             'persistConfigs',
             $cm
         );
@@ -98,8 +99,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(
             [
                 'extend_TestClass_testFieldName' => [
-                    'owner'     => [0 => null, 1 => ExtendManager::OWNER_CUSTOM],
-                    'state'     => [0 => null, 1 => ExtendManager::STATE_UPDATED],
+                    'owner'     => [0 => null, 1 => ExtendScope::OWNER_CUSTOM],
+                    'state'     => [0 => null, 1 => ExtendScope::STATE_UPDATED],
                     'is_extend' => [0 => null, 1 => true]
                 ]
             ],
@@ -116,13 +117,13 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 [
-                    'state' => ExtendManager::STATE_NEW,
+                    'state' => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'oneToMany'
             ),
-            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
-            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
+            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
+            ['state' => [0 => null, 1 => ExtendScope::STATE_NEW]]
         );
 
         /** @var ConfigManager $cm */
@@ -132,7 +133,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             [
                 'extend_TestClass' => $this->getEntityConfig(
                     [
-                        'state' => ExtendManager::STATE_UPDATED,
+                        'state' => ExtendScope::STATE_UPDATED,
                         'relation' => [
                             'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                 'assign' => false,
@@ -168,13 +169,13 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 [
-                    'state' => ExtendManager::STATE_NEW,
+                    'state' => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'manyToOne'
             ),
-            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
-            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
+            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
+            ['state' => [0 => null, 1 => ExtendScope::STATE_NEW]]
         );
 
         /** @var ConfigManager $cm */
@@ -184,7 +185,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             [
                 'extend_TestClass' => $this->getEntityConfig(
                     [
-                        'state' => ExtendManager::STATE_UPDATED,
+                        'state' => ExtendScope::STATE_UPDATED,
                         'relation' => [
                             'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                 'assign' => false,
@@ -215,13 +216,13 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 [
-                    'state' => ExtendManager::STATE_NEW,
+                    'state' => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'manyToMany'
             ),
-            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
-            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
+            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
+            ['state' => [0 => null, 1 => ExtendScope::STATE_NEW]]
         );
 
         /** @var ConfigManager $cm */
@@ -231,7 +232,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             [
                 'extend_TestClass' => $this->getEntityConfig(
                     [
-                        'state' => ExtendManager::STATE_UPDATED,
+                        'state' => ExtendScope::STATE_UPDATED,
                         'relation' => [
                             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                 'assign' => false,
@@ -269,7 +270,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->getEventConfigNewField([], 'oneToMany'),
             $test = $this->getEntityConfig(
                 [
-                    'state' => ExtendManager::STATE_NEW,
+                    'state' => ExtendScope::STATE_NEW,
                     'relation' => [
                         'oneToMany|TestClass|TestClass|testFieldName' => [
                             'assign' => false,
@@ -282,7 +283,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 ]
             ),
             [
-                'state' => [0 => null, 1 => ExtendManager::STATE_NEW]
+                'state' => [0 => null, 1 => ExtendScope::STATE_NEW]
             ]
         );
 
@@ -338,8 +339,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend')
     {
         $resultValues = [
-            'owner'      => ExtendManager::OWNER_CUSTOM,
-            'state'      => ExtendManager::STATE_NEW,
+            'owner'      => ExtendScope::OWNER_CUSTOM,
+            'state'      => ExtendScope::STATE_NEW,
             'is_extend'  => true,
             'is_deleted' => false,
         ];
@@ -365,9 +366,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     protected function getEntityConfig($values = [], $scope = 'extend')
     {
         $resultValues = [
-            'owner'       => ExtendManager::OWNER_CUSTOM,
+            'owner'       => ExtendScope::OWNER_CUSTOM,
             'is_extend'   => true,
-            'state'       => ExtendManager::STATE_NEW,
+            'state'       => ExtendScope::STATE_NEW,
             'is_deleted'  => false,
             'upgradeable' => false,
             'relation'    => [],
@@ -390,9 +391,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         return array_merge(
             [
-                'owner'     => [0 => null, 1 => ExtendManager::OWNER_CUSTOM],
+                'owner'     => [0 => null, 1 => ExtendScope::OWNER_CUSTOM],
                 'is_extend' => [0 => null, 1 => true],
-                'state'     => [0 => null, 1 => ExtendManager::STATE_NEW]
+                'state'     => [0 => null, 1 => ExtendScope::STATE_NEW]
             ],
             $values
         );
@@ -430,22 +431,13 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->event = new PersistConfigEvent($eventConfig, $configManager);
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $extendConfigProvider = clone $configProvider;
         $extendConfigProvider
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($eventConfig));
 
-        $extendManager
-            ->expects($this->any())
-            ->method('getConfigProvider')
-            ->will($this->returnValue($extendConfigProvider));
-
-        $this->configSubscriber = new ConfigSubscriber($extendManager);
+        $this->configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $this->configSubscriber->persistConfig($this->event);
     }
 }

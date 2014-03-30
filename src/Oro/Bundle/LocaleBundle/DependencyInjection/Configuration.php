@@ -103,14 +103,15 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             array(
-                'locale'   => array('value' => '%locale%'),
-                'language' => array('value' => null),
-                'country'  => array('value' => null),
-                'currency' => array('value' => null),
-                'timezone' => array('value' => date_default_timezone_get()),
-                'format_address_by_address_country' => array('value' => true, 'type' => 'boolean'),
-                'qwerty' => array('value' => array(), 'type' => 'array'),
-                'languages' => ['value' => ['en'], 'type' => 'array'],
+                'locale'                            => ['value' => '%locale%'],
+                'language'                          => ['value' => null],
+                'country'                           => ['value' => null],
+                'currency'                          => ['value' => null],
+                'timezone'                          => ['value' => date_default_timezone_get()],
+                'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],
+                'qwerty'                            => ['value' => [], 'type' => 'array'],
+                'languages'                         => ['value' => ['en'], 'type' => 'array'],
+                'quarter_start'                     => ['value' => ['year' => '2009', 'month' => '1', 'day' => '1']],
             )
         );
 

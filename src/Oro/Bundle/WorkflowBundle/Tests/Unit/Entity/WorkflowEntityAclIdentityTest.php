@@ -70,7 +70,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit_Framework_TestCase
 
         $newAclIdentity = new WorkflowEntityAclIdentity();
         $newAclIdentity->setAcl($entityAcl);
-        $newAclIdentity->import($this->aclIdentity);
+        $this->assertEquals($newAclIdentity, $newAclIdentity->import($this->aclIdentity));
 
         $this->assertEquals(123, $newAclIdentity->getEntityId());
 

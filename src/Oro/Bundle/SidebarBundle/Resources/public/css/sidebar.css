@@ -1,3 +1,16 @@
+#main.sidebar-left-minimized {
+    margin-left: 33px;
+}
+#main.sidebar-right-minimized {
+    margin-right: 33px;
+}
+#main.sidebar-left-maximized {
+    margin-left: 200px;
+}
+#main.sidebar-right-maximized {
+    margin-right: 200px;
+}
+
 .sidebar {
     background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
     top: 66px;
@@ -13,6 +26,12 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.sidebar{
+    margin-bottom: 33px;
+}
+.dev-mode .sidebar{
+    margin-bottom: 72px;
 }
 
 .sidebar-maximized .sidebar-widget-close{
@@ -229,7 +248,6 @@
     border-bottom: 1px solid #aaaaaa;
 }
 .sidebar-widget-popup .sidebar-widget-header{
-    margin: 0 0 10px;
     background: #c4c4c4;
     border-bottom: 1px solid #aaaaaa;
 }
@@ -332,12 +350,8 @@
 }
 .sidebar-widget-content {
     color: #444;
-    margin: 0 8px 8px;
-    padding: 10px;
-    border: 1px solid #dbdbdb;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     background-color: #f4f4f4;
+    word-wrap: break-word;
 }
 .sidebar-widget-popup{
     bottom: 75px;
@@ -363,7 +377,7 @@
     padding-bottom: 2px;
 }
 .sidebar-widget-popup .sidebar-widget-content {
-    overflow: auto;
+    height: auto;
 }
 .sidebar-widget-popup{
     background-color: #cecece;

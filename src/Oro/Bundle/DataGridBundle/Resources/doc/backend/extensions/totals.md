@@ -14,30 +14,40 @@ datagrid:
   demo:
     source:
       totals:
-        columns:
-          name:
-              label: 'TOTALS'
-          contactName:
-              query: 'COUNT(o.name)'
-              formatter: integer
-          closeDate:
-              label: 'Oldest'
-              query: 'MIN(o.closeDate)'
-              formatter: date
-          probability:
-              label: 'Summary'
-              query: 'SUM(o.probability)'
-              formatter: percent
-          statusLabel:
-              label: orocrm.sales.opportunity.status.label
+        page_total:
+            extends: grand_total
+            per_page: true
+            hide_if_one_page: true
+            columns:
+              name:
+                  label: 'page total'
+        grand_total:          
+            columns:
+              name:
+                  label: 'grand totals'
+              contactName:
+                  expr: 'COUNT(o.name)'
+                  formatter: integer
+              closeDate:
+                  label: 'Oldest'
+                  expr: 'MIN(o.closeDate)'
+                  formatter: date
+              probability:
+                  label: 'Summary'
+                  expr: 'SUM(o.probability)'
+                  formatter: percent
+              statusLabel:
+                  label: orocrm.sales.opportunity.status.label
 ```
 
 **Notes:**
   -- _Column name should be equal as name of correspond column_
   -- **label** can be just a text or translation placeholder (***not required***)
-  -- **query** data aggregation SQL query (***not required***)
+  -- **expr** data aggregation SQL expression (***not required***)
   -- **formatter** backend formatter that will process the column value
-  -- -- available values: date, datetime, decimal, integer, percent
-  
+  -- available values: date, datetime, decimal, integer, percent
   -- if you add "label" and "query" config, but query aggregation returns nothing -> total's cell will be empty 
   -- generally they'll be shown as "`<label>: <query result>`"
+  -- total config can be taken from another total row with **extends** parameter.
+  -- **per_page** parameter switch data calculation only for current page data
+  -- if **hide_if_one_page** is true, then this total row will be hidden on full data set.

@@ -4,8 +4,9 @@ oro_menu_config:
             label: Job Queue
             route: oro_cron_job_index
             extras:
+                position:    60
                 description: 'Cron job queue'
-                routes: ['oro_cron_job_*']
+                routes:      ['oro_cron_job_*']
 
         oro_cron_job_shortcut:
             label: Jobs List

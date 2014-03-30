@@ -1,14 +1,15 @@
 /*jslint nomen: true, vars: true*/
 /*global define, requirejs*/
 
-define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
-    'text!oro/sidebar/widget-container/widget-max-template'
+define(['jquery', 'underscore', 'backbone', '../constants',
+    'text!./templates/widget-min-template.html',
+    'text!./templates/widget-max-template.html'
     ], function ($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     /**
-     * @export  oro/sidebar/widget-controller/view
-     * @class oro.sidebar.widget-controller.View
+     * @export  orosidebar/js/widget-container/view
+     * @class   orosidebar.widgetContainer.View
      * @extends Backbone.View
      */
     var WidgetView = Backbone.View.extend({
@@ -17,6 +18,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
 
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
+            'click .sidebar-widget-refresh': 'onClickRefresh',
             'click .sidebar-widget-settings': 'onClickSettings',
             'click .sidebar-widget-remove': 'onClickRemove',
             'click .sidebar-widget-close': 'onClickClose'
@@ -40,6 +42,11 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
 
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
+
+
+            if (view.model.get('cssClass')) {
+                view.$el.attr('class', view.model.get('cssClass'));
+            }
 
             if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
                 requirejs([model.get('module')], function (Widget) {
@@ -75,6 +82,13 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
 
             this.model.toggleState();
             this.model.save();
+        },
+
+        onClickRefresh: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            Backbone.trigger('refreshWidget', this.model.cid);
         },
 
         onClickSettings: function (e) {

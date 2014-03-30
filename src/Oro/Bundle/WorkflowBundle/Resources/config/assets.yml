@@ -1,3 +1,4 @@
 css:
-  'windows':
+  'oroworkflow':
+  'oroworkflow':
       - 'bundles/oroworkflow/css/workflow.css'

@@ -12,18 +12,11 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
-    oro_workflow.listener.subscriber.workflow_step:
-        class: %oro_workflow.listener.subscriber.workflow_step.class%
-        arguments:
-            - @doctrine
-            - @oro_workflow.entity_connector
-        tags:
-            - { name: doctrine.event_subscriber }
-
     oro_workflow.listener.subscriber.workflow_item:
         class: %oro_workflow.listener.subscriber.workflow_item.class%
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_workflow.entity_connector
+            - @oro_workflow.manager
         tags:
             - { name: doctrine.event_subscriber }

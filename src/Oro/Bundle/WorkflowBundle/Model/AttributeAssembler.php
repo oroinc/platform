@@ -10,6 +10,19 @@ use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 class AttributeAssembler extends AbstractAssembler
 {
     /**
+     * @var AttributeGuesser
+     */
+    protected $attributeGuesser;
+
+    /**
+     * @param AttributeGuesser $attributeGuesser
+     */
+    public function __construct(AttributeGuesser $attributeGuesser)
+    {
+        $this->attributeGuesser = $attributeGuesser;
+    }
+
+    /**
      * @param WorkflowDefinition $definition,
      * @param array $configuration
      * @return ArrayCollection
@@ -30,7 +43,7 @@ class AttributeAssembler extends AbstractAssembler
 
         $attributes = new ArrayCollection();
         foreach ($configuration as $name => $options) {
-            $attribute = $this->assembleAttribute($name, $options);
+            $attribute = $this->assembleAttribute($definition, $name, $options);
             $attributes->set($name, $attribute);
         }
 
@@ -38,12 +51,17 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param string $name
      * @param array $options
      * @return Attribute
      */
-    protected function assembleAttribute($name, array $options)
+    protected function assembleAttribute(WorkflowDefinition $definition, $name, array $options)
     {
+        if (!empty($options['property_path'])) {
+            $options = $this->guessOptions($options, $definition->getRelatedEntity(), $options['property_path']);
+        }
+
         $this->assertOptions($options, array('label', 'type'));
         $this->assertAttributeEntityAcl($options);
 
@@ -58,6 +76,39 @@ class AttributeAssembler extends AbstractAssembler
         $this->validateAttribute($attribute);
 
         return $attribute;
+    }
+
+    /**
+     * @param array $options
+     * @param string $rootClass
+     * @param string $propertyPath
+     * @return array
+     */
+    protected function guessOptions(array $options, $rootClass, $propertyPath)
+    {
+        $guessedOptions = array('label', 'type', 'options');
+        $needGuess = false;
+        foreach ($guessedOptions as $option) {
+            if (empty($options[$option])) {
+                $needGuess = true;
+                break;
+            }
+        }
+
+        if (!$needGuess) {
+            return $options;
+        }
+
+        $attributeParameters = $this->attributeGuesser->guessAttributeParameters($rootClass, $propertyPath);
+        if ($attributeParameters) {
+            foreach ($guessedOptions as $option) {
+                if (empty($options[$option]) && !empty($attributeParameters[$option])) {
+                    $options[$option] = $attributeParameters[$option];
+                }
+            }
+        }
+
+        return $options;
     }
 
     /**

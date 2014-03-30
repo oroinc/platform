@@ -3,7 +3,10 @@ placeholders:
         items:
             application_version:
                 order: 100
+            have_request: ~
 
 items:
     application_version:
         template: OroPlatformBundle::application_version.html.twig
+    have_request:
+        template: OroPlatformBundle::have_request.html.twig

@@ -1,0 +1,6 @@
+.segment-designer {
+    position: relative;
+}
+.form-horizontal .segment-descr textarea {
+    height: 54px;
+}

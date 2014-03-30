@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'oro/app', 'jquery-ui'
+define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/app', 'jquery-ui'
     ], function ($, routing, __, messenger, app) {
     'use strict';
 
@@ -15,7 +15,7 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'oro/app', 'jque
                 'with-entity-details': 1,
                 'deep-level': 1
             },
-            // supports 'oro/modal' confirmation dialog
+            // supports 'oroui/js/modal' confirmation dialog
             confirm: null,
             requireConfirm: function () { return true; }
         },

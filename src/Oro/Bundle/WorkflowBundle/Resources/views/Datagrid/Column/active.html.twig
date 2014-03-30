@@ -1,0 +1,6 @@
+{% set config = oro_entity_config(record.getValue('relatedEntity'), 'workflow') %}
+{% if (config.active_workflow|default('') == record.getValue('name')) %}
+    {{ 'Yes'|trans }}
+{% else %}
+    {{ 'No'|trans }}
+{% endif %}

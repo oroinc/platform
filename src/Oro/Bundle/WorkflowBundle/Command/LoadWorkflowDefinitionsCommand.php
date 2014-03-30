@@ -72,6 +72,9 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
             foreach ($workflowDefinitions as $workflowDefinition) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
 
+                // all loaded workflows set as system by default
+                $workflowDefinition->setSystem(true);
+
                 /** @var WorkflowDefinition $existingWorkflowDefinition */
                 $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
 

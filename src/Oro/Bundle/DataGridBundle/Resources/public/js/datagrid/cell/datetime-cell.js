@@ -1,18 +1,18 @@
-/* global define */
-define(['oro/datagrid/string-cell', 'oro/datagrid/datetime-formatter'],
-function(StringCell, DatagridDateTimeFormatter) {
+/*global define*/
+define(['./string-cell', '../formatter/datetime-formatter'
+    ], function (StringCell, DatagridDateTimeFormatter) {
     'use strict';
 
     /**
      * Datetime column cell
      *
-     * @export  oro/datagrid/datetime-cell
-     * @class   oro.datagrid.DateTimeCell
-     * @extends oro.datagrid.StringCell
+     * @export  orodatagrid/js/datagrid/cell/datetime-cell
+     * @class   orodatagrid.datagrid.cell.DateTimeCell
+     * @extends orodatagrid.datagrid.cell.StringCell
      */
     return StringCell.extend({
         /**
-         * @property {oro.datagrid.DateTimeFormatter}
+         * @property {orodatagrid.datagrid.formatter.DateTimeFormatter}
          */
         formatterPrototype: DatagridDateTimeFormatter,
 
@@ -20,6 +20,11 @@ function(StringCell, DatagridDateTimeFormatter) {
          * @property {string}
          */
         type: 'dateTime',
+
+        /**
+         * @property {string}
+         */
+        className: 'datetime-cell',
 
         /**
          * @inheritDoc
@@ -32,7 +37,7 @@ function(StringCell, DatagridDateTimeFormatter) {
         /**
          * Creates number cell formatter
          *
-         * @return {oro.datagrid.DateTimeFormatter}
+         * @return {orodatagrid.datagrid.formatter.DateTimeFormatter}
          */
         createFormatter: function() {
             return new this.formatterPrototype({type: this.type});

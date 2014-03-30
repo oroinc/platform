@@ -1,0 +1,15 @@
+{% macro renderFieldValue(fieldValue) %}
+    {% set type = null %}
+    {% if fieldValue.type is defined %}
+        {% set type = fieldValue.type %}
+    {% endif %}
+    {% if fieldValue.value is defined %}
+        {% set fieldValue = fieldValue.value %}
+    {% endif %}
+
+    {%- if fieldValue.timestamp is defined -%}
+        {{ type == 'date' ? fieldValue|oro_format_date : fieldValue|oro_format_datetime }}
+    {%- else -%}
+        {% if fieldValue is iterable %}{{ fieldValue|join(', ') }}{% else %}{{ fieldValue|default('') }}{% endif %}
+    {%- endif -%}
+{% endmacro %}

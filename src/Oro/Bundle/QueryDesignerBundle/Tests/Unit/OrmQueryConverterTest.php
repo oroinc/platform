@@ -19,7 +19,7 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         return $provider;
     }
 
-    protected function getDoctrine(array $config = [])
+    protected function getDoctrine(array $config = [], array $identifiersConfig = [])
     {
         $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -48,6 +48,11 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
             $metadata->expects($this->any())
                 ->method('getTypeOfField')
                 ->will($this->returnValueMap($typeMap));
+
+            if (!empty($identifiersConfig[$entity])) {
+                $metadata->expects($this->any())->method('getIdentifier')
+                    ->will($this->returnValue($identifiersConfig[$entity]));
+            }
             if (!empty($associationMap)) {
                 $metadata->expects($this->any())
                     ->method('getAssociationMapping')

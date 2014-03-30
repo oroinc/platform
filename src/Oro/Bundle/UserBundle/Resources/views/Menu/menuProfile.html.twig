@@ -4,7 +4,7 @@
             {% if isMobileVersion() %}
                 <i class="icon-user"></i>
             {% else %}
-                {{ app.user|oro_format_name }}
+                {{ app.user|oro_format_name|escape }}
                 <i class="icon-sort-down"></i>
             {% endif %}
         </a>

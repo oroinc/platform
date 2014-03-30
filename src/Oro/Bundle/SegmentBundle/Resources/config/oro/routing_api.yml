@@ -1,0 +1,3 @@
+oro_segment_api:
+    resource:     "@OroSegmentBundle/Controller/Api/Rest/SegmentController.php"
+    type:         rest

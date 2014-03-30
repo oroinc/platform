@@ -55,7 +55,7 @@ class Runner
      * @param PackageInterface $package
      * @return string
      */
-    public function install(PackageInterface $package)
+    public function runInstallScripts(PackageInterface $package)
     {
         return $this->run($this->getPackageScriptPath($package, 'install.php'));
     }
@@ -64,7 +64,7 @@ class Runner
      * @param PackageInterface $package
      * @return string
      */
-    public function uninstall(PackageInterface $package)
+    public function runUninstallScripts(PackageInterface $package)
     {
         return $this->run($this->getPackageScriptPath($package, 'uninstall.php'));
     }
@@ -74,7 +74,7 @@ class Runner
      * @param string $previousPackageVersion
      * @return string
      */
-    public function update(PackageInterface $updatedPackage, $previousPackageVersion)
+    public function runUpdateScripts(PackageInterface $updatedPackage, $previousPackageVersion)
     {
         $migrationScripts = $this->findMigrationScripts($updatedPackage, $previousPackageVersion);
         if (!$migrationScripts) {
@@ -118,12 +118,13 @@ class Runner
      * @return string
      * @throws ProcessFailedException
      */
-    public function updateDBSchema()
+    public function removeApplicationCache()
     {
-        return $this->runCommand('doctrine:schema:update --force');
+        return $this->runCommand('cache:clear --no-warmup');
     }
 
     /**
+     * Removes dependency container an bundles definitions from the main application cache.
      * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
      */
     public function removeCachedFiles()
@@ -144,26 +145,6 @@ class Runner
                 unlink($file->getPathname());
             }
         }
-    }
-
-    /**
-     * @param PackageInterface[] $packages
-     *
-     * @return string
-     */
-    public function loadFixtures(array $packages)
-    {
-        return $this->runCommand('oro:installer:fixtures:load');
-    }
-
-    /**
-     * @param PackageInterface[] $packages
-     *
-     * @return string
-     */
-    public function updateWorkflow(array $packages)
-    {
-        return $this->runCommand('oro:workflow:definitions:load');
     }
 
     /**

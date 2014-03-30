@@ -1,6 +1,6 @@
 /* jshint devel:true */
 /* global define */
-define(['backbone', 'underscore', 'routing', 'oro/translator', 'oro/navigation', 'oro/messenger'],
+define(['backbone', 'underscore', 'routing', 'orotranslation/js/translator', 'oronavigation/js/navigation', 'oroui/js/messenger'],
 function (Backbone, _, routing, __, Navigation, messenger) {
     var $ = Backbone.$;
 
@@ -137,6 +137,10 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             actionMediator.el.replaceWith($newButton);
 
             this.$el.val(JSON.stringify(config));
+
+            if (action == 'enable' || action == 'disable') {
+                this.$el.parents('form').submit();
+            }
         },
 
         /**

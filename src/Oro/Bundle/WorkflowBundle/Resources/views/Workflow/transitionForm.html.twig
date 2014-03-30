@@ -66,20 +66,25 @@
             'loadingMaskEnabled': false
         }) }}
         <script type="text/javascript">
-            require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor', 'oro/navigation'],
+            require(['jquery', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor',
+                    'oronavigation/js/navigation'],
             function($, widgetManager, performTransition, Navigation) {
                 var saveAndTransitBtn = $('#save-and-transit');
                 var navigation = Navigation.getInstance();
 
                 widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
                     if (Navigation.isEnabled()) {
-                        widget.once('beforeContentLoad', function() {
-                            navigation.beforeRequest();
+                        widget.on('beforeContentLoad', function() {
+                            navigation.showLoading();
                         });
                     }
 
-                    widget.once('formSave', function(data) {
+                    widget.on('formSave', function(data) {
                         performTransition(saveAndTransitBtn, data)
+                    });
+
+                    widget.on('formSaveError', function() {
+                        navigation.hideLoading();
                     });
                 });
 

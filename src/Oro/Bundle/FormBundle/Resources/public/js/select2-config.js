@@ -1,11 +1,11 @@
-/* global define */
-define(['jquery', 'underscore'],
-function($, _) {
+/*global define*/
+define(['jquery', 'underscore'
+    ], function ($, _) {
     'use strict';
 
     /**
-     * @export  oro/select2-config
-     * @class   oro.Select2Config
+     * @export  oroform/js/select2-config
+     * @class   oroform.Select2Config
      */
     var Select2Config = function (config, url, perPage, excluded) {
         this.config = config;
@@ -100,7 +100,7 @@ function($, _) {
                         return object.children ? str : self.highlightSelection(str, query);
                     };
                 if (object._html !== undefined) {
-                    result = object._html;
+                    result = _.escape(object._html);
                 } else if (jsTemplate) {
                     object = _.clone(object);
                     object.highlight = highlight;
@@ -109,17 +109,21 @@ function($, _) {
                     }
                     result = jsTemplate(object);
                 } else {
-                    result = highlight(self.getTitle(object, self.config.properties));
+                    result = highlight(_.escape(self.getTitle(object, self.config.properties)));
                 }
                 return result;
             };
         },
 
         initSelection: function(element, callback) {
+            var data = element.data('selected-data')
+                ? element.data('selected-data')
+                : [{'id': element.val(), 'text': element.val()}];
+
             if (this.config.multiple === true) {
-                callback(element.data('selected-data'));
+                callback(data);
             } else {
-                callback(element.data('selected-data').pop());
+                callback(data.pop());
             }
         },
 

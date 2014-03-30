@@ -21,11 +21,11 @@ class MaintenanceListener
 
     public function onModeOn()
     {
-        $this->publisher->send('oro/maintenance', array('isOn' => true, 'msg' => 'Maintenance mode is ON'));
+        $this->publisher->send('oro/maintenance', array('isOn' => true));
     }
 
     public function onModeOff()
     {
-        $this->publisher->send('oro/maintenance', array('isOn' => false, 'msg' => 'Maintenance mode is OFF'));
+        $this->publisher->send('oro/maintenance', array('isOn' => false));
     }
 }

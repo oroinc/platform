@@ -1,27 +1,27 @@
-/* global define */
-define(['underscore', 'oro/translator', 'oro/datagrid/abstract-action'],
-function(_, __, AbstractAction) {
+/*global define*/
+define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-action'
+    ], function ($, _, __, AbstractAction) {
     'use strict';
 
     /**
      * Allows to export grid data
      *
-     * @export  oro/datagrid/export-action
-     * @class   oro.datagrid.ExportAction
-     * @extends oro.datagrid.AbstractAction
+     * @export  orodatagrid/js/datagrid/action/export-action
+     * @class   orodatagrid.datagrid.action.ExportAction
+     * @extends orodatagrid.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
 
         /** @property oro.PageableCollection */
         collection: undefined,
 
-        /** @property {oro.datagrid.ActionLauncher} */
+        /** @property {orodatagrid.datagrid.ActionLauncher} */
         launcher: null,
 
         /**
          * {@inheritdoc}
          */
-        initialize: function(options) {
+        initialize: function (options) {
             this.launcherOptions = {
                 runAction: false
             };
@@ -37,7 +37,7 @@ function(_, __, AbstractAction) {
         /**
          * {@inheritdoc}
          */
-        createLauncher: function(options) {
+        createLauncher: function (options) {
             this.launcher = AbstractAction.prototype.createLauncher.apply(this, arguments);
             // update 'href' attribute for each export type
             this.listenTo(this.launcher, 'expand', _.bind(function (launcher) {

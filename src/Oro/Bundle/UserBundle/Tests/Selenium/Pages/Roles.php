@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Roles
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles openRoles() openRoles()
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles assertTitle() assertTitle($title, $message = '')
+ * @method Roles openRoles() openRoles(string)
+ * {@inheritdoc}
  */
 class Roles extends AbstractPageFilteredGrid
 {
@@ -24,7 +24,7 @@ class Roles extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXpath("//a[@title='Create role']")->click();
+        $this->test->byXpath("//a[@title='Create Role']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new Role($this->test);

@@ -6,12 +6,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 
 class OrmDatasource implements DatasourceInterface
 {
@@ -20,16 +23,26 @@ class OrmDatasource implements DatasourceInterface
     /** @var QueryBuilder */
     protected $qb;
 
+    /**
+     * @var array
+     */
+    protected $queryHints;
+
     /** @var EntityManager */
     protected $em;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    /** @var DatagridInterface */
+    protected $datagrid;
 
-    public function __construct(EntityManager $em, AclHelper $aclHelper)
-    {
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    public function __construct(
+        EntityManager $em,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->em = $em;
-        $this->aclHelper = $aclHelper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -37,6 +50,8 @@ class OrmDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
+        $this->datagrid = $grid;
+
         if (isset($config['query'])) {
             $queryConfig = array_intersect_key($config, array_flip(['query']));
             $converter = new YamlConverter();
@@ -68,6 +83,10 @@ class OrmDatasource implements DatasourceInterface
             throw new \Exception(get_class($this).' expects to be configured with query or repository method');
         }
 
+        if (isset($config['hints'])) {
+            $this->processQueryHints($config['hints']);
+        }
+
         $grid->setDatasource(clone $this);
     }
 
@@ -76,23 +95,25 @@ class OrmDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $results = $this->getResultQuery()->execute();
+        $query = $this->qb->getQuery();
+
+        $this->setQueryHints($query);
+
+        $event = new OrmResultBefore($this->datagrid, $query);
+        $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
+        $this->eventDispatcher->dispatch(OrmResultBefore::NAME . '.' . $this->datagrid->getName(), $event);
+
+        $results = $event->getQuery()->execute();
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
 
-        return $rows;
-    }
+        $event = new OrmResultAfter($this->datagrid, $rows);
+        $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
+        $this->eventDispatcher->dispatch(OrmResultAfter::NAME . '.' . $this->datagrid->getName(), $event);
 
-    /**
-     * Returns query is used to retrieve grid data
-     *
-     * @return Query
-     */
-    public function getResultQuery()
-    {
-        return $this->aclHelper->apply($this->qb->getQuery());
+        return $event->getRecords();
     }
 
     /**
@@ -117,5 +138,41 @@ class OrmDatasource implements DatasourceInterface
         $this->qb = $qb;
 
         return $this;
+    }
+
+    /**
+     * Parses 'hints' configuration and save it in $this->queryHints
+     *
+     * @param array $config
+     */
+    protected function processQueryHints(array $config)
+    {
+        if (!empty($config)) {
+            $this->queryHints = [];
+            foreach ($config as $hint) {
+                if (is_array($hint)) {
+                    $this->queryHints[$hint['name']] = isset($hint['value']) ? $hint['value'] : true;
+                } elseif (is_string($hint)) {
+                    $this->queryHints[$hint] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets hints for result query
+     *
+     * @param Query $query
+     */
+    protected function setQueryHints(Query $query)
+    {
+        if (!empty($this->queryHints)) {
+            foreach ($this->queryHints as $name => $value) {
+                if (defined("Doctrine\\ORM\\Query::$name")) {
+                    $name = constant("Doctrine\\ORM\\Query::$name");
+                }
+                $query->setHint($name, $value);
+            }
+        }
     }
 }

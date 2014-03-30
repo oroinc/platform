@@ -1,0 +1,9 @@
+{% if app.user %}
+    {% placeholder oro_reminder_reminder_templates %}
+    <script type="text/javascript">
+        require(['ororeminder/js/reminder-handler'], function(reminderHandler) {
+            reminderHandler.init({{ app.user.id }}, {{ check_ws() ? 'true' : 'false' }});
+        });
+    </script>
+{% endif %}
+

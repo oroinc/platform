@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\ORM\Query\AST\PathExpression;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -76,7 +77,7 @@ class OwnershipConditionDataBuilder
     /**
      * Get data for query acl access level check
      * Return null if entity has full access, empty array if user does't have access to the entity
-     *  and array with entity field and field values witch user have access.
+     *  and array with entity field and field values which user have access.
      *
      * @param $entityClassName
      * @param $permissions
@@ -309,7 +310,8 @@ class OwnershipConditionDataBuilder
         if (!empty($idOrIds)) {
             return array(
                 $this->getColumnName($metadata, $columnName),
-                $idOrIds
+                $idOrIds,
+                $columnName == null ? PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION : PathExpression::TYPE_STATE_FIELD
             );
         }
 

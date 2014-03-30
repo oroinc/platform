@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone'],
-function($, _, Backbone) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone'
+    ], function ($, _, Backbone) {
     'use strict';
 
     /**
@@ -9,8 +9,8 @@ function($, _, Backbone) {
      * Events:
      * click: Fired when launcher was clicked
      *
-     * @export  oro/datagrid/action-launcher
-     * @class   oro.datagrid.ActionLauncher
+     * @export  orodatagrid/js/datagrid/action-launcher
+     * @class   orodatagrid.datagrid.ActionLauncher
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -23,7 +23,7 @@ function($, _, Backbone) {
         /** @property {Boolean} */
         onClickReturnValue: true,
 
-        /** @property {oro.datagrid.AbstractAction} */
+        /** @property {orodatagrid.datagrid.action.AbstractAction} */
         action: undefined,
 
         /** @property {String} */
@@ -104,7 +104,7 @@ function($, _, Backbone) {
          * Initialize
          *
          * @param {Object} options
-         * @param {oro.datagrid.AbstractAction} options.action
+         * @param {orodatagrid.datagrid.action.AbstractAction} options.action
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]

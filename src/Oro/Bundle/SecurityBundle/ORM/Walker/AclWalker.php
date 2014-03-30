@@ -295,7 +295,7 @@ class AclWalker extends TreeWalkerAdapter
             $whereCondition->getEntityField()
         );
 
-        $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
+        $pathExpression->type = $whereCondition->getPathExpressionType();
 
         return $pathExpression;
     }

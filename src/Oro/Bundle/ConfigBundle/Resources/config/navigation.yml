@@ -3,6 +3,7 @@ oro_menu_config:
         system_configuration:
             label: 'Configuration'
             extras:
+                position:    10
                 description: 'System configuration'
             route: 'oro_config_configuration_system'
 

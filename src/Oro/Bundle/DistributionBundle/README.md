@@ -1,22 +1,7 @@
-Oro Distribution Bundle
-=======================
+OroDistributionBundle
+=====================
 
-## Installation ##
-Add the `oro/distribution-bundle` package to your `require` section in the `composer.json` file.
-
-``` yaml
-"require": {
-    [...]
-    "oro/distribution-bundle": "dev-master"
-},
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "git@github.com:laboro/DistributionBundle.git",
-        "branch": "master"
-    }
-]
-```
+Implements packages management and bundles load without necessity to update application files.
 
 ## Usage ##
 Add Resources/config/oro/bundles.yml file to every bundle you want to be autoregistered:

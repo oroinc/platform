@@ -9,7 +9,7 @@ class MetadataRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $metadataFactory;
+    protected $metadataBuilder;
 
     /**
      * @var MetadataRegistry
@@ -18,10 +18,10 @@ class MetadataRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->metadataFactory = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory')
+        $this->metadataBuilder = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->metadataRegistry = new MetadataRegistry($this->metadataFactory);
+        $this->metadataRegistry = new MetadataRegistry($this->metadataBuilder);
     }
 
     public function testGetEntityMetadata()
@@ -32,8 +32,8 @@ class MetadataRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->metadataFactory->expects($this->once())
-            ->method('createEntityMetadata')
+        $this->metadataBuilder->expects($this->once())
+            ->method('createEntityMetadataByClass')
             ->with($className)
             ->will($this->returnValue($expectedResult));
 

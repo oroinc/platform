@@ -54,14 +54,6 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 array('required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label')
             )
             ->will($this->returnSelf());
-        $builder->expects($this->at(4))
-            ->method('add')
-            ->with(
-                'reminder',
-                'checkbox',
-                array('required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label')
-            )
-            ->will($this->returnSelf());
 
         $this->type->buildForm($builder, array());
     }

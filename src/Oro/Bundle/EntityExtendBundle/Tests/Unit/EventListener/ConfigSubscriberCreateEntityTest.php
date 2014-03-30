@@ -54,11 +54,11 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $configManager);
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configSubscriber = new ConfigSubscriber($extendManager);
+        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $configSubscriber->updateEntityConfig($event);
 
         /** @var ConfigManager $cm */
@@ -128,11 +128,11 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $configManager);
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configSubscriber = new ConfigSubscriber($extendManager);
+        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $configSubscriber->updateEntityConfig($event);
 
         /** @var ConfigManager $cm */

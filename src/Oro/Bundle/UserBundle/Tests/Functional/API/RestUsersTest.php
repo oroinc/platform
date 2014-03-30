@@ -34,7 +34,7 @@ class RestUsersTest extends WebTestCase
                 "firstName"     => "firstName",
                 "lastName"      => "lastName",
                 "roles"         => array("3"),
-                "owner"         => "1",
+                "owner"         => "1"
             )
         );
         $this->client->request(

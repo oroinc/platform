@@ -4,10 +4,6 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroTagBundle:Form:fields.html.twig'] %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId
-    ? 'Update'|trans ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans
-    : 'New'|trans  ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans
-%}
 {% oro_title_set({params : { "%business_unit.name%": form.vars.value.name } }) %}
 {% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
 {% set gridName = 'bu-update-users-grid' %}
@@ -39,10 +35,11 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_business_unit_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
     {% if form.vars.value.id or resource_granted('oro_business_unit_update') %}
-        {{ UI.saveAndStayButton() }}
+        {% set html = html ~ UI.saveAndStayButton() %}
     {% endif %}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
@@ -50,12 +47,13 @@
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_business_unit_index'),
-            'indexLabel': 'oro.organization.businessunit.entity_plural_label',
+            'indexLabel': 'oro.organization.businessunit.entity_plural_label'|trans,
             'entityTitle': form.vars.value.name
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.organization.businessunit.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 

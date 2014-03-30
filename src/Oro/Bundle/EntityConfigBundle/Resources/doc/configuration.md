@@ -21,6 +21,7 @@ oro_entity_config:
                 label:                                              # A property code
                     options:                                        # A property options
                         priority:           20                      # The default sort order (will be used in grid and form if not specified)
+                        indexed:            true                    # If a property is displayed in a data grid it should be indexed
 
                     grid:                                           # Define how this property is displayed in a data grid (same as in DatagridManager)
                         type:               string
@@ -42,7 +43,7 @@ oro_entity_config:
                 auditable:
                     options:
                         priority:           60
-                        serializable:       true
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Auditable'

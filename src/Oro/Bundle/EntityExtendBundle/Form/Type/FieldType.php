@@ -8,26 +8,28 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FieldType extends AbstractType
 {
     protected $types = array(
-        'string'     => 'String',
-        'integer'    => 'Integer',
-        'smallint'   => 'SmallInt',
-        'bigint'     => 'BigInt',
-        'boolean'    => 'Boolean',
-        'decimal'    => 'Decimal',
-        'date'       => 'Date',
-        'text'       => 'Text',
-        'float'      => 'Float',
-        'oneToMany'  => 'Relation one to many',
-        'manyToOne'  => 'Relation many to one',
-        'manyToMany' => 'Relation many to many',
-        'optionSet'  => 'Option set'
+        'string'     => 'oro.entity_extend.form.data_type.string',
+        'integer'    => 'oro.entity_extend.form.data_type.integer',
+        'smallint'   => 'oro.entity_extend.form.data_type.smallint',
+        'bigint'     => 'oro.entity_extend.form.data_type.bigint',
+        'boolean'    => 'oro.entity_extend.form.data_type.boolean',
+        'decimal'    => 'oro.entity_extend.form.data_type.decimal',
+        'date'       => 'oro.entity_extend.form.data_type.date',
+        'text'       => 'oro.entity_extend.form.data_type.text',
+        'float'      => 'oro.entity_extend.form.data_type.float',
+        'money'      => 'oro.entity_extend.form.data_type.money',
+        'percent'    => 'oro.entity_extend.form.data_type.percent',
+        'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
+        'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
+        'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
+        'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     );
 
     /**
@@ -76,7 +78,7 @@ class FieldType extends AbstractType
 
                 if ($fieldId
                     && $extendProvider->hasConfigById($fieldId)
-                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendManager::STATE_DELETED)
+                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
                 ) {
                     continue;
                 }

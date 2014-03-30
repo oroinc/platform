@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -11,13 +12,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
+/**
+ * @Route("/workflow")
+ */
 class WorkflowController extends Controller
 {
     /**
      * @Route(
-     *      "/{workflowName}/start/{transitionName}",
+     *      "/start/{workflowName}/{transitionName}",
      *      name="oro_workflow_start_transition_form"
      * )
      * @Template("OroWorkflowBundle:Workflow:transitionForm.html.twig")
@@ -54,7 +59,7 @@ class WorkflowController extends Controller
 
     /**
      * @Route(
-     *      "/transit/{transitionName}/{workflowItemId}",
+     *      "/transit/{workflowItemId}/{transitionName}",
      *      name="oro_workflow_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})

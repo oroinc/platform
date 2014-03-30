@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
@@ -29,18 +32,26 @@ class WorkflowManager
     protected $doctrineHelper;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @param ManagerRegistry $registry
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
+     * @param ConfigManager $configManager
      */
     public function __construct(
         ManagerRegistry $registry,
         WorkflowRegistry $workflowRegistry,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager
     ) {
         $this->registry = $registry;
         $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -216,5 +227,65 @@ class WorkflowManager
         }
 
         throw new WorkflowException('Can\'t find workflow by given identifier.');
+    }
+
+    /**
+     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     */
+    public function activateWorkflow($workflowIdentifier)
+    {
+        if ($workflowIdentifier instanceof WorkflowDefinition) {
+            $entityClass = $workflowIdentifier->getRelatedEntity();
+            $workflowName = $workflowIdentifier->getName();
+        } else {
+            $workflow = $this->getWorkflow($workflowIdentifier);
+            $entityClass = $workflow->getDefinition()->getRelatedEntity();
+            $workflowName = $workflow->getName();
+        }
+
+        $this->setActiveWorkflow($entityClass, $workflowName);
+    }
+
+    /**
+     * @param string $entityClass
+     */
+    public function deactivateWorkflow($entityClass)
+    {
+        $this->setActiveWorkflow($entityClass, null);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string|null $workflowName
+     */
+    protected function setActiveWorkflow($entityClass, $workflowName)
+    {
+        $entityConfig = $this->getEntityConfig($entityClass);
+        $entityConfig->set('active_workflow', $workflowName);
+        $this->persistEntityConfig($entityConfig);
+    }
+
+    /**
+     * @param $entityClass
+     * @return ConfigInterface
+     * @throws WorkflowException
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        $workflowConfigProvider = $this->configManager->getProvider('workflow');
+        if (!$workflowConfigProvider->hasConfig($entityClass)) {
+            throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+        }
+
+        return $workflowConfigProvider->getConfig($entityClass);
+    }
+
+    /**
+     * @param ConfigInterface $entityConfig
+     */
+    protected function persistEntityConfig(ConfigInterface $entityConfig)
+    {
+        $this->configManager->persist($entityConfig);
+        $this->configManager->flush();
     }
 }

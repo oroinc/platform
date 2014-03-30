@@ -5,6 +5,8 @@ namespace Oro\Bundle\DataGridBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -13,7 +15,14 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_data_grid');
+        $rootNode    = $treeBuilder->root('oro_data_grid');
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'default_per_page' => ['value' => 25]
+            ]
+        );
 
         return $treeBuilder;
     }

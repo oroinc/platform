@@ -77,7 +77,7 @@ abstract class AbstractPageEntity extends AbstractPage
             $this->waitForAjax();
             $this->assertElementPresent(
                 "//div[@id='select2-drop']//div[contains(., '{$tag}')]",
-                "Tag's autocoplete doesn't return entity"
+                "Tag's autocomplete doesn't return entity"
             );
             $tagsPath->clear();
         } else {
@@ -109,7 +109,7 @@ abstract class AbstractPageEntity extends AbstractPage
             $this->waitForAjax();
             $this->assertElementPresent(
                 "//div[@id='select2-drop']//div[contains(., '{$tag}')]",
-                "Tag's autocoplete doesn't return entity"
+                "Tag's autocomplete doesn't return entity"
             );
             $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$tag}')]")->click();
 

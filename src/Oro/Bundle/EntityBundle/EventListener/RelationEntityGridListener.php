@@ -8,8 +8,6 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityGridListener extends CustomEntityGridListener
 {
@@ -51,7 +49,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
             }
 
             $parameters = [
-                'data_in' => $added,
+                'data_in'     => $added,
                 'data_not_in' => $removed
             ];
 
@@ -72,17 +70,14 @@ class RelationEntityGridListener extends CustomEntityGridListener
         // get field config, extendEntity, $added, $removed
         $extendEntityName = $this->getRequestParam('class_name');
         $extendEntityName = str_replace('_', '\\', $extendEntityName);
-        $fieldName = $this->getRequestParam('field_name');
-        $entityId = $this->getRequestParam('id');
+        $fieldName        = $this->getRequestParam('field_name');
+        $entityId         = $this->getRequestParam('id');
 
-        /** @var ConfigProvider $entityConfigProvider */
-        //$entityConfigProvider = $this->configManager->getProvider('entity');
+        /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
+        $fieldConfig          = $extendConfigProvider->getConfig($extendEntityName, $fieldName);
 
-        //$entityConfig = $entityConfigProvider->getConfig($extendEntityName);
-        $fieldConfig  = $extendConfigProvider->getConfig($extendEntityName, $fieldName);
-
-        $this->entityClass = $fieldConfig->get('target_entity');
+        $this->entityClass    = $fieldConfig->get('target_entity');
         $this->relationConfig = $fieldConfig;
 
         // set extendEntity
@@ -107,8 +102,9 @@ class RelationEntityGridListener extends CustomEntityGridListener
 
         $result = array_merge_recursive(
             $result,
-            ['source' => [
-                'query' => ['select' => [$this->getHasAssignedExpression() . ' as assigned']],
+            [
+                'source' => [
+                    'query' => ['select' => [$this->getHasAssignedExpression() . ' as assigned']],
                 ]
             ]
         );
@@ -119,7 +115,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
     /**
      * Get dynamic field or empty array if field is not visible
      *
-     * @param $alias
+     * @param                 $alias
      * @param ConfigInterface $extendConfig
      * @return array
      */
@@ -129,23 +125,20 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $fieldConfig = $extendConfig->getId();
         $fieldName   = $fieldConfig->getFieldName();
 
-        $field = [];
-        $select = ''; // no need to add to select enything here
+        $select = ''; // no need to add to select anything here
+        $field  = [];
 
-        if (in_array($fieldName, $this->relationConfig->get('target_grid'))) {
+        $isGridFieldName  = in_array($fieldName, $this->relationConfig->get('target_grid'));
+        $isTitleFieldName = in_array($fieldName, $this->relationConfig->get('target_title'));
+
+        if ($isGridFieldName || $isTitleFieldName) {
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
-            $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldName
-                : $fieldName;
-
-            $this->queryFields[] = $code;
-
-            $field = $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $label  = $entityConfig->get('label') ? : $fieldName;
+            $field  = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfig, $isGridFieldName);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];
@@ -159,28 +152,33 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $entityConfig = $this->configManager->getProvider('extend')->getConfig(
             $this->relationConfig->getId()->getClassName()
         );
-        $relations = $entityConfig->get('relation');
-        $relation  = $relations[$this->relationConfig->get('relation_key')];
+        $relations    = $entityConfig->get('relation');
+        $relation     = $relations[$this->relationConfig->get('relation_key')];
 
-        $fieldName = ExtendConfigDumper::FIELD_PREFIX . $relation['target_field_id']->getFieldName();
+        $fieldName = $relation['target_field_id']->getFieldName();
 
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';
 
-            $compOperator = $this->relationConfig->getId()->getFieldType() == 'oneToMany'
-                ? '='
-                : 'MEMBER OF';
+            // TODO: getting a field type from a model here is a temporary solution.
+            // We need to use $this->relationConfig->getId()->getFieldType()
+            $fieldType = $this->configManager->getConfigFieldModel(
+                $this->relationConfig->getId()->getClassName(),
+                $this->relationConfig->getId()->getFieldName()
+            )->getType();
+
+            $compOperator = $fieldType == 'oneToMany' ? '=' : 'MEMBER OF';
 
             if ($this->getRelation()->getId()) {
                 $this->hasAssignedExpression =
                     "CASE WHEN " .
                     "(:relation $compOperator $entityAlias.$fieldName OR $entityAlias.id IN (:data_in)) AND " .
-                    "$entityAlias.id NOT IN (:data_not_in) ".
+                    "$entityAlias.id NOT IN (:data_not_in) " .
                     "THEN true ELSE false END";
             } else {
                 $this->hasAssignedExpression =
                     "CASE WHEN " .
-                    "$entityAlias.id IN (:data_in) AND $entityAlias.id NOT IN (:data_not_in) ".
+                    "$entityAlias.id IN (:data_in) AND $entityAlias.id NOT IN (:data_not_in) " .
                     "THEN true ELSE false END";
             }
         }

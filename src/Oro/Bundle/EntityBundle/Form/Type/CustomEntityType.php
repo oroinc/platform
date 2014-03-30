@@ -8,10 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -20,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class CustomEntityType extends AbstractType
 {
@@ -31,6 +30,8 @@ class CustomEntityType extends AbstractType
      */
     protected $configManager;
 
+    // TODO: Replace manual mapping with form type guessing,
+    // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3351
     protected $typeMap = [
         'string'     => 'text',
         'integer'    => 'integer',
@@ -38,6 +39,8 @@ class CustomEntityType extends AbstractType
         'bigint'     => 'integer',
         'boolean'    => 'choice',
         'decimal'    => 'number',
+        'money'      => 'oro_money',
+        'percent'    => 'oro_percent',
         'date'       => 'oro_date',
         'datetime'   => 'oro_datetime',
         'text'       => 'textarea',
@@ -51,11 +54,13 @@ class CustomEntityType extends AbstractType
     /**
      * @param ConfigManager $configManager
      * @param Router $router
+     * @param Translator $translator
      */
-    public function __construct(ConfigManager $configManager, Router $router)
+    public function __construct(ConfigManager $configManager, Router $router, Translator $translator)
     {
         $this->configManager = $configManager;
         $this->router        = $router;
+        $this->translator    = $translator;
     }
 
     /**
@@ -83,8 +88,8 @@ class CustomEntityType extends AbstractType
             // TODO: Convert this check to method in separate helper service and reuse it in ExtendEntityExtension,
             // TODO: should be done in scope of https://magecore.atlassian.net/browse/BAP-1721
             if ($formConfig->get('is_enabled') && !$extendConfig->is('is_deleted')
-                && $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                && !$extendConfig->is('state', ExtendManager::STATE_NEW)
+                && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                && !$extendConfig->is('state', ExtendScope::STATE_NEW)
                 && !in_array($formConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
                 && !(
                     in_array($formConfig->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
@@ -206,8 +211,8 @@ class CustomEntityType extends AbstractType
 
             if ($formConfig->get('is_enabled')
                 && !$extendConfig->is('is_deleted')
-                && $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                && !$extendConfig->is('state', ExtendManager::STATE_NEW)
+                && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                && !$extendConfig->is('state', ExtendScope::STATE_NEW)
                 && !in_array($formConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
                 && (
                     in_array($formConfig->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
@@ -263,7 +268,7 @@ class CustomEntityType extends AbstractType
                     ->get('label');
 
                 $extraData[] = [
-                    'label' => $label,
+                    'label' => $this->translator->trans($label),
                     'value' => $entity->{Inflector::camelize('get_' . $fieldName)}()
                 ];
             }

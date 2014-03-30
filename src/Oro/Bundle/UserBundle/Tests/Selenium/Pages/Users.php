@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Users
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users openUsers() openUsers()
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users assertTitle() assertTitle($title, $message = '')
+ * @method Users openUsers() openUsers(string)
+ * {@inheritdoc}
  */
 class Users extends AbstractPageFilteredGrid
 {
@@ -27,7 +27,7 @@ class Users extends AbstractPageFilteredGrid
      */
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create user']")->click();
+        $this->test->byXPath("//a[@title='Create User']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $user = new User($this->test);

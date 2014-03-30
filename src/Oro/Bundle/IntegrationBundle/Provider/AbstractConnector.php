@@ -11,7 +11,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
-use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
 {

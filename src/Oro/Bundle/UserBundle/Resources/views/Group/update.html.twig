@@ -2,9 +2,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId
-    ? 'Update'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans
-    : 'New'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans %}
 {% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}
@@ -22,10 +19,11 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_user_group_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
     {% if form.vars.value.id or resource_granted('oro_user_group_update') %}
-        {{ UI.saveAndStayButton() }}
+        {% set html = html ~ UI.saveAndStayButton() %}
     {% endif %}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
@@ -38,7 +36,8 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.group.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 

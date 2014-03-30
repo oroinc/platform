@@ -39,20 +39,17 @@ class WorkflowAssembler extends AbstractAssembler
 
     /**
      * @param ContainerInterface $container
-     * @param WorkflowConfiguration $workflowConfiguration
      * @param AttributeAssembler $attributeAssembler
      * @param StepAssembler $stepAssembler
      * @param TransitionAssembler $transitionAssembler
      */
     public function __construct(
         ContainerInterface $container,
-        WorkflowConfiguration $workflowConfiguration,
         AttributeAssembler $attributeAssembler,
         StepAssembler $stepAssembler,
         TransitionAssembler $transitionAssembler
     ) {
         $this->container = $container;
-        $this->workflowConfiguration = $workflowConfiguration;
         $this->attributeAssembler = $attributeAssembler;
         $this->stepAssembler = $stepAssembler;
         $this->transitionAssembler = $transitionAssembler;
@@ -60,11 +57,12 @@ class WorkflowAssembler extends AbstractAssembler
 
     /**
      * @param WorkflowDefinition $definition
+     * @param bool $needValidation
      * @throws UnknownStepException
      * @throws AssemblerException
      * @return Workflow
      */
-    public function assemble(WorkflowDefinition $definition)
+    public function assemble(WorkflowDefinition $definition, $needValidation = true)
     {
         $configuration = $this->parseConfiguration($definition);
         $this->assertOptions(
@@ -83,7 +81,6 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow
             ->setName($definition->getName())
             ->setLabel($definition->getLabel())
-            ->setEnabled($definition->isEnabled())
             ->setDefinition($definition);
 
         $workflow->getStepManager()
@@ -94,7 +91,9 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow->getTransitionManager()
             ->setTransitions($transitions);
 
-        $this->validateWorkflow($workflow);
+        if ($needValidation) {
+            $this->validateWorkflow($workflow);
+        }
 
         return $workflow;
     }
@@ -120,15 +119,21 @@ class WorkflowAssembler extends AbstractAssembler
         }
     }
 
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
     protected function parseConfiguration(WorkflowDefinition $workflowDefinition)
     {
-        return $this->prepareDefaultStartTransition(
-            $workflowDefinition,
-            $this->workflowConfiguration->processConfiguration($workflowDefinition->getConfiguration())
-        );
+        return $this->prepareDefaultStartTransition($workflowDefinition, $workflowDefinition->getConfiguration());
     }
 
-    protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, $configuration)
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param array $configuration
+     * @return array
+     */
+    protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, array $configuration)
     {
         if ($workflowDefinition->getStartStep()
             && !array_key_exists(

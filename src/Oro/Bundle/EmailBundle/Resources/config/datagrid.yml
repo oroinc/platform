@@ -137,7 +137,7 @@ datagrid:
                 type:         navigate
                 label:        oro.email.datagrid.emailtemplate.action.clone
                 link:         clone_link
-                icon:         share
+                icon:         copy
                 acl_resource: oro_email_emailtemplate_create
             delete:
                 type:         delete

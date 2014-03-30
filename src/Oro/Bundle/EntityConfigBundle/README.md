@@ -1,5 +1,6 @@
-EntityConfigBundle
-==================
+OroEntityConfigBundle
+=====================
+
 - Allows to add metadata (configuration) to any entity class
 - Provides functionality to manage this metadata
 
@@ -77,6 +78,8 @@ oro_entity_config:
                                                                  # and actual value should be taken from translation table
                                                                  # or in twig via "|trans" filter
 
+                        indexed:            true                 # should be TRUE because this attribute is displayed in a data grid
+
                     grid:                                        # configure a data grid to display 'demo_attr' attribute
                         type:               string               # sets the attribute type
                         label:              'Demo Attr'          # sets the data grid column name
@@ -93,6 +96,26 @@ oro_entity_config:
 Now you may go to System > Entities. The 'Demo Attr' column should be displayed in the grid. Click Edit on any entity to go to edit entity form. 'Demo Attr' field should be displayed there.
 
 [Example of YAML config](Resources/doc/configuration.md)
+
+Indexed attributes
+------------------
+All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section. In this case you can mark an attribute as indexed. For example:
+``` yaml
+oro_entity_config:
+    acme:
+        entity:
+            items:
+                demo_attr:
+                    options:
+                        indexed: true
+```
+When you do this a copy of this attribute will be stored (and will be kept synchronized if a value is changed) in `oro_entity_config_index_value` table. As a result you can write SQL query like this:
+``` sql
+select *
+from oro_entity_config c
+    inner join oro_entity_config_index_value v on v.entity_id = c.id
+where v.scope = 'entity' and v.code = 'label' and v.value like '%test%'
+```
 
 Implementation
 --------------
@@ -115,6 +138,9 @@ $configProvider = $this->get('oro_entity_config.provider.extend');
 
 ### ConfigManager
 This class is the central access point to entity configuration functionality. It allows to load/save configuration data from/into the database, manage configuration data, manage configuration data cache, retrieve the configuration provider for particular scope, and other.
+
+### EntityConfigAwareRepositoryInterface
+If you need to use the entity configuration in your entity repository you can just implement `EntityConfigAwareRepositoryInterface` interface. This interface has only one method `setEntityConfigManager` which is called each time when you get a repository from a Doctrine entity manager.
 
 ### Events
  - Events::NEW_ENTITY_CONFIG    - This event is raised when a new configurable entity is found and we are going to add its metadata to the database.

@@ -22,4 +22,4 @@ services:
        arguments:
            - @oro_entity_merge.metadata.registry
        tags:
-           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.before, method: onBuildBefore }
+           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }

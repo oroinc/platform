@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -151,7 +152,12 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $dataClassName = $builder->getFormConfig()->getDataClass();
+        $formConfig = $builder->getFormConfig();
+        if (!$formConfig->getCompound()) {
+            return;
+        }
+
+        $dataClassName = $formConfig->getDataClass();
         if (!$dataClassName) {
             return;
         }
@@ -174,7 +180,9 @@ class OwnerFormExtension extends AbstractTypeExtension
             $defaultOwner = $user;
         } elseif ($metadata->isBusinessUnitOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
-            $defaultOwner = $this->getCurrentBusinessUnit();
+            if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
+                $defaultOwner = $this->getCurrentBusinessUnit();
+            }
         } elseif ($metadata->isOrganizationOwned()) {
             $this->addOrganizationOwnerField($builder, $user);
             $defaultOwner = $this->getCurrentOrganization();
@@ -316,7 +324,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param FormBuilderInterface|FormInterface  $builder
+     * @param FormBuilderInterface|FormInterface $builder
      * @param $dataClass
      * @param string $permission
      * @param array $data
@@ -329,12 +337,15 @@ class OwnerFormExtension extends AbstractTypeExtension
          * granted.
          */
         if ($this->isAssignGranted || $permission == 'ASSIGN') {
+            $formBuilder = $builder instanceof FormInterface ? $builder->getConfig() : $builder;
+            $isRequired = $formBuilder->getOption('required');
+
             $builder->add(
                 $this->fieldName,
                 'oro_user_acl_select',
                 array(
                     'required' => true,
-                    'constraints' => array(new NotBlank()),
+                    'constraints' => $isRequired ? array(new NotBlank()) : array(),
                     'autocomplete_alias' => 'acl_users',
                     'data' => $data,
                     'configs' => [
@@ -353,6 +364,22 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
+     * Check if current entity is BusinessUnit
+     *
+     * @param string $className
+     * @return bool
+     */
+    protected function checkIsBusinessUnitEntity($className)
+    {
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
+        if ($className != $businessUnitClass && !is_subclass_of($className, $businessUnitClass)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param User $user
      * @param string $className
@@ -362,31 +389,30 @@ class OwnerFormExtension extends AbstractTypeExtension
         /**
          * Owner field is required for all entities except business unit
          */
-        $businessUnitClass = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
-        if ($className != $businessUnitClass && !is_subclass_of($className, $businessUnitClass)) {
+        if (!$this->checkIsBusinessUnitEntity($className)) {
             $validation = array(
                 'constraints' => array(new NotBlank()),
                 'required' => true,
             );
+            $emptyValueLabel = 'oro.business_unit.form.choose_business_user';
         } else {
             $validation = array(
                 'required' => false
             );
-            $this->fieldLabel = 'Parent';
+            $emptyValueLabel = 'oro.business_unit.form.none_business_user';
+            $this->fieldLabel = 'oro.organization.businessunit.parent.label';
         }
 
         if ($this->isAssignGranted) {
             /**
              * If assign permission is granted, showing all available business units
              */
-            $businessUnits = $this->getTreeOptions($this->businessUnitManager->getBusinessUnitsTree());
             $builder->add(
                 $this->fieldName,
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value' => $this->translator->trans('oro.business_unit.form.choose_business_user'),
-                        'choices' => $businessUnits,
+                        'empty_value' => $this->translator->trans($emptyValueLabel),
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
@@ -435,7 +461,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         // if assign is granted then only allowed business units can be used
-        $allowedBusinessUnits = array_keys($this->getTreeOptions($this->businessUnitManager->getBusinessUnitsTree()));
+        $allowedBusinessUnits = $this->businessUnitManager->getBusinessUnitIds();
 
         /** @var BusinessUnit $businessUnit */
         foreach ($businessUnits as $businessUnit) {
@@ -508,27 +534,6 @@ class OwnerFormExtension extends AbstractTypeExtension
             $fieldOptions['choices'] = $organizations;
         }
         $builder->add($this->fieldName, 'entity', $fieldOptions);
-    }
-
-    /**
-     * Prepare choice options for a hierarchical select
-     *
-     * @param $options
-     * @param int $level
-     * @return array
-     */
-    protected function getTreeOptions($options, $level = 0)
-    {
-        $choices = array();
-        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
-        foreach ($options as $option) {
-            $choices += array($option['id'] => $blanks . $option['name']);
-            if (isset($option['children'])) {
-                $choices += $this->getTreeOptions($option['children'], $level + 1);
-            }
-        }
-
-        return $choices;
     }
 
     /**

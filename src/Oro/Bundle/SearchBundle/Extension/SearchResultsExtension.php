@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Extension;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -69,13 +70,16 @@ class SearchResultsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows       = $result->offsetGetByPath('[data]');
-        $rows       = array_map(
+        $rows = $result->offsetGetByPath('[data]');
+        $rows = is_array($rows) ? $rows : array();
+
+        $rows = array_map(
             function (ResultRecordInterface $record) {
                 return $record->getRootEntity();
             },
             $rows
         );
+
         $entities   = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
@@ -85,6 +89,8 @@ class SearchResultsExtension extends AbstractExtension
             $entityId   = $row->getRecordId();
             if (isset($entities[$entityName][$entityId])) {
                 $entity = $entities[$entityName][$entityId];
+            } else {
+                continue;
             }
 
             $item         = new ResultItem(
@@ -106,7 +112,7 @@ class SearchResultsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPriority()
     {

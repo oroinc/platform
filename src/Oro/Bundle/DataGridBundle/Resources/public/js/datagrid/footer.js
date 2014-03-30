@@ -1,13 +1,13 @@
-/* global define */
-define(['backbone', 'backgrid' ,'oro/datagrid/footer-row', 'oro/datagrid/footer-cell'],
-function (Backbone, Backgrid , FooterRow, FooterCell) {
+/*global define*/
+define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
+    ], function (Backbone, Backgrid, FooterRow, FooterCell) {
     "use strict";
 
     /**
      * Datagrid footer widget
      *
-     * @export  oro/datagrid/footer
-     * @class   oro.datagrid.Footer
+     * @export  orodatagrid/js/datagrid/footer
+     * @class   orodatagrid.datagrid.Footer
      * @extends Backgrid.Footer
      */
     return Backgrid.Footer.extend({
@@ -18,6 +18,9 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
         row: FooterRow,
 
         /** @property */
+        rows: [],
+
+        /** @property */
         footerCell: FooterCell,
 
         renderable: false,
@@ -26,6 +29,7 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
          * @inheritDoc
          */
         initialize: function (options) {
+            this.rows = [];
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
@@ -41,11 +45,15 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
             var state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
-                this.row = new this.row({
-                    columns: this.columns,
-                    collection: this.collection,
-                    footerCell: this.footerCell
-                });
+                _.each(state.totals, function (total, rowName) {
+                    this.rows[this.rows.length] = new this.row({
+                        columns: this.columns,
+                        collection: this.collection,
+                        footerCell: this.footerCell,
+                        rowName: rowName
+                    });
+                }, this);
+
             }
         },
 
@@ -54,7 +62,9 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
          */
         render: function () {
             if (this.renderable) {
-                this.$el.append(this.row.render().$el);
+                _.each(this.rows, function (row) {
+                    this.$el.append(row.render().$el);
+                }, this);
             }
             this.delegateEvents();
             return this;

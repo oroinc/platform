@@ -2,35 +2,53 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType;
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderType;
+use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
+use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 
 class CalendarEventApiTypeTest extends TypeTestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $registry;
+
     protected function getExtensions()
     {
-        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $meta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $meta           = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repo           = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $calendar = new Calendar();
+        $calendar       = new Calendar();
         ReflectionUtil::setId($calendar, 1);
 
-        $registry->expects($this->any())
+        $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with('OroCalendarBundle:Calendar')
             ->will($this->returnValue($em));
@@ -50,13 +68,9 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->with($calendar->getId())
             ->will($this->returnValue($calendar));
 
-        $childType = new EntityIdentifierType($registry);
-
         return array(
             new PreloadedExtension(
-                array(
-                    $childType->getName() => $childType,
-                ),
+                $this->loadTypes(),
                 array()
             )
         );
@@ -65,12 +79,12 @@ class CalendarEventApiTypeTest extends TypeTestCase
     public function testSubmitValidData()
     {
         $formData = array(
-            'calendar' => 1,
-            'title'    => 'testTitle',
-            'start'    => '2013-10-05T13:00:00Z',
-            'end'      => '2013-10-05T13:30:00+00:00',
-            'allDay'   => true,
-            'reminder' => true,
+            'calendar'  => 1,
+            'title'     => 'testTitle',
+            'start'     => '2013-10-05T13:00:00Z',
+            'end'       => '2013-10-05T13:30:00+00:00',
+            'allDay'    => true,
+            'reminders' => new ArrayCollection()
         );
 
         $type = new CalendarEventApiType(array());
@@ -89,7 +103,6 @@ class CalendarEventApiTypeTest extends TypeTestCase
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:00:00Z'), $result->getStart());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:30:00Z'), $result->getEnd());
         $this->assertTrue($result->getAllDay());
-        $this->assertTrue($result->getReminder());
 
         $view     = $form->createView();
         $children = $view->children;
@@ -120,5 +133,31 @@ class CalendarEventApiTypeTest extends TypeTestCase
     {
         $type = new CalendarEventApiType(array());
         $this->assertEquals('oro_calendar_event_api', $type->getName());
+    }
+
+    /**
+     * @return AbstractType[]
+     */
+    protected function loadTypes()
+    {
+        $types = [
+            new EntityIdentifierType($this->registry),
+            new ReminderCollectionType($this->registry),
+            new CollectionType($this->registry),
+            new ReminderType($this->registry),
+            new MethodType(new SendProcessorRegistry([])),
+            new ReminderIntervalType(),
+            new UnitType(),
+        ];
+
+        $keys = array_map(
+            function ($type) {
+                /* @var AbstractType $type */
+                return $type->getName();
+            },
+            $types
+        );
+
+        return array_combine($keys, $types);
     }
 }

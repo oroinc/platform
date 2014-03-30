@@ -6,6 +6,7 @@ oro_entity_config:
                     options:
                         create_only:        true
                         priority:           100
+                        indexed:            true
                     grid:
                         type:               select
                         label:              'Ownership Type'

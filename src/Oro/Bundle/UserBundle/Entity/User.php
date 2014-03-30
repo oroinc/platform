@@ -58,6 +58,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "form"={
+ *              "form_type"="oro_user_select"
  *          }
  *      }
  * )

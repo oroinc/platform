@@ -13,8 +13,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
@@ -48,9 +47,8 @@ class ExtendExtension extends AbstractExtension
 
         $entityProvider = $this->cm->getProvider('entity');
         $fields         = $this->getDynamicFields($entityName);
-        /** @var $field FieldConfigId */
         foreach ($fields as $field) {
-            $fieldName     = ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName();
+            $fieldName     = $field->getFieldName();
             $fieldConfig   = $entityProvider->getConfigById($field);
             $filterOptions = [];
             switch ($field->getFieldType()) {
@@ -71,6 +69,14 @@ class ExtendExtension extends AbstractExtension
                     break;
                 case 'date':
                     $type = $filterType = PropertyInterface::TYPE_DATE;
+                    break;
+                case 'money':
+                    $filterType = 'number';
+                    $type = PropertyInterface::TYPE_CURRENCY;
+                    break;
+                case 'percent':
+                    $filterType = 'percent';
+                    $type = PropertyInterface::TYPE_PERCENT;
                     break;
                 default:
                     $type = $filterType = PropertyInterface::TYPE_STRING;
@@ -93,9 +99,9 @@ class ExtendExtension extends AbstractExtension
             $config->offsetSetByPath(
                 sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
                 [
-                    FilterUtility::TYPE_KEY     => $filterType,
+                    FilterUtility::TYPE_KEY         => $filterType,
                     FilterUtility::DATA_NAME_KEY    => $fieldName,
-                    FilterUtility::ENABLED_KEY  => false,
+                    FilterUtility::ENABLED_KEY      => false,
                     FilterUtility::FORM_OPTIONS_KEY => $filterOptions
                 ]
             );
@@ -124,22 +130,32 @@ class ExtendExtension extends AbstractExtension
 
             if ($alias === false) {
                 // add entity if it not exists in from clause
-                $alias = ExtendConfigDumper::FIELD_PREFIX . 'o';
+                $alias = 'o';
                 $qb->from($entityName, $alias);
             }
 
             foreach ($fields as $field) {
-                $fn = ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName();
-                $qb->addSelect(sprintf('%s.%s', $alias, $fn));
+                $fieldName = $field->getFieldName();
+                $qb->addSelect(sprintf('%s.%s', $alias, $fieldName));
 
                 // set real "data name" for filters and sorters
                 $config->offsetSetByPath(
-                    sprintf('%s[%s][%s]', OrmSorterConfiguration::COLUMNS_PATH, $fn, PropertyInterface::DATA_NAME_KEY),
-                    sprintf('%s.%s', $alias, $fn)
+                    sprintf(
+                        '%s[%s][%s]',
+                        OrmSorterConfiguration::COLUMNS_PATH,
+                        $fieldName,
+                        PropertyInterface::DATA_NAME_KEY
+                    ),
+                    sprintf('%s.%s', $alias, $fieldName)
                 );
                 $config->offsetSetByPath(
-                    sprintf('%s[%s][%s]', FilterConfiguration::COLUMNS_PATH, $fn, FilterUtility::DATA_NAME_KEY),
-                    sprintf('%s.%s', $alias, $fn)
+                    sprintf(
+                        '%s[%s][%s]',
+                        FilterConfiguration::COLUMNS_PATH,
+                        $fieldName,
+                        FilterUtility::DATA_NAME_KEY
+                    ),
+                    sprintf('%s.%s', $alias, $fieldName)
                 );
             }
         }
@@ -158,7 +174,7 @@ class ExtendExtension extends AbstractExtension
      *
      * @param string $entityName
      *
-     * @return array
+     * @return FieldConfigId[]
      */
     protected function getDynamicFields($entityName)
     {
@@ -171,9 +187,9 @@ class ExtendExtension extends AbstractExtension
             $fieldIds = $entityProvider->getIds($entityName);
             foreach ($fieldIds as $fieldId) {
                 $extendConfig = $extendProvider->getConfigById($fieldId);
-                if ($extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
+                if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                     && $datagridProvider->getConfigById($fieldId)->is('is_visible')
-                    && !$extendConfig->is('state', ExtendManager::STATE_NEW)
+                    && !$extendConfig->is('state', ExtendScope::STATE_NEW)
                     && !$extendConfig->is('is_deleted')
                 ) {
                     $fields[] = $fieldId;

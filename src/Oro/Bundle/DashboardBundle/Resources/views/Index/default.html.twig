@@ -27,7 +27,7 @@
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 {% block title %}
-                <div class="span9">
+                <div class="pull-left pull-left-extra">
                     <div class="pull-left">
                         <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
                     </div>
@@ -47,7 +47,7 @@
                             </select>
                         </div>
                         <script type="text/javascript">
-                            require(['jquery', 'routing', 'oro/navigation'],
+                            require(['jquery', 'routing', 'oronavigation/js/navigation'],
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {

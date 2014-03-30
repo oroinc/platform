@@ -1,37 +1,7 @@
-Oro Platform Bundle
-===============
-Centralised BAP management.
+OroPlatformBundle
+=================
 
-## Installation ##
-Add the `oro/platform-bundle` package to your `require` section in the `composer.json` file.
-
-``` yaml
-"require": {
-    [...]
-    "oro/platform-bundle": "dev-master"
-},
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "git@github.com:laboro/PlatformBundle.git",
-        "branch": "master"
-    }
-]
-```
-
-Add the PlatformBundle to your application's kernel:
-
-``` php
-<?php
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Oro\Bundle\PlatformBundle\OroPlatformBundle(),
-        // ...
-    );
-    ...
-}
+The Oro Platform version holder and maintenance mode support.
 
 ## Maintenance mode ##
 To use maintenance mode functionality bundle provides `oro_platform.maintenance` service.

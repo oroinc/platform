@@ -15,6 +15,7 @@ parameters:
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
+    oro_integration.channels.datagrid_helper.class:                       Oro\Bundle\IntegrationBundle\Datagrid\DatagridHelper
 
 services:
     oro_integration.channel.manager.api:
@@ -54,8 +55,8 @@ services:
     oro_integration.job_executor:
         class: %oro_integration.job_executor.class%
         arguments:
-            - @oro_batch.connectors
-            - @oro_batch.job_repository
+            - @akeneo_batch.connectors
+            - @akeneo_batch.job_repository
             - @oro_importexport.context_registry
             - @doctrine
 
@@ -94,3 +95,6 @@ services:
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
+
+    oro_integration.channels.datagrid_helper:
+        class: %oro_integration.channels.datagrid_helper.class%

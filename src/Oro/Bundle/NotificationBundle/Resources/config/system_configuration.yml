@@ -1,0 +1,28 @@
+oro_system_configuration:
+    groups:
+        notifications:
+            icon:   icon-bullhorn
+            title:  'Notifications'
+        email_notifications_settings:
+            title:  'General contact'
+    fields:
+        oro_notification.email_notification_sender_email:
+            type: email
+            options:
+                label: 'Sender email'
+        oro_notification.email_notification_sender_name:
+            type: text
+            options:
+                label: 'Sender name'
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            notifications:
+                                children:
+                                    email_notifications_settings:
+                                        children:
+                                            - oro_notification.email_notification_sender_email
+                                            - oro_notification.email_notification_sender_name

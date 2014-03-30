@@ -105,12 +105,16 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @param FilterDatasourceAdapterInterface $ds
      * @param mixed                            $expression
+     * @param string                           $conditionType
      */
-    protected function applyFilterToClause(FilterDatasourceAdapterInterface $ds, $expression)
-    {
+    protected function applyFilterToClause(
+        FilterDatasourceAdapterInterface $ds,
+        $expression,
+        $conditionType = FilterUtility::CONDITION_AND
+    ) {
         $ds->addRestriction(
             $expression,
-            $this->getOr(FilterUtility::CONDITION_KEY, FilterUtility::CONDITION_AND),
+            $this->getOr(FilterUtility::CONDITION_KEY, $conditionType),
             $this->getOr(FilterUtility::BY_HAVING_KEY, false)
         );
     }

@@ -1,0 +1,10 @@
+parameters:
+    oro_reminder.event_listener.reminder_subscriber.class: Oro\Bundle\ReminderBundle\EventListener\ReminderSubscriber
+
+services:
+    oro_reminder.event_listener.reminder_subscriber:
+        class: %oro_reminder.event_listener.reminder_subscriber.class%
+        arguments:
+            - @service_container
+        tags:
+            - { name: doctrine.event_subscriber }

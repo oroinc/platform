@@ -62,7 +62,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->entityMetadata));
     }
 
-    public function testOnCreateMetadata()
+    public function testOnBuildMetadata()
     {
         $this->entityMetadata
             ->expects($this->once())
@@ -70,7 +70,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new EntityMetadataEvent($this->entityMetadata);
 
-        $this->listener->onCreateMetadata($event);
+        $this->listener->onBuildMetadata($event);
     }
 
     public function testOnCreateEntityData()
@@ -133,7 +133,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new EntityMetadataEvent($this->entityMetadata);
 
-        $this->listener->onCreateMetadata($event);
+        $this->listener->onBuildMetadata($event);
     }
 
     /**

@@ -24,11 +24,6 @@ class Workflow
     protected $name;
 
     /**
-     * @var boolean
-     */
-    protected $enabled = true;
-
-    /**
      * @var EntityConnector
      */
     protected $entityConnector;
@@ -87,28 +82,6 @@ class Workflow
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
-    }
-
-    /**
-     * Set enabled.
-     *
-     * @param boolean $enabled
-     * @return Workflow
-     */
-    public function setEnabled($enabled)
-    {
-        $this->enabled = (bool)$enabled;
-        return $this;
-    }
-
-    /**
-     * Is workflow enabled.
-     *
-     * @return boolean
-     */
-    public function isEnabled()
-    {
-        return $this->enabled;
     }
 
     /**
@@ -451,11 +424,11 @@ class Workflow
             $minStepIdx--;
             while ($minStepIdx > -1) {
                 $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
-                if ($step->getOrder() < $minStep->getOrder()) {
+                if ($step->getOrder() <= $minStep->getOrder() && $step->getName() != $minStep->getName()) {
                     $minStepIdx--;
                     $minStep = $step;
                     $steps[] = $step;
-                } elseif ($step->getName() === $minStep->getName()) {
+                } elseif ($step->getName() == $minStep->getName()) {
                     $minStepIdx--;
                 } else {
                     break;

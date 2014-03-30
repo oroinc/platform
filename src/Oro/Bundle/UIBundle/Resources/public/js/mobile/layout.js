@@ -4,8 +4,8 @@
 define(function (require) {
     'use strict';
     var $ = require('jquery'),
-        pageHeader = require('oro/mobile/page-header');
-    require('oro/mobile/side-menu');
+        pageHeader = require('oroui/js/mobile/page-header');
+    require('oroui/js/mobile/side-menu');
 
     /**
      * Instantiate sideMenu widget
@@ -29,7 +29,7 @@ define(function (require) {
     /**
      * Initializes mobile layout
      *
-     * @export oro/mobile/layout
+     * @export oroui/js/mobile/layout
      * @name oro.mobile.layout
      */
     return {

@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'backgrid'],
-function ($, _, Backbone, Backgrid) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'backgrid'
+    ], function ($, _, Backbone, Backgrid) {
     "use strict";
 
     /**
      * Datagrid footer cell
      *
-     * @export  oro/datagrid/footer
-     * @class   FooterCell
+     * @exports orodatagrid/js/datagrid/footer/footer-cell
+     * @class orodatagrid.datagrid.footer.FooterCell
      * @extends Backbone.View
      */
     return Backgrid.FooterCell = Backbone.View.extend({
@@ -15,7 +15,7 @@ function ($, _, Backbone, Backgrid) {
         tagName: "th",
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>' // wrap label into span otherwise underscore will not render it
         ),
 
@@ -44,15 +44,28 @@ function ($, _, Backbone, Backgrid) {
                 state      = this.collection.state || {},
                 totals     = state.totals || {};
 
-            if (_.has(totals, columnName)) {
-                var columnTotals = totals[columnName];
-                if (columnTotals.query && !columnTotals.total) {
+            if (_.isUndefined(totals[this.options.rowName])){
+                this.$el.hide();
+                return;
+            }
+            if (!_.isUndefined(totals[this.options.rowName]) && _.has(totals[this.options.rowName].columns, columnName)) {
+                this.$el.show();
+                var columnTotals = totals[this.options.rowName].columns[columnName];
+                if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }
                 this.$el.append($(this.template({
                     label: columnTotals.label,
                     total: columnTotals.total
                 })));
+            }
+
+            if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
+                this.$el.addClass(this.column.attributes.cell.prototype.className);
+            }
+
+            if (this.column.has('align')) {
+                this.$el.css('text-align', this.column.get('align'));
             }
 
             return this;

@@ -63,7 +63,7 @@ class TransactionEmail extends AbstractPageEntity
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@id='select2-drop']//div[contains(., '{$template}')]",
-            "Template autocoplete doesn't return search value"
+            "Template autocomplete doesn't return search value"
         );
         $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$template}')]")->click();
 
@@ -81,7 +81,7 @@ class TransactionEmail extends AbstractPageEntity
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@id='select2-drop']//div[contains(., '{$user}')]",
-            "Users autocoplete field doesn't return entity"
+            "Users autocomplete field doesn't return entity"
         );
         $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$user}')]")->click();
 

@@ -111,14 +111,12 @@ datagrid:
                 ownerName:
                     type: choice
                     data_name: ownerName
-                    filter_by_having: true
                     options:
                           field_options:
                               choices: @oro_organization.provider.business_units_grid->getOwnerChoices
                 organizationName:
                     type: choice
                     data_name: organizationName
-                    filter_by_having: true
                     options:
                           field_options:
                               choices: @oro_organization.provider.business_units_grid->getOrganizationChoices
@@ -127,7 +125,7 @@ datagrid:
                     data_name: u.createdAt
 
     bu-update-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         source:
             acl_resource: oro_business_unit_update
             query:
@@ -158,7 +156,6 @@ datagrid:
                 hasCurrentBusinessUnit:
                     type: boolean
                     data_name: hasCurrentBusinessUnit
-                    filter_by_having: true
                 firstName:
                     type: string
                     data_name: u.firstName
@@ -182,7 +179,7 @@ datagrid:
         options:
             entityHint: user
             requireJSModules:
-              - oro/datagrid/column-form-listener
+              - orodatagrid/js/datagrid/listener/column-form-listener
             columnListener:
                 dataField: id
                 columnName: hasCurrentBusinessUnit
@@ -191,7 +188,7 @@ datagrid:
                     excluded: '#businessUnitRemoveUsers'
 
     bu-view-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         options:
             entityHint: user
         source:

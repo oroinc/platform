@@ -1,6 +1,6 @@
 {% if check_ws() %}
 <script type="text/javascript">
-    require(['jquery', 'oro/sync', 'oro/sync/wamp'],
+    require(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp'],
     function($, sync, Wamp){
         $(document).on('click.action.data-api', '[data-action=sync-connect]', function (e) {
             sync.reconnect();
@@ -10,7 +10,9 @@
 
         sync(new Wamp({
             host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
-            port: {{ ws.port }}
+            port: {{ ws.port }},
+            maxRetries: 3,
+            retryDelay: 30000
         }));
 
         /*mediator.on('datagrid_collection_set_after', function(obj) {

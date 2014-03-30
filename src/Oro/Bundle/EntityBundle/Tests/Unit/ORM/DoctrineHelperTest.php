@@ -145,10 +145,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'expected' => self::TEST_IDENTIFIER,
                 'actual' => array('id' => self::TEST_IDENTIFIER),
             ),
-            'empty identifier, no exception' => array(
+            'empty identifier' => array(
                 'expected' => null,
-                'actual' => array('first_id' => 1, 'second_id'),
-                'exception' => false,
+                'actual' => array(),
             ),
             'multiple identifier, no exception' => array(
                 'expected' => null,
@@ -164,9 +163,6 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     public function getSingleEntityIdentifierIncorrectIdentifierDataProvider()
     {
         return array(
-            'empty identifier' => array(
-                'identifier' => array(),
-            ),
             'multiple identifier' => array(
                 'identifier' => array('key1' => 'value1', 'key2' => 'value2'),
             ),

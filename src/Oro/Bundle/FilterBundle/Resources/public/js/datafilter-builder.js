@@ -1,9 +1,9 @@
 /*jshint browser:true*/
 /*jslint nomen: true*/
 /*global define, require*/
-define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'orofilter/js/map-filter-module-name',
-    'oro/datafilter/collection-filters-manager'],
-function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
+        './map-filter-module-name', './collection-filters-manager'
+    ], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var initialized = false,
@@ -32,6 +32,7 @@ function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
                 var filtersList = new FiltersManager(options);
                 this.$el.prepend(filtersList.render().$el);
                 mediator.trigger('datagrid_filters:rendered', this.collection);
+                this.metadata.state.filters = this.metadata.state.filters || [];
                 if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                     filtersList.$el.hide();
                 }

@@ -2,137 +2,59 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {
-    /**
-     * DateTime object as string format
-     */
+    /** DateTime object as string format */
     const DATETIME_FORMAT = 'Y-m-d';
+
+    /** @var DateFilterUtility */
+    protected $dateFilterUtility;
+
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        DateFilterUtility $dateFilterUtility
+    ) {
+        parent::__construct($factory, $util);
+        $this->dateFilterUtility = $dateFilterUtility;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $data = $this->parseData($data);
+        $data = $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data);
         if (!$data) {
             return false;
         }
 
-        /** @var $dateStartValue \DateTime */
         $dateStartValue = $data['date_start'];
-        /** @var $dateEndValue \DateTime */
-        $dateEndValue = $data['date_end'];
-        $type         = $data['type'];
+        $dateEndValue   = $data['date_end'];
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
 
         $this->applyDependingOnType(
-            $type,
+            $data['type'],
             $ds,
             $dateStartValue,
             $dateEndValue,
             $startDateParameterName,
             $endDateParameterName,
-            $this->get(FilterUtility::DATA_NAME_KEY)
+            $data['field']
         );
 
-        if ($dateStartValue) {
+        if (null !== $dateStartValue) {
             $ds->setParameter($startDateParameterName, $dateStartValue);
         }
-        if ($dateEndValue) {
+        if (null !== $dateEndValue) {
             $ds->setParameter($endDateParameterName, $dateEndValue);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param mixed $data
-     *
-     * @return array|bool
-     */
-    public function parseData($data)
-    {
-        if (!$this->isValidData($data)) {
-            return false;
-        }
-
-        if (isset($data['value']['start'])) {
-            /** @var \DateTime $startDate */
-            $startDate = $data['value']['start'];
-            $startDate->setTimezone(new \DateTimeZone('UTC'));
-            $data['value']['start'] = $startDate->format(static::DATETIME_FORMAT);
-        } else {
-            $data['value']['start'] = null;
-        }
-
-        if (isset($data['value']['end'])) {
-            /** @var \DateTime $endDate */
-            $endDate = $data['value']['end'];
-            $endDate->setTimezone(new \DateTimeZone('UTC'));
-            $data['value']['end'] = $endDate->format(static::DATETIME_FORMAT);
-        } else {
-            $data['value']['end'] = null;
-        }
-
-        if (!isset($data['type'])) {
-            $data['type'] = null;
-        }
-
-        if (!in_array(
-            $data['type'],
-            array(
-                DateRangeFilterType::TYPE_BETWEEN,
-                DateRangeFilterType::TYPE_NOT_BETWEEN,
-                DateRangeFilterType::TYPE_MORE_THAN,
-                DateRangeFilterType::TYPE_LESS_THAN
-            )
-        )
-        ) {
-            $data['type'] = DateRangeFilterType::TYPE_BETWEEN;
-        }
-
-        if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
-            $data['value']['end'] = null;
-        } elseif ($data['type'] == DateRangeFilterType::TYPE_LESS_THAN) {
-            $data['value']['start'] = null;
-        }
-
-        return array(
-            'date_start' => $data['value']['start'],
-            'date_end'   => $data['value']['end'],
-            'type'       => $data['type']
-        );
-    }
-
-    /**
-     * @param $data
-     *
-     * @return bool
-     */
-    protected function isValidData($data)
-    {
-        if (!is_array($data) || !array_key_exists('value', $data) || !is_array($data['value'])) {
-            return false;
-        }
-
-        if (!isset($data['value']['start']) && !isset($data['value']['end'])) {
-            return false;
-        }
-
-        // check start date
-        if (isset($data['value']['start']) && !$data['value']['start'] instanceof \DateTime) {
-            return false;
-        }
-
-        // check end date
-        if (isset($data['value']['end']) && !$data['value']['end'] instanceof \DateTime) {
-            return false;
         }
 
         return true;
@@ -146,7 +68,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      * @param string                           $dateEndValue
      * @param string                           $startDateParameterName
      * @param string                           $endDateParameterName
-     * @param string                           $fieldName ,
+     * @param string                           $fieldName
      */
     protected function applyFilterBetween(
         $ds,
@@ -156,17 +78,26 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
-        if ($dateStartValue) {
+        // check if date part applied and start date greater than end
+        if ($dateStartValue > $dateEndValue && strpos($fieldName, '(') !== false) {
+            $conditionType = FilterUtility::CONDITION_OR;
+        } else {
+            $conditionType = FilterUtility::CONDITION_AND;
+        }
+
+        if (null !== $dateStartValue) {
             $this->applyFilterToClause(
                 $ds,
-                $ds->expr()->gte($fieldName, $startDateParameterName, true)
+                $ds->expr()->gte($fieldName, $startDateParameterName, true),
+                $conditionType
             );
         }
 
-        if ($dateEndValue) {
+        if (null !== $dateEndValue) {
             $this->applyFilterToClause(
                 $ds,
-                $ds->expr()->lte($fieldName, $endDateParameterName, true)
+                $ds->expr()->lte($fieldName, $endDateParameterName, true),
+                $conditionType
             );
         }
     }
@@ -187,7 +118,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         $fieldName,
         $isLess
     ) {
-        if ($dateValue) {
+        if (null !== $dateValue) {
             $expr = $isLess
                 ? $ds->expr()->lt($fieldName, $dateParameterName, true)
                 : $ds->expr()->gt($fieldName, $dateParameterName, true);
@@ -213,10 +144,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
-        if ($dateStartValue || $dateEndValue) {
+        if (null !== $dateStartValue || null !== $dateEndValue) {
             $expr = null;
-            if ($dateStartValue) {
-                if ($dateEndValue) {
+            if (null !== $dateStartValue) {
+                if (null !== $dateEndValue) {
                     $expr = $ds->expr()->orX(
                         $ds->expr()->lt($fieldName, $startDateParameterName, true),
                         $ds->expr()->gt($fieldName, $endDateParameterName, true)
@@ -304,7 +235,11 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         $metadata                          = parent::getMetadata();
         $metadata['typeValues']            = $formView->vars['type_values'];
-        $metadata['externalWidgetOptions'] = $formView->vars['widget_options'];
+        $metadata['dateParts']             = $formView->vars['date_parts'];
+        $metadata['externalWidgetOptions'] = array_merge(
+            $formView->vars['widget_options'],
+            ['dateVars' => $formView->vars['date_vars']]
+        );
 
         return $metadata;
     }

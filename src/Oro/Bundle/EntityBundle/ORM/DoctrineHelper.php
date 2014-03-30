@@ -51,12 +51,12 @@ class DoctrineHelper
         $entityIdentifier = $this->getEntityIdentifier($entity);
 
         $result = null;
-        if (count($entityIdentifier) != 1) {
+        if (count($entityIdentifier) > 1) {
             if ($triggerException) {
                 throw new Exception\InvalidEntityException('Can\'t get single identifier for the entity');
             }
         } else {
-            $result = current($entityIdentifier);
+            $result = $entityIdentifier ? current($entityIdentifier) : null;
         }
 
         return $result;
