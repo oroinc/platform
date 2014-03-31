@@ -345,9 +345,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
-                if (_.isString(options.date)) {
-                    options.date = $.fullCalendar.parseISO8601(options.date, true);
-                }
+                options.date = dateTimeFormatter.applyTimeZoneCorrection(options.date);
                 options.year = options.date.getFullYear();
                 options.month = options.date.getMonth();
                 options.date = options.date.getDate();

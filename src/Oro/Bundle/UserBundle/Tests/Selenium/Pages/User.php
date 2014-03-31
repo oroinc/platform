@@ -292,7 +292,7 @@ class User extends AbstractPageEntity
         $this->test->byXpath("//ul[@class='dropdown-menu']//a[contains(normalize-space(.), 'My User')]")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[label[normalize-space(text()) = 'Username']]//div/p[normalize-space(text()) = '$userName']"
+            "//div[label[normalize-space(text()) = 'Username']]//div/div[normalize-space(text()) = '$userName']"
         );
         return $this;
     }

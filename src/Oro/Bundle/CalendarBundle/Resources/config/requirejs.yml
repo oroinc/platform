@@ -1,9 +1,4 @@
 config:
-    shim:
-        'jquery.fullcalendar':
-            deps:
-                - 'jquery'
-                - 'jquery-ui'
     paths:
         'jquery.fullcalendar': 'bundles/orocalendar/lib/fullcalendar/fullcalendar.js'
         'orocalendar/js/calendar': 'bundles/orocalendar/js/calendar.js'
