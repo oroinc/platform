@@ -89,7 +89,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                         'extends' => 'wrong_total_row',
                         'columns' => [
                             'name' => [
-                                'label' => 'Page Totals'
+                                'label' => 'Page Total'
                             ]
                         ]
                     ]
@@ -134,13 +134,13 @@ class OrmTotalsExtensionTest extends OrmTestCase
                         'per_page' => true,
                         'hide_if_one_page' => true,
                         'columns' => [
-                            'name' => ['label' => 'Page Totals']
+                            'name' => ['label' => 'Page Total']
                         ]
                     ],
                     'grand_total' =>[
                         'columns' => [
                             'id' => ['expr' => 'COUNT(a.id)'],
-                            'name' => ['label' => 'Grand Totals'],
+                            'name' => ['label' => 'Grand Total'],
                             'wonCount' => ['expr' => 'SUM(a.won)']
                         ]
                     ]

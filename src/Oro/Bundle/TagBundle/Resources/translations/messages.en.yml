@@ -4,7 +4,7 @@ oro:
             tag.saved.message: "Tag saved"
         form:
             choose_tag: "Choose a tag"
-            choose_or_create_tag: "Choose or create a tag"
+            choose_or_create_tag: "Select an existing tag or create new"
         datagrid:
             usage_count: Usage Count
 

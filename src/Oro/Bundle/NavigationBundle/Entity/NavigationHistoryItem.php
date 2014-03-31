@@ -45,7 +45,7 @@ class NavigationHistoryItem implements NavigationItemInterface
     /**
      * @var string $title
      *
-     * @ORM\Column(name="title", type="string")
+     * @ORM\Column(name="title", type="text")
      */
     protected $title;
 
