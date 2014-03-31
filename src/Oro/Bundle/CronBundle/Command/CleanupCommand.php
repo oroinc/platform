@@ -81,10 +81,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             $con->executeUpdate(
                 sprintf(
                     "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s)",
-                    $sql,
                     $sql
                 ),
-                array_merge($bindParams, $bindParams)
+                $bindParams
             );
 
             $qb = $em->createQueryBuilder();
