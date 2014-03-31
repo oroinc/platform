@@ -107,7 +107,7 @@ oro:
         entity_description:  Represent user profile
         id.label:          Id
         username.label:    Username
-        email.label:       Email
+        email.label:       Primary Email
         name_prefix.label: Name prefix
         first_name.label:  First name
         middle_name.label: Middle name
@@ -161,5 +161,5 @@ oro:
             label.label:  Label
             owner.label:  Owner
         invite:
-            label: Invite User by e-mail
-            tooltip: If selected an invitation email will be sent to the user with his user name and password
+            label: Send an Email Invitation
+            tooltip: When this option is selected, an invitation email

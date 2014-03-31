@@ -24,7 +24,7 @@ datagrid:
         grand_total:          
             columns:
               name:
-                  label: 'grand totals'
+                  label: 'grand total'
               contactName:
                   expr: 'COUNT(o.name)'
                   formatter: integer
