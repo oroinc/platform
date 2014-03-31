@@ -13,7 +13,7 @@ class DateEarlierThan extends Constraint
     public $message = 'This field can not be earlier than {{ field }} field';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -21,7 +21,7 @@ class DateEarlierThan extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {

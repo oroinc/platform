@@ -87,6 +87,8 @@ function($, _, __, app) {
          * Removes all field level errors.
          *
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
+         * @var fakeTarget {jQuery} The jQuery object for a form field, which duplicate the real hidden field.
+         *                          For example - jQuery DateTimePicker plugin
          */
         removeFieldErrors: function (field) {
             var targets = [_.isString(field) ? $(field) : field];
@@ -112,6 +114,8 @@ function($, _, __, app) {
          *
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          * @param errorMessages {string[]|string} The localized error string(s).
+         * @var fakeTarget {jQuery} The jQuery object for a form field, which duplicate the real hidden field.
+         *                          For example - jQuery DateTimePicker plugin
          */
         addFieldErrors: function (field, errorMessages) {
             var targets = [_.isString(field) ? $(field) : field];

@@ -9,9 +9,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class DateEarlierThanValidator extends ConstraintValidator
 {
 
+    /**
+     * @param \DateTime $value
+     * @param Constraint| DateEarlierThan $constraint
+     * @throws UnexpectedTypeException
+     */
     public function validate($value, Constraint $constraint)
     {
-        /** @var DateEarlierThan $constraint */
         if (!$value instanceof \DateTime) {
             throw new UnexpectedTypeException($value, 'DateTime');
         }
