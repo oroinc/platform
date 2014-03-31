@@ -101,9 +101,9 @@ class MenuExtension extends \Twig_Extension
             }
 
             $menu = $this->getMenu($menu, $path, $options);
-            $menu = $this->filterUnallowedItems($menu);
         }
 
+        $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
         if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
@@ -124,7 +124,7 @@ class MenuExtension extends \Twig_Extension
         /** @var ItemInterface $item */
         foreach ($menu as &$item) {
             if ($item->hasChildren()) {
-                $filteredChildren = $this->filterUnallowedItems($item->getChildren());
+                $filteredChildren = $this->filterUnallowedItems($item);
                 $invisibleChildrenCount = 0;
                 /** @var ItemInterface $child */
                 foreach ($filteredChildren as $child) {
@@ -133,7 +133,9 @@ class MenuExtension extends \Twig_Extension
                     }
                 }
 
-                if (count($filteredChildren) == $invisibleChildrenCount) {
+                if (count($filteredChildren) == $invisibleChildrenCount
+                    && (!$item->getUri() || $item->getUri() == '#')
+                ) {
                     $item->setExtra('isAllowed', false);
                 }
             }
