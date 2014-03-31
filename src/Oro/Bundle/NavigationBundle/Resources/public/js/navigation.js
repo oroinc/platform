@@ -54,7 +54,7 @@ define(function (require) {
     /**
      * Router for hash navigation
      *
-     * @export  oronavigation/js/navigation
+     * @_export  oronavigation/js/navigation
      * @class   oronavigation
      * @extends Backbone.Router
      */
