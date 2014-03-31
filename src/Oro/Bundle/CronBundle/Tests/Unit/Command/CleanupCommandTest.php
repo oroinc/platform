@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -85,39 +85,80 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testExecution()
     {
-        $em = $this->getTestEntityManager();
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\CronBundle\Tests\Unit\Stub'
-        );
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('doctrine.orm.entity_manager')
+            ->will($this->returnValue($this->emMock));
 
-        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $em->getConfiguration()->setEntityNamespaces(
-            [
-                'JMSJobQueueBundle' => 'Oro\Bundle\CronBundle\Tests\Unit\Stub'
-            ]
-        );
+        $qbMock = $this->getQueryBuilderMock();
+        $this->emMock->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qbMock));
 
-        $statement = $this->createFetchStatementMock([['id' => 1]]);
-        $this->getDriverConnectionMock($em)->expects($this->any())
-            ->method('prepare')
-            ->will(
-                $this->returnCallback(
-                    function ($prepareString) use (&$statement) {
-                        return $statement;
-                    }
-                )
-            );
+        $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+
+        $jobs = [
+            new Job('test'),
+            new Job('test-deps'),
+        ];
+
+        $queryMock->expects($this->once())->method('getResult')
+            ->will($this->returnValue($jobs));
+
+        $qbMock->expects($this->once())
+            ->method('select')
+            ->with('j')
+            ->will($this->returnSelf());
+
+        $qbMock->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($queryMock));
+
+
+        $countQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['setParameter', 'getSingleScalarResult'])
+            ->getMockForAbstractClass();
+
+        $countQuery->expects($this->at(0))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $countQuery->expects($this->at(1))
+            ->method('getSingleScalarResult')
+            ->will($this->returnValue(0));
+        $countQuery->expects($this->at(2))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $countQuery->expects($this->at(3))
+            ->method('getSingleScalarResult')
+            ->will($this->returnValue(1));
+
+        $this->emMock->expects($this->exactly(2))
+            ->method('createQuery')
+            ->will($this->returnValue($countQuery));
+
+        $this->emMock->expects($this->once())
+            ->method('remove');
+
+        $this->emMock->expects($this->once())
+            ->method('flush');
+
+        $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(['executeUpdate'])
+            ->getMock();
+        $conn->expects($this->exactly(2))
+            ->method('executeUpdate');
+        $this->emMock->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($conn));
 
         $params    = [];
         $input     = new ArrayInput($params, $this->command->getDefinition());
         $output    = new MemoryOutput();
-
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('doctrine.orm.entity_manager')
-            ->will($this->returnValue($em));
 
         $this->command->execute($input, $output);
     }
