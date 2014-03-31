@@ -60,32 +60,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $message = 'Will be removed %d rows';
         } else {
-            $query = $this->applyCriteria($qb->select('j.id'))
-                ->getQuery();
-            $sql = $query->getSQL();
-
-            $params = $query->getParameters()->toArray();
-            $bindParams = [];
-
-            /** @var Parameter $param */
-            foreach ($params as $param) {
-                $bindParams[] = $param->getValue();
-            }
-
-            $con = $em->getConnection();
-            $con->executeUpdate(
-                sprintf("DELETE FROM jms_job_statistics WHERE job_id IN (%s)", $sql),
-                $bindParams
-            );
-
-            $con->executeUpdate(
-                sprintf(
-                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s)",
-                    $sql
-                ),
-                $bindParams
-            );
-
             $qb = $em->createQueryBuilder();
             $query = $this->applyCriteria($qb->select('j'))
                 ->getQuery();
@@ -95,6 +69,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 ->getResult();
 
             $result = 0;
+            $jobIds = [];
             foreach ($jobs as $job) {
                 /** @var Job $job */
 
@@ -108,12 +83,24 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                     continue;
                 }
 
+                $jobIds[] = $job->getId();
                 $em->remove($job);
                 $result++;
             }
 
             if ($result > 0) {
                 $em->flush();
+
+                $con = $em->getConnection();
+                $con->executeUpdate(
+                    "DELETE FROM jms_job_statistics WHERE job_id IN (:ids)",
+                    ['ids' => $jobIds]
+                );
+
+                $con->executeUpdate(
+                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (:ids)",
+                    ['ids' => $jobIds]
+                );
             }
 
             $message = 'Removed %d rows';
