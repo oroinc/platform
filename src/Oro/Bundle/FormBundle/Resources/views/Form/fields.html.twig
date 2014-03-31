@@ -482,7 +482,7 @@
     {% set gridWidgetAlias = form.vars.id ~ '-grid' %}
     {% set routeParametersElement = form.vars.id ~ '-route-parameters' %}
 
-    <div class="create-select-entity-container">
+    <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
             <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}">
                 <span
@@ -562,7 +562,8 @@
                     {{ gridWidgetAlias|json_encode|raw }},
                     {{ form.vars.view_widgets|json_encode|raw }},
                     {{ form.vars.existing_entity_grid_id|json_encode|raw }},
-                    {{ currentMode|json_encode|raw }}
+                    {{ currentMode|json_encode|raw }},
+                    {{ allRouteParameters|json_encode|raw }}
                 );
             });
         });

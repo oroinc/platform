@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'oroui/js/widget-manager', 'routing', 'oronavigation/js/navigation'],
-function ($, widgetManager, routing) {
+define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing', 'oronavigation/js/navigation'],
+function ($, _, widgetManager, routing) {
     'use strict';
 
     /**
@@ -16,7 +16,8 @@ function ($, widgetManager, routing) {
         gridWidgetAlias,
         viewWidgets,
         gridModelId,
-        templateMode
+        templateMode,
+        templateRouteParameters
     ) {
         var setAltLabel = function (el, mode) {
             var $labelHolder = el.find('span');
@@ -128,11 +129,15 @@ function ($, widgetManager, routing) {
             });
         });
 
+        var getCurrentRouteParameters = function() {
+            return JSON.parse($(routeParametersEl).val());
+        };
+
         var setMode = function(mode) {
             setCurrentMode(mode);
             switch(mode) {
                 case 'view':
-                    var allRouteParameters = JSON.parse($(routeParametersEl).val());
+                    var allRouteParameters = getCurrentRouteParameters();
                     for (var i = 0; i < viewWidgets.length; i++) {
                         var widgetAlias = viewWidgets[i]['widget_alias'];
                         if (allRouteParameters[widgetAlias]) {
@@ -148,7 +153,8 @@ function ($, widgetManager, routing) {
 
         // update mode
         var currentMode = getCurrentMode();
-        if (templateMode != currentMode) {
+        var currentRouteParameters = getCurrentRouteParameters();
+        if (templateMode != currentMode || !_.isEqual(templateRouteParameters, currentRouteParameters)) {
             setMode(currentMode);
         }
     }
