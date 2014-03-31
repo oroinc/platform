@@ -60,13 +60,10 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $message = 'Will be removed %d rows';
         } else {
-            $qb = $em->createQueryBuilder();
             $query = $this->applyCriteria($qb->select('j'))
                 ->getQuery();
 
-            $jobs = $query
-                ->setMaxResults(1000)
-                ->getResult();
+            $jobs = $query->getResult();
 
             $result = 0;
             $jobIds = [];
