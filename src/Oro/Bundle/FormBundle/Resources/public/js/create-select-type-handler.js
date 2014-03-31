@@ -154,7 +154,9 @@ function ($, _, widgetManager, routing) {
         // update mode
         var currentMode = getCurrentMode();
         var currentRouteParameters = getCurrentRouteParameters();
-        if (templateMode != currentMode || !_.isEqual(templateRouteParameters, currentRouteParameters)) {
+        if (templateMode != currentMode
+            || currentMode == 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
+        ) {
             setMode(currentMode);
         }
     }
