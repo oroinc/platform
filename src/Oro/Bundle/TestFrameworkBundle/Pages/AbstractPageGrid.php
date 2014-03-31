@@ -298,7 +298,7 @@ abstract class AbstractPageGrid extends AbstractPage
         //get current sort order status
         $current = $this->test->byXPath("{$this->gridPath}//table/thead/tr/th[a[contains(., '{$columnName}')]]")
             ->attribute('class');
-        if ($current != $orderFull || $order == '') {
+        if (strpos($current, $orderFull) === false || $order == '') {
             $this->test->byXPath("{$this->gridPath}//table/thead/tr/th/a[contains(., '{$columnName}')]")->click();
             $this->waitForAjax();
             if ($order != '') {
