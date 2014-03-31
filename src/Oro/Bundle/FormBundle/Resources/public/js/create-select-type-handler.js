@@ -12,9 +12,11 @@ function ($, widgetManager, routing) {
         viewContainer,
         currentModeEl,
         existingEl,
+        routeParametersEl,
         gridWidgetAlias,
         viewWidgets,
-        gridModelId
+        gridModelId,
+        templateMode
     ) {
         var setAltLabel = function (el, mode) {
             var $labelHolder = el.find('span');
@@ -48,13 +50,17 @@ function ($, widgetManager, routing) {
             }
         };
 
+        var getCurrentMode = function() {
+            return $(currentModeEl).val();
+        };
+
         // Render grid and change current mode to grid
         var $btnContainer = $(btnContainer);
         var $selectBtn = $btnContainer.find('.entity-select-btn');
         var $createBtn = $btnContainer.find('.entity-create-btn');
         var $cancelBtn = $btnContainer.find('.entity-cancel-btn');
 
-        $selectBtn.on('click', function() {
+        var drawGrid =  function() {
             widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
                 if (widget.firstRun) {
                     widget.render();
@@ -65,7 +71,10 @@ function ($, widgetManager, routing) {
                     setCurrentMode('grid');
                 }
             });
+        };
 
+        $selectBtn.on('click', function() {
+            drawGrid();
         });
 
         // Render create from and change current mode to create
@@ -81,6 +90,13 @@ function ($, widgetManager, routing) {
             }
         });
 
+        var drawViewWidget = function (viewWidget, routeParameters) {
+            widgetManager.getWidgetInstanceByAlias(viewWidget['widget_alias'], function(w) {
+                w.setUrl(routing.generate(viewWidget['route_name'], routeParameters));
+                w.render();
+            });
+        };
+
         var loadViewWidgets = function (model) {
             var getRouteParameters = function(map, model) {
                 var parameters = {};
@@ -90,19 +106,14 @@ function ($, widgetManager, routing) {
                 return parameters;
             };
 
+            var allRouteParameters = {};
             for (var i = 0; i < viewWidgets.length; i++) {
-                (function (viewWidget) {
-                    widgetManager.getWidgetInstanceByAlias(viewWidget['widget_alias'], function(w) {
-                        w.setUrl(
-                            routing.generate(
-                                viewWidget['route_name'],
-                                getRouteParameters(viewWidget['grid_row_to_route'], model)
-                            )
-                        );
-                        w.render();
-                    });
-                })(viewWidgets[i]);
+                var routeParameters = getRouteParameters(viewWidgets[i]['grid_row_to_route'], model);
+                var widgetAlias = viewWidgets[i]['widget_alias'];
+                allRouteParameters[widgetAlias] = routeParameters;
+                drawViewWidget(viewWidgets[i], routeParameters);
             }
+            $(routeParametersEl).val(JSON.stringify(allRouteParameters));
         };
 
         // On grid row select render widgets and change current mode to view
@@ -116,5 +127,29 @@ function ($, widgetManager, routing) {
                 setCurrentMode('view');
             });
         });
+
+        var setMode = function(mode) {
+            setCurrentMode(mode);
+            switch(mode) {
+                case 'view':
+                    var allRouteParameters = JSON.parse($(routeParametersEl).val());
+                    for (var i = 0; i < viewWidgets.length; i++) {
+                        var widgetAlias = viewWidgets[i]['widget_alias'];
+                        if (allRouteParameters[widgetAlias]) {
+                            drawViewWidget(viewWidgets[i], allRouteParameters[widgetAlias]);
+                        }
+                    }
+                    break;
+                case 'grid':
+                    drawGrid();
+                    break;
+            }
+        };
+
+        // update mode
+        var currentMode = getCurrentMode();
+        if (templateMode != currentMode) {
+            setMode(currentMode);
+        }
     }
 });
