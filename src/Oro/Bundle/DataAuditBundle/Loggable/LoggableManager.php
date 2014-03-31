@@ -318,10 +318,37 @@ class LoggableManager
                     continue;
                 }
 
+                $fieldMapping = null;
+                if ($entityMeta->hasField($field)) {
+                    $fieldMapping = $entityMeta->getFieldMapping($field);
+                    if ($fieldMapping['type'] == 'date') {
+                        // leave only date
+                        $utc = new \DateTimeZone('UTC');
+                        if ($old && $old instanceof \DateTime) {
+                            $old->setTimezone($utc);
+                            $old = new \DateTime($old->format('Y-m-d'), $utc);
+                        }
+                        if ($new && $new instanceof \DateTime) {
+                            $new->setTimezone($utc);
+                            $new = new \DateTime($new->format('Y-m-d'), $utc);
+                        }
+                    }
+                }
+
                 if ($old instanceof \DateTime && $new instanceof \DateTime
                     && $old->getTimestamp() == $new->getTimestamp()
                 ) {
                     continue;
+                }
+
+                // need to distinguish date and datetime
+                if ($fieldMapping && in_array($fieldMapping['type'], array('date', 'datetime'))) {
+                    if ($old instanceof \DateTime) {
+                        $old = array('type' => $fieldMapping['type'], 'value' => $old);
+                    }
+                    if ($new instanceof \DateTime) {
+                        $new = array('type' => $fieldMapping['type'], 'value' => $new);
+                    }
                 }
 
                 if ($entityMeta->isSingleValuedAssociation($field) && $new) {

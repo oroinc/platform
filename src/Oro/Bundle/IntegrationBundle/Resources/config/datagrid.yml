@@ -8,6 +8,11 @@ datagrid:
                     - c.id
                     - c.name
                     - c.type
+                    - |
+                      (SELECT COUNT(s.id)
+                      FROM OroIntegrationBundle:Status s
+                      WHERE s.channel = c AND s.code = Oro\Bundle\IntegrationBundle\Entity\Status::STATUS_COMPLETED
+                      ) as syncCount
                 from:
                     - { table: %oro_integration.channel.entity.class%, alias: c }
         columns:
@@ -54,5 +59,6 @@ datagrid:
                 acl_resource: oro_integration_channel_delete
                 icon:         trash
                 label:        oro.integration.datagrid.action.delete
+        action_configuration: @oro_integration.channels.datagrid_helper->getActionConfigurationClosure
         options:
             entityHint: channel

@@ -44,15 +44,15 @@
     {% macro attribute_data(value, additionalData) %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
-                <p class="control-label">{{ value }}</p>
+                <div class="control-label">{{ value }}</div>
             {% else %}
-                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
             {% for data in additionalData.data %}
                 <div class="clearfix-oro">
-                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                    <div class="control-label">{{ attribute(data, additionalData.field) }}</div>
                 </div>
             {% endfor %}
         {% endif %}
@@ -92,7 +92,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -108,13 +108,19 @@
         ]
 #}
 {% macro link(parameters) %}
+    {# need to remove spaces just before label #}
+    {% set iconHtml = '' %}
+    {% if parameters.iCss is defined %}
+        {% set iconHtml %}
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endset %}
+    {% else %}
+    {% endif %}
+    {% spaceless %}
     <a href="{{ parameters.path }}"
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       title="{{ parameters.title|trans }}">
-        {% if parameters.iCss is defined %}
-            <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
-        {% endif %}{{ parameters.label|trans }}
-    </a>
+           title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+    {% endspaceless %}
 {% endmacro %}
 
 {#
@@ -246,13 +252,17 @@
     {% if parameters.aCss is defined %}
         {% set aCss = parameters.aCss|split(' ')|merge(aCss) %}
     {% endif %}
-    {% set title = parameters.title is defined
-        ? parameters.title
-        : 'Edit'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '')
-    %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.edit_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.edit'|trans
+        %}
+    {% endif %}
     {% set label = parameters.label is defined
         ? parameters.label
-        : 'Edit'|trans
+        : 'oro.ui.edit'|trans
     %}
     {% set parameters = parameters|merge({
         'iCss': iCss|join(' '),
@@ -275,11 +285,27 @@
         ]
 #}
 {% macro addButton(parameters) %}
+    {% if parameters.label is defined %}
+        {% set label = parameters.label %}
+    {% else %}
+        {% set label = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
     <a href="{{ parameters.path }}"
         class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
-        title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+        title="{{ title }}"
     >
-        {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
+        {{ label }}
     </a>
 {% endmacro %}
 
@@ -299,6 +325,19 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
+    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'oro.ui.item'|trans %}
+    {% set label = parameters.label is defined
+        ? parameters.label
+        : 'oro.ui.delete'|trans
+    %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.delete_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.delete'|trans
+        %}
+    {% endif %}
     <div class="pull-left btn-group icons-holder">
         <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}{{ parameters.disabled is defined and parameters.disabled ? ' disabled' : ''}}"
             {% if (parameters.id is defined) %}
@@ -307,8 +346,8 @@
             {% if (parameters.dataId is defined) %}
                 data-id="{{ parameters.dataId }}"
             {% endif %}
-            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'Are you sure you want to delete this %entity_label%?'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label|lower : 'item'|trans }) }}"
-            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : '%entity_label% deleted'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label : 'Item'|trans }) }}"
+            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) }}"
+            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) }}"
             {% if (parameters.dataUrl is defined) %}
                 data-url="{{ parameters.dataUrl }}"
             {% endif %}
@@ -320,10 +359,10 @@
                 data-{{ dataItemName }}="{{ dataItemValue|raw }}"
                 {% endfor %}
             {% endif %}
-            title="{{ parameters.title is defined ? parameters.title : 'Delete'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+            title="{{ title }}"
         >
             <i class="icon-trash hide-text"></i>
-            {{ parameters.label is defined ? parameters.label : 'Delete'|trans }}
+            {{ label }}
         </a>
     </div>
 {% endmacro %}

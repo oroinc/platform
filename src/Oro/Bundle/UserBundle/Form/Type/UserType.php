@@ -190,7 +190,59 @@ class UserType extends AbstractType
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false]);
+            ->add(
+                'imageFile',
+                'file',
+                [
+                    'label' => 'oro.user.image.label',
+                    'required' => false,
+                    'tooltip' => 'oro.user.image.tooltip',
+                    'tooltip_parameters' => ['%file_size%' => $this->comparePhpIniSizes()]
+                ]
+            );
+    }
+
+    /**
+     * Compare upload_max_filesize and post_max_size ini settings and return the lesser
+     *
+     * @return int
+     */
+    protected function comparePhpIniSizes()
+    {
+        $uploadMaxFilesize = ini_get('upload_max_filesize');
+        $postMaxSize = ini_get('post_max_size');
+
+        if ($uploadMaxFilesize <= 0) {
+            return $postMaxSize;
+        }
+
+        if ($postMaxSize <= 0) {
+            return $uploadMaxFilesize;
+        }
+
+        return $this->getBytes($uploadMaxFilesize) <= $this->getBytes($postMaxSize) ? $uploadMaxFilesize : $postMaxSize;
+    }
+
+    /**
+     * Calculate bytes from config string
+     *
+     * @param string $value
+     * @return int
+     */
+    protected function getBytes($value)
+    {
+        switch(substr($value, -1)) {
+            case 'G':
+                $value = (int)$value * 1024;
+                // break intentionally omitted
+            case 'M':
+                $value = (int)$value * 1024;
+                // break intentionally omitted
+            case 'K':
+                $value = (int)$value * 1024;
+        }
+
+        return $value;
     }
 
     /**

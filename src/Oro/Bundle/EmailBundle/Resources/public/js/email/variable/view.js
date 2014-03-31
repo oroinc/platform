@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
+    ], function ($, _, Backbone, __) {
     'use strict';
 
     /**
@@ -28,6 +28,10 @@ define(['jquery', 'underscore', 'backbone'
 
             $('input[name*="subject"], textarea[name*="content"]')
                 .on('blur', _.bind(this._updateElementsMetaData, this));
+
+            // set default to content
+            this.lastElement = $('textarea[name*="content"]');
+
             this.render();
         },
 
@@ -48,12 +52,32 @@ define(['jquery', 'underscore', 'backbone'
          * @returns {*}
          */
         render: function () {
-            var html = _.template(this.options.template.html(), {
-                userVars: this.model.get('user'),
-                entityVars: this.model.get('entity')
-            });
+            var userVars   = this.model.get('user'),
+                entityVars = this.model.get('entity'),
+                $el        = $(this.el);
 
-            $(this.el).html(html);
+            if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
+                $el.parent().hide();
+            } else {
+                var html = _.template(this.options.template.html(), {
+                    userVars: this.model.get('user'),
+                    entityVars: this.model.get('entity'),
+                    title: __('Click to insert variable.')
+                });
+
+                $el.html(html);
+                $el.parent().show();
+
+                $('input[name*="subject"], textarea[name*="content"]')
+                    .bind("dragenter dragover", function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                    })
+                    .bind("dragleave dragexit", function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+            }
 
             return this;
         },

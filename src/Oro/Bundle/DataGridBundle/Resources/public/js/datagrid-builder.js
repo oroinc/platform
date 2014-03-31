@@ -105,6 +105,7 @@ define(function (require) {
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
                 this.$el.data('datagrid', grid);
+                mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
                     // register router
@@ -157,7 +158,7 @@ define(function (require) {
 
                 // columns
                 columns = _.map(metadata.columns, function (cell) {
-                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable'],
+                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'],
                         cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys))),
                         extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type'))),
                         cellType = modules[helpers.cellType(cell.type)];

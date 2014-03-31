@@ -1,7 +1,7 @@
 oro_system_configuration:
     groups:
         look_and_feel:
-            title: 'Look & Feel'
+            title: 'Display settings'
             icon:  'icon-eye-open'
         grid_settings:
             title: 'Datagrid settings'

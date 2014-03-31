@@ -271,7 +271,7 @@ class CalendarEvent implements RemindableInterface
         $result = new ReminderData();
 
         $result->setSubject($this->getTitle());
-        $result->setExpireAt($this->getEnd());
+        $result->setExpireAt($this->getStart());
         $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;

@@ -1,5 +1,5 @@
 /*global define*/
-define(['flotr2'], function (Flotr) {
+define(['jquery', 'flotr2'], function ($, Flotr) {
 
 Flotr.addType('funnel', {
     options: {
@@ -299,13 +299,13 @@ Flotr.addType('funnel', {
     },
 
     renderLabel: function(context, options, label, startY, iterator, isNozzleStep) {
-        var distX = (options.width - options.marginX) / 2,
-            count = Object.keys(options.data).length,
-            distY = (iterator == 0)
+        var $prev = $(options.element).find('.flotr-grid-label').last(),
+            distX = (options.width - options.marginX) / 2,
+            distY = !$prev[0]
                 ? options.marginY
-                : this.shiftLabels
-                    ? (options.height - options.marginY * 2) / (count + 1) * iterator
-                    : startY,
+                : ! this.shiftLabels
+                    ? startY
+                    : $prev.position().top + $prev.height() + options.fontSize * 1.2,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
