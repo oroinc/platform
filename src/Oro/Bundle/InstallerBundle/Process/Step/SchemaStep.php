@@ -16,7 +16,9 @@ class SchemaStep extends AbstractStep
                 // module's ini settings at this time
                 error_reporting(E_ALL ^ E_WARNING);
                 return $this->handleAjaxAction('cache:clear');
-            case 'clear':
+            case 'clear-config':
+                return $this->handleAjaxAction('oro:entity-config:clear');
+            case 'clear-extend':
                 return $this->handleAjaxAction('oro:entity-extend:clear');
             case 'schema-drop':
                 return $this->handleAjaxAction(
