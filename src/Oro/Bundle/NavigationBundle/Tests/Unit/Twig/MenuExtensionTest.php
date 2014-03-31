@@ -269,6 +269,10 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function menuItemsDataProvider()
     {
         return array(
