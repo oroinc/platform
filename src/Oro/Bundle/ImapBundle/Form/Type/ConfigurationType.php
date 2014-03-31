@@ -79,7 +79,8 @@ class ConfigurationType extends AbstractType
                 'ssl',
                 'choice',
                 array(
-                    'choices'     => array('ssl' => 'ssl', 'tsl' => 'tsl'),
+                    'label'       => 'SSL',
+                    'choices'     => array('ssl' => 'SSL', 'tsl' => 'TSL'),
                     'empty_data'  => null,
                     'empty_value' => '',
                     'required'    => false
