@@ -14,11 +14,11 @@ oro.locale:
 
     form:
         tooltip:
-            languages: "Languages available for email templates translation."
-            locale: "Select the locale option used to format numbers, addresses, names and dates"
-            location: " Location will be used to format addresses when 'Format address by address country' option is disabled"
-            format_address_by_address_country: "Selecting this option will enabled addresses to be formatted by the country they are in. Disabeling this option will cause the addresses to be formatted in your location address format"
-            language: "Select the system language you wish to use"
-            timezone: "Select the timezone for displaying date and time"
+            languages: "Select the languages that can be used for translation of the email templates."
+            locale: "Locale selection affects formatting of numbers, addresses, names, and dates."
+            location: " If Format address per country option is disabled, or there is no country-specific formatting, the addresses will be formatted according to the rules of primary location."
+            format_address_by_address_country: "When this option is selected, addresses will be formatted according to the rules of their countries. Otherwise, the primary location formatting will be applied."
+            language: "Select the system language from the list of installed translations (see below)."
+            timezone: "Select the timezone of your location. All dates and times will be displayed in the specified timezone."
             currency: "Select the default currency"
-            quarter_start: "Select start date of the first quarter in the year."
+            quarter_start: "Select the starting date of the first quarter in year."

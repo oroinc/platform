@@ -261,7 +261,7 @@
             {%- elseif raw_label is defined and raw_label -%}
                 {{ label|raw }}
             {%- else -%}
-                {{ label|trans({}, translation_domain)|capitalize }}
+                {{ label|trans({}, translation_domain) }}
             {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
@@ -269,7 +269,7 @@
 {% endblock form_label %}
 
 {% block oro_money_row %}
-    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (' ~ currency_symbol ~')' %}
+    {% set label = label|trans({}, translation_domain) ~ ' (' ~ currency_symbol ~')' %}
     {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
 {% endblock %}
 
@@ -279,7 +279,7 @@
 {% endblock %}
 
 {% block percent_row %}
-    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
+    {% set label = label|trans({}, translation_domain) ~ ' (%)' %}
     {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
 {% endblock %}
 
