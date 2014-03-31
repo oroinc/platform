@@ -38,7 +38,8 @@ define(function (require) {
         events: {
             'click .sidebar-add a': 'onClickAdd',
             'click .sidebar-resize a': 'onClickToggle',
-            'click .sidebar-toggle a': 'onClickToggle'
+            'click .sidebar-toggle a': 'onClickToggle',
+            'mousedown .sidebar-icon': 'onMouseDown'
         },
 
         options: {
@@ -184,6 +185,18 @@ define(function (require) {
             var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = false;
+            }
+        },
+
+        onMouseDown: function(event) {
+            var $container = this.$el.find('.sidebar-content'),
+                $current   = $(event.currentTarget),
+                children   = $container.children();
+
+            if (children.first().attr('data-cid') == $current.attr('data-cid')) {
+                $container.sortable('option', 'cursorAt', { bottom: 5 } );
+            } else if (children.last().attr('data-cid') == $current.attr('data-cid')) {
+                $container.sortable('option', 'cursorAt', { top: 5 } );
             }
         },
 
