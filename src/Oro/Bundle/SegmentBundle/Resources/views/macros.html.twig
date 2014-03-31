@@ -116,9 +116,9 @@
                         e.preventDefault();
 
                         var confirm = new DeleteConfirmation({
-                            title:    __('Run confirmation'),
+                            title:    __('Confirm action'),
                             okText:   __('Yes, I Agree'),
-                            content:  __('Are you sure you want to refresh this segment?')
+                            content:  __('Please confirm that you want to refresh this segment.')
                         });
 
                         var url = $(this).data('url'),
@@ -132,7 +132,7 @@
                                     $.post(url,function () {
                                         success = true;
                                     }).error(function () {
-                                        messenger.notificationFlashMessage('error', __('Error was occurred, please contact administrator.'));
+                                        messenger.notificationFlashMessage('error', __('An unidentified error has occurred. Please contact your Administrator.'));
                                     }).always(function () {
                                         if (navigation) {
                                             navigation.loadingMask.hide();
@@ -200,7 +200,7 @@
                     var confirm = new DeleteConfirmation({
                         title: __('Change Entity Confirmation'),
                         okText: __('Yes, I Agree'),
-                        content: __('Are you sure you want to change entity?')
+                        content: __('oro.{{ type }}.confirm_update')
                     });
 
                     $('#{{ type }}-designer').append(loadingMask.render().$el);

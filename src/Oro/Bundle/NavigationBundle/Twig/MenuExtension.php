@@ -103,6 +103,7 @@ class MenuExtension extends \Twig_Extension
             $menu = $this->getMenu($menu, $path, $options);
         }
 
+        $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
         if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
@@ -110,6 +111,37 @@ class MenuExtension extends \Twig_Extension
         }
 
         return $this->helper->render($menu, $options, $renderer);
+    }
+
+    /**
+     * Get menu filtered by isAllowed children.
+     *
+     * @param ItemInterface|array $menu
+     * @return ItemInterface|array
+     */
+    protected function filterUnallowedItems($menu)
+    {
+        /** @var ItemInterface $item */
+        foreach ($menu as $item) {
+            if ($item->hasChildren()) {
+                $filteredChildren = $this->filterUnallowedItems($item);
+                $invisibleChildrenCount = 0;
+                /** @var ItemInterface $child */
+                foreach ($filteredChildren as $child) {
+                    if (!$child->getLabel() || !$child->getExtra('isAllowed')) {
+                        $invisibleChildrenCount++;
+                    }
+                }
+
+                if (count($filteredChildren) == $invisibleChildrenCount
+                    && (!$item->getUri() || $item->getUri() == '#')
+                ) {
+                    $item->setExtra('isAllowed', false);
+                }
+            }
+        }
+
+        return $menu;
     }
 
     /**

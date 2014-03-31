@@ -112,7 +112,7 @@ class SecurityFacade
      * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
      *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
      *
-*@return bool
+     * @return bool
      */
     public function isGranted($attributes, $object = null)
     {
