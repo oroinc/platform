@@ -122,7 +122,7 @@ class MenuExtension extends \Twig_Extension
     protected function filterUnallowedItems($menu)
     {
         /** @var ItemInterface $item */
-        foreach ($menu as &$item) {
+        foreach ($menu as $item) {
             if ($item->hasChildren()) {
                 $filteredChildren = $this->filterUnallowedItems($item);
                 $invisibleChildrenCount = 0;

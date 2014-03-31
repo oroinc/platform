@@ -314,7 +314,8 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                                     $this->getMenuItem('item_5_1_1', false),
                                 )
                             )
-                        )
+                        ),
+                        '#'
                     ),
                     $this->getMenuItem(
                         'item_6',
@@ -392,7 +393,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     array(
                         'label' => 'item_5',
-                        'uri' => '',
+                        'uri' => '#',
                         'isAllowed' => false,
                         'children' => array(
                             array(
