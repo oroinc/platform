@@ -21,7 +21,7 @@ class OroNavigationBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('url', 'string', ['length' => 1023]);
-        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('title', 'text');
         $table->addColumn('visited_at', 'datetime', []);
         $table->addColumn('visit_count', 'integer', []);
         $table->setPrimaryKey(['id']);
