@@ -22,7 +22,7 @@ function($, messenger, __, Navigation) {
                 };
                 var doReload = function() {
                     if (navigation) {
-                        navigation.loadPage();
+                        navigation.loadPage(true);
                     } else {
                         window.location.reload();
                     }
