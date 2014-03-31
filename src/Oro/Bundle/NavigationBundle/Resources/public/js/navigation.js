@@ -447,7 +447,8 @@ define(function (require) {
         /**
          * Ajax call for loading page content
          */
-        loadPage: function() {
+        loadPage: function(forceLoad) {
+            forceLoad = forceLoad || false;
             if (!this.url) {
                 return;
             }
@@ -455,7 +456,7 @@ define(function (require) {
             this.beforeRequest();
 
             var cacheData = this.getCachedData();
-            if (cacheData) {
+            if (!forceLoad && cacheData) {
                 widgetManager.resetWidgets();
                 this.tempCache = cacheData;
                 this.handleResponse(cacheData, {fromCache: true});

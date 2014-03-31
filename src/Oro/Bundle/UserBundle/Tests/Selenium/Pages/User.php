@@ -225,12 +225,31 @@ class User extends AbstractPageEntity
         }
     }
 
-    public function setRoles($roles = array())
+    /**
+     * @param array $roles
+     * @param bool  $oneOf Do not check role exists or not
+     *
+     * @return $this
+     */
+    public function setRoles($roles = array(), $oneOf = false)
     {
-        foreach ($roles as $role) {
+        $condition = '';
+        if ($oneOf) {
+            foreach ($roles as $role) {
+                if ($condition != '') {
+                    $condition .= ' or ';
+                }
+                $condition .= "normalize-space(text()) = '{$role}'";
+            }
             $this->roles->element(
-                $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                $this->test->using('xpath')->value("div[label[{$condition}]]/input")
             )->click();
+        } else {
+            foreach ($roles as $role) {
+                $this->roles->element(
+                    $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                )->click();
+            }
         }
 
         return $this;
