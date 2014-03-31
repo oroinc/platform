@@ -10,7 +10,7 @@
 
 {% block content %}
     {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Defaults' }) %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Saved Values' }) %}
     {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
     <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true">
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
@@ -21,16 +21,28 @@
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
-        require(['jquery', 'oroconfig/js/form/state', 'oroconfig/js/form/default'
-            ], function ($, FormState, FormDefault) {
+        require(['jquery', 'orotranslation/js/translator', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
+        function ($, __, FormState, FormDefault, Modal) {
             'use strict';
 
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
                 var $form = $(this).closest('form'),
-                    $notDefault = $form.find('.parent-scope-checkbox :checkbox:not(:checked)');
+                    $checkboxes = $form.find('.parent-scope-checkbox input'),
+                    confirm = new Modal({
+                        title: __('Confirmation'),
+                        okText: __('Ok'),
+                        cancelText: __('Cancel'),
+                        content: __(' Settings will be restored to saved values. Please confirm you want to continue.'),
+                        className: 'modal modal-primary',
+                        okButtonClass: 'btn-primary btn-large'
+                    });
+
+                confirm.on('ok', function () {
+                    $form.get(0).reset();
+                    $checkboxes.trigger('change');
+                });
+                confirm.open();
                 e.preventDefault();
-                $form.get(0).reset();
-                $notDefault.filter(':checked').trigger('change');
             });
 
             new FormState();
