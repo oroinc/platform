@@ -8,13 +8,13 @@ use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
 {
