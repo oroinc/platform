@@ -99,12 +99,19 @@ class CleanupCommandTest extends OrmTestCase
             ]
         );
 
-        $statement = $this->createFetchStatementMock([['id' => 1]]);
-        $this->getDriverConnectionMock($em)->expects($this->any())
+        $records = [
+            ['id0' => 1]
+        ];
+        $statement = $this->createFetchStatementMock($records);
+        $actualSql = '';
+
+        $driverConMock = $this->getDriverConnectionMock($em);
+        $driverConMock->expects($this->any())
             ->method('prepare')
             ->will(
                 $this->returnCallback(
-                    function ($prepareString) use (&$statement) {
+                    function ($prepareString) use (&$statement, &$actualSql) {
+                        $actualSql = $prepareString;
                         return $statement;
                     }
                 )
@@ -120,6 +127,12 @@ class CleanupCommandTest extends OrmTestCase
             ->will($this->returnValue($em));
 
         $this->command->execute($input, $output);
+
+        $this->assertEquals(
+            'SELECT j0_.id AS id0, j0_.closedAt AS closedAt1, j0_.state AS state2 ' .
+            'FROM Job j0_ WHERE j0_.closedAt < ? AND j0_.state = ? LIMIT 1000',
+            $actualSql
+        );
     }
 
     protected function getQueryBuilderMock()

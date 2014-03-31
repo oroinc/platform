@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\ORM\Query\Parameter;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -93,13 +93,15 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
                 $con = $em->getConnection();
                 $con->executeUpdate(
-                    "DELETE FROM jms_job_statistics WHERE job_id IN (:ids)",
-                    ['ids' => $jobIds]
+                    "DELETE FROM jms_job_statistics WHERE job_id IN (?)",
+                    [$jobIds],
+                    [Connection::PARAM_INT_ARRAY]
                 );
 
                 $con->executeUpdate(
-                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (:ids)",
-                    ['ids' => $jobIds]
+                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (?)",
+                    [$jobIds],
+                    [Connection::PARAM_INT_ARRAY]
                 );
             }
 
