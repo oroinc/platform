@@ -34,7 +34,7 @@ class OroNavigationBundle implements Migration
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('type', 'string', ['length' => 10]);
         $table->addColumn('url', 'string', ['length' => 1023]);
-        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('title', 'text');
         $table->addColumn('position', 'smallint', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
@@ -70,8 +70,8 @@ class OroNavigationBundle implements Migration
         $table = $schema->createTable('oro_navigation_title');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('route', 'string', ['length' => 255]);
-        $table->addColumn('title', 'string', ['length' => 255]);
-        $table->addColumn('short_title', 'string', ['length' => 255]);
+        $table->addColumn('title', 'text');
+        $table->addColumn('short_title', 'text');
         $table->addColumn('is_system', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['route'], 'unq_route');
