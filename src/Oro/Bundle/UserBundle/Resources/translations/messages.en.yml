@@ -93,6 +93,22 @@ oro:
             view_all:   View All
 
     user:
+        menu:
+            system_tab.label: System
+            user_list.description: List of system users
+            user_roles.description: List of system roles
+            user_groupes.description: List of system groups
+            users_management.label: Users Management
+            user_create.label: Create User
+            shortcut_new_user.label: Create new user
+            shortcut_new_user.description: Create new user instance
+            shortcut_list_users.label: Show users list
+            shortcut_list_users.description: List of all system users
+            shortcut_new_role.label: Create new role
+            shortcut_new_role.description: Create new role instance
+            shortcut_new_group.label: Create new group
+            shortcut_new_group.description: Create new group instance
+            oro_user_profile_view.label: My User
         controller:
             group.message.saved: "Group saved"
             role.message.saved: "Role saved"

@@ -27,6 +27,8 @@ oro:
                     hint: Maximum value
 
     report:
+        menu:
+            manage_reports.label:   Manage Custom Reports
         type:
             table: Table
         datagrid:

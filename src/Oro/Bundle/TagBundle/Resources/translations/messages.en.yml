@@ -1,5 +1,10 @@
 oro:
     tag:
+        menu:
+            new_tag.label: Create new tag
+            new_tag.description: Create new tag
+            tag_list.description: Tags list
+
         controller:
             tag.saved.message: "Tag saved"
         form:

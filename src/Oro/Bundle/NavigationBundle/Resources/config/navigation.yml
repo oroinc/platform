@@ -30,24 +30,24 @@ oro_menu_config:
 
     items:
         pinbar:
-            label: 'Pinbar'
+            label: 'oro.navigation.menu.pinbar.label'
             extras:
                 icon: 'icon-folder-close'
                 maxItems: 10
             uri: '#'
         history:
-            label: 'History'
+            label: 'oro.navigation.menu.history.label'
             extras:
                 icon: 'icon-time'
                 activeIfFirstIsEmpty: true
             uri: '#'
         favorite:
-            label: 'Favorites'
+            label: 'oro.navigation.menu.favorite.label'
             extras:
                 icon: 'icon-star-empty'
             uri: '#'
         mostviewed:
-            label: 'Most Viewed'
+            label: 'oro.navigation.menu.mostviewed.label'
             extras:
                 icon: 'icon-flag'
             uri: '#'
@@ -68,5 +68,5 @@ oro_menu_config:
             type: shortcuts
 
 oro_titles:
-    oro_shortcut_actionslist: Shortcut Actions List
-    oro_pinbar_help: How To Use Pinbar
+    oro_shortcut_actionslist: 'Shortcut Actions List'
+    oro_pinbar_help: 'How To Use Pinbar'

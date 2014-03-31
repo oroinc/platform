@@ -1,7 +1,7 @@
 oro_menu_config:
     items:
         system_configuration:
-            label: 'Configuration'
+            label: 'oro.config.menu.system_configuration.label'
             extras:
                 position:    10
                 description: 'System configuration'

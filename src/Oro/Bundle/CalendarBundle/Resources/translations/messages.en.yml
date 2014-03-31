@@ -11,6 +11,9 @@ oro:
             view_calendar: My Calendar
 
     calendar:
+        menu:
+            view_default.label: My Calendar
+
         form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
 
         control:

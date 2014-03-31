@@ -1,5 +1,10 @@
 oro:
     cron:
+        menu:
+            cron_job.label: Job Queue
+            cron_job.description: Cron job queue
+            cron_job_shortcut: Jobs List
+            cron_job_shortcut.description: List of cron jobs
         header:
             jobs:         Jobs
             id:           ID

@@ -14,57 +14,59 @@ Update: Update
 New: New
 Save: Save
 'Transition name': 'Transition name'
-'From step': 'From step'
-'To step': 'To step'
-'Warning message': 'Warning message'
+From step: From step
+To step: To step
+Warning message: Warning message
 Button: Button
-'Button style': 'Button style'
-'Button preview': 'Button preview'
+Button style: Button style
+Button preview: Button preview
 Attributes: Attributes
-'View form': 'View form'
-'Popup window': 'Popup window'
-'Separate page': 'Separate page'
+View form: View form
+Popup window: Popup window
+Separate page: Separate page
 Cancel: Cancel
 Ok: Ok
-'This value should be {{ limit }} or more.': 'This value should be {{ limit }} or more.'
-'This value should be {{ limit }} or less.': 'This value should be {{ limit }} or less.'
-'This value should be a valid number.': 'This value should be a valid number.'
+This value should be {{ limit }} or more.: This value should be {{ limit }} or more.
+This value should be {{ limit }} or less.: This value should be {{ limit }} or less.
+This value should be a valid number.: This value should be a valid number.
 Name: Name
 Final: Final
 Transitions: Transitions
-'Add transition': 'Add transition'
-'Add transition to this step': 'Add transition to this step'
-'Step': 'Step'
+Add transition: Add transition
+Add transition to this step: Add transition to this step
+Step: Step
 Position: Position
-'Update this step': 'Update this step'
-'Clone this step': 'Clone this step'
-'Delete this step': 'Delete this step'
-'Entity field': 'Entity field'
+Update this step: Update this step
+Clone this step: Clone this step
+Delete this step: Delete this step
+Entity field: Entity field
 Label: Label
-'Leave empty for system value': 'Leave empty for system value'
+Leave empty for system value: Leave empty for system value
 Required: Required
 Add: Add
 Reset: Reset
 system: system
 yes: yes
-'Update field': 'Update field'
-'Delete field': 'Delete field'
-'Update this transition': 'Update this transition'
-'Clone this transition': 'Clone this transition'
-'Delete this transition': 'Delete this transition'
+Update field: Update field
+Delete field: Delete field
+Update this transition: Update this transition
+Clone this transition: Clone this transition
+Delete this transition: Delete this transition
 General: General
-'Add step': 'Add step'
+Add step: Add step
 Designer: Designer
-'Workflow steps and transitions': 'Workflow steps and transitions'
-'Unmet conditions': 'Unmet conditions'
+Workflow steps and transitions: Workflow steps and transitions
+Unmet conditions: Unmet conditions
 Submit: Submit
-'General Information': 'General Information'
-'Create Workflow': 'Create Workflow'
-'Workflow activated': 'Workflow activated'
-'Workflow deactivated': 'Workflow deactivated'
+General Information: General Information
+Create Workflow: Create Workflow
+Workflow activated: Workflow activated
+Workflow deactivated: Workflow deactivated
 
 oro:
     workflow:
+        menu:
+            workflow_definition_list.description: Workflow management UI
         workflowitem:
             entity_label:             Workflow Item
             entity_plural_label:      Workflow Items
@@ -113,7 +115,7 @@ oro:
             steps.label:                  Steps
             steps_display_ordered.label:  Display steps ordered
             active.label:                 Active
-            clone_label_prefix:           'Copy of '
+            clone_label_prefix:           Copy of
             name.tooltip:                 "The name of the workflow"
             related_entity.tooltip:       "The related entity is the entity for which the workflow is created. When the workflow is active, it can be launched and executed on the records of its related entity."
             steps_display_ordered.tooltip: "When this box is selected, all workflow steps will be shown on the Related entity view page so the entire progression path can be seen. Otherwise, only the current step and the past steps of the workflow will be shown.<br/><strong>Note:</strong> We recommend not to check this box for non-linear workflows where two or more steps have the same priority to avoid confusion."
@@ -137,7 +139,7 @@ oro:
             step:
                 name.tooltip:             "The name of the step that will be displayed on the entity record."
                 order.tooltip:            "A number that determines the position of the step in the workflow. The higher is the number, the further is the step from the start"
-                is_final.tooltip:         'This option marks the step as the logical "end" or the outcome of the workflow. This is a purely logical property that is needed to distinguish such steps for drawing the funnel charts or creating reports on the workflow data. Marking the step as final has no effect on the flow itself.'
+                is_final.tooltip:         This option marks the step as the logical "end" or the outcome of the workflow. This is a purely logical property that is needed to distinguish such steps for drawing the funnel charts or creating reports on the workflow data. Marking the step as final has no effect on the flow itself.
 
             datagrid:
                 update: Update
