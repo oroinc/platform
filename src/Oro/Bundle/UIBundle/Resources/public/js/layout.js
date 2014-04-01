@@ -70,9 +70,11 @@ define(function (require) {
                 if (e.target.tagName.toLowerCase() != 'a') {
                     e.preventDefault();
                 }
+            }).on('focus.popover-hide', 'select, input, textarea', function() {
+                $items.popover('hide');
             });
         mediator.once('hash_navigation_request:start', function () {
-            $('body').off('click.popover-hide').off('click.popover-prevent');
+            $('body').off('click.popover-hide').off('click.popover-prevent').off('focus.popover-hide');
         });
     };
 
