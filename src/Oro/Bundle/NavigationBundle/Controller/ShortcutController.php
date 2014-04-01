@@ -54,9 +54,9 @@ class ShortcutController extends Controller
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
         $result = array();
         /** @var $item ItemInterface */
-        foreach ($iterator as $item) {
+        foreach ($iterator as $key => $item) {
             if ($item->getExtra('isAllowed') && !in_array($item->getUri(), $this->uris) && $item->getUri() !== '#') {
-                $result[] = array(
+                $result[$key] = array(
                     'url' => $item->getUri(),
                     'label' => $item->getLabel(),
                     'description' => $item->getExtra('description')
