@@ -4,11 +4,10 @@
 {% macro render_label(label, required, tooltip, tooltip_placement) %}
     <label class="control-label {% if required %}required{% endif %}">
         {% if tooltip is defined and tooltip %}
-            <i data-toggle="popover"
-               data-content="{{ tooltip|trans }}"
-               {% if tooltip_placement is defined and tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
-               class="icon-info-sign tooltip-icon"></i>
+            {% import 'OroUIBundle::macros.html.twig' as ui %}
+            {{ ui.tooltip(tooltip, {}, tooltip_placement) }}
         {% endif %}
+
         {{ label }} {% if required %}<em>*</em>{% endif %}
     </label>
 {% endmacro %}
@@ -89,7 +88,7 @@
         }
 
         .transitions-list-short {
-            margin-left: 0px;
+            margin-left: 0;
         }
 
         .transitions-list-short li {
