@@ -109,11 +109,14 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 
         $expression->add(new ExpressionResult(1));
         $expectedQuarter += 1;
+        if ($expectedQuarter > 4) {
+            $expectedQuarter -= 4;
+        }
         $this->assertSame($expectedQuarter, (int)$result->quarter);
 
         $expression->subtract(new ExpressionResult(3));
         $expectedQuarter -= 3;
-        if ($expectedQuarter < 0) {
+        if ($expectedQuarter < 1) {
             $expectedQuarter += 4;
         }
         $this->assertSame($expectedQuarter, (int)$result->quarter);
@@ -129,10 +132,16 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 
         $expression->add(new ExpressionResult(3));
         $expectedMonth += 3;
+        if ($expectedMonth > 12) {
+            $expectedMonth -= 12;
+        }
         $this->assertSame($expectedMonth, (int)$result->month);
 
         $expression->subtract(new ExpressionResult(2));
         $expectedMonth -= 2;
+        if ($expectedMonth < 1) {
+            $expectedMonth += 12;
+        }
         $this->assertSame($expectedMonth, (int)$result->month);
     }
 
