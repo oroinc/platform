@@ -15,13 +15,21 @@ class OroNavigationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_navigation_history');
-        $table->getColumn('title')->setType(Type::getType('text'));
+        $table->getColumn('title')
+            ->setType(Type::getType(Type::TEXT))
+            ->setLength(null);
 
         $table = $schema->getTable('oro_navigation_item');
-        $table->getColumn('title')->setType(Type::getType('text'));
+        $table->getColumn('title')
+            ->setType(Type::getType(Type::TEXT))
+            ->setLength(null);
 
         $table = $schema->getTable('oro_navigation_title');
-        $table->getColumn('title')->setType(Type::getType('text'));
-        $table->getColumn('short_title')->setType(Type::getType('text'));
+        $table->getColumn('title')
+            ->setType(Type::getType(Type::TEXT))
+            ->setLength(null);
+        $table->getColumn('short_title')
+            ->setType(Type::getType(Type::TEXT))
+            ->setLength(null);
     }
 }
