@@ -119,26 +119,31 @@ class OroLocaleExtension extends Extension
         $externalCurrencyData = array();
 
         // read configuration from external files
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
 
             // read name format files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/name_format.yml')) {
+            $file = dirname($reflection->getFilename()) . '/Resources/config/oro/name_format.yml';
+            if (is_file($file)) {
                 $externalNameFormat = array_merge($externalNameFormat, Yaml::parse(realpath($file)));
             }
 
             // read address format files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/address_format.yml')) {
+            $file = dirname($reflection->getFilename()) . '/Resources/config/oro/address_format.yml';
+            if (is_file($file)) {
                 $externalAddressFormat = array_merge($externalAddressFormat, Yaml::parse(realpath($file)));
             }
 
             // read locale data files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/locale_data.yml')) {
+            $file = dirname($reflection->getFilename()) . '/Resources/config/oro/locale_data.yml';
+            if (is_file($file)) {
                 $externalLocaleData = array_merge($externalLocaleData, Yaml::parse(realpath($file)));
             }
 
             // read currency data files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/currency_data.yml')) {
+            $file = dirname($reflection->getFilename()) . '/Resources/config/oro/currency_data.yml';
+            if (is_file($file)) {
                 $externalCurrencyData = array_merge($externalCurrencyData, Yaml::parse(realpath($file)));
             }
         }
