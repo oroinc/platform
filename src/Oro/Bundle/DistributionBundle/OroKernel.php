@@ -52,12 +52,18 @@ abstract class OroKernel extends Kernel
     {
         $paths = [];
         foreach ($roots as $root) {
+            if (!is_dir($root)) {
+                continue;
+            }
+            $root   = realpath($root);
             $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::FOLLOW_SYMLINKS);
             $filter = new \RecursiveCallbackFilterIterator(
                 $dir,
                 function (\SplFileInfo $current) use (&$paths) {
-                    if ($current->getFilename()[0] === '.'
-                        || $current->getFilename() == 'tests'
+                    $fileName = strtolower($current->getFilename());
+                    if ($fileName === '.'
+                        || $fileName === '..'
+                        || $fileName === 'tests'
                         || $current->isFile()
                     ) {
                         return false;
@@ -83,13 +89,13 @@ abstract class OroKernel extends Kernel
 
     protected function collectBundles()
     {
-        $finder = $this->findBundles(
+        $files = $this->findBundles(
             [
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
             ]
         );
-        foreach ($finder as $file) {
+        foreach ($files as $file) {
             $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
