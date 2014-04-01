@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Command;
+namespace Oro\Bundle\CronBundle\Tests\Unit\Command;
 
 use Doctrine\ORM\EntityManager;
 
@@ -9,6 +9,7 @@ use JMS\JobQueueBundle\Entity\Job;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\CronBundle\Command\CleanupCommand;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\MemoryOutput;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
@@ -58,9 +59,9 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testDryExecution()
     {
-        $params    = ['-d' => true];
-        $input     = new ArrayInput($params, $this->command->getDefinition());
-        $output    = new MemoryOutput();
+        $params = ['-d' => true];
+        $input  = new ArrayInput($params, $this->command->getDefinition());
+        $output = new MemoryOutput();
 
         $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -85,6 +86,13 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testExecution()
     {
+        $command = $this->getMock(
+            'Oro\Bundle\CronBundle\Command\CleanupCommand',
+            ['getResultIterator'],
+            [CleanupCommand::COMMAND_NAME]
+        );
+        $command->setContainer($this->container);
+
         $this->container->expects($this->once())
             ->method('get')
             ->with('doctrine.orm.entity_manager')
@@ -95,28 +103,24 @@ class CleanupCommandTest extends OrmTestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($qbMock));
 
-        $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
+        $jobIds = [1, 2];
+        $command->expects($this->once())->method('getResultIterator')
+            ->will($this->returnValue(new \ArrayIterator($jobIds)));
 
-        $jobs = [
-            new Job('test'),
-            new Job('test-deps'),
-        ];
-
-        $queryMock->expects($this->once())->method('getResult')
-            ->will($this->returnValue($jobs));
+        $this->emMock->expects($this->exactly(2))->method('getReference')
+            ->will(
+                $this->returnValueMap(
+                    [
+                    ['JMSJobQueueBundle:Job', 1, new Job('test')],
+                    ['JMSJobQueueBundle:Job', 2, new Job('test-deps')]
+                    ]
+                )
+            );
 
         $qbMock->expects($this->once())
             ->method('select')
-            ->with('j')
+            ->with('j.id')
             ->will($this->returnSelf());
-
-        $qbMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($queryMock));
-
 
         $countQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -136,6 +140,8 @@ class CleanupCommandTest extends OrmTestCase
             ->method('getSingleScalarResult')
             ->will($this->returnValue(1));
 
+        $this->emMock->expects($this->once())->method('beginTransaction');
+
         $this->emMock->expects($this->exactly(2))
             ->method('createQuery')
             ->will($this->returnValue($countQuery));
@@ -145,6 +151,9 @@ class CleanupCommandTest extends OrmTestCase
 
         $this->emMock->expects($this->once())
             ->method('flush');
+        $this->emMock->expects($this->once())
+            ->method('clear');
+        $this->emMock->expects($this->once())->method('commit');
 
         $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -156,11 +165,11 @@ class CleanupCommandTest extends OrmTestCase
             ->method('getConnection')
             ->will($this->returnValue($conn));
 
-        $params    = [];
-        $input     = new ArrayInput($params, $this->command->getDefinition());
-        $output    = new MemoryOutput();
+        $params = [];
+        $input  = new ArrayInput($params, $this->command->getDefinition());
+        $output = new MemoryOutput();
 
-        $this->command->execute($input, $output);
+        $command->execute($input, $output);
     }
 
     protected function getQueryBuilderMock()

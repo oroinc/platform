@@ -118,10 +118,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -154,10 +155,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
