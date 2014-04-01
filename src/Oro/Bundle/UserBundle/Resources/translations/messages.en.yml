@@ -131,7 +131,6 @@ oro:
         name_suffix.label: Name suffix
         birthday.label:    Birthday
         image.label:       Avatar
-        image.tooltip:     The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
         enabled.label:     Status
         salt.label:        Salt
         password.label:    Password
@@ -143,9 +142,6 @@ oro:
         roles.label:       Roles
         groups.label:      Groups
         api.label:         API key
-        api.tooltip_text: >
-            API key could be used for authentication in third party software.
-            Please keep your regular password in secret.
 
         statuses.label:    Statuses
         emails.label:      Emails
@@ -178,4 +174,3 @@ oro:
             owner.label:  Owner
         invite:
             label: Send an Email Invitation
-            tooltip: When this option is selected, an invitation email
