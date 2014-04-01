@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
-use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
@@ -49,52 +47,36 @@ abstract class OroKernel extends Kernel
         return $bundles;
     }
 
-    protected function checkDir0($p)
-    {
-        $p .= '/';
-        $subdirs = scandir($p);
-        $subdirs = array_filter(
-            $subdirs,
-            function ($s) use ($p) {
-                return !in_array($s, ['.', '..', 'tests']) && is_dir($p . $s);
-            }
-        );
-        //var_dump("\n\n", print_r($subdirs, 1), "\n\n");
-        if (!in_array('Resources', $subdirs)) {
-            foreach ($subdirs as $subdir) {
-                $this->checkDir($p . $subdir);
-            }
-        } else {
-            if (is_dir($p . $this->configPath) && is_file($p . $this->configPath . 'bundles.yml')) {
-                $this->bundleConfigPath[] = $p . $this->configPath . 'bundles.yml';
-            }
-            return;
-        }
-    }
-
     protected function checkDir($roots = [])
     {
+        $paths = [];
         foreach ($roots as $root) {
-            $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS);
+            $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::FOLLOW_SYMLINKS);
             $filter = new \RecursiveCallbackFilterIterator(
                 $dir,
-                function ($current, $key, $iterator) {
-                    if ($current->getFilename()[0] === '.') {
+                function (\SplFileInfo $current) use (&$paths) {
+                    if ($current->getFilename()[0] === '.'
+                        || $current->getFilename() == 'tests'
+                        || $current->isFile()
+                    ) {
                         return false;
                     }
-                    if ($current->isDir()) {
+                    if ($current->isDir() && !is_dir($current->getPathname() . '/Resources')) {
                         return true;
                     } else {
-                        return strpos($current->getFilename(), 'bundles.yml') === 0;
+                        if (is_file($current->getPathname() . '/Resources/config/oro/bundles.yml')) {
+                            $paths[] = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                        }
+                        return false;
                     }
                 }
             );
 
             $iterator = new \RecursiveIteratorIterator($filter);
-            foreach ($iterator as $info) {
-                $this->bundleConfigPath[] = $info->getPathname();
-            }
+            $iterator->rewind();
         }
+
+        return $paths;
     }
 
     protected function collectBundles()
@@ -102,40 +84,16 @@ abstract class OroKernel extends Kernel
         $time_start = microtime(true);
         var_dump($time_start);
 
-        $this->checkDir(
+        $finder = $this->checkDir(
             [
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
             ]
         );
-        $finder = $this->bundleConfigPath;
 
-//        $finder = new Finder();
-//        $bundles = array();
-//        $finder
-//            ->files()
-//            ->in(
-//                array(
-//                    $this->getRootDir() . '/../src',
-//                    $this->getRootDir() . '/../vendor',
-//                )
-//            )
-//            ->followLinks()
-//            ->name('bundles.yml');
-
-
-//        var_dump(count($this->bundleConfigPath));
-//        print_r($this->bundleConfigPath);
-
-//        var_dump(count($finder));
-//        foreach ($finder as $file) {
-//            var_dump($file->getRealpath());
-//        }
-
-//        die();
+        print_r($finder);
 
         foreach ($finder as $file) {
-            //$import = Yaml::parse($file->getRealpath());
             $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
@@ -167,7 +125,7 @@ abstract class OroKernel extends Kernel
         var_dump($time_end);
 
         $time = $time_end - $time_start;
-        var_dump("\nsearching bundles for $time seconds\n");
+        echo("\nsearching bundles for $time seconds\n");
 
 
         return $bundles;
