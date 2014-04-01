@@ -1,1 +1,1 @@
-"This field can not be greater than {{ field }} field": "This field can not be greater than {{ field }} field"
+"This date can\'t be earlier than {{ field }} date": "This date can\'t be earlier than {{ field }} date"

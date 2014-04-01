@@ -7,11 +7,15 @@ use Oro\Bundle\CalendarBundle\Validator\Constraints\DateEarlierThanValidator;
 
 class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DateEarlierThan
+     */
+    protected $constraint;
 
     /**
-     * @var DateEarlierThanValidator
+     * @var \Symfony\Component\Validator\ExecutionContext
      */
-    protected $dateEarlierThanValidator;
+    protected $context;
 
     /**
     * @var \DateTime
@@ -24,23 +28,21 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
     protected $dateTimeEnd;
 
     /**
-     * @var DateEarlierThan
+     * @var \Symfony\Component\Form\Form
      */
-    protected $constraint;
+    protected $formField;
 
     /**
-     * @var \Symfony\Component\Validator\ExecutionContext
+     * @var DateEarlierThanValidator
      */
-    protected $context;
-
-    protected $formField;
+    protected $validator;
 
     protected function setUp()
     {
         $this->dateTimeStart = new \DateTime('-1 day');
         $this->dateTimeEnd   = new \DateTime('+1 day');
         $this->constraint    = new DateEarlierThan('end');
-        $this->dateEarlierThanValidator = new DateEarlierThanValidator();
+        $this->validator     = new DateEarlierThanValidator();
 
         $this->formField = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
@@ -54,13 +56,12 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->will($this->returnValue($this->formField));
 
-        $getRootReturnValue = 'testValidateExceptionWhenInvalidRootType' == $this->getName() ? array() : $form;
         $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
         $this->context->expects($this->any())
             ->method('getRoot')
-            ->will($this->returnValue($getRootReturnValue));
+            ->will($this->returnValue($form));
 
-        $this->dateEarlierThanValidator->initialize($this->context);
+        $this->validator->initialize($this->context);
     }
 
     /**
@@ -83,7 +84,7 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
         $this->formField->expects($this->any())
             ->method('getData')
             ->will($this->returnValue('string'));
-        $this->dateEarlierThanValidator->validate($this->dateTimeStart, $this->constraint);
+        $this->validator->validate($this->dateTimeStart, $this->constraint);
     }
 
     /**
@@ -92,11 +93,19 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateExceptionWhenInvalidRootType()
     {
+        $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context->expects($this->any())
+            ->method('getRoot')
+            ->will($this->returnValue(array()));
+
+        $validator = new DateEarlierThanValidator();
+        $validator->initialize($this->context);
+
         $this->formField->expects($this->any())
             ->method('getData')
             ->will($this->returnValue($this->dateTimeEnd));
 
-        $this->dateEarlierThanValidator->validate($this->dateTimeStart, $this->constraint);
+        $validator->validate($this->dateTimeStart, $this->constraint);
     }
 
 
@@ -109,7 +118,7 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->dateEarlierThanValidator->validate($this->dateTimeStart, $this->constraint);
+        $this->validator->validate($this->dateTimeStart, $this->constraint);
     }
 
     public function testInvalidData()
@@ -125,6 +134,6 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo(array('{{ ' . $this->constraint->getDefaultOption() . ' }}' => $this->constraint->field))
             );
 
-        $this->dateEarlierThanValidator->validate($this->dateTimeEnd, $this->constraint);
+        $this->validator->validate($this->dateTimeEnd, $this->constraint);
     }
 }
