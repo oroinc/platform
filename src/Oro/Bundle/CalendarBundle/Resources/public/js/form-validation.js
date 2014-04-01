@@ -87,26 +87,15 @@ function($, _, __, app) {
          * Removes all field level errors.
          *
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
-         * @var fakeTarget {jQuery} The jQuery object for a form field, which duplicate the real hidden field.
-         *                          For example - jQuery DateTimePicker plugin
          */
         removeFieldErrors: function (field) {
-            var targets = [_.isString(field) ? $(field) : field];
+            var $field     = $(field),
+                $container = $field.closest('.controls');
 
-            if (!targets[0].parent().is(':visible')) {
-                var fakeTarget = targets[0].closest('div.controls').children(':input');
-                if (fakeTarget.length) {
-                    targets.push(fakeTarget);
-                }
-            }
-
-            _.each(targets, function(target) {
-                if (target.parent().filter('.error').length) {
-                    target = target.parent();
-                }
-                target.siblings('.validation-failed').remove();
-                target.removeClass('error').parent().filter('.controls').removeClass('validation-error');
-             });
+            $container
+                .removeClass('validation-error')
+                .find('.error')
+                .removeClass('error');
         },
 
         /**
@@ -114,33 +103,25 @@ function($, _, __, app) {
          *
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          * @param errorMessages {string[]|string} The localized error string(s).
-         * @var fakeTarget {jQuery} The jQuery object for a form field, which duplicate the real hidden field.
-         *                          For example - jQuery DateTimePicker plugin
          */
         addFieldErrors: function (field, errorMessages) {
-            var targets = [_.isString(field) ? $(field) : field];
+            var $field     = $(field),
+                $container = $field.closest('div.controls');
 
-            if (!targets[0].parent().is(':visible')) {
-                var fakeTarget = targets[0].closest('div.controls').children(':input');
-                if (fakeTarget.length) {
-                    targets.push(fakeTarget);
-                }
+            if (!$field.is(':visible')) {
+                $field = $container.children(':input');
             }
 
-            _.each(targets, function(target) {
-                if (target.parent().filter('.selector').length || target.parent().filter('.uploader').length) {
-                    target = target.parent();
-                }
+            var $errorContainer = $field.siblings('.validation-failed');
 
-                if (!target.siblings('.validation-failed').length) {
-                    $('<span class="validation-failed"></span>').insertAfter(target);
-                }
+            if (!$errorContainer.length) {
+                $errorContainer = $('<span class="validation-failed"></span>');
+                $field.after($errorContainer);
+            }
 
-                target.siblings('.validation-failed').text(
-                    _.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages
-                );
-                target.addClass('error').parent().filter('.controls').addClass('validation-error');
-            });
+            $errorContainer.show().text(_.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages);
+            $field.addClass('error');
+            $container.addClass('validation-error');
         },
 
         /**
