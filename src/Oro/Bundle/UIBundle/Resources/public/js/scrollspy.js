@@ -21,7 +21,6 @@ define(function (require) {
         container.find('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
-            $('.scrollspy-nav ul.nav li').removeClass('active').first().addClass('active');
         });
     };
 
@@ -80,7 +79,7 @@ define(function (require) {
                 }
             });
 
-            $spy.scrollspy('refresh');
+            $spy.scrollspy('refresh').scrollspy('process');
         });
     };
 
