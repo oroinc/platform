@@ -45,8 +45,11 @@ Leave empty for system value: Leave empty for system value
 Required: Required
 Add: Add
 Reset: Reset
-system: system
-yes: yes
+Apply: Apply
+Info: Info
+System: System
+Yes: Yes
+No: No
 Update field: Update field
 Delete field: Delete field
 Update this transition: Update this transition
@@ -62,6 +65,7 @@ General Information: General Information
 Create Workflow: Create Workflow
 Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
+There are no transitions yet.: There are no transitions yet.
 
 oro:
     workflow:
