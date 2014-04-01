@@ -62,7 +62,7 @@ abstract class OroKernel extends Kernel
                     ) {
                         return false;
                     }
-                    if ($current->isDir() && !is_dir($current->getPathname() . '/Resources')) {
+                    if (!is_dir($current->getPathname() . '/Resources')) {
                         return true;
                     } else {
                         $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
