@@ -4,7 +4,7 @@ oro_menu_config:
             label: 'oro.workflow.workflowdefinition.entity_plural_label'
             extras:
                 position:    100
-                description: 'oro.workflow.workflow_definition_list.description'
+                description: 'oro.workflow.menu.workflow_definition_list.description'
                 routes:      ['/^oro_workflow_definition/']
             route: 'oro_workflow_definition_index'
 

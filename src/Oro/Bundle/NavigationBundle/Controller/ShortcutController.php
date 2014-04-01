@@ -56,8 +56,11 @@ class ShortcutController extends Controller
         /** @var $item ItemInterface */
         foreach ($iterator as $item) {
             if ($item->getExtra('isAllowed') && !in_array($item->getUri(), $this->uris) && $item->getUri() !== '#') {
-                $key = $translator->trans($item->getLabel());
-                $result[$key] = array('url' => $item->getUri(), 'description' => $item->getExtra('description'));
+                $result[] = array(
+                    'url' => $item->getUri(),
+                    'label' => $item->getLabel(),
+                    'description' => $item->getExtra('description')
+                );
                 $this->uris[] = $item->getUri();
             }
         }

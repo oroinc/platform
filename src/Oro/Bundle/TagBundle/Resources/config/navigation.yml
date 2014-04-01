@@ -8,10 +8,10 @@ oro_menu_config:
                 routes:      ['oro_tag_*']
                 description: 'oro.tag.menu.tag_list.description'
         shortcut_new_tag:
-            label: 'oro.tag.menu.tag_list.label'
+            label: 'oro.tag.menu.shortcut_new_tag.label'
             route: 'oro_tag_create'
             extras:
-                description: 'oro.tag.menu.tag_list.description'
+                description: 'oro.tag.menu.shortcut_new_tag.description'
     tree:
         application_menu:
             children:

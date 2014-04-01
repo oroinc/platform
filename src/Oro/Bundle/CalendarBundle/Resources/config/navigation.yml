@@ -1,7 +1,7 @@
 oro_menu_config:
     items:
         oro_calendar_view_default:
-            label: 'oro.calenar.menu.view_default.label'
+            label: 'oro.calendar.menu.view_default.label'
             route: 'oro_calendar_view_default'
             extras:
                 position: 20

@@ -12,7 +12,7 @@ oro_menu_config:
             label: 'oro.cron.menu.cron_job_shortcut.label'
             route: 'oro_cron_job_index'
             extras:
-                description: 'List of cron jobs'
+                description: 'oro.cron.menu.cron_job_shortcut.description'
 
     tree:
         application_menu:

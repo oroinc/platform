@@ -4,7 +4,7 @@ oro_menu_config:
             label: 'oro.config.menu.system_configuration.label'
             extras:
                 position:    10
-                description: 'System configuration'
+                description: 'oro.config.menu.system_configuration.description'
             route: 'oro_config_configuration_system'
 
     tree:
