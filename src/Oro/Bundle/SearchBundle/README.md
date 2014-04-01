@@ -1,5 +1,5 @@
-Search Bundle
-========================
+OeoSearchBundle
+===============
 
 Search bundle create search index for mapping objects and allow to create advanced queries to this indexed data.
 

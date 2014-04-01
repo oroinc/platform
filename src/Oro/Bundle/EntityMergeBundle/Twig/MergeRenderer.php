@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
+use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MergeRenderer
 {
@@ -15,17 +18,27 @@ class MergeRenderer
     protected $environment;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var string
      */
     protected $defaultTemplate;
 
     /**
      * @param \Twig_Environment $environment
+     * @param EventDispatcherInterface $eventDispatcher
      * @param string $defaultTemplate
      */
-    public function __construct(\Twig_Environment $environment, $defaultTemplate)
-    {
+    public function __construct(
+        \Twig_Environment $environment,
+        EventDispatcherInterface $eventDispatcher,
+        $defaultTemplate
+    ) {
         $this->environment = $environment;
+        $this->eventDispatcher = $eventDispatcher;
         $this->defaultTemplate = $defaultTemplate;
     }
 
@@ -112,16 +125,22 @@ class MergeRenderer
      */
     protected function convertToString($value, Metadata $metadata)
     {
+        $convertResult = null;
+
         if (null === $value || is_scalar($value)) {
-            return (string) $value;
+            $convertResult = $value;
+        } else {
+            $method = $metadata->get('cast_method') ? : '__toString';
+
+            if (method_exists($value, $method)) {
+                $convertResult = $value->$method();
+            }
         }
 
-        $method = $metadata->get('cast_method') ? : '__toString';
+        $event = new ValueRenderEvent($convertResult, $value, $metadata);
+        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_VALUE_RENDER, $event);
+        $convertResult = $event->getConvertedValue();
 
-        if (method_exists($value, $method)) {
-            return $value->$method();
-        }
-
-        return '';
+        return (string)$convertResult;
     }
 }

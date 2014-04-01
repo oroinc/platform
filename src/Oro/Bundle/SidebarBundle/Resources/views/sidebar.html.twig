@@ -1,9 +1,9 @@
-{% if isDesktopVersion() %}
+{% if isDesktopVersion() and oro_config_value('oro_sidebar.sidebar_' ~ placement ~ '_active') == true %}
 <div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"></div>
 
 <script type="text/javascript">
-    require(['jquery', 'oro/sidebar/sidebar/model', 'oro/sidebar/sidebar/view',
-        'oro/sidebar/widget-container/collection', 'oro/sidebar/constants'],
+    require(['jquery', 'orosidebar/js/model', 'orosidebar/js/view',
+        'orosidebar/js/widget-container/collection', 'orosidebar/js/constants'],
     function($, SidebarModel, SidebarView, WidgetContainerCollection, constants) {
         'use strict';
 

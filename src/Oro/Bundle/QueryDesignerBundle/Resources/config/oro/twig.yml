@@ -1,0 +1,2 @@
+bundles:
+    - OroQueryDesignerBundle:Form:fields.html.twig

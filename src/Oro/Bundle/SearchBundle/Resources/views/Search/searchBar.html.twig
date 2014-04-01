@@ -6,7 +6,7 @@
         <li class="dark">
             <form method="get" action="{{ path('oro_search_results') }}" style="margin: 0" id="top-search-form" class="search-form">
                 <div id="search-div" class="input-append input-prepend pull-left header-search">
-                    <div class="btn-group">
+                    <div class="btn-group btn-block">
                         <button data-toggle="dropdown" class="btn dropdown-toggle" id="search-bar-button">
                             <span class="search-bar-type">{% trans %}All{% endtrans %}</span>
                             <span class="icon-caret-down"></span>
@@ -32,7 +32,7 @@
                         <input type="text" id="search-bar-search" class="span2 search" placeholder="" name="search" value="" autocomplete="off"/>
                         <button type="submit" class="btn btn-search btn-primary">{% trans %}Go{% endtrans %}</button>
                         <div class="custom-dropdown" id="search-dropdown"></div>
-                        <div class="search-more"><a href="javascript:void(0);" class="search-view-more-link">{% trans %}View more...{% endtrans %}</a></div>
+                        <div class="search-more hide"><a href="javascript:void(0);" class="search-view-more-link">{% trans %}View more...{% endtrans %}</a></div>
                     </div>
                 </div>
             </form>
@@ -40,6 +40,6 @@
     </ul>
 </div>
 <script type="text/javascript">
-    require(['oro/init-search-bar'])
+    require(['orosearch/js/init-search-bar'])
 </script>
 {% endif %}

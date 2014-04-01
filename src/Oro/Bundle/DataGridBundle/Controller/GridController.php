@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\ImportExportBundle\Context\Context as ExportContext;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
@@ -24,6 +25,27 @@ class GridController extends Controller
 
     /**
      * @Route(
+     *      "/widget/{gridName}",
+     *      name="oro_datagrid_widget",
+     *      requirements={"gridName"="[\w-]+"}
+     * )
+     * @Template
+     *
+     * @param string $gridName
+     *
+     * @return Response
+     */
+    public function widgetAction($gridName)
+    {
+        return array(
+            'gridName'     => $gridName,
+            'params'       => $this->getRequest()->get('params', array()),
+            'renderParams' => $this->getRequest()->get('renderParams', array())
+        );
+    }
+
+    /**
+     * @Route(
      *      "/{gridName}",
      *      name="oro_datagrid_index",
      *      requirements={"gridName"="[\w-]+"}
@@ -31,13 +53,28 @@ class GridController extends Controller
      *
      * @param string $gridName
      *
+     * @throws \Exception
      * @return Response
      */
     public function getAction($gridName)
     {
         $parameters = (array)$this->getRequest()->query->get($gridName, array());
-        $grid = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName, $parameters);
-        $result = $grid->getData();
+        $grid       = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName, $parameters);
+
+        try {
+            $result = $grid->getData();
+        } catch (\Exception $e) {
+            if ($e instanceof UserInputErrorExceptionInterface) {
+                return new JsonResponse(
+                    [
+                        'type'    => UserInputErrorExceptionInterface::TYPE,
+                        'message' => $this->get('translator')->trans($e->getMessageTemplate(), $e->getMessageParams())
+                    ],
+                    500
+                );
+            }
+            throw $e;
+        }
 
         return new JsonResponse($result->toArray());
     }
@@ -115,7 +152,7 @@ class GridController extends Controller
 
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
-        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
+        $response             = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
         $data = [
             'successful' => $response->isSuccessful(),
@@ -128,6 +165,7 @@ class GridController extends Controller
     /**
      * @param ContextInterface $context
      * @param StepExecutor     $executor
+     *
      * @return \Closure
      */
     protected function exportCallback(ContextInterface $context, StepExecutor $executor)

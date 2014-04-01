@@ -101,13 +101,13 @@ Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext
 
 **Description:**
 Implementation of Oro\Bundle\ImportExportBundle\Context\ContextInterface. It is a wrapper of
-instance of Oro\Bundle\BatchBundle\Entity\StepExecution from OroBatchBundle.
+instance of Akeneo\Bundle\BatchBundle\Entity\StepExecution from AkeneoBatchBundle.
 
-**Oro\Bundle\BatchBundle\Entity\StepExecution**
+**Akeneo\Bundle\BatchBundle\Entity\StepExecution**
 Instance of this class can store data of step execution, such as number of records were read/write, errors, exceptions,
-read warnings and execution context (Oro\Bundle\BatchBundle\Item\ExecutionContext), a storage for abstract data generated during execution.
+read warnings and execution context (Akeneo\Bundle\BatchBundle\Item\ExecutionContext), a storage for abstract data generated during execution.
 
-As import/export domain has it's own terms, ContextInterface expands Oro\Bundle\BatchBundle\Entity\StepExecution
+As import/export domain has it's own terms, ContextInterface expands Akeneo\Bundle\BatchBundle\Entity\StepExecution
 interface and decouples it's clients from knowing about OroBatchBundle.
 
 ### Context Registry
@@ -115,8 +115,8 @@ interface and decouples it's clients from knowing about OroBatchBundle.
 Oro\Bundle\ImportExportBundle\Context\ContextRegistry
 
 **Description:**
-A storage which gets specific instance of context based on Oro\Bundle\BatchBundle\Entity\StepExecution.
-Provides interface to get single instances Contexts using Oro\Bundle\BatchBundle\Entity\StepExecution.
+A storage which gets specific instance of context based on Akeneo\Bundle\BatchBundle\Entity\StepExecution.
+Provides interface to get single instances Contexts using Akeneo\Bundle\BatchBundle\Entity\StepExecution.
 
 Reader
 ------

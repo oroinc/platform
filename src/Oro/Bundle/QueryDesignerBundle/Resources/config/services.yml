@@ -1,7 +1,8 @@
 parameters:
-    oro_query_designer.query_designer.manager.class:         Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
-    oro_query_designer.config.resolver.class:                Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
-    oro_query_designer.grid.extension.orm_datasource.class:  Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
+    oro_query_designer.query_designer.manager.class:                Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
+    oro_query_designer.query_designer.restriction_builder.class:    Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder
+    oro_query_designer.config.resolver.class:                       Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
+    oro_query_designer.grid.extension.orm_datasource.class:         Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
 
 services:
     oro_query_designer.query_designer.manager:
@@ -10,6 +11,11 @@ services:
             - []
             - @oro_query_designer.config.resolver
             - @translator
+
+    oro_query_designer.query_designer.restriction_builder:
+        class: %oro_query_designer.query_designer.restriction_builder.class%
+        arguments:
+            - @oro_query_designer.query_designer.manager
 
     oro_query_designer.config.resolver:
         class: %oro_query_designer.config.resolver.class%
@@ -20,6 +26,6 @@ services:
     oro_query_designer.grid.extension.orm_datasource:
         class: %oro_query_designer.grid.extension.orm_datasource.class%
         arguments:
-            - @oro_query_designer.query_designer.manager
+            - @oro_query_designer.query_designer.restriction_builder
         tags:
             - { name: oro_datagrid.extension }

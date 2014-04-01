@@ -5,15 +5,17 @@ namespace Oro\Bundle\EntityExtendBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
-use Symfony\Component\Process\Process;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
+use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 
 class OroEntityExtendBundle extends Bundle
@@ -35,7 +37,9 @@ class OroEntityExtendBundle extends Bundle
     {
         $this->ensureInitialized();
 
+        $container->addCompilerPass(new ConfigLoaderPass());
         $container->addCompilerPass(new EntityManagerPass());
+        $container->addCompilerPass(new MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 array(

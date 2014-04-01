@@ -26,7 +26,7 @@ oro_system_configuration:
             type: oro_locale_country
             priority: 60
             options:
-                label: 'Location'
+                label: 'Primary Location'
                 tooltip: oro.locale.form.tooltip.location
                 required: true
                 constraints:
@@ -36,7 +36,7 @@ oro_system_configuration:
             type: oro_config_checkbox
             priority: 50
             options:
-                label: 'Format address by address country'
+                label: 'Format address per country'
                 tooltip: oro.locale.form.tooltip.format_address_by_address_country
                 required: true
 
@@ -81,6 +81,16 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        oro_locale.quarter_start:
+            type: oro_quarter
+            priority: 30
+            options:
+                label: 'First Quarter Starts on'
+                tooltip: oro.locale.form.tooltip.quarter_start
+                required: true
+                constraints:
+                    - NotBlank: ~
+
     tree:
         system_configuration:
             platform:
@@ -88,7 +98,7 @@ oro_system_configuration:
                     general_setup:
                         children:
                             localization:
-                                priority: 254
+                                priority: 255
                                 children:
                                     locale_settings:
                                         priority: 100
@@ -98,7 +108,9 @@ oro_system_configuration:
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
                                             - oro_locale.currency
+                                            - oro_locale.quarter_start
                             language_settings:
+                                priority: 230
                                 children:
                                     language_languages:
                                         children:

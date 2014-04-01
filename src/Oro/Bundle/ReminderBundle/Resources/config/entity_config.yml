@@ -1,0 +1,6 @@
+oro_entity_config:
+    reminder:
+        entity:
+            items:
+                # reminder email template name
+                reminder_template_name: ~

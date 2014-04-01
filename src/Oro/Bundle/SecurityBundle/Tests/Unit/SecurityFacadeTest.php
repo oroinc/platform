@@ -376,6 +376,17 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
+    public function testIsGrantedWithCombinedString()
+    {
+        $this->securityContext->expects($this->once())
+            ->method('isGranted')
+            ->with($this->equalTo('VIEW'), 'entity:AcmeDemoBundle:Test')
+            ->will($this->returnValue(true));
+
+        $result = $this->facade->isGranted('VIEW;entity:AcmeDemoBundle:Test');
+        $this->assertTrue($result);
+    }
+
     public function testIsGrantedWithObject()
     {
         $obj = new \stdClass();

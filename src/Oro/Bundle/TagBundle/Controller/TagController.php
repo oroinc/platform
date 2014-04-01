@@ -101,6 +101,7 @@ class TagController extends Controller
         }
 
         return array(
+            'entity' => $entity,
             'form' => $this->get('oro_tag.form.tag')->createView(),
         );
     }

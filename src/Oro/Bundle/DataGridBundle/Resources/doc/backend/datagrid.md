@@ -141,10 +141,10 @@ Contains registered datasource type and extensions, also it performs check for d
 For customization of grid behavior(e.g. dynamic columns, actions etc) event listeners could be used.
 Grid dispatches 4 event during preparing.
 
-- oro_datagrid.datgrid.build.before
-- oro_datagrid.datgrid.build.before.EVENT_NAME - named event
-- oro_datagrid.datgrid.build.after
-- oro_datagrid.datgrid.build.after.EVENT_NAME - named event
+- oro_datagrid.datagrid.build.before
+- oro_datagrid.datagrid.build.before.EVENT_NAME - named event
+- oro_datagrid.datagrid.build.after
+- oro_datagrid.datagrid.build.after.EVENT_NAME - named event
 
 Basically build.before event is intended to make changes of grid configuration before builder will process it.
 Single argument pass to listeners is BuildBefore event mediator object.

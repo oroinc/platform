@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'oro/sync', 'oro/mediator', 'oro/messenger', 'oro/translator'],
-function (_, sync, mediator, messenger, __) {
+/*global define*/
+define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'
+    ], function (_, sync, mediator, messenger, __) {
     'use strict';
 
     /**
@@ -12,8 +12,8 @@ function (_, sync, mediator, messenger, __) {
      *  - listing sever messages for content update;
      *  - shows notification for outdated content;
      *
-     * @export oro/content-manager
-     * @name   oro.contentManager
+     * @export oronavigation/js/content-manager
+     * @name   oronavigation.contentManager
      * @type {Object}
      */
     var contentManager,
@@ -49,7 +49,13 @@ function (_, sync, mediator, messenger, __) {
          * Notifier object
          * @type {{close: function()}}
          */
-        notifier;
+        notifier,
+
+        /**
+         * Pages that has been out dated
+         * @type {Array}
+         */
+        outdatedPageHandlers = {};
 
     /**
      * Remove restore params from url
@@ -119,10 +125,10 @@ function (_, sync, mediator, messenger, __) {
     function onUpdate(tags) {
         tags = prepareTags(tags);
 
-        _.each(pagesTags, function(items, url) {
+        _.each(pagesTags, function (items, url) {
             var handler, callbacks = [];
             // collect callbacks for outdated contents
-            _.each(items, function(options) {
+            _.each(items, function (options) {
                 if (_.intersection(options.tags, tags).length) {
                     callbacks.push(options.callback || defaultCallback);
                 }
@@ -138,21 +144,31 @@ function (_, sync, mediator, messenger, __) {
                 _.each(callbacks, function (callback) {
                     callback(url);
                 });
-
             } else {
-                // cached page is outdated - setup page changing handler
-                handler = function(obj) {
-                    if (url === obj.url) {
-                        _.each(callbacks, function (callback) {
-                            callback(url);
-                        });
-                        mediator.off('hash_navigation_request:refresh', handler);
-                    }
-                };
-                mediator.on('hash_navigation_request:refresh', handler);
+                if (!outdatedPageHandlers[url]) {
+                    handler = _.partial(refreshHandler, url, callbacks);
+
+                    outdatedPageHandlers[url] = handler;
+                    mediator.on('hash_navigation_request:refresh', handler);
+                }
             }
             mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === currentUrl() });
         });
+    }
+
+    /**
+     * Page refresh handler, check whenever
+     *
+     * @param {string} url
+     * @param {array} callbacks
+     * @param {object} obj
+     */
+    function refreshHandler(url, callbacks, obj) {
+        if (url === obj.url) {
+            _.each(callbacks, function (callback) {
+                callback(url);
+            });
+        }
     }
 
     /**
@@ -175,7 +191,7 @@ function (_, sync, mediator, messenger, __) {
     }
 
     // handles page changing
-    mediator.on('hash_navigation_request:start', function(navigation) {
+    mediator.on('hash_navigation_request:start', function (navigation) {
         changeUrl(navigation.url);
         if (notifier) {
             notifier.close();
@@ -188,8 +204,8 @@ function (_, sync, mediator, messenger, __) {
     /**
      * Router for hash navigation
      *
-     * @export  oro/content-manager
-     * @class   oro.contentManager
+     * @export oronavigation/js/content-manager
+     * @name   oronavigation.contentManager
      */
     contentManager = {
         /**
@@ -229,11 +245,16 @@ function (_, sync, mediator, messenger, __) {
          *
          * @param {?string} url
          */
-        clearCache: function(url) {
+        clearCache: function (url) {
             if (!_.isUndefined(url)) {
                 url = clearUrl(url);
                 delete pagesCache[url];
                 delete pagesTags[url];
+
+                if (outdatedPageHandlers[url]) {
+                    mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
+                    delete outdatedPageHandlers[url];
+                }
             } else {
                 pagesCache = {};
             }
@@ -245,7 +266,7 @@ function (_, sync, mediator, messenger, __) {
          * @param {string} url
          * @param {Object} page
          */
-        addPage: function(url, page) {
+        addPage: function (url, page) {
             pagesCache[clearUrl(url)] = page;
         },
 
@@ -255,7 +276,7 @@ function (_, sync, mediator, messenger, __) {
          * @param {string} url
          * @return {Object}
          */
-        getPage: function(url) {
+        getPage: function (url) {
             return pagesCache[clearUrl(url)] || false;
         }
     };

@@ -4,13 +4,15 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ENTITY_CLASS = 'SomeEntity';
 
-    const TEST_FROM_EMAIL = 'admin@example.com';
+    const TEST_SENDER_EMAIL = 'admin@example.com';
+    const TEST_SENDER_NAME  = 'asdSDA';
 
     const TEST_ENV = 'prod';
 
@@ -46,10 +48,8 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $mailer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $localeSettings;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    protected $cm;
 
     /**
      * @var EmailNotificationProcessor
@@ -58,8 +58,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMockBuilder('Monolog\Logger')
-            ->disableOriginalConstructor()->getMock();
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -73,8 +72,18 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()->getMock();
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
+
+        $this->cm->expects($this->any())->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['oro_notification.email_notification_sender_email', false, false, self::TEST_SENDER_EMAIL],
+                        ['oro_notification.email_notification_sender_name', false, false, self::TEST_SENDER_NAME]
+                    ]
+                )
+            );
 
         $this->processor = new EmailNotificationProcessor(
             $this->logger,
@@ -82,8 +91,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->entityPool,
             $this->emailRenderer,
             $this->mailer,
-            $this->localeSettings,
-            self::TEST_FROM_EMAIL
+            $this->cm
         );
 
         $this->processor->setEnv(self::TEST_ENV);
@@ -102,6 +110,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         unset($this->configProvider);
         unset($this->cache);
         unset($this->processor);
+        unset($this->cm);
     }
 
     /**
@@ -109,13 +118,8 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $object       = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
-
-        $locale = 'uk_UA';
-        $this->localeSettings->expects($this->once())
-            ->method('getLanguage')
-            ->will($this->returnValue($locale));
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
@@ -124,11 +128,10 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $notification->expects($this->once())
             ->method('getTemplate')
-            ->with($locale)
             ->will($this->returnValue($template));
 
         $expectedSubject = 'subject';
-        $expectedBody = 'body';
+        $expectedBody    = 'body';
 
         $this->emailRenderer->expects($this->once())
             ->method('compileMessage')
@@ -149,7 +152,10 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                         $this->isInstanceOf('Swift_Message', $message);
                         $this->assertEquals($expectedSubject, $message->getSubject());
                         $this->assertEquals($expectedBody, $message->getBody());
-                        $this->assertEquals(array(self::TEST_FROM_EMAIL => null), $message->getFrom());
+                        $this->assertEquals(
+                            array(self::TEST_SENDER_EMAIL => self::TEST_SENDER_NAME),
+                            $message->getFrom()
+                        );
                         $this->assertEquals(array($expectedTo => null), $message->getTo());
                         $this->assertEquals('text/html', $message->getContentType());
 
@@ -168,8 +174,8 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessErrors()
     {
-        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
+        $object        = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $notification  = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
         $notifications = array($notification);
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');

@@ -15,12 +15,13 @@ Table of Contents
  - [Currencies](#currencies)
  - [Names formats](#names-formats)
  - [Addresses formats](#addresses-formats)
+ - [Localization Dumping](#localization-dumping)
 
 Overview
 ========
 
-Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings class. Id of the service is "oro_locale.settings".
-This service can be used to get locale specific settings of the application such as:
+Locale Settings is a service of Oro\Bundle\LocaleBundle\Model\LocaleSettings class. Id of the service is
+"oro_locale.settings". This service can be used to get locale specific settings of the application such as:
 * locale
 * language
 * location
@@ -191,7 +192,7 @@ accessed:
 * phone prefix
 * default locale
 
-This data is loaded from bundle's file ./Resources/config/locale_data.yml. Other bundles could provide their files
+This data is loaded from bundle's file ./Resources/config/oro/locale_data.yml. Other bundles could provide their files
 to extend this data. Example of locale_data.yml file:
 
 ```yml
@@ -244,7 +245,7 @@ $localeSettings = $this->get('oro_locale.settings');
 $symbol = $localeSettings->getCurrencySymbolByCurrency('USD');
 ```
 
-Data about currency code and currency symbols are loaded from bundle's file ./Resources/config/currency_data.yml. Other bundles could provide their files
+Data about currency code and currency symbols are loaded from bundle's file ./Resources/config/oro/currency_data.yml. Other bundles could provide their files
 to extend this data.
 
 Example of currency_data.yml file:
@@ -270,7 +271,7 @@ $localeSettings = $this->get('oro_locale.settings');
 $nameFormats = $localeSettings->getNameFormats();
 ```
 
-Name formats are loaded from bundle's file ./Resources/config/name_format.yml. Other bundles could provide their files
+Name formats are loaded from bundle's file ./Resources/config/oro/name_format.yml. Other bundles could provide their files
 to extend name formats configuration.
 
 Example of name_format.yml file:
@@ -296,7 +297,7 @@ $localeSettings = $this->get('oro_locale.settings');
 $addressesFormats = $localeSettings->getAddressFormats();
 ```
 
-Addresses formats are loaded from bundle's file ./Resources/config/address_format.yml. Other bundles could provide
+Addresses formats are loaded from bundle's file ./Resources/config/oro/address_format.yml. Other bundles could provide
 their files to extend address formats configuration.
 
 Example of address_format.yml file:
@@ -317,3 +318,21 @@ AM:
 ```
 
 See address formats [detailed documentation](./address-formatting.md).
+
+Localization Dumping
+====================
+
+Localization information is stored in *.yml files in appropriate bundles, but during installation these data
+is dumped to container parameters (on backend) and to file oro.locale_data.js (on frontend).
+
+If user wants to regenerate these dumped information, he have to execute two commands -
+cache:clear and oro:localization:dump:
+```
+> php app/console cache:clear
+Clearing the cache for the dev environment with debug true
+> php app/console oro:localization:dump
+17:28:34 [file+] oro.locale_data.js
+```
+
+First command will update all application cache including container parameters, second command will build
+*.js file that contain all localization information used on frontend.

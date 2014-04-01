@@ -1,11 +1,11 @@
-AddressBundle
-=============
+OroAddressBundle
+================
 
-OroAddressBundle implements basic address storage and country/region storage.
+OroAddressBundle implements base entity and interfaces for address and address related entities like country, region,
+phone and email. It also provides a dictionary with country region codes and names.
 
 ###Table of contents
 
-* [Installation](./Resources/doc/reference/installation.md)
 * [Usage](./Resources/doc/reference/usage.md)
 * [Entities](./Resources/doc/reference/entities.md)
 * [Form Types](./Resources/doc/reference/form_types.md)

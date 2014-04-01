@@ -16,7 +16,7 @@
     {% if not entity.name is empty %}
         {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.entity_label'|trans }, {'label': entity.name}]) %}
     {% else %}
-        {% set breadcrumbs = breadcrumbs|merge([{'label': 'My'|trans ~ ' ' ~ 'oro.calendar.entity_label'|trans }]) %}
+        {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.my_calendar'|trans }]) %}
     {% endif %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}

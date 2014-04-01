@@ -111,7 +111,5 @@ class BackupCommand extends ContainerAwareCommand
         } else {
             $output->writeln('Database backup failed');
         }
-
-        $output->writeln('Done');
     }
 }

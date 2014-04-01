@@ -18,17 +18,31 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException($exception, $message);
 
-        $assembler = new AttributeAssembler();
+        $assembler = new AttributeAssembler($this->getAttributeGuesser());
         $definition = $this->getWorkflowDefinition();
         $assembler->assemble($definition, $configuration);
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getWorkflowDefinition()
     {
         $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
             ->getMock();
         return $definition;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getAttributeGuesser()
+    {
+        $guesser = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeGuesser')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $guesser;
     }
 
     /**
@@ -105,24 +119,38 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider configurationDataProvider
      * @param array $configuration
      * @param Attribute $expectedAttribute
+     * @param array $guessedParameters
      */
-    public function testAssemble($configuration, $expectedAttribute)
+    public function testAssemble($configuration, $expectedAttribute, array $guessedParameters = array())
     {
-        $assembler = new AttributeAssembler();
+        $relatedEntity = '\stdClass';
+
+        $attributeGuesser = $this->getAttributeGuesser();
+        $attributeGuesser->expects($this->any())
+            ->method('fixPropertyPath')
+            ->will($this->returnArgument(0));
+        $attributeConfiguration = current($configuration);
+        if ($guessedParameters && array_key_exists('property_path', $attributeConfiguration)) {
+            $attributeGuesser->expects($this->any())
+                ->method('guessAttributeParameters')
+                ->with($relatedEntity, $attributeConfiguration['property_path'])
+                ->will($this->returnValue($guessedParameters));
+        }
+
+        $assembler = new AttributeAssembler($attributeGuesser);
         $definition = $this->getWorkflowDefinition();
         $definition->expects($this->once())
             ->method('getEntityAttributeName')
             ->will($this->returnValue('entity_attribute'));
+        $definition->expects($this->any())
+            ->method('getRelatedEntity')
+            ->will($this->returnValue($relatedEntity));
+
         $expectedAttributesCount = 1;
         if (!array_key_exists('entity_attribute', $configuration)) {
-            $definition->expects($this->once())
-                ->method('getRelatedEntity')
-                ->will($this->returnValue('\stdClass'));
             $expectedAttributesCount++;
-        } else {
-            $definition->expects($this->never())
-                ->method('getRelatedEntity');
         }
+
         $attributes = $assembler->assemble($definition, $configuration);
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
         $this->assertCount($expectedAttributesCount, $attributes);
@@ -132,13 +160,15 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function configurationDataProvider()
     {
         return array(
             'string' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'string', 'property_path' => null)),
+                array(
+                    'attribute_one' => array('label' => 'label', 'type' => 'string', 'property_path' => null)),
                 $this->getAttribute('attribute_one', 'label', 'string')
             ),
             'bool' => array(
@@ -169,7 +199,9 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             'object' => array(
                 array(
                     'attribute_one' => array(
-                        'label' => 'label', 'type' => 'object', 'options' => array('class' => 'stdClass'),
+                        'label' => 'label',
+                        'type' => 'object',
+                        'options' => array('class' => 'stdClass'),
                         'property_path' => null
                     )
                 ),
@@ -178,7 +210,9 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             'entity_minimal' => array(
                 array(
                     'attribute_one' => array(
-                        'label' => 'label', 'type' => 'entity', 'options' => array('class' => 'stdClass'),
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => array('class' => 'stdClass'),
                         'property_path' => null
                     )
                 ),
@@ -192,7 +226,9 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_related_entity' => array(
                 array(
                     'entity_attribute' => array(
-                        'label' => 'label', 'type' => 'entity', 'options' => array('class' => 'stdClass'),
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => array('class' => 'stdClass'),
                         'property_path' => null
                     )
                 ),
@@ -206,8 +242,11 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_entity_acl' => array(
                 array(
                     'attribute_one' => array(
-                        'label' => 'label', 'type' => 'entity', 'options' => array('class' => 'stdClass'),
-                        'property_path' => null, 'entity_acl' => array('update' => false),
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => array('class' => 'stdClass'),
+                        'property_path' => null,
+                        'entity_acl' => array('update' => false),
                     )
                 ),
                 $this->getAttribute(
@@ -218,6 +257,47 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                     null,
                     array('update' => false)
                 )
+            ),
+            'entity_minimal_guessed_parameters' => array(
+                array(
+                    'attribute_one' => array(
+                        'property_path' => 'entity.field'
+                    )
+                ),
+                $this->getAttribute(
+                    'attribute_one',
+                    'label',
+                    'entity',
+                    array('class' => 'stdClass'),
+                    'entity.field'
+                ),
+                'guessedParameters' => array(
+                    'label' => 'label',
+                    'type' => 'entity',
+                    'options' => array('class' => 'stdClass'),
+                ),
+            ),
+            'entity_full_guessed_parameters' => array(
+                array(
+                    'attribute_one' => array(
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => array('class' => 'stdClass'),
+                        'property_path' => 'entity.field'
+                    )
+                ),
+                $this->getAttribute(
+                    'attribute_one',
+                    'label',
+                    'entity',
+                    array('class' => 'stdClass'),
+                    'entity.field'
+                ),
+                'guessedParameters' => array(
+                    'label' => 'guessed label',
+                    'type' => 'object',
+                    'options' => array('class' => 'GuessedClass'),
+                ),
             ),
         );
     }

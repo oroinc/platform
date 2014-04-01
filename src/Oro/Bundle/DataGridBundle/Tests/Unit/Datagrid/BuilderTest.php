@@ -114,14 +114,14 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\DatagridClass';
         $baseEventList     = [
-            ['oro_datagrid.datgrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
+            ['oro_datagrid.datagrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
             [
-                sprintf('oro_datagrid.datgrid.build.before.%s', self::TEST_DATAGRID_NAME),
+                sprintf('oro_datagrid.datagrid.build.before.%s', self::TEST_DATAGRID_NAME),
                 'Oro\Bundle\DataGridBundle\Event\BuildBefore'
             ],
-            ['oro_datagrid.datgrid.build.after', 'Oro\Bundle\DataGridBundle\Event\BuildAfter'],
+            ['oro_datagrid.datagrid.build.after', 'Oro\Bundle\DataGridBundle\Event\BuildAfter'],
             [
-                sprintf('oro_datagrid.datgrid.build.after.%s', self::TEST_DATAGRID_NAME),
+                sprintf('oro_datagrid.datagrid.build.after.%s', self::TEST_DATAGRID_NAME),
                 'Oro\Bundle\DataGridBundle\Event\BuildAfter'
             ],
         ];
@@ -293,10 +293,6 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ACL_NAME,
                 false
             ],
-            'ACL combined resource given' => [
-                sprintf('%s;%s', self::TEST_ACL_NAME, self::TEST_ACL_DESCRIPTOR),
-                true
-            ]
         ];
     }
 

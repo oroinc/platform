@@ -10,10 +10,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -50,14 +49,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $extendConfigProvider = $event->getConfigManager()->getProvider('extend');
                 if (!$extendConfigProvider->hasConfig($className, $ownerFieldName)) {
                     // update 'ownership' config for entity
-                    $ownershipConfig->set(
-                        'owner_field_name',
-                        ExtendConfigDumper::FIELD_PREFIX . $ownerFieldName
-                    );
-                    $ownershipConfig->set(
-                        'owner_column_name',
-                        ExtendConfigDumper::FIELD_PREFIX . $ownerFieldName . '_id'
-                    );
+                    $ownershipConfig->set('owner_field_name', $ownerFieldName);
+                    $ownershipConfig->set('owner_column_name', $ownerFieldName . '_id');
                     $event->getConfigManager()->persist($ownershipConfig);
 
                     // create 'owner' field
@@ -75,8 +68,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                         $ownerFieldName,
                         [
                             'extend'        => true,
-                            'state'         => ExtendManager::STATE_NEW,
-                            'owner'         => ExtendManager::OWNER_CUSTOM,
+                            'state'         => ExtendScope::STATE_NEW,
+                            'owner'         => ExtendScope::OWNER_CUSTOM,
                             'target_entity' => $ownerTargetEntity,
                             'target_field'  => 'id',
                             'relation_key'  =>

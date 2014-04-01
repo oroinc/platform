@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Groups
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups openGroups() openGroups()
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups assertTitle() assertTitle($title, $message = '')
+ * @method Groups openGroups() openGroups(string)
+ * {@inheritdoc}
  */
 class Groups extends AbstractPageFilteredGrid
 {
@@ -24,7 +24,7 @@ class Groups extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXpath("//a[@title = 'Create group']")->click();
+        $this->test->byXpath("//a[@title = 'Create Group']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new Group($this->test);

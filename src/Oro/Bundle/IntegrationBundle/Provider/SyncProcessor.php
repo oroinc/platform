@@ -14,8 +14,6 @@ use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
 class SyncProcessor
 {
-    const DEFAULT_BATCH_SIZE = 15;
-
     /** @var EntityManager */
     protected $em;
 
@@ -74,7 +72,9 @@ class SyncProcessor
                 $status->setCode(Status::STATUS_FAILED)
                     ->setMessage($e->getMessage())
                     ->setConnector($connector);
-                $channel->addStatus($status);
+
+                $this->em->getRepository('OroIntegrationBundle:Channel')
+                    ->addStatus($channel, $status);
                 continue;
             }
             $jobName = $realConnector->getImportJobName();
@@ -102,18 +102,6 @@ class SyncProcessor
     public function getLoggerStrategy()
     {
         return $this->logger;
-    }
-
-    /**
-     * @param Channel $channel
-     */
-    protected function saveChannel(Channel $channel)
-    {
-        if ($this->em->isOpen()) {
-            $channel = $this->em->merge($channel);
-            $this->em->persist($channel);
-            $this->em->flush();
-        }
     }
 
     /**
@@ -178,7 +166,7 @@ class SyncProcessor
 
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
-        $channel->addStatus($status);
-        $this->saveChannel($channel);
+        $this->em->getRepository('OroIntegrationBundle:Channel')
+            ->addStatus($channel, $status);
     }
 }

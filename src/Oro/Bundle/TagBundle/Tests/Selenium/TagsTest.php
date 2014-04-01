@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Selenium;
 
+use Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 class TagsTest extends Selenium2TestCase
@@ -14,7 +15,7 @@ class TagsTest extends Selenium2TestCase
         $tagName = 'Tag_'.mt_rand();
 
         $login = $this->login();
-
+        /** @var Tags $login */
         $login->openTags('Oro\Bundle\TagBundle')
             ->add()
             ->assertTitle('Create Tag - Tags - System')
@@ -37,7 +38,7 @@ class TagsTest extends Selenium2TestCase
     {
         $newTagName = 'Update_' . $tagName;
         $login = $this->login();
-        /** @var \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags $login*/
+        /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
             ->filterBy('Tag', $tagName)
             ->edit()
@@ -56,7 +57,7 @@ class TagsTest extends Selenium2TestCase
     public function testDeleteTag($tagName)
     {
         $login = $this->login();
-        /** @var \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags $login*/
+        /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
             ->filterBy('Tag', $tagName)
             ->delete()

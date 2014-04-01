@@ -43,7 +43,8 @@ class InstallCommand extends ContainerAwareCommand
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
-            $this->getApplication()
+            $this->getApplication(),
+            $this->getContainer()->get('oro.oro_data_cache_manager')
         );
 
         // if there is application is not installed or no --force option
@@ -135,8 +136,6 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:entity-config:clear')
-            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
                 array(
@@ -146,23 +145,21 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            ->runCommand('doctrine:schema:create')
-            ->runCommand('oro:entity-config:init')
-            ->runCommand('oro:entity-extend:init')
+            ->runCommand('oro:entity-config:clear')
+            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
-                'oro:entity-extend:update-config',
-                array('--process-isolation' => true)
-            )
-            ->runCommand(
-                'doctrine:schema:update',
-                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300
+                )
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)
             )
             ->runCommand(
-                'oro:installer:fixtures:load',
+                'oro:migration:data:load',
                 array('--process-isolation' => true, '--no-interaction' => true)
             );
 
@@ -230,26 +227,19 @@ class InstallCommand extends ContainerAwareCommand
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
         // create an administrator
-        $user = $container->get('oro_user.manager')->createUser();
-        $role = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-        $businessUnit = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(array('name' => 'Main'));
-        $user
-            ->setUsername($userName)
-            ->setEmail($userEmail)
-            ->setFirstName($userFirstName)
-            ->setLastName($userLastName)
-            ->setPlainPassword($userPassword)
-            ->setEnabled(true)
-            ->addRole($role)
-            ->setOwner($businessUnit)
-            ->addBusinessUnit($businessUnit);
-        $container->get('oro_user.manager')->updateUser($user);
+        $commandExecutor->runCommand(
+            'oro:user:create',
+            array(
+                '--process-isolation' => true,
+                '--user-name' => $userName,
+                '--user-email' => $userEmail,
+                '--user-firstname' => $userFirstName,
+                '--user-lastname' => $userLastName,
+                '--user-password' => $userPassword,
+                '--user-role' => 'ROLE_ADMINISTRATOR',
+                '--user-business-unit' => 'Main'
+            )
+        );
 
         // update company name and title if specified
         if (!empty($companyName) && $companyName !== $defaultCompanyName) {
@@ -263,7 +253,7 @@ class InstallCommand extends ContainerAwareCommand
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:installer:fixtures:load',
+                'oro:migration:data:load',
                 array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
             );
         }
@@ -286,10 +276,10 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:navigation:init')
+            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
-            ->runCommand('assets:install')
+            ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
             ->runCommand('assetic:dump')
             ->runCommand('oro:translation:dump')
             ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));

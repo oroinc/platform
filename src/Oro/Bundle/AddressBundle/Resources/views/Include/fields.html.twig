@@ -1,3 +1,6 @@
+{% block oro_combobox_dataconfig_country_select %}
+    country_select2_handler.handle(select2Config);
+{% endblock %}
 {% block oro_region_widget %}
     {# // check if block was not included yet #}
     {% set _block = block('oro_region_updater_js') %}
@@ -20,7 +23,7 @@
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
 
     <script type="text/javascript">
-        require(['jquery', 'oro/region/view', 'oro/region/collection'],
+        require(['jquery', 'oroaddress/js/region/view', 'oroaddress/js/region/collection'],
         function($, RegionView, RegionCollection){
             $(function() {
                 /** @type oro.region.View */
@@ -83,10 +86,14 @@
 {%  endblock %}
 
 {% block oro_address_widget %}
-    <div {{ block('widget_container_attributes') }}>
+    {% if form.parent is not empty %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ block('oro_address_rows') }}
+        </div>
+    {% else %}
         {{ block('oro_address_rows') }}
-    </div>
-{%  endblock %}
+    {% endif %}
+{% endblock %}
 
 {% block oro_address_rows %}
     {{ form_row(form.id) }}
@@ -108,9 +115,7 @@
 {%  endblock %}
 
 {% block oro_typed_address_widget %}
-    <div {{ block('widget_container_attributes') }}>
-        {{ block('oro_typed_address_rows') }}
-    </div>
+    {{ block('oro_typed_address_rows') }}
 {%  endblock %}
 
 {% block oro_typed_address_rows %}

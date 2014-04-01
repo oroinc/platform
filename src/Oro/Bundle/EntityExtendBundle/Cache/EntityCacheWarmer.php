@@ -23,7 +23,7 @@ class EntityCacheWarmer extends CacheWarmer
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function warmUp($cacheDir)
     {
@@ -31,10 +31,10 @@ class EntityCacheWarmer extends CacheWarmer
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function isOptional()
     {
-        return true;
+        return false;
     }
 }

@@ -1,0 +1,8 @@
+{% if app.user %}
+    <script type="text/javascript">
+        require(['ororeminder/js/reminder-handler'], function(reminderHandler) {
+            reminderHandler.setReminders({{ oro_reminder_get_requested_reminders_data()|json_encode|raw }});
+            reminderHandler.showReminders();
+        });
+    </script>
+{% endif %}

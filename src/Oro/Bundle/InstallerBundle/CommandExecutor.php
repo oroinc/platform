@@ -5,8 +5,11 @@ namespace Oro\Bundle\InstallerBundle;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
+
+use Oro\Bundle\SecurityBundle\Cache\OroDataCacheManager;
 
 class CommandExecutor
 {
@@ -26,6 +29,11 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var OroDataCacheManager
+     */
+    protected $dataCacheManager;
+
+    /**
      * @var int
      */
     protected $lastCommandExitCode;
@@ -33,15 +41,21 @@ class CommandExecutor
     /**
      * Constructor
      *
-     * @param string|null     $env
-     * @param OutputInterface $output
-     * @param Application     $application
+     * @param string|null         $env
+     * @param OutputInterface     $output
+     * @param Application         $application
+     * @param OroDataCacheManager $dataCacheManager
      */
-    public function __construct($env, OutputInterface $output, Application $application)
-    {
-        $this->env         = $env;
-        $this->output      = $output;
-        $this->application = $application;
+    public function __construct(
+        $env,
+        OutputInterface $output,
+        Application $application,
+        OroDataCacheManager $dataCacheManager = null
+    ) {
+        $this->env              = $env;
+        $this->output           = $output;
+        $this->application      = $application;
+        $this->dataCacheManager = $dataCacheManager;
     }
 
     /**
@@ -57,13 +71,13 @@ class CommandExecutor
      * @return CommandExecutor
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
-    public function runCommand($command, $params = array())
+    public function runCommand($command, $params = [])
     {
         $params = array_merge(
-            array(
+            [
                 'command'    => $command,
                 '--no-debug' => true,
-            ),
+            ],
             $params
         );
         if ($this->env && $this->env !== 'dev') {
@@ -77,11 +91,9 @@ class CommandExecutor
 
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
-            $phpFinder = new PhpExecutableFinder();
-            $php       = $phpFinder->find();
-            $pb        = new ProcessBuilder();
+            $pb = new ProcessBuilder();
             $pb
-                ->add($php)
+                ->add($this->getPhp())
                 ->add($_SERVER['argv'][0]);
 
             if (array_key_exists('--process-timeout', $params)) {
@@ -89,16 +101,8 @@ class CommandExecutor
                 unset($params['--process-timeout']);
             }
 
-            foreach ($params as $param => $val) {
-                if ($param && '-' === $param[0]) {
-                    if ($val === true) {
-                        $this->addParameter($pb, $param);
-                    } else {
-                        $this->addParameter($pb, $param, $val);
-                    }
-                } else {
-                    $this->addParameter($pb, $val);
-                }
+            foreach ($params as $name => $val) {
+                $this->processParameter($pb, $name, $val);
             }
 
             $process = $pb
@@ -112,25 +116,17 @@ class CommandExecutor
                 }
             );
             $this->lastCommandExitCode = $process->getExitCode();
+
+            // synchronize all data caches
+            if ($this->dataCacheManager) {
+                $this->dataCacheManager->sync();
+            }
         } else {
             $this->application->setAutoExit(false);
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
-        if (0 !== $this->lastCommandExitCode) {
-            if ($ignoreErrors) {
-                $this->output->writeln(
-                    sprintf(
-                        '<error>The command terminated with an exit code: %u.</error>',
-                        $this->lastCommandExitCode
-                    )
-                );
-            } else {
-                throw new \RuntimeException(
-                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
-                );
-            }
-        }
+        $this->processResult($ignoreErrors);
 
         return $this;
     }
@@ -146,11 +142,51 @@ class CommandExecutor
     }
 
     /**
-     * @param ProcessBuilder $processBuilder
-     * @param string $name
+     * @param bool $ignoreErrors
+     * @throws \RuntimeException
+     */
+    protected function processResult($ignoreErrors)
+    {
+        if (0 !== $this->lastCommandExitCode) {
+            if ($ignoreErrors) {
+                $this->output->writeln(
+                    sprintf(
+                        '<error>The command terminated with an exit code: %u.</error>',
+                        $this->lastCommandExitCode
+                    )
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
      * @param array|string|null $value
      */
-    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    protected function processParameter(ProcessBuilder $pb, $name, $value)
+    {
+        if ($name && '-' === $name[0]) {
+            if ($value === true) {
+                $this->addParameter($pb, $name);
+            } else {
+                $this->addParameter($pb, $name, $value);
+            }
+        } else {
+            $this->addParameter($pb, $value);
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $pb, $name, $value = null)
     {
         $parameters = array();
 
@@ -167,7 +203,24 @@ class CommandExecutor
         }
 
         foreach ($parameters as $parameter) {
-            $processBuilder->add($parameter);
+            $pb->add($parameter);
         }
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    protected function getPhp()
+    {
+        $phpFinder = new PhpExecutableFinder();
+        $phpPath   = $phpFinder->find();
+        if (!$phpPath) {
+            throw new FileNotFoundException('The PHP executable could not be found.');
+        }
+
+        return $phpPath;
     }
 }

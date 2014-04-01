@@ -17,15 +17,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-
-        $root = $treeBuilder->root('oro_batch');
-
-        $root
-            ->children()
-                ->booleanNode('enable_mail_notification')->defaultFalse()->end()
-                ->scalarNode('sender_email')->defaultValue('mailer@bap.com')->end()
-            ->end()
-        ->end();
+        $treeBuilder->root('oro_batch');
 
         return $treeBuilder;
     }

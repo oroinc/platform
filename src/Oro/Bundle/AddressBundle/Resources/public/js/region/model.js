@@ -1,11 +1,10 @@
-/* global define */
-define(['backbone'],
-function(Backbone) {
+/*global define*/
+define(['backbone'], function (Backbone) {
     'use strict';
 
     /**
-     * @export  oro/region/model
-     * @class   oro.region.Model
+     * @export  oroaddress/js/region/model
+     * @class   oroaddress.region.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({

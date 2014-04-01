@@ -39,7 +39,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSetStepExecution()
     {
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()->getMock();
         $this->processor->setStepExecution($stepExecution);
 
@@ -197,7 +197,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStepExecution()
     {
-        return $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        return $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
     }

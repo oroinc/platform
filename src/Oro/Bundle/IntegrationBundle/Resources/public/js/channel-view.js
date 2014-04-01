@@ -1,11 +1,11 @@
-/* global define */
-define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'oro/navigation', 'oro/delete-confirmation'],
-function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
+/*global define*/
+define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oronavigation/js/navigation', 'oroui/js/delete-confirmation'
+    ], function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
     "use strict";
 
     /**
-     * @export  oro/integration/channel-view
-     * @class   oro.integration.channelView
+     * @export  orointegration/js/channel-view
+     * @class   orointegration.channelView
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -66,9 +66,9 @@ function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
                 var prevVal = $el.data('current');
                 if (!this.isEmpty()) {
                     var confirm = new DeleteConfirmation({
-                        title:   __('Change Type'),
+                        title:   __('oro.integration.change_type'),
                         okText:  __('Yes, I Agree'),
-                        content: __('Are you sure you want to change type?')
+                        content: __('oro.integration.submit')
                     });
                     confirm.on('ok', _.bind(function () {
                         this.processChange($el);

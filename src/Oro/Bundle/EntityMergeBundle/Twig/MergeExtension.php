@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
@@ -19,13 +22,36 @@ class MergeExtension extends \Twig_Extension
     protected $fieldValueRenderer;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param AccessorInterface $accessor
      * @param MergeRenderer $fieldValueRenderer
+     * @param TranslatorInterface $translator
      */
-    public function __construct(AccessorInterface $accessor, MergeRenderer $fieldValueRenderer)
-    {
+    public function __construct(
+        AccessorInterface $accessor,
+        MergeRenderer $fieldValueRenderer,
+        TranslatorInterface $translator
+    ) {
         $this->accessor = $accessor;
         $this->fieldValueRenderer = $fieldValueRenderer;
+        $this->translator = $translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return array(
+            new \Twig_SimpleFilter(
+                'oro_entity_merge_sort_fields',
+                array($this, 'sortMergeFields')
+            )
+        );
     }
 
     /**
@@ -45,6 +71,30 @@ class MergeExtension extends \Twig_Extension
                 array('is_safe' => array('html'))
             ),
         );
+    }
+
+    /**
+     * Render value of merge field
+     *
+     * @param FormView[] $fields
+     * @return FormView[]
+     */
+    public function sortMergeFields(array $fields)
+    {
+        usort(
+            $fields,
+            function ($first, $second) {
+                $firstLabel = isset($first->vars['label']) ?
+                    $this->translator->trans($first->vars['label']) : $first->vars['name'];
+
+                $secondLabel = isset($second->vars['label']) ?
+                    $this->translator->trans($second->vars['label']) : $second->vars['name'];
+
+                return strnatcasecmp($firstLabel, $secondLabel);
+            }
+        );
+
+        return $fields;
     }
 
     /**

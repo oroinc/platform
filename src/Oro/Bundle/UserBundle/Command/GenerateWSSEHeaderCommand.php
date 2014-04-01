@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 class GenerateWSSEHeaderCommand extends ContainerAwareCommand
 {
@@ -18,7 +19,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $this->setDescription('Generate X-WSSE HTTP header for a given user');
         $this->setDefinition(
             array(
-                new InputArgument('username', InputArgument::REQUIRED, 'The username'),
+                 new InputArgument('username', InputArgument::REQUIRED, 'The username'),
             )
         );
     }
@@ -26,6 +27,9 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
+     *
+     * @throws \InvalidArgumentException
+     * @return int
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -46,9 +50,21 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $created = date('c');
 
         // http://stackoverflow.com/questions/18117695/how-to-calculate-wsse-nonce
-        $prefix         = gethostname();
-        $nonce          = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
-        $passwordDigest = base64_encode(sha1(base64_decode($nonce) . $created . $user->getApi()->getApiKey(), true));
+        $prefix = gethostname();
+        $nonce  = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
+        $salt   = ''; // do not use real salt here, because API key already encrypted enough
+
+        /** @var MessageDigestPasswordEncoder $encoder */
+        $encoder        = $this->getContainer()->get('escape_wsse_authentication.encoder.wsse_secured');
+        $passwordDigest = $encoder->encodePassword(
+            sprintf(
+                '%s%s%s',
+                base64_decode($nonce),
+                $created,
+                $user->getApi()->getApiKey()
+            ),
+            $salt
+        );
 
         $output->writeln('<info>To use WSSE authentication add following headers to the request:</info>');
         $output->writeln('Authorization: WSSE profile="UsernameToken"');

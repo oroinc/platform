@@ -51,6 +51,7 @@ function Util(rootMessagesElements) {
             var dialogOptions = $.extend(true, defaultDialogOptions, {
                 title: title,
                 message: message,
+                onEscape: cancelCallback,
                 buttons: {
                     cancel: {
                         callback: cancelCallback

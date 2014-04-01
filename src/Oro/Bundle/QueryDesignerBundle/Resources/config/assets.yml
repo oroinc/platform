@@ -1,4 +1,4 @@
 css:
-    'query_designer':
+    'oroquerydesigner':
         - 'bundles/oroquerydesigner/css/less/condition-builder.less'
         - 'bundles/oroquerydesigner/css/query-designer.css'

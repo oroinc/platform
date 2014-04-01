@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-class LoadPackageDemoDataCommand extends ContainerAwareCommand
+use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
+use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
+
+class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 {
     /**
      * @inheritdoc
@@ -23,13 +24,14 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
                 'package',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
                 'Package directories'
-            );
+            )
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of fixtures without apply them');
     }
 
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getFixtures(InputInterface $input, OutputInterface $output)
     {
         $suppliedPackagePaths = $input->getArgument('package');
         $packageDirectories = [];
@@ -40,15 +42,12 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
                 continue;
             }
 
-            $packageDirectories[] = $path;
+            $packageDirectories[] = $path . DIRECTORY_SEPARATOR;
         }
 
         if (!$packageDirectories) {
-            $output->writeln('');
-            $output->writeln('<error>No valid paths specified</error>');
-            return 1;
+            throw new \RuntimeException("No valid paths specified", 1);
         }
-
 
         // a function which allows filter fixtures by the given packages
         $filterByPackage = function ($path) use ($packageDirectories) {
@@ -63,31 +62,29 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
 
         // prepare data fixture loader
         // we should load only fixtures from the specified packages
-        $container = $this->getContainer();
-        $loader    = $container->get('oro_installer.fixtures.loader');
-        $loader->isLoadDemoData(true);
-        $hasFixtures = false;
-        $bundles = [];
-        foreach ($container->get('kernel')->getBundles() as $bundleName => $bundle) {
-            $fixtureDir = $bundle->getPath();
-            if (is_dir($fixtureDir) && $filterByPackage($fixtureDir)) {
-                $bundles = $bundleName;
-                $hasFixtures = true;
+        /** @var DataFixturesLoader $loader */
+        $loader = $this->getContainer()->get('oro_migration.data_fixtures.loader');
+        $fixtureRelativePath = $this->getFixtureRelativePath($input);
+
+        /** @var BundleInterface $bundle */
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            $bundleDir = $bundle->getPath();
+            if (is_dir($bundleDir) && $filterByPackage($bundleDir)) {
+                $path = $bundleDir . $fixtureRelativePath;
+                if (is_dir($path)) {
+                    $loader->loadFromDirectory($path);
+                }
             }
         }
 
-        $bundles = array_unique($bundles);
-        // load data fixtures
-        if ($hasFixtures) {
-            $loader->setBundles($bundles);
-            $output->writeln('Loading data ...');
-            $executor = new ORMExecutor($container->get('doctrine.orm.entity_manager'));
-            $executor->setLogger(
-                function ($message) use ($output) {
-                    $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
-                }
-            );
-            $executor->execute($loader->getFixtures(), true);
-        }
+        return $loader->getFixtures();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTypeOfFixtures(InputInterface $input)
+    {
+        return LoadDataFixturesCommand::DEMO_FIXTURES_TYPE;
     }
 }

@@ -7,7 +7,6 @@ use Doctrine\ORM\PersistentCollection;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -81,9 +80,15 @@ class ConfigProvider implements ConfigProviderInterface
             $className = $this->getClassName($className);
         }
 
-        return $fieldName
-            ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
-            : new EntityConfigId($this->getScope(), $className);
+        if ($fieldName) {
+            if ($fieldType) {
+                return new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType);
+            } else {
+                return $this->configManager->getId($this->getScope(), $className, $fieldName);
+            }
+        } else {
+            return new EntityConfigId($this->getScope(), $className);
+        }
     }
 
     /**

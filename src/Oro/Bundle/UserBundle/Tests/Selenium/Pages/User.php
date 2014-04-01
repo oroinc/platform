@@ -51,6 +51,8 @@ class User extends AbstractPageEntity
     protected $website;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
+    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $inviteUser;
 
     public function init($new = false)
     {
@@ -66,6 +68,14 @@ class User extends AbstractPageEntity
         $this->groups = $this->test->byId('oro_user_user_form_groups');
         $this->roles = $this->test->byId('oro_user_user_form_roles');
         $this->owner = $this->test->select($this->test->byId('oro_user_user_form_owner'));
+        $this->inviteUser = $this->test->byId('oro_user_user_form_inviteUser');
+
+        return $this;
+    }
+
+    public function uncheckInviteUser()
+    {
+        $this->inviteUser->click();
 
         return $this;
     }
@@ -175,7 +185,7 @@ class User extends AbstractPageEntity
             $this->waitForAjax();
             $this->assertElementPresent(
                 "//div[@id='select2-drop']//div[contains(., '{$tag}')]",
-                "Tag's autocoplete doesn't return entity"
+                "Tag's autocomplete doesn't return entity"
             );
             $this->tags->clear();
         } else {
@@ -205,7 +215,7 @@ class User extends AbstractPageEntity
             $this->waitForAjax();
             $this->assertElementPresent(
                 "//div[@id='select2-drop']//div[contains(., '{$tag}')]",
-                "Tag's autocoplete doesn't return entity"
+                "Tag's autocomplete doesn't return entity"
             );
             $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$tag}')]")->click();
 
@@ -215,12 +225,31 @@ class User extends AbstractPageEntity
         }
     }
 
-    public function setRoles($roles = array())
+    /**
+     * @param array $roles
+     * @param bool  $oneOf Do not check role exists or not
+     *
+     * @return $this
+     */
+    public function setRoles($roles = array(), $oneOf = false)
     {
-        foreach ($roles as $role) {
+        $condition = '';
+        if ($oneOf) {
+            foreach ($roles as $role) {
+                if ($condition != '') {
+                    $condition .= ' or ';
+                }
+                $condition .= "normalize-space(text()) = '{$role}'";
+            }
             $this->roles->element(
-                $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                $this->test->using('xpath')->value("div[label[{$condition}]]/input")
             )->click();
+        } else {
+            foreach ($roles as $role) {
+                $this->roles->element(
+                    $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                )->click();
+            }
         }
 
         return $this;
@@ -240,7 +269,7 @@ class User extends AbstractPageEntity
 
     public function edit()
     {
-        $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit user']")->click();
+        $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit User']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();
@@ -263,7 +292,7 @@ class User extends AbstractPageEntity
         $this->test->byXpath("//ul[@class='dropdown-menu']//a[contains(normalize-space(.), 'My User')]")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[label[normalize-space(text()) = 'Username']]//div/p[normalize-space(text()) = '$userName']"
+            "//div[label[normalize-space(text()) = 'Username']]//div/div[normalize-space(text()) = '$userName']"
         );
         return $this;
     }

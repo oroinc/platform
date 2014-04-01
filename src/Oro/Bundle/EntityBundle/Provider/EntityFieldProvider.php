@@ -151,10 +151,7 @@ class EntityFieldProvider
             $metadata = $em->getClassMetadata($className);
 
             foreach ($metadata->getFieldNames() as $fieldName) {
-                $fieldLabel = $this->getFieldLabel(
-                    $className,
-                    $this->getFieldNameToTranslate($className, $fieldName)
-                );
+                $fieldLabel = $this->getFieldLabel($className, $fieldName);
                 $this->addField(
                     $result,
                     $fieldName,
@@ -226,10 +223,7 @@ class EntityFieldProvider
 
                     $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                     $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel      = $this->getFieldLabel(
-                        $className,
-                        $this->getFieldNameToTranslate($className, $associationName)
-                    );
+                    $fieldLabel      = $this->getFieldLabel($className, $associationName);
                     $relationData    = array(
                         'name'                => $associationName,
                         'type'                => $targetMetadata->getTypeOfField($targetFieldName),
@@ -339,26 +333,6 @@ class EntityFieldProvider
         }
 
         return false;
-    }
-
-    /**
-     * Returns a string can be used to translate the given field name.
-     * For extend fields the field prefix is removed from the given field name.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @return string
-     */
-    protected function getFieldNameToTranslate($className, $fieldName)
-    {
-        if (strpos($fieldName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
-            $guessedFieldName = substr($fieldName, strlen(ExtendConfigDumper::FIELD_PREFIX));
-            if ($this->isExtendField($className, $guessedFieldName)) {
-                $fieldName = $guessedFieldName;
-            }
-        }
-
-        return $fieldName;
     }
 
     /**

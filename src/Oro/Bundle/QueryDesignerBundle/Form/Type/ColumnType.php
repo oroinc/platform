@@ -18,10 +18,12 @@ class ColumnType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('name', 'oro_field_choice', array('required' => true))
             ->add('label', 'text', array('required' => true))
             ->add('func', 'oro_function_choice', array('required' => false))
             ->add('sorting', 'oro_sorting_choice', array('required' => false));
 
+        /*
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -35,16 +37,17 @@ class ColumnType extends AbstractType
                         null,
                         array(
                             'required'           => true,
+                            'auto_initialize'    => false,
                             'entity'             => $form->getConfig()->getOption('entity'),
                             'skip_load_entities' => true,
                             'skip_load_data'     => true,
                             'with_relations'     => true,
-                            'auto_initialize'    => false
                         )
                     )
                 );
             }
         );
+        */
     }
 
     /**

@@ -138,6 +138,7 @@ class EmailTemplateController extends Controller
         }
 
         return array(
+            'entity'  => $entity,
             'form'    => $this->get('oro_email.form.emailtemplate')->createView(),
             'isClone' => $isClone
         );

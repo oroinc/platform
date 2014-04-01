@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -112,7 +112,7 @@ class EntityProvider
             $className = $config->getId()->getClassName();
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
-                [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
             )
             ) {
                 $this->addEntity(

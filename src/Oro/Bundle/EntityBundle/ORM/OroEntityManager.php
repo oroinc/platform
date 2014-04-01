@@ -9,11 +9,9 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 
-use Doctrine\ORM\ORMInvalidArgumentException;
 use Oro\Bundle\EntityBundle\ORM\Query\FilterCollection;
 
-use Oro\Bundle\EntityExtendBundle\Entity\ProxyEntityInterface;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class OroEntityManager extends EntityManager
 {
@@ -25,11 +23,11 @@ class OroEntityManager extends EntityManager
     protected $filterCollection;
 
     /**
-     * Manager for extend and custom entities
+     * Entity config provider for "extend" scope
      *
-     * @var ExtendManager
+     * @var ConfigProvider
      */
-    protected $extendManager;
+    protected $extendConfigProvider;
 
     public static function create($conn, Configuration $config, EventManager $eventManager = null)
     {
@@ -51,31 +49,22 @@ class OroEntityManager extends EntityManager
     }
 
     /**
-     * @param \Oro\Bundle\EntityExtendBundle\Extend\ExtendManager $extendManager
+     * @param ConfigProvider $extendConfigProvider
      * @return $this
      */
-    public function setExtendManager($extendManager)
+    public function setExtendConfigProvider($extendConfigProvider)
     {
-        $this->extendManager = $extendManager;
+        $this->extendConfigProvider = $extendConfigProvider;
 
         return $this;
     }
 
     /**
-     * @return ExtendManager
+     * @return ConfigProvider
      */
-    public function getExtendManager()
+    public function getExtendConfigProvider()
     {
-        return $this->extendManager;
-    }
-
-    /**
-     * @param $entity
-     * @return bool
-     */
-    public function isExtendEntity($entity)
-    {
-        return $this->extendManager->isExtend($entity);
+        return $this->extendConfigProvider;
     }
 
     /**
@@ -127,7 +116,7 @@ class OroEntityManager extends EntityManager
     {
         $repo = parent::getRepository($className);
         if ($repo instanceof EntityConfigAwareRepositoryInterface) {
-            $repo->setEntityConfigManager($this->extendManager->getConfigProvider()->getConfigManager());
+            $repo->setEntityConfigManager($this->extendConfigProvider->getConfigManager());
         }
 
         return $repo;

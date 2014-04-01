@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class TargetType extends AbstractType
 {
@@ -88,7 +88,7 @@ class TargetType extends AbstractType
             function (EntityConfigId $configId) use ($configManager) {
                 $config = $configManager->getConfig($configId);
 
-                return $config->is('is_extend', false) || !$config->is('state', ExtendManager::STATE_NEW);
+                return $config->is('is_extend', false) || !$config->is('state', ExtendScope::STATE_NEW);
             }
         );
 

@@ -8,7 +8,6 @@
     "require": {
         "php": ">=5.3.3",
         "ext-intl": "*",
-        "lib-ICU": ">=4.4",
         "symfony/symfony": ">=2.1",
         "oro/requirejs-bundle": "dev-master",
         "oro/config-bundle": "dev-master"

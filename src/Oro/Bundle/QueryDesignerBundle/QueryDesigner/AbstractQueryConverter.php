@@ -40,12 +40,12 @@ abstract class AbstractQueryConverter
     /**
      * @var array
      */
-    private $tableAliases;
+    protected $tableAliases;
 
     /**
      * @var array
      */
-    private $columnAliases;
+    protected $columnAliases;
 
     /**
      * Constructor

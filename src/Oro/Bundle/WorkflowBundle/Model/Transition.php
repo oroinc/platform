@@ -285,9 +285,6 @@ class Transition
         if ($this->isAllowed($workflowItem)) {
             $stepTo = $this->getStepTo();
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
-            if ($stepTo->isFinal() || !$stepTo->hasAllowedTransitions()) {
-                $workflowItem->setClosed(true);
-            }
 
             if ($this->postAction) {
                 $this->postAction->execute($workflowItem);
@@ -346,7 +343,7 @@ class Transition
      */
     public function hasForm()
     {
-        return !empty($this->formOptions);
+        return !empty($this->formOptions) && !empty($this->formOptions['attribute_fields']);
     }
 
     /**

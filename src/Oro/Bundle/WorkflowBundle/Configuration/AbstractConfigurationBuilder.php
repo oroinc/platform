@@ -26,7 +26,7 @@ abstract class AbstractConfigurationBuilder
      * @param mixed $default
      * @return mixed
      */
-    protected function getConfigurationOption(array $options, $key, $default)
+    protected function getConfigurationOption(array $options, $key, $default = null)
     {
         if (array_key_exists($key, $options)) {
             return $options[$key];

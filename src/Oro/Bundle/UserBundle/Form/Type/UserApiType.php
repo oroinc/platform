@@ -44,4 +44,13 @@ class UserApiType extends UserType
     {
         return 'user';
     }
+
+    /**
+     * Add Invite user fields
+     *
+     * @param FormBuilderInterface $builder
+     */
+    protected function addInviteUserField(FormBuilderInterface $builder)
+    {
+    }
 }

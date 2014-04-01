@@ -18,6 +18,7 @@ parameters:
     oro_locale.form.type.locale.class:   Oro\Bundle\LocaleBundle\Form\Type\LocaleType
     oro_locale.form.type.language.class: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
     oro_locale.form.type.timezone.class: Oro\Bundle\LocaleBundle\Form\Type\TimezoneType
+    oro_locale.form.type.quarter.class:  Oro\Bundle\LocaleBundle\Form\Type\QuarterType
 
     oro_locale.locale_listener.class:   Oro\Bundle\LocaleBundle\EventListener\LocaleListener
 
@@ -93,6 +94,11 @@ services:
         tags:
             - { name: form.type, alias: "oro_locale_timezone" }
 
+    oro_locale.form.type.quarter:
+        class: %oro_locale.form.type.quarter.class%
+        tags:
+            - { name: form.type, alias: "oro_quarter" }
+
     # Converters
     oro_locale.format_converter.date_time.registry:
         class: %oro_locale.format_converter.date_time.registry.class%
@@ -116,6 +122,7 @@ services:
         class: %oro_locale.locale_listener.class%
         arguments:
             - @oro_locale.settings
+            - @stof_doctrine_extensions.listener.translatable
             - %installed%
         calls:
             - [ setRequest, [@?request=] ]

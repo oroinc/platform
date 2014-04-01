@@ -1,21 +1,19 @@
+{% import 'OroDataAuditBundle::macros.html.twig' as dataAudit %}
+
 <ul>
 {% for fieldKey, fieldValue in value %}
     {% if fieldKey == 'auditData' %}
         {% if fieldValue.new|length %}
         {% for collKey, collValue in fieldValue.new %}
-    <li>
-        <b>{{ collKey }}: </b> {{ collValue }}
-    </li>
+            <li>
+                <b>{{ collKey }}: </b> {{ collValue }}
+            </li>
         {% endfor %}
         {% endif %}
     {% else %}
-    <li>
-        {%  set value = fieldValue.new.timestamp is defined
-            ? fieldValue.new|oro_format_datetime
-            : ( fieldValue.new is iterable ? fieldValue.new|join(', ') : fieldValue.new|default(''))
-        %}
-        <b>{{ fieldKey }}: </b>{{ value }}
-    </li>
+        <li>
+            <b>{{ fieldKey }}:</b> {{ dataAudit.renderFieldValue(fieldValue.new) }}
+        </li>
     {% endif %}
 {% endfor %}
 </ul>

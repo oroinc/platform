@@ -51,7 +51,7 @@ class RunnerTest extends WebTestCase
             'The install script was executed'
         );
 
-        $this->assertEquals($expectedOutput, $runner->install($package));
+        $this->assertEquals($expectedOutput, $runner->runInstallScripts($package));
     }
 
     public function testShouldDoNothingWhenInstallScriptIsAbsent()
@@ -63,7 +63,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('There is no '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/empty');
 
-        $this->assertNull($runner->install($package));
+        $this->assertNull($runner->runInstallScripts($package));
     }
 
     /**
@@ -79,7 +79,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('The command '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/invalid');
 
-        $runner->install($package);
+        $runner->runInstallScripts($package);
     }
 
     public function testShouldRunValidUninstallScriptOfPackageAndReturnOutput()
@@ -96,7 +96,7 @@ class RunnerTest extends WebTestCase
             'The uninstall script was executed'
         );
 
-        $this->assertEquals($expectedOutput, $runner->uninstall($package));
+        $this->assertEquals($expectedOutput, $runner->runUninstallScripts($package));
     }
 
     public function testShouldDoNothingWhenUninstallScriptIsAbsent()
@@ -108,7 +108,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('There is no '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/empty');
 
-        $this->assertNull($runner->uninstall($package));
+        $this->assertNull($runner->runUninstallScripts($package));
     }
 
     /**
@@ -124,7 +124,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('The command '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/invalid');
 
-        $runner->uninstall($package);
+        $runner->runUninstallScripts($package);
     }
 
     public function testShouldRunValidUpdateScriptOfPackageAndReturnOutput()
@@ -141,7 +141,7 @@ class RunnerTest extends WebTestCase
             'The update script was executed'
         );
 
-        $this->assertEquals($expectedOutput, $runner->update($package, 'any version'));
+        $this->assertEquals($expectedOutput, $runner->runUpdateScripts($package, 'any version'));
     }
 
     public function testShouldDoNothingWhenUpdateScriptIsAbsent()
@@ -153,7 +153,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('There is no '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/empty');
 
-        $this->assertNull($runner->update($package, 'any version'));
+        $this->assertNull($runner->runUpdateScripts($package, 'any version'));
     }
 
     /**
@@ -169,7 +169,7 @@ class RunnerTest extends WebTestCase
             ->with($this->stringContains('The command '));
         $runner = $this->createRunner($package, $logger, __DIR__ . '/../Fixture/Script/invalid');
 
-        $runner->update($package, 'any version');
+        $runner->runUpdateScripts($package, 'any version');
     }
 
     public function testShouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
@@ -192,7 +192,7 @@ class RunnerTest extends WebTestCase
             'update 3'
         );
 
-        $this->assertEquals($expectedRunnerOutput, $runner->update($package, '1'));
+        $this->assertEquals($expectedRunnerOutput, $runner->runUpdateScripts($package, '1'));
     }
 
     public function testShouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
@@ -215,7 +215,7 @@ class RunnerTest extends WebTestCase
             'update 0.1.10'
         );
 
-        $this->assertEquals($expectedRunnerOutput, $runner->update($package, '0.1.9'));
+        $this->assertEquals($expectedRunnerOutput, $runner->runUpdateScripts($package, '0.1.9'));
     }
 
     public function testShouldRunUpdatePlatformCommandWithoutErrors()

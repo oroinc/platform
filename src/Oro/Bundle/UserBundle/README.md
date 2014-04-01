@@ -1,5 +1,6 @@
-User Bundle
-===========
+OroUserBundle
+=============
+
 Provides user management functionality (authentication, authorization, etc).
 
 

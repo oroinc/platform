@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
-use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 
 /**
  * A factory class to create ACL ObjectIdentity objects
@@ -41,7 +41,7 @@ class ObjectIdentityFactory
      */
     public function root($oidOrExtensionKey)
     {
-        if ($oidOrExtensionKey instanceof ObjectIdentity) {
+        if ($oidOrExtensionKey instanceof ObjectIdentityInterface) {
             $oidOrExtensionKey = $this->extensionSelector
                 ->select($oidOrExtensionKey)
                 ->getExtensionKey();
@@ -56,11 +56,11 @@ class ObjectIdentityFactory
      * Constructs an underlying ObjectIdentity for given ObjectIdentity
      * Underlying is class level ObjectIdentity for given object level ObjectIdentity.
      *
-     * @param ObjectIdentity $oid
+     * @param ObjectIdentityInterface $oid
      * @return ObjectIdentity
      * @throws InvalidAclException
      */
-    public function underlying(ObjectIdentity $oid)
+    public function underlying(ObjectIdentityInterface $oid)
     {
         if ($oid->getIdentifier() === self::ROOT_IDENTITY_TYPE
             || $oid->getIdentifier() === ($extensionKey = $this->extensionSelector->select($oid)->getExtensionKey())

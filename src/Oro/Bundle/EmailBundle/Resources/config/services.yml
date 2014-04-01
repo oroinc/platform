@@ -198,6 +198,7 @@ services:
         arguments:
             - @oro_email.email_renderer
             - @security.context
+            - @doctrine.orm.entity_manager
         tags:
             - { name: validator.constraint_validator, alias: oro_email.variables_validator }
 
@@ -238,4 +239,4 @@ services:
         arguments:
             - @oro_email.datagrid_query_factory
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.email-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.email-grid, method: onBuildAfter }

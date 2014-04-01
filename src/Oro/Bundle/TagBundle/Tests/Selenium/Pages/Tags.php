@@ -8,8 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Tags
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
- * @method \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags openTags() openTags()
- * @method \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags assertTitle() assertTitle($title, $message = '')
+ * @method Tags openTags() openTags(string)
  * {@inheritdoc}
  */
 class Tags extends AbstractPageFilteredGrid
@@ -29,7 +28,7 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function add($new = true)
     {
-        $this->test->byXPath("//a[@title='Create tag']")->click();
+        $this->test->byXPath("//a[@title='Create Tag']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $tag = new Tag($this->test);

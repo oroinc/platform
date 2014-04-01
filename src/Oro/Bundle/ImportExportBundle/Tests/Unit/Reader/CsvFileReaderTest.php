@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 
 class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
@@ -167,7 +167,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\BatchBundle\Item\InvalidItemException
+     * @expectedException Akeneo\Bundle\BatchBundle\Item\InvalidItemException
      * @expectedExceptionMessage Expecting to get 3 columns, actually got 2
      */
     public function testReadError()
@@ -184,7 +184,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStepExecution($context)
     {
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
 

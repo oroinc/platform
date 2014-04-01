@@ -163,13 +163,6 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->workflowItem->getResult()->isEmpty());
     }
 
-    public function testClosed()
-    {
-        $this->assertFalse($this->workflowItem->isClosed());
-        $this->workflowItem->setClosed(true);
-        $this->assertTrue($this->workflowItem->isClosed());
-    }
-
     public function testDefinition()
     {
         $this->assertNull($this->workflowItem->getDefinition());

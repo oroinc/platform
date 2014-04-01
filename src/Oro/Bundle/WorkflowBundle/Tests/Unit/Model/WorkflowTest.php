@@ -49,20 +49,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testEnabled()
-    {
-        $workflow = $this->createWorkflow();
-        $this->assertTrue($workflow->isEnabled());
-
-        $workflow->setEnabled(false);
-        $this->assertFalse($workflow->isEnabled());
-
-        $workflow->setEnabled(true);
-        $this->assertTrue($workflow->isEnabled());
-    }
-
-
-
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Expected transition argument type is string or Transition
@@ -735,6 +721,14 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                     $this->getTransitionRecordMock('step3'),
                 ),
                 array('step1', 'step3')
+            ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step2'),
+                ),
+                array('step1', 'step3', 'step2')
             ),
         );
     }

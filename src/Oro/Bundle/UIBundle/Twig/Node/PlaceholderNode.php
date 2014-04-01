@@ -1,87 +1,48 @@
 <?php
-namespace Oro\Bundle\UIBundle\Twig\Node;
 
-use \Twig_Compiler;
-use \Twig_Node_Expression_Constant;
-use \Twig_Node_Expression_Function;
-use \Twig_Node_Print;
-use \Twig_Node_Include;
+namespace Oro\Bundle\UIBundle\Twig\Node;
 
 class PlaceholderNode extends \Twig_Node
 {
     /**
-     * @var array Array with placeholder data
+     * @var \Twig_NodeInterface
      */
-    protected $placeholder;
-
-    protected $variables;
-
-    protected $wrapClassName;
+    protected $nameNode;
 
     /**
-     * @param array $placeholder Array with placeholder data
-     * @param       $variables Additional placeholder data
-     * @param string $wrapClassName css class name for items wrapper
-     * @param int   $line Line
-     * @param int   $tag twig tag
+     * @var \Twig_NodeInterface
      */
-    public function __construct(array $placeholder, $variables, $wrapClassName, $line, $tag)
+    protected $variablesNode;
+
+    /**
+     * @param \Twig_NodeInterface $nameName
+     * @param \Twig_NodeInterface $variablesNode
+     * @param int $lineno
+     * @param string $tag
+     */
+    public function __construct(\Twig_NodeInterface $nameName, \Twig_NodeInterface $variablesNode, $lineno, $tag)
     {
-        $items = isset($placeholder['items']) ?: array();
-        parent::__construct(array(), array('value' => $items), $line, $tag);
-        $this->placeholder = $placeholder;
-        $this->wrapClassName = $wrapClassName;
-        $this->variables = $variables;
+        parent::__construct(array(), array(), $lineno, $tag);
+        $this->nameNode = $nameName;
+        $this->variablesNode = $variablesNode;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function compile(Twig_Compiler $compiler)
+    public function compile(\Twig_Compiler $compiler)
     {
-        /*if (isset($this->placeholder['label'])) {
-            $compiler
-                ->write('echo \'<div>\';')
-                ->write('echo $this->env->getExtension(\'translator\')->getTranslator()
-                    ->trans("' . $this->placeholder['label'] . '");')
-                ->write("echo '</div>';\n")
-            ;
-        }*/
-        if (isset($this->placeholder['items']) && count($this->placeholder['items'])) {
-            foreach ($this->placeholder['items'] as $item) {
-                //$compiler->raw(
-                //    'echo \'<div id = "block-' . $blockData['name'] . '" class="' . $this->wrapClassName . '" >\';'
-                //);
-                if (array_key_exists('template', $item)) {
-                    $expression = new Twig_Node_Expression_Constant($item['template'], $this->lineno);
-                    $block = new Twig_Node_Include($expression, $this->variables, true, $this->lineno, $this->tag);
-                    $block->compile($compiler);
-                } elseif (array_key_exists('action', $item)) {
-                    $expression = new Twig_Node_Expression_Constant($item['action'], $this->lineno);
-                    $attr = new Twig_Node_Expression_Constant(array(), $this->lineno);
-                    if ($this->variables === null) {
-                        $attributes = $attr;
-                    } else {
-                        $attributes = $this->variables;
-                    }
-
-                    // {{ render(controller('Bundle:Directory:controllerAction', { action: attributes })) }}
-                    $controllerFunctionExpression = new Twig_Node_Expression_Function(
-                        'controller',
-                        new \Twig_Node(array($expression, $attributes)),
-                        $this->lineno
-                    );
-                    $renderFunctionExpression = new Twig_Node_Expression_Function(
-                        'render',
-                        new \Twig_Node(array('uri' => $controllerFunctionExpression)),
-                        $this->lineno
-                    );
-
-                    $block = new Twig_Node_Print($renderFunctionExpression, $this->lineno, $this->tag);
-                    $block->compile($compiler);
-                }
-                //$compiler->raw('echo \'</div>\';');
-            }
-        }
+        $placeholderExpression = new \Twig_Node_Expression_Function(
+            'placeholder',
+            new \Twig_Node(
+                array(
+                    'name' => $this->nameNode,
+                    'variables' => $this->variablesNode
+                )
+            ),
+            $this->lineno
+        );
+        $block = new \Twig_Node_Print($placeholderExpression, $this->lineno);
+        $block->compile($compiler);
     }
 }

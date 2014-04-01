@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -127,8 +128,15 @@ class DynamicFieldsExtension extends \Twig_Extension
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
             }
 
+            if ($value && $fieldConfigId->getFieldType() == 'manyToOne') {
+                $value = $this->propertyAccessor->getValue(
+                    $entity->{Inflector::camelize('get_' . $fieldName)}(),
+                    $field->get('target_field')
+                );
+            }
+
             /** Prepare Relation field type */
-            if ($value instanceof Collection) {
+            if ($value && $value instanceof Collection) {
                 $value = $this->getValueForCollection($value, $fieldConfigId);
             }
 
@@ -211,7 +219,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             }
 
             $relationExtendConfig = $this->extendProvider->getConfig($targetEntity);
-            if ($relationExtendConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $route = $this->entityViewRoute;
                 $routeParams = array(
                     'entity_id' => str_replace('\\', '_', $targetEntity),
@@ -256,8 +264,8 @@ class DynamicFieldsExtension extends \Twig_Extension
         $fieldConfigId = $extendConfig->getId();
 
         return
-            $config->is('owner', ExtendManager::OWNER_CUSTOM)
-            && !$config->is('state', ExtendManager::STATE_NEW)
+            $config->is('owner', ExtendScope::OWNER_CUSTOM)
+            && !$config->is('state', ExtendScope::STATE_NEW)
             && !$config->is('is_deleted')
             && $this->viewProvider->getConfigById($config->getId())->is('is_displayable')
             && !(

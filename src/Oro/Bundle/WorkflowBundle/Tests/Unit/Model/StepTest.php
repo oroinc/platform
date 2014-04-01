@@ -48,9 +48,9 @@ class StepTest extends \PHPUnit_Framework_TestCase
     public function testIsFinal()
     {
         $this->assertFalse($this->step->isFinal());
-        $this->step->setIsFinal(true);
+        $this->step->setFinal(true);
         $this->assertTrue($this->step->isFinal());
-        $this->step->setIsFinal(false);
+        $this->step->setFinal(false);
         $this->assertFalse($this->step->isFinal());
     }
 

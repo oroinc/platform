@@ -22,7 +22,7 @@ class Step
     /**
      * @var boolean
      */
-    protected $isFinal = false;
+    protected $final = false;
 
     /**
      * @var string[]
@@ -115,9 +115,9 @@ class Step
      * @param boolean $isFinal
      * @return Step
      */
-    public function setIsFinal($isFinal)
+    public function setFinal($isFinal)
     {
-        $this->isFinal = $isFinal;
+        $this->final = $isFinal;
         return $this;
     }
 
@@ -128,7 +128,7 @@ class Step
      */
     public function isFinal()
     {
-        return $this->isFinal;
+        return $this->final;
     }
 
     /**

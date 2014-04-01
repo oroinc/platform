@@ -2,7 +2,6 @@
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
 {% oro_title_set({ params : {"%form.title%": form.vars.value ? form.vars.value.title : null} }) %}
-{% set title = 'New'|trans ~ ' ' ~ 'oro.embeddedform.entity_label'|trans|lower %}
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_embedded_form_delete') %}
@@ -18,10 +17,11 @@
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
 
+    {% set html = UI.saveAndCloseButton() %}
     {% if resource_granted('oro_embedded_form_edit') %}
-        {{ UI.saveAndStayButton() }}
+        {% set html = html ~ UI.saveAndStayButton() %}
     {% endif %}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock %}
 
 {% block pageHeader %}
@@ -64,7 +64,7 @@
     } %}
 
     <script type="text/javascript">
-        require(['oro/embedded/watcher'],
+        require(['oroembeddedform/js/embedded-form-watcher'],
             function (EmbeddedFormWatcher) {
                 var forceDataLoading;
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 class DummyWriter implements ItemWriterInterface
 {

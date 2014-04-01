@@ -56,7 +56,7 @@ datagrid:
         options:
             entityHint: entity
             requireJSModules:
-              - oro/datagrid/column-form-listener
+              - orodatagrid/js/datagrid/listener/column-form-listener
             columnListener:
                 dataField: id
                 columnName: assigned

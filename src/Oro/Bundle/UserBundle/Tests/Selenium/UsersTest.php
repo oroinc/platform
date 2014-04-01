@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class UsersTest extends Selenium2TestCase
 {
@@ -14,6 +15,7 @@ class UsersTest extends Selenium2TestCase
         $username = 'User_'.mt_rand();
 
         $login = $this->login();
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->assertTitle('Create User - Users - Users Management - System')
@@ -25,7 +27,8 @@ class UsersTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
-            ->setRoles(array('Manager'))
+            ->setRoles(array('Manager', 'Marketing manager'), true)
+            ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
@@ -45,6 +48,7 @@ class UsersTest extends Selenium2TestCase
         $newUsername = 'Update_' . $username;
 
         $login = $this->login();
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', $username)
             ->open(array($username))
@@ -69,6 +73,7 @@ class UsersTest extends Selenium2TestCase
     public function testHistoryWindow($username)
     {
         $login = $this->login();
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', $username)
             ->open(array($username))
@@ -83,6 +88,7 @@ class UsersTest extends Selenium2TestCase
     public function testDeleteUser($username)
     {
         $login = $this->login();
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', $username)
             ->open(array($username))

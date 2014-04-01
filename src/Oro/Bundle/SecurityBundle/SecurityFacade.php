@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class SecurityFacade
 {
@@ -90,27 +91,27 @@ class SecurityFacade
     }
 
     /**
-     * Get permission for given class and method from the ACL annotation
+     * Gets ACL annotation is bound to the given class/method
      *
-     * @param $class
-     * @param $method
-     * @return string
+     * @param string $class
+     * @param string $method
+     * @return Acl|null
      */
-    public function getClassMethodAnnotationPermission($class, $method)
+    public function getClassMethodAnnotation($class, $method)
     {
-        $annotation = $this->annotationProvider->findAnnotation($class, $method);
-
-        if ($annotation) {
-            return $annotation->getPermission();
-        }
+        return $this->annotationProvider->findAnnotation($class, $method);
     }
 
     /**
      * Checks if an access to a resource is granted to the caller
      *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     *                                    string in format "permission;descriptor"
+     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
      * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
+     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     *
      * @return bool
      */
     public function isGranted($attributes, $object = null)
@@ -139,6 +140,14 @@ class SecurityFacade
                 $this->objectIdentityFactory->get($object)
             );
         } else {
+            if (is_string($attributes) && $object == null) {
+                $delimiter = strpos($attributes, ';');
+                if ($delimiter) {
+                    $object = substr($attributes, $delimiter + 1);
+                    $attributes = substr($attributes, 0, $delimiter);
+                }
+            }
+
             $isGranted = $this->securityContext->isGranted($attributes, $object);
         }
 

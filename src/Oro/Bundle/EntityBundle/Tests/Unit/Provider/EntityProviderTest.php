@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntityProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -173,12 +173,12 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($param) {
-                        $this->extendConfig->set('state', ExtendManager::STATE_ACTIVE);
+                        $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendManager::STATE_NEW);
+                            $this->extendConfig->set('state', ExtendScope::STATE_NEW);
                         }
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendManager::STATE_DELETED);
+                            $this->extendConfig->set('state', ExtendScope::STATE_DELETED);
                         }
                         return $this->extendConfig;
                     }

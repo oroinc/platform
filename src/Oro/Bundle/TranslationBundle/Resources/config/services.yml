@@ -1,5 +1,6 @@
 parameters:
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
+    oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
     oro_translation.database_translation.persister.class:       Oro\Bundle\TranslationBundle\Translation\DatabasePersister

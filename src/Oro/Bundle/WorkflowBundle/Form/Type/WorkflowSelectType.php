@@ -17,15 +17,9 @@ class WorkflowSelectType extends AbstractType
      */
     protected $workflowRegistry;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
+    public function __construct(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;
-        $this->translator = $translator;
     }
 
     /**
@@ -77,9 +71,6 @@ class WorkflowSelectType extends AbstractType
                         foreach ($workflows as $workflow) {
                             $name = $workflow->getName();
                             $label = $workflow->getLabel();
-                            if (!$workflow->isEnabled()) {
-                                $label = sprintf("%s (%s)", $label, $this->translator->trans('oro.workflow.disabled'));
-                            }
                             $choices[$name] = $label;
                         }
                     }

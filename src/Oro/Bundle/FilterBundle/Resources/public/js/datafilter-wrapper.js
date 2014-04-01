@@ -1,6 +1,6 @@
 /* jshint browser:true */
-/* global define, require */
-define(['jquery', 'underscore'], function($, _) {
+/*global define*/
+define(['jquery', 'underscore'], function ($, _) {
     'use strict';
 
     return {
@@ -23,7 +23,8 @@ define(['jquery', 'underscore'], function($, _) {
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),
                 nullLink: this.nullLink,
-                canDisable: this.canDisable
+                canDisable: this.canDisable,
+                isEmpty: this.isEmptyValue()
             }));
 
             this.$(this.criteriaSelector).append($filter);
@@ -35,6 +36,12 @@ define(['jquery', 'underscore'], function($, _) {
             }, this);
 
             $('body').on('click', this._clickOutsideCriteriaCallback);
+
+            this.$el.on('keyup', '.dropdown-menu.filter-criteria', _.bind(function (e) {
+                if (e.keyCode === 27) {
+                    this._hideCriteria();
+                }
+            }, this));
         }
     };
 });

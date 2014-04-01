@@ -1,11 +1,10 @@
-/* global define */
-define(['backbone', 'routing'],
-function(Backbone, routing) {
+/*global define*/
+define(['backbone', 'routing'], function (Backbone, routing) {
     'use strict';
 
     /**
-     * @export  oro/calendar/event/model
-     * @class   oro.calendar.event.Model
+     * @export  orocalendar/js/calendar/event/model
+     * @class   orocalendar.calendar.event.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
@@ -18,12 +17,12 @@ function(Backbone, routing) {
             start: null,
             end: null,
             allDay: false,
-            reminder: false,
             editable: false,
+            reminders: {},
             removable: false
         },
 
-        initialize: function() {
+        initialize: function () {
             this.urlRoot = routing.generate(this.route);
         }
     });

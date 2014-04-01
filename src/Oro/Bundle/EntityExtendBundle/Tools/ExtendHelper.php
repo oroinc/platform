@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 class ExtendHelper
 {
     /**
@@ -25,30 +23,40 @@ class ExtendHelper
     }
 
     /**
-     * @param FieldConfigId $selfFieldId
-     * @param string        $targetEntity
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param string $targetEntityClassName
      * @return string
      */
-    public static function generateManyToManyJoinTableName(FieldConfigId $selfFieldId, $targetEntity)
+    public static function buildRelationKey($entityClassName, $fieldName, $fieldType, $targetEntityClassName)
     {
-        $selfClassArray = explode('\\', $selfFieldId->getClassName());
-        $selfClassName  = array_pop($selfClassArray);
-
-        $targetClassArray = explode('\\', $targetEntity);
-        $targetClassName  = array_pop($targetClassArray);
-
-        return strtolower('oro_extend_' . $selfClassName . '_' . $targetClassName . '_' . $selfFieldId->getFieldName());
+        return implode('|', [$fieldType, $entityClassName, $targetEntityClassName, $fieldName]);
     }
 
     /**
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param string $targetEntityClass
+     * Checks if an entity is a custom one
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
+     *
+     * @param string $className
+     * @return bool
+     */
+    public static function isCustomEntity($className)
+    {
+        return strpos($className, ExtendConfigDumper::ENTITY) === 0;
+    }
+
+    /**
+     * Gets the short name of the class, the part without the namespace.
+     *
+     * @param string $className The full name of a class
      * @return string
      */
-    public static function buildRelationKey($entityClass, $fieldName, $fieldType, $targetEntityClass)
+    public static function getShortClassName($className)
     {
-        return implode('|', [$fieldType, $entityClass, $targetEntityClass, $fieldName]);
+        $parts = explode('\\', $className);
+
+        return array_pop($parts);
     }
 }

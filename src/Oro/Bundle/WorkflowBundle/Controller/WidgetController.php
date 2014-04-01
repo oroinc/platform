@@ -25,6 +25,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
+/**
+ * @Route("/workflowwidget")
+ */
 class WidgetController extends Controller
 {
     /**
@@ -34,45 +37,24 @@ class WidgetController extends Controller
      */
     public function stepsAction($entityClass, $entityId)
     {
-        /** @var EntityConnector $entityConnector */
-        $entityConnector = $this->get('oro_workflow.entity_connector');
         $entity = $this->getEntityReference($entityClass, $entityId);
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflowItem = $entityConnector->getWorkflowItem($entity);
-        $currentStep = $entityConnector->getWorkflowStep($entity);
+        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+
         $steps = array();
+        $currentStep = null;
         if ($workflowItem) {
             $workflow = $workflowManager->getWorkflow($workflowItem);
 
-            $workflowDefinition = $workflow->getDefinition();
-            if (!$workflowDefinition->isStepsDisplayOrdered()) {
+            if ($workflow->getDefinition()->isStepsDisplayOrdered()) {
+                $steps = $workflow->getStepManager()->getOrderedSteps();
+            } else {
                 $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
             }
 
-            if (!$currentStep) {
-                $currentStepName = $workflowItem->getCurrentStep()->getName();
-                $currentStep = $workflow->getStepManager()->getStep($currentStepName);
-            }
-        } else {
-            $workflow = $workflowManager->getApplicableWorkflow($entity);
-            $workflowDefinition = $workflow->getDefinition();
-            if (!$currentStep && $workflowDefinition->getStartStep()) {
-                $currentStep = $workflow->getStepManager()
-                    ->getStep($workflowDefinition->getStartStep()->getName());
-
-                if (!$workflowDefinition->isStepsDisplayOrdered()) {
-                    $steps = array($currentStep);
-                }
-            }
-        }
-
-        if ($workflowDefinition->isStepsDisplayOrdered()) {
-            $steps = $workflow->getStepManager()->getOrderedSteps();
-        }
-        if (!$steps && $currentStep) {
-            $steps[] = $currentStep;
+            $currentStep = $workflowItem->getCurrentStep();
         }
 
         return array(
@@ -83,7 +65,7 @@ class WidgetController extends Controller
 
     /**
      * @Route(
-     *      "/transition/create/attributes/{transitionName}/{workflowName}",
+     *      "/transition/create/attributes/{workflowName}/{transitionName}",
      *      name="oro_workflow_widget_start_transition_form"
      * )
      * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
@@ -96,6 +78,9 @@ class WidgetController extends Controller
     public function startTransitionFormAction($transitionName, $workflowName)
     {
         $entityId = $this->getRequest()->get('entityId', 0);
+
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -114,18 +99,33 @@ class WidgetController extends Controller
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
-                /** @var WorkflowAwareSerializer $serializer */
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflow->getName());
-
                 // Create new WorkflowData instance with all data required to start.
                 // Original WorkflowData can not be used, as some attributes may be set by reference
                 // So, serialized data will not contain all required data.
                 $formOptions = $transition->getFormOptions();
                 $attributes = array_keys($formOptions['attribute_fields']);
-                $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
-                $data = $serializer->serialize(new WorkflowData($dataArray), 'json');
 
+                $existingAttributes = $workflowItem->getData()->getValues();
+                $formAttributes = $workflowItem->getData()->getValues($attributes);
+                foreach ($formAttributes as $value) {
+                    // Need to persist all new entities to allow serialization
+                    // and correct passing to API start method of all input data.
+                    // Form validation already performed, so all these entities are valid
+                    // and they can be used in workflow start action.
+                    if (is_object($value) && $doctrineHelper->isManageableEntity($value)) {
+                        $entityManager = $doctrineHelper->getEntityManager($value);
+                        $unitOfWork = $entityManager->getUnitOfWork();
+                        if (!$unitOfWork->isInIdentityMap($value) || $unitOfWork->isScheduledForInsert($value)) {
+                            $entityManager->persist($value);
+                            $entityManager->flush($value);
+                        }
+                    }
+                }
+
+                /** @var WorkflowAwareSerializer $serializer */
+                $serializer = $this->get('oro_workflow.serializer.data.serializer');
+                $serializer->setWorkflowName($workflow->getName());
+                $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
                 $saved = true;
             }
         }
@@ -141,7 +141,7 @@ class WidgetController extends Controller
 
     /**
      * @Route(
-     *      "/transition/edit/attributes/{transitionName}/{workflowItemId}",
+     *      "/transition/edit/attributes/{workflowItemId}/{transitionName}",
      *      name="oro_workflow_widget_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})

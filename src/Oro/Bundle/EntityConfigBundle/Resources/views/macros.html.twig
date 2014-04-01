@@ -3,14 +3,16 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for item in dynamicFields %}
+            {% set hasLink = false %}
             {% set itemValue = item.value %}
             {% if itemValue is iterable %}
                 {% set data = '' %}
                 {% for value in itemValue.values %}
                     {% if value.link is defined and value.link != false  %}
+                        {% set hasLink = true %}
                         {% set data = data ~ ui.renderUrl(value.link, value.title) %}
                     {% else %}
-                        {% set data = data ~ value.title %}
+                        {% set data = data ~ value.title|escape %}
                     {% endif %}
                     {% if not loop.last %}
                         {% set data = data ~ ', ' %}
@@ -20,12 +22,20 @@
             {% endif %}
 
             {% if item.type == 'text' %}
-                {% set itemValue = itemValue|nl2br %}
+                {% set itemValue = itemValue|escape|nl2br %}
             {% elseif item.type == 'boolean' %}
                 {% set itemValue = itemValue ? 'Yes'|trans : 'No'|trans %}
+            {% elseif item.type == 'money' %}
+                {% set itemValue = itemValue ? itemValue | oro_format_currency : null %}
+            {% elseif item.type == 'percent' %}
+                {% set itemValue = itemValue ? itemValue | oro_format_percent : null %}
+            {% elseif item.type == 'date' %}
+                {% set itemValue = itemValue ? itemValue | oro_format_date : null %}
+            {% elseif not hasLink %}
+                {% set itemValue = itemValue|escape %}
             {% endif %}
 
-            {{ ui.renderProperty(item.label|trans, itemValue) }}
+            {{ ui.renderHtmlProperty(item.label|trans, itemValue) }}
         {% endfor %}
     {% endif %}
 {% endmacro %}

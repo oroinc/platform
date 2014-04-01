@@ -1,14 +1,14 @@
 /* jshint devel:true */
-/* global define */
-define(['underscore', 'backbone', 'oro/multiple-entity/view', 'oro/multiple-entity/model', 'oro/dialog-widget'],
-function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+/*global define*/
+define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
+    ], function (_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/multiple-entity
-     * @class   oro.multipleEntity
+     * @export  oroform/js/multiple-entity
+     * @class   oroform.MultipleEntity
      * @extends Backbone.View
      */
     return Backbone.View.extend({

@@ -1,1 +1,1 @@
-<% _.each(context.splitFieldId(id), function (val, index, list) { %>&#32;<%= val.entity.label %>&nbsp;<b><%= val.label %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %>
+<% _.each(context.splitFieldId(id), function (val, index, list) { %>&#32;<%= _.escape(val.entity.label) %>&nbsp;<b><%= _.escape(val.label) %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %>

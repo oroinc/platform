@@ -5,6 +5,8 @@ namespace Oro\Bundle\SidebarBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -30,6 +32,9 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('module')
                                 ->cannotBeEmpty()
                             ->end()
+                            ->scalarNode('cssClass')
+                                ->cannotBeEmpty()
+                            ->end()
                             ->scalarNode('placement')
                                 ->cannotBeEmpty()
                             ->end()
@@ -40,6 +45,14 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'sidebar_left_active'  => ['value' => false, 'type' => 'bool'],
+                'sidebar_right_active' => ['value' => true, 'type' => 'bool']
+            ]
+        );
 
         return $treeBuilder;
     }

@@ -1,43 +1,8 @@
-## Config Bundle ##
-Centralised application configuration management.
+## OroConfigBundle ##
 
-## Installation ##
-Add the `oro/config-bundle` package to your `require` section in the `composer.json` file.
-
-``` yaml
-"require": {
-    [...]
-    "oro/config-bundle": "dev-master"
-},
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "git@github.com:laboro/ConfigBundle.git",
-        "branch": "master"
-    }
-]
-```
-
-Add the ConfigBundle to your application's kernel:
-
-``` php
-<?php
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Oro\Bundle\ConfigBundle\OroConfigBundle(),
-        // ...
-    );
-    ...
-}
-```
-
-## Run unit tests ##
-
-``` bash
-$ phpunit --coverage-html=cov/
-```
+This bundle allows to introduce and maintain configuration settings definition with possibility to define values
+in different scopes (bundle, application and user level by default) and organize and visualize multiple
+configuration trees.
 
 ## Usage ##
 - [Config management](./Resources/doc/config_management.md)

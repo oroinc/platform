@@ -83,7 +83,7 @@ class GridTest extends Selenium2TestCase
         return array(
             //'ID' => array('ID', '='),
             'Username' => array('Username', 'is equal to'),
-            'Email' => array('Email', 'contains'),
+            'Email' => array('Primary Email', 'contains'),
             //'First name' => array('First name', 'is equal to'),
             //'Birthday' => array('Birthday', '')
         );
@@ -98,14 +98,13 @@ class GridTest extends Selenium2TestCase
         $countOfRecords = $users->getRowsCount();
         $this->assertEquals(
             $countOfRecords,
-            $users->removeFilter('Email')
-                ->getRowsCount()
+            $users->getRowsCount()
         );
 
         $this->assertEquals(
             1,
-            $users->addFilter('Email')
-                ->filterBy('Email', $userData[strtoupper('Email')], 'is equal to')
+            $users->addFilter('Primary Email')
+                ->filterBy('Primary Email', $userData[strtoupper('Primary Email')], 'is equal to')
                 ->getRowsCount()
         );
     }

@@ -2,7 +2,7 @@
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
 
-require(['oro/mediator'], function (mediator) {
+require(['oroui/js/mediator'], function (mediator) {
     'use strict';
     mediator.once('tab:changed', function () {
         setTimeout(function () {
@@ -13,8 +13,10 @@ require(['oro/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
-    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
+        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
+        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
@@ -25,9 +27,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl()) {
+        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
             if ($('#page-title').size()) {
-                document.title = $('#page-title').text();
+                document.title = _.unescape($('#page-title').text());
             }
             layout.hideProgressBar();
         }
@@ -133,12 +135,19 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         dropdownToggles.click(function (e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
+                $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
         $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
+
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+            if (e.keyCode === 27) {
+                $(e.currentTarget).parent().removeClass('open');
+            }
+        });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
@@ -168,14 +177,21 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
+
+        layout.pageRendered();
+    });
+
+    mediator.bind('hash_navigation_request:before', function () {
+        layout.pageRendering();
     });
 
     /**
      * Init page layout js and hide progress bar after hash navigation request is completed
      */
     mediator.bind("hash_navigation_request:complete", function () {
-        layout.hideProgressBar();
         layout.init();
+        layout.hideProgressBar();
+        layout.pageRendered();
     });
 
     /* ============================================================
@@ -258,7 +274,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 .appendTo($(document.body));
         }
 
-        mediator.once("page-rendered", function () {
+        layout.onPageRendered(function () {
             var debugBar = $('.sf-toolbar');
             if (debugBar.length) {
                 waitForDebugBar();
@@ -269,13 +285,15 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
 
         $(window).on('resize', adjustHeight);
 
-        mediator.bind("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("hash_navigation_request:complete", adjustReloaded);
 
-        mediator.bind('layout:adjustHeight', adjustHeight);
+        mediator.on('layout:adjustReloaded', adjustReloaded);
+        mediator.on('layout:adjustHeight', adjustHeight);
+        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
 
-        if ($('body').hasClass('error-page')) {
+        $(function () {
             adjustHeight();
-        }
+        });
     }());
 
     /* ============================================================

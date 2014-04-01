@@ -159,14 +159,6 @@ class Builder
      */
     protected function isResourceGranted($aclResource)
     {
-        $delimiter = strpos($aclResource, ';');
-        if ($delimiter) {
-            $permission = substr($aclResource, 0, $delimiter);
-            $descriptor = substr($aclResource, $delimiter + 1);
-
-            return $this->securityFacade->isGranted($permission, $descriptor);
-        }
-
         return $this->securityFacade->isGranted($aclResource);
     }
 }

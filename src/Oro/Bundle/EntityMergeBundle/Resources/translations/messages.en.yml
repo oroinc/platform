@@ -5,6 +5,11 @@ oro:
             select_error: Select entities to merge.
         action:
             merge: Merge {{ label }}
+        acl:
+            merge: Merge entities
+
+        hint:
+            other_related_entities: All other related entities will be merged using an append strategy
 
         merge_modes:
             replace: Replace

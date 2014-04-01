@@ -42,7 +42,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getEventListQueryBuilder(1, new \DateTime(), new \DateTime(), true);
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder'
+            'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE ('
@@ -69,7 +69,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getEventListQueryBuilder(1, new \DateTime(), new \DateTime(), false);
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder'
+            'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE ('
@@ -77,23 +77,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . '(e.start <= :end AND e.end > :end) OR'
             . '(e.start >= :start AND e.end < :end)) AND c.id = :id'
             . ' ORDER BY c.id, e.start ASC',
-            $qb->getQuery()->getDQL()
-        );
-    }
-
-    public function testGetEventsToRemindQueryBuilder()
-    {
-        /** @var CalendarEventRepository $repo */
-        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
-
-        $qb = $repo->getEventsToRemindQueryBuilder(new \DateTime());
-
-        $this->assertEquals(
-            'SELECT e, c, u'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
-            . ' INNER JOIN e.calendar c'
-            . ' INNER JOIN c.owner u'
-            . ' WHERE e.remindAt <= :current AND e.start > :current AND e.reminded = :reminded',
             $qb->getQuery()->getDQL()
         );
     }

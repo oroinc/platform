@@ -58,7 +58,7 @@ class BusinessUnit extends AbstractPageEntity
     public function edit()
     {
         $this->test
-            ->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit business unit']")
+            ->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit Business Unit']")
             ->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
