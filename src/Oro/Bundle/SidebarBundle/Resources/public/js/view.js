@@ -38,8 +38,7 @@ define(function (require) {
         events: {
             'click .sidebar-add a': 'onClickAdd',
             'click .sidebar-resize a': 'onClickToggle',
-            'click .sidebar-toggle a': 'onClickToggle',
-            'mousedown .sidebar-icon': 'onMouseDown'
+            'click .sidebar-toggle a': 'onClickToggle'
         },
 
         options: {
@@ -119,10 +118,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -155,10 +155,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -185,18 +186,6 @@ define(function (require) {
             var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = false;
-            }
-        },
-
-        onMouseDown: function(event) {
-            var $container = this.$el.find('.sidebar-content'),
-                $current   = $(event.currentTarget),
-                children   = $container.children();
-
-            if (children.first().attr('data-cid') == $current.attr('data-cid')) {
-                $container.sortable('option', 'cursorAt', { bottom: 5 } );
-            } else if (children.last().attr('data-cid') == $current.attr('data-cid')) {
-                $container.sortable('option', 'cursorAt', { top: 5 } );
             }
         },
 
