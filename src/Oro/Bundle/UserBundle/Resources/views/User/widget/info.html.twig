@@ -10,9 +10,10 @@
 {% endmacro %}
 
 {% macro renderApiBlock(user) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
     <div class="control-group api-block">
         <label class="control-label">
-            <i class="icon-info-sign" data-content="{{ 'oro.user.api.tooltip_text'|trans }}" data-toggle="popover"></i>
+            {{ ui.tooltip('oro.user.api.tooltip_text', {}, 'bottom') }}
             {{ 'oro.user.api.label'|trans }}
         </label>
         <div class="controls">
