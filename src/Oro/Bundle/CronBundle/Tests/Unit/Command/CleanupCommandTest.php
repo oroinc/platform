@@ -63,111 +63,81 @@ class CleanupCommandTest extends OrmTestCase
         $input  = new ArrayInput($params, $this->command->getDefinition());
         $output = new MemoryOutput();
 
-        $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getSingleScalarResult'])
-            ->getMockForAbstractClass();
-
-        $queryMock->expects($this->once())->method('getSingleScalarResult')
-            ->will($this->returnValue('0'));
-
-        $qbMock = $this->getQueryBuilderMock();
-        $qbMock->expects($this->once())
-            ->method('select')
-            ->with('COUNT(j.id)')
-            ->will($this->returnSelf());
-
-        $qbMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($queryMock));
+        $stm = $this->getStatementMock();
+        $stm->expects($this->once())
+            ->method('fetchColumn')
+            ->will($this->returnValue(1));
 
         $this->command->execute($input, $output);
     }
 
-    public function testExecution()
+    protected function getStatementMock()
     {
-        $command = $this->getMock(
-            'Oro\Bundle\CronBundle\Command\CleanupCommand',
-            ['getResultIterator'],
-            [CleanupCommand::COMMAND_NAME]
-        );
-        $command->setContainer($this->container);
+        $statement = $this->getMock('\Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
+        $statement->expects($this->exactly(2))
+            ->method('bindValue');
+
+        $statement->expects($this->once())
+            ->method('execute');
+
+        $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(['prepare'])
+            ->getMock();
+
+        $conn->expects($this->once())
+            ->method('prepare')
+            ->will($this->returnValue($statement));
+
+        $this->emMock->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($conn));
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('doctrine.orm.entity_manager')
             ->will($this->returnValue($this->emMock));
 
-        $qbMock = $this->getQueryBuilderMock();
-        $this->emMock->expects($this->once())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($qbMock));
+        return $statement;
+    }
 
-        $jobIds = [1, 2];
-        $command->expects($this->once())->method('getResultIterator')
-            ->will($this->returnValue(new \ArrayIterator($jobIds)));
-
-        $this->emMock->expects($this->exactly(2))->method('getReference')
-            ->will(
-                $this->returnValueMap(
-                    [
-                    ['JMSJobQueueBundle:Job', 1, new Job('test')],
-                    ['JMSJobQueueBundle:Job', 2, new Job('test-deps')]
-                    ]
-                )
-            );
-
-        $qbMock->expects($this->once())
-            ->method('select')
-            ->with('j.id')
-            ->will($this->returnSelf());
-
-        $countQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['setParameter', 'getSingleScalarResult'])
-            ->getMockForAbstractClass();
-
-        $countQuery->expects($this->at(0))
-            ->method('setParameter')
-            ->will($this->returnSelf());
-        $countQuery->expects($this->at(1))
-            ->method('getSingleScalarResult')
-            ->will($this->returnValue(0));
-        $countQuery->expects($this->at(2))
-            ->method('setParameter')
-            ->will($this->returnSelf());
-        $countQuery->expects($this->at(3))
-            ->method('getSingleScalarResult')
-            ->will($this->returnValue(1));
-
-        $this->emMock->expects($this->once())->method('beginTransaction');
-
-        $this->emMock->expects($this->exactly(2))
-            ->method('createQuery')
-            ->will($this->returnValue($countQuery));
-
-        $this->emMock->expects($this->once())
-            ->method('remove');
-
-        $this->emMock->expects($this->once())
-            ->method('flush');
-        $this->emMock->expects($this->once())
-            ->method('clear');
-        $this->emMock->expects($this->once())->method('commit');
-
-        $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate'])
-            ->getMock();
-        $conn->expects($this->exactly(2))
-            ->method('executeUpdate');
-        $this->emMock->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($conn));
-
+    public function testExecution()
+    {
         $params = [];
         $input  = new ArrayInput($params, $this->command->getDefinition());
         $output = new MemoryOutput();
+
+        $stm = $this->getStatementMock();
+        $stm->expects($this->at(3))
+            ->method('fetchColumn')
+            ->will($this->returnValue(1));
+        $stm->expects($this->at(4))
+            ->method('fetchColumn')
+            ->will($this->returnValue(false));
+
+
+        $this->emMock->expects($this->any())
+            ->method('beginTransaction');
+
+        $this->emMock->expects($this->any())
+            ->method('commit');
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('doctrine.orm.entity_manager')
+            ->will($this->returnValue($this->emMock));
+
+
+        $command = $this->getMock(
+            'Oro\Bundle\CronBundle\Command\CleanupCommand',
+            ['processBuff'],
+            [CleanupCommand::COMMAND_NAME]
+        );
+        $command->setContainer($this->container);
+
+        $command->expects($this->exactly(2))
+            ->method('processBuff')
+            ->will($this->returnValue([]));
 
         $command->execute($input, $output);
     }
