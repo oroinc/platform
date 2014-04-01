@@ -43,12 +43,12 @@ class OroSidebarExtension extends Extension
      */
     protected function getBundlesSettings(ContainerBuilder $container)
     {
-        $bundles = $container->getParameter('kernel.bundles');
         $result = array();
 
+        $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $dir = dirname($reflection->getFilename()) . '/Resources/public/sidebar_widgets';
+            $dir        = dirname($reflection->getFilename()) . '/Resources/public/sidebar_widgets';
             if (is_dir($dir)) {
                 $finder = new Finder();
                 $finder
