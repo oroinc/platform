@@ -1,5 +1,9 @@
 oro:
     integration:
+        menu:
+            channels_submenu.label: Channels
+            channels_list.label: Manage Channels
+
         datagrid:
             column:
                 name: Name
