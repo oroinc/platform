@@ -103,7 +103,7 @@ class FieldType extends AbstractType
             'choice',
             array(
                 'choices'     => $this->types,
-                'empty_value' => 'Please choice type...',
+                'empty_value' => 'Select field type',
                 'block'       => 'type',
             )
         );

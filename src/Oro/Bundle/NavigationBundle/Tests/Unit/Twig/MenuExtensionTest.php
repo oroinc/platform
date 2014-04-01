@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 
 class MenuExtensionTest extends \PHPUnit_Framework_TestCase
@@ -151,6 +152,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         $menuInstance->expects($this->once())
             ->method('getExtra')
             ->with('type');
+        $menuInstance->expects($this->any())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator()));
         $this->assertRender($menuInstance, $menuInstance, $options, $renderer);
     }
 
@@ -163,6 +167,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         $menuInstance->expects($this->once())
             ->method('getExtra')
             ->with('type');
+        $menuInstance->expects($this->any())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator()));
         $this->assertRender($menu, $menuInstance, $options, $renderer);
     }
 
@@ -180,6 +187,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getExtra')
             ->with('type')
             ->will($this->returnValue('type'));
+        $menuInstance->expects($this->any())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator()));
 
         $runtimeOptions = array(
             'template' => 'test_runtime.tpl'
@@ -213,6 +223,258 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
+    }
+
+    /**
+     * @dataProvider menuItemsDataProvider
+     * @param array $items
+     * @param array $expected
+     */
+    public function testFilterUnallowedItems($items, $expected)
+    {
+        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->getMockForAbstractClass();
+
+        $menu->expects($this->atLeastOnce())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator($items)));
+
+        $this->helper->expects($this->once())
+            ->method('render')
+            ->will(
+                $this->returnCallback(
+                    function ($menu) use ($expected) {
+                        $result = $this->collectResultItemsData($menu);
+                        \PHPUnit_Framework_Assert::assertEquals($expected, $result);
+                    }
+                )
+            );
+
+        $this->menuExtension->render($menu);
+    }
+
+    protected function collectResultItemsData($item)
+    {
+        $result = array();
+        /** @var ItemInterface $sub */
+        foreach ($item as $sub) {
+            $result[] = array(
+                'label' => $sub->getLabel(),
+                'uri' => $sub->getUri(),
+                'isAllowed' => $sub->getExtra('isAllowed'),
+                'children' => $this->collectResultItemsData($sub)
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public function menuItemsDataProvider()
+    {
+        return array(
+            array(
+                array(
+                    $this->getMenuItem('item_1'),
+                    $this->getMenuItem(
+                        'item_2',
+                        true,
+                        array(
+                            $this->getMenuItem('item_2_1'),
+                            $this->getMenuItem(''),
+                        )
+                    ),
+                    $this->getMenuItem(
+                        'item_3',
+                        true,
+                        array(
+                            $this->getMenuItem('item_3_1', false),
+                            $this->getMenuItem('item_3_2'),
+                        )
+                    ),
+                    $this->getMenuItem(
+                        'item_4',
+                        true,
+                        array(
+                            $this->getMenuItem('item_4_1', false),
+                            $this->getMenuItem(''),
+                        )
+                    ),
+                    $this->getMenuItem(
+                        'item_5',
+                        true,
+                        array(
+                            $this->getMenuItem(
+                                'item_5_1',
+                                true,
+                                array(
+                                    $this->getMenuItem('item_5_1_1', false),
+                                )
+                            )
+                        ),
+                        '#'
+                    ),
+                    $this->getMenuItem(
+                        'item_6',
+                        true,
+                        array(
+                            $this->getMenuItem('item_6_1', false),
+                            $this->getMenuItem(''),
+                        ),
+                        '/my-uri'
+                    ),
+                ),
+                array(
+                    array(
+                        'label' => 'item_1',
+                        'uri' => '',
+                        'isAllowed' => true,
+                        'children' => array()
+                    ),
+                    array(
+                        'label' => 'item_2',
+                        'uri' => '',
+                        'isAllowed' => true,
+                        'children' => array(
+                            array(
+                                'label' => 'item_2_1',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'children' => array()
+                            ),
+                            array(
+                                'label' => '',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'children' => array()
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'item_3',
+                        'uri' => '',
+                        'isAllowed' => true,
+                        'children' => array(
+                            array(
+                                'label' => 'item_3_1',
+                                'uri' => '',
+                                'isAllowed' => false,
+                                'children' => array()
+                            ),
+                            array(
+                                'label' => 'item_3_2',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'children' => array()
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'item_4',
+                        'uri' => '',
+                        'isAllowed' => false,
+                        'children' => array(
+                            array(
+                                'label' => 'item_4_1',
+                                'uri' => '',
+                                'isAllowed' => false,
+                                'children' => array()
+                            ),
+                            array(
+                                'label' => '',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'children' => array()
+                            ),
+                        )
+                    ),
+                    array(
+                        'label' => 'item_5',
+                        'uri' => '#',
+                        'isAllowed' => false,
+                        'children' => array(
+                            array(
+                                'label' => 'item_5_1',
+                                'uri' => '',
+                                'isAllowed' => false,
+                                'children' => array(
+                                    array(
+                                        'label' => 'item_5_1_1',
+                                        'uri' => '',
+                                        'isAllowed' => false,
+                                        'children' => array()
+                                    ),
+                                )
+                            )
+                        )
+                    ),
+                    array(
+                        'label' => 'item_6',
+                        'uri' => '/my-uri',
+                        'isAllowed' => true,
+                        'children' => array(
+                            array(
+                                'label' => 'item_6_1',
+                                'uri' => '',
+                                'isAllowed' => false,
+                                'children' => array()
+                            ),
+                            array(
+                                'label' => '',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'children' => array()
+                            ),
+                        )
+                    ),
+                )
+            )
+        );
+    }
+
+    protected function getMenuItem($label, $isAllowed = true, $children = array(), $uri = '')
+    {
+        $menu = $this->getMockBuilder('Knp\Menu\MenuItem')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'))
+            ->getMock();
+
+        $menu->expects($this->any())
+            ->method('getLabel')
+            ->will($this->returnValue($label));
+
+        $menu->expects($this->any())
+            ->method('getUri')
+            ->will($this->returnValue($uri));
+
+        $menu->setExtra('isAllowed', $isAllowed);
+
+        $childrenCount = count($children);
+        $hasChildren = $childrenCount > 0;
+        $menu->expects($this->any())
+            ->method('hasChildren')
+            ->will($this->returnValue($hasChildren));
+
+        $menu->expects($this->any())
+            ->method('hasChildren')
+            ->will($this->returnValue($hasChildren));
+
+        $menu->expects($this->any())
+            ->method('getIterator')
+            ->will($this->returnValue(new \ArrayIterator($children)));
+
+        $menu->expects($this->any())
+            ->method('count')
+            ->will($this->returnValue($childrenCount));
+
+        $menu->expects($this->any())
+            ->method('getChildren')
+            ->will($this->returnValue($children));
+
+        return $menu;
     }
 
     protected function assertRender($menu, $menuInstance, $options, $renderer)

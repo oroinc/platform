@@ -10,7 +10,7 @@ oro:
                     delete: "Delete"
                 filter:
                     type:
-                        html: "HTML"
+                        html: "Html"
                         txt: "Plain text"
                 page_size:
                     all: "All"
