@@ -52,18 +52,20 @@ class OroThemeExtension extends Extension
 
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $bundlePath = dirname($reflection->getFilename());
-            $finder = new Finder();
-            $finder
-                ->files()
-                ->path('#^Resources/public/themes/\w+/settings.yml#')
-                ->in($bundlePath);
+            $dir = dirname($reflection->getFilename()) . '/Resources/public/themes';
+            if (is_dir($dir)) {
+                $finder = new Finder();
+                $finder
+                    ->files()
+                    ->path('#^\w+/settings.yml#')
+                    ->in($dir);
 
-            /** @var SplFileInfo $file */
-            foreach ($finder as $file) {
-                $themeName = $file->getPathInfo()->getFilename();
-                $settings = Yaml::parse($file->getRealPath());
-                $result[$themeName] = $settings;
+                /** @var SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $themeName = $file->getPathInfo()->getFilename();
+                    $settings = Yaml::parse($file->getRealPath());
+                    $result[$themeName] = $settings;
+                }
             }
         }
 
