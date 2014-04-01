@@ -10,11 +10,6 @@ use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 
 abstract class OroKernel extends Kernel
 {
-    protected $configPath  = 'Resources/config/oro/';
-    protected $bundlePaths = [];
-    protected $bundleConfigPath = [];
-
-
     /**
      * Get the list of all "autoregistered" bundles
      *
@@ -47,7 +42,13 @@ abstract class OroKernel extends Kernel
         return $bundles;
     }
 
-    protected function checkDir($roots = [])
+    /**
+     * Finds all bundles.yml in given root folders
+     *
+     * @param array $roots
+     * @return array
+     */
+    protected function findBundles($roots = [])
     {
         $paths = [];
         foreach ($roots as $root) {
@@ -81,18 +82,12 @@ abstract class OroKernel extends Kernel
 
     protected function collectBundles()
     {
-        $time_start = microtime(true);
-        var_dump($time_start);
-
-        $finder = $this->checkDir(
+        $finder = $this->findBundles(
             [
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
             ]
         );
-
-        print_r($finder);
-
         foreach ($finder as $file) {
             $import = Yaml::parse($file);
 
@@ -119,14 +114,6 @@ abstract class OroKernel extends Kernel
         }
 
         uasort($bundles, array($this, 'compareBundles'));
-
-
-        $time_end = microtime(true);
-        var_dump($time_end);
-
-        $time = $time_end - $time_start;
-        echo("\nsearching bundles for $time seconds\n");
-
 
         return $bundles;
     }
