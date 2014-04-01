@@ -43,7 +43,7 @@ abstract class OroKernel extends Kernel
     }
 
     /**
-     * Finds all bundles.yml in given root folders
+     * Finds all .../Resource/config/oro/bundles.yml in given root folders
      *
      * @param array $roots
      * @return array
@@ -65,8 +65,9 @@ abstract class OroKernel extends Kernel
                     if ($current->isDir() && !is_dir($current->getPathname() . '/Resources')) {
                         return true;
                     } else {
-                        if (is_file($current->getPathname() . '/Resources/config/oro/bundles.yml')) {
-                            $paths[] = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                        $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                        if (is_file($file)) {
+                            $paths[] = $file;
                         }
                         return false;
                     }
