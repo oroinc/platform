@@ -48,18 +48,20 @@ class OroSidebarExtension extends Extension
 
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $bundlePath = dirname($reflection->getFilename());
-            $finder = new Finder();
-            $finder
-                ->files()
-                ->path('#^Resources/public/sidebar_widgets/\w+/widget.yml#')
-                ->in($bundlePath);
+            $dir = dirname($reflection->getFilename()) . '/Resources/public/sidebar_widgets';
+            if (is_dir($dir)) {
+                $finder = new Finder();
+                $finder
+                    ->files()
+                    ->path('#^\w+/widget.yml#')
+                    ->in($dir);
 
-            /** @var SplFileInfo $file */
-            foreach ($finder as $file) {
-                $widgetName = $file->getPathInfo()->getFilename();
-                $settings = Yaml::parse($file->getRealPath());
-                $result[$widgetName] = $settings;
+                /** @var SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $widgetName = $file->getPathInfo()->getFilename();
+                    $settings = Yaml::parse($file->getRealPath());
+                    $result[$widgetName] = $settings;
+                }
             }
         }
 
