@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\ORM\Query\Parameter;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -60,42 +60,13 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $message = 'Will be removed %d rows';
         } else {
-            $query = $this->applyCriteria($qb->select('j.id'))
-                ->getQuery();
-            $sql = $query->getSQL();
-
-            $params = $query->getParameters()->toArray();
-            $bindParams = [];
-
-            /** @var Parameter $param */
-            foreach ($params as $param) {
-                $bindParams[] = $param->getValue();
-            }
-
-            $con = $em->getConnection();
-            $con->executeUpdate(
-                sprintf("DELETE FROM jms_job_statistics WHERE job_id IN (%s)", $sql),
-                $bindParams
-            );
-
-            $con->executeUpdate(
-                sprintf(
-                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s)",
-                    $sql,
-                    $sql
-                ),
-                array_merge($bindParams, $bindParams)
-            );
-
-            $qb = $em->createQueryBuilder();
             $query = $this->applyCriteria($qb->select('j'))
                 ->getQuery();
 
-            $jobs = $query
-                ->setMaxResults(1000)
-                ->getResult();
+            $jobs = $query->getResult();
 
             $result = 0;
+            $jobIds = [];
             foreach ($jobs as $job) {
                 /** @var Job $job */
 
@@ -109,12 +80,26 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                     continue;
                 }
 
+                $jobIds[] = $job->getId();
                 $em->remove($job);
                 $result++;
             }
 
             if ($result > 0) {
                 $em->flush();
+
+                $con = $em->getConnection();
+                $con->executeUpdate(
+                    "DELETE FROM jms_job_statistics WHERE job_id IN (?)",
+                    [$jobIds],
+                    [Connection::PARAM_INT_ARRAY]
+                );
+
+                $con->executeUpdate(
+                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (?)",
+                    [$jobIds],
+                    [Connection::PARAM_INT_ARRAY]
+                );
             }
 
             $message = 'Removed %d rows';

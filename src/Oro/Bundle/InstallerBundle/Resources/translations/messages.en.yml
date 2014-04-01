@@ -52,7 +52,8 @@ process:
         schema:
             header:        Database initialization
             cache:         Clear cache before database initialization
-            clear:         Clear extended entities data
+            clear-config:  Clear entities cache
+            clear-extend:  Clear extended entities data
             schema-drop:   Drop current schema
             schema-update: Schema update
             fixtures:      Load fixtures

@@ -88,9 +88,9 @@
 
                     $.ajax(url, {
                         success: function (res) {
-                            var successMessage = __('Sync was scheduled.'),
+                            var successMessage = __('oro.integration.sync'),
                                 url = routing.generate('oro_cron_job_view', {id: res.job_id}),
-                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('Check progress.') + '</a>';
+                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('oro.integration.progress') + '</a>';
 
                             messenger.notificationMessage('success', [successMessage, jobViewLink].join(' '));
                             if (navigation) {
@@ -98,7 +98,7 @@
                             }
                         },
                         error: function () {
-                            messenger.notificationMessage('error', __('Error was occurred, please try later.'));
+                            messenger.notificationMessage('error', __('oro.integration.error'));
                         },
                         dataType: 'json'
                     }).always(function () {

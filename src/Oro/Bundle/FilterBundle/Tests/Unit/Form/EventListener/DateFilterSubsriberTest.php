@@ -77,6 +77,11 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function dataProvider()
     {
+        $weekDateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $weekDateTime->modify('this week');
+        // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
+        $weekNumber = $weekDateTime->format('W');
+
         return [
             'should process date value'  => [
                 ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
@@ -94,7 +99,10 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
                     'part'  => DateModifierInterface::PART_WEEK,
                     'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
                 ],
-                ['part' => DateModifierInterface::PART_WEEK, 'value' => ['start' => 3, 'end' => date('W')]],
+                [
+                    'part' => DateModifierInterface::PART_WEEK,
+                    'value' => ['start' => 3, 'end' => $weekNumber]
+                ],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
