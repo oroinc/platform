@@ -54,7 +54,7 @@ class ReminderExtension extends AbstractTypeExtension
         $form = $event->getForm();
         $entity = $form->getData();
 
-        if (!$entity instanceof RemindableInterface || !$form->has('reminders')) {
+        if (!$form->isValid() || !$entity instanceof RemindableInterface || !$form->has('reminders')) {
             return;
         }
 
