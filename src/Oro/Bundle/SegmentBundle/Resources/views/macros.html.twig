@@ -210,6 +210,9 @@
                             router: 'oro_api_get_entity_fields',
                             routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
                             confirm: confirm,
+                            afterRevertCallback: function(element){
+                                element.change();
+                            },
                             requireConfirm: function () {
                                 var data = $('#oro_{{ type }}_form_definition').val();
                                 if (!data) {
