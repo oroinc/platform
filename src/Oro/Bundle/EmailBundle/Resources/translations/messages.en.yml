@@ -1,5 +1,8 @@
 oro:
     email:
+        menu:
+            emailtemplate_list.description: List of email templates
+
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template: "Choose a template..."
         datagrid:
@@ -10,7 +13,7 @@ oro:
                     delete: "Delete"
                 filter:
                     type:
-                        html: "HTML"
+                        html: "Html"
                         txt: "Plain text"
                 page_size:
                     all: "All"

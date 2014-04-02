@@ -1,5 +1,7 @@
 oro:
     business_unit:
+        menu:
+            list.description: List of business units
         controller:
             message:
                 saved: "Business Unit saved"

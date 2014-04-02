@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Command;
+namespace Oro\Bundle\CronBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\CronBundle\Command\CleanupCommand;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\MemoryOutput;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
@@ -58,9 +59,9 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testDryExecution()
     {
-        $params    = ['-d' => true];
-        $input     = new ArrayInput($params, $this->command->getDefinition());
-        $output    = new MemoryOutput();
+        $params = ['-d' => true];
+        $input  = new ArrayInput($params, $this->command->getDefinition());
+        $output = new MemoryOutput();
 
         $queryMock = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -85,41 +86,90 @@ class CleanupCommandTest extends OrmTestCase
 
     public function testExecution()
     {
-        $em = $this->getTestEntityManager();
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\CronBundle\Tests\Unit\Stub'
+        $command = $this->getMock(
+            'Oro\Bundle\CronBundle\Command\CleanupCommand',
+            ['getResultIterator'],
+            [CleanupCommand::COMMAND_NAME]
         );
-
-        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $em->getConfiguration()->setEntityNamespaces(
-            [
-                'JMSJobQueueBundle' => 'Oro\Bundle\CronBundle\Tests\Unit\Stub'
-            ]
-        );
-
-        $statement = $this->createFetchStatementMock([['id' => 1]]);
-        $this->getDriverConnectionMock($em)->expects($this->any())
-            ->method('prepare')
-            ->will(
-                $this->returnCallback(
-                    function ($prepareString) use (&$statement) {
-                        return $statement;
-                    }
-                )
-            );
-
-        $params    = [];
-        $input     = new ArrayInput($params, $this->command->getDefinition());
-        $output    = new MemoryOutput();
+        $command->setContainer($this->container);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('doctrine.orm.entity_manager')
-            ->will($this->returnValue($em));
+            ->will($this->returnValue($this->emMock));
 
-        $this->command->execute($input, $output);
+        $qbMock = $this->getQueryBuilderMock();
+        $this->emMock->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qbMock));
+
+        $jobIds = [1, 2];
+        $command->expects($this->once())->method('getResultIterator')
+            ->will($this->returnValue(new \ArrayIterator($jobIds)));
+
+        $this->emMock->expects($this->exactly(2))->method('getReference')
+            ->will(
+                $this->returnValueMap(
+                    [
+                    ['JMSJobQueueBundle:Job', 1, new Job('test')],
+                    ['JMSJobQueueBundle:Job', 2, new Job('test-deps')]
+                    ]
+                )
+            );
+
+        $qbMock->expects($this->once())
+            ->method('select')
+            ->with('j.id')
+            ->will($this->returnSelf());
+
+        $countQuery = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['setParameter', 'getSingleScalarResult'])
+            ->getMockForAbstractClass();
+
+        $countQuery->expects($this->at(0))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $countQuery->expects($this->at(1))
+            ->method('getSingleScalarResult')
+            ->will($this->returnValue(0));
+        $countQuery->expects($this->at(2))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $countQuery->expects($this->at(3))
+            ->method('getSingleScalarResult')
+            ->will($this->returnValue(1));
+
+        $this->emMock->expects($this->once())->method('beginTransaction');
+
+        $this->emMock->expects($this->exactly(2))
+            ->method('createQuery')
+            ->will($this->returnValue($countQuery));
+
+        $this->emMock->expects($this->once())
+            ->method('remove');
+
+        $this->emMock->expects($this->once())
+            ->method('flush');
+        $this->emMock->expects($this->once())
+            ->method('clear');
+        $this->emMock->expects($this->once())->method('commit');
+
+        $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(['executeUpdate'])
+            ->getMock();
+        $conn->expects($this->exactly(2))
+            ->method('executeUpdate');
+        $this->emMock->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($conn));
+
+        $params = [];
+        $input  = new ArrayInput($params, $this->command->getDefinition());
+        $output = new MemoryOutput();
+
+        $command->execute($input, $output);
     }
 
     protected function getQueryBuilderMock()

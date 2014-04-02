@@ -69,7 +69,23 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                 'fields' => [
                     'field1' => [
                         'type' => 'integer'
-                    ]
+                    ],
+                    'field2' => [
+                        'type' => 'string',
+                        'configs' => [
+                            'extend' => [
+                                'length' => 200
+                            ]
+                        ]
+                    ],
+                    'field3' => [
+                        'type' => 'text',
+                        'configs' => [
+                            'extend' => [
+                                'length' => null
+                            ]
+                        ]
+                    ],
                 ]
             ]
         ];

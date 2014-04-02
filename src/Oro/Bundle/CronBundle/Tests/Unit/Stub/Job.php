@@ -16,6 +16,15 @@ class Job
     protected $id;
 
     /**
+     * @ORM\ManyToMany(targetEntity = "Job", fetch = "EAGER")
+     * @ORM\JoinTable(name="jms_job_dependencies",
+     *     joinColumns = { @ORM\JoinColumn(name = "source_job_id", referencedColumnName = "id") },
+     *     inverseJoinColumns = { @ORM\JoinColumn(name = "dest_job_id", referencedColumnName = "id")}
+     * )
+     */
+    protected $dependencies;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     protected $closedAt;

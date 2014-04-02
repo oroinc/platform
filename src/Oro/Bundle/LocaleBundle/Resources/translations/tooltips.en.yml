@@ -1,0 +1,11 @@
+oro.locale:
+    form:
+        tooltip:
+            languages: "Select the languages that can be used for translation of the email templates."
+            locale: "Locale selection affects formatting of numbers, addresses, names, and dates."
+            location: " If Format address per country option is disabled, or there is no country-specific formatting, the addresses will be formatted according to the rules of primary location."
+            format_address_by_address_country: "When this option is selected, addresses will be formatted according to the rules of their countries. Otherwise, the primary location formatting will be applied."
+            language: "Select the system language from the list of installed translations (see below)."
+            timezone: "Select the timezone of your location. All dates and times will be displayed in the specified timezone."
+            currency: "Select the default currency"
+            quarter_start: "Select the starting date of the first quarter in year."
