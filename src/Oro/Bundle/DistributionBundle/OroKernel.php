@@ -4,7 +4,6 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
@@ -43,24 +42,61 @@ abstract class OroKernel extends Kernel
         return $bundles;
     }
 
+    /**
+     * Finds all .../Resource/config/oro/bundles.yml in given root folders
+     *
+     * @param array $roots
+     * @return array
+     */
+    protected function findBundles($roots = [])
+    {
+        $paths = [];
+        foreach ($roots as $root) {
+            if (!is_dir($root)) {
+                continue;
+            }
+            $root   = realpath($root);
+            $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $filter = new \RecursiveCallbackFilterIterator(
+                $dir,
+                function (\SplFileInfo $current) use (&$paths) {
+                    $fileName = strtolower($current->getFilename());
+                    if ($fileName === '.'
+                        || $fileName === '..'
+                        || $fileName === 'tests'
+                        || $current->isFile()
+                    ) {
+                        return false;
+                    }
+                    if (!is_dir($current->getPathname() . '/Resources')) {
+                        return true;
+                    } else {
+                        $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                        if (is_file($file)) {
+                            $paths[] = $file;
+                        }
+                        return false;
+                    }
+                }
+            );
+
+            $iterator = new \RecursiveIteratorIterator($filter);
+            $iterator->rewind();
+        }
+
+        return $paths;
+    }
+
     protected function collectBundles()
     {
-        $finder = new Finder();
-        $bundles = array();
-
-        $finder
-            ->files()
-            ->in(
-                array(
-                    $this->getRootDir() . '/../src',
-                    $this->getRootDir() . '/../vendor',
-                )
-            )
-            ->followLinks()
-            ->name('bundles.yml');
-
-        foreach ($finder as $file) {
-            $import = Yaml::parse($file->getRealpath());
+        $files = $this->findBundles(
+            [
+                $this->getRootDir() . '/../src',
+                $this->getRootDir() . '/../vendor'
+            ]
+        );
+        foreach ($files as $file) {
+            $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
                 $kernel = false;

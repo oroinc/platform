@@ -1,8 +1,8 @@
 oro_menu_config:
     items:
         embedded_forms:
-            label: oro.embeddedform.entity_plural_label
-            route: oro_embedded_form_list
+            label: 'oro.embeddedform.entity_plural_label'
+            route: 'oro_embedded_form_list'
             extras:
                 position:   20
                 routes:     ['oro_embedded_form_*']
@@ -16,7 +16,7 @@ oro_menu_config:
                                 embedded_forms: ~
 
 oro_titles:
-    oro_embedded_form_list:    ~
-    oro_embedded_form_view:    %%form.title%%
-    oro_embedded_form_create:  Create Embedded Form
-    oro_embedded_form_update:  %%form.title%% - Edit
+    oro_embedded_form_list: ~
+    oro_embedded_form_view: '%%form.title%%'
+    oro_embedded_form_create: 'Create Embedded Form'
+    oro_embedded_form_update: '%%form.title%% - Edit'

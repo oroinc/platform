@@ -24,7 +24,9 @@ class ConfigurationPass implements CompilerPassInterface
             $managerDef = $container->getDefinition(self::MANAGER_SERVICE_ID);
 
             $configs = array();
-            foreach ($container->getParameter('kernel.bundles') as $bundle) {
+
+            $bundles = $container->getParameter('kernel.bundles');
+            foreach ($bundles as $bundle) {
                 $reflection = new \ReflectionClass($bundle);
                 $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
                 if (is_file($file)) {

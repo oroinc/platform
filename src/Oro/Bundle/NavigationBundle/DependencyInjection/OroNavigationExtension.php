@@ -26,9 +26,11 @@ class OroNavigationExtension extends Extension
         $entitiesConfig = array();
         $titlesConfig = array();
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/navigation.yml')) {
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/navigation.yml';
+            if (is_file($file)) {
                 $bundleConfig = Yaml::parse(realpath($file));
 
                 // Merge menu from bundle configuration
