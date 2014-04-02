@@ -37,4 +37,4 @@ class TestConnector implements ConnectorInterface
     {
         return 'test Type';
     }
-} 
+}

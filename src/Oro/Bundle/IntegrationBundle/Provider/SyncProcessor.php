@@ -65,7 +65,7 @@ class SyncProcessor
         } else {
             $connectors = $channel->getConnectors();
             foreach ((array)$connectors as $connector) {
-                $this->processConnector($channel, $connector);
+                $this->processChannelConnector($channel, $connector);
             }
         }
     }
