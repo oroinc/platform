@@ -296,17 +296,7 @@ class PackageManager
             )
         );
 
-        // put system in maintenance mode
-        $this->maintenance->on();
-
-        register_shutdown_function(
-            function ($maintenance) {
-                /** @var MaintenanceMode $maintenance */
-                $maintenance->off();
-            },
-            $this->maintenance
-        );
-
+        $this->enableMaintenanceMode();
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
@@ -415,6 +405,7 @@ class PackageManager
             $packageNames
         );
 
+        $this->enableMaintenanceMode();
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
@@ -507,10 +498,13 @@ class PackageManager
     public function update($packageName)
     {
         $this->logger->info(sprintf('%s updating begin', $packageName));
+
+        $this->enableMaintenanceMode();
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
         $this->scriptRunner->removeApplicationCache();
+
         if ($this->doInstall($packageName)) {
             $currentlyInstalled = $this->getInstalled();
             $changeSetBuilder = new ChangeSetBuilder();
@@ -707,5 +701,21 @@ class PackageManager
         $pool->addRepository(new CompositeRepository($this->getRepositories()));
 
         return $this->pool = $pool;
+    }
+
+    /**
+     * Turn on maintenance mode and register shutdown function to turn it off
+     */
+    protected function enableMaintenanceMode()
+    {
+        $this->maintenance->on();
+
+        register_shutdown_function(
+            function ($maintenance) {
+                /** @var MaintenanceMode $maintenance */
+                $maintenance->off();
+            },
+            $this->maintenance
+        );
     }
 }

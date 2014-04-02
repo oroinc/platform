@@ -22,11 +22,12 @@ use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -342,6 +343,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
 
+        $maintenance = $this->getEnableMaintenanceMock();
+
         $logger = $this->createLoggerMock();
         $logger->expects($this->at(0))->method('info')->with($this->stringContains('installing begin'));
         $logger->expects($this->at(1))->method('info')->with($this->stringContains('Updating composer.json'));
@@ -353,6 +356,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             null,
             $runner,
+            $maintenance,
             $logger,
             $tempComposerJson
         );
@@ -498,6 +502,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             $bufferMock,
             null,
+            null,
             $logger,
             $tempComposerJson
         );
@@ -518,6 +523,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function shouldRemoveNewPackageFromJsonAndRethrowRunnerExceptionDuringInstallation()
     {
@@ -622,6 +628,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             null,
             $scriptRunner,
+            null,
             $logger,
             $tempComposerJson
         );
@@ -744,6 +751,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function shouldUninstallViaInstallationManagerAndUpdateComposerJson()
     {
@@ -814,6 +822,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->once())
             ->method('clearDistApplicationCache');
 
+        $maintenance = $this->getEnableMaintenanceMock();
+
         $logger = $this->createLoggerMock();
         $logger->expects($this->at(0))
             ->method('info')
@@ -828,7 +838,15 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('error');
 
         // Ready Steady Go!
-        $manager = $this->createPackageManager($composer, null, null, $runner, $logger, $tempComposerJson);
+        $manager = $this->createPackageManager(
+            $composer,
+            null,
+            null,
+            $runner,
+            $maintenance,
+            $logger,
+            $tempComposerJson
+        );
         $manager->uninstall($packageNamesToBeRemoved);
 
         $updatedComposerData = json_decode(file_get_contents($tempComposerJson), true);
@@ -853,7 +871,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with($this->stringContains('Package oro/platform is not deletable'));
 
-        $manager = $this->createPackageManager(null, null, null, null, $logger);
+        $manager = $this->createPackageManager(null, null, null, null, null, $logger);
         $manager->uninstall(['oro/platform']);
     }
 
@@ -873,7 +891,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with($this->stringContains('Package oro/platform-dist is not deletable'));
 
-        $manager = $this->createPackageManager(null, null, null, null, $logger);
+        $manager = $this->createPackageManager(null, null, null, null, null, $logger);
         $manager->uninstall(['oro/platform-dist']);
     }
 
@@ -1077,6 +1095,9 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('runPlatformUpdate');
 
         $composerInstaller = $this->prepareInstallerMock($packageName, 0);
+
+        $maintenance = $this->getEnableMaintenanceMock();
+
         $logger = $this->createLoggerMock();
         $logger->expects($this->at(0))
             ->method('info')
@@ -1098,6 +1119,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             null,
             $runner,
+            $maintenance,
             $logger,
             tempnam(sys_get_temp_dir(), uniqid())
         );
@@ -1151,6 +1173,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             $bufferMock,
             $this->createScriptRunnerMock(),
+            null,
             $logger,
             tempnam(sys_get_temp_dir(), uniqid())
         );
@@ -1329,6 +1352,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      * @param Installer $installer
      * @param BufferIO $io
      * @param Runner $scriptRunner
+     * @param MaintenanceMode $maintenance
      * @param LoggerInterface $logger
      * @param null $pathToComposerJson
      *
@@ -1339,6 +1363,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         Installer $installer = null,
         BufferIO $io = null,
         Runner $scriptRunner = null,
+        MaintenanceMode $maintenance = null,
         LoggerInterface $logger = null,
         $pathToComposerJson = null
     ) {
@@ -1354,13 +1379,24 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         if (!$scriptRunner) {
             $scriptRunner = $this->createScriptRunnerMock();
         }
+        if (!$maintenance) {
+            $maintenance = $this->createMaintenanceMock();
+        }
         if (!$logger) {
             $logger = $this->createLoggerMock();
         }
         if (!$pathToComposerJson) {
             $pathToComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
         }
-        return new PackageManager($composer, $installer, $io, $scriptRunner, $logger, $pathToComposerJson);
+        return new PackageManager(
+            $composer,
+            $installer,
+            $io,
+            $scriptRunner,
+            $maintenance,
+            $logger,
+            $pathToComposerJson
+        );
     }
 
     /**
@@ -1416,6 +1452,16 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MaintenanceMode
+     */
+    protected function createMaintenanceMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\PlatformBundle\Maintenance\Mode')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
     protected function createLoggerMock()
@@ -1443,5 +1489,20 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     protected function createLocalRepositoryMock()
     {
         return $this->getMock('Composer\Repository\WritableRepositoryInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|MaintenanceMode
+     */
+    protected function getEnableMaintenanceMock()
+    {
+        $maintenance = $this->createMaintenanceMock();
+        $maintenance->expects($this->once())
+            ->method('on');
+
+        // can't check turning off of maintenance, because it's performed inside register_shutdown_function callback
+        // it should be tested with Selenium tests
+
+        return $maintenance;
     }
 }
