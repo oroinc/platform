@@ -20,7 +20,7 @@ class Configuration implements ConfigurationInterface
                         ->ifNull()
                         ->then(
                             function () {
-                                return '/install.php';
+                                return 'install.php';
                             }
                         )
                     ->end()

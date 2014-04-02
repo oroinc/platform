@@ -9,12 +9,14 @@
  * For event drag & drop, requires jQuery UI draggable.
  * For event resizing, requires jQuery UI resizable.
  */
- 
-(function($, undefined) {
+
+/*global require*/
+require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'], function ($, dateTimeFormatter) {
 
 
 ;;
 
+var undefined = arguments[3];
 var defaults = {
 
 	// display
@@ -118,6 +120,9 @@ var rtlDefaults = {
 var fc = $.fullCalendar = { version: "1.6.4" };
 var fcViews = fc.views = {};
 
+function getSystemTodayDate() {
+    return dateTimeFormatter.applyTimeZoneCorrection(new Date());
+}
 
 $.fn.fullCalendar = function(options) {
 
@@ -232,7 +237,7 @@ function Calendar(element, options, eventSources) {
 	var suggestedViewHeight;
 	var resizeUID = 0;
 	var ignoreWindowResize = 0;
-	var date = new Date();
+	var date = getSystemTodayDate();
 	var events = [];
 	var _dragElement;
 	
@@ -549,7 +554,7 @@ function Calendar(element, options, eventSources) {
 
 
 	function updateTodayButton() {
-		var today = new Date();
+		var today = getSystemTodayDate();
 		if (today >= currentView.start && today < currentView.end) {
 			header.disableButton('today');
 		}
@@ -604,7 +609,7 @@ function Calendar(element, options, eventSources) {
 	
 	
 	function today() {
-		date = new Date();
+		date = getSystemTodayDate();
 		renderView();
 	}
 	
@@ -2351,7 +2356,7 @@ function BasicView(element, calendar, viewName) {
 	function buildCellHTML(date) {
 		var contentClass = tm + "-widget-content";
 		var month = t.start.getMonth();
-		var today = clearTime(new Date());
+		var today = clearTime(getSystemTodayDate());
 		var html = '';
 		var classNames = [
 			'fc-day',
@@ -3110,7 +3115,7 @@ function AgendaView(element, calendar, viewName) {
 		var headerClass = tm + "-widget-header"; // TODO: make these when updateOptions() called
 		var contentClass = tm + "-widget-content";
 		var date;
-		var today = clearTime(new Date());
+		var today = clearTime(getSystemTodayDate());
 		var col;
 		var cellsHTML;
 		var cellHTML;
@@ -6107,4 +6112,4 @@ function HorizontalPositionCache(getElement) {
 
 ;;
 
-})(jQuery);
+});

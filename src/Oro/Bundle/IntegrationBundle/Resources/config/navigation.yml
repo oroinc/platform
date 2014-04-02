@@ -1,12 +1,12 @@
 oro_menu_config:
     items:
         channels_submenu:
-            label: Channels
+            label: 'oro.integration.menu.channels_submenu.label'
             uri: '#'
             extras:
                 position: 50
         channels_list:
-            label: Manage Channels
+            label: 'oro.integration.menu.channels_list.label'
             route: oro_integration_channel_index
             extras:
                 position: 10
@@ -23,5 +23,5 @@ oro_menu_config:
 
 oro_titles:
     oro_integration_channel_index:  ~
-    oro_integration_channel_update: %%channel.name%%
-    oro_integration_channel_create: Create Channel
+    oro_integration_channel_update: '%%channel.name%%'
+    oro_integration_channel_create: 'Create Channel'

@@ -1,7 +1,10 @@
 "Change Entity Confirmation": "Change Entity Confirmation"
 "Yes, I Agree": "Yes, I Agree"
-"Are you sure you want to change entity?": "Are you sure you want to change entity?"
-"Run confirmation": "Run confirmation"
-"Are you sure you want to refresh this segment?": "Are you sure you want to refresh this segment?"
+"Confirm action": "Confirm action"
+"Please confirm that you want to refresh this segment.": "Please confirm that you want to refresh this segment."
 "Segment successfully processed.": "Segment successfully processed."
-"Error was occurred, please contact administrator.": "Error was occurred, please contact administrator."
+"An unidentified error has occurred. Please contact your Administrator.": "An unidentified error has occurred. Please contact your Administrator."
+
+oro:
+    segment:
+        confirm_update: Changing the entity will erase all segment filters and columns. Do you want to continue?

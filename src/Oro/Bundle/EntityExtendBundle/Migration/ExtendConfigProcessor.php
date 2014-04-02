@@ -104,7 +104,9 @@ class ExtendConfigProcessor
                             if (isset($fieldConfigs['configs']['extend'])) {
                                 $doctrineAttrModificationCount = 0;
                                 foreach ($doctrineFieldAttributes as $attrName) {
-                                    if (isset($fieldConfigs['configs']['extend'][$attrName])) {
+                                    if (isset($fieldConfigs['configs']['extend'][$attrName])
+                                        || (array_key_exists($attrName, $fieldConfigs['configs']['extend']))
+                                    ) {
                                         $doctrineAttrModificationCount++;
                                     }
                                 }
@@ -331,7 +333,7 @@ class ExtendConfigProcessor
         $result = false;
 
         foreach ($configs as $scope => $values) {
-            $config      = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
+            $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
             $hasChanges = false;
             foreach ($values as $key => $value) {
                 $config->set($key, $value);

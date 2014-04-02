@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\ORM\Query\Parameter;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use JMS\JobQueueBundle\Entity\Job;
@@ -13,10 +14,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class CleanupCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const COMMAND_NAME = 'oro:cron:cleanup';
+    const BATCH_SIZE   = 200;
 
     /**
      * {@inheritdoc}
@@ -48,9 +51,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $logger = new OutputLogger($output);
-        $em = $this->getContainer()
+        $em     = $this->getContainer()
             ->get('doctrine.orm.entity_manager');
-        $qb = $em->createQueryBuilder();
+        $qb     = $em->createQueryBuilder();
 
         if ($input->getOption('dry-run')) {
             $result = $this
@@ -60,61 +63,47 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
             $message = 'Will be removed %d rows';
         } else {
-            $query = $this->applyCriteria($qb->select('j.id'))
-                ->getQuery();
-            $sql = $query->getSQL();
+            $qb   = $this->applyCriteria($qb->select('j.id'));
+            $jobs = $this->getResultIterator($qb);
 
-            $params = $query->getParameters()->toArray();
-            $bindParams = [];
-
-            /** @var Parameter $param */
-            foreach ($params as $param) {
-                $bindParams[] = $param->getValue();
-            }
-
-            $con = $em->getConnection();
-            $con->executeUpdate(
-                sprintf("DELETE FROM jms_job_statistics WHERE job_id IN (%s)", $sql),
-                $bindParams
-            );
-
-            $con->executeUpdate(
-                sprintf(
-                    "DELETE FROM jms_job_dependencies WHERE source_job_id IN (%s)",
-                    $sql,
-                    $sql
-                ),
-                array_merge($bindParams, $bindParams)
-            );
-
-            $qb = $em->createQueryBuilder();
-            $query = $this->applyCriteria($qb->select('j'))
-                ->getQuery();
-
-            $jobs = $query
-                ->setMaxResults(1000)
-                ->getResult();
-
-            $result = 0;
-            foreach ($jobs as $job) {
+            $em->beginTransaction();
+            try {
+                $result = 0;
+                $jobIds = [];
                 /** @var Job $job */
+                foreach ($jobs as $jobId) {
+                    $job = $em->getReference('JMSJobQueueBundle:Job', $jobId);
 
-                $incomingDepsCount = (integer)$em->createQuery(
-                    "SELECT COUNT(j) FROM JMSJobQueueBundle:Job j WHERE :job MEMBER OF j.dependencies"
-                )
-                    ->setParameter('job', $job)
-                    ->getSingleScalarResult();
+                    $incomingDepsCount = (integer)$em->createQuery(
+                        "SELECT COUNT(j) FROM JMSJobQueueBundle:Job j WHERE :job MEMBER OF j.dependencies"
+                    )
+                        ->setParameter('job', $job)
+                        ->getSingleScalarResult();
 
-                if ($incomingDepsCount > 0) {
-                    continue;
+                    if ($incomingDepsCount > 0) {
+                        continue;
+                    }
+
+                    $jobIds[] = $job->getId();
+                    $em->remove($job);
+                    $result++;
+
+                    if (0 === $result % self::BATCH_SIZE) {
+                        $this->flushBatch($em, $jobIds);
+                        $jobIds = [];
+                    }
                 }
 
-                $em->remove($job);
-                $result++;
-            }
+                if (!empty($jobIds)) {
+                    $this->flushBatch($em, $jobIds);
+                }
 
-            if ($result > 0) {
-                $em->flush();
+                $em->commit();
+            } catch (\Exception $e) {
+                $em->rollback();
+                $logger->critical($e->getMessage(), ['exception' => $e]);
+
+                return 1;
             }
 
             $message = 'Removed %d rows';
@@ -145,5 +134,40 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             ->setParameters([$date, Job::STATE_FINISHED]);
 
         return $qb;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return BufferedQueryResultIterator
+     */
+    protected function getResultIterator(QueryBuilder $qb)
+    {
+        return new BufferedQueryResultIterator($qb);
+    }
+
+    /**
+     * Flush batch
+     *
+     * @param EntityManager $em
+     * @param array         $ids
+     */
+    protected function flushBatch(EntityManager $em, array $ids)
+    {
+        $em->flush();
+        $em->clear();
+
+        $con = $em->getConnection();
+        $con->executeUpdate(
+            "DELETE FROM jms_job_statistics WHERE job_id IN (?)",
+            [$ids],
+            [Connection::PARAM_INT_ARRAY]
+        );
+
+        $con->executeUpdate(
+            "DELETE FROM jms_job_dependencies WHERE source_job_id IN (?)",
+            [$ids],
+            [Connection::PARAM_INT_ARRAY]
+        );
     }
 }

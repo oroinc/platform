@@ -10,15 +10,15 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>Action Name</th>
-                        <th>Description</th>
+                        <th>{% trans %}Action Name{% endtrans %}</th>
+                        <th>{% trans %}Description{% endtrans %}</th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for code, action in actionsList if action["url"] %}
+                {% for action in actionsList if action.url %}
                     <tr>
-                        <td><a href="{{ action["url"] }}" target="_blank">{{ code }}</a></td>
-                        <td>{{ action["description"] }}</td>
+                        <td><a href="{{ action.url }}" target="_blank">{{ action.label|trans }}</a></td>
+                        <td>{{ action.description|trans }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
