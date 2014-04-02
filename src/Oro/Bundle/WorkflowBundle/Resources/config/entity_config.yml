@@ -9,7 +9,20 @@ oro_entity_config:
                     form:
                         type:               oro_workflow_select
                         options:
-                            label:          'Active workflow'
+                            label:          oro.workflow.entity_config.active_workflow.label
                             required:       false
-                            empty_value:    'none'
+                            empty_value:    oro.workflow.entity_config.active_workflow.none
+                            block:          other
+                is_show_step_in_grid:
+                    options:
+                        priority:           250
+                        default_value:      true
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.workflow.entity_config.is_show_step_in_grid.label
+                            choices:
+                                false:      oro.workflow.entity_config.is_show_step_in_grid.choice.hide
+                                true:       oro.workflow.entity_config.is_show_step_in_grid.choice.show
+                            empty_value:    false
                             block:          other
