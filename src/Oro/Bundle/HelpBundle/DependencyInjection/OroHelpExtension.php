@@ -51,15 +51,18 @@ class OroHelpExtension extends Extension
     protected function getBundleConfigs(ContainerBuilder $container)
     {
         $result = array();
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $file = dirname($reflection->getFilename()) . '/Resources/config/' . self::BUNDLE_CONFIG_FILE;
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::BUNDLE_CONFIG_FILE;
             if (is_file($file)) {
-                $file = realpath($file);
+                $file     = realpath($file);
                 $result[] = Yaml::parse($file);
                 $container->addResource(new FileResource($file));
             }
         }
+
         return $result;
     }
 }
