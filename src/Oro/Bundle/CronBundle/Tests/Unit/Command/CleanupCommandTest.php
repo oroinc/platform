@@ -122,12 +122,6 @@ class CleanupCommandTest extends OrmTestCase
         $this->emMock->expects($this->any())
             ->method('commit');
 
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('doctrine.orm.entity_manager')
-            ->will($this->returnValue($this->emMock));
-
-
         $command = $this->getMock(
             'Oro\Bundle\CronBundle\Command\CleanupCommand',
             ['processBuff'],
@@ -142,39 +136,42 @@ class CleanupCommandTest extends OrmTestCase
         $command->execute($input, $output);
     }
 
-    protected function getQueryBuilderMock()
+    public function testFailedExecution()
     {
-        $qbMock = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $this->emMock->expects($this->once())
+            ->method('beginTransaction');
+
+        $this->emMock->expects($this->once())
+            ->method('rollback');
+
+        $params = [];
+        $input  = new ArrayInput($params, $this->command->getDefinition());
+        $output = new MemoryOutput();
+
+        $stm = $this->getStatementMock();
+        $stm->expects($this->once())
+            ->method('fetchColumn')
+            ->will($this->throwException(new \Exception('Error')));
+
+        $this->command->execute($input, $output);
+    }
+
+    public function testProcessBuf()
+    {
+        $conn = $this->getMockBuilder('\Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
+            ->setMethods(['executeUpdate'])
             ->getMock();
+        $conn->expects($this->exactly(4))
+            ->method('executeUpdate');
 
-        $qbMock->expects($this->any())
-            ->method('from')
-            ->will($this->returnSelf());
+        $this->emMock->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($conn));
 
-        $qbMock->expects($this->any())
-            ->method('where')
-            ->will($this->returnSelf());
-
-        $qbMock->expects($this->any())
-            ->method('andWhere')
-            ->will($this->returnSelf());
-
-        $qbMock->expects($this->any())
-            ->method('setParameters')
-            ->will($this->returnSelf());
-
-
-        $this->emMock->expects($this->any())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($qbMock));
-
-
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('doctrine.orm.entity_manager')
-            ->will($this->returnValue($this->emMock));
-
-        return $qbMock;
+        $refl = new \ReflectionObject($this->command);
+        $method = $refl->getMethod('processBuff');
+        $method->setAccessible(true);
+        $method->invoke($this->command, $this->emMock, [['id' => 1], ['id' => 2]], 1);
     }
 }
