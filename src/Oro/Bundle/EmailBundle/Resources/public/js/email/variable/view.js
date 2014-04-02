@@ -76,7 +76,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
                                 textarea = $(this);
 
                             textarea.val(textarea.val() + variable);
-                            console.log($(this).val());
                         }
                     });
             }
