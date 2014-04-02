@@ -47,7 +47,9 @@ define(['jquery', 'underscore', 'backgrid'
 
         /** @property */
         events: {
-            'click': '_onCellClick'
+            'click': '_onCellClick',
+            'mouseover .dropdown-toggle': '_onCellClick',
+            'mouseout .dropdown-toggle': '_onCellClick'
         },
 
         /**
