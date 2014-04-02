@@ -23,6 +23,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     const BATCH_SIZE   = 200;
     const DAYS         = 1; // cleanup entries older than ...
 
+    const EXITCODE_SUCCESS = 0;
+    const EXITCODE_FAILED = 1;
+
     /**
      * {@inheritdoc}
      */
@@ -84,7 +87,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                 $em->rollback();
                 $logger->critical($e->getMessage(), ['exception' => $e]);
 
-                return 1;
+                return self::EXITCODE_FAILED;
             }
 
             $message = 'Removed %d rows';
@@ -93,7 +96,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         $logger->notice(sprintf($message, $result));
         $logger->notice('Completed');
 
-        return 0;
+        return self::EXITCODE_SUCCESS;
     }
 
     /**
