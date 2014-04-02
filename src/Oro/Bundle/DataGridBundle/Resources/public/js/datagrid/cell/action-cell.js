@@ -47,9 +47,9 @@ define(['jquery', 'underscore', 'backgrid'
 
         /** @property */
         events: {
-            'click': '_onCellClick',
-            'mouseover .dropdown-toggle': '_onCellClick',
-            'mouseleave .dropdown-menu': '_onCellClick'
+            'click': '_toggleDropdown',
+            'mouseover .dropdown-toggle': '_toggleDropdown',
+            'mouseleave .dropdown-menu': '_toggleDropdown'
         },
 
         /**
@@ -228,7 +228,7 @@ define(['jquery', 'underscore', 'backgrid'
          * @param {Event} e
          * @protected
          */
-        _onCellClick: function(e) {
+        _toggleDropdown: function(e) {
             this.$('.dropdown-toggle').dropdown('toggle');
             e.stopPropagation();
         }
