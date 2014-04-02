@@ -62,20 +62,22 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
                 var html = _.template(this.options.template.html(), {
                     userVars: this.model.get('user'),
                     entityVars: this.model.get('entity'),
-                    title: __('Click to insert variable.')
+                    title: __('Click to insert variable or drag it.')
                 });
 
                 $el.html(html);
                 $el.parent().show();
 
+                $el.find('ul li a').draggable({helper: 'clone'});
                 $('input[name*="subject"], textarea[name*="content"]')
-                    .bind("dragenter dragover", function(e){
-                        e.preventDefault();
-                        e.stopPropagation();
-                    })
-                    .bind("dragleave dragexit", function(e){
-                        e.preventDefault();
-                        e.stopPropagation();
+                    .droppable({
+                        drop: function Drop(event, ui) {
+                            var variable = ui.draggable.text(),
+                                textarea = $(this);
+
+                            textarea.val(textarea.val() + variable);
+                            console.log($(this).val());
+                        }
                     });
             }
 
