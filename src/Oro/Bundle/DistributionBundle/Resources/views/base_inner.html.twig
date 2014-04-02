@@ -2,13 +2,13 @@
 
     {% block javascripts %}
         {{ parent() }}
-        <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="{{ asset('bundles/oroinstaller/lib/jquery-2.0.3.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/loader.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/util.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/package.manager.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootbox.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/jquery.cookie.js') }}"></script>
 
         <script type="text/javascript">
 
@@ -81,7 +81,7 @@
                 {% endif %}
             </div>
             <div class="content">
-                <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>
+                <img src="{{ asset('bundles/oroinstaller/img/icon/wait.png') }}" alt="" class="ajax-loading"/>
 
                 <div class="title clearfix">
                     <h2 class="pull-left">{{ block('title') }}</h2>
