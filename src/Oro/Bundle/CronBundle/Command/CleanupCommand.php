@@ -21,6 +21,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 {
     const COMMAND_NAME = 'oro:cron:cleanup';
     const BATCH_SIZE   = 200;
+    const DAYS         = 1; // cleanup entries older than ...
 
     /**
      * {@inheritdoc}
@@ -56,7 +57,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         $con    = $em->getConnection();
 
         if ($input->getOption('dry-run')) {
-            $stm = $this->getConditionStatement($con, 1, true);
+            $stm = $this->getConditionStatement($con, true);
             $stm->execute();
             $result = $stm->fetchColumn();
 
@@ -119,25 +120,25 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      * Get statement with bound values
      *
      * @param Connection $connection
-     * @param int        $days
      * @param bool       $isCount
      *
      * @return Statement
      */
-    protected function getConditionStatement(Connection $connection, $days = 1, $isCount = false)
+    protected function getConditionStatement(Connection $connection, $isCount = false)
     {
         $sql = "SELECT %s FROM jms_jobs j
                  LEFT JOIN jms_job_dependencies d ON d.source_job_id=j.id
-                 WHERE j.closedAt > ? AND j.state = ?
+                 WHERE j.closedAt < ? AND j.state NOT IN (?, ?)
                  AND d.dest_job_id IS NULL";
         $sql = sprintf($sql, $isCount ? 'COUNT(j.id)' : 'j.id');
 
-        $date = new \DateTime(sprintf('%d days ago', $days), new \DateTimeZone('UTC'));
+        $date = new \DateTime(sprintf('%d days ago', self::DAYS), new \DateTimeZone('UTC'));
         $date = $date->format('Y-m-d H:i:s');
 
         $stm = $connection->prepare($sql);
         $stm->bindValue(1, $date);
-        $stm->bindValue(2, Job::STATE_FAILED);
+        $stm->bindValue(2, Job::STATE_RUNNING, \PDO::PARAM_INT);
+        $stm->bindValue(3, Job::STATE_PENDING, \PDO::PARAM_INT);
 
         return $stm;
     }

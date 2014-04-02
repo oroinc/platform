@@ -74,7 +74,7 @@ class CleanupCommandTest extends OrmTestCase
     protected function getStatementMock()
     {
         $statement = $this->getMock('\Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
-        $statement->expects($this->exactly(2))
+        $statement->expects($this->exactly(3))
             ->method('bindValue');
 
         $statement->expects($this->once())
@@ -108,13 +108,12 @@ class CleanupCommandTest extends OrmTestCase
         $output = new MemoryOutput();
 
         $stm = $this->getStatementMock();
-        $stm->expects($this->at(3))
-            ->method('fetchColumn')
-            ->will($this->returnValue(1));
         $stm->expects($this->at(4))
             ->method('fetchColumn')
+            ->will($this->returnValue(1));
+        $stm->expects($this->at(5))
+            ->method('fetchColumn')
             ->will($this->returnValue(false));
-
 
         $this->emMock->expects($this->any())
             ->method('beginTransaction');
