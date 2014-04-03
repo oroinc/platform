@@ -159,8 +159,7 @@ class LoggableManager
     {
         $this->em = $em;
         $uow      = $em->getUnitOfWork();
-
-        $oid = spl_object_hash($entity);
+        $oid      = spl_object_hash($entity);
 
         if ($this->pendingLogEntityInserts && array_key_exists($oid, $this->pendingLogEntityInserts)) {
             $logEntry     = $this->pendingLogEntityInserts[$oid];
@@ -207,7 +206,7 @@ class LoggableManager
      */
     protected function calculateCollectionData(PersistentCollection $collection)
     {
-        $ownerEntity = $collection->getOwner();
+        $ownerEntity          = $collection->getOwner();
         $ownerEntityClassName = $this->getEntityClassName($ownerEntity);
 
         if ($this->checkAuditable($ownerEntityClassName)) {
@@ -218,7 +217,6 @@ class LoggableManager
                 $method = $meta->propertyMetadata[$collectionMapping['fieldName']]->method;
 
                 // calculate collection changes
-                // TODO: Fix bug with collection diff calculation. https://magecore.atlassian.net/browse/BAP-2724
                 $newCollection = $collection->toArray();
                 $oldCollection = $collection->getSnapshot();
 
@@ -429,6 +427,7 @@ class LoggableManager
         ) {
             $this->loadUser();
         }
+
         return self::$userCache[$this->username];
     }
 
@@ -511,6 +510,7 @@ class LoggableManager
 
             if (count($classMetadata->propertyMetadata)) {
                 $this->addConfig($classMetadata);
+
                 return true;
             }
         }
@@ -538,7 +538,7 @@ class LoggableManager
     protected function getEntityIdentifierString($entity)
     {
         $className = $this->getEntityClassName($entity);
-        $metadata = $this->em->getClassMetadata($className);
+        $metadata  = $this->em->getClassMetadata($className);
 
         return serialize($metadata->getIdentifierValues($entity));
     }
