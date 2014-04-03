@@ -102,6 +102,7 @@ oro:
 
             related_entity.label:       Workflow Step
             related_entity.description: Related field for Workflow Step
+            grid.label:                 Step
 
         workflowdefinition:
             entity_label:                 Workflow
