@@ -18,6 +18,16 @@
 .filter-item .filter-default-value .reset-filter {
     display: none;
 }
+.filter-select .select-filter-placeholder {
+    display: none;
+}
+.filter-select.filter-default-value .select-filter-placeholder {
+    display: inline-block;
+}
+.filter-select.filter-default-value .select-filter-widget {
+    display: none;
+}
+
 .filter-box .btn-group [class^='icon-'] {
   padding-top:2px;
   vertical-align:middle;

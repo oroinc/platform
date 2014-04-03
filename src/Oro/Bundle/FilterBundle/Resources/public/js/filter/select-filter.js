@@ -303,7 +303,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
             this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());;
+                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**
