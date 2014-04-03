@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MultipleEntityType extends AbstractType
 {
@@ -19,9 +20,15 @@ class MultipleEntityType extends AbstractType
      */
     protected $entityManager;
 
-    public function __construct($entityManager)
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    public function __construct($entityManager, SecurityFacade $securityFacade = null)
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager  = $entityManager;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -85,13 +92,14 @@ class MultipleEntityType extends AbstractType
         $resolver->setRequired(array('class'));
         $resolver->setDefaults(
             array(
+                'add_acl_resource'      => null,
                 'class'                 => null,
-                'mapped'                => false,
-                'grid_url'              => null,
                 'default_element'       => null,
+                'extend'                => false,
+                'grid_url'              => null,
                 'initial_elements'      => null,
+                'mapped'                => false,
                 'selector_window_title' => null,
-                'extend'                => false
             )
         );
     }
@@ -105,6 +113,17 @@ class MultipleEntityType extends AbstractType
         $this->setOptionToView($view, $options, 'initial_elements');
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');
+
+        if (null == $this->securityFacade ||
+            !isset($options['add_acl_resource']) ||
+            null === $options['add_acl_resource']
+        ) {
+            $options['allow_action'] = true;
+        } else {
+            $options['allow_action'] = $this->securityFacade->isGranted($options['add_acl_resource']);
+        }
+
+        $this->setOptionToView($view, $options, 'allow_action');
     }
 
     /**

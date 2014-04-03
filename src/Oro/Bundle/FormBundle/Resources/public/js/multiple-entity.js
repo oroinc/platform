@@ -13,6 +13,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
      */
     return Backbone.View.extend({
         options: {
+            allowAction: true,
             template: null,
             elementTemplate: null,
             entitiesContainerSelector: '.entities',
@@ -42,6 +43,11 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
             }
+
+            if (_.isNull(this.options.allowAction)) {
+                this.options.allowAction = true;
+            }
+
             this.initialCollectionItems = [];
             this.addedCollectionItems = [];
             this.removedCollectionItems = [];
@@ -216,6 +222,11 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
 
         render: function() {
             this.$el.html(this.template());
+
+            if (false === this.options.allowAction) {
+                this.$el.children('.actions.clearfix').remove();
+            }
+
             this.$entitiesContainer = this.$el.find(this.options.entitiesContainerSelector);
 
             return this;
