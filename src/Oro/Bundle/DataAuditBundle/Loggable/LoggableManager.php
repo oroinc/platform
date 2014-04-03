@@ -16,7 +16,7 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @ SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * TODO: This class should be refactored  (BAP-978)
  */
 class LoggableManager
@@ -110,15 +110,6 @@ class LoggableManager
         }
 
         return $this->configs[$name];
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     */
-    public function hasConfig($name)
-    {
-        return isset($this->configs[$name]);
     }
 
     /**
@@ -219,7 +210,7 @@ class LoggableManager
         $ownerEntity = $collection->getOwner();
         $ownerEntityClassName = $this->getEntityClassName($ownerEntity);
 
-        if ($this->hasConfig($ownerEntityClassName)) {
+        if ($this->checkAuditable($ownerEntityClassName)) {
             $meta              = $this->getConfig($ownerEntityClassName);
             $collectionMapping = $collection->getMapping();
 
@@ -271,7 +262,7 @@ class LoggableManager
         }
 
         $entityClassName = $this->getEntityClassName($entity);
-        if (!$this->hasConfig($entityClassName) || !$this->checkAuditable($entityClassName)) {
+        if (!$this->checkAuditable($entityClassName)) {
             return;
         }
 
