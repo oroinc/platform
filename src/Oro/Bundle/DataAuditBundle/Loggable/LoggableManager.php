@@ -16,7 +16,7 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
 
 /**
- * @ SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * TODO: This class should be refactored  (BAP-978)
  */
 class LoggableManager
