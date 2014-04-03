@@ -137,7 +137,9 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _minimize: function () {
-        this._normalize();
+        if (this.state() !== 'minimized') {
+            this._normalize();
+        }
 
         var widget = this.widget();
 
@@ -200,7 +202,9 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _maximize: function () {
-        this._normalize();
+        if (this.state() !== 'maximized') {
+            this._normalize();
+        }
 
         this._trigger("beforeMaximize");
         this._saveSnapshot();
