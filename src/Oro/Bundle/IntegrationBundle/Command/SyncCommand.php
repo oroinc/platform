@@ -65,8 +65,8 @@ class SyncCommand extends AbstractSyncCronCommand
     {
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
-        $channelId           = $input->getOption('connector');
-        $connector           = $input->getOption('channel-id');
+        $connector           = $input->getOption('connector');
+        $channelId           = $input->getOption('channel-id');
         $connectorParameters = $this->getConnectorParameters($input);
         $repository          = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
