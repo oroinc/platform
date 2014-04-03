@@ -261,7 +261,7 @@ class TranslationServiceProvider
      * @param string $locale
      * @param string $sourceDir
      */
-    protected function  apply($locale, $sourceDir)
+    protected function apply($locale, $sourceDir)
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
