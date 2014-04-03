@@ -55,7 +55,7 @@ class InstallCommand extends ContainerAwareCommand
         } elseif ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
-            $commandExecutor->runCommand('cache:clear');
+            $commandExecutor->runCommand('cache:clear', array('--no-optional-warmers' => true));
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');

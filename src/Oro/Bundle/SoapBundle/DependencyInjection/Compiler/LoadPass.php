@@ -15,10 +15,11 @@ class LoadPass implements CompilerPassInterface
     {
         $classes = [];
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/soap.yml')) {
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/oro/soap.yml';
+            if (is_file($file)) {
                 $classes = array_merge($classes, Yaml::parse(realpath($file))['classes']);
             }
         }

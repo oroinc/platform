@@ -206,3 +206,7 @@
     to { background-position: 40px 0 }
 }
 /* End: Progress bar */
+.dropdown-toggle:focus {
+    outline: 0;
+    font-weight: bold;
+}
