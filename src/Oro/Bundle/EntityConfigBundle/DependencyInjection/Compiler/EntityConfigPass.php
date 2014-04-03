@@ -19,9 +19,11 @@ class EntityConfigPass implements CompilerPassInterface
     {
         $providerBagDefinition = $container->getDefinition('oro_entity_config.provider_bag');
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/entity_config.yml')) {
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/entity_config.yml';
+            if (is_file($file)) {
                 $bundleConfig = Yaml::parse(realpath($file));
 
                 if (isset($bundleConfig['oro_entity_config']) && count($bundleConfig['oro_entity_config'])) {

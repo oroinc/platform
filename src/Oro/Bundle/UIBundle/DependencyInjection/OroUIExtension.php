@@ -45,11 +45,12 @@ class OroUIExtension extends Extension
     {
         $placeholders = array();
         $items = array();
-        $bundles = $container->getParameter('kernel.bundles');
 
+        $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/placeholders.yml')) {
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/placeholders.yml';
+            if (is_file($file)) {
                 $placeholderData = Yaml::parse(realpath($file));
                 if (isset($placeholderData['placeholders'])) {
                     $placeholders = array_replace_recursive($placeholders, $placeholderData['placeholders']);
