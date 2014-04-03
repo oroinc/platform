@@ -67,6 +67,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
                 load = $.proxy(this.loadFields, this),
                 revert = function () {
                     $el.val(oldVal);
+                    $el.change();
                     if ($.isFunction(this.options.afterRevertCallback)) {
                         this.options.afterRevertCallback.call(this, $el);
                     }
