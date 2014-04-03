@@ -1497,11 +1497,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEnableMaintenanceMock()
     {
         $maintenance = $this->createMaintenanceMock();
-        $maintenance->expects($this->once())
-            ->method('on');
-
-        // can't check turning off of maintenance, because it's performed inside register_shutdown_function callback
-        // it should be tested with Selenium tests
+        $maintenance->expects($this->once())->method('activate');
 
         return $maintenance;
     }

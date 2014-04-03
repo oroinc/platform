@@ -296,7 +296,7 @@ class PackageManager
             )
         );
 
-        $this->enableMaintenanceMode();
+        $this->maintenance->activate();
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
@@ -405,7 +405,7 @@ class PackageManager
             $packageNames
         );
 
-        $this->enableMaintenanceMode();
+        $this->maintenance->activate();
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
@@ -499,7 +499,7 @@ class PackageManager
     {
         $this->logger->info(sprintf('%s updating begin', $packageName));
 
-        $this->enableMaintenanceMode();
+        $this->maintenance->activate();
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
@@ -701,21 +701,5 @@ class PackageManager
         $pool->addRepository(new CompositeRepository($this->getRepositories()));
 
         return $this->pool = $pool;
-    }
-
-    /**
-     * Turn on maintenance mode and register shutdown function to turn it off
-     */
-    protected function enableMaintenanceMode()
-    {
-        $this->maintenance->on();
-
-        register_shutdown_function(
-            function ($maintenance) {
-                /** @var MaintenanceMode $maintenance */
-                $maintenance->off();
-            },
-            $this->maintenance
-        );
     }
 }
