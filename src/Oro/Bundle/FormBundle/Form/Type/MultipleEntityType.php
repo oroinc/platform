@@ -21,11 +21,11 @@ class MultipleEntityType extends AbstractType
     protected $entityManager;
 
     /**
-     * @var SecurityFacade
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityFacade;
 
-    public function __construct($entityManager, SecurityFacade $securityFacade = null)
+    public function __construct($entityManager, SecurityFacade $securityFacade)
     {
         $this->entityManager  = $entityManager;
         $this->securityFacade = $securityFacade;
@@ -114,11 +114,8 @@ class MultipleEntityType extends AbstractType
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');
 
-        if (null == $this->securityFacade ||
-            !isset($options['add_acl_resource']) ||
-            null === $options['add_acl_resource']
-        ) {
-            $options['allow_action'] = true;
+        if (!isset($options['add_acl_resource']) || empty($options['add_acl_resource'])) {
+            $options['allow_action'] = false;
         } else {
             $options['allow_action'] = $this->securityFacade->isGranted($options['add_acl_resource']);
         }

@@ -7,8 +7,13 @@ use Symfony\Component\Form\FormView;
 
 class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
 {
-    const PERMISSION_ALLOW = 'test_permission_allow';
+    const PERMISSION_ALLOW    = 'test_permission_allow';
     const PERMISSION_DISALLOW = 'test_permission_disallow';
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $securityFacade;
 
     /**
      * @var MultipleEntityType
@@ -22,20 +27,11 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('getClassMetadata', 'getRepository'))
             ->getMockForAbstractClass();
 
-        $sf = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $map = array(
-            array(self::PERMISSION_ALLOW,    null, true),
-            array(self::PERMISSION_DISALLOW, null, false)
-        );
-
-        $sf->expects($this->any())
-            ->method('isGranted')
-            ->will($this->returnValueMap($map));
-
-        $this->type = new MultipleEntityType($em, $sf);
+        $this->type = new MultipleEntityType($em, $this->securityFacade);
     }
 
     public function testGetName()
@@ -96,29 +92,20 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        if (isset($options['add_acl_resource'])) {
+            $this->securityFacade->expects($this->once())
+                ->method('isGranted')
+                ->with($options['add_acl_resource'])
+                ->will($this->returnValue($expectedValue));
+        } else {
+            $this->securityFacade->expects($this->never())
+                ->method('isGranted');
+        }
+
         $view = new FormView();
         $this->type->finishView($view, $form, $options);
         $this->assertArrayHasKey($expectedKey, $view->vars);
         $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
-    }
-
-    public function testFinishViewWithoutSecurityFacade()
-    {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository'))
-            ->getMockForAbstractClass();
-
-        $type = new MultipleEntityType($em);
-
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $view = new FormView();
-        $type->finishView($view, $form, array('add_acl_resource' => 'some_permission_rule'));
-        $this->assertArrayHasKey('allow_action', $view->vars);
-        $this->assertEquals(true, $view->vars['allow_action']);
     }
 
     public function optionsDataProvider()
@@ -127,7 +114,7 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             array(
                 array(),
                 'allow_action',
-                true
+                false
             ),
             array(
                 array('add_acl_resource' => self::PERMISSION_ALLOW),

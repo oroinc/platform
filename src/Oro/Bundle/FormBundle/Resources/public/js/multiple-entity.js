@@ -13,18 +13,18 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
      */
     return Backbone.View.extend({
         options: {
-            allowAction: true,
-            template: null,
-            elementTemplate: null,
+            addedElement:              null,
+            allowAction:               false,
+            collection:                null,
+            defaultElement:            null,
+            elementTemplate:           null,
             entitiesContainerSelector: '.entities',
-            name: null,
-            collection: null,
-            selectionUrl: null,
-            addedElement: null,
-            removedElement: null,
-            defaultElement: null,
-            itemsPerRow: 4,
-            selectorWindowTitle: null
+            itemsPerRow:               4,
+            name:                      null,
+            removedElement:            null,
+            selectionUrl:              null,
+            selectorWindowTitle:       null,
+            template:                  null
         },
 
         events: {
@@ -42,10 +42,6 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
             if (this.options.defaultElement) {
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
-            }
-
-            if (_.isNull(this.options.allowAction)) {
-                this.options.allowAction = true;
             }
 
             this.initialCollectionItems = [];
@@ -223,7 +219,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
         render: function() {
             this.$el.html(this.template());
 
-            if (false === this.options.allowAction) {
+            if (!this.options.allowAction) {
                 this.$el.children('.actions.clearfix').remove();
             }
 
