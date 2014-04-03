@@ -20,10 +20,10 @@ oro_entity_config:
                     form:
                         type:               choice
                         options:
-                            label:          oro.workflow.entity_config.is_show_step_in_grid.label
+                            label:          oro.workflow.entity_config.show_step_in_grid.label
                             required:       false
                             choices:
-                                false:      oro.workflow.entity_config.is_show_step_in_grid.choice.hide
-                                true:       oro.workflow.entity_config.is_show_step_in_grid.choice.show
+                                false:      oro.workflow.entity_config.show_step_in_grid.choice.hide
+                                true:       oro.workflow.entity_config.show_step_in_grid.choice.show
                             empty_value:    false
                             block:          other

@@ -134,7 +134,7 @@ oro:
         entity_config:
             active_workflow.label:        'Active workflow'
             active_workflow.none:         'none'
-            is_show_step_in_grid.label:   'Workflow step in grid'
-            is_show_step_in_grid.choice:
+            show_step_in_grid.label:      'Workflow step in grid'
+            show_step_in_grid.choice:
                 hide:                     'Hide'
                 show:                     'Show'
