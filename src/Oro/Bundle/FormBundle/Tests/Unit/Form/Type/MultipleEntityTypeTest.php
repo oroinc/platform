@@ -5,8 +5,11 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
 use Symfony\Component\Form\FormView;
 
-class MultipleEntityTypeTypeTest extends \PHPUnit_Framework_TestCase
+class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
 {
+    const PERMISSION_ALLOW = 'test_permission_allow';
+    const PERMISSION_DISALLOW = 'test_permission_disallow';
+
     /**
      * @var MultipleEntityType
      */
@@ -19,7 +22,20 @@ class MultipleEntityTypeTypeTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('getClassMetadata', 'getRepository'))
             ->getMockForAbstractClass();
 
-        $this->type = new MultipleEntityType($em);
+        $sf = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $map = array(
+            array(self::PERMISSION_ALLOW,    null, true),
+            array(self::PERMISSION_DISALLOW, null, false)
+        );
+
+        $sf->expects($this->any())
+            ->method('isGranted')
+            ->will($this->returnValueMap($map));
+
+        $this->type = new MultipleEntityType($em, $sf);
     }
 
     public function testGetName()
@@ -55,13 +71,14 @@ class MultipleEntityTypeTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with(
                 array(
+                    'add_acl_resource'      => null,
                     'class'                 => null,
-                    'mapped'                => false,
-                    'grid_url'              => null,
                     'default_element'       => null,
+                    'extend'                => false,
+                    'grid_url'              => null,
                     'initial_elements'      => null,
+                    'mapped'                => false,
                     'selector_window_title' => null,
-                    'extend'                => false
                 )
             );
         $this->type->setDefaultOptions($optionsResolver);
@@ -85,9 +102,43 @@ class MultipleEntityTypeTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
     }
 
+    public function testFinishViewWithoutSecurityFacade()
+    {
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->getMockForAbstractClass();
+
+        $type = new MultipleEntityType($em);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $view = new FormView();
+        $type->finishView($view, $form, array('add_acl_resource' => 'some_permission_rule'));
+        $this->assertArrayHasKey('allow_action', $view->vars);
+        $this->assertEquals(true, $view->vars['allow_action']);
+    }
+
     public function optionsDataProvider()
     {
         return array(
+            array(
+                array(),
+                'allow_action',
+                true
+            ),
+            array(
+                array('add_acl_resource' => self::PERMISSION_ALLOW),
+                'allow_action',
+                true
+            ),
+            array(
+                array('add_acl_resource' => self::PERMISSION_DISALLOW),
+                'allow_action',
+                false
+            ),
             array(
                 array('grid_url' => '/test'),
                 'grid_url',
