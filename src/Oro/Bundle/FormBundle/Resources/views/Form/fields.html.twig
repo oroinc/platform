@@ -208,6 +208,7 @@
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ form.vars.grid_url|json_encode|raw }},
+                allowAction: {{ form.vars.allow_action|json_encode|raw }},
                 collection: new MultipleEntityCollection(),
                 selectorWindowTitle: {{ form.vars.selector_window_title|trans|json_encode|raw }}
             });

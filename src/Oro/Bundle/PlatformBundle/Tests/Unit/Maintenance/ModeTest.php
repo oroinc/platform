@@ -84,4 +84,17 @@ class ModeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->mode->off());
     }
+
+    public function testActivate()
+    {
+        $this->dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->equalTo(Events::MAINTENANCE_ON));
+
+        $this->mode->activate();
+
+        // can't check turning off of maintenance, because it's performed inside register_shutdown_function callback
+        // it should be tested with Selenium tests
+    }
 }
