@@ -61,7 +61,7 @@ class SyncProcessor
     public function process(Channel $channel, $connector = '', array $parameters = [])
     {
         if ($connector) {
-            $this->processChannelConnector($channel, $connector, $parameters);
+            $this->processChannelConnector($channel, $connector, $parameters, false);
         } else {
             $connectors = $channel->getConnectors();
             foreach ((array)$connectors as $connector) {
@@ -86,8 +86,9 @@ class SyncProcessor
      * @param Channel $channel    Channel object
      * @param string  $connector  Connector name
      * @param array   $parameters Connector additional parameters
+     * @param boolean $saveStatus Do we need to save new status to bd
      */
-    protected function processChannelConnector(Channel $channel, $connector, array $parameters = [])
+    protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
     {
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
@@ -124,7 +125,7 @@ class SyncProcessor
                     $parameters
                 ),
         ];
-        $this->processImport($connector, $jobName, $configuration, $channel);
+        $this->processImport($connector, $jobName, $configuration, $channel, $saveStatus);
     }
 
     /**
@@ -132,8 +133,9 @@ class SyncProcessor
      * @param string  $jobName
      * @param array   $configuration
      * @param Channel $channel
+     * @param boolean $saveStatus
      */
-    protected function processImport($connector, $jobName, $configuration, Channel $channel)
+    protected function processImport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
     {
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
 
@@ -189,7 +191,9 @@ class SyncProcessor
 
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
-        $this->em->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($channel, $status);
+        if ($saveStatus) {
+            $this->em->getRepository('OroIntegrationBundle:Channel')
+                ->addStatus($channel, $status);
+        }
     }
 }

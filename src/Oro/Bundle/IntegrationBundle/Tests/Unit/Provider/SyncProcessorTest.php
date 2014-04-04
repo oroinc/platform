@@ -109,12 +109,8 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processorRegistry->expects($this->once())
             ->method('getProcessorAliasesByEntity')
             ->will($this->returnValue([]));
-        $channelRepo = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($channelRepo));
+        $this->em->expects($this->never())
+            ->method('getRepository');
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
@@ -133,8 +129,6 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                 ]
             )
             ->will($this->returnValue($jobResult));
-        $channelRepo->expects($this->once())
-            ->method('addStatus');
 
         $processor = new SyncProcessor(
             $this->em,
