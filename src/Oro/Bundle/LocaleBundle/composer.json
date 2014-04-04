@@ -9,6 +9,7 @@
         "php": ">=5.3.3",
         "ext-intl": "*",
         "symfony/symfony": ">=2.1",
+        "oro/cache-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/config-bundle": "dev-master"
     },

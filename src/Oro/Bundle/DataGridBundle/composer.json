@@ -1,0 +1,25 @@
+{
+    "name": "oro/datagrid-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP DataGrid Bundle",
+    "keywords": ["BAP", "DataGrid"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.1.*",
+        "oro/cache-bundle": "dev-master",
+        "oro/ui-bundle": "dev-master",
+        "oro/requirejs-bundle": "dev-master",
+        "oro/security-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\DataGridBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/DataGridBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

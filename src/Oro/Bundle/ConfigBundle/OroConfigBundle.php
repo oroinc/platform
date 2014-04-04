@@ -2,14 +2,33 @@
 
 namespace Oro\Bundle\ConfigBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ConfigPass;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 
 class OroConfigBundle extends Bundle
 {
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        CumulativeResourceManager::getInstance()->registerResource(
+            $this->getName(),
+            'Resources/config/system_configuration.yml'
+        );
+        CumulativeResourceManager::getInstance()->registerResource(
+            'entity_output',
+            'Resources/config/entity_output.yml'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

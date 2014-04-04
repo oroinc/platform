@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\ConfigBundle\Provider\Provider;
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Provider\Provider;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {
-    const CONFIG_FILE_NAME = 'system_configuration.yml';
-
     /**
      * {@inheritDoc}
      */
@@ -22,14 +20,11 @@ class SystemConfigurationPass implements CompilerPassInterface
         $config    = array();
         $processor = new ProcessorDecorator(new Processor());
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
-            if (is_file($file)) {
-                $bundleConfig = Yaml::parse(realpath($file));
-                $config       = $processor->merge($config, $bundleConfig);
-            }
+        $resources = CumulativeResourceManager::getInstance()
+            ->getLoader('OroConfigBundle')
+            ->load($container);
+        foreach ($resources as $resource) {
+            $config = $processor->merge($config, $resource->data);
         }
 
         $taggedServices = $container->findTaggedServiceIds(Provider::TAG_NAME);

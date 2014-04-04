@@ -1,6 +1,4 @@
 parameters:
-    oro.oro_data_cache_manager.class:                          Oro\Bundle\SecurityBundle\Cache\OroDataCacheManager
-
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
@@ -56,9 +54,6 @@ parameters:
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
 
 services:
-    oro.oro_data_cache_manager:
-        class: %oro.oro_data_cache_manager.class%
-
     oro_security.security_facade:
         class: %oro_security.security_facade.class%
         arguments:

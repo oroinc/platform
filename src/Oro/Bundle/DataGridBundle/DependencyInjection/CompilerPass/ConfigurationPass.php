@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -17,7 +18,6 @@ class ConfigurationPass implements CompilerPassInterface
     const EXTENSION_TAG_NAME = 'oro_datagrid.extension';
     const PROVIDER_TAG_NAME  = 'oro_datagrid.configuration.provider';
 
-    const CONFIG_FILE_NAME = 'datagrid.yml';
     const ROOT_PARAMETER   = 'datagrid';
 
     /**
@@ -40,15 +40,12 @@ class ConfigurationPass implements CompilerPassInterface
         if ($container->hasDefinition(self::PROVIDER_SERVICE_ID)) {
             $config = [];
 
-            $bundles = $container->getParameter('kernel.bundles');
-            foreach ($bundles as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
-                $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
-                if (is_file($file)) {
-                    $bundleConfig = Yaml::parse(realpath($file));
-                    if (isset($bundleConfig[self::ROOT_PARAMETER]) && is_array($bundleConfig[self::ROOT_PARAMETER])) {
-                        $config = array_merge_recursive($config, $bundleConfig[self::ROOT_PARAMETER]);
-                    }
+            $resources = CumulativeResourceManager::getInstance()
+                ->getLoader('OroDataGridBundle')
+                ->load($container);
+            foreach ($resources as $resource) {
+                if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
+                    $config = array_merge_recursive($config, $resource->data[self::ROOT_PARAMETER]);
                 }
             }
 

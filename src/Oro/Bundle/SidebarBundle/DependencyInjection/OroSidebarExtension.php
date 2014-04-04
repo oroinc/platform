@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\SidebarBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Yaml\Yaml;
 
 class OroSidebarExtension extends Extension
@@ -60,6 +61,7 @@ class OroSidebarExtension extends Extension
                 foreach ($finder as $file) {
                     $widgetName = $file->getPathInfo()->getFilename();
                     $settings = Yaml::parse($file->getRealPath());
+                    $container->addResource(new FileResource($file->getRealPath()));
                     $result[$widgetName] = $settings;
                 }
             }

@@ -2,10 +2,21 @@
 
 namespace Oro\Bundle\AsseticBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 
 class OroAsseticBundle extends Bundle
 {
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        CumulativeResourceManager::getInstance()->registerResource(
+            $this->getName(),
+            'Resources/config/assets.yml'
+        );
+    }
 }

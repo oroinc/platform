@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
+use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 
 class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,8 +33,14 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $bundles, $expectedSet)
     {
-        $this->container->expects($this->once())->method('getParameter')->with('kernel.bundles')
-            ->will($this->returnValue($bundles));
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($bundles)
+            ->registerResource(
+                'OroConfigBundle',
+                'Resources/config/system_configuration.yml'
+            );
+
         if ($expectedSet) {
             $taggedServices = array('some.service.id' => 'some arguments');
 
@@ -62,7 +70,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 'should set data' => false
             ),
             'one bundle specified config'    => array(
-                'bundles'         => array('Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle'),
+                'bundles'         => array(new TestBundle()),
                 'should set data' => true
             )
         );

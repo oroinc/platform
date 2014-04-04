@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
@@ -19,6 +20,13 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->registerResource(
+                'entity_output',
+                'Resources/config/entity_output.yml'
+            );
+
         $extension = new OroConfigExtension();
         $configs = array();
 
@@ -35,19 +43,19 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $container->expects($this->any())
-            ->method('getParameter')
-            ->with('kernel.bundles')
-            ->will($this->returnValue(array()));
-
         $extension->load($configs, $container);
     }
 
     protected function createEmptyConfiguration()
     {
-        $this->configuration = new ContainerBuilder();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->registerResource(
+                'entity_output',
+                'Resources/config/entity_output.yml'
+            );
 
-        $this->configuration->setParameter('kernel.bundles', array());
+        $this->configuration = new ContainerBuilder();
 
         $loader = new OroConfigExtension();
         $config = $this->getEmptyConfig();
@@ -75,28 +83,6 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
     protected function assertParameter($value, $key)
     {
         $this->assertEquals($value, $this->configuration->getParameter($key), sprintf('%s parameter is correct', $key));
-    }
-
-    protected function getContainer(array $config = array())
-    {
-        $container = new ContainerBuilder();
-        $loader    = new OroConfigExtension();
-
-        $container->addCompilerPass(new Compiler\ConfigPass());
-        $container->setParameter('kernel.bundles', array());
-        $loader->load($config, $container);
-
-        $container->register(
-            'doctrine.orm.entity_manager',
-            $this->getMockClass('Doctrine\Common\Persistence\ObjectManager')
-        );
-        $container->register(
-            'security.context',
-            $this->getMockClass('Symfony\Component\Security\Core\SecurityContextInterface')
-        );
-        $container->compile();
-
-        return $container;
     }
 
     protected function tearDown()
