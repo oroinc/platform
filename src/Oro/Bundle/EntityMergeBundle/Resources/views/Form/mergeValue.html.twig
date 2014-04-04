@@ -6,24 +6,35 @@
     mixed value           - original value
     boolean isListValue   - is value represents list
 #}
+{% set emptyCellContent = '<span class="empty">-- ' ~ 'oro.entity_merge.form.empty'|trans ~ ' --</span>' %}
 {% if isListValue %}
     {% if value|length %}
+        {% set isAllEmpty = true %}
+        {% set listContent = '' %}
+
+        {% for value in convertedValue %}
+            {% if value|length %}
+                {% set listContent = listContent ~ '<li>' ~ value ~ '<li>' %}
+                {% set isAllEmpty = false %}
+            {% else %}
+                {% set listContent = listContent ~ '<li>' ~ emptyCellContent ~ '<li>' %}
+            {% endif %}
+        {% endfor %}
+
         <ul>
-            {% for value in convertedValue %}
-                {% if value|length %}
-                    <li>{{ value }}</li>
-                {% else %}
-                    <span class="empty">-- Empty --</span>
-                {% endif %}
-            {% endfor %}
+            {% if isAllEmpty %}
+                {{ emptyCellContent|raw }}
+            {% else %}
+                {{ listContent|raw }}
+            {% endif %}
         </ul>
     {% else %}
-        <span class="empty">-- Empty --</span>
+        {{ emptyCellContent|raw }}
     {% endif %}
 {% else %}
     {% if convertedValue|length %}
         {{ convertedValue }}
     {% else %}
-        <span class="empty">-- Empty --</span>
+        {{ emptyCellContent|raw }}
     {% endif %}
 {% endif %}
