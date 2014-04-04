@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class OroLocaleExtension extends Extension
@@ -113,48 +112,21 @@ class OroLocaleExtension extends Extension
      */
     protected function parseExternalConfigFiles(ContainerBuilder $container)
     {
-        $externalNameFormat = array();
-        $externalAddressFormat = array();
-        $externalLocaleData = array();
-        $externalCurrencyData = array();
+        $result = [
+            'name_format'    => [],
+            'address_format' => [],
+            'locale_data'    => [],
+            'currency_data'  => [],
+        ];
 
-        // read configuration from external files
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $configDir  = dirname($reflection->getFilename()) . '/Resources/config/oro';
-
-            // read name format files
-            $file = $configDir . '/name_format.yml';
-            if (is_file($file)) {
-                $externalNameFormat = array_merge($externalNameFormat, Yaml::parse(realpath($file)));
-            }
-
-            // read address format files
-            $file = $configDir . '/address_format.yml';
-            if (is_file($file)) {
-                $externalAddressFormat = array_merge($externalAddressFormat, Yaml::parse(realpath($file)));
-            }
-
-            // read locale data files
-            $file = $configDir . '/locale_data.yml';
-            if (is_file($file)) {
-                $externalLocaleData = array_merge($externalLocaleData, Yaml::parse(realpath($file)));
-            }
-
-            // read currency data files
-            $file = $configDir . '/currency_data.yml';
-            if (is_file($file)) {
-                $externalCurrencyData = array_merge($externalCurrencyData, Yaml::parse(realpath($file)));
-            }
+        $resources = CumulativeResourceManager::getInstance()
+            ->getLoader('OroLocaleBundle')
+            ->load($container);
+        foreach ($resources as $resource) {
+            $result[$resource->name] = array_merge($result[$resource->name], $resource->data);
         }
 
-        return array(
-            'name_format' => $externalNameFormat,
-            'address_format' => $externalAddressFormat,
-            'locale_data' => $externalLocaleData,
-            'currency_data' => $externalCurrencyData,
-        );
+        return $result;
     }
 
     /**

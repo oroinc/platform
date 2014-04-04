@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension;
+use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
+use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -20,7 +23,14 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadServices()
     {
-        $container = $this->createContainer();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->registerResource(
+                'OroHelpBundle',
+                'Resources/config/oro_help.yml'
+            );
+
+        $container = new ContainerBuilder();
 
         $this->extension->load(
             array(
@@ -44,7 +54,15 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadConfiguration(array $configs, array $bundles, array $expectedConfiguration)
     {
-        $container = $this->createContainer($bundles);
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($bundles)
+            ->registerResource(
+                'OroHelpBundle',
+                'Resources/config/oro_help.yml'
+            );
+
+        $container = new ContainerBuilder();
 
         $this->extension->load(
             $configs,
@@ -94,8 +112,8 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'bundles' => array(
-                    'Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle',
-                    'Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle',
+                    new BarBundle(),
+                    new FooBundle(),
                 ),
                 'expectedConfiguration' => array(
                     'defaults' => array(
@@ -142,18 +160,5 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             ),
         );
-    }
-
-    protected function createContainer(array $bundles = array())
-    {
-        $container = new ContainerBuilder(
-            new ParameterBag(
-                array(
-                    'kernel.bundles'=> $bundles,
-                )
-            )
-        );
-
-        return $container;
     }
 }

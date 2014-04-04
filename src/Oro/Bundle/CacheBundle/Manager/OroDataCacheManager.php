@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Cache;
+namespace Oro\Bundle\CacheBundle\Manager;
+
+use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 
 class OroDataCacheManager
 {

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -26,26 +27,22 @@ class OroNavigationExtension extends Extension
         $entitiesConfig = array();
         $titlesConfig = array();
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/navigation.yml';
-            if (is_file($file)) {
-                $bundleConfig = Yaml::parse(realpath($file));
-
-                // Merge menu from bundle configuration
-                if (isset($bundleConfig[self::MENU_CONFIG_KEY])) {
-                    $this->mergeMenuConfig($entitiesConfig, $bundleConfig[self::MENU_CONFIG_KEY]);
-                }
-
-                // Merge titles from bundle configuration
-                if (isset($bundleConfig[self::TITLES_KEY])) {
-                    $titlesConfig += is_array($bundleConfig[self::TITLES_KEY])
-                        ? $bundleConfig[self::TITLES_KEY]
-                        : array();
-                }
+        $resources = CumulativeResourceManager::getInstance()
+            ->getLoader('OroNavigationBundle')
+            ->load($container);
+        foreach ($resources as $resource) {
+            // Merge menu from bundle configuration
+            if (isset($resource->data[self::MENU_CONFIG_KEY])) {
+                $this->mergeMenuConfig($entitiesConfig, $resource->data[self::MENU_CONFIG_KEY]);
+            }
+            // Merge titles from bundle configuration
+            if (isset($resource->data[self::TITLES_KEY])) {
+                $titlesConfig += is_array($resource->data[self::TITLES_KEY])
+                    ? $resource->data[self::TITLES_KEY]
+                    : array();
             }
         }
+
         // Merge menu from application configuration
         if (is_array($configs)) {
             foreach ($configs as $configPart) {

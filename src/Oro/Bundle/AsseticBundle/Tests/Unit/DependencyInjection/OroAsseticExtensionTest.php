@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
@@ -13,6 +14,14 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $configs, array $expectedBundles, array $expectedConfiguration)
     {
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($expectedBundles)
+            ->registerResource(
+                'OroAsseticBundle',
+                'Resources/config/assets.yml'
+            );
+
         $extension = new OroAsseticExtension();
 
         $container = new ContainerBuilder();

@@ -10,6 +10,21 @@ use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 
 abstract class OroKernel extends Kernel
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeBundles()
+    {
+        parent::initializeBundles();
+
+        foreach ($this->getBundles() as $bundle) {
+            if (method_exists($bundle, 'init')) {
+                $bundle->init($this);
+            }
+        }
+    }
+
     /**
      * Get the list of all "autoregistered" bundles
      *

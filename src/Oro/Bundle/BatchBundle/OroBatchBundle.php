@@ -3,7 +3,8 @@
 namespace Oro\Bundle\BatchBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 
 /**
  * Batch Bundle
@@ -12,11 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class OroBatchBundle extends Bundle
 {
     /**
-     * {@inheritdoc}
+     * Constructor
      */
-    public function build(ContainerBuilder $container)
+    public function __construct()
     {
-        parent::build($container);
+        CumulativeResourceManager::getInstance()->registerResource(
+            $this->getName(),
+            'Resources/config/batch_jobs.yml'
+        );
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Cache;
+namespace Oro\Bundle\CacheBundle\Provider;
 
 /**
  * Provides a way to synchronize a cache between different processes.

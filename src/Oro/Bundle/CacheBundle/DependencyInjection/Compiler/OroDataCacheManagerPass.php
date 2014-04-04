@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
+namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class OroDataCacheManagerPass implements CompilerPassInterface
 {
-    const MANAGER_SERVICE_KEY        = 'oro.oro_data_cache_manager';
+    const MANAGER_SERVICE_KEY        = 'oro_cache.oro_data_cache_manager';
     const ABSTRACT_CACHE_SERVICE_KEY = 'oro.cache.abstract';
 
     /**

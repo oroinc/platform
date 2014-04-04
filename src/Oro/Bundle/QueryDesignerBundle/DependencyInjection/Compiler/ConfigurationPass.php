@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 
 class ConfigurationPass implements CompilerPassInterface
 {
     const MANAGER_SERVICE_ID = 'oro_query_designer.query_designer.manager';
     const TAG_NAME           = 'oro_filter.extension.orm_filter.filter';
-    const CONFIG_FILE_NAME   = 'query_designer.yml';
 
     /**
      * {@inheritDoc}
@@ -25,17 +25,16 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configs = array();
 
-            $bundles = $container->getParameter('kernel.bundles');
-            foreach ($bundles as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
-                $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
-                if (is_file($file)) {
-                    $config = Yaml::parse(realpath($file))[Configuration::ROOT_NODE_NAME];
-                    $vendor = strtolower(substr($bundle, 0, strpos($bundle, '\\')));
-                    $this->updateLabelsOfFunctions($config, 'converters', $vendor);
-                    $this->updateLabelsOfFunctions($config, 'aggregates', $vendor);
-                    $configs[] = $config;
-                }
+            $resources = CumulativeResourceManager::getInstance()
+                ->getLoader('OroQueryDesignerBundle')
+                ->load($container);
+            foreach ($resources as $resource) {
+                $config = $resource->data[Configuration::ROOT_NODE_NAME];
+
+                $vendor = strtolower(substr($resource->bundleClass, 0, strpos($resource->bundleClass, '\\')));
+                $this->updateLabelsOfFunctions($config, 'converters', $vendor);
+                $this->updateLabelsOfFunctions($config, 'aggregates', $vendor);
+                $configs[] = $config;
             }
 
             $filterTypes = [];

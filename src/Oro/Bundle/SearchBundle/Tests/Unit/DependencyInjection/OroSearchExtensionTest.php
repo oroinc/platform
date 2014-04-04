@@ -1,42 +1,29 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ContainerBuilder */
     private $container;
 
     public function setUp()
     {
-        $this->container = new ContainerBuilder();
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-
-        $params = array(
-            'kernel.bundles'     => array('Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle'),
-            'kernel.environment' => 'test',
-        );
-
-        $this->container->expects($this->any())
-            ->method('getParameter')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('kernel.bundles'),
-                    $this->equalTo('kernel.environment')
-                )
-            )
-            ->will(
-                $this->returnCallback(
-                    function ($param) use (&$params) {
-                        return $params[$param];
-                    }
-                )
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([new TestBundle()])
+            ->registerResource(
+                'OroSearchBundle',
+                'Resources/config/search.yml'
             );
 
-        $this->container->expects($this->any())
-            ->method('setParameter');
+        $this->container = new ContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'test');
     }
 
     public function testGetAlias()
