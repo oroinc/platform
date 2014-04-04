@@ -15,6 +15,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
                 'with-entity-details': 1,
                 'deep-level': 1
             },
+            afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog
             confirm: null,
             requireConfirm: function () { return true; }
@@ -64,7 +65,13 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         _confirm: function (confirm, newVal, oldVal) {
             var $el = this.element,
                 load = $.proxy(this.loadFields, this),
-                revert = function () { $el.val(oldVal); };
+                revert = function () {
+                    $el.val(oldVal);
+                    $el.change();
+                    if ($.isFunction(this.options.afterRevertCallback)) {
+                        this.options.afterRevertCallback.call(this, $el);
+                    }
+                }.bind(this);
             confirm.on('ok', load);
             confirm.on('cancel', revert);
             confirm.once('hidden', function () {
