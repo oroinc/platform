@@ -8,36 +8,21 @@ class SecurityProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider aclDataProvider
-     * @param bool $isProtected
-     * @param bool $isGranted
+     * @param array $protectedMap
+     * @param array $grantedMap
      * @param array $expectedAllowedEntities
      */
-    public function testApplyAcl($isProtected, $isGranted, $expectedAllowedEntities)
+    public function testApplyAcl($protectedMap, $grantedMap, $expectedAllowedEntities)
     {
         $entities = array(
-            array('entityName' => '\stdClass')
+            array('entityName' => '\stdClass'),
+            array('entityName' => '\DateTime')
         );
         $tableAlias = 'alias';
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-
-        if ($expectedAllowedEntities) {
-            $qb->expects($this->once())
-                ->method('andWhere')
-                ->with($tableAlias . '.entityName IN(:allowedEntities)')
-                ->will($this->returnSelf());
-            $qb->expects($this->once())
-                ->method('setParameter')
-                ->with('allowedEntities', $expectedAllowedEntities)
-                ->will($this->returnSelf());
-        } else {
-            $qb->expects($this->once())
-                ->method('andWhere')
-                ->with('1 = 0')
-                ->will($this->returnSelf());
-        }
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -63,23 +48,40 @@ class SecurityProviderTest extends \PHPUnit_Framework_TestCase
         $em->expects($this->once())
             ->method('createQueryBuilder')
             ->will($this->returnValue($searchQb));
-        
+
         $qb->expects($this->once())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
+        if ($expectedAllowedEntities) {
+            if (count($expectedAllowedEntities) != count($entities)) {
+                $qb->expects($this->once())
+                    ->method('andWhere')
+                    ->with($tableAlias . '.entityName IN(:allowedEntities)')
+                    ->will($this->returnSelf());
+                $qb->expects($this->once())
+                    ->method('setParameter')
+                    ->with('allowedEntities', $expectedAllowedEntities)
+                    ->will($this->returnSelf());
+            }
+        } else {
+            $qb->expects($this->once())
+                ->method('andWhere')
+                ->with('1 = 0')
+                ->will($this->returnSelf());
+        }
+
         $searchSecurityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $searchSecurityProvider->expects($this->once())
+        $searchSecurityProvider->expects($this->exactly(count($entities)))
             ->method('isProtectedEntity')
-            ->with($entities[0]['entityName'])
-            ->will($this->returnValue($isProtected));
-        if ($isProtected) {
-            $searchSecurityProvider->expects($this->once())
+            ->will($this->returnValueMap($protectedMap));
+
+        if ($grantedMap) {
+            $searchSecurityProvider->expects($this->exactly(count($grantedMap)))
                 ->method('isGranted')
-                ->with(SecurityProvider::ENTITY_PERMISSION, 'Entity:' . $entities[0]['entityName'])
-                ->will($this->returnValue($isGranted));
+                ->will($this->returnValueMap($grantedMap));
         } else {
             $searchSecurityProvider->expects($this->never())
                 ->method('isGranted');
@@ -92,9 +94,54 @@ class SecurityProviderTest extends \PHPUnit_Framework_TestCase
     public function aclDataProvider()
     {
         return array(
-            'not protected' => array(false, null, array('\stdClass')),
-            'protected and granted' => array(true, true, array('\stdClass')),
-            'protected not granted' => array(true, false, array()),
+            'not protected' => array(
+                array(),
+                array(),
+                array('\stdClass', '\DateTime')
+            ),
+            'protected and granted' => array(
+                array(
+                    array('\stdClass', true),
+                    array('\DateTime', true)
+                ),
+                array(
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\stdClass', true),
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\DateTime', true)
+                ),
+                array('\stdClass', '\DateTime')
+            ),
+            'protected not granted' => array(
+                array(
+                    array('\stdClass', true),
+                    array('\DateTime', true)
+                ),
+                array(
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\stdClass', false),
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\DateTime', false)
+                ),
+                array()
+            ),
+            'one not protected other granted' => array(
+                array(
+                    array('\stdClass', false),
+                    array('\DateTime', true)
+                ),
+                array(
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\DateTime', true)
+                ),
+                array('\stdClass', '\DateTime')
+            ),
+            'both protected one granted' => array(
+                array(
+                    array('\stdClass', true),
+                    array('\DateTime', true)
+                ),
+                array(
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\stdClass', false),
+                    array(SecurityProvider::ENTITY_PERMISSION, 'Entity:\DateTime', true)
+                ),
+                array('\DateTime')
+            ),
         );
     }
 }
