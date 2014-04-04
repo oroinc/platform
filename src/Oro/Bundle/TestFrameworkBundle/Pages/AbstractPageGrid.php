@@ -13,7 +13,7 @@ use PHPUnit_Framework_Assert;
 abstract class AbstractPageGrid extends AbstractPage
 {
 
-    protected $gridPath = "//div[@class = 'grid-container']";
+    protected $gridPath = '';
 
     protected $filtersPath = '';
 
@@ -205,7 +205,9 @@ abstract class AbstractPageGrid extends AbstractPage
     public function deleteEntity($entityData = array(), $actionName = 'Delete', $confirmation = true)
     {
         $entity = $this->getEntity($entityData);
-        $element = $entity->element($this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]"));
+        $element = $entity->element(
+            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]")
+        );
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $element->click();
         $element->click();
