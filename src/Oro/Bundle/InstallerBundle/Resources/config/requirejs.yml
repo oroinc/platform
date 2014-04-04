@@ -1,7 +1,0 @@
-config:
-    shim:
-        'jquery.ajax.queue':
-            deps:
-                - 'jquery'
-    paths:
-        'jquery.ajax.queue': 'bundles/oroinstaller/lib/jquery.ajaxQueue.min.js'
