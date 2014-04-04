@@ -97,6 +97,7 @@
 
 .ui-multiselect-menu.select-filter-widget {
     padding: 2px;
+    z-index:700;
 }
 
 .ui-multiselect-menu.select-filter-widget ul {

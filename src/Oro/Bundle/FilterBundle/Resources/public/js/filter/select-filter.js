@@ -173,7 +173,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
-                        my: 'left top+2',
+                        my: 'left top+7',
                         at: 'left bottom',
                         of: this.$(this.containerSelector)
                     },
@@ -280,10 +280,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _onSelectChange: function() {
             // set value
             this.applyValue();
-
             // update dropdown
-            var widget = this.$(this.containerSelector);
-            this.selectWidget.updateDropdownPosition(widget);
+            this.selectWidget.updateDropdownPosition();
         },
 
         /**
