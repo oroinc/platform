@@ -107,6 +107,7 @@
 
 .ui-multiselect-menu.select-filter-widget {
     padding: 2px;
+    z-index: 700;
 }
 
 .ui-multiselect-menu.select-filter-widget ul {
@@ -134,8 +135,7 @@
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-hover {
     background-image: none;
-    background-color: #3875d7;
-    color: #fff;
+    background-color: #EFEFEF;
 }
 
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-active {
@@ -146,7 +146,9 @@
 .ui-multiselect-single .ui-multiselect-checkboxes label {
   line-height:20px;
 }
-.ui-multiselect-menu.select-filter-widget { padding:0 0 2px 0; }
+.ui-multiselect-menu.select-filter-widget {
+    padding: 0 0 2px 0;
+}
 .ui-multiselect-menu.select-filter-widget input[type="search"] {
     margin: 0;
 }
@@ -162,7 +164,7 @@
     text-decoration: none;
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-header {
-    padding: 0;
+    padding: 4px 4px 0 4px;
     margin: 0;
 }
 

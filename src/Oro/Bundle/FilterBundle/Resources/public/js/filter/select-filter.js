@@ -173,7 +173,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
-                        my: 'left top+2',
+                        my: 'left top+7',
                         at: 'left bottom',
                         of: this.$(this.containerSelector)
                     },
@@ -249,7 +249,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                 filterWidth = this.$(this.containerSelector).width(),
                 requiredWidth = Math.max(filterWidth + 10, this.minimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
-            widget.find('input[type="search"]').width(requiredWidth - 22);
+            widget.find('input[type="search"]').width(requiredWidth - 30);
         },
 
         /**
