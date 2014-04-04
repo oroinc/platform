@@ -150,7 +150,7 @@ class Role extends BaseRole
      */
     public function __toString()
     {
-        return (string) $this->label == null ? $this->role : $this->label;
+        return (string) $this->label;
     }
 
     /**
