@@ -63,14 +63,18 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWorkflowStepColumn()
     {
-        $this->assertAttributeEmpty('workflowStepColumns', $this->listener);
+        $this->assertAttributeEquals(
+            array(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN),
+            'workflowStepColumns',
+            $this->listener
+        );
 
-        $this->listener->addWorkflowStepColumn('workflowStepLabel');
+        $this->listener->addWorkflowStepColumn(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN);
         $this->listener->addWorkflowStepColumn('workflowStep');
         $this->listener->addWorkflowStepColumn('workflowStep');
 
         $this->assertAttributeEquals(
-            array('workflowStepLabel', 'workflowStep'),
+            array(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN, 'workflowStep'),
             'workflowStepColumns',
             $this->listener
         );
@@ -104,6 +108,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         return array(
             'workflow step column already defined' => array(
                 'config' => array(
+                    'source' => array(),
                     'columns' => array(
                         self::COLUMN => array('label' => 'Test'),
                     )
@@ -171,9 +176,9 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $inputConfig
      * @param array $expectedConfig
-     * @dataProvider buildBeforeDataProvider
+     * @dataProvider buildBeforeAddColumnDataProvider
      */
-    public function testBuildBefore(array $inputConfig, array $expectedConfig)
+    public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig)
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
         $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
@@ -188,7 +193,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function buildBeforeDataProvider()
+    public function buildBeforeAddColumnDataProvider()
     {
         return array(
             'simple configuration' => array(
@@ -328,6 +333,111 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+        );
+    }
+
+    /**
+     * @param array $inputConfig
+     * @param array $expectedConfig
+     * @dataProvider buildBeforeRemoveColumnDataProvider
+     */
+    public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)
+    {
+        $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
+        $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
+
+        $event = $this->createEvent($inputConfig);
+        $this->listener->onBuildBefore($event);
+        $this->assertEquals($expectedConfig, $event->getConfig()->toArray());
+    }
+
+    /**
+     * @return array
+     */
+    public function buildBeforeRemoveColumnDataProvider()
+    {
+        return array(
+            'remove defined workflow step column' => array(
+                'inputConfig' => array(
+                    'source' => array(
+                        'query' => array(
+                            'select' => array(
+                                self::ALIAS . '.rootField',
+                                'workflowStep.label as ' . WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
+                            ),
+                            'from' => array(array('table' => self::ENTITY, 'alias' => self::ALIAS)),
+                            'join' => array(
+                                'inner' => array(
+                                    array(
+                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'alias' => 'workflowStep',
+                                    )
+                                ),
+                            ),
+                        ),
+                    ),
+                    'columns' => array(
+                        'rootField' => array('label' => 'Root field'),
+                        WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => array(
+                            'label' => 'oro.workflow.workflowstep.grid.label'
+                        ),
+                    ),
+                    'filters' => array(
+                        'columns' => array(
+                            'rootField' => array('data_name' => self::ALIAS . '.rootField'),
+                            WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => array(
+                                'type' => 'entity',
+                                'data_name' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                'options' => array(
+                                    'field_type' => 'oro_workflow_step_select',
+                                    'field_options' => array('workflow_entity_class' => self::ENTITY_FULL_NAME)
+                                )
+                            ),
+                        ),
+                    ),
+                    'sorters' => array(
+                        'columns' => array(
+                            'rootField' => array('data_name' => self::ALIAS . '.rootField'),
+                            WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN => array(
+                                'data_name' => 'workflowStep.stepOrder',
+                            ),
+                        ),
+                    ),
+                ),
+                'expectedConfig' => array(
+                    'source' => array(
+                        'query' => array(
+                            'select' => array(
+                                self::ALIAS . '.rootField',
+                                'workflowStep.label as ' . WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
+                            ),
+                            'from' => array(array('table' => self::ENTITY, 'alias' => self::ALIAS)),
+                            'join' => array(
+                                'inner' => array(
+                                    array(
+                                        'join' => self::ALIAS . '.' . FieldGenerator::PROPERTY_WORKFLOW_STEP,
+                                        'alias' => 'workflowStep',
+                                    )
+                                ),
+                            ),
+                        ),
+                    ),
+                    'columns' => array(
+                        'rootField' => array('label' => 'Root field'),
+                    ),
+                    'filters' => array(
+                        'columns' => array(
+                            'rootField' => array('data_name' => self::ALIAS . '.rootField'),
+                        ),
+                    ),
+                    'sorters' => array(
+                        'columns' => array(
+                            'rootField' => array('data_name' => self::ALIAS . '.rootField'),
+                        ),
+                    ),
+                ),
+            )
         );
     }
 
