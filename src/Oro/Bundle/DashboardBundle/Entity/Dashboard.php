@@ -22,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "owner_column_name"="user_owner_id"
  *      },
  *      "security"={
- *          "type"="ACL",a
+ *          "type"="ACL",
  *          "group_name"=""
  *      }
  *  }
