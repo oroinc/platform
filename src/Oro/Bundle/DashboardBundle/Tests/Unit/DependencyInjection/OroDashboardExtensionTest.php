@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
 use Oro\Bundle\DashboardBundle\Tests\Unit\fixtures\SecondTestBundle\SecondTestBundle;
-use Oro\Bundle\DashboardBundle\Tests\Unit\fixtures\TestBundle\TestBundle;
+use Oro\Bundle\DashboardBundle\Tests\Unit\fixtures\FirstTestBundle\FirstTestBundle;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('getParameter')
-            ->will($this->returnValue(array(new TestBundle(), new SecondTestBundle())));
+            ->will($this->returnValue(array(new FirstTestBundle(), new SecondTestBundle())));
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
 
         $items = array(

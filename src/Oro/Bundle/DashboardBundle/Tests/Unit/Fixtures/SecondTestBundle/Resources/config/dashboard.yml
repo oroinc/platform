@@ -20,4 +20,4 @@ oro_dashboard_config:
         empty_board:
             label:      oro.dashboard.title.empty_board
             position:   20
-            widgets:
+            widgets: ~
