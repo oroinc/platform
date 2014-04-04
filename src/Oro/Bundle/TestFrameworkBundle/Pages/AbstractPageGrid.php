@@ -13,7 +13,7 @@ use PHPUnit_Framework_Assert;
 abstract class AbstractPageGrid extends AbstractPage
 {
 
-    protected $gridPath = "//div[@class = 'grid-container']";
+    protected $gridPath = '';
 
     protected $filtersPath = '';
 
