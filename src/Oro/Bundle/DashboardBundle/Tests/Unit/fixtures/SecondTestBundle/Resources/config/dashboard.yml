@@ -1,0 +1,23 @@
+oro_dashboard_config:
+    widgets:
+        second_quick_launchpad:
+            route:      second_quick_launchpad_test_route
+            route_parameters: { bundle: SecondTestBundle, name: secondQuickLaunchpad }
+        quick_launchpad:
+            route:      alternative_quick_lanchpad_route
+    dashboards:
+        main:
+            widgets:
+                second_quick_launchpad:
+                    position:   1
+                quick_launchpad:
+                    route_parameters: { bundle: TestOverrideBundle, name: TestOverrideName }
+                    route:      alternative_quick_lanchpad_route_to_dashboard_only
+        alternative_dashboard:
+            label:      oro.dashboard.title.alternative_dashboard
+            widgets:
+                quick_launchpad: ~
+        empty_board:
+            label:      oro.dashboard.title.empty_board
+            position:   20
+            widgets:

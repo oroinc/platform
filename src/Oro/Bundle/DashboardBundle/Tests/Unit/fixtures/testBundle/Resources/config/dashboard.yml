@@ -1,0 +1,37 @@
+oro_dashboard_config:
+    widgets:
+        quick_launchpad:
+            route:      quick_launchpad_test_route
+            route_parameters: { bundle: TestBundle, name: quickLaunchpad }
+            items:
+                index:
+                    label:      List
+                    route:      orocrm_sales_opportunity_index
+                    acl:        orocrm_sales_opportunity_view
+                    position:   43
+                    visible: true
+                create:
+                    label:      Create opportunity
+                    route:      orocrm_sales_opportunity_create
+                    acl:        orocrm_sales_opportunity_create
+                    position:   12
+                    visible: true
+                create_without_position:
+                    label:      Create opportunity
+                    route:      orocrm_sales_opportunity_create
+                    acl:        orocrm_sales_opportunity_create
+                inisible_without_position:
+                    label:      Create opportunity
+                    route:      orocrm_sales_opportunity_create
+                    acl:        orocrm_sales_opportunity_create
+                    visible: false
+    dashboards:
+        main:
+            label:      oro.dashboard.title.main
+            position:   20
+            widgets:
+                quick_launchpad:
+                    route:      quick_lanchpad_route_to_dashboard_only
+                    route_parameters: { bundle: SecondTestBundle, name: secondQuickLaunchpad }
+                    position:   10
+

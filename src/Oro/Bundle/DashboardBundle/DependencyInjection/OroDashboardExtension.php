@@ -18,15 +18,13 @@ class OroDashboardExtension extends Extension
         $dashboardConfigs = array();
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/dashboard.yml';
+            $file       = realpath(dirname($reflection->getFilename()) . '/Resources/config/dashboard.yml');
             if (is_file($file)) {
-                $dashboardConfigs[] = Yaml::parse(realpath($file))['oro_dashboard_config'];
+                $dashboardConfigs[] = Yaml::parse($file)['oro_dashboard_config'];
             }
         }
 
-        foreach ($configs as $config) {
-            $dashboardConfigs[] = $config;
-        }
+        $dashboardConfigs = array_merge($dashboardConfigs, $configs);
 
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $dashboardConfigs);
@@ -34,7 +32,7 @@ class OroDashboardExtension extends Extension
         // remove 'position' attribute after sorting
         // remove non visible dashboards and widgets
         // remove 'visible' attribute for rest dashboards and widgets
-        $this->prepareItems($config['dashboards'], 'widgets');
+        $this->prepareItems($config['dashboards']);
         // set 'widget' parameter for all widget routes
         // sort widget items (if any)
         // remove 'position' attribute after sorting
@@ -52,9 +50,7 @@ class OroDashboardExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container
-            ->getDefinition('oro_dashboard.manager')
-            ->replaceArgument(0, $config);
+        $container->getDefinition('oro_dashboard.manager')->replaceArgument(0, $config);
     }
 
     /**
@@ -62,29 +58,23 @@ class OroDashboardExtension extends Extension
      * Removes items which has 'visible' attribute equals false and then remove 'visible' attribute for rest items.
      *
      * @param array       $items    The array to be processed
-     * @param string|null $children The name of child array to be processed as well
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function prepareItems(&$items, $children = null)
+    protected function prepareItems(&$items)
     {
         // update 'position' attribute if it was not specified to keep order of such items as it was declared in config
         $lastUnspecifiedPosition = Configuration::UNSPECIFIED_POSITION;
         foreach ($items as &$item) {
             if ($item['position'] === Configuration::UNSPECIFIED_POSITION) {
-                $lastUnspecifiedPosition++;
-                $item['position'] = $lastUnspecifiedPosition;
+                $item['position'] = ++$lastUnspecifiedPosition;
             }
         }
         // sort items
         uasort(
             $items,
-            function (&$a, &$b) {
-                if ($a['position'] == $b['position']) {
-                    return 0;
-                } else {
-                    return ($a['position'] < $b['position']) ? -1 : 1;
-                }
+            function ($first, $second) {
+                return $first['position'] - $second['position'];
             }
         );
         // remove non visible items and remove 'position' and 'visible' attributes
@@ -98,8 +88,8 @@ class OroDashboardExtension extends Extension
                     unset($item['visible']);
                 }
             }
-            if ($children !== null && isset($item[$children])) {
-                $this->prepareItems($item[$children]);
+            if (isset($item['widgets'])) {
+                $this->prepareItems($item['widgets']);
             }
         }
     }
