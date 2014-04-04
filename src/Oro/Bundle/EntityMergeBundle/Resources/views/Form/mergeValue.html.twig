@@ -10,10 +10,20 @@
     {% if value|length %}
         <ul>
             {% for value in convertedValue %}
-                <li>{{ value }}</li>
+                {% if value|length %}
+                    <li>{{ value }}</li>
+                {% else %}
+                    <span class="empty">-- Empty --</span>
+                {% endif %}
             {% endfor %}
         </ul>
+    {% else %}
+        <span class="empty">-- Empty --</span>
     {% endif %}
 {% else %}
-    {{ convertedValue }}
+    {% if convertedValue|length %}
+        {{ convertedValue }} -
+    {% else %}
+        <span class="empty">-- Empty --</span>
+    {% endif %}
 {% endif %}
