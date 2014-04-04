@@ -102,6 +102,6 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
             )
         );
         $container->expects($this->once())->method('getDefinition')->will($this->returnValue($definition));
-        $this->target->load(array( array ( 'default_dashboard' => 'main1' )), $container);
+        $this->target->load(array(array('default_dashboard' => 'main1')), $container);
     }
 }
