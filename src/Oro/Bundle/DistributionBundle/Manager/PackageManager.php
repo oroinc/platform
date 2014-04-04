@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DistributionBundle\Manager;
 
 use Composer\Composer;
@@ -16,12 +17,14 @@ use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Script\Runner;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 
 class PackageManager
 {
@@ -66,10 +69,16 @@ class PackageManager
     protected $logger;
 
     /**
+     * @var MaintenanceMode
+     */
+    protected $maintenance;
+
+    /**
      * @param Composer $composer
      * @param Installer $installer
      * @param BufferIO $composerIO
      * @param Runner $scriptRunner
+     * @param MaintenanceMode $maintenance
      * @param LoggerInterface $logger
      * @param string $pathToComposerJson
      */
@@ -78,6 +87,7 @@ class PackageManager
         Installer $installer,
         BufferIO $composerIO,
         Runner $scriptRunner,
+        MaintenanceMode $maintenance,
         LoggerInterface $logger,
         $pathToComposerJson
     ) {
@@ -87,6 +97,7 @@ class PackageManager
         $this->scriptRunner = $scriptRunner;
         $this->pathToComposerJson = $pathToComposerJson;
 
+        $this->maintenance = $maintenance;
         $this->logger = $logger;
     }
 
@@ -284,9 +295,12 @@ class PackageManager
                 $loadDemoData ? 'with demo data' : 'without demo data'
             )
         );
+
+        $this->maintenance->activate();
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
+
         $justInstalledPackages = [];
         try {
             $this->scriptRunner->removeApplicationCache();
@@ -391,6 +405,7 @@ class PackageManager
             $packageNames
         );
 
+        $this->maintenance->activate();
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
@@ -483,10 +498,13 @@ class PackageManager
     public function update($packageName)
     {
         $this->logger->info(sprintf('%s updating begin', $packageName));
+
+        $this->maintenance->activate();
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
         $this->scriptRunner->removeApplicationCache();
+
         if ($this->doInstall($packageName)) {
             $currentlyInstalled = $this->getInstalled();
             $changeSetBuilder = new ChangeSetBuilder();
