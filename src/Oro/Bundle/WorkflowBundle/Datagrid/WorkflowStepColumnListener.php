@@ -94,7 +94,7 @@ class WorkflowStepColumnListener
             $this->removeWorkflowStep($config, $workflowStepColumns);
         }
 
-        // show workflow step if is must be shown and there are no workflow step columns
+        // add workflow step if it must be shown and there are no workflow step columns
         if ($isShowWorkflowStep && empty($workflowStepColumns)) {
             $this->addWorkflowStep($config, $rootEntity, $rootEntityAlias);
         }
