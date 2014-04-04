@@ -16,7 +16,9 @@ class OroDashboardExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $dashboardConfigs = array();
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             $file       = realpath(dirname($reflection->getFilename()) . '/Resources/config/dashboard.yml');
             if (is_file($file)) {

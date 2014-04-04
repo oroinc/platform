@@ -15,7 +15,7 @@ class SchemaStep extends AbstractStep
                 // suppress warning: ini_set(): A session is active. You cannot change the session
                 // module's ini settings at this time
                 error_reporting(E_ALL ^ E_WARNING);
-                return $this->handleAjaxAction('cache:clear');
+                return $this->handleAjaxAction('cache:clear', array('--no-optional-warmers' => true));
             case 'clear-config':
                 return $this->handleAjaxAction('oro:entity-config:clear');
             case 'clear-extend':

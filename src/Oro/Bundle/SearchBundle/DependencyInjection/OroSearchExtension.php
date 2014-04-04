@@ -70,7 +70,8 @@ class OroSearchExtension extends Extension
     {
         $entitiesConfig = $config['entities_config'];
         if (!count($entitiesConfig)) {
-            foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $bundles = $container->getParameter('kernel.bundles');
+            foreach ($bundles as $bundle) {
                 $entitiesConfig = $this->parseSearchMapping($bundle, $entitiesConfig);
             }
         }
