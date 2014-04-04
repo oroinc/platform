@@ -118,4 +118,28 @@ abstract class AbstractPageEntity extends AbstractPage
             throw new \Exception("Tag field can't be found");
         }
     }
+
+    /**
+     * @param $paramName
+     *
+     * @return mixed
+     */
+    public function getParam($paramName)
+    {
+        $url = $this->test->url();
+        $fragment = parse_url($url)['fragment'];
+        $str = explode('/', $fragment);
+
+        $found_index = array_search($paramName, $str);
+        if ($found_index !== false) {
+            return $str[$found_index+1];
+        }
+
+        return null;
+    }
+
+    public function getId($paramName = 'view')
+    {
+        return $this->getParam($paramName);
+    }
 }
