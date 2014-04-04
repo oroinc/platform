@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * Dashboard
  *
+ * @ORM\Entity
  * @ORM\Table(name="oro_dashboard")
  * @Config(
  *  defaultValues={
@@ -21,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "owner_column_name"="user_owner_id"
  *      },
  *      "security"={
- *          "type"="ACL",
+ *          "type"="ACL",a
  *          "group_name"=""
  *      }
  *  }
