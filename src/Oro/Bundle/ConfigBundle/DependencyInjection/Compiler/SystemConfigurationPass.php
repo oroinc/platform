@@ -22,12 +22,13 @@ class SystemConfigurationPass implements CompilerPassInterface
         $config    = array();
         $processor = new ProcessorDecorator(new Processor());
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME)) {
+            $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
+            if (is_file($file)) {
                 $bundleConfig = Yaml::parse(realpath($file));
-
-                $config = $processor->merge($config, $bundleConfig);
+                $config       = $processor->merge($config, $bundleConfig);
             }
         }
 
