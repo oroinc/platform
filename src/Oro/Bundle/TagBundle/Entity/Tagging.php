@@ -13,6 +13,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *     name="oro_tag_tagging",
  *     uniqueConstraints={
  *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "user_owner_id"})
+ *    },
+ *    indexes={
+ *        @ORM\Index(name="entity_name_idx", columns={"entity_name"})
  *    }
  * )
  * @ORM\Entity
@@ -72,7 +75,7 @@ class Tagging
 
     /**
      * @var int
-     *@ORM\Column(name="record_id", type="integer")
+     * @ORM\Column(name="record_id", type="integer")
      */
     protected $recordId;
 
