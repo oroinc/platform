@@ -114,7 +114,7 @@ class MultipleEntityType extends AbstractType
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');
 
-        if (!isset($options['add_acl_resource']) || empty($options['add_acl_resource'])) {
+        if (empty($options['add_acl_resource'])) {
             $options['allow_action'] = false;
         } else {
             $options['allow_action'] = $this->securityFacade->isGranted($options['add_acl_resource']);
