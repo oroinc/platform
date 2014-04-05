@@ -26,11 +26,6 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadConfiguration(array $configs, array $bundles, array $expectedMenu, array $expectedTitles)
     {
-        $tmp = [];
-        foreach ($bundles as $bundle) {
-            $tmp[$bundle->getName()] = get_class($bundle);
-        }
-        $bundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)
@@ -104,6 +99,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function loadConfigurationDataProvider()
     {
+        $bundle1 = new BarBundle();
+        $bundle2 = new FooBundle();
+
         $settings = array(
             'resolved' => true,
             'maxItems' => array(
@@ -128,6 +126,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             'routeParameters' => array(),
             'extras' => array()
         );
+
         return array(
             'without_bundles' => array(
                 'configs' => array(
@@ -191,8 +190,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'bundles' => array(
-                    new BarBundle(),
-                    new FooBundle(),
+                    $bundle1->getName() => get_class($bundle1),
+                    $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedMenu' => array(
                     'items' => array(

@@ -33,11 +33,6 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $bundles, $expectedSet)
     {
-        $tmp = [];
-        foreach ($bundles as $bundle) {
-            $tmp[$bundle->getName()] = get_class($bundle);
-        }
-        $bundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)
@@ -69,13 +64,15 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function bundlesProvider()
     {
+        $bundle = new TestBundle();
+
         return array(
             'no one bundle specified config' => array(
                 'bundles'         => array(),
                 'should set data' => false
             ),
             'one bundle specified config'    => array(
-                'bundles'         => array(new TestBundle()),
+                'bundles'         => array($bundle->getName() => get_class($bundle)),
                 'should set data' => true
             )
         );
