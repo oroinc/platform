@@ -3,8 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclYamlConfigLoader;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
 class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
@@ -18,17 +21,24 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
 
     public function testLoaders()
     {
+        $bundle = new TestBundle();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle->getName() => get_class($bundle)])
+            ->registerResource(
+                'oro_acl_config',
+                'Resources/config/acl.yml'
+            )
+            ->registerResource(
+                'oro_acl_annotation',
+                new AclAnnotationCumulativeResourceLoader()
+            );
+
         $storage = new AclAnnotationStorage();
-        $annotationLoader = new AclAnnotationLoader(
-            array('TestBundle' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle'),
-            array(),
-            new AnnotationReader()
-        );
+        $annotationLoader = new AclAnnotationLoader(new AnnotationReader());
         $annotationLoader->load($storage);
-        $yamlConfigLoader = new AclYamlConfigLoader(
-            array('TestBundle' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle')
-        );
-        $yamlConfigLoader->load($storage);
+        $configLoader = new AclConfigLoader();
+        $configLoader->load($storage);
 
         $a = $storage->findById('user_test_main_controller');
         $this->assertNotNull($a);

@@ -14,9 +14,11 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([new TestBundle1(), new TestBundle2()])
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)])
             ->registerResource(
                 'OroQueryDesignerBundle',
                 'Resources/config/query_designer.yml'

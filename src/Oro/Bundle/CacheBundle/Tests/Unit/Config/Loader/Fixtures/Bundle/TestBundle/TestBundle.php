@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures;
+namespace Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader\Fixtures\Bundle\TestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

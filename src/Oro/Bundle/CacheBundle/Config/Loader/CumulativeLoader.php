@@ -4,15 +4,14 @@ namespace Oro\Bundle\CacheBundle\Config\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResource;
 use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
 
 class CumulativeLoader
 {
     /**
-     * @var CumulativeLoaderHolder
+     * @var array
      */
-    protected $holder;
+    protected $bundles;
 
     /**
      * @var CumulativeResourceLoader[]
@@ -20,11 +19,13 @@ class CumulativeLoader
     protected $resourceLoaders = [];
 
     /**
-     * @param CumulativeLoaderHolder $holder
+     * Sets a list of available bundles
+     *
+     * @param array $bundles
      */
-    public function __construct(CumulativeLoaderHolder $holder)
+    public function setBundles($bundles)
     {
-        $this->holder = $holder;
+        $this->bundles = $bundles;
     }
 
     /**
@@ -47,24 +48,27 @@ class CumulativeLoader
     }
 
     /**
-     * @param ContainerBuilder $container
+     * @param ContainerBuilder|null $container
      * @return CumulativeResourceInfo[]
      */
-    public function load(ContainerBuilder $container)
+    public function load(ContainerBuilder $container = null)
     {
         $result = [];
 
-        $bundles = $this->holder->getBundles();
-        foreach ($bundles as $bundle) {
+        foreach ($this->bundles as $bundleClass) {
+            $reflection = new \ReflectionClass($bundleClass);
+            $bundleDir  = dirname($reflection->getFilename());
             foreach ($this->resourceLoaders as $resourceLoader) {
-                $resource = $resourceLoader->load($bundle);
+                $resource = $resourceLoader->load($bundleClass, $bundleDir);
                 if ($resource) {
                     $result[] = $resource;
                 }
             }
         }
 
-        $this->registerResources($container);
+        if ($container) {
+            $this->registerResources($container);
+        }
 
         return $result;
     }
@@ -75,7 +79,7 @@ class CumulativeLoader
     public function registerResources(ContainerBuilder $container)
     {
         foreach ($this->resourceLoaders as $resourceLoader) {
-            $container->addResource(new CumulativeResource($resourceLoader->getResource()));
+            $resourceLoader->registerResource($container);
         }
     }
 }

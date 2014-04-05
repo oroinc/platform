@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\CacheBundle\Config\Loader;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Bundle\CacheBundle\Config\CumulativeResource;
 use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
 
-abstract class CumulativeFileLoader implements CumulativeResourceLoader
+abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFreshChecker
 {
     /**
      * @var string
@@ -51,9 +52,9 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load(BundleInterface $bundle)
+    public function load($bundleClass, $bundleDir)
     {
-        $path = $bundle->getPath() . $this->relativeFilePath;
+        $path = $bundleDir . $this->relativeFilePath;
         if (!is_file($path)) {
             return null;
         }
@@ -61,8 +62,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
         $realPath = realpath($path);
 
         return new CumulativeResourceInfo(
-            $bundle->getName(),
-            get_class($bundle),
+            $bundleClass,
             $this->resourceName,
             $realPath,
             $this->loadFile($realPath)
@@ -72,9 +72,17 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function isFresh(BundleInterface $bundle, $timestamp)
+    public function registerResource(ContainerBuilder $container)
     {
-        $path = $bundle->getPath() . $this->relativeFilePath;
+        $container->addResource(new CumulativeResource($this->getResource()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isResourceFresh($bundleClass, $bundleDir, $timestamp)
+    {
+        $path = $bundleDir . $this->relativeFilePath;
 
         return !is_file($path) || filemtime($path) < $timestamp;
     }

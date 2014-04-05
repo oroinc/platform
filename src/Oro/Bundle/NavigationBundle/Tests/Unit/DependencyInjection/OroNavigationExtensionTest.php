@@ -26,6 +26,11 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadConfiguration(array $configs, array $bundles, array $expectedMenu, array $expectedTitles)
     {
+        $tmp = [];
+        foreach ($bundles as $bundle) {
+            $tmp[$bundle->getName()] = get_class($bundle);
+        }
+        $bundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)

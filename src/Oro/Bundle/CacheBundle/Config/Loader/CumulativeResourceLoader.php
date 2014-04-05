@@ -2,34 +2,38 @@
 
 namespace Oro\Bundle\CacheBundle\Config\Loader;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
 
+/**
+ * CumulativeResourceLoader is the interface that must be implemented by all resource loader classes
+ * responsible to load resources which can be located in any bundle and does not required any special
+ * registration in a bundle.
+ */
 interface CumulativeResourceLoader
 {
     /**
-     * Gets resource name
+     * Gets the resource
      *
-     * @return string
+     * @return mixed
      */
     public function getResource();
 
     /**
-     * Loads resource located in the given bundle
+     * Loads the resource located in the given bundle
      *
-     * @param BundleInterface $bundle
+     * @param string $bundleClass
+     * @param string $bundleDir
      * @return CumulativeResourceInfo|null
      */
-    public function load(BundleInterface $bundle);
+    public function load($bundleClass, $bundleDir);
 
     /**
-     * Returns true if the resource has not been updated since the given timestamp.
+     * Adds a resource object to the container.
+     * This object will be used to check whether the resource loaded by this loader is up-to-date or not.
      *
-     * @param BundleInterface $bundle
-     * @param integer         $timestamp The last time the resource was loaded
-     *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * @param ContainerBuilder $container
      */
-    public function isFresh(BundleInterface $bundle, $timestamp);
+    public function registerResource(ContainerBuilder $container);
 }

@@ -33,6 +33,11 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $bundles, $expectedSet)
     {
+        $tmp = [];
+        foreach ($bundles as $bundle) {
+            $tmp[$bundle->getName()] = get_class($bundle);
+        }
+        $bundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)

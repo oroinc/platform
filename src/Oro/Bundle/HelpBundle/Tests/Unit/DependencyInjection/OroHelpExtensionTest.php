@@ -54,6 +54,11 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadConfiguration(array $configs, array $bundles, array $expectedConfiguration)
     {
+        $tmp = [];
+        foreach ($bundles as $bundle) {
+            $tmp[$bundle->getName()] = get_class($bundle);
+        }
+        $bundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)

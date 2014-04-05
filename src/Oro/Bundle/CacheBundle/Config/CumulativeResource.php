@@ -4,15 +4,19 @@ namespace Oro\Bundle\CacheBundle\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 
+/**
+ * CumulativeResource represents a resource which can be located in any bundle
+ * and does not required any special registration in a bundle.
+ */
 class CumulativeResource implements ResourceInterface, \Serializable
 {
     /**
-     * @var string
+     * @var mixed
      */
     private $resource;
 
     /**
-     * @param string $resource The name of resource
+     * @param mixed $resource The resource tied to this Resource
      */
     public function __construct($resource)
     {

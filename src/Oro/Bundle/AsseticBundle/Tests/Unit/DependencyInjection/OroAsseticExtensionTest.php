@@ -14,6 +14,11 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $configs, array $expectedBundles, array $expectedConfiguration)
     {
+        $tmp = [];
+        foreach ($expectedBundles as $bundle) {
+            $tmp[$bundle->getName()] = get_class($bundle);
+        }
+        $expectedBundles = $tmp;
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($expectedBundles)

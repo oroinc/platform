@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\CacheBundle\Config;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeLoader;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeLoaderHolder;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader;
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
 
-class CumulativeResourceManager implements CumulativeLoaderHolder
+class CumulativeResourceManager
 {
     /**
      * The singleton instance
@@ -19,7 +17,7 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
     private static $instance = null;
 
     /**
-     * @var BundleInterface[]
+     * @var array
      */
     private $bundles = [];
 
@@ -81,7 +79,9 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
     }
 
     /**
-     * @return BundleInterface[]
+     * Gets a list of available bundles
+     *
+     * @return array
      */
     public function getBundles()
     {
@@ -89,12 +89,17 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
     }
 
     /**
-     * @param BundleInterface[] $bundles
+     * Sets a list of available bundles
+     *
+     * @param array $bundles
      * @return CumulativeResourceManager
      */
     public function setBundles($bundles)
     {
         $this->bundles = $bundles;
+        foreach ($this->loaders as $loader) {
+            $loader->setBundles($this->bundles);
+        }
 
         return $this;
     }
@@ -130,7 +135,9 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
     public function registerResource($resourceGroup, $resource)
     {
         if (!isset($this->loaders[$resourceGroup])) {
-            $this->loaders[$resourceGroup] = new CumulativeLoader($this);
+            $loader = new CumulativeLoader();
+            $loader->setBundles($this->bundles);
+            $this->loaders[$resourceGroup] = $loader;
         }
 
         if (!is_array($resource)) {
@@ -170,7 +177,7 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
-     * @param string $resource
+     * @param mixed $resource   The resource
      * @param int    $timestamp The last time the resource was loaded
      *
      * @return bool true if the resource has not been updated, false otherwise
@@ -180,14 +187,21 @@ class CumulativeResourceManager implements CumulativeLoaderHolder
         if ($this->checkTimestamp !== $timestamp) {
             $this->checkTimestamp = $timestamp;
             $this->checkResult    = [];
+            $bundles = [];
+            foreach ($this->bundles as $bundleClass) {
+                $reflection = new \ReflectionClass($bundleClass);
+                $bundles[$bundleClass] = dirname($reflection->getFilename());
+            }
             foreach ($this->loaders as $loader) {
                 $resourceLoaders = $loader->getResourceLoaders();
                 foreach ($resourceLoaders as $resourceLoader) {
-                    foreach ($this->bundles as $bundle) {
+                    if ($resourceLoader instanceof CumulativeResourceLoaderWithFreshChecker) {
                         $currentResource = $resourceLoader->getResource();
-                        if (!isset($this->checkResult[$currentResource])) {
-                            if (!$resourceLoader->isFresh($bundle, $timestamp)) {
-                                $this->checkResult[$currentResource] = true;
+                        foreach ($bundles as $bundleClass => $bundleDir) {
+                            if (!isset($this->checkResult[$currentResource])) {
+                                if (!$resourceLoader->isResourceFresh($bundleClass, $bundleDir, $timestamp)) {
+                                    $this->checkResult[$currentResource] = true;
+                                }
                             }
                         }
                     }

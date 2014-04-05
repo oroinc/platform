@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
-use Symfony\Component\Finder\Finder;
+use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
-class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderInterface
+class AclAnnotationLoader implements AclAnnotationLoaderInterface
 {
     const ANNOTATION_CLASS = 'Oro\Bundle\SecurityBundle\Annotation\Acl';
-    const ANCESTOR_CLASS = 'Oro\Bundle\SecurityBundle\Annotation\AclAncestor';
+    const ANCESTOR_CLASS   = 'Oro\Bundle\SecurityBundle\Annotation\AclAncestor';
 
     /**
      * @var AnnotationReader
@@ -17,23 +17,13 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
     private $reader;
 
     /**
-     * @var string[]
-     */
-    private $subDirs;
-
-    /**
      * Constructor
      *
-     * @param string[] $bundles A list of loaded bundles
-     * @param string[] $subDirs A list of sub directories (related to a bundle directory)
-     *                          where classes with ACL annotations may be located
      * @param AnnotationReader $reader
      */
-    public function __construct($bundles, array $subDirs, AnnotationReader $reader)
+    public function __construct(AnnotationReader $reader)
     {
-        parent::__construct($bundles);
         $this->reader = $reader;
-        $this->subDirs = $subDirs;
     }
 
     /**
@@ -43,45 +33,34 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
      */
     public function load(AclAnnotationStorage $storage)
     {
-        if (!empty($this->subDirs)) {
-            $directories = array();
-            foreach ($this->bundleDirectories as $bundleDir) {
-                foreach ($this->subDirs as $subDir) {
-                    $dir = $bundleDir . DIRECTORY_SEPARATOR . $subDir;
-                    if (is_dir($dir)) {
-                        $directories[] = $dir;
-                    }
-                }
-            }
-        } else {
-            $directories = $this->bundleDirectories;
-        }
-
-        $files = $this->findFiles('*.php', $directories);
-
-        foreach ($files as $file) {
-            $className = $this->getClassName($file);
-            if ($className !== null) {
-                $reflection = $this->getReflectionClass($className);
-                // read annotations from class
-                $annotation = $this->reader->getClassAnnotation($reflection, self::ANNOTATION_CLASS);
-                if ($annotation) {
-                    $storage->add($annotation, $reflection->getName());
-                } else {
-                    $ancestor = $this->reader->getClassAnnotation($reflection, self::ANCESTOR_CLASS);
-                    if ($ancestor) {
-                        $storage->addAncestor($ancestor, $reflection->getName());
-                    }
-                }
-                // read annotations from methods
-                foreach ($reflection->getMethods() as $reflectionMethod) {
-                    $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
+        $resources = CumulativeResourceManager::getInstance()
+            ->getLoader('oro_acl_annotation')
+            ->load();
+        foreach ($resources as $resource) {
+            foreach ($resource->data as $file) {
+                $className = $this->getClassName($file);
+                if ($className !== null) {
+                    $reflection = $this->getReflectionClass($className);
+                    // read annotations from class
+                    $annotation = $this->reader->getClassAnnotation($reflection, self::ANNOTATION_CLASS);
                     if ($annotation) {
-                        $storage->add($annotation, $reflection->getName(), $reflectionMethod->getName());
+                        $storage->add($annotation, $reflection->getName());
                     } else {
-                        $ancestor = $this->reader->getMethodAnnotation($reflectionMethod, self::ANCESTOR_CLASS);
+                        $ancestor = $this->reader->getClassAnnotation($reflection, self::ANCESTOR_CLASS);
                         if ($ancestor) {
-                            $storage->addAncestor($ancestor, $reflection->getName(), $reflectionMethod->getName());
+                            $storage->addAncestor($ancestor, $reflection->getName());
+                        }
+                    }
+                    // read annotations from methods
+                    foreach ($reflection->getMethods() as $reflectionMethod) {
+                        $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
+                        if ($annotation) {
+                            $storage->add($annotation, $reflection->getName(), $reflectionMethod->getName());
+                        } else {
+                            $ancestor = $this->reader->getMethodAnnotation($reflectionMethod, self::ANCESTOR_CLASS);
+                            if ($ancestor) {
+                                $storage->addAncestor($ancestor, $reflection->getName(), $reflectionMethod->getName());
+                            }
                         }
                     }
                 }
@@ -96,7 +75,7 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
      *      - only one class must be declared in a file
      *      - a namespace must be declared in a file
      *
-     * @param  string      $fileName
+     * @param  string $fileName
      * @return null|string the fully qualified class name or null if the class name cannot be extracted
      */
     protected function getClassName($fileName)
@@ -121,7 +100,7 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
     /**
      * Creates ReflectionClass object
      *
-     * @param  string           $className
+     * @param  string $className
      * @return \ReflectionClass
      */
     protected function getReflectionClass($className)
@@ -138,28 +117,5 @@ class AclAnnotationLoader extends AbstractLoader implements AclAnnotationLoaderI
     protected function getFileContent($fileName)
     {
         return file_get_contents($fileName);
-    }
-
-    /**
-     * @param $filePattern
-     * @param  array $dirs
-     * @return array
-     */
-    private function findFiles($filePattern, array $dirs)
-    {
-        $finder = new Finder();
-        $finder
-            ->files()
-            ->name($filePattern)
-            ->in($dirs)
-            ->ignoreVCS(true);
-
-        $result = array();
-        /** @var \SplFileInfo $file */
-        foreach ($finder as $file) {
-            $result[] = $file->getRealPath();
-        }
-
-        return $result;
     }
 }

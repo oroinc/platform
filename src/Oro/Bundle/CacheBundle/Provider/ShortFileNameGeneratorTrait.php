@@ -21,10 +21,21 @@ trait ShortFileNameGeneratorTrait
         if ($namespace && strpos($id, $namespace) === 0) {
             $id = substr($id, strlen($namespace));
         }
-        $id = preg_replace('@[\\\/:"*?<>|]+@', '', $id);
+        $id = $this->removeSpecialChars($id);
 
         return $this->directory . DIRECTORY_SEPARATOR
-        . ($namespace ? preg_replace('@[\\\/:"*?<>|]+@', '', $namespace) . DIRECTORY_SEPARATOR : '')
+        . ($namespace ? $this->removeSpecialChars($namespace) . DIRECTORY_SEPARATOR : '')
         . $id . $this->extension;
+    }
+
+    /**
+     * Removes special characters like \/:? and others from the given string
+     *
+     * @param string $str
+     * @return string
+     */
+    protected function removeSpecialChars($str)
+    {
+        return preg_replace('@[\\\/:"*?<>|]+@', '', $str);
     }
 }

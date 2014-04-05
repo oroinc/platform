@@ -4,12 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader;
 
 use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeFileLoader;
+use Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader\Fixtures\Bundle\TestBundle\TestBundle;
 
 class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoader()
     {
-        $relativeFilePath = 'Tests/Unit/Config/Loader/Fixtures/test.yml';
+        $relativeFilePath = 'Resources/config/test.yml';
 
         /** @var CumulativeFileLoader|\PHPUnit_Framework_MockObject_MockObject $loader */
         $loader = $this->getMockForAbstractClass(
@@ -18,21 +19,11 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
         );
 
         $data = ['test' => 123];
-        $bundleName = 'TestBundle';
-        $bundlePath = realpath(__DIR__ . '/../../../..');
-        $expectedFilePath = $bundlePath . '/' . $relativeFilePath;
+        $bundle = new TestBundle();
+        $expectedFilePath = $bundle->getPath() . '/' . $relativeFilePath;
         $expectedFilePath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFilePath);
 
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
-        $bundle->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($bundleName));
-        $bundle->expects($this->once())
-            ->method('getPath')
-            ->will($this->returnValue($bundlePath));
-
         $expectedResource = new CumulativeResourceInfo(
-            $bundleName,
             get_class($bundle),
             'test',
             $expectedFilePath,
@@ -46,7 +37,7 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($relativeFilePath, $loader->getResource());
 
-        $resource = $loader->load($bundle);
+        $resource = $loader->load(get_class($bundle), $bundle->getPath());
         $this->assertEquals($expectedResource, $resource);
     }
 }

@@ -12,9 +12,10 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoad()
     {
+        $bundle = new UnitTestBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([new UnitTestBundle()])
+            ->setBundles([$bundle->getName() => get_class($bundle)])
             ->registerResource(
                 'OroUIBundle',
                 'Resources/config/placeholders.yml'

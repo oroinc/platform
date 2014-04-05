@@ -96,7 +96,7 @@ class EntitySecurityMetadataProvider
             }
         }
         foreach ($securityTypes as $securityType) {
-            $this->ensureMetadataLoaded($securityType);
+            $this->loadMetadata($securityType);
         }
     }
 
@@ -144,7 +144,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Makes sure that metadata for the given security type is loaded
+     * Makes sure that metadata for the given security type are loaded and cached
      *
      * @param string $securityType The security type.
      */
@@ -155,43 +155,57 @@ class EntitySecurityMetadataProvider
             if ($this->cache) {
                 $data = $this->cache->fetch($securityType);
             }
-            if (!$data) {
-                $securityConfigs = $this->securityConfigProvider->getConfigs();
-                foreach ($securityConfigs as $securityConfig) {
-                    $className = $securityConfig->getId()->getClassName();
-                    if ($securityConfig->get('type') === $securityType
-                        && $this->extendConfigProvider->getConfig($className)->in(
-                            'state',
-                            [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
-                        )
-                    ) {
-                        $label = '';
-                        if ($this->entityConfigProvider->hasConfig($className)) {
-                            $label = $this->entityConfigProvider
-                                ->getConfig($className)
-                                ->get('label');
-                        }
-                        $permissions = $securityConfig->get('permissions');
-                        if (!$permissions || $permissions == 'All') {
-                            $permissions = array();
-                        } else {
-                            $permissions = explode(';', $permissions);
-                        }
-                        $data[$className] = new EntitySecurityMetadata(
-                            $securityType,
-                            $className,
-                            $securityConfig->get('group_name'),
-                            $label,
-                            $permissions
-                        );
-                    }
-                }
-                if ($this->cache) {
-                    $this->cache->save($securityType, $data);
-                }
+            if ($data) {
+                $this->localCache[$securityType] = $data;
+            } else {
+                $this->loadMetadata($securityType);
             }
-
-            $this->localCache[$securityType] = $data;
         }
+    }
+
+    /**
+     * Loads metadata for the given security type and save them in cache
+     *
+     * @param $securityType
+     */
+    protected function loadMetadata($securityType)
+    {
+        $data = array();
+        $securityConfigs = $this->securityConfigProvider->getConfigs();
+        foreach ($securityConfigs as $securityConfig) {
+            $className = $securityConfig->getId()->getClassName();
+            if ($securityConfig->get('type') === $securityType
+                && $this->extendConfigProvider->getConfig($className)->in(
+                    'state',
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                )
+            ) {
+                $label = '';
+                if ($this->entityConfigProvider->hasConfig($className)) {
+                    $label = $this->entityConfigProvider
+                        ->getConfig($className)
+                        ->get('label');
+                }
+                $permissions = $securityConfig->get('permissions');
+                if (!$permissions || $permissions == 'All') {
+                    $permissions = array();
+                } else {
+                    $permissions = explode(';', $permissions);
+                }
+                $data[$className] = new EntitySecurityMetadata(
+                    $securityType,
+                    $className,
+                    $securityConfig->get('group_name'),
+                    $label,
+                    $permissions
+                );
+            }
+        }
+
+        if ($this->cache) {
+            $this->cache->save($securityType, $data);
+        }
+
+        $this->localCache[$securityType] = $data;
     }
 }

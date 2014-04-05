@@ -7,11 +7,6 @@ class CumulativeResourceInfo
     /**
      * @var string
      */
-    public $bundleName;
-
-    /**
-     * @var string
-     */
     public $bundleClass;
 
     /**
@@ -30,15 +25,13 @@ class CumulativeResourceInfo
     public $data;
 
     /**
-     * @param string $bundleName
      * @param string $bundleClass
      * @param string $name
      * @param string $path
      * @param array  $data
      */
-    public function __construct($bundleName, $bundleClass, $name, $path, $data)
+    public function __construct($bundleClass, $name, $path, $data)
     {
-        $this->bundleName  = $bundleName;
         $this->bundleClass = $bundleClass;
         $this->name        = $name;
         $this->path        = $path;

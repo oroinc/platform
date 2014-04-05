@@ -14,9 +14,10 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $bundle = new TestBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([new TestBundle()])
+            ->setBundles([$bundle->getName() => get_class($bundle)])
             ->registerResource(
                 'OroSearchBundle',
                 'Resources/config/search.yml'
