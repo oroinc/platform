@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Config;
+namespace Oro\Component\Config\Tests\Unit;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver;
-use Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader\Fixtures\Bundle\TestBundle\TestBundle;
-use Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader\Fixtures\Bundle\TestBundle1\TestBundle1;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderResolver;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 
 class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,10 +18,10 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             CumulativeResourceManager::getInstance()->getBundles()
         );
 
-        $bundle = new TestBundle();
-        CumulativeResourceManager::getInstance()->setBundles([$bundle->getName() => get_class($bundle)]);
+        $bundle = new TestBundle1();
+        CumulativeResourceManager::getInstance()->setBundles(['TestBundle1' => get_class($bundle)]);
         $this->assertEquals(
-            [$bundle->getName() => get_class($bundle)],
+            ['TestBundle1' => get_class($bundle)],
             CumulativeResourceManager::getInstance()->getBundles()
         );
     }
@@ -35,7 +35,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             CumulativeResourceManager::getInstance()->getResourceLoaderResolver()
         );
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver')
+        $resolver = $this->getMockBuilder('Oro\Component\Config\Loader\CumulativeResourceLoaderResolver')
             ->disableOriginalConstructor()
             ->getMock();
         CumulativeResourceManager::getInstance()->setResourceLoaderResolver($resolver);
@@ -65,14 +65,14 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
         $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
         $this->assertCount(1, $resourceLoaders);
         $this->assertInstanceOf(
-            'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
+            'Oro\Component\Config\Loader\CumulativeResourceLoader',
             $resourceLoaders[0]
         );
     }
 
     public function testRegisterResourceLoaderObject()
     {
-        $resourceLoader = $this->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -85,7 +85,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterResourceLoaderArray()
     {
-        $resourceLoader = $this->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -94,7 +94,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
         $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
         $this->assertCount(2, $resourceLoaders);
         $this->assertInstanceOf(
-            'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
+            'Oro\Component\Config\Loader\CumulativeResourceLoader',
             $resourceLoaders[0]
         );
         $this->assertSame($resourceLoader, $resourceLoaders[1]);
@@ -102,7 +102,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterResourceLoaderWithSameName()
     {
-        $resourceLoader = $this->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -112,7 +112,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
         $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
         $this->assertCount(2, $resourceLoaders);
         $this->assertInstanceOf(
-            'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
+            'Oro\Component\Config\Loader\CumulativeResourceLoader',
             $resourceLoaders[0]
         );
         $this->assertSame($resourceLoader, $resourceLoaders[1]);
@@ -120,10 +120,10 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFreshShouldBeCachedIfTimestampWasNotChanged()
     {
-        $bundle = new TestBundle();
+        $bundle = new TestBundle1();
 
         $resourceLoader = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
 
         $resourceLoader->expects($this->once())
             ->method('getResource')
@@ -134,7 +134,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)])
+            ->setBundles(['TestBundle1' => get_class($bundle)])
             ->registerResource('test', $resourceLoader);
 
         $this->assertTrue(CumulativeResourceManager::getInstance()->isFresh('res', 100));
@@ -143,10 +143,10 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFreshShouldBeRecheckedIfTimestampChanged()
     {
-        $bundle = new TestBundle();
+        $bundle = new TestBundle1();
 
         $resourceLoader = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
 
         $resourceLoader->expects($this->exactly(2))
             ->method('getResource')
@@ -157,7 +157,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)])
+            ->setBundles(['TestBundle1' => get_class($bundle)])
             ->registerResource('test', $resourceLoader);
 
         $this->assertTrue(CumulativeResourceManager::getInstance()->isFresh('res', 100));
@@ -167,12 +167,12 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
     public function testIsFreshAllResourcesAreUpToDate()
     {
         $bundle1 = new TestBundle1();
-        $bundle2 = new TestBundle();
+        $bundle2 = new TestBundle2();
 
         $resourceLoader1 = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
         $resourceLoader2 = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
 
         $resourceLoader1->expects($this->once())
             ->method('getResource')
@@ -190,7 +190,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)])
+            ->setBundles(['TestBundle1' => get_class($bundle1), 'TestBundle2' => get_class($bundle2)])
             ->registerResource('test1', $resourceLoader1)
             ->registerResource('test2', $resourceLoader2);
 
@@ -201,12 +201,12 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
     public function testIsFreshResource1ForBundle1IsNotUpToDate()
     {
         $bundle1 = new TestBundle1();
-        $bundle2 = new TestBundle();
+        $bundle2 = new TestBundle2();
 
         $resourceLoader1 = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
         $resourceLoader2 = $this
-            ->getMock('Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
+            ->getMock('Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker');
 
         $resourceLoader1->expects($this->once())
             ->method('getResource')
@@ -224,7 +224,7 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)])
+            ->setBundles(['TestBundle1' => get_class($bundle1), 'TestBundle2' => get_class($bundle2)])
             ->registerResource('test1', $resourceLoader1)
             ->registerResource('test2', $resourceLoader2);
 

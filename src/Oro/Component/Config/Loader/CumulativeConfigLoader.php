@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config\Loader;
+namespace Oro\Component\Config\Loader;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class CumulativeConfigLoader
 {

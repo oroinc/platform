@@ -4,9 +4,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\UnitTestBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {

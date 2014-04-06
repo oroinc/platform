@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceMethodPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceLinkPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroEntityConfigBundle extends Bundle
 {

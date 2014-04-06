@@ -5,8 +5,9 @@ namespace Oro\Bundle\QueryDesignerBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroQueryDesignerBundle extends Bundle
 {

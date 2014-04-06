@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config;
+namespace Oro\Component\Config;
 
 class CumulativeResourceInfo
 {

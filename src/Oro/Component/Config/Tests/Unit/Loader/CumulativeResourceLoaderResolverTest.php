@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader;
+namespace Oro\Component\Config\Tests\Unit\Loader;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderResolver;
 
 class CumulativeResourceLoaderResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class CumulativeResourceLoaderResolverTest extends \PHPUnit_Framework_TestCase
     {
         $resolver = new CumulativeResourceLoaderResolver();
         $loader = $resolver->resolve('Resources/config/test.yml');
-        $this->assertInstanceOf('Oro\Bundle\CacheBundle\Config\Loader\YamlCumulativeFileLoader', $loader);
+        $this->assertInstanceOf('Oro\Component\Config\Loader\YamlCumulativeFileLoader', $loader);
         $this->assertEquals('Resources/config/test.yml', $loader->getResource());
     }
 }

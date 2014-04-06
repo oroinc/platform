@@ -4,7 +4,7 @@ namespace Oro\Bundle\HelpBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroHelpBundle extends Bundle
 {

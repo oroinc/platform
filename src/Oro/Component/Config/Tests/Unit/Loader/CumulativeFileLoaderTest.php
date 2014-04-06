@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader;
+namespace Oro\Component\Config\Tests\Unit\Loader;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeFileLoader;
-use Oro\Bundle\CacheBundle\Tests\Unit\Config\Loader\Fixtures\Bundle\TestBundle\TestBundle;
+
+use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeFileLoader;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 
 class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,13 +15,14 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         /** @var CumulativeFileLoader|\PHPUnit_Framework_MockObject_MockObject $loader */
         $loader = $this->getMockForAbstractClass(
-            'Oro\Bundle\CacheBundle\Config\Loader\CumulativeFileLoader',
+            'Oro\Component\Config\Loader\CumulativeFileLoader',
             [$relativeFilePath]
         );
 
-        $data = ['test' => 123];
-        $bundle = new TestBundle();
-        $expectedFilePath = $bundle->getPath() . '/' . $relativeFilePath;
+        $data             = ['test' => 123];
+        $bundle           = new TestBundle1();
+        $bundleDir        = dirname((new \ReflectionClass($bundle))->getFileName());
+        $expectedFilePath = $bundleDir . '/' . $relativeFilePath;
         $expectedFilePath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFilePath);
 
         $expectedResource = new CumulativeResourceInfo(
@@ -37,7 +39,7 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($relativeFilePath, $loader->getResource());
 
-        $resource = $loader->load(get_class($bundle), $bundle->getPath());
+        $resource = $loader->load(get_class($bundle), $bundleDir);
         $this->assertEquals($expectedResource, $resource);
     }
 }

@@ -1,11 +1,13 @@
 <?php
+
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
 use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {

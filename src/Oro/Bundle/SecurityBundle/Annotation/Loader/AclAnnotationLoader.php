@@ -4,8 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class AclAnnotationLoader implements AclAnnotationLoaderInterface
 {

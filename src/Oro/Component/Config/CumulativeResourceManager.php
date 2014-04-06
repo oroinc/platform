@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config;
+namespace Oro\Component\Config;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
+use Oro\Component\Config\Loader\CumulativeResourceLoader;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderResolver;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
 
 class CumulativeResourceManager
 {

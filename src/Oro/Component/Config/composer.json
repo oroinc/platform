@@ -1,0 +1,23 @@
+{
+    "name": "oro/config",
+    "type": "library",
+    "description": "ORO BAP Config Component",
+    "keywords": ["BAP", "Config"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.4",
+        "symfony/config": "~2.1",
+        "symfony/dependency-injection": "~2.1",
+        "symfony/yaml": "~2.1"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\Config": "" }
+    },
+    "target-dir": "Oro/Component/Config",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

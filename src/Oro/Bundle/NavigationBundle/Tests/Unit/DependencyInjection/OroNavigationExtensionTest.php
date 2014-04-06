@@ -4,10 +4,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 {

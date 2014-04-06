@@ -1,11 +1,13 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {

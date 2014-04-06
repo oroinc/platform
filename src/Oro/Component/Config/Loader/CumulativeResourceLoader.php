@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config\Loader;
+namespace Oro\Component\Config\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResourceInfo;
 
 /**
  * CumulativeResourceLoader is the interface that must be implemented by all resource loader classes

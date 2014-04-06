@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Config;
+namespace Oro\Component\Config\Tests\Unit;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResource;
+use Oro\Component\Config\CumulativeResource;
 
 class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
 {

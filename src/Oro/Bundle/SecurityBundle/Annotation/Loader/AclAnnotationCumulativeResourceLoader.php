@@ -6,8 +6,8 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Finder\Finder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader;
+use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeResourceLoader;
 
 class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
 {

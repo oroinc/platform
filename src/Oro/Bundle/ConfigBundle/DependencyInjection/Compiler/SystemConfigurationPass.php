@@ -6,9 +6,10 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Provider\Provider;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {

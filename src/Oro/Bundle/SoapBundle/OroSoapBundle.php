@@ -5,8 +5,9 @@ namespace Oro\Bundle\SoapBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroSoapBundle extends Bundle
 {

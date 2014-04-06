@@ -5,9 +5,10 @@ namespace Oro\Bundle\ConfigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ConfigPass;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroConfigBundle extends Bundle
 {

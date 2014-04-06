@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config\Loader;
+namespace Oro\Component\Config\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResource;
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceInfo;
+use Oro\Component\Config\CumulativeResource;
+use Oro\Component\Config\CumulativeResourceInfo;
 
 abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFreshChecker
 {

@@ -9,7 +9,7 @@
         "php": ">=5.3.3",
         "symfony/symfony": "2.1.*",
         "kriswallsmith/assetic": "1.1.*@dev",
-        "oro/cache-bundle": "dev-master"
+        "oro/config": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\AsseticBundle": "" }

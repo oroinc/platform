@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config\Loader;
+namespace Oro\Component\Config\Loader;
 
 class CumulativeResourceLoaderResolver
 {

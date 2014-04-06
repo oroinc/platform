@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Config\Loader;
+namespace Oro\Component\Config\Loader;
 
 /**
  * CumulativeResourceChecker is the interface that must be implemented by resource loader classes

@@ -5,9 +5,10 @@ namespace Oro\Bundle\UIBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigConfigurationPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\PlaceholderFilterCompilerPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroUIBundle extends Bundle
 {

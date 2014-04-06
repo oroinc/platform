@@ -7,8 +7,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {

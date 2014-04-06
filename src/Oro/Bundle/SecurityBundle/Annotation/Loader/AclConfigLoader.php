@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class AclConfigLoader implements AclAnnotationLoaderInterface
 {

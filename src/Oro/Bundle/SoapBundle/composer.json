@@ -11,7 +11,7 @@
         "besimple/soap-common": "dev-master",
         "besimple/soap-server": "dev-master",
         "besimple/soap-bundle": "dev-master",
-        "oro/cache-bundle": "dev-master"
+        "oro/config": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\SoapBundle": "" }

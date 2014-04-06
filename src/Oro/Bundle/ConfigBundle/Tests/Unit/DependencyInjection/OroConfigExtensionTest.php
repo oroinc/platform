@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {

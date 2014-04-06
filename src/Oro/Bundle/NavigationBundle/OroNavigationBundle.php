@@ -5,9 +5,10 @@ namespace Oro\Bundle\NavigationBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\TagGeneratorPass;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroNavigationBundle extends Bundle
 {
