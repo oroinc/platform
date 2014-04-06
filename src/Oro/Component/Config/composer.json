@@ -1,8 +1,8 @@
 {
     "name": "oro/config",
     "type": "library",
-    "description": "ORO BAP Config Component",
-    "keywords": ["BAP", "Config"],
+    "description": "ORO Config Component",
+    "keywords": ["ORO", "BAP", "Config"],
     "license": "MIT",
     "require": {
         "php": ">=5.4.4",
