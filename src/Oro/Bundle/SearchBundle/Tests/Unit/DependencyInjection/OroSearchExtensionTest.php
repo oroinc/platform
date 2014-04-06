@@ -8,6 +8,7 @@ use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,9 +21,9 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle->getName() => get_class($bundle)])
-            ->registerResource(
+            ->addResourceLoader(
                 'OroSearchBundle',
-                'Resources/config/search.yml'
+                new YamlCumulativeFileLoader('Resources/config/search.yml')
             );
 
         $this->container = new ContainerBuilder();

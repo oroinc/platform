@@ -7,6 +7,7 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestB
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,9 +21,9 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)])
-            ->registerResource(
+            ->addResourceLoader(
                 'OroQueryDesignerBundle',
-                'Resources/config/query_designer.yml'
+                new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
             );
 
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')

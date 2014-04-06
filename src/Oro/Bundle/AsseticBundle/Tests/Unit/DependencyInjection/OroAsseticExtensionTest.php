@@ -8,6 +8,7 @@ use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
 use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,9 +20,9 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($expectedBundles)
-            ->registerResource(
+            ->addResourceLoader(
                 'OroAsseticBundle',
-                'Resources/config/assets.yml'
+                new YamlCumulativeFileLoader('Resources/config/assets.yml')
             );
 
         $extension = new OroAsseticExtension();

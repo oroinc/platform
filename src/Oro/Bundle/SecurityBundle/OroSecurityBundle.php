@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroSecurityBundle extends Bundle
 {
@@ -19,8 +20,11 @@ class OroSecurityBundle extends Bundle
     public function __construct()
     {
         CumulativeResourceManager::getInstance()
-            ->registerResource('oro_acl_config', 'Resources/config/acl.yml')
-            ->registerResource(
+            ->addResourceLoader(
+                'oro_acl_config',
+                new YamlCumulativeFileLoader('Resources/config/acl.yml')
+            )
+            ->addResourceLoader(
                 'oro_acl_annotation',
                 new AclAnnotationCumulativeResourceLoader(['Controller'])
             );

@@ -6,6 +6,7 @@ use Symfony\Bundle\AsseticBundle\DependencyInjection\Compiler;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroAsseticBundle extends Bundle
 {
@@ -14,9 +15,9 @@ class OroAsseticBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/assets.yml'
+            new YamlCumulativeFileLoader('Resources/config/assets.yml')
         );
     }
 }

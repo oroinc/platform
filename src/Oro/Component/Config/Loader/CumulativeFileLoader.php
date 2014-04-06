@@ -88,8 +88,10 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFresh
     }
 
     /**
-     * @param string $path A real path to a file
-     * @return array
+     * Loads a file
+     *
+     * @param string $file A real path to a file
+     * @return array|null
      */
-    abstract protected function loadFile($path);
+    abstract protected function loadFile($file);
 }

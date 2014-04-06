@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroSoapBundle extends Bundle
 {
@@ -16,9 +17,9 @@ class OroSoapBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/oro/soap.yml'
+            new YamlCumulativeFileLoader('Resources/config/oro/soap.yml')
         );
     }
 

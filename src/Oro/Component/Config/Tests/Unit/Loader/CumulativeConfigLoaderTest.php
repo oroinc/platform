@@ -21,7 +21,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->registerResource('test_group', $resourceLoader);
+            ->addResourceLoader('test_group', $resourceLoader);
 
         $container = new ContainerBuilder();
         $loader    = new CumulativeConfigLoader($container);
@@ -52,7 +52,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->registerResource('test_group', $resourceLoader);
+            ->addResourceLoader('test_group', $resourceLoader);
 
         $container = new ContainerBuilder();
         $loader    = new CumulativeConfigLoader($container);
@@ -84,7 +84,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->registerResource('test_group', $resourceLoader);
+            ->addResourceLoader('test_group', $resourceLoader);
 
         $loader = new CumulativeConfigLoader();
         $result = $loader->load('test_group');

@@ -11,6 +11,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,11 +28,11 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle->getName() => get_class($bundle)])
-            ->registerResource(
+            ->addResourceLoader(
                 'oro_acl_config',
-                'Resources/config/acl.yml'
+                new YamlCumulativeFileLoader('Resources/config/acl.yml')
             )
-            ->registerResource(
+            ->addResourceLoader(
                 'oro_acl_annotation',
                 new AclAnnotationCumulativeResourceLoader()
             );

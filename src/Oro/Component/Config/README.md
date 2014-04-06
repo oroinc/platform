@@ -9,7 +9,7 @@ Cumulative Configuration
 The cumulative configuration provides a way to load configuration from any bundle without an additional registration of configuration files in each bundle.
 For example you may need to load configuration from `Resources\config\acme.yml` file located in any bundle. In this case a bundle which need this configuration should do the following:
 
- - Register configuration file in a constructor of your bundle. For example:
+ - Register configuration file loader in a constructor of your bundle. For example:
 
 ``` php
 <?php
@@ -19,15 +19,16 @@ namespace Acme\Bundle\SomeBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class AcmeSomeBundle extends Bundle
 {
     public function __construct()
     {
         // register acme.yml as configuration resource
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(), // resource group name, in this case it is 'AcmeSomeBundle'
-            'Resources/config/acme.yml'
+            new YamlCumulativeFileLoader('Resources/config/acme.yml')
         );
     }
 }
@@ -50,7 +51,7 @@ class AcmeSomeExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        // load configuration from acme.yml which can be loated in any bundle
+        // load configuration from acme.yml which can be located in any bundle
         $acmeConfig = [];
         $configLoader = new CumulativeConfigLoader($container);
         $resources    = $configLoader->load('AcmeSomeBundle');

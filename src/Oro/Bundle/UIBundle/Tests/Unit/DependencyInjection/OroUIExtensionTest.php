@@ -8,6 +8,7 @@ use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\UnitTestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,9 +18,9 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle->getName() => get_class($bundle)])
-            ->registerResource(
+            ->addResourceLoader(
                 'OroUIBundle',
-                'Resources/config/placeholders.yml'
+                new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
             );
 
         $container = new ContainerBuilder();

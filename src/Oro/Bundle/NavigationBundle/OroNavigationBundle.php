@@ -9,6 +9,7 @@ use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\TagGeneratorPass;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroNavigationBundle extends Bundle
 {
@@ -17,9 +18,9 @@ class OroNavigationBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/navigation.yml'
+            new YamlCumulativeFileLoader('Resources/config/navigation.yml')
         );
     }
 

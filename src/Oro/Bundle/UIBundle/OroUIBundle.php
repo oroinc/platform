@@ -9,6 +9,7 @@ use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigConfigurationPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\PlaceholderFilterCompilerPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroUIBundle extends Bundle
 {
@@ -17,9 +18,9 @@ class OroUIBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/placeholders.yml'
+            new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
         );
     }
 

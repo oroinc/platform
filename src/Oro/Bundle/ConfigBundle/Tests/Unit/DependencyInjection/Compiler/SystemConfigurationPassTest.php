@@ -7,6 +7,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,9 +38,9 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)
-            ->registerResource(
+            ->addResourceLoader(
                 'OroConfigBundle',
-                'Resources/config/system_configuration.yml'
+                new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
             );
 
         if ($expectedSet) {

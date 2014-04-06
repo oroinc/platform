@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\FormattersPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroDataGridBundle extends Bundle
 {
@@ -19,9 +20,9 @@ class OroDataGridBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/datagrid.yml'
+            new YamlCumulativeFileLoader('Resources/config/datagrid.yml')
         );
     }
 

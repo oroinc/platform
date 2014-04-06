@@ -9,6 +9,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundl
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,9 +31,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)
-            ->registerResource(
+            ->addResourceLoader(
                 'OroNavigationBundle',
-                'Resources/config/navigation.yml'
+                new YamlCumulativeFileLoader('Resources/config/navigation.yml')
             );
 
         $container = new ContainerBuilder();

@@ -9,6 +9,7 @@ use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarB
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,9 +27,9 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->registerResource(
+            ->addResourceLoader(
                 'OroHelpBundle',
-                'Resources/config/oro_help.yml'
+                new YamlCumulativeFileLoader('Resources/config/oro_help.yml')
             );
 
         $container = new ContainerBuilder();
@@ -58,9 +59,9 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles)
-            ->registerResource(
+            ->addResourceLoader(
                 'OroHelpBundle',
-                'Resources/config/oro_help.yml'
+                new YamlCumulativeFileLoader('Resources/config/oro_help.yml')
             );
 
         $container = new ContainerBuilder();

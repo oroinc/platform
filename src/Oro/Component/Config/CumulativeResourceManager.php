@@ -3,7 +3,6 @@
 namespace Oro\Component\Config;
 
 use Oro\Component\Config\Loader\CumulativeResourceLoader;
-use Oro\Component\Config\Loader\CumulativeResourceLoaderResolver;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
 
 class CumulativeResourceManager
@@ -19,11 +18,6 @@ class CumulativeResourceManager
      * @var array
      */
     private $bundles = [];
-
-    /**
-     * @var CumulativeResourceLoaderResolver
-     */
-    private $resourceLoaderResolver;
 
     /**
      * @var array of CumulativeResourceLoader[]
@@ -71,7 +65,6 @@ class CumulativeResourceManager
     public function clear()
     {
         $this->bundles                = [];
-        $this->resourceLoaderResolver = null;
         $this->resourceLoaders        = [];
         $this->checkTimestamp         = null;
         $this->checkResult            = null;
@@ -103,53 +96,32 @@ class CumulativeResourceManager
     }
 
     /**
-     * @return CumulativeResourceLoaderResolver
-     */
-    public function getResourceLoaderResolver()
-    {
-        if (null === $this->resourceLoaderResolver) {
-            $this->resourceLoaderResolver = new CumulativeResourceLoaderResolver();
-        }
-
-        return $this->resourceLoaderResolver;
-    }
-
-    /**
-     * @param CumulativeResourceLoaderResolver $resourceLoaderResolver
+     * Adds resource loaders for the given resource group
+     *
+     * @param string                                              $resourceGroup   The name of a resource group
+     * @param CumulativeResourceLoader|CumulativeResourceLoader[] $resourceLoader Resource loader(s)
      * @return CumulativeResourceManager
      */
-    public function setResourceLoaderResolver(CumulativeResourceLoaderResolver $resourceLoaderResolver)
-    {
-        $this->resourceLoaderResolver = $resourceLoaderResolver;
-
-        return $this;
-    }
-
-    /**
-     * @param string                               $resourceGroup The name of a resource group
-     * @param mixed|CumulativeResourceLoader|array $resource      Resource(s) or resource loader(s)
-     * @return CumulativeResourceManager
-     */
-    public function registerResource($resourceGroup, $resource)
+    public function addResourceLoader($resourceGroup, $resourceLoader)
     {
         if (!isset($this->resourceLoaders[$resourceGroup])) {
             $this->resourceLoaders[$resourceGroup] = [];
         }
 
-        if (!is_array($resource)) {
-            $resource = [$resource];
-        }
-        foreach ($resource as $res) {
-            if (!($res instanceof CumulativeResourceLoader)) {
-                $res = $this->getResourceLoaderResolver()->resolve($res);
+        if (is_array($resourceLoader)) {
+            foreach ($resourceLoader as $loader) {
+                $this->resourceLoaders[$resourceGroup][] = $loader;
             }
-            $this->resourceLoaders[$resourceGroup][] = $res;
+        } else {
+            $this->resourceLoaders[$resourceGroup][] = $resourceLoader;
         }
 
         return $this;
     }
 
     /**
+     * Gets all resource loaders for the given resource group
+     *
      * @param string $resourceGroup The name of a resource group
      * @return CumulativeResourceLoader[]
      * @throws \RuntimeException if a loader was not found
@@ -160,7 +132,7 @@ class CumulativeResourceManager
             throw new \RuntimeException(
                 sprintf(
                     'Resource loaders for "%s" was not found. Please make sure you call'
-                    . ' CumulativeResourceManager::getInstance()->registerResource()'
+                    . ' CumulativeResourceManager::getInstance()->addResourceLoader()'
                     . ' in a constructor of a bundle responsible for accumulation of this resource.',
                     $resourceGroup
                 )

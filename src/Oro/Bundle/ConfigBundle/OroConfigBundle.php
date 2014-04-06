@@ -9,6 +9,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ConfigPass;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroConfigBundle extends Bundle
 {
@@ -17,13 +18,13 @@ class OroConfigBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/system_configuration.yml'
+            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
         );
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             'entity_output',
-            'Resources/config/entity_output.yml'
+            new YamlCumulativeFileLoader('Resources/config/entity_output.yml')
         );
     }
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroDashboardBundle extends Bundle
 {
@@ -13,9 +14,9 @@ class OroDashboardBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/dashboard.yml'
+            new YamlCumulativeFileLoader('Resources/config/dashboard.yml')
         );
     }
 }

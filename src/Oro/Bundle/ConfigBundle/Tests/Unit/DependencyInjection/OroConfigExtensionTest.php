@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,9 +24,9 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->registerResource(
+            ->addResourceLoader(
                 'entity_output',
-                'Resources/config/entity_output.yml'
+                new YamlCumulativeFileLoader('Resources/config/entity_output.yml')
             );
 
         $extension = new OroConfigExtension();
@@ -51,9 +52,9 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->registerResource(
+            ->addResourceLoader(
                 'entity_output',
-                'Resources/config/entity_output.yml'
+                new YamlCumulativeFileLoader('Resources/config/entity_output.yml')
             );
 
         $this->configuration = new ContainerBuilder();
