@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 
 class OroDashboardExtension extends Extension
 {
@@ -18,9 +18,8 @@ class OroDashboardExtension extends Extension
     {
         $dashboardConfigs = array();
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroDashboardBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroDashboardBundle');
         foreach ($resources as $resource) {
             $dashboardConfigs[] = $resource->data['oro_dashboard_config'];
         }

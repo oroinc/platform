@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -40,9 +40,8 @@ class ConfigurationPass implements CompilerPassInterface
         if ($container->hasDefinition(self::PROVIDER_SERVICE_ID)) {
             $config = [];
 
-            $resources = CumulativeResourceManager::getInstance()
-                ->getLoader('OroDataGridBundle')
-                ->load($container);
+            $configLoader = new CumulativeConfigLoader($container);
+            $resources    = $configLoader->load('OroDataGridBundle');
             foreach ($resources as $resource) {
                 if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
                     $config = array_merge_recursive($config, $resource->data[self::ROOT_PARAMETER]);

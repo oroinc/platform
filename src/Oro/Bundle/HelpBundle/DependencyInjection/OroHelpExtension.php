@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 
 class OroHelpExtension extends Extension
 {
@@ -50,9 +50,8 @@ class OroHelpExtension extends Extension
     {
         $result = [];
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroHelpBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroHelpBundle');
         foreach ($resources as $resource) {
             $result[] = $resource->data;
         }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 
 class LoadPass implements CompilerPassInterface
 {
@@ -16,9 +16,8 @@ class LoadPass implements CompilerPassInterface
     {
         $classes = [];
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroSoapBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroSoapBundle');
         foreach ($resources as $resource) {
             $classes = array_merge($classes, $resource->data['classes']);
         }

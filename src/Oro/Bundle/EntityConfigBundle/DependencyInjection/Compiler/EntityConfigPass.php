@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 
 class EntityConfigPass implements CompilerPassInterface
 {
@@ -18,9 +18,8 @@ class EntityConfigPass implements CompilerPassInterface
     {
         $providerBagDefinition = $container->getDefinition('oro_entity_config.provider_bag');
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroEntityConfigBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroEntityConfigBundle');
         foreach ($resources as $resource) {
             if (isset($resource->data['oro_entity_config']) && count($resource->data['oro_entity_config'])) {
                 foreach ($resource->data['oro_entity_config'] as $scope => $config) {

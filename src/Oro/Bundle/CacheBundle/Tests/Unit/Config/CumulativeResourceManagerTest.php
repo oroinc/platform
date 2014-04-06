@@ -47,13 +47,13 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage A loader for "unknown" was not found.
+     * @expectedExceptionMessage Resource loaders for "unknown" was not found.
      */
     public function testGetLoaderUnknown()
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->getLoader('unknown');
+            ->getResourceLoaders('unknown');
     }
 
     public function testRegisterResourceString()
@@ -62,11 +62,11 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             ->clear()
             ->registerResource('test', 'test.yml');
 
-        $loader = CumulativeResourceManager::getInstance()->getLoader('test');
-        $this->assertCount(1, $loader->getResourceLoaders());
+        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
+        $this->assertCount(1, $resourceLoaders);
         $this->assertInstanceOf(
             'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
-            $loader->getResourceLoaders()[0]
+            $resourceLoaders[0]
         );
     }
 
@@ -78,9 +78,9 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             ->clear()
             ->registerResource('test', $resourceLoader);
 
-        $loader = CumulativeResourceManager::getInstance()->getLoader('test');
-        $this->assertCount(1, $loader->getResourceLoaders());
-        $this->assertSame($resourceLoader, $loader->getResourceLoaders()[0]);
+        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
+        $this->assertCount(1, $resourceLoaders);
+        $this->assertSame($resourceLoader, $resourceLoaders[0]);
     }
 
     public function testRegisterResourceLoaderArray()
@@ -91,13 +91,13 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             ->clear()
             ->registerResource('test', ['test.yml', $resourceLoader]);
 
-        $loader = CumulativeResourceManager::getInstance()->getLoader('test');
-        $this->assertCount(2, $loader->getResourceLoaders());
+        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
+        $this->assertCount(2, $resourceLoaders);
         $this->assertInstanceOf(
             'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
-            $loader->getResourceLoaders()[0]
+            $resourceLoaders[0]
         );
-        $this->assertSame($resourceLoader, $loader->getResourceLoaders()[1]);
+        $this->assertSame($resourceLoader, $resourceLoaders[1]);
     }
 
     public function testRegisterResourceLoaderWithSameName()
@@ -109,13 +109,13 @@ class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
             ->registerResource('test', 'test.yml')
             ->registerResource('test', $resourceLoader);
 
-        $loader = CumulativeResourceManager::getInstance()->getLoader('test');
-        $this->assertCount(2, $loader->getResourceLoaders());
+        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders('test');
+        $this->assertCount(2, $resourceLoaders);
         $this->assertInstanceOf(
             'Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader',
-            $loader->getResourceLoaders()[0]
+            $resourceLoaders[0]
         );
-        $this->assertSame($resourceLoader, $loader->getResourceLoaders()[1]);
+        $this->assertSame($resourceLoader, $resourceLoaders[1]);
     }
 
     public function testIsFreshShouldBeCachedIfTimestampWasNotChanged()

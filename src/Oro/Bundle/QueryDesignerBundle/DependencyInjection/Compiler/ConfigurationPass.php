@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 
 class ConfigurationPass implements CompilerPassInterface
@@ -25,9 +25,8 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configs = array();
 
-            $resources = CumulativeResourceManager::getInstance()
-                ->getLoader('OroQueryDesignerBundle')
-                ->load($container);
+            $configLoader = new CumulativeConfigLoader($container);
+            $resources    = $configLoader->load('OroQueryDesignerBundle');
             foreach ($resources as $resource) {
                 $config = $resource->data[Configuration::ROOT_NODE_NAME];
 

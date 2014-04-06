@@ -3,7 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+
+use Oro\Bundle\CacheBundle\Config\Loader\CumulativeConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 
 class AclAnnotationLoader implements AclAnnotationLoaderInterface
@@ -33,9 +34,8 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
      */
     public function load(AclAnnotationStorage $storage)
     {
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('oro_acl_annotation')
-            ->load();
+        $configLoader = new CumulativeConfigLoader();
+        $resources    = $configLoader->load('oro_acl_annotation');
         foreach ($resources as $resource) {
             foreach ($resource->data as $file) {
                 $className = $this->getClassName($file);

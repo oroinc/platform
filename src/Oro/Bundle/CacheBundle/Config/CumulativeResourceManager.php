@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CacheBundle\Config;
 
-use Oro\Bundle\CacheBundle\Config\Loader\CumulativeLoader;
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoader;
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderResolver;
 use Oro\Bundle\CacheBundle\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
@@ -27,9 +26,11 @@ class CumulativeResourceManager
     private $resourceLoaderResolver;
 
     /**
-     * @var CumulativeLoader[]
+     * @var array of CumulativeResourceLoader[]
+     *            key   = resource group
+     *            value = CumulativeResourceLoader[]
      */
-    private $loaders = [];
+    private $resourceLoaders = [];
 
     /**
      * @var int
@@ -71,7 +72,7 @@ class CumulativeResourceManager
     {
         $this->bundles                = [];
         $this->resourceLoaderResolver = null;
-        $this->loaders                = [];
+        $this->resourceLoaders        = [];
         $this->checkTimestamp         = null;
         $this->checkResult            = null;
 
@@ -97,9 +98,6 @@ class CumulativeResourceManager
     public function setBundles($bundles)
     {
         $this->bundles = $bundles;
-        foreach ($this->loaders as $loader) {
-            $loader->setBundles($this->bundles);
-        }
 
         return $this;
     }
@@ -134,10 +132,8 @@ class CumulativeResourceManager
      */
     public function registerResource($resourceGroup, $resource)
     {
-        if (!isset($this->loaders[$resourceGroup])) {
-            $loader = new CumulativeLoader();
-            $loader->setBundles($this->bundles);
-            $this->loaders[$resourceGroup] = $loader;
+        if (!isset($this->resourceLoaders[$resourceGroup])) {
+            $this->resourceLoaders[$resourceGroup] = [];
         }
 
         if (!is_array($resource)) {
@@ -147,7 +143,7 @@ class CumulativeResourceManager
             if (!($res instanceof CumulativeResourceLoader)) {
                 $res = $this->getResourceLoaderResolver()->resolve($res);
             }
-            $this->loaders[$resourceGroup]->addResourceLoader($res);
+            $this->resourceLoaders[$resourceGroup][] = $res;
         }
 
         return $this;
@@ -155,15 +151,15 @@ class CumulativeResourceManager
 
     /**
      * @param string $resourceGroup The name of a resource group
-     * @return CumulativeLoader
+     * @return CumulativeResourceLoader[]
      * @throws \RuntimeException if a loader was not found
      */
-    public function getLoader($resourceGroup)
+    public function getResourceLoaders($resourceGroup)
     {
-        if (!isset($this->loaders[$resourceGroup])) {
+        if (!isset($this->resourceLoaders[$resourceGroup])) {
             throw new \RuntimeException(
                 sprintf(
-                    'A loader for "%s" was not found. Please make sure you call'
+                    'Resource loaders for "%s" was not found. Please make sure you call'
                     . ' CumulativeResourceManager::getInstance()->registerResource()'
                     . ' in a constructor of a bundle responsible for accumulation of this resource.',
                     $resourceGroup
@@ -171,29 +167,28 @@ class CumulativeResourceManager
             );
         }
 
-        return $this->loaders[$resourceGroup];
+        return $this->resourceLoaders[$resourceGroup];
     }
 
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
-     * @param mixed $resource   The resource
-     * @param int    $timestamp The last time the resource was loaded
+     * @param mixed $resource  The resource
+     * @param int   $timestamp The last time the resource was loaded
      *
-     * @return bool true if the resource has not been updated, false otherwise
+     * @return bool TRUE if the resource has not been updated; otherwise, FALSE
      */
     public function isFresh($resource, $timestamp)
     {
         if ($this->checkTimestamp !== $timestamp) {
             $this->checkTimestamp = $timestamp;
             $this->checkResult    = [];
-            $bundles = [];
+            $bundles              = [];
             foreach ($this->bundles as $bundleClass) {
-                $reflection = new \ReflectionClass($bundleClass);
+                $reflection            = new \ReflectionClass($bundleClass);
                 $bundles[$bundleClass] = dirname($reflection->getFilename());
             }
-            foreach ($this->loaders as $loader) {
-                $resourceLoaders = $loader->getResourceLoaders();
+            foreach ($this->resourceLoaders as $resourceLoaders) {
                 foreach ($resourceLoaders as $resourceLoader) {
                     if ($resourceLoader instanceof CumulativeResourceLoaderWithFreshChecker) {
                         $currentResource = $resourceLoader->getResource();
