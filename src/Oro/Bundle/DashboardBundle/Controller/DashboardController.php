@@ -32,16 +32,29 @@ class DashboardController extends Controller
         } else {
             $name = $this->get('session')->get('saved_dashboard', $manager->getDefaultDashboardName());
         }
-        $dashboard = $manager->getDashboard($name);
-        $template  = isset($dashboard['twig']) ? $dashboard['twig'] : 'OroDashboardBundle:Index:default.html.twig';
+
+
+
+        $dashboards = $manager->getDashboards();
+
+        foreach ($dashboards as $dashboard) {
+            //todo: stub (must be rewrite)
+            if ($dashboard->getDashboard()->getName() == $name) {
+                break;
+            }
+        }
+        //todo: stub (must be rewrite)
+        $config = $dashboard->getConfig();
+
+        $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
         return $this->render(
             $template,
             [
-                'pageTitle'     => $dashboard['label'],
+                'pageTitle'     => $config['label'],
                 'dashboardName' => $name,
-                'dashboards'    => $manager->getDashboards(),
-                'widgets'       => $manager->getDashboardWidgets($name),
+                'dashboards'    => $dashboards,
+                'widgets'       => $dashboard->getWidgets(),
             ]
         );
     }

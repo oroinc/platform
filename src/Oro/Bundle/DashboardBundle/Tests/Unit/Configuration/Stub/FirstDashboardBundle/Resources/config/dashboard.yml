@@ -1,0 +1,13 @@
+oro_dashboard_config:
+    widgets:
+        quick_launchpad2: ~
+
+    dashboards:
+        main:
+            widgets:
+                quick_launchpad2:
+                    position:   30
+        quick_launchpad:
+            widgets:
+                quick_launchpad:
+                    position:   10

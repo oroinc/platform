@@ -54,9 +54,7 @@ class OroDashboardExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container
-            ->getDefinition('oro_dashboard.manager')
-            ->replaceArgument(0, $config);
+        $container->getDefinition('oro_dashboard.config_provider')->replaceArgument(0, $config);
     }
 
     /**

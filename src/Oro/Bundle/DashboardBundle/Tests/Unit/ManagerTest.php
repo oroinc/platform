@@ -45,7 +45,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
 
         $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals($expectedResult, $dashboard->getDashboardWidgets('default_dashboard'));
+        $this->assertEquals($expectedResult, $dashboard->getDashboardModel('default_dashboard'));
     }
 
     /**

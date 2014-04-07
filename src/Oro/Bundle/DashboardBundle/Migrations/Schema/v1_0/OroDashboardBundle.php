@@ -18,7 +18,7 @@ class OroDashboardBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('label', 'string', ['length' => 255, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_DF2802EF5E237E06');
         $table->addIndex(['user_owner_id'], 'IDX_DF2802EF9EB185F9', []);
