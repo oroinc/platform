@@ -55,7 +55,10 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function edit()
     {
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $action->click();
+        $action->click();
         $this->waitForAjax();
         $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Update']")->click();
         $this->waitPageToLoad();
@@ -67,7 +70,10 @@ class Tags extends AbstractPageFilteredGrid
 
     public function delete()
     {
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $action->click();
+        $action->click();
         $this->waitForAjax();
         $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Delete']")->click();
         $this->waitForAjax();
