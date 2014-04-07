@@ -6,7 +6,7 @@ use Oro\Component\Config\CumulativeResource;
 
 /**
  * FolderingCumulativeFileLoader represents a file resource located in some folder.
- * It allows to make the container dirty when a new folder with this file resource is created.
+ * It allows to make the container dirty when a new folder with this file resource is created or deleted.
  */
 class FolderingCumulativeFileLoader implements CumulativeResourceLoader
 {
