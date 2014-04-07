@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Oro\Component\Config\CumulativeResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 
