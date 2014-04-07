@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\ConfigBundle\OroConfigBundle;
 use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,11 +37,9 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles($bundles)
-            ->addResourceLoader(
-                'OroConfigBundle',
-                new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
-            );
+            ->setBundles($bundles);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroConfigBundle();
 
         if ($expectedSet) {
             $taggedServices = array('some.service.id' => 'some arguments');

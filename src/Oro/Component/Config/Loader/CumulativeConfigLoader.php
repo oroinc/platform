@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Config\Loader;
 
+use Oro\Component\Config\CumulativeResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\CumulativeResourceInfo;
@@ -39,8 +40,14 @@ class CumulativeConfigLoader
             $bundleDir  = dirname($reflection->getFilename());
             foreach ($resourceLoaders as $resourceLoader) {
                 $resource = $resourceLoader->load($bundleClass, $bundleDir);
-                if ($resource) {
-                    $result[] = $resource;
+                if (null !== $resource) {
+                    if (is_array($resource)) {
+                        foreach ($resource as $res) {
+                            $result[] = $res;
+                        }
+                    } else {
+                        $result[] = $resource;
+                    }
                 }
             }
         }
@@ -65,9 +72,16 @@ class CumulativeConfigLoader
             throw new \RuntimeException('The container builder must not be null.');
         }
 
+        $bundles         = CumulativeResourceManager::getInstance()->getBundles();
         $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders($resourceGroup);
+        $resource        = new CumulativeResource($resourceGroup);
         foreach ($resourceLoaders as $resourceLoader) {
-            $resourceLoader->registerResource($this->container);
+            foreach ($bundles as $bundleClass) {
+                $reflection = new \ReflectionClass($bundleClass);
+                $bundleDir  = dirname($reflection->getFilename());
+                $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $resource);
+            }
         }
+        $this->container->addResource($resource);
     }
 }

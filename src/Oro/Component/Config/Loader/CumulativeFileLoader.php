@@ -2,12 +2,10 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 
-abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFreshChecker
+abstract class CumulativeFileLoader implements CumulativeResourceLoader
 {
     /**
      * @var string
@@ -25,20 +23,46 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFresh
     protected $resourceName;
 
     /**
-     * @param string $relativeFilePath The name of a file starts from bundle folder
+     * @param string $relativeFilePath The relative path to a resource file starts from bundle folder
      */
     public function __construct($relativeFilePath)
     {
+        $this->setRelativeFilePath($relativeFilePath);
+    }
+
+    /**
+     * Gets relative path to a resource file
+     *
+     * @return string
+     */
+    public function getRelativeFilePath()
+    {
+        return $this->relativeFilePath;
+    }
+
+    /**
+     * Sets relative path to a resource file
+     *
+     * @param string $relativeFilePath The relative path to a resource file starts from bundle folder
+     */
+    public function setRelativeFilePath($relativeFilePath)
+    {
+        $relativeFilePath   = str_replace('\\', '/', $relativeFilePath);
         $delim              = strrpos($relativeFilePath, '/');
         $this->resourceName = pathinfo(
             false === $delim ? $relativeFilePath : substr($relativeFilePath, $delim + 1),
             PATHINFO_FILENAME
         );
-        $this->resource     = $relativeFilePath;
-        if (DIRECTORY_SEPARATOR !== '/') {
-            $relativeFilePath = str_replace('/', DIRECTORY_SEPARATOR, $relativeFilePath);
+        $path               = DIRECTORY_SEPARATOR === '/'
+            ? $relativeFilePath
+            : str_replace('/', DIRECTORY_SEPARATOR, $relativeFilePath);
+        if (strpos($relativeFilePath, '/') === 0) {
+            $this->resource         = substr($relativeFilePath, 1);
+            $this->relativeFilePath = $path;
+        } else {
+            $this->resource         = $relativeFilePath;
+            $this->relativeFilePath = DIRECTORY_SEPARATOR . $path;
         }
-        $this->relativeFilePath = DIRECTORY_SEPARATOR . $relativeFilePath;
     }
 
     /**
@@ -72,19 +96,27 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoaderWithFresh
     /**
      * {@inheritdoc}
      */
-    public function registerResource(ContainerBuilder $container)
+    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
     {
-        $container->addResource(new CumulativeResource($this->getResource()));
+        $path = $bundleDir . $this->relativeFilePath;
+        if (is_file($path)) {
+            $resource->addFound($bundleClass, $path);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isResourceFresh($bundleClass, $bundleDir, $timestamp)
+    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
     {
         $path = $bundleDir . $this->relativeFilePath;
-
-        return !is_file($path) || filemtime($path) < $timestamp;
+        if ($resource->isFound($bundleClass, $path)) {
+            // check exists and removed resource
+            return is_file($path) && filemtime($path) < $timestamp;
+        } else {
+            // check new resource
+            return !is_file($path);
+        }
     }
 
     /**

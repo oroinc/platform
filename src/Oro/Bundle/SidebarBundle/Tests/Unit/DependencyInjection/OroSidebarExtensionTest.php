@@ -5,7 +5,10 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
+use Oro\Bundle\SidebarBundle\OroSidebarBundle;
 use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,16 +17,18 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $configs, array $expectedThemeSettings)
     {
+        $bundle1 = new Fixtures\FooBundle\FooBundle();
+        $bundle2 = new Fixtures\BarBundle\BarBundle();
+
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroSidebarBundle();
+
         $extension = new OroSidebarExtension();
 
         $container = new ContainerBuilder();
-        $container->setParameter(
-            'kernel.bundles',
-            array(
-                new Fixtures\FooBundle\FooBundle(),
-                new Fixtures\BarBundle\BarBundle(),
-            )
-        );
 
         $extension->load($configs, $container);
 

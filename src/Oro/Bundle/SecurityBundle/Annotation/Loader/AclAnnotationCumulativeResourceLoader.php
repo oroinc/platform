@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Finder\Finder;
 
+use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeResourceLoader;
 
@@ -65,20 +64,42 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function registerResource(ContainerBuilder $container)
+    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
     {
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
+        $finder = $this->getFileFinder($bundleDir);
+        if ($finder) {
+            /** @var \SplFileInfo $file */
+            foreach ($finder as $file) {
+                $resource->addFound($bundleClass, $file->getRealPath());
+            }
+        }
+    }
 
-            $finder = $this->getFileFinder(dirname($reflection->getFileName()));
-            if ($finder) {
-                /** @var \SplFileInfo $file */
-                foreach ($finder as $file) {
-                    $container->addResource(new FileResource($file->getRealPath()));
+    /**
+     * {@inheritdoc}
+     */
+    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
+    {
+        // check exist and removed resources
+        $found = $resource->getFound($bundleClass);
+        foreach ($found as $path) {
+            if (!is_file($path) || filemtime($path) >= $timestamp) {
+                return false;
+            }
+        }
+        // check new resources
+        $finder = $this->getFileFinder($bundleDir);
+        if ($finder) {
+            /** @var \SplFileInfo $file */
+            foreach ($finder as $file) {
+                $path = $file->getRealPath();
+                if (!$resource->isFound($bundleClass, $path)) {
+                    return false;
                 }
             }
         }
+
+        return true;
     }
 
     /**

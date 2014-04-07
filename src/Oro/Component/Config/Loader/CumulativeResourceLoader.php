@@ -2,8 +2,7 @@
 
 namespace Oro\Component\Config\Loader;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
+use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 
 /**
@@ -23,17 +22,31 @@ interface CumulativeResourceLoader
     /**
      * Loads the resource located in the given bundle
      *
-     * @param string $bundleClass
-     * @param string $bundleDir
-     * @return CumulativeResourceInfo|null
+     * @param string $bundleClass The full name of bundle class
+     * @param string $bundleDir   The bundle root directory
+     * @return CumulativeResourceInfo|CumulativeResourceInfo[]|null
      */
     public function load($bundleClass, $bundleDir);
 
     /**
-     * Adds a resource object to the container.
-     * This object will be used to check whether the resource loaded by this loader is up-to-date or not.
+     * Registers the resource located in the given bundle as found.
      *
-     * @param ContainerBuilder $container
+     * @param string             $bundleClass The full name of bundle class
+     * @param string             $bundleDir   The bundle root directory
+     * @param CumulativeResource $resource
      */
-    public function registerResource(ContainerBuilder $container);
+    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource);
+
+    /**
+     * Returns true if the resource loaded by this loader and located in the given bundle
+     * has not been updated since the given timestamp.
+     *
+     * @param string             $bundleClass The full name of bundle class
+     * @param string             $bundleDir   The bundle root directory
+     * @param CumulativeResource $resource    The resource
+     * @param int                $timestamp   The last time the resource was loaded
+     *
+     * @return bool TRUE if the resource has not been updated; otherwise, FALSE
+     */
+    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp);
 }

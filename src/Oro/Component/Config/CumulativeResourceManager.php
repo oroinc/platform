@@ -3,7 +3,6 @@
 namespace Oro\Component\Config;
 
 use Oro\Component\Config\Loader\CumulativeResourceLoader;
-use Oro\Component\Config\Loader\CumulativeResourceLoaderWithFreshChecker;
 
 class CumulativeResourceManager
 {
@@ -20,21 +19,11 @@ class CumulativeResourceManager
     private $bundles = [];
 
     /**
-     * @var array of CumulativeResourceLoader[]
-     *            key   = resource group
-     *            value = CumulativeResourceLoader[]
+     * @var array
+     *      key   = resource group
+     *      value = CumulativeResourceLoader[]
      */
     private $resourceLoaders = [];
-
-    /**
-     * @var int
-     */
-    private $checkTimestamp;
-
-    /**
-     * @var array
-     */
-    private $checkResult;
 
     /**
      * Returns the singleton instance
@@ -64,10 +53,8 @@ class CumulativeResourceManager
      */
     public function clear()
     {
-        $this->bundles                = [];
-        $this->resourceLoaders        = [];
-        $this->checkTimestamp         = null;
-        $this->checkResult            = null;
+        $this->bundles         = [];
+        $this->resourceLoaders = [];
 
         return $this;
     }
@@ -98,7 +85,7 @@ class CumulativeResourceManager
     /**
      * Adds resource loaders for the given resource group
      *
-     * @param string                                              $resourceGroup   The name of a resource group
+     * @param string                                              $resourceGroup  The name of a resource group
      * @param CumulativeResourceLoader|CumulativeResourceLoader[] $resourceLoader Resource loader(s)
      * @return CumulativeResourceManager
      */
@@ -140,42 +127,5 @@ class CumulativeResourceManager
         }
 
         return $this->resourceLoaders[$resourceGroup];
-    }
-
-    /**
-     * Returns true if the resource has not been updated since the given timestamp.
-     *
-     * @param mixed $resource  The resource
-     * @param int   $timestamp The last time the resource was loaded
-     *
-     * @return bool TRUE if the resource has not been updated; otherwise, FALSE
-     */
-    public function isFresh($resource, $timestamp)
-    {
-        if ($this->checkTimestamp !== $timestamp) {
-            $this->checkTimestamp = $timestamp;
-            $this->checkResult    = [];
-            $bundles              = [];
-            foreach ($this->bundles as $bundleClass) {
-                $reflection            = new \ReflectionClass($bundleClass);
-                $bundles[$bundleClass] = dirname($reflection->getFilename());
-            }
-            foreach ($this->resourceLoaders as $resourceLoaders) {
-                foreach ($resourceLoaders as $resourceLoader) {
-                    if ($resourceLoader instanceof CumulativeResourceLoaderWithFreshChecker) {
-                        $currentResource = $resourceLoader->getResource();
-                        foreach ($bundles as $bundleClass => $bundleDir) {
-                            if (!isset($this->checkResult[$currentResource])) {
-                                if (!$resourceLoader->isResourceFresh($bundleClass, $bundleDir, $timestamp)) {
-                                    $this->checkResult[$currentResource] = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return !isset($this->checkResult[$resource]);
     }
 }

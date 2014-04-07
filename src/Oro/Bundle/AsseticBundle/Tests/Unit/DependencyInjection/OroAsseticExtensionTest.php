@@ -5,10 +5,10 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
+use Oro\Bundle\AsseticBundle\OroAsseticBundle;
 use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,11 +19,9 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles($expectedBundles)
-            ->addResourceLoader(
-                'OroAsseticBundle',
-                new YamlCumulativeFileLoader('Resources/config/assets.yml')
-            );
+            ->setBundles($expectedBundles);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroAsseticBundle();
 
         $extension = new OroAsseticExtension();
 

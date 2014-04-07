@@ -5,10 +5,10 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
+use Oro\Bundle\SearchBundle\OroSearchBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,11 +20,9 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $bundle = new TestBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)])
-            ->addResourceLoader(
-                'OroSearchBundle',
-                new YamlCumulativeFileLoader('Resources/config/search.yml')
-            );
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroSearchBundle();
 
         $this->container = new ContainerBuilder();
         $this->container->setParameter('kernel.environment', 'test');

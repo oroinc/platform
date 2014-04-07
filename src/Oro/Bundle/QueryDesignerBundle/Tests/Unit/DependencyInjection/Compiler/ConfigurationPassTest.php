@@ -3,11 +3,11 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Oro\Bundle\QueryDesignerBundle\OroQueryDesignerBundle;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,11 +20,9 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $bundle2 = new TestBundle2();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)])
-            ->addResourceLoader(
-                'OroQueryDesignerBundle',
-                new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
-            );
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroQueryDesignerBundle();
 
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()

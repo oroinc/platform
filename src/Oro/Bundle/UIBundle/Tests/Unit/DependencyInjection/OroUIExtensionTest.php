@@ -5,10 +5,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
+use Oro\Bundle\UIBundle\OroUIBundle;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\UnitTestBundle;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,11 +17,9 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
         $bundle = new UnitTestBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles([$bundle->getName() => get_class($bundle)])
-            ->addResourceLoader(
-                'OroUIBundle',
-                new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
-            );
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroUIBundle();
 
         $container = new ContainerBuilder();
 
