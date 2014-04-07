@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\BatchBundle\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\FileLocator;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResource;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 /**
  * Batch bundle services configuration declaration
@@ -21,9 +20,8 @@ class OroBatchExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        CumulativeResourceManager::getInstance()
-            ->getLoader('OroBatchBundle')
-            ->registerResources($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $configLoader->registerResources('OroBatchBundle');
 
         $this->processConfiguration(new Configuration(), $configs);
 

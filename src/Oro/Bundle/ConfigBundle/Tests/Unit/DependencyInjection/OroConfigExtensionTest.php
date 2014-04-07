@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
+
+use Oro\Bundle\ConfigBundle\OroConfigBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,12 +23,9 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->registerResource(
-                'entity_output',
-                'Resources/config/entity_output.yml'
-            );
+        CumulativeResourceManager::getInstance()->clear();
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroConfigBundle();
 
         $extension = new OroConfigExtension();
         $configs = array();
@@ -48,12 +48,9 @@ class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function createEmptyConfiguration()
     {
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->registerResource(
-                'entity_output',
-                'Resources/config/entity_output.yml'
-            );
+        CumulativeResourceManager::getInstance()->clear();
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroConfigBundle();
 
         $this->configuration = new ContainerBuilder();
 

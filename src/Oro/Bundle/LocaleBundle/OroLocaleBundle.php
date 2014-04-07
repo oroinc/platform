@@ -5,9 +5,11 @@ namespace Oro\Bundle\LocaleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConverterCompilerPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroLocaleBundle extends Bundle
 {
@@ -16,13 +18,13 @@ class OroLocaleBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
             [
-                'Resources/config/oro/name_format.yml',
-                'Resources/config/oro/address_format.yml',
-                'Resources/config/oro/locale_data.yml',
-                'Resources/config/oro/currency_data.yml'
+                new YamlCumulativeFileLoader('Resources/config/oro/name_format.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/address_format.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/locale_data.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/currency_data.yml')
             ]
         );
     }

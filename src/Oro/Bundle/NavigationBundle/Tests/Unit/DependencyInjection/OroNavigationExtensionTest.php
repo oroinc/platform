@@ -4,10 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
+use Oro\Bundle\NavigationBundle\OroNavigationBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,11 +30,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles($bundles)
-            ->registerResource(
-                'OroNavigationBundle',
-                'Resources/config/navigation.yml'
-            );
+            ->setBundles($bundles);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroNavigationBundle();
 
         $container = new ContainerBuilder();
 
@@ -99,6 +99,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function loadConfigurationDataProvider()
     {
+        $bundle1 = new BarBundle();
+        $bundle2 = new FooBundle();
+
         $settings = array(
             'resolved' => true,
             'maxItems' => array(
@@ -123,6 +126,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             'routeParameters' => array(),
             'extras' => array()
         );
+
         return array(
             'without_bundles' => array(
                 'configs' => array(
@@ -186,8 +190,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'bundles' => array(
-                    new BarBundle(),
-                    new FooBundle(),
+                    $bundle1->getName() => get_class($bundle1),
+                    $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedMenu' => array(
                     'items' => array(

@@ -4,7 +4,8 @@ namespace Oro\Bundle\HelpBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroHelpBundle extends Bundle
 {
@@ -13,9 +14,9 @@ class OroHelpBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/oro_help.yml'
+            new YamlCumulativeFileLoader('Resources/config/oro_help.yml')
         );
     }
 }

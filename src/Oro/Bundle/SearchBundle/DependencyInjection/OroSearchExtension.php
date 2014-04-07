@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -71,9 +71,8 @@ class OroSearchExtension extends Extension
     {
         $entitiesConfig = $config['entities_config'];
         if (!count($entitiesConfig)) {
-            $resources = CumulativeResourceManager::getInstance()
-                ->getLoader('OroSearchBundle')
-                ->load($container);
+            $configLoader = new CumulativeConfigLoader($container);
+            $resources    = $configLoader->load('OroSearchBundle');
             foreach ($resources as $resource) {
                 $entitiesConfig += $resource->data;
             }

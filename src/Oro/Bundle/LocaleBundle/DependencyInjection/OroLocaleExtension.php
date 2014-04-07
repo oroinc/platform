@@ -7,8 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class OroLocaleExtension extends Extension
 {
@@ -119,9 +120,8 @@ class OroLocaleExtension extends Extension
             'currency_data'  => [],
         ];
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroLocaleBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroLocaleBundle');
         foreach ($resources as $resource) {
             $result[$resource->name] = array_merge($result[$resource->name], $resource->data);
         }

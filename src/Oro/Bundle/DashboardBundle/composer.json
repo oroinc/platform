@@ -7,7 +7,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": "2.1.*",
-        "oro/cache-bundle": "dev-master",
+        "oro/config": "dev-master",
         "oro/ui-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/security-bundle": "dev-master"

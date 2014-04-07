@@ -4,7 +4,8 @@ namespace Oro\Bundle\BatchBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * Batch Bundle
@@ -17,9 +18,9 @@ class OroBatchBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/batch_jobs.yml'
+            new YamlCumulativeFileLoader('Resources/config/batch_jobs.yml')
         );
     }
 

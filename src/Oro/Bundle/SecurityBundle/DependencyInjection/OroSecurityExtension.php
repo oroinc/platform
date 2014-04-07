@@ -7,6 +7,8 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+
 /**
  * This is the class that loads and manages your bundle configuration
  *
@@ -19,12 +21,15 @@ class OroSecurityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $configLoader = new CumulativeConfigLoader($container);
+        $configLoader->registerResources('oro_acl_config');
+        $configLoader->registerResources('oro_acl_annotation');
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $configuration = new Configuration();
+        $this->processConfiguration($configuration, $configs);
+
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('ownership.yml');
         $loader->load('services.yml');
-
     }
 }

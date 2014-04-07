@@ -6,11 +6,11 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 
 abstract class OroKernel extends Kernel
 {
-
     /**
      * {@inheritdoc}
      */
@@ -18,11 +18,12 @@ abstract class OroKernel extends Kernel
     {
         parent::initializeBundles();
 
-        foreach ($this->getBundles() as $bundle) {
-            if (method_exists($bundle, 'init')) {
-                $bundle->init($this);
-            }
+        // pass bundles to CumulativeResourceManager
+        $bundles       = [];
+        foreach ($this->bundles as $name => $bundle) {
+            $bundles[$name] = get_class($bundle);
         }
+        CumulativeResourceManager::getInstance()->setBundles($bundles);
     }
 
     /**
@@ -32,6 +33,9 @@ abstract class OroKernel extends Kernel
      */
     public function registerBundles()
     {
+        // clear a state of CumulativeResourceManager
+        CumulativeResourceManager::getInstance()->clear();
+
         $bundles = array();
 
         if (!$this->getCacheDir()) {

@@ -5,8 +5,10 @@ namespace Oro\Bundle\QueryDesignerBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroQueryDesignerBundle extends Bundle
 {
@@ -15,9 +17,9 @@ class OroQueryDesignerBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/query_designer.yml'
+            new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
         );
     }
 

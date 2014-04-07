@@ -3,13 +3,11 @@
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Yaml\Yaml;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class OroThemeExtension extends Extension
 {
@@ -50,25 +48,10 @@ class OroThemeExtension extends Extension
     {
         $result = array();
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dir        = dirname($reflection->getFilename()) . '/Resources/public/themes';
-            if (is_dir($dir)) {
-                $finder = new Finder();
-                $finder
-                    ->files()
-                    ->path('#^\w+/settings.yml#')
-                    ->in($dir);
-
-                /** @var SplFileInfo $file */
-                foreach ($finder as $file) {
-                    $themeName = $file->getPathInfo()->getFilename();
-                    $settings = Yaml::parse($file->getRealPath());
-                    $container->addResource(new FileResource($file->getRealPath()));
-                    $result[$themeName] = $settings;
-                }
-            }
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroThemeBundle');
+        foreach ($resources as $resource) {
+            $result[basename(dirname($resource->path))] = $resource->data;
         }
 
         return $result;

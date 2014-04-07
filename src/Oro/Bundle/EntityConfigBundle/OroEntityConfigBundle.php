@@ -5,10 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceMethodPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceLinkPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass;
+
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroEntityConfigBundle extends Bundle
 {
@@ -17,9 +19,9 @@ class OroEntityConfigBundle extends Bundle
      */
     public function __construct()
     {
-        CumulativeResourceManager::getInstance()->registerResource(
+        CumulativeResourceManager::getInstance()->addResourceLoader(
             $this->getName(),
-            'Resources/config/entity_config.yml'
+            new YamlCumulativeFileLoader('Resources/config/entity_config.yml')
         );
     }
 

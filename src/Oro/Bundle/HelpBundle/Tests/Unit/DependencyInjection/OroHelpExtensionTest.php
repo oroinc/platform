@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension;
+use Oro\Bundle\HelpBundle\OroHelpBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,12 +25,9 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadServices()
     {
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->registerResource(
-                'OroHelpBundle',
-                'Resources/config/oro_help.yml'
-            );
+        CumulativeResourceManager::getInstance()->clear();
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroHelpBundle();
 
         $container = new ContainerBuilder();
 
@@ -56,11 +55,9 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
     {
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles($bundles)
-            ->registerResource(
-                'OroHelpBundle',
-                'Resources/config/oro_help.yml'
-            );
+            ->setBundles($bundles);
+        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
+        $mainBundle = new OroHelpBundle();
 
         $container = new ContainerBuilder();
 
@@ -84,6 +81,9 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function loadConfigurationDataProvider()
     {
+        $bundle1 = new BarBundle();
+        $bundle2 = new FooBundle();
+
         return array(
             'without_bundles' => array(
                 'configs' => array(
@@ -112,8 +112,8 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'bundles' => array(
-                    new BarBundle(),
-                    new FooBundle(),
+                    $bundle1->getName() => get_class($bundle1),
+                    $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedConfiguration' => array(
                     'defaults' => array(

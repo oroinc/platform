@@ -9,6 +9,7 @@
         "php": ">=5.3.3",
         "symfony/framework-bundle": "2.3.*",
         "sylius/flow-bundle": "dev-master",
+        "oro/config": "dev-master",
         "oro/cache-bundle": "dev-master"
     },
     "require-dev": {

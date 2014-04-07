@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResourceManager;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\CacheBundle\Config\CumulativeResource;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -49,9 +47,8 @@ class OroUIExtension extends Extension
         $placeholders = array();
         $items = array();
 
-        $resources = CumulativeResourceManager::getInstance()
-            ->getLoader('OroUIBundle')
-            ->load($container);
+        $configLoader = new CumulativeConfigLoader($container);
+        $resources    = $configLoader->load('OroUIBundle');
         foreach ($resources as $resource) {
             if (isset($resource->data['placeholders'])) {
                 $placeholders = array_replace_recursive($placeholders, $resource->data['placeholders']);
