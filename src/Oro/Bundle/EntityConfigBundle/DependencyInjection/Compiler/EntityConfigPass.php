@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Yaml\Yaml;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class EntityConfigPass implements CompilerPassInterface
 {
@@ -19,29 +19,27 @@ class EntityConfigPass implements CompilerPassInterface
     {
         $providerBagDefinition = $container->getDefinition('oro_entity_config.provider_bag');
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/entity_config.yml';
-            if (is_file($file)) {
-                $bundleConfig = Yaml::parse(realpath($file));
+        $configLoader = new CumulativeConfigLoader(
+            'oro_entity_config',
+            new YamlCumulativeFileLoader('Resources/config/entity_config.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            if (isset($resource->data['oro_entity_config']) && count($resource->data['oro_entity_config'])) {
+                foreach ($resource->data['oro_entity_config'] as $scope => $config) {
+                    $provider = new Definition('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
+                    $provider->setArguments(
+                        [
+                            new Reference('oro_entity_config.config_manager'),
+                            new Reference('service_container'),
+                            $scope,
+                            $config
+                        ]
+                    );
 
-                if (isset($bundleConfig['oro_entity_config']) && count($bundleConfig['oro_entity_config'])) {
-                    foreach ($bundleConfig['oro_entity_config'] as $scope => $config) {
-                        $provider = new Definition('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
-                        $provider->setArguments(
-                            array(
-                                new Reference('oro_entity_config.config_manager'),
-                                new Reference('service_container'),
-                                $scope,
-                                $config
-                            )
-                        );
+                    $container->setDefinition('oro_entity_config.provider.' . $scope, $provider);
 
-                        $container->setDefinition('oro_entity_config.provider.' . $scope, $provider);
-
-                        $providerBagDefinition->addMethodCall('addProvider', array($provider));
-                    }
+                    $providerBagDefinition->addMethodCall('addProvider', array($provider));
                 }
             }
         }
