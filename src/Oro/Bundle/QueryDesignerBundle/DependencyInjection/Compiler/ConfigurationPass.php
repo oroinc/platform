@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -26,8 +27,11 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configs = array();
 
-            $configLoader = new CumulativeConfigLoader($container);
-            $resources    = $configLoader->load('OroQueryDesignerBundle');
+            $configLoader = new CumulativeConfigLoader(
+                'oro_query_designer',
+                new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
+            );
+            $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {
                 $config = $resource->data[Configuration::ROOT_NODE_NAME];
 

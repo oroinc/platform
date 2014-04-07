@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Config;
 
+use Oro\Component\Config\Loader\CumulativeResourceLoader;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
@@ -13,7 +15,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
     /**
      * @var string
      */
-    private $resourceGroup;
+    protected $resource;
 
     /**
      * The list of found the resource
@@ -24,28 +26,35 @@ class CumulativeResource implements ResourceInterface, \Serializable
      *          key   = resource path
      *          value = TRUE
      */
-    private $found = [];
+    protected $found = [];
 
     /**
      * @var int
      *
      * not serializable
      */
-    private $isFreshTimestamp;
+    protected $isFreshTimestamp;
 
     /**
      * @var int|false
      *
      * not serializable
      */
-    private $isFresh;
+    protected $isFresh;
 
     /**
-     * @param string $resourceGroup The name of a resource group
+     * @var CumulativeResourceLoaderCollection
      */
-    public function __construct($resourceGroup)
+    private $resourceLoaders;
+
+    /**
+     * @param string                             $resource        The unique name of a configuration resource
+     * @param CumulativeResourceLoaderCollection $resourceLoaders The resource loaders
+     */
+    public function __construct($resource, CumulativeResourceLoaderCollection $resourceLoaders)
     {
-        $this->resourceGroup = $resourceGroup;
+        $this->resource        = $resource;
+        $this->resourceLoaders = $resourceLoaders;
     }
 
     /**
@@ -53,7 +62,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
      */
     public function getResource()
     {
-        return $this->resourceGroup;
+        return $this->resource;
     }
 
     /**
@@ -63,14 +72,14 @@ class CumulativeResource implements ResourceInterface, \Serializable
     {
         if ($this->isFreshTimestamp !== $timestamp) {
             $this->isFreshTimestamp = $timestamp;
-            $this->isFresh    = true;
+            $this->isFresh          = true;
 
             $bundles = CumulativeResourceManager::getInstance()->getBundles();
-            $loaders = CumulativeResourceManager::getInstance()->getResourceLoaders($this->resourceGroup);
             foreach ($bundles as $bundleClass) {
                 $reflection = new \ReflectionClass($bundleClass);
                 $bundleDir  = dirname($reflection->getFilename());
-                foreach ($loaders as $loader) {
+                /** @var CumulativeResourceLoader $loader */
+                foreach ($this->resourceLoaders as $loader) {
                     if (!$loader->isResourceFresh($bundleClass, $bundleDir, $this, $timestamp)) {
                         $this->isFresh = false;
                         break;
@@ -129,7 +138,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return $this->resourceGroup;
+        return $this->resource;
     }
 
     /**
@@ -137,7 +146,7 @@ class CumulativeResource implements ResourceInterface, \Serializable
      */
     public function serialize()
     {
-        return serialize([$this->resourceGroup, $this->found]);
+        return serialize([$this->resource, $this->found, $this->resourceLoaders]);
     }
 
     /**
@@ -145,6 +154,6 @@ class CumulativeResource implements ResourceInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        list($this->resourceGroup, $this->found) = unserialize($serialized);
+        list($this->resource, $this->found, $this->resourceLoaders) = unserialize($serialized);
     }
 }

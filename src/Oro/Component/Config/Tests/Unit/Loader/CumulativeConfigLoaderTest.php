@@ -2,18 +2,72 @@
 
 namespace Oro\Component\Config\Tests\Unit\Loader;
 
-use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 
 class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $name must not be empty.
+     */
+    public function testConstructorWithNullName()
+    {
+        $loader = new CumulativeConfigLoader(null, null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $name must not be empty.
+     */
+    public function testConstructorWithEmptyName()
+    {
+        $loader = new CumulativeConfigLoader('', null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $resourceLoader must not be empty.
+     */
+    public function testConstructorWithNullResourceLoader()
+    {
+        $loader = new CumulativeConfigLoader('test', null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $resourceLoader must not be empty.
+     */
+    public function testConstructorWithEmptyResourceLoader()
+    {
+        $loader = new CumulativeConfigLoader('test', []);
+    }
+
+    public function testConstructorWithOneResourceLoader()
+    {
+        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+
+        $loader = new CumulativeConfigLoader('test', $resourceLoader);
+        $this->assertAttributeCount(1, 'resourceLoaders', $loader);
+    }
+
+    public function testConstructorWithSeveralResourceLoader()
+    {
+        $resourceLoader1 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader2 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+
+        $loader = new CumulativeConfigLoader('test', [$resourceLoader1, $resourceLoader2]);
+        $this->assertAttributeCount(2, 'resourceLoaders', $loader);
+    }
+
     public function testRegisterResources()
     {
         $bundle1      = new TestBundle1();
@@ -27,14 +81,16 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(['TestBundle1' => $bundle1Class, 'TestBundle2' => $bundle2Class])
-            ->addResourceLoader('test_group', [$resourceLoader1, $resourceLoader2]);
+            ->setBundles(['TestBundle1' => $bundle1Class, 'TestBundle2' => $bundle2Class]);
 
         $container = new ContainerBuilder();
-        $loader    = new CumulativeConfigLoader($container);
-        $loader->registerResources('test_group');
+        $loader    = new CumulativeConfigLoader('test', [$resourceLoader1, $resourceLoader2]);
+        $loader->registerResources($container);
 
-        $expectedResource = new CumulativeResource('test_group');
+        $expectedResource = new CumulativeResource(
+            'test',
+            new CumulativeResourceLoaderCollection([$resourceLoader1, $resourceLoader2])
+        );
         $expectedResource->addFound(
             $bundle1Class,
             str_replace('/', DIRECTORY_SEPARATOR, $bundle1Dir . '/Resources/config/test.yml')
@@ -48,16 +104,6 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResource, $container->getResources()[0]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The container builder must not be null.
-     */
-    public function testRegisterResourcesWithoutContainer()
-    {
-        $loader = new CumulativeConfigLoader();
-        $loader->registerResources('test_group');
-    }
-
     public function testLoad()
     {
         $resourceRelativePath = 'Resources/config/test.yml';
@@ -67,12 +113,11 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->addResourceLoader('test_group', $resourceLoader);
+            ->setBundles(['TestBundle1' => get_class($bundle)]);
 
         $container = new ContainerBuilder();
-        $loader    = new CumulativeConfigLoader($container);
-        $result    = $loader->load('test_group');
+        $loader    = new CumulativeConfigLoader('test', $resourceLoader);
+        $result    = $loader->load($container);
 
         $this->assertEquals(
             [
@@ -86,7 +131,10 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
             $result
         );
 
-        $expectedResource = new CumulativeResource('test_group');
+        $expectedResource = new CumulativeResource(
+            'test',
+            new CumulativeResourceLoaderCollection([$resourceLoader])
+        );
         $expectedResource->addFound(
             get_class($bundle),
             str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/test.yml')
@@ -104,11 +152,10 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->addResourceLoader('test_group', $resourceLoader);
+            ->setBundles(['TestBundle1' => get_class($bundle)]);
 
-        $loader = new CumulativeConfigLoader();
-        $result = $loader->load('test_group');
+        $loader = new CumulativeConfigLoader('test', $resourceLoader);
+        $result = $loader->load();
 
         $this->assertEquals(
             [
@@ -135,11 +182,10 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(['TestBundle1' => get_class($bundle)])
-            ->addResourceLoader('test_group', $resourceLoader);
+            ->setBundles(['TestBundle1' => get_class($bundle)]);
 
-        $loader = new CumulativeConfigLoader();
-        $result = $loader->load('test_group');
+        $loader = new CumulativeConfigLoader('test', $resourceLoader);
+        $result = $loader->load();
 
         $this->assertCount(0, $result);
     }
@@ -165,11 +211,10 @@ class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(['TestBundle1' => get_class($bundle1), 'TestBundle2' => get_class($bundle2)])
-            ->addResourceLoader('test_group', $resourceLoader);
+            ->setBundles(['TestBundle1' => get_class($bundle1), 'TestBundle2' => get_class($bundle2)]);
 
-        $loader = new CumulativeConfigLoader();
-        $result = $loader->load('test_group');
+        $loader = new CumulativeConfigLoader('test', $resourceLoader);
+        $result = $loader->load();
 
         $this->assertEquals([$resource1, $resource2, $resource3], $result);
     }

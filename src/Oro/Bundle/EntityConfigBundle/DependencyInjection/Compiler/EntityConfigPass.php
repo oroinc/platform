@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class EntityConfigPass implements CompilerPassInterface
 {
@@ -18,8 +19,11 @@ class EntityConfigPass implements CompilerPassInterface
     {
         $providerBagDefinition = $container->getDefinition('oro_entity_config.provider_bag');
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroEntityConfigBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_entity_config',
+            new YamlCumulativeFileLoader('Resources/config/entity_config.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             if (isset($resource->data['oro_entity_config']) && count($resource->data['oro_entity_config'])) {
                 foreach ($resource->data['oro_entity_config'] as $scope => $config) {

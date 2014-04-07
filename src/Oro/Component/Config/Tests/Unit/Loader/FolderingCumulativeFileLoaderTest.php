@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Tests\Unit\Loader;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
+use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
@@ -53,7 +54,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = $this->createLoader();
 
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $found = $resource->getFound($bundleClass);
@@ -76,11 +77,11 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = $this->createLoader();
 
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) + 1;
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
@@ -94,11 +95,11 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = $this->createLoader();
 
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) - 1;
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, $resource, $loadTime));
@@ -114,11 +115,11 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = $this->createLoader();
 
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $loadTime = $this->getLastMTime($bundleDir) + 1;
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
@@ -140,14 +141,14 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = $this->createLoader();
 
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
         mkdir(dirname($filePath));
         file_put_contents($filePath, 'test: tmp');
         $loadTime = $this->getLastMTime($bundleDir) + 1;
-        $resource = new CumulativeResource('test_group');
+        $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
         unlink($filePath);
         rmdir(dirname($filePath));

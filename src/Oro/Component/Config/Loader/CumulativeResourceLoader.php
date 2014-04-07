@@ -10,7 +10,7 @@ use Oro\Component\Config\CumulativeResourceInfo;
  * responsible to load resources which can be located in any bundle and does not required any special
  * registration in a bundle.
  */
-interface CumulativeResourceLoader
+interface CumulativeResourceLoader extends \Serializable
 {
     /**
      * Gets the resource

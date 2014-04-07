@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes;
 
 class ClassWOAnnotation
 {

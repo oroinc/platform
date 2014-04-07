@@ -6,7 +6,6 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\OroThemeExtension;
-use Oro\Bundle\ThemeBundle\OroThemeBundle;
 use Oro\Bundle\ThemeBundle\Tests\Unit\Fixtures;
 
 use Oro\Component\Config\CumulativeResourceManager;
@@ -24,8 +23,6 @@ class OroThemeExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
-        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
-        $mainBundle = new OroThemeBundle();
 
         $extension = new OroThemeExtension();
 

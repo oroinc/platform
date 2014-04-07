@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroAsseticExtension extends Extension
 {
@@ -43,8 +44,11 @@ class OroAsseticExtension extends Extension
             'css'              => array()
         );
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroAsseticBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_assetic',
+            new YamlCumulativeFileLoader('Resources/config/assets.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             if (isset($resource->data['css'])) {
                 $result['css'] = array_merge_recursive($result['css'], $resource->data['css']);

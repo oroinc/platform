@@ -7,22 +7,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
 
-use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-
 class OroQueryDesignerBundle extends Bundle
 {
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        CumulativeResourceManager::getInstance()->addResourceLoader(
-            $this->getName(),
-            new YamlCumulativeFileLoader('Resources/config/query_designer.yml')
-        );
-    }
-
     /**
      * {@inheritdoc}
      */

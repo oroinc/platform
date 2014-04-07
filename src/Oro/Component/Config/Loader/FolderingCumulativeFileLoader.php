@@ -27,11 +27,15 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @var array
+     *
+     * not serializable. it sets in initialize method
      */
     protected $preparedRelativeFilePaths;
 
     /**
      * @var string
+     *
+     * not serializable. it sets in initialize method
      */
     protected $resource;
 
@@ -191,6 +195,23 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([$this->folderPlaceholder, $this->folderPattern, $this->fileResourceLoaders]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list($this->folderPlaceholder, $this->folderPattern, $this->fileResourceLoaders) = unserialize($serialized);
+        $this->initialize();
     }
 
     /**

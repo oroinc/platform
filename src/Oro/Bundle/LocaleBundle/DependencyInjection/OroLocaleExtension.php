@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroLocaleExtension extends Extension
 {
@@ -120,8 +121,16 @@ class OroLocaleExtension extends Extension
             'currency_data'  => [],
         ];
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroLocaleBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_locale',
+            [
+                new YamlCumulativeFileLoader('Resources/config/oro/name_format.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/address_format.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/locale_data.yml'),
+                new YamlCumulativeFileLoader('Resources/config/oro/currency_data.yml')
+            ]
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $result[$resource->name] = array_merge($result[$resource->name], $resource->data);
         }

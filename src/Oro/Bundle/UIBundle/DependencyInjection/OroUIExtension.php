@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -47,8 +48,11 @@ class OroUIExtension extends Extension
         $placeholders = array();
         $items = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroUIBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_placeholders',
+            new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             if (isset($resource->data['placeholders'])) {
                 $placeholders = array_replace_recursive($placeholders, $resource->data['placeholders']);

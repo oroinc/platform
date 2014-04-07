@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
-use Oro\Bundle\NavigationBundle\OroNavigationBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 
@@ -31,8 +30,6 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
-        $mainBundle = new OroNavigationBundle();
 
         $container = new ContainerBuilder();
 

@@ -5,7 +5,6 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension;
-use Oro\Bundle\HelpBundle\OroHelpBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 
@@ -26,8 +25,6 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadServices()
     {
         CumulativeResourceManager::getInstance()->clear();
-        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
-        $mainBundle = new OroHelpBundle();
 
         $container = new ContainerBuilder();
 
@@ -56,8 +53,6 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
-        $mainBundle = new OroHelpBundle();
 
         $container = new ContainerBuilder();
 
