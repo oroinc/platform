@@ -10,6 +10,7 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\WidgetModelFactory;
 use Oro\Bundle\DashboardBundle\Model\WidgetsModelCollection;
 use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class Manager
@@ -35,23 +36,31 @@ class Manager
     protected $widgetModelFactory;
 
     /**
+     * @var AclHelper
+     */
+    protected $aclHelper;
+
+    /**
      * Constructor
      *
-     * @param Provider\ConfigProvider  $configProvider
-     * @param SecurityFacade           $securityFacade
-     * @param EntityManager            $entityManager
-     * @param Model\WidgetModelFactory $widgetModelFactory
+     * @param Provider\ConfigProvider                         $configProvider
+     * @param SecurityFacade                                  $securityFacade
+     * @param EntityManager                                   $entityManager
+     * @param WidgetModelFactory                              $widgetModelFactory
+     * @param AclHelper $aclHelper
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         EntityManager $entityManager,
-        WidgetModelFactory $widgetModelFactory
+        WidgetModelFactory $widgetModelFactory,
+        AclHelper $aclHelper
     ) {
         $this->securityFacade = $securityFacade;
         $this->entityManager = $entityManager;
         $this->widgetModelFactory = $widgetModelFactory;
         $this->configProvider = $configProvider;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -74,9 +83,9 @@ class Manager
     public function getDashboards()
     {
         $result = [];
-        $dashboards = $this->getDashboardRepository();
-        //todo: add criteria to find by user id
-        foreach ($dashboards->findAll() as $dashboard) {
+        $qb = $this->getDashboardRepository()->createQueryBuilder('d');
+        $dashboards = $this->aclHelper->apply($qb)->execute();
+        foreach ($dashboards as $dashboard) {
             $dashboardModel = $this->getDashboardModel($dashboard);
             if ($dashboardModel) {
                 $result[] = $dashboardModel;
@@ -115,20 +124,6 @@ class Manager
     }
 
     /**
-     * Returns dashboard configuration
-     *
-     * @param string $name The name of dashboard
-     * @return array
-     */
-    public function getDashboard($name)
-    {
-        $result = $this->configProvider->getDashboardConfigs($name);
-        unset($result['widgets']);
-
-        return $result;
-    }
-
-    /**
      * Returns all widgets for the given dashboard
      *
      * @param Entity\Dashboard $dashboard
@@ -151,23 +146,6 @@ class Manager
     }
 
     /**
-     * Returns widget attributes
-     *
-     * @param string $widgetName The name of widget
-     * @return array
-     */
-    public function getWidgetAttributes($widgetName)
-    {
-        $widget = $this->configProvider->getWidgetConfigs($widgetName);
-        unset($widget['route']);
-        unset($widget['route_parameters']);
-        unset($widget['acl']);
-        unset($widget['items']);
-
-        return $widget;
-    }
-
-    /**
      * Returns widget attributes with attribute name converted to use in widget's TWIG template
      *
      * @param string $widgetName The name of widget
@@ -178,7 +156,14 @@ class Manager
         $result = [
             'widgetName' => $widgetName
         ];
-        foreach ($this->getWidgetAttributes($widgetName) as $key => $val) {
+
+        $widget = $this->configProvider->getWidgetConfigs($widgetName);
+        unset($widget['route']);
+        unset($widget['route_parameters']);
+        unset($widget['acl']);
+        unset($widget['items']);
+
+        foreach ($widget as $key => $val) {
             $attrName = 'widget';
             foreach (explode('_', str_replace('-', '_', $key)) as $keyPart) {
                 $attrName .= ucfirst($keyPart);
