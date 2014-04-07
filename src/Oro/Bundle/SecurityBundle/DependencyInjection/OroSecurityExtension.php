@@ -7,7 +7,10 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
+
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -21,9 +24,8 @@ class OroSecurityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configLoader = new CumulativeConfigLoader($container);
-        $configLoader->registerResources('oro_acl_config');
-        $configLoader->registerResources('oro_acl_annotation');
+        self::getAclConfigLoader()->registerResources($container);
+        self::getAclAnnotationLoader()->registerResources($container);
 
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
@@ -31,5 +33,27 @@ class OroSecurityExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('ownership.yml');
         $loader->load('services.yml');
+    }
+
+    /**
+     * @return CumulativeConfigLoader
+     */
+    public static function getAclConfigLoader()
+    {
+        return new CumulativeConfigLoader(
+            'oro_acl_config',
+            new YamlCumulativeFileLoader('Resources/config/acl.yml')
+        );
+    }
+
+    /**
+     * @return CumulativeConfigLoader
+     */
+    public static function getAclAnnotationLoader()
+    {
+        return new CumulativeConfigLoader(
+            'oro_acl_annotation',
+            new AclAnnotationCumulativeResourceLoader(['Controller'])
+        );
     }
 }

@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroSidebarExtension extends Extension
 {
@@ -44,8 +46,15 @@ class OroSidebarExtension extends Extension
     {
         $result = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroSidebarBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_sidebar',
+            new FolderingCumulativeFileLoader(
+                '{folder}',
+                '\w+',
+                new YamlCumulativeFileLoader('Resources/public/sidebar_widgets/{folder}/widget.yml')
+            )
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $result[basename(dirname($resource->path))] = $resource->data;
         }

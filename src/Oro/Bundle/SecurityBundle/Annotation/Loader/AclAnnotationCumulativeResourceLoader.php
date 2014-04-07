@@ -103,6 +103,22 @@ class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->subDirs);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $this->subDirs = unserialize($serialized);
+    }
+
+    /**
      * @param $bundleDir
      * @return array
      */

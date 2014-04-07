@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class LoadPass implements CompilerPassInterface
 {
@@ -16,8 +17,11 @@ class LoadPass implements CompilerPassInterface
     {
         $classes = [];
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroSoapBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_soap',
+            new YamlCumulativeFileLoader('Resources/config/oro/soap.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $classes = array_merge($classes, $resource->data['classes']);
         }

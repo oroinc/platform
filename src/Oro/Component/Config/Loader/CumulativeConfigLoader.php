@@ -11,34 +11,53 @@ use Oro\Component\Config\CumulativeResourceManager;
 class CumulativeConfigLoader
 {
     /**
-     * @var ContainerBuilder
+     * @var string
      */
-    protected $container;
+    protected $name;
 
     /**
-     * @param ContainerBuilder|null $container
+     * @var CumulativeResourceLoaderCollection
      */
-    public function __construct(ContainerBuilder $container = null)
+    protected $resourceLoaders;
+
+    /**
+     * @param string                                              $name The unique name of a configuration resource
+     * @param CumulativeResourceLoader|CumulativeResourceLoader[] $resourceLoader
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($name, $resourceLoader)
     {
-        $this->container = $container;
+        if (empty($name)) {
+            throw new \InvalidArgumentException('$name must not be empty.');
+        }
+        if (empty($resourceLoader)) {
+            throw new \InvalidArgumentException('$resourceLoader must not be empty.');
+        }
+
+        $this->name            = $name;
+        $this->resourceLoaders = new CumulativeResourceLoaderCollection(
+            is_array($resourceLoader) ? $resourceLoader : [$resourceLoader]
+        );
     }
 
     /**
-     * Loads resources of the given group
+     * Loads resources
      *
-     * @param string $resourceGroup The name of a resource group
+     * @param ContainerBuilder|null $container The container builder
+     *                                         If NULL the loaded resources will not be registered in the container
+     *                                         and as result will not be monitored for changes
      * @return CumulativeResourceInfo[]
      */
-    public function load($resourceGroup)
+    public function load(ContainerBuilder $container = null)
     {
         $result = [];
 
-        $bundles         = CumulativeResourceManager::getInstance()->getBundles();
-        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders($resourceGroup);
+        $bundles = CumulativeResourceManager::getInstance()->getBundles();
         foreach ($bundles as $bundleClass) {
             $reflection = new \ReflectionClass($bundleClass);
             $bundleDir  = dirname($reflection->getFilename());
-            foreach ($resourceLoaders as $resourceLoader) {
+            /** @var CumulativeResourceLoader $resourceLoader */
+            foreach ($this->resourceLoaders as $resourceLoader) {
                 $resource = $resourceLoader->load($bundleClass, $bundleDir);
                 if (null !== $resource) {
                     if (is_array($resource)) {
@@ -52,8 +71,8 @@ class CumulativeConfigLoader
             }
         }
 
-        if ($this->container) {
-            $this->registerResources($resourceGroup);
+        if ($container) {
+            $this->registerResources($container);
         }
 
         return $result;
@@ -61,27 +80,23 @@ class CumulativeConfigLoader
 
     /**
      * Adds a resource objects to the container.
-     * These objects will be used to check whether resources of the given group are up-to-date or not.
+     * These objects will be used to monitor whether resources are up-to-date or not.
      *
-     * @param string $resourceGroup The name of a resource group
+     * @param ContainerBuilder $container
      * @throws \RuntimeException if the container builder was not specified
      */
-    public function registerResources($resourceGroup)
+    public function registerResources(ContainerBuilder $container)
     {
-        if (!$this->container) {
-            throw new \RuntimeException('The container builder must not be null.');
-        }
-
-        $bundles         = CumulativeResourceManager::getInstance()->getBundles();
-        $resourceLoaders = CumulativeResourceManager::getInstance()->getResourceLoaders($resourceGroup);
-        $resource        = new CumulativeResource($resourceGroup);
-        foreach ($resourceLoaders as $resourceLoader) {
+        $bundles  = CumulativeResourceManager::getInstance()->getBundles();
+        $resource = new CumulativeResource($this->name, $this->resourceLoaders);
+        /** @var CumulativeResourceLoader $resourceLoader */
+        foreach ($this->resourceLoaders as $resourceLoader) {
             foreach ($bundles as $bundleClass) {
                 $reflection = new \ReflectionClass($bundleClass);
                 $bundleDir  = dirname($reflection->getFilename());
                 $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $resource);
             }
         }
-        $this->container->addResource($resource);
+        $container->addResource($resource);
     }
 }

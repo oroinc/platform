@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
-
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 
 class AclConfigLoader implements AclAnnotationLoaderInterface
 {
@@ -16,8 +15,8 @@ class AclConfigLoader implements AclAnnotationLoaderInterface
      */
     public function load(AclAnnotationStorage $storage)
     {
-        $configLoader = new CumulativeConfigLoader();
-        $resources    = $configLoader->load('oro_acl_config');
+        $configLoader = OroSecurityExtension::getAclConfigLoader();
+        $resources    = $configLoader->load();
         foreach ($resources as $resource) {
             foreach ($resource->data as $id => $data) {
                 $data['id'] = $id;

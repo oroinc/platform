@@ -10,6 +10,7 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDec
 use Oro\Bundle\ConfigBundle\Provider\Provider;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {
@@ -21,8 +22,11 @@ class SystemConfigurationPass implements CompilerPassInterface
         $config    = array();
         $processor = new ProcessorDecorator(new Processor());
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroConfigBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_system_configuration',
+            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $config = $processor->merge($config, $resource->data);
         }

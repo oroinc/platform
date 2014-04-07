@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -23,8 +24,11 @@ class OroConfigExtension extends Extension
     {
         $data = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('entity_output');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_entity_output',
+            new YamlCumulativeFileLoader('Resources/config/entity_output.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $data = array_merge($data, $resource->data);
         }

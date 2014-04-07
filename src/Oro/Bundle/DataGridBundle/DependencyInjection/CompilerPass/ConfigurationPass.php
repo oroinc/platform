@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -40,8 +41,11 @@ class ConfigurationPass implements CompilerPassInterface
         if ($container->hasDefinition(self::PROVIDER_SERVICE_ID)) {
             $config = [];
 
-            $configLoader = new CumulativeConfigLoader($container);
-            $resources    = $configLoader->load('OroDataGridBundle');
+            $configLoader = new CumulativeConfigLoader(
+                'oro_datagrid',
+                new YamlCumulativeFileLoader('Resources/config/datagrid.yml')
+            );
+            $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {
                 if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
                     $config = array_merge_recursive($config, $resource->data[self::ROOT_PARAMETER]);

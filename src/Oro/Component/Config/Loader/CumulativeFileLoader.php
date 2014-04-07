@@ -14,11 +14,15 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @var string
+     *
+     * not serializable. it sets in setRelativeFilePath method
      */
     protected $resource;
 
     /**
      * @var string
+     *
+     * not serializable. it sets in setRelativeFilePath method
      */
     protected $resourceName;
 
@@ -117,6 +121,22 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             // check new resource
             return !is_file($path);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->relativeFilePath);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $this->setRelativeFilePath(unserialize($serialized));
     }
 
     /**

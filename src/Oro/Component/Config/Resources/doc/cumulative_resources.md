@@ -5,33 +5,7 @@ This resource type provides a way to load configuration from any bundle without 
 
 Introdution
 -----------
-Please imagine your bundle need to load configuration from `Resources\config\acme.yml` file located in any other bundle. In other words you need to allow other bundles to provide additional configuration to your bundle. In this case a bundle which need this configuration should do the following steps:
-
- - Register configuration file loader in a constructor of your bundle. For example:
-
-``` php
-<?php
-
-namespace Acme\Bundle\SomeBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-
-class AcmeSomeBundle extends Bundle
-{
-    public function __construct()
-    {
-        // register acme.yml as configuration resource
-        CumulativeResourceManager::getInstance()->addResourceLoader(
-            $this->getName(), // resource group name, in this case it is 'AcmeSomeBundle'
-            new YamlCumulativeFileLoader('Resources/config/acme.yml')
-        );
-    }
-}
-```
- - Add a code to load configuration in the extension or a compiler pass of your bundle. For example:
+Please imagine your bundle need to load configuration from `Resources\config\acme.yml` file located in any other bundle. In other words you need to allow other bundles to provide additional configuration to your bundle. In this case a bundle which need this configuration can use [CumulativeConfigLoader](../../Loader/CumulativeConfigLoader.php). The following example demonstrates this:
 
 ``` php
 <?php
@@ -44,6 +18,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class AcmeSomeExtension extends Extension
 {
@@ -51,8 +26,11 @@ class AcmeSomeExtension extends Extension
     {
         // load configuration from acme.yml which can be located in any bundle
         $acmeConfig = [];
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('AcmeSomeBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'acme_config',
+            new YamlCumulativeFileLoader('Resources/config/acme.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $acmeConfig = array_merge($acmeConfig, $resource->data);
         }
@@ -67,7 +45,7 @@ class AcmeSomeExtension extends Extension
 
 Initialization
 --------------
-The `Cumulative Resources` routine need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing state of [CumulativeResourceManager](../../CumulativeResourceManager.php) before constructors of any bundle will be called and set list of available bundles for this manager. The following example shows how it is done in ORO platform:
+The `Cumulative Resources` routine need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing state of [CumulativeResourceManager](../../CumulativeResourceManager.php), which should be done before constructors of any bundle will be called, and set list of available bundles. The following example shows how it is done in ORO platform:
 
 ``` php
 <?php
@@ -117,27 +95,6 @@ Examples
 
 ### Load configuration from different file types, for example YAML and XML
 
- - registration
-
-``` php
-<?php
-
-class AcmeSomeBundle extends Bundle
-{
-    public function __construct()
-    {
-        CumulativeResourceManager::getInstance()->addResourceLoader(
-            $this->getName(),
-            [
-                new YamlCumulativeFileLoader('Resources/config/acme.yml')
-                new MyXmlCumulativeFileLoader('Resources/config/acme.xml')
-            ]
-        );
-    }
-}
-```
- - loading
-
 ``` php
 <?php
 
@@ -146,8 +103,14 @@ class AcmeSomeExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $acmeConfig = [];
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('AcmeSomeBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'acme_config',
+            [
+                new YamlCumulativeFileLoader('Resources/config/acme.yml')
+                new MyXmlCumulativeFileLoader('Resources/config/acme.xml')
+            ]
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $acmeConfig = array_merge($acmeConfig, $resource->data);
         }
@@ -156,27 +119,6 @@ class AcmeSomeExtension extends Extension
 ```
 
 ### Load configuration from different files
-
- - registration
-
-``` php
-<?php
-
-class AcmeSomeBundle extends Bundle
-{
-    public function __construct()
-    {
-        CumulativeResourceManager::getInstance()->addResourceLoader(
-            $this->getName(),
-            [
-                new YamlCumulativeFileLoader('Resources/config/foo.yml')
-                new YamlCumulativeFileLoader('Resources/config/bar.yml')
-            ]
-        );
-    }
-}
-```
- - loading
 
 ``` php
 <?php
@@ -189,8 +131,14 @@ class AcmeSomeExtension extends Extension
             'foo' => [],
             'bar' => []
         ];
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('AcmeSomeBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'acme_config',
+            [
+                new YamlCumulativeFileLoader('Resources/config/foo.yml')
+                new YamlCumulativeFileLoader('Resources/config/bar.yml')
+            ]
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $acmeConfig[$resource->name] = array_merge($acmeConfig[$resource->name], $resource->data);
         }
@@ -200,28 +148,6 @@ class AcmeSomeExtension extends Extension
 
 ### Load configuration files located in different folders
 
- - registration
-
-``` php
-<?php
-
-class AcmeSomeBundle extends Bundle
-{
-    public function __construct()
-    {
-        CumulativeResourceManager::getInstance()->addResourceLoader(
-            $this->getName(),
-            new FolderingCumulativeFileLoader(
-                '{folder}',
-                '\w+',
-                new YamlCumulativeFileLoader('Resources/config/widgets/{folder}/widget.yml')
-            )
-        );
-    }
-}
-```
- - loading
-
 ``` php
 <?php
 
@@ -230,10 +156,18 @@ class AcmeSomeExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $acmeConfig = [];
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('AcmeSomeBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'acme_config',
+            new FolderingCumulativeFileLoader(
+                '{folder}', // placeholder name
+                '\w+',      // regex pattern the folder should conform
+                new YamlCumulativeFileLoader('Resources/config/widgets/{folder}/widget.yml')
+            )
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $acmeConfig[basename(dirname($resource->path))] = $resource->data;
+            $folderName = basename(dirname($resource->path)); 
+            $acmeConfig[$folderName] = $resource->data;
         }
     }
 }

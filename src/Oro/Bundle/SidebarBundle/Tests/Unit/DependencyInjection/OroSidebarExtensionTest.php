@@ -5,7 +5,6 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
-use Oro\Bundle\SidebarBundle\OroSidebarBundle;
 use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures;
 
 use Oro\Component\Config\CumulativeResourceManager;
@@ -23,8 +22,6 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
-        // create main bundle to call CumulativeResourceManager::getInstance()->addResourceLoader
-        $mainBundle = new OroSidebarBundle();
 
         $extension = new OroSidebarExtension();
 

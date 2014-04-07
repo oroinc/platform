@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -27,8 +28,11 @@ class OroNavigationExtension extends Extension
         $entitiesConfig = array();
         $titlesConfig = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroNavigationBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_navigation',
+            new YamlCumulativeFileLoader('Resources/config/navigation.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             // Merge menu from bundle configuration
             if (isset($resource->data[self::MENU_CONFIG_KEY])) {

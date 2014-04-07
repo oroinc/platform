@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroDashboardExtension extends Extension
 {
@@ -18,8 +19,11 @@ class OroDashboardExtension extends Extension
     {
         $dashboardConfigs = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroDashboardBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_dashboard',
+            new YamlCumulativeFileLoader('Resources/config/dashboard.yml')
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $dashboardConfigs[] = $resource->data['oro_dashboard_config'];
         }

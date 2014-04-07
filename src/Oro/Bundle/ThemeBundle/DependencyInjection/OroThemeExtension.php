@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroThemeExtension extends Extension
 {
@@ -48,8 +50,15 @@ class OroThemeExtension extends Extension
     {
         $result = array();
 
-        $configLoader = new CumulativeConfigLoader($container);
-        $resources    = $configLoader->load('OroThemeBundle');
+        $configLoader = new CumulativeConfigLoader(
+            'oro_theme',
+            new FolderingCumulativeFileLoader(
+                '{folder}',
+                '\w+',
+                new YamlCumulativeFileLoader('Resources/public/themes/{folder}/settings.yml')
+            )
+        );
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $result[basename(dirname($resource->path))] = $resource->data;
         }
