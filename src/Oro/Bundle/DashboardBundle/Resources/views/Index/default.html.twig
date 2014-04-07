@@ -10,7 +10,7 @@
                     {{
                         oro_widget_render({
                             'widgetType': 'block',
-                            'url': path(widget.route, widget.route_parameters)
+                            'url': path(widget.config.route, widget.config.route_parameters)
                         })
                     }}
                 {% endif %}
@@ -41,8 +41,10 @@
                         <div class="dashboard-selector-container">
                             <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
                             <select id="dashboard_selector">
-                                {% for name,label in dashboards %}
-                                    <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
+                                {% for dashboardModel in dashboards %}
+                                    <option value="{{ dashboardModel.dashboard.name }}"{% if dashboardModel.dashboard.name == dashboardName %} selected="selected"{% endif %}>
+                                        {{ dashboardModel.config.label|trans }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>

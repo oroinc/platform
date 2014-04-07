@@ -2,14 +2,22 @@
 
 namespace Oro\Bundle\DashboardBundle;
 
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\WidgetModelFactory;
+use Oro\Bundle\DashboardBundle\Model\WidgetsModelCollection;
+use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class Manager
 {
     /**
-     * @var array
+     * @var ConfigProvider
      */
-    protected $config;
+    protected $configProvider;
 
     /**
      * @var SecurityFacade
@@ -17,15 +25,33 @@ class Manager
     protected $securityFacade;
 
     /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @var WidgetModelFactory
+     */
+    protected $widgetModelFactory;
+
+    /**
      * Constructor
      *
-     * @param array          $config
-     * @param SecurityFacade $securityFacade
+     * @param Provider\ConfigProvider  $configProvider
+     * @param SecurityFacade           $securityFacade
+     * @param EntityManager            $entityManager
+     * @param Model\WidgetModelFactory $widgetModelFactory
      */
-    public function __construct(array $config, SecurityFacade $securityFacade)
-    {
-        $this->config         = $config;
+    public function __construct(
+        ConfigProvider $configProvider,
+        SecurityFacade $securityFacade,
+        EntityManager $entityManager,
+        WidgetModelFactory $widgetModelFactory
+    ) {
         $this->securityFacade = $securityFacade;
+        $this->entityManager = $entityManager;
+        $this->widgetModelFactory = $widgetModelFactory;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -35,24 +61,57 @@ class Manager
      */
     public function getDefaultDashboardName()
     {
-        return $this->config['default_dashboard'];
+        return $this->configProvider->getConfig('default_dashboard');
     }
 
     /**
      * Returns all dashboards
      *
-     * @return array
-     *      key = dashboard name
-     *      value = dashboard label name
+     * @throws Exception\InvalidConfigurationException
+     *
+     * @return DashboardModel[]
      */
     public function getDashboards()
     {
         $result = [];
-        foreach ($this->config['dashboards'] as $name => &$dashboard) {
-            $result[$name] = $dashboard['label'];
+        $dashboards = $this->getDashboardRepository();
+        //todo: add criteria to find by user id
+        foreach ($dashboards->findAll() as $dashboard) {
+            $dashboardModel = $this->getDashboardModel($dashboard);
+            if ($dashboardModel) {
+                $result[] = $dashboardModel;
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * @param       $id
+     * @param array $widgetState
+     * @return bool is widget exist
+     */
+    public function saveWidget($id, array $widgetState)
+    {
+        $widget = $this->entityManager->getRepository('OroDashboardBundle:DashboardWidget')
+            ->find($id);
+
+        if ($widget == null || !$this->securityFacade->isGranted('EDIT', $widget)) {
+            return false;
+        }
+
+        foreach ($widgetState as $property => $value) {
+            $methodName = 'set' . ucfirst($property);
+            if ($property == 'id' || !method_exists($widget, $methodName)) {
+                continue;
+            }
+
+            $widget->$methodName($value);
+        }
+
+        $this->entityManager->persist($widget);
+
+        return true;
     }
 
     /**
@@ -63,7 +122,7 @@ class Manager
      */
     public function getDashboard($name)
     {
-        $result = $this->config['dashboards'][$name];
+        $result = $this->configProvider->getDashboardConfigs($name);
         unset($result['widgets']);
 
         return $result;
@@ -72,27 +131,23 @@ class Manager
     /**
      * Returns all widgets for the given dashboard
      *
-     * @param string $name The name of dashboard
-     * @return array
+     * @param Entity\Dashboard $dashboard
+     *
+     * @throws InvalidConfigurationException
+     *
+     * @return DashboardModel
      */
-    public function getDashboardWidgets($name)
+    public function getDashboardModel(Dashboard $dashboard)
     {
-        $result = $this->config['dashboards'][$name]['widgets'];
-        foreach (array_keys($result) as $widgetName) {
-            $widget = $result[$widgetName];
-            if (isset($this->config['widgets'][$widgetName])) {
-                $widget = array_merge_recursive($widget, $this->config['widgets'][$widgetName]);
-            }
-            if (!isset($widget['acl']) || $this->securityFacade->isGranted($widget['acl'])) {
-                unset($widget['acl']);
-                unset($widget['items']);
-                $result[$widgetName] = $widget;
-            } else {
-                unset($result[$widgetName]);
-            }
+        if (!$this->securityFacade->isGranted('VIEW', $dashboard)) {
+            return null;
         }
 
-        return $result;
+        $dashboardConfig = $this->configProvider->getDashboardConfigs($dashboard->getName());
+
+        $widgetsCollection = new WidgetsModelCollection($dashboard, $this->widgetModelFactory);
+
+        return new DashboardModel($widgetsCollection, $dashboardConfig, $dashboard);
     }
 
     /**
@@ -103,7 +158,7 @@ class Manager
      */
     public function getWidgetAttributes($widgetName)
     {
-        $widget = $this->config['widgets'][$widgetName];
+        $widget = $this->configProvider->getWidgetConfigs($widgetName);
         unset($widget['route']);
         unset($widget['route_parameters']);
         unset($widget['acl']);
@@ -142,9 +197,10 @@ class Manager
      */
     public function getWidgetItems($widgetName)
     {
-        $items = isset($this->config['widgets'][$widgetName]['items'])
-            ? $this->config['widgets'][$widgetName]['items']
-            : [];
+        $widgetConfig = $this->configProvider->getWidgetConfigs($widgetName);
+
+        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
+
         foreach ($items as $itemName => &$item) {
             if (!isset($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
                 unset($item['acl']);
@@ -154,5 +210,13 @@ class Manager
         }
 
         return $items;
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    protected function getDashboardRepository()
+    {
+        return $this->entityManager->getRepository('OroDashboardBundle:Dashboard');
     }
 }
