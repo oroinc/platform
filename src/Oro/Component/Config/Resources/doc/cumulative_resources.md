@@ -67,7 +67,7 @@ class AcmeSomeExtension extends Extension
 
 Initialization
 --------------
-The `Cumulative Resources` routine need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing a state of [CumulativeResourceManager](../../CumulativeResourceManager.php) before constructors of any bundle will be called and set a list of available bundles for this manager. The following example shows how it is done in ORO platform:
+The `Cumulative Resources` routine need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing state of [CumulativeResourceManager](../../CumulativeResourceManager.php) before constructors of any bundle will be called and set list of available bundles for this manager. The following example shows how it is done in ORO platform:
 
 ``` php
 <?php
@@ -95,7 +95,7 @@ abstract class OroKernel extends Kernel
 
     public function registerBundles()
     {
-        // clear a state of CumulativeResourceManager
+        // clear state of CumulativeResourceManager
         CumulativeResourceManager::getInstance()->clear();
 
         ...

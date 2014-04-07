@@ -33,7 +33,7 @@ abstract class OroKernel extends Kernel
      */
     public function registerBundles()
     {
-        // clear a state of CumulativeResourceManager
+        // clear state of CumulativeResourceManager
         CumulativeResourceManager::getInstance()->clear();
 
         $bundles = array();

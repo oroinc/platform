@@ -47,7 +47,7 @@ class CumulativeResourceManager
     }
 
     /**
-     * Clears a state of this manager
+     * Clears state of this manager
      *
      * @return CumulativeResourceManager
      */
@@ -60,7 +60,7 @@ class CumulativeResourceManager
     }
 
     /**
-     * Gets a list of available bundles
+     * Gets list of available bundles
      *
      * @return array
      */
@@ -70,7 +70,7 @@ class CumulativeResourceManager
     }
 
     /**
-     * Sets a list of available bundles
+     * Sets list of available bundles
      *
      * @param array $bundles
      * @return CumulativeResourceManager
