@@ -9,7 +9,7 @@
                 {% if (isEven and index is even) or (not isEven and index is odd) %}
                     {{
                         oro_widget_render({
-                            'widgetType': 'block',
+                            'widgetType': 'dashboard-item',
                             'url': path(widget.route, widget.route_parameters)
                         })
                     }}

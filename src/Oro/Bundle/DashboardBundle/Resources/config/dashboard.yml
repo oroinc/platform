@@ -1,6 +1,7 @@
 oro_dashboard_config:
     widgets:
         quick_launchpad:
+            label:      oro.dashboard.title.quick_launchpad
             route:      oro_dashboard_itemized_widget
             route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad }
 
