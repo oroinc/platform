@@ -1,9 +1,20 @@
 parameters:
     oro_dashboard.manager.class:      Oro\Bundle\DashboardBundle\Manager
-
+    oro_dashboard.configuration.loader.class: Oro\Bundle\DashboardBundle\Configuration\ConfigurationLoader
+    oro_dashboard.configuration.manager.class: Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager
 services:
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%
         arguments:
             - []
             - @oro_security.security_facade
+
+    oro_dashboard.configuration.loader:
+        class: %oro_dashboard.configuration.loader.class%
+        arguments:
+            - %kernel.bundles%
+
+    oro_dashboard.configuration.manager:
+        class: %oro_dashboard.configuration.manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager

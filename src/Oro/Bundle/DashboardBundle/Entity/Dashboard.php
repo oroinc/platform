@@ -49,7 +49,7 @@ class Dashboard
     /**
      * @var string
      *
-     * @ORM\Column(name="label", type="string", length=255)
+     * @ORM\Column(name="label", type="string", length=255, nullable=true)
      */
     protected $label;
 
