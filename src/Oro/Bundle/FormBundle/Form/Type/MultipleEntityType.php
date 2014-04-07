@@ -21,7 +21,7 @@ class MultipleEntityType extends AbstractType
     protected $entityManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade
      */
     protected $securityFacade;
 
