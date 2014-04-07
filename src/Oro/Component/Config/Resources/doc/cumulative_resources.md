@@ -5,7 +5,7 @@ This resource type provides a way to load configuration from any bundle without 
 
 Introdution
 -----------
-Please imagine your bundle need to load configuration from `Resources\config\acme.yml` file located in any other bundle. In other words you need to allow other bundles to provide additional configuration to your bundle. In this case a bundle which need this configuration should do the following:
+Please imagine your bundle need to load configuration from `Resources\config\acme.yml` file located in any other bundle. In other words you need to allow other bundles to provide additional configuration to your bundle. In this case a bundle which need this configuration should do the following steps:
 
  - Register configuration file loader in a constructor of your bundle. For example:
 
@@ -67,7 +67,7 @@ class AcmeSomeExtension extends Extension
 
 Initialization
 --------------
-The `Cumulative Resources` runtine  need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing a state of [CumulativeResourceManager](../../CumulativeResourceManager.php) before constructors of any bundle will be called and set a list of available bundles for this manager. The following example shows how it is done in ORO platform:
+The `Cumulative Resources` routine need to be initialized before you can use it. It can be done in your application Kernel class. The initialization steps include clearing a state of [CumulativeResourceManager](../../CumulativeResourceManager.php) before constructors of any bundle will be called and set a list of available bundles for this manager. The following example shows how it is done in ORO platform:
 
 ``` php
 <?php
