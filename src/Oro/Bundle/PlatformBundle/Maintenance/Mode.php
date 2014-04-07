@@ -67,4 +67,18 @@ class Mode
     {
         return $this->factory->getDriver()->decide();
     }
+
+    /**
+     * Turn on maintenance mode and register shutdown function to turn it off
+     */
+    public function activate()
+    {
+        $this->on();
+
+        register_shutdown_function(
+            function () {
+                $this->off();
+            }
+        );
+    }
 }
