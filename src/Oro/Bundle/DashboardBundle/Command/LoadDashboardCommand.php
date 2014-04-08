@@ -16,7 +16,7 @@ class LoadDashboardCommand extends ContainerAwareCommand
     const COMMAND_NAME = 'oro:dashboard:load';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -27,15 +27,15 @@ class LoadDashboardCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
 
         /** @var ConfigProvider $configurationProvider */
-        $configurationManager  = $container->get('oro_dashboard.configuration.manager');
-        $em                    = $container->get('doctrine.orm.entity_manager');
+        $configurationManager = $container->get('oro_dashboard.configuration.manager');
+        $em                   = $container->get('doctrine.orm.entity_manager');
 
         $output->writeln('Load dashboard configuration');
 

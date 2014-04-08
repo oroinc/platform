@@ -115,6 +115,8 @@ class ConfigurationManager
     /**
      * @param string $widgetName
      * @param array  $widgetOptions
+     *
+     * @return DashboardWidget
      */
     public function saveWidgetConfiguration(Dashboard $dashboard, $widgetName, array $widgetConfiguration)
     {
