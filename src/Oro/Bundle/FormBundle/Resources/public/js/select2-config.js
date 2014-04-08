@@ -81,6 +81,9 @@ define(['jquery', 'underscore'
             if (this.config.dropdownAutoWidth === undefined) {
                 this.config.dropdownAutoWidth = true;
             }
+            if (this.config.openOnEnter === undefined) {
+                this.config.openOnEnter = null;
+            }
             return this.config;
         },
 

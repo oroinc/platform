@@ -14,7 +14,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
     return Backbone.View.extend({
         options: {
             addedElement:              null,
-            allowAction:               false,
+            allowAction:               true,
             collection:                null,
             defaultElement:            null,
             elementTemplate:           null,
@@ -32,7 +32,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template)
+            this.template = _.template(this.options.template);
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
