@@ -46,7 +46,7 @@ class DashboardModel
     }
 
     /**
-     * @return DashboardWidget[]
+     * @return WidgetsModelCollection
      */
     public function getWidgets()
     {

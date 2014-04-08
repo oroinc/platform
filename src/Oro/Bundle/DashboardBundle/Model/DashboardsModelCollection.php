@@ -29,7 +29,7 @@ class DashboardsModelCollection implements \Iterator, \Countable
      *
      * @return null|DashboardModel
      */
-    public function getByName($name)
+    public function findByName($name)
     {
         return $this->findByCriteria('name', $name);
     }
@@ -39,7 +39,7 @@ class DashboardsModelCollection implements \Iterator, \Countable
      *
      * @return null|DashboardModel
      */
-    public function getById($id)
+    public function findById($id)
     {
         return $this->findByCriteria('id', $id);
     }
@@ -56,7 +56,7 @@ class DashboardsModelCollection implements \Iterator, \Countable
     {
         $getter = 'get' . ucfirst($name);
 
-        if (!method_exists('\Oro\Bundle\DashboardBundle\Entity\Dashboard', $getter)) {
+        if (!method_exists('Oro\Bundle\DashboardBundle\Entity\Dashboard', $getter)) {
             throw new InvalidArgumentException("getter for property {$name} not found");
         }
 

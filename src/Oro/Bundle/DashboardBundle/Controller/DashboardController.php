@@ -36,7 +36,7 @@ class DashboardController extends Controller
             return $this->render('OroDashboardBundle:Index:withoutDashboards.html.twig');
         }
 
-        $dashboard = $id ? $dashboards->getById($id) : $dashboards->getByName($manager->getDefaultDashboardName());
+        $dashboard = $id ? $dashboards->findById($id) : $dashboards->findByName($manager->getDefaultDashboardName());
 
         if (!$dashboard) {
             $dashboard = $dashboards->current();
@@ -46,10 +46,7 @@ class DashboardController extends Controller
 
         $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
-        return $this->render(
-            $template,
-            array('dashboards'=>$dashboards, 'dashboard' => $dashboard)
-        );
+        return $this->render($template, array('dashboards' => $dashboards, 'dashboard' => $dashboard));
     }
 
     /**
