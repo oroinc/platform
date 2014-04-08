@@ -91,7 +91,6 @@ class OroDashboardExtension extends Extension
         );
         // remove non visible items and remove 'position' and 'visible' attributes
         foreach ($items as $key => &$item) {
-            unset($item['position']);
             if (isset($item['visible'])) {
                 if (!$item['visible']) {
                     unset($items[$key]);

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\DashboardBundle\Configuration\ConfigurationLoader;
+use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 
 class LoadDashboardCommand extends ContainerAwareCommand
 {
@@ -23,12 +23,6 @@ class LoadDashboardCommand extends ContainerAwareCommand
         $this->setName(self::COMMAND_NAME)
             ->setDescription(
                 'Load dashboard definitions from configuration files to the database'
-            )
-            ->addOption(
-                'directories',
-                'd',
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Directories used to find configuration files'
             );
     }
 
@@ -37,33 +31,23 @@ class LoadDashboardCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedDirectories = $input->getOption('directories');
-        $usedDirectories = $usedDirectories ? : null;
-
         $container = $this->getContainer();
 
-        /** @var ConfigurationLoader $configurationLoader */
-        $configurationLoader = $container->get('oro_dashboard.configuration.loader');
-        $configurations      = $configurationLoader->getDashboardConfiguration($usedDirectories);
-        if ($configurations) {
-            $configurationManager = $container->get('oro_dashboard.configuration.manager');
-            $em                   = $container->get('doctrine.orm.entity_manager');
+        /** @var ConfigProvider $configurationProvider */
+        $configurationManager  = $container->get('oro_dashboard.configuration.manager');
+        $em                    = $container->get('doctrine.orm.entity_manager');
 
-            $dashboards = [];
-            $output->writeln('Load dashboard configuration');
-            foreach ($configurations as $dashboardName => $dashboardConfiguration) {
+        $output->writeln('Load dashboard configuration');
+
+        $dashboards = $configurationManager->saveDashboardConfigurations();
+        if ($dashboards) {
+            foreach ($dashboards as $dashboard) {
                 $output->writeln(
-                    sprintf('  <comment>></comment> <info>%s</info>', $dashboardName)
-                );
-                $dashboards[] = $configurationManager->saveConfiguration(
-                    $dashboardName,
-                    $dashboardConfiguration
+                    sprintf('  <comment>></comment> <info>%s</info>', $dashboard->getName())
                 );
             }
 
             $em->flush($dashboards);
-        } else {
-            $output->writeln('No dashboard configuration found.');
         }
     }
 }

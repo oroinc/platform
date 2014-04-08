@@ -20,7 +20,6 @@ class OroDashboardBundle implements Migration
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_DF2802EF5E237E06');
         $table->addIndex(['user_owner_id'], 'IDX_DF2802EF9EB185F9', []);
         /** End of generate table oro_dashboard **/
 
@@ -42,7 +41,6 @@ class OroDashboardBundle implements Migration
         $table->addColumn('position', 'integer', []);
         $table->addColumn('is_expanded', 'boolean', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'UNIQ_4B6C43AC5E237E06');
         $table->addIndex(['dashboard_id'], 'IDX_4B6C43ACB9D04D2B', []);
         /** End of generate table oro_dashboard_widget **/
 
