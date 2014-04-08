@@ -40,4 +40,18 @@ class RoleRepository extends EntityRepository
 
         return !empty($findResult);
     }
+
+    /**
+     * @param Role $role
+     * @return User
+     */
+    public function getFirstMatchedUser(Role $role)
+    {
+        return $this
+            ->getUserQueryBuilder($role)
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

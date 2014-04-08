@@ -39,6 +39,38 @@
       margin-right: 13px;
     }
   }
+  .dashboard-widget {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+
+    .widget-actions-container, .default-actions-container {
+      .action-wrapper {
+        border-right: 1px solid #ddd;
+        padding: 3px 13px;
+      }
+    }
+    .default-actions-container {
+      .action-wrapper:last-child {
+        border-right: none;
+      }
+    }
+    .title {
+      padding-left: 0;
+      padding-right: 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .dashboard-widget-content {
+      padding-top: 12px;
+    }
+  }
+  .dashboard-widget.collapsed .title {
+    border-bottom: none;
+  }
+  .collapse-expand-action-container {
+    padding-left: 8px;
+    padding-right: 5px;
+  }
 }
 
 .launchpad-widget-content > div {
@@ -94,38 +126,6 @@
   }
 }
 
-.dashboard-widget-content {
-  .nav-tabs {
-    margin-bottom: 0;
-    .active > a,
-    .active > a:hover,
-    .active > a:focus {
-      background-color: #fff;
-    }
-  }
-  .tab-container {
-    position: relative;
-  }
-  .tab-content {
-    overflow: hidden;
-  }
-  .container-fluid {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  .grid-container {
-    margin-top: 0;
-    .grid {
-      border: 0;
-      margin-bottom: 0;
-    }
-  }
-  .no-data {
-    border: 0;
-    margin: 0;
-  }
-}
-
 .quick-launchpad-toolbar{
   width: 100%;
   margin: 0;
@@ -163,10 +163,6 @@
       color: #444;
     }
   }
-}
-
-.dashboard-btn{
-  margin-left: 10px;
 }
 
 .dashboard-link{
