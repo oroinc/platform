@@ -28,13 +28,21 @@ class OroEntityExtendBundle extends Bundle
         ExtendClassLoadingUtils::registerClassLoader($this->kernel->getCacheDir());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function boot()
     {
         $this->ensureInitialized();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
+        parent::build($container);
+
         $this->ensureInitialized();
 
         $container->addCompilerPass(new ConfigLoaderPass());

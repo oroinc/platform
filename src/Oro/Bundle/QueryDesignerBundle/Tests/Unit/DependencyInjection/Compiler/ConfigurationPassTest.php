@@ -3,6 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,20 +15,18 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $bundles    = [
-            'TestBundle1' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1',
-            'TestBundle2' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2'
-        ];
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $result     = null;
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.bundles')
-            ->will($this->returnValue($bundles));
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with(ConfigurationPass::MANAGER_SERVICE_ID)

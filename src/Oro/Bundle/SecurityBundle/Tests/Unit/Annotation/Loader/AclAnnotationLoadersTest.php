@@ -3,9 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+
+use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader;
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclYamlConfigLoader;
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,17 +22,16 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
 
     public function testLoaders()
     {
+        $bundle = new TestBundle();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
+
         $storage = new AclAnnotationStorage();
-        $annotationLoader = new AclAnnotationLoader(
-            array('TestBundle' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle'),
-            array(),
-            new AnnotationReader()
-        );
+        $annotationLoader = new AclAnnotationLoader(new AnnotationReader());
         $annotationLoader->load($storage);
-        $yamlConfigLoader = new AclYamlConfigLoader(
-            array('TestBundle' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle')
-        );
-        $yamlConfigLoader->load($storage);
+        $configLoader = new AclConfigLoader();
+        $configLoader->load($storage);
 
         $a = $storage->findById('user_test_main_controller');
         $this->assertNotNull($a);
@@ -37,7 +40,9 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $a->getPermission());
         $this->assertEquals('Test Group', $a->getGroup());
         $this->assertEquals('Test controller for ACL', $a->getLabel());
-        $a = $storage->find('Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\MainTestController');
+        $a = $storage->find(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\MainTestController'
+        );
         $this->assertNotNull($a);
         $this->assertEquals('user_test_main_controller', $a->getId());
 
@@ -50,7 +55,7 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Group', $a->getGroup());
         $this->assertEquals('Action 1', $a->getLabel());
         $a = $storage->find(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\MainTestController',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\MainTestController',
             'test1Action'
         );
         $this->assertNotNull($a);
@@ -64,12 +69,12 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Another Group', $a->getGroup());
         $this->assertEquals('Action 2', $a->getLabel());
         $a = $storage->find(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\MainTestController',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\MainTestController',
             'test2Action'
         );
         $this->assertEquals('user_test_main_controller_action2', $a->getId());
         $a = $storage->find(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\MainTestController',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\MainTestController',
             'test3Action'
         );
         $this->assertNotNull($a);
@@ -84,7 +89,7 @@ class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test Group', $a->getGroup());
         $this->assertEquals('Test controller', $a->getLabel());
         $a = $storage->find(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\ConfigController',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ConfigController',
             'testAction'
         );
         $this->assertNotNull($a);
