@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\AsseticBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Yaml\Yaml;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroAsseticExtension extends Extension
 {
@@ -42,15 +44,14 @@ class OroAsseticExtension extends Extension
             'css'              => array()
         );
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/assets.yml';
-            if (is_file($file)) {
-                $bundleConfig = Yaml::parse(realpath($file));
-                if (isset($bundleConfig['css'])) {
-                    $result['css'] = array_merge_recursive($result['css'], $bundleConfig['css']);
-                }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_assetic',
+            new YamlCumulativeFileLoader('Resources/config/assets.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            if (isset($resource->data['css'])) {
+                $result['css'] = array_merge_recursive($result['css'], $resource->data['css']);
             }
         }
 
