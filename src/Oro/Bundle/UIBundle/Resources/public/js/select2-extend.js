@@ -104,7 +104,7 @@ define(['jquery', 'jquery.select2'], function ($) {
         populate(results, container, 0, []);
     }
 
-    // Overwrite methods of AbstractSelect2 class
+    // Override methods of AbstractSelect2 class
     (function (prototype) {
         var prepareOpts = prototype.prepareOpts;
         prototype.prepareOpts = function (options) {
@@ -118,4 +118,17 @@ define(['jquery', 'jquery.select2'], function ($) {
             return prepareOpts.call(this, options);
         };
     }(window.Select2['class'].abstract.prototype));
+
+
+    // Override methods of SingleSelect2 class
+    (function (prototype) {
+        var onSelect = prototype.onSelect;
+        prototype.onSelect = function (data, options) {
+            onSelect.apply(this, arguments);
+            // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
+            if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
+                this.focusser.focus();
+            }
+        };
+    }(window.Select2['class'].single.prototype));
 });

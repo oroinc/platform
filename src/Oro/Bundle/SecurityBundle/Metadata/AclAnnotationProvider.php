@@ -131,7 +131,7 @@ class AclAnnotationProvider
      */
     public function warmUpCache()
     {
-        $this->ensureAnnotationsLoaded();
+        $this->loadAnnotations();
     }
 
     /**
@@ -146,20 +146,8 @@ class AclAnnotationProvider
     }
 
     /**
-     * @param  array                $bundleDirectories
-     * @return AclAnnotationStorage
+     * Makes sure that annotations loaded and cached
      */
-    public function getBundleAnnotations(array $bundleDirectories)
-    {
-        $data = new AclAnnotationStorage();
-        foreach ($this->loaders as $loader) {
-            $loader->setBundleDirectories($bundleDirectories);
-            $loader->load($data);
-        }
-
-        return $data;
-    }
-
     protected function ensureAnnotationsLoaded()
     {
         if ($this->storage === null) {
@@ -167,18 +155,28 @@ class AclAnnotationProvider
             if ($this->cache) {
                 $data = $this->cache->fetch(self::CACHE_KEY);
             }
-            if (!$data) {
-                $data = new AclAnnotationStorage();
-                foreach ($this->loaders as $loader) {
-                    $loader->load($data);
-                }
-
-                if ($this->cache) {
-                    $this->cache->save(self::CACHE_KEY, $data);
-                }
+            if ($data) {
+                $this->storage = $data;
+            } else {
+                $this->loadAnnotations();
             }
-
-            $this->storage = $data;
         }
+    }
+
+    /**
+     * Loads annotations and save them in cache
+     */
+    protected function loadAnnotations()
+    {
+        $data = new AclAnnotationStorage();
+        foreach ($this->loaders as $loader) {
+            $loader->load($data);
+        }
+
+        if ($this->cache) {
+            $this->cache->save(self::CACHE_KEY, $data);
+        }
+
+        $this->storage = $data;
     }
 }

@@ -75,7 +75,7 @@ class DoctrineHelper
     }
 
     /**
-     * @param string $entityOrClass
+     * @param string|object $entityOrClass
      * @return EntityManager
      * @throws Exception\NotManageableEntityException
      */

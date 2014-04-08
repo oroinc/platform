@@ -11,6 +11,7 @@
         "kriswallsmith/assetic": "1.1.*@dev",
         "symfony/assetic-bundle": "2.1.*",
         "leafo/lessphp": "dev-master",
+        "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
         "oro/theme-bundle": "dev-master"

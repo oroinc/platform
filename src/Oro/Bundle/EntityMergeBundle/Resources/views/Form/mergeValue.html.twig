@@ -6,14 +6,26 @@
     mixed value           - original value
     boolean isListValue   - is value represents list
 #}
-{% if isListValue %}
-    {% if value|length %}
-        <ul>
-            {% for value in convertedValue %}
-                <li>{{ value }}</li>
-            {% endfor %}
-        </ul>
+{% set empty_cell %}
+    <span class="empty">-- {{ 'oro.entity_merge.form.empty'|trans }} --</span>
+{% endset %}
+
+{% if convertedValue|length %}
+    {% if isListValue %}
+    {% set hasVisibleValues = false %}
+    <ul>
+        {% for value in convertedValue if value|length %}
+            {% set hasVisibleValues = true %}
+            <li> {{ value }} </li>
+        {% endfor %}
+
+        {% if not hasVisibleValues %}
+            <li>{{ empty_cell }}</li>
+        {% endif %}
+    </ul>
+    {% else %}
+        {{ convertedValue }}
     {% endif %}
 {% else %}
-    {{ convertedValue }}
+    {{ empty_cell }}
 {% endif %}
