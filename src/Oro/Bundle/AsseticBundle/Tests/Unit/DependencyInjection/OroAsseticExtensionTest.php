@@ -1,10 +1,13 @@
 <?php
+
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
 use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,6 +16,10 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $configs, array $expectedBundles, array $expectedConfiguration)
     {
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($expectedBundles);
+
         $extension = new OroAsseticExtension();
 
         $container = new ContainerBuilder();
@@ -28,6 +35,8 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function loadDataProvider()
     {
+        $bundle = new Fixtures\TestBundle();
+
         return array(
             'minimal' => array(
                 'configs' => array(
@@ -47,7 +56,7 @@ class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
                         'css_debug_all' => true,
                     )
                 ),
-                'expectedBundles' => array(new Fixtures\TestBundle()),
+                'expectedBundles' => array($bundle->getName() => get_class($bundle)),
                 'expectedConfiguration' => array(
                     'css_debug_groups' => array('css_group'),
                     'css_debug_all' => true,
