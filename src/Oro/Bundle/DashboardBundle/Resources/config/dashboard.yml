@@ -16,6 +16,3 @@ oro_dashboard_config:
             label:      oro.dashboard.title.quick_launchpad
             twig:       OroDashboardBundle:Index:quickLaunchpad.html.twig
             position:   10
-            widgets:
-                quick_launchpad:
-                    position:   10
