@@ -5,23 +5,20 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
+use Oro\Bundle\UIBundle\Tests\Unit\Fixture\UnitTestBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    private $container;
-
     public function testLoad()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $bundle = new UnitTestBundle();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
 
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->will($this->returnValue(array('Oro\Bundle\UIBundle\Tests\Unit\Fixture\UnitTestBundle')));
-
-        $this->container->expects($this->any())
-            ->method('setParameter');
-
-        $extension = new OroUIExtension();
+        $container = new ContainerBuilder();
 
         $extensionConfig = array(
             array(
@@ -41,6 +38,7 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $extension->load($extensionConfig, $this->container);
+        $extension = new OroUIExtension();
+        $extension->load($extensionConfig, $container);
     }
 }
