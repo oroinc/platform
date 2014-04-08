@@ -11,8 +11,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
      * @extends oro.BlockWidget
      */
     return BlockWidget.extend({
-        expanded: true,
-
+        /**
+         * Widget events
+         *
+         * @property {Object}
+         */
         widgetEvents: {
             'click .collapse-expand-action-container .collapse-action': function(event) {
                 event.preventDefault();
@@ -32,6 +35,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             }
         },
 
+        /**
+         * Widget options
+         *
+         * @property {Object}
+         */
         options: _.extend({}, BlockWidget.prototype.options, {
             type: 'dashboard-item',
             actionsContainer: '.widget-actions-container',
@@ -45,8 +53,12 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
                     '</div>' +
                     '<span class="widget-title"><%- title %></span>' +
                     '<div class="pull-right default-actions-container">' +
-                        '<a class="move-action" href="#"><i class="icon-move hide-text"></i></a>' +
-                        '<a class="remove-action" href="#"><i class="icon-trash hide-text"></i></a>' +
+                        '<span class="action-wrapper">' +
+                            '<a class="move-action" href="#"><i class="icon-move hide-text"></i></a>' +
+                        '</span>' +
+                        '<span class="action-wrapper">' +
+                            '<a class="remove-action" href="#"><i class="icon-trash hide-text"></i></a>' +
+                        '</span>' +
                     '</div>' +
                     '<div class="pull-right widget-actions-container"></div>' +
                 '</div>' +
@@ -54,54 +66,83 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             '</div>')
         }),
 
+        /**
+         * Initialize
+         */
         initialize: function() {
             BlockWidget.prototype.initialize.apply(this, arguments);
             this.once('widgetRender', this._initWidgetCollapseState);
         },
 
+        /**
+         * Set initial widget collapse state
+         */
         _initWidgetCollapseState: function() {
             if (this.isCollapsed()) {
-                this._collapse();
+                this._setCollapsed();
             } else {
-                this._expand();
+                this._setExpanded();
             }
         },
 
+        /**
+         * Collapse widget
+         */
         collapse: function() {
-            this._collapse();
+            this._setCollapsed();
             this.trigger('collapse', this.$el, this);
             mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
         },
 
-        _collapse: function() {
-            this.widget.attr('collapsed', 1);
+        /**
+         * Set collapsed state
+         */
+        _setCollapsed: function() {
+            this.widget.addClass('collapsed');
             this.widgetContentContainer.hide();
             $('.collapse-expand-action-container .collapse-action').hide();
             $('.collapse-expand-action-container .expand-action').show();
         },
 
+        /**
+         * Expand widget
+         */
         expand: function() {
-            this._expand();
+            this._setExpanded();
             this.trigger('expand', this.$el, this);
             mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
         },
 
-        _expand: function() {
-            this.widget.removeAttr('collapsed');
+        /**
+         * Set expanded state
+         */
+        _setExpanded: function() {
+            this.widget.removeClass('collapsed');
             this.widgetContentContainer.show();
             $('.collapse-expand-action-container .collapse-action').show();
             $('.collapse-expand-action-container .expand-action').hide();
         },
 
+        /**
+         * Is collapsed
+         *
+         * @returns {HTMLElement}
+         */
         isCollapsed: function() {
-            return this.widget.attr('collapsed');
+            return this.widget.hasClass('collapsed');
         },
 
+        /**
+         * Triggering move action
+         */
         onMove: function() {
             this.trigger('move', this.$el, this);
             mediator.trigger('widget:dashboard:move:' + this.getWid(), this.$el, this);
         },
 
+        /**
+         * Trigger remove action
+         */
         onRemoveFromDashboard: function() {
             this.trigger('removeFromDashboard', this.$el, this);
             mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
