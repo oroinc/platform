@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
