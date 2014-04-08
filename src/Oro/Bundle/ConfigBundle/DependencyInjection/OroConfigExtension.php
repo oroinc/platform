@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Yaml\Yaml;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -22,13 +24,13 @@ class OroConfigExtension extends Extension
     {
         $data = array();
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/entity_output.yml';
-            if (is_file($file)) {
-                $data = array_merge($data, Yaml::parse(realpath($file)));
-            }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_entity_output',
+            new YamlCumulativeFileLoader('Resources/config/entity_output.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $data = array_merge($data, $resource->data);
         }
 
         $configs[]     = array('entity_output' => $data);

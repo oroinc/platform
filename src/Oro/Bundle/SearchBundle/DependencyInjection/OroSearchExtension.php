@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -70,22 +72,16 @@ class OroSearchExtension extends Extension
     {
         $entitiesConfig = $config['entities_config'];
         if (!count($entitiesConfig)) {
-            $bundles = $container->getParameter('kernel.bundles');
-            foreach ($bundles as $bundle) {
-                $entitiesConfig = $this->parseSearchMapping($bundle, $entitiesConfig);
+            $configLoader = new CumulativeConfigLoader(
+                'oro_search',
+                new YamlCumulativeFileLoader('Resources/config/search.yml')
+            );
+            $resources    = $configLoader->load($container);
+            foreach ($resources as $resource) {
+                $entitiesConfig += $resource->data;
             }
         }
         $container->setParameter('oro_search.entities_config', $entitiesConfig);
-    }
-
-    private function parseSearchMapping($bundle, $entitiesConfig)
-    {
-        $reflection = new \ReflectionClass($bundle);
-        if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/search.yml')) {
-            $entitiesConfig += Yaml::parse(realpath($file));
-        }
-
-        return $entitiesConfig;
     }
 
     /**

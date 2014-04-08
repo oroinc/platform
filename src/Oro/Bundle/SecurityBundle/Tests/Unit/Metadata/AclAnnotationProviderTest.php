@@ -94,19 +94,33 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCache()
     {
-        $this->loader->expects($this->exactly(2))
+        // Called when: warmUpCache, findAnnotationById, warmUpCache
+        $this->loader->expects($this->exactly(3))
             ->method('load');
+        // First warmUpCache
         $this->cache->expects($this->at(0))
-            ->method('fetch');
+            ->method('save')
+            ->with(AclAnnotationProvider::CACHE_KEY);
+        // clearCache
         $this->cache->expects($this->at(1))
-            ->method('save');
+            ->method('delete')
+            ->with(AclAnnotationProvider::CACHE_KEY);
+        // First findAnnotationById
         $this->cache->expects($this->at(2))
-            ->method('delete');
+            ->method('fetch')
+            ->with(AclAnnotationProvider::CACHE_KEY);
         $this->cache->expects($this->at(3))
-            ->method('fetch');
+            ->method('save')
+            ->with(AclAnnotationProvider::CACHE_KEY);
+        // Second warmUpCache
+        $this->cache->expects($this->at(4))
+            ->method('save')
+            ->with(AclAnnotationProvider::CACHE_KEY);
 
         $this->provider->warmUpCache();
         $this->provider->clearCache();
+        $this->assertNull($this->provider->findAnnotationById('unknown'));
+        $this->provider->warmUpCache();
         $this->assertNull($this->provider->findAnnotationById('unknown'));
     }
 }
