@@ -18,6 +18,16 @@
 .filter-item .filter-default-value .reset-filter {
     display: none;
 }
+.filter-select .select-filter-placeholder {
+    display: none;
+}
+.filter-select.filter-default-value .select-filter-placeholder {
+    display: inline-block;
+}
+.filter-select.filter-default-value .select-filter-widget {
+    display: none;
+}
+
 .filter-box .btn-group [class^='icon-'] {
   padding-top:2px;
   vertical-align:middle;
@@ -52,7 +62,7 @@
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
     display: none;
-    z-index: 700;
+    z-index: 10000;
     margin-top: 7px;
     top: auto;
 }
@@ -97,6 +107,7 @@
 
 .ui-multiselect-menu.select-filter-widget {
     padding: 2px;
+    z-index: 10000;
 }
 
 .ui-multiselect-menu.select-filter-widget ul {
@@ -124,8 +135,7 @@
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-hover {
     background-image: none;
-    background-color: #3875d7;
-    color: #fff;
+    background-color: #EFEFEF;
 }
 
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-checkboxes label.ui-state-active {
@@ -136,7 +146,9 @@
 .ui-multiselect-single .ui-multiselect-checkboxes label {
   line-height:20px;
 }
-.ui-multiselect-menu.select-filter-widget { padding:0 0 2px 0; }
+.ui-multiselect-menu.select-filter-widget {
+    padding: 0 0 2px 0;
+}
 .ui-multiselect-menu.select-filter-widget input[type="search"] {
     margin: 0;
 }
@@ -152,7 +164,7 @@
     text-decoration: none;
 }
 .ui-multiselect-menu.select-filter-widget .ui-multiselect-header {
-    padding: 0;
+    padding: 4px 4px 0 4px;
     margin: 0;
 }
 
@@ -229,4 +241,8 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 }
 .active-filter .field-select {
     display: block;
+}
+
+.ui-multiselect-menu.multiselect-filter-widget {
+    margin-top: 7px;
 }
