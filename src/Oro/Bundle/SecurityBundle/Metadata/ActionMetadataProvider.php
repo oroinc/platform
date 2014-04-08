@@ -69,7 +69,7 @@ class ActionMetadataProvider
      */
     public function warmUpCache()
     {
-        $this->ensureMetadataLoaded();
+        $this->loadMetadata();
     }
 
     /**
@@ -84,7 +84,7 @@ class ActionMetadataProvider
     }
 
     /**
-     * Makes sure that metadata are loaded
+     * Makes sure that metadata are loaded and cached
      */
     protected function ensureMetadataLoaded()
     {
@@ -93,22 +93,32 @@ class ActionMetadataProvider
             if ($this->cache) {
                 $data = $this->cache->fetch(self::CACHE_KEY);
             }
-            if (!$data) {
-                $data = array();
-                foreach ($this->annotationProvider->getAnnotations('action') as $annotation) {
-                    $data[$annotation->getId()] = new ActionMetadata(
-                        $annotation->getId(),
-                        $annotation->getGroup(),
-                        $annotation->getLabel()
-                    );
-                }
-
-                if ($this->cache) {
-                    $this->cache->save(self::CACHE_KEY, $data);
-                }
+            if ($data) {
+                $this->localCache = $data;
+            } else {
+                $this->loadMetadata();
             }
-
-            $this->localCache = $data;
         }
+    }
+
+    /**
+     * Loads metadata and save them in cache
+     */
+    protected function loadMetadata()
+    {
+        $data = array();
+        foreach ($this->annotationProvider->getAnnotations('action') as $annotation) {
+            $data[$annotation->getId()] = new ActionMetadata(
+                $annotation->getId(),
+                $annotation->getGroup(),
+                $annotation->getLabel()
+            );
+        }
+
+        if ($this->cache) {
+            $this->cache->save(self::CACHE_KEY, $data);
+        }
+
+        $this->localCache = $data;
     }
 }

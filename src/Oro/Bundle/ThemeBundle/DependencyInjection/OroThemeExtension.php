@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ThemeBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroThemeExtension extends Extension
 {
@@ -49,24 +50,17 @@ class OroThemeExtension extends Extension
     {
         $result = array();
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dir        = dirname($reflection->getFilename()) . '/Resources/public/themes';
-            if (is_dir($dir)) {
-                $finder = new Finder();
-                $finder
-                    ->files()
-                    ->path('#^\w+/settings.yml#')
-                    ->in($dir);
-
-                /** @var SplFileInfo $file */
-                foreach ($finder as $file) {
-                    $themeName = $file->getPathInfo()->getFilename();
-                    $settings = Yaml::parse($file->getRealPath());
-                    $result[$themeName] = $settings;
-                }
-            }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_theme',
+            new FolderingCumulativeFileLoader(
+                '{folder}',
+                '\w+',
+                new YamlCumulativeFileLoader('Resources/public/themes/{folder}/settings.yml')
+            )
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $result[basename(dirname($resource->path))] = $resource->data;
         }
 
         return $result;

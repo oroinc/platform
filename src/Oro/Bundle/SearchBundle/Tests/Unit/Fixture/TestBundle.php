@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture;
 
-class TestBundle
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class TestBundle extends Bundle
 {
 }

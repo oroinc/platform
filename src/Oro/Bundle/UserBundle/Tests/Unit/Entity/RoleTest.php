@@ -20,8 +20,6 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $role->setRole('foo');
 
         $this->assertEquals('ROLE_FOO', $role->getRole());
-        $this->assertEquals('ROLE_FOO', $role);
-        $this->assertNotEquals('foo', $role);
     }
 
     public function testLabel()

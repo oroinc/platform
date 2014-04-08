@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Batch Bundle
@@ -11,14 +10,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class OroBatchBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-    }
-
     /**
      * {@inheritdoc}
      */

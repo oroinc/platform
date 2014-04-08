@@ -44,7 +44,7 @@ services:
         arguments:
             - @oro_security.owner.ownership_metadata_provider
         tags:
-            - { name: kernel.cache_warmer}
+            - { name: kernel.cache_warmer }
 
     oro_security.owner.ownership_metadata_provider.cache.clearer:
         public: false
