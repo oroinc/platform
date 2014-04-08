@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\UIBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigConfigurationPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\PlaceholderFilterCompilerPass;
 

@@ -1,0 +1,6 @@
+parameters:
+    oro_cache.oro_data_cache_manager.class:                    Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
+
+services:
+    oro_cache.oro_data_cache_manager:
+        class: %oro_cache.oro_data_cache_manager.class%
