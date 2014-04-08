@@ -1,7 +1,10 @@
 oro:
     dashboard:
         title:
+            not_found: Dashboard
             main: Dashboard
             quick_launchpad: Quick Launchpad
 
         no_data_found:    No data found
+
+        no_one_available: You have no dashboards available

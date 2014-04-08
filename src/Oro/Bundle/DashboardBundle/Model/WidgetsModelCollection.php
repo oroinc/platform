@@ -16,7 +16,10 @@ class WidgetsModelCollection implements \Iterator, \Countable
      */
     private $widgetModels = null;
 
-    private $position;
+    /**
+     * @var int cursor position
+     */
+    private $position = 0;
 
     /**
      * @var WidgetModelFactory
@@ -91,7 +94,6 @@ class WidgetsModelCollection implements \Iterator, \Countable
      */
     public function count()
     {
-        $elements = $this->getElements();
-        return count($elements);
+        return count($this->getElements());
     }
 }

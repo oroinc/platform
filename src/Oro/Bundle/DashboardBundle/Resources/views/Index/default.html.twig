@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% oro_title_set({params : {"%name%": pageTitle|trans }}) %}
+{% oro_title_set({params : {"%name%": dashboard.config.label|trans }}) %}
 
 {% macro renderCell(widgets, isEven) %}
     {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
@@ -29,7 +29,7 @@
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-                        <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
+                        <h1 class="oro-subtitle">{{ dashboard.config.label|trans }}</h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -42,7 +42,7 @@
                             <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
                             <select id="dashboard_selector">
                                 {% for dashboardModel in dashboards %}
-                                    <option value="{{ dashboardModel.dashboard.name }}"{% if dashboardModel.dashboard.name == dashboardName %} selected="selected"{% endif %}>
+                                    <option value="{{ dashboardModel.dashboard.id }}"{% if dashboardModel.dashboard.id == dashboard.dashboard.id %} selected="selected"{% endif %}>
                                         {{ dashboardModel.config.label|trans }}
                                     </option>
                                 {% endfor %}
@@ -53,7 +53,7 @@
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
+                                        var url = routing.generate('oro_dashboard_index', {id: $(e.currentTarget).val()}) + '?change_dashboard=true',
                                             navigation = Navigation.getInstance();
                                         if (navigation) {
                                             navigation.processRedirect({
@@ -81,8 +81,8 @@
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
-                    {{ __.renderCell(widgets, false) }}
-                    {{ __.renderCell(widgets, true) }}
+                    {{ __.renderCell(dashboard.widgets, false) }}
+                    {{ __.renderCell(dashboard.widgets, true) }}
                 {% endblock widgets %}
                 </div>
             </div>

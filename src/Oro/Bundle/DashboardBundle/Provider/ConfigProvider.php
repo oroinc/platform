@@ -6,6 +6,8 @@ use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 
 class ConfigProvider
 {
+    const WIDGETS_BRANCH = 'widgets';
+    const DASHBOARDS_BRANCH = 'dashboards';
     /**
      * Array of oro_dashboard_config config section
      *
@@ -57,7 +59,7 @@ class ConfigProvider
             throw new InvalidConfigurationException($dashboardName);
         }
 
-        return $this->configs['dashboards'][$dashboardName];
+        return $this->configs[self::DASHBOARDS_BRANCH][$dashboardName];
     }
 
     /**
@@ -66,7 +68,7 @@ class ConfigProvider
      */
     public function hasDashboardConfig($dashboardName)
     {
-        return isset($this->configs['dashboards'][$dashboardName]);
+        return isset($this->configs[self::DASHBOARDS_BRANCH][$dashboardName]);
     }
 
     /**
@@ -82,7 +84,7 @@ class ConfigProvider
             throw new InvalidConfigurationException($widgetName);
         }
 
-        return $this->configs['widgets'][$widgetName];
+        return $this->configs[self::WIDGETS_BRANCH][$widgetName];
     }
 
     /**
@@ -91,6 +93,6 @@ class ConfigProvider
      */
     public function hasWidgetConfig($widgetName)
     {
-        return isset($this->configs['widgets'][$widgetName]);
+        return isset($this->configs[self::WIDGETS_BRANCH][$widgetName]);
     }
 }

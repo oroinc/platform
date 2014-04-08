@@ -29,7 +29,7 @@ class DashboardWidget
     protected $name;
 
     /**
-     * @var string
+     * @var integer
      *
      * @ORM\Column(name="position", type="integer")
      */
@@ -82,7 +82,7 @@ class DashboardWidget
     }
 
     /**
-     * @param string $position
+     * @param integer $position
      * @return DashboardWidget
      */
     public function setPosition($position)
@@ -92,7 +92,7 @@ class DashboardWidget
     }
 
     /**
-     * @return string
+     * @return integer
      */
     public function getPosition()
     {

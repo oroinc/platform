@@ -6,56 +6,49 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\DashboardBundle\Manager;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/index/{name}",
+     *      "/index/{id}",
      *      name="oro_dashboard_index",
-     *      requirements={"name"="[\w-]*"},
-     *      defaults={"name" = ""}
+     *      defaults={"id" = ""}
      * )
      */
-    public function indexAction($name = null)
+    public function indexAction($id = null)
     {
         /** @var Manager $manager */
         $manager = $this->get('oro_dashboard.manager');
-        if (empty($name)) {
-            $name = $manager->getDefaultDashboardName();
-        }
+
         /**
          * @todo: change work with session after user state will be implement
          */
         if ($this->get('request')->get('change_dashboard', false)) {
-            $this->get('session')->set('saved_dashboard', $name);
+            $this->get('session')->set('saved_dashboard', $id);
         } else {
-            $name = $this->get('session')->get('saved_dashboard', $manager->getDefaultDashboardName());
+            $id = $this->get('session')->get('saved_dashboard');
         }
-
-
 
         $dashboards = $manager->getDashboards();
-
-        foreach ($dashboards as $dashboard) {
-            //todo: stub (must be rewrite)
-            if ($dashboard->getDashboard()->getName() == $name) {
-                break;
-            }
+        if (count($dashboards) == 0) {
+            return $this->render('OroDashboardBundle:Index:withoutDashboards.html.twig');
         }
-        //todo: stub (must be rewrite)
+
+        $dashboard = $id ? $dashboards->getById($id) : $dashboards->getByName($manager->getDefaultDashboardName());
+
+        if (!$dashboard) {
+            $dashboard = $dashboards->current();
+        }
+
         $config = $dashboard->getConfig();
 
         $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
         return $this->render(
             $template,
-            [
-                'pageTitle'     => $config['label'],
-                'dashboardName' => $name,
-                'dashboards'    => $dashboards,
-                'widgets'       => $dashboard->getWidgets(),
-            ]
+            array('dashboards'=>$dashboards, 'dashboard' => $dashboard)
         );
     }
 

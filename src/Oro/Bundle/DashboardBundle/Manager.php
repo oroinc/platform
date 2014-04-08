@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\DashboardsModelCollection;
 use Oro\Bundle\DashboardBundle\Model\WidgetModelFactory;
 use Oro\Bundle\DashboardBundle\Model\WidgetsModelCollection;
 use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
@@ -78,7 +79,7 @@ class Manager
      *
      * @throws Exception\InvalidConfigurationException
      *
-     * @return DashboardModel[]
+     * @return DashboardsModelCollection
      */
     public function getDashboards()
     {
@@ -92,7 +93,7 @@ class Manager
             }
         }
 
-        return $result;
+        return new DashboardsModelCollection($result);
     }
 
     /**
@@ -109,13 +110,12 @@ class Manager
             return false;
         }
 
-        foreach ($widgetState as $property => $value) {
-            $methodName = 'set' . ucfirst($property);
-            if ($property == 'id' || !method_exists($widget, $methodName)) {
-                continue;
-            }
+        if (array_key_exists('position', $widgetState)) {
+            $widget->setPosition((int)$widgetState['position']);
+        }
 
-            $widget->$methodName($value);
+        if (array_key_exists('expanded', $widgetState)) {
+            $widget->setExpanded((bool)$widgetState['expanded']);
         }
 
         $this->entityManager->persist($widget);
