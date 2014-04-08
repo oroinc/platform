@@ -125,7 +125,7 @@ define(['jquery', 'jquery.select2'], function ($) {
         var onSelect = prototype.onSelect;
         prototype.onSelect = function (data, options) {
             onSelect.apply(this, arguments);
-            // @todo remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
+            // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
                 this.focusser.focus();
             }
