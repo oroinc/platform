@@ -43,7 +43,7 @@ class ChoiceFilterType extends AbstractChoiceType
                 'field_type'            => 'choice',
                 'field_options'         => array('choices' => array()),
                 'operator_choices'      => $choices,
-                'populate_default'      => true,
+                'populate_default'      => false,
                 'is_translated_choices' => false
             )
         );

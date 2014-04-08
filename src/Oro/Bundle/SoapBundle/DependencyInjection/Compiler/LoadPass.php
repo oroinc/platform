@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class LoadPass implements CompilerPassInterface
 {
@@ -15,13 +17,13 @@ class LoadPass implements CompilerPassInterface
     {
         $classes = [];
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/oro/soap.yml';
-            if (is_file($file)) {
-                $classes = array_merge($classes, Yaml::parse(realpath($file))['classes']);
-            }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_soap',
+            new YamlCumulativeFileLoader('Resources/config/oro/soap.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $classes = array_merge($classes, $resource->data['classes']);
         }
 
         $container

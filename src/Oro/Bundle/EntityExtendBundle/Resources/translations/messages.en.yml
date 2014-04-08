@@ -19,6 +19,9 @@ oro:
                 manyToOne:          Relation many to one
                 manyToMany:         Relation many to many
                 optionSet:          Option set
+
+                ref-one:            System relation
+                ref-many:           System relation
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
