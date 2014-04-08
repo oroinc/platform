@@ -246,3 +246,12 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .ui-multiselect-menu.multiselect-filter-widget {
     margin-top: 7px;
 }
+.ui-multiselect.multiselect-filter-widget span,
+.filter-item .filter-criteria-hint {
+    max-width: 250px;
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: bottom;
+}
