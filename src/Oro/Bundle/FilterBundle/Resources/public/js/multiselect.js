@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen:true, browser:true*/
-define(['jquery', 'jquery-ui', 'jquery.multiselect'], function ($) {
+define(['jquery', 'oroui/js/dropdown-mask', 'jquery-ui', 'jquery.multiselect'], function ($, mask) {
     'use strict';
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
@@ -11,13 +11,7 @@ define(['jquery', 'jquery-ui', 'jquery.multiselect'], function ($) {
          */
         open: function () {
             this._superApply(arguments);
-
-            var events = this._getUpdatePosEvents(),
-                handler = $.proxy(this.updatePos, this);
-
-            this.element.parents().add(window).each(function () {
-                $(this).on(events, handler);
-            });
+            mask.show().onhide($.proxy(this.close, this));
         },
 
         /**
@@ -25,12 +19,7 @@ define(['jquery', 'jquery-ui', 'jquery.multiselect'], function ($) {
          * @override
          */
         close: function () {
-            var events = this._getUpdatePosEvents();
-
-            this.element.parents().add(window).each(function () {
-                $(this).off(events);
-            });
-
+            mask.hide();
             this._superApply(arguments);
         },
 
@@ -43,24 +32,6 @@ define(['jquery', 'jquery-ui', 'jquery.multiselect'], function ($) {
             if (isShown) {
                 this.menu.show();
             }
-        },
-
-        /**
-         * Combines space-separated line of events with widget's namespace
-         *  for updating menu's position
-         *
-         * @returns {string}
-         * @private
-         */
-        _getUpdatePosEvents: function () {
-            var events = ['scroll'],
-                ns = 'multiselect-' + this.uuid;
-
-            events = $.map(events, function (eventName) {
-                return eventName + '.' + ns;
-            });
-
-            return events.join(' ');
         }
     });
 
