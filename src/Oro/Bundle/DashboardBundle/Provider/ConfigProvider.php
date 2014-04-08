@@ -6,6 +6,9 @@ use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 
 class ConfigProvider
 {
+    const NODE_DASHBOARD = 'dashboards';
+    const NODE_WIDGET = 'widgets';
+
     /**
      * Array of oro_dashboard_config config section
      *
@@ -38,6 +41,30 @@ class ConfigProvider
     }
 
     /**
+     * @return array
+     */
+    public function getConfigs()
+    {
+        return $this->configs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDashboardConfigs()
+    {
+        return $this->configs[self::NODE_DASHBOARD];
+    }
+
+    /**
+     * @return array
+     */
+    public function getWidgetConfigs()
+    {
+        return $this->configs[self::NODE_WIDGET];
+    }
+
+    /**
      * @param $key
      * @return bool
      */
@@ -51,13 +78,13 @@ class ConfigProvider
      * @return mixed
      * @throws InvalidConfigurationException
      */
-    public function getDashboardConfigs($dashboardName)
+    public function getDashboardConfig($dashboardName)
     {
         if (!$this->hasDashboardConfig($dashboardName)) {
             throw new InvalidConfigurationException($dashboardName);
         }
 
-        return $this->configs['dashboards'][$dashboardName];
+        return $this->configs[self::NODE_DASHBOARD][$dashboardName];
     }
 
     /**
@@ -66,7 +93,7 @@ class ConfigProvider
      */
     public function hasDashboardConfig($dashboardName)
     {
-        return isset($this->configs['dashboards'][$dashboardName]);
+        return isset($this->configs[self::NODE_DASHBOARD][$dashboardName]);
     }
 
     /**
@@ -76,13 +103,13 @@ class ConfigProvider
      *
      * @return mixed
      */
-    public function getWidgetConfigs($widgetName)
+    public function getWidgetConfig($widgetName)
     {
         if (!$this->hasWidgetConfig($widgetName)) {
             throw new InvalidConfigurationException($widgetName);
         }
 
-        return $this->configs['widgets'][$widgetName];
+        return $this->configs[self::NODE_WIDGET][$widgetName];
     }
 
     /**
@@ -91,6 +118,6 @@ class ConfigProvider
      */
     public function hasWidgetConfig($widgetName)
     {
-        return isset($this->configs['widgets'][$widgetName]);
+        return isset($this->configs[self::NODE_WIDGET][$widgetName]);
     }
 }

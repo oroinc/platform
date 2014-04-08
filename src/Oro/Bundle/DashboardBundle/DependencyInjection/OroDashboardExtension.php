@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroDashboardExtension extends Extension
 {
@@ -17,13 +19,13 @@ class OroDashboardExtension extends Extension
     {
         $dashboardConfigs = array();
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $file       = dirname($reflection->getFilename()) . '/Resources/config/dashboard.yml';
-            if (is_file($file)) {
-                $dashboardConfigs[] = Yaml::parse(realpath($file))['oro_dashboard_config'];
-            }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_dashboard',
+            new YamlCumulativeFileLoader('Resources/config/dashboard.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $dashboardConfigs[] = $resource->data['oro_dashboard_config'];
         }
 
         foreach ($configs as $config) {
@@ -89,7 +91,6 @@ class OroDashboardExtension extends Extension
         );
         // remove non visible items and remove 'position' and 'visible' attributes
         foreach ($items as $key => &$item) {
-            unset($item['position']);
             if (isset($item['visible'])) {
                 if (!$item['visible']) {
                     unset($items[$key]);

@@ -72,7 +72,7 @@ class OwnerTreeProvider
     }
 
     /**
-     * Makes sure that tree data
+     * Makes sure that tree data are loaded and cached
      */
     protected function ensureTreeLoaded()
     {
@@ -81,17 +81,29 @@ class OwnerTreeProvider
             if ($this->cache) {
                 $treeData = $this->cache->fetch(self::CACHE_KEY);
             }
-            if (!$treeData && $this->checkDatabase()) {
-                $treeData = new OwnerTree();
-                $this->fillTree($treeData);
-
-                if ($this->cache) {
-                    $this->cache->save(self::CACHE_KEY, $treeData);
-                }
+            if ($treeData) {
+                $this->tree = $treeData;
+            } else {
+                $this->loadTree();
             }
-
-            $this->tree = $treeData;
         }
+    }
+
+    /**
+     * Loads tree data and save them in cache
+     */
+    protected function loadTree()
+    {
+        $treeData = new OwnerTree();
+        if ($this->checkDatabase()) {
+            $this->fillTree($treeData);
+        }
+
+        if ($this->cache) {
+            $this->cache->save(self::CACHE_KEY, $treeData);
+        }
+
+        $this->tree = $treeData;
     }
 
     /**
