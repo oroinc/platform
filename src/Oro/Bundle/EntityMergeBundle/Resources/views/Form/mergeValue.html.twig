@@ -10,22 +10,22 @@
     <span class="empty">-- {{ 'oro.entity_merge.form.empty'|trans }} --</span>
 {% endset %}
 
-{% if isListValue %}
-    {% if convertedValue|length %}
-        <ul>
-            {% for value in convertedValue %}
-                {% if value|length %}
-                    <li> {{ value }} </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+{% if convertedValue|length %}
+    {% if isListValue %}
+    {% set hasVisibleValues = false %}
+    <ul>
+        {% for value in convertedValue if value|length %}
+            {% set hasVisibleValues = true %}
+            <li> {{ value }} </li>
+        {% endfor %}
+
+        {% if not hasVisibleValues %}
+            <li>{{ empty_cell }}</li>
+        {% endif %}
+    </ul>
     {% else %}
-        {{ empty_cell }}
+        {{ convertedValue }}
     {% endif %}
 {% else %}
-    {% if convertedValue|length %}
-        {{ convertedValue }}
-    {% else %}
-        {{ empty_cell }}
-    {% endif %}
+    {{ empty_cell }}
 {% endif %}
