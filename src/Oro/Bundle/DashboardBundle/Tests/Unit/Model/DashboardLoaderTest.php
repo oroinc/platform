@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\DashboardBundle\Configuration\ConfigurationLoader;
-use Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager;
+use Oro\Bundle\DashboardBundle\Model\DashboardLoader;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
+class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @param string $name
-     * @param array  $configuration
+     * @param string          $expectedException
+     * @param string          $expectedExceptionMessage
+     * @param string          $dashboardName
+     * @param array           $dashboardConfiguration
+     * @param Dashboard       $repositoryDashboard
+     * @param DashboardWidget $repositoryWidget
      *
      * @dataProvider configurationProvider
      */
@@ -31,7 +34,11 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
             $repositoryDashboard->setName($dashboardName);
         }
         $manager   = $this->createManager($repositoryDashboard);
-        $dashboard = $manager->saveDashboardConfiguration($dashboardName, $dashboardConfiguration);
+        $dashboard = $manager->saveDashboardConfiguration(
+            $dashboardName,
+            $dashboardConfiguration,
+            new User()
+        );
 
         $this->assertEquals($dashboardName, $dashboard->getName());
 
@@ -98,18 +105,9 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testSaveDashboardConfigurations()
-    {
-        $manager    = $this->createManager();
-        $dashboards = $manager->saveDashboardConfigurations();
-
-        $this->assertNotNull($dashboards);
-        $this->assertEquals('dashboard', $dashboards[0]->getName());
-    }
-
     /**
      * @param Dashboard $dashboard
-     * @return ConfigurationManager
+     * @return DashboardLoader
      */
     protected function createManager(Dashboard $dashboard = null)
     {
@@ -118,59 +116,18 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->setMethods(['getFirstMatchedUser', 'find', 'findBy', 'findAll', 'findOneBy', 'getClassName'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
 
         $repository
             ->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($dashboard));
 
-        $repository
-            ->expects($this->any())
-            ->method('getFirstMatchedUser')
-            ->will($this->returnValue(new User()));
-
-        $repository
-            ->expects($this->at(0))
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => User::ROLE_ADMINISTRATOR]))
-            ->will($this->returnValue(new User()));
-
         $entityManager
             ->expects($this->atLeastOnce())
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $configProvider = $this
-            ->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configProvider
-            ->expects($this->any())
-            ->method('getWidgetConfig')
-            ->will($this->returnValue([]));
-
-        $configProvider
-            ->expects($this->any())
-            ->method('getDashboardConfigs')
-            ->will(
-                $this->returnValue(
-                    [
-                        'dashboard' => [
-                            'widgets' => []
-                        ]
-                    ]
-                )
-            );
-
-        return new ConfigurationManager(
-            $entityManager,
-            $configProvider
-        );
+        return new DashboardLoader($entityManager);
     }
 }

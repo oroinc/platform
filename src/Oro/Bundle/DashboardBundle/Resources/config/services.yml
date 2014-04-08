@@ -1,8 +1,8 @@
 parameters:
-    oro_dashboard.manager.class:               Oro\Bundle\DashboardBundle\Manager
-    oro_dashboard.configuration.manager.class: Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager
-    oro_dashboard.widget_model_factory.class:  Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
-    oro_dashboard.config_provider.class:       Oro\Bundle\DashboardBundle\Provider\ConfigProvider
+    oro_dashboard.manager.class:                Oro\Bundle\DashboardBundle\Manager
+    oro_dashboard.model.dashboard_loader.class: Oro\Bundle\DashboardBundle\Model\DashboardLoader
+    oro_dashboard.widget_model_factory.class:   Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
+    oro_dashboard.config_provider.class:        Oro\Bundle\DashboardBundle\Provider\ConfigProvider
 
 services:
     oro_dashboard.manager:
@@ -14,8 +14,8 @@ services:
             - @oro_dashboard.widget_model_factory
             - @oro_security.acl_helper
 
-    oro_dashboard.configuration.manager:
-        class: %oro_dashboard.configuration.manager.class%
+    oro_dashboard.model.dashboard_loader:
+        class: %oro_dashboard.model.dashboard_loader.class%
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_dashboard.config_provider
