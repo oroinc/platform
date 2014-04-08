@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+
+use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
+use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle;
+use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +27,11 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadConfiguration(array $configs, array $bundles, array $expectedMenu, array $expectedTitles)
     {
-        $container = $this->createContainer($bundles);
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($bundles);
+
+        $container = new ContainerBuilder();
 
         $this->extension->load($configs, $container);
 
@@ -88,6 +96,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function loadConfigurationDataProvider()
     {
+        $bundle1 = new BarBundle();
+        $bundle2 = new FooBundle();
+
         $settings = array(
             'resolved' => true,
             'maxItems' => array(
@@ -112,6 +123,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             'routeParameters' => array(),
             'extras' => array()
         );
+
         return array(
             'without_bundles' => array(
                 'configs' => array(
@@ -175,8 +187,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 'bundles' => array(
-                    'Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundle\BarBundle',
-                    'Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle',
+                    $bundle1->getName() => get_class($bundle1),
+                    $bundle2->getName() => get_class($bundle2),
                 ),
                 'expectedMenu' => array(
                     'items' => array(
@@ -241,18 +253,5 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-    }
-
-    protected function createContainer(array $bundles = array())
-    {
-        $container = new ContainerBuilder(
-            new ParameterBag(
-                array(
-                    'kernel.bundles'=> $bundles,
-                )
-            )
-        );
-
-        return $container;
     }
 }
