@@ -34,7 +34,7 @@ class WidgetModelFactory
          * @var DashboardWidget $widget
          */
         foreach ($dashboard->getWidgets() as $widget) {
-            $widgetConfig = $this->configProvider->getWidgetConfigs($widget->getName());
+            $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
             $model = new WidgetModel($widgetConfig, $widget);
             if (!isset($widgetConfig['acl']) || $this->securityFacade->isGranted($widgetConfig['acl'])) {
                 $widgets[] = $model;

@@ -138,7 +138,7 @@ class Manager
             return null;
         }
 
-        $dashboardConfig = $this->configProvider->getDashboardConfigs($dashboard->getName());
+        $dashboardConfig = $this->configProvider->getDashboardConfig($dashboard->getName());
 
         $widgetsCollection = new WidgetsModelCollection($dashboard, $this->widgetModelFactory);
 
@@ -157,7 +157,7 @@ class Manager
             'widgetName' => $widgetName
         ];
 
-        $widget = $this->configProvider->getWidgetConfigs($widgetName);
+        $widget = $this->configProvider->getWidgetConfig($widgetName);
         unset($widget['route']);
         unset($widget['route_parameters']);
         unset($widget['acl']);
@@ -182,7 +182,7 @@ class Manager
      */
     public function getWidgetItems($widgetName)
     {
-        $widgetConfig = $this->configProvider->getWidgetConfigs($widgetName);
+        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
         $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
 
