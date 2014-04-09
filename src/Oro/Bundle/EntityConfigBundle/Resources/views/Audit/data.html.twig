@@ -17,7 +17,7 @@
             <li>
                 {% set old = key in translatable ? data[0]|default('N/A')|trans : data[0] %}
                 {% set new = key in translatable ? data[1]|trans : data[1] %}
-                <b>{{ label }}</b>: <s>{{ old }}</s> {{ new }}
+                <b>{{ label|trans }}</b>: <s>{{ old }}</s> {{ new }}
             </li>
             {% endif %}
         {% endfor %}

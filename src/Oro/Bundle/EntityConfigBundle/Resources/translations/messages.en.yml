@@ -1,5 +1,19 @@
 oro:
     entity_config:
+        entity_config:
+            entity_name.label:  Name
+            module_name.label:  Module
+            updated.label:      Updated at
+
+        field_config:
+            field_name.label:   Name
+            type.label:         Data Type
+
+        config_log:
+            user.label:         Author
+            diffs.label:        Diffs
+            logged_at.label:    Logged at
+
         menu:
             entities_list.label: Entities
             entities_list.description: List of entities
