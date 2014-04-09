@@ -7,302 +7,214 @@ use Oro\Bundle\DashboardBundle\Manager;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
-    const DEFAULT_DASHBOARD_NAME = 'default_dashboard';
-    const DASHBOARD_NAME = 'dashboard';
+     /**
+     * @var Manager
+     */
+    protected $manager;
 
     /**
-     * @dataProvider dashboardProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public function testGetDefaultDashboardName($config, $securityFacade)
-    {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals(self::DEFAULT_DASHBOARD_NAME, $dashboard->getDefaultDashboardName());
-    }
+    protected $configProvider;
 
     /**
-     * @dataProvider dashboardProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-
-    public function testGetDashboards($config, $securityFacade)
-    {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals(array(self::DEFAULT_DASHBOARD_NAME, self::DASHBOARD_NAME), $dashboard->getDashboards());
-    }
+    protected $securityFacade;
 
     /**
-     * @dataProvider dashboardProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public function getDashboard($config, $securityFacade)
-    {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals(self::DASHBOARD_NAME, $dashboard->getDashboard(self::DASHBOARD_NAME));
-    }
+    protected $entityManager;
 
     /**
-     * @dataProvider widgetsProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public function testGetDashboardWidgets($config, $securityFacade, $expectedResult)
-    {
-
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals($expectedResult, $dashboard->getDashboardModel('default_dashboard'));
-    }
+    protected $widgetModelFactory;
 
     /**
-     * @dataProvider attributesProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public function testGetWidgetAttributes($config, $securityFacade, $expectedResult)
-    {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals($expectedResult, $dashboard->getWidgetAttributes('widget'));
-    }
+    protected $aclHelper;
 
-    /**
-     * @dataProvider itemsProvider
-     */
-    public function testGetWidgetItems($config, $securityFacade, $expectedResult)
+    protected function setUp()
     {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals($expectedResult, $dashboard->getWidgetItems('widget'));
-    }
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    /**
-     * @dataProvider attributesTwigProvider
-     */
-    public function testGetWidgetAttributesForTwig($config, $securityFacade, $expectedResult)
-    {
-        $dashboard = new Manager($config, $securityFacade);
-        $this->assertEquals($expectedResult, $dashboard->getWidgetAttributesForTwig('widget'));
-    }
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    public function widgetsProvider()
-    {
-        $securityFacade = $this->getMock(
-            'Oro\Bundle\SecurityBundle\SecurityFacade',
-            array('isGranted'),
-            array(),
-            '',
-            false
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(array('isGranted'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->widgetModelFactory = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModelFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $this->manager = new Manager(
+            $this->configProvider,
+            $this->securityFacade,
+            $this->entityManager,
+            $this->widgetModelFactory,
+            $this->aclHelper
         );
-        $securityFacade->expects($this->any())
+    }
+
+    public function testGetDefaultDashboardName()
+    {
+        $expected = 'expected_dashboard';
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('default_dashboard')
+            ->will($this->returnValue($expected));
+
+        $actual = $this->manager->getDefaultDashboardName();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetDashboardModel()
+    {
+        $firstDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $secondDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $expectedConfig = array('label' => 'test label');
+        $this->securityFacade->expects($this->at(0))
             ->method('isGranted')
-            ->will($this->returnArgument(0));
+            ->will($this->returnValue(false));
 
-        return array(
-            array(
-                'config' => array('dashboards' => array(
-                    'default_dashboard' => array(
-                        'label' => self::DEFAULT_DASHBOARD_NAME,
-                        'widgets' => array(
-                            'widget' => array(
-                                'acl' => true,
-                                'items' => 'acl'
-                            )
-                        )
-
-                    )
-                )),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array('widget' => array())
-            ),
-            array(
-                'config' => array('dashboards' => array(
-                    'default_dashboard' => array(
-                        'label' => self::DEFAULT_DASHBOARD_NAME,
-                        'widgets' => array(
-                            'widget' => array(
-                                'items' => 'acl'
-                            )
-                        )
-
-                    )
-                )),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array('widget' => array())
-            ),
-            array(
-                'config' => array('dashboards' => array(
-                    'default_dashboard' => array(
-                        'label' => self::DEFAULT_DASHBOARD_NAME,
-                        'widgets' => array(
-                            'widget' => array(
-                                'acl' => false,
-                                'items' => 'acl'
-                            )
-                        )
-
-                    )
-                )),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array()
-            ),
-            array(
-                'config' => array('dashboards' => array(
-                    'default_dashboard' => array(
-                        'label' => self::DEFAULT_DASHBOARD_NAME,
-                        'widgets' => array(
-                            'widget' => array(
-                                'items' => 'acl'
-                            )
-                        )
-                    )
-                ),
-                'widgets' => array(
-                    'widget' => array(
-                        'acl' => true,
-                        'items' => 'acl'
-                    )
-                )),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array('widget' => array())
-            ),
-        );
-    }
-
-    public function dashboardProvider()
-    {
-        $securityFacade = $this->getMock('Oro\Bundle\SecurityBundle\SecurityFacade', array(), array(), '', false);
-        $config = array(
-            'default_dashboard' => self::DEFAULT_DASHBOARD_NAME,
-            'dashboards' => array(
-                array(
-                    'label' => self::DEFAULT_DASHBOARD_NAME,
-                ),
-                array(
-                    'label' => self::DASHBOARD_NAME,
-                ),
-            )
-        );
-
-        return array(
-            array(
-                'config' => $config,
-                'securityFacade' => $securityFacade
-            )
-        );
-    }
-
-    public function attributesProvider()
-    {
-        $securityFacade = $this->getMock('Oro\Bundle\SecurityBundle\SecurityFacade', array(), array(), '', false);
-        $config = array(
-            'widgets' => array(
-                'widget' => array(
-                    'route' => true,
-                    'route_parameters' => 'route_parameters',
-                    'acl' => 'acl',
-                    'items' => 'items',
-                    'attributes' => 'attributes',
-                    'attributes-twig' => 'attributes-twig',
-                )
-            )
-        );
-
-        return array(
-            array(
-                'config' => $config,
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array('attributes' => 'attributes', 'attributes-twig' => 'attributes-twig')
-            )
-        );
-    }
-
-    public function attributesTwigProvider()
-    {
-        $securityFacade = $this->getMock('Oro\Bundle\SecurityBundle\SecurityFacade', array(), array(), '', false);
-        $config = array(
-            'widgets' => array(
-                'widget' => array(
-                    'route' => true,
-                    'route_parameters' => 'route_parameters',
-                    'acl' => 'acl',
-                    'items' => 'items',
-                    'attributes' => 'attributes',
-                    'attributes-twig' => 'attributes-twig',
-                )
-            )
-        );
-
-        return array(
-            array(
-                'config' => $config,
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array(
-                    'widgetName' => 'widget',
-                    'widgetAttributes' => 'attributes',
-                    'widgetAttributesTwig' => 'attributes-twig'
-                )
-            )
-        );
-    }
-
-    public function itemsProvider()
-    {
-        $securityFacade = $this->getMock(
-            'Oro\Bundle\SecurityBundle\SecurityFacade',
-            array('isGranted'),
-            array(),
-            '',
-            false
-        );
-        $securityFacade->expects($this->any())
+        $this->securityFacade->expects($this->at(1))
             ->method('isGranted')
-            ->will($this->returnArgument(0));
+            ->will($this->returnValue(true));
 
-        return array(
-            array(
-                'config' => array(
-                    'widgets' => array(
-                        'widget' => array(
-                            'route' => true,
-                            'route_parameters' => 'route_parameters',
-                            'acl' => 'acl',
-                            'attributes' => 'attributes'
-                        )
-                    )
-                ),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array()
-            ),
-            array(
-                'config' => array(
-                    'widgets' => array(
-                        'widget' => array(
-                            'route' => true,
-                            'route_parameters' => 'route_parameters',
-                            'acl' => 'acl',
-                            'attributes' => 'attributes',
-                            'items' => array(
-                                'item' => array(
-                                    'acl' => true
-                                )
-                            )
+        $this->configProvider->expects($this->once())
+            ->method('getDashboardConfig')
+            ->will($this->returnValue($expectedConfig));
+        $model = $this->manager->getDashboardModel($firstDashboard);
+        $this->assertNull($model);
+        $model = $this->manager->getDashboardModel($secondDashboard);
+        $this->assertEquals($model->getConfig(), $expectedConfig);
+    }
 
-                        )
-                    )
-                ),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array('item' => array())
-            ),
-            array(
-                'config' => array(
-                    'widgets' => array(
-                        'widget' => array(
-                            'route' => true,
-                            'route_parameters' => 'route_parameters',
-                            'acl' => 'acl',
-                            'attributes' => 'attributes',
-                            'items' => array(
-                                'item' => array(
-                                    'acl' => false
-                                )
-                            )
+    public function testGetWidgetAttributesForTwig()
+    {
+        $expectedWidgetName = 'widget_name';
+        $configs = array(
+            'route'=>'sample route',
+            'route_parameters'=>'sample params',
+            'acl'=>'view_acl',
+            'items'=>array(),
+            'test-param'=>'param'
+        );
+        $expected = array('widgetName' => $expectedWidgetName, 'widgetTestParam' => 'param');
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->with($expectedWidgetName)
+            ->will($this->returnValue($configs));
 
-                        )
-                    )
-                ),
-                'securityFacade' => $securityFacade,
-                'expectedResult' => array()
+        $actual = $this->manager->getWidgetAttributesForTwig($expectedWidgetName);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetWidgetItems()
+    {
+        $expectedWidgetName = 'widget_name';
+
+        $expectedItem = 'expected_item';
+        $expectedValue = array('label' => 'test label', 'acl' => 'valid_acl');
+        $notGrantedItem = 'not_granted_item';
+        $notGrantedValue = array('label' => 'not granted label', 'acl' => 'invalid_acl');
+        $configs = array(
+            $expectedItem => $expectedValue,
+            $notGrantedItem => $notGrantedValue
+        );
+        unset($expectedValue['acl']);
+        $expected = array($expectedItem => $expectedValue);
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfig')
+            ->with($expectedWidgetName)
+            ->will($this->returnValue(array('items' => $configs)));
+
+        $this->securityFacade->expects($this->exactly(2))
+            ->method('isGranted')
+            ->will(
+                $this->returnCallback(
+                    function ($parameter) use ($notGrantedValue) {
+                        return $notGrantedValue['acl'] != $parameter;
+                    }
+                )
+            );
+
+        $actual = $this->manager->getWidgetItems($expectedWidgetName);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetDashboards()
+    {
+        $expectedConfig = array('label' => 'test label');
+
+        $firstDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $secondDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboards = array($firstDashboard, $secondDashboard);
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
+        $query = $this->getMock('StdClass', array('execute'));
+        $query->expects($this->once())->method('execute')->will($this->returnValue($dashboards));
+        $this->aclHelper->expects($this->once())->method('apply')->with($qb)->will($this->returnValue($query));
+        $repository->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($qb));
+
+        $this->securityFacade->expects($this->at(0))
+            ->method('isGranted')
+            ->with('VIEW', $firstDashboard)
+            ->will($this->returnValue(false));
+        $this->securityFacade->expects($this->at(1))
+            ->method('isGranted')
+            ->with('VIEW', $secondDashboard)
+            ->will($this->returnValue(true));
+        $this->configProvider->expects($this->once())
+            ->method('getDashboardConfig')
+            ->will($this->returnValue($expectedConfig));
+
+        $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
+
+        $dashboards = $this->manager->getDashboards();
+
+        $this->assertCount(1, $dashboards);
+        $this->assertEquals($expectedConfig, $dashboards->current()->getConfig());
+        $this->assertSame($secondDashboard, $dashboards->current()->getDashboard());
+    }
+
+    public function testSaveWidget()
+    {
+        $widgetId = 42;
+        $expectedPosition = 34;
+        $expectedExpanded = true;
+        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget');
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $repository->expects($this->at(1))->method('find')->will($this->returnValue($widget));
+        $this->securityFacade->expects($this->once())->method('isGranted')->will($this->returnValue(true));
+        $this->assertFalse($this->manager->saveWidget(1, array()));
+
+        $widget->expects($this->once())->method('setPosition')->with($this->equalTo($expectedPosition));
+        $widget->expects($this->once())->method('setExpanded')->with($this->equalTo($expectedExpanded));
+
+        $this->assertTrue(
+            $this->manager->saveWidget(
+                $widgetId,
+                array('position' => $expectedPosition, 'expanded' => $expectedExpanded)
             )
         );
     }

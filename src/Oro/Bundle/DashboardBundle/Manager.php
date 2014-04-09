@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
@@ -110,7 +111,7 @@ class Manager
             return false;
         }
 
-        if (array_key_exists('position', $widgetState)) {
+        if (!empty($widgetState['position'])) {
             $widget->setPosition((int)$widgetState['position']);
         }
 
@@ -198,7 +199,7 @@ class Manager
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository
+     * @return EntityRepository
      */
     protected function getDashboardRepository()
     {

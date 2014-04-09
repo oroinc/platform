@@ -20,7 +20,7 @@ class WidgetModelFactoryTest extends \PHPUnit_Framework_TestCase
         $configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $configProvider->expects($this->exactly(2))->method('getWidgetConfigs')->will($this->returnValueMap($config));
+        $configProvider->expects($this->exactly(2))->method('getWidgetConfig')->will($this->returnValueMap($config));
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();

@@ -6,6 +6,9 @@ use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 
 class WidgetModel
 {
+    /**
+     * @var array
+     */
     protected $config;
 
     /**
@@ -29,6 +32,10 @@ class WidgetModel
         return $this->widget;
     }
 
+    /**
+     * @param array           $config
+     * @param DashboardWidget $widget
+     */
     public function __construct(array $config, DashboardWidget $widget)
     {
         $this->config = $config;
