@@ -74,6 +74,13 @@ class OroEntityExtendBundle extends Bundle
             // but in this moment we are exactly doing this for the current process.
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
+
+            // $_SERVER['argv'] may be empty in some cases. In this case check for isCommandExecuting will always fail.
+            // This will produce infinite command execution. To prevent this initial empty aliases file is created
+            // before command execution. In command it will be overridden and will contain generated aliases cache.
+            file_put_contents($aliasesPath, '{}');
+
+            // Execute aliases cache generation process
             $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
             $process->setTimeout(100000);
             $process->run();
