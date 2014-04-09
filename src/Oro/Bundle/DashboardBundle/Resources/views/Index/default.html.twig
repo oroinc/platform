@@ -1,26 +1,6 @@
 {% extends bap.layout %}
 {% oro_title_set({params : {"%name%": dashboard.config.label|trans }}) %}
 
-{% macro renderCell(widgets, isEven) %}
-    {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
-        <div class="responsive-cell">
-            {% set index = 1 %}
-            {% for widget in widgets %}
-                {% if (isEven and index is even) or (not isEven and index is odd) %}
-                    {{
-                        oro_widget_render({
-                            'widgetType': 'dashboard-item',
-                            'url': path(widget.config.route, widget.config.route_parameters)
-                        })
-                    }}
-                {% endif %}
-                {% set index = index + 1 %}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-{% import _self as __ %}
-
 {% block content %}
 <div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
@@ -81,8 +61,8 @@
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
-                    {{ __.renderCell(dashboard.widgets, false) }}
-                    {{ __.renderCell(dashboard.widgets, true) }}
+                    {{ __.renderColumn(dashboard.getOrderedColumnWidgets(1, false, true), 1) }}
+                    {{ __.renderColumn(dashboard.getOrderedColumnWidgets(2, true, false), 2) }}
                 {% endblock widgets %}
                 </div>
             </div>
@@ -99,3 +79,17 @@
     {% endblock widgets_content %}
 </div>
 {% endblock content %}
+
+{% macro renderColumn(widgets, column) %}
+    <div class="responsive-cell column" data-column="column">
+        {% for widget in widgets %}
+            {{
+                oro_widget_render({
+                    'widgetType': 'dashboard-item',
+                    'url': path(widget.config.route, widget.config.route_parameters)
+                })
+            }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+{% import _self as __ %}

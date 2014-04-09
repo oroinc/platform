@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const UNSPECIFIED_COLUMN = 1;
     const UNSPECIFIED_POSITION = 9999;
 
     /**
@@ -83,10 +84,6 @@ class Configuration implements ConfigurationInterface
                                             ->cannotBeEmpty()
                                             ->defaultValue(self::UNSPECIFIED_POSITION)
                                         ->end()
-                                        ->booleanNode('visible')
-                                            ->info('Set to "false" to remove an item')
-                                            ->defaultTrue()
-                                        ->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -103,15 +100,6 @@ class Configuration implements ConfigurationInterface
                                 ->isRequired()
                                 ->cannotBeEmpty()
                             ->end()
-                            ->integerNode('position')
-                                ->info('The position in which a dashboard is rendered')
-                                ->cannotBeEmpty()
-                                ->defaultValue(self::UNSPECIFIED_POSITION)
-                            ->end()
-                            ->booleanNode('visible')
-                                ->info('Set to "false" to remove a dashboard')
-                                ->defaultTrue()
-                            ->end()
                             ->scalarNode('twig')
                                 ->info(
                                     'The name of TWIG template.'
@@ -125,14 +113,30 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('array')
                                     ->ignoreExtraKeys()
                                     ->children()
-                                        ->integerNode('position')
-                                            ->info('The position in which a widget is rendered')
+                                        ->arrayNode('layout_position')
+                                            ->info('The position in dashboard layout in which a widget is rendered')
                                             ->cannotBeEmpty()
-                                            ->defaultValue(self::UNSPECIFIED_POSITION)
-                                        ->end()
-                                        ->booleanNode('visible')
-                                            ->info('Set to "false" to remove a widget')
-                                            ->defaultTrue()
+                                            ->defaultValue(array(self::UNSPECIFIED_COLUMN, self::UNSPECIFIED_POSITION))
+                                            ->validate()
+                                                ->always(
+                                                    function ($value) {
+                                                        if (count($value) != 2) {
+                                                            throw new \Exception(
+                                                                'Value should contain at two elements.'
+                                                            );
+                                                        }
+                                                        $value = array_values($value);
+                                                        if ($value[0] < 1) {
+                                                            throw new \Exception(
+                                                                'First element should be greater than 0.'
+                                                            );
+                                                        }
+                                                        return array_values($value);
+                                                    }
+                                                )
+                                            ->end()
+                                            ->prototype('integer')
+                                            ->end()
                                         ->end()
                                     ->end()
                                 ->end()

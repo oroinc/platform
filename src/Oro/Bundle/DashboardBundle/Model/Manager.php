@@ -27,11 +27,6 @@ class Manager
     protected $dashboardRepository;
 
     /**
-     * @var AclHelper
-     */
-    protected $aclHelper;
-
-    /**
      * @var DashboardModelFactory
      */
     protected $dashboardModelFactory;
@@ -85,9 +80,7 @@ class Manager
     {
         $result = [];
         foreach ($this->dashboardRepository->getAvailableDashboards() as $dashboard) {
-            if ($this->securityFacade->isGranted('VIEW', $dashboard)) {
-                $result[] = $this->dashboardModelFactory->getDashboardModel($dashboard);
-            }
+            $result[] = $this->dashboardModelFactory->getDashboardModel($dashboard);
         }
 
         return $result;

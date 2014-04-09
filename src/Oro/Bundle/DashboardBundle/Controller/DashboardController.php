@@ -49,7 +49,9 @@ class DashboardController extends Controller
             $currentDashboard = $this->findCurrentDashboard($id, $dashboards);
         } else {
             $activeDashboard = $this->findUserActiveDashboard($user);
-            $currentDashboard = $this->findCurrentDashboard($activeDashboard->getDashboard()->getId(), $dashboards);
+            if ($activeDashboard) {
+                $currentDashboard = $this->findCurrentDashboard($activeDashboard->getDashboard()->getId(), $dashboards);
+            }
         }
 
         if (!$currentDashboard) {

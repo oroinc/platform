@@ -31,9 +31,9 @@ class DashboardWidget
     /**
      * @var integer
      *
-     * @ORM\Column(name="position", type="integer")
+     * @ORM\Column(name="layout_position", type="simple_array")
      */
-    protected $position;
+    protected $layoutPosition;
 
     /**
      * @var boolean
@@ -82,21 +82,21 @@ class DashboardWidget
     }
 
     /**
-     * @param integer $position
+     * @param array $layoutPosition
      * @return DashboardWidget
      */
-    public function setPosition($position)
+    public function setLayoutPosition(array $layoutPosition)
     {
-        $this->position = $position;
+        $this->layoutPosition = $layoutPosition;
         return $this;
     }
 
     /**
-     * @return integer
+     * @return array
      */
-    public function getPosition()
+    public function getLayoutPosition()
     {
-        return $this->position;
+        return $this->layoutPosition;
     }
 
     /**

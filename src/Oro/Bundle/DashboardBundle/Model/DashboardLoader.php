@@ -109,10 +109,10 @@ class DashboardLoader
         );
 
         if (!$widget) {
-            if (!isset($widgetConfiguration['position'])) {
+            if (!isset($widgetConfiguration['layout_position'])) {
                 throw new InvalidArgumentException(
                     sprintf(
-                        'Position for "%s" widget should not be empty',
+                        'Layout position for "%s" widget should not be empty',
                         $widgetName
                     )
                 );
@@ -122,7 +122,7 @@ class DashboardLoader
             $widget = new DashboardWidget();
             $widget
                 ->setName($widgetName)
-                ->setPosition($widgetConfiguration['position'])
+                ->setLayoutPosition($widgetConfiguration['layout_position'])
                 ->setDashboard($dashboard);
 
             $this->em->persist($widget);
