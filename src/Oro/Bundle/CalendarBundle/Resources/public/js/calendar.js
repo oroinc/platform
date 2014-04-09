@@ -126,7 +126,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         onEventAdded: function (eventModel) {
             var fcEvent = eventModel.toJSON();
-            this.prepareViewModel(fcEvent);
+            // don't need time zone correction, on add event
+            this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -204,11 +205,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadEvents: function (start, end, callback) {
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.getCollection().toJSON();
-                _.each(fcEvents, function (fcEvent) {
-                    fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(new Date(fcEvent.start));
-                    fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(new Date(fcEvent.end));
-                });
-                this.prepareViewModels(fcEvents);
+                _.each(fcEvents, this.prepareViewModel, this);
                 this._hideMask();
                 callback(fcEvents);
             }, this);
@@ -237,15 +234,21 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
         },
 
-        prepareViewModels : function (fcEvents) {
-            _.each(fcEvents, this.prepareViewModel, this);
-        },
-
-        prepareViewModel : function (fcEvent) {
+        /**
+         * Prepares event entry for rendering in calendar plugin
+         *
+         * @param {Object} fcEvent
+         * @param {boolean=} applyTZCorrection by default applies time zone correction
+         */
+        prepareViewModel: function (fcEvent, applyTZCorrection) {
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
+            if (applyTZCorrection !== false) {
+                fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.start);
+                fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.end);
+            }
         },
 
         formatDateTimeForModel: function (date) {
