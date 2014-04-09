@@ -10,9 +10,20 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class WidgetModelFactory
 {
+    /**
+     * @var ConfigProvider
+     */
     private $configProvider;
+
+    /**
+     * @var SecurityFacade
+     */
     private $securityFacade;
 
+    /**
+     * @param ConfigProvider $configProvider
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(ConfigProvider $configProvider, SecurityFacade $securityFacade)
     {
         $this->configProvider = $configProvider;
@@ -21,9 +32,7 @@ class WidgetModelFactory
 
     /**
      * @param Dashboard $dashboard
-     *
      * @throws InvalidConfigurationException
-     *
      * @return WidgetModel[]
      */
     public function getModels(Dashboard $dashboard)

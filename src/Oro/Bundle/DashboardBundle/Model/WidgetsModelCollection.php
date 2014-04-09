@@ -2,24 +2,17 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
-class WidgetsModelCollection implements \Iterator, \Countable
+class WidgetsModelCollection extends AbstractLazyCollection
 {
     /**
      * @var Dashboard
      */
     private $dashboard;
-
-    /**
-     * @var WidgetModel[]|null
-     */
-    private $widgetModels = null;
-
-    /**
-     * @var int cursor position
-     */
-    private $position = 0;
 
     /**
      * @var WidgetModelFactory
@@ -33,67 +26,10 @@ class WidgetsModelCollection implements \Iterator, \Countable
     }
 
     /**
-     * {@inheritdoc}
+     * {inheritdoc}
      */
-    public function current()
+    protected function doInitialize()
     {
-        $elements = $this->getElements();
-        return $elements[$this->position];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next()
-    {
-        ++$this->position;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->position;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid()
-    {
-        $elements = $this->getElements();
-        return isset($elements[$this->position]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind()
-    {
-        $this->position = 0;
-    }
-
-    private function getElements()
-    {
-        if ($this->widgetModels === null) {
-            $this->widgetModels = $this->widgetModelFactory->getModels($this->dashboard);
-        }
-
-        return $this->widgetModels;
-    }
-
-    /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Count elements of an object
-     * @link http://php.net/manual/en/countable.count.php
-     * @return int The custom count as an integer.
-     * </p>
-     * <p>
-     * The return value is cast to an integer.
-     */
-    public function count()
-    {
-        return count($this->getElements());
+        $this->collection = new ArrayCollection($this->widgetModelFactory->getModels($this->dashboard));
     }
 }

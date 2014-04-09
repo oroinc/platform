@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * Dashboard
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository")
  * @ORM\Table(name="oro_dashboard")
  * @Config(
  *  defaultValues={

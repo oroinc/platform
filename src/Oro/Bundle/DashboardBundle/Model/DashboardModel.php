@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 
 class DashboardModel
 {
     /**
-     * @var WidgetsModelCollection
+     * @var Collection
      */
     protected $widgets;
 
@@ -22,7 +22,12 @@ class DashboardModel
      */
     protected $dashboard;
 
-    public function __construct(WidgetsModelCollection $widgets, array $config, Dashboard $dashboard)
+    /**
+     * @param Collection $widgets
+     * @param array      $config
+     * @param Dashboard  $dashboard
+     */
+    public function __construct(Collection $widgets, array $config, Dashboard $dashboard)
     {
         $this->widgets = $widgets;
         $this->config = $config;
@@ -46,7 +51,7 @@ class DashboardModel
     }
 
     /**
-     * @return WidgetsModelCollection
+     * @return Collection
      */
     public function getWidgets()
     {

@@ -25,10 +25,8 @@ class ConfigProvider
     }
 
     /**
-     * @param $key
-     *
-     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
-     *
+     * @param string $key
+     * @throws InvalidConfigurationException
      * @return array
      */
     public function getConfig($key)
@@ -65,18 +63,9 @@ class ConfigProvider
     }
 
     /**
-     * @param $key
-     * @return bool
-     */
-    public function hasConfig($key)
-    {
-        return isset($this->configs[$key]);
-    }
-
-    /**
-     * @param $dashboardName
-     * @return mixed
+     * @param string $dashboardName
      * @throws InvalidConfigurationException
+     * @return array
      */
     public function getDashboardConfig($dashboardName)
     {
@@ -88,7 +77,16 @@ class ConfigProvider
     }
 
     /**
-     * @param $dashboardName
+     * @param string $key
+     * @return bool
+     */
+    public function hasConfig($key)
+    {
+        return isset($this->configs[$key]);
+    }
+
+    /**
+     * @param string $dashboardName
      * @return bool
      */
     public function hasDashboardConfig($dashboardName)
@@ -97,11 +95,9 @@ class ConfigProvider
     }
 
     /**
-     * @param $widgetName
-     *
+     * @param string $widgetName
      * @throws InvalidConfigurationException
-     *
-     * @return mixed
+     * @return array
      */
     public function getWidgetConfig($widgetName)
     {
@@ -113,7 +109,7 @@ class ConfigProvider
     }
 
     /**
-     * @param $widgetName
+     * @param string $widgetName
      * @return bool
      */
     public function hasWidgetConfig($widgetName)

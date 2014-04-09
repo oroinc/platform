@@ -1,8 +1,11 @@
 parameters:
-    oro_dashboard.manager.class:               Oro\Bundle\DashboardBundle\Manager
-    oro_dashboard.configuration.manager.class: Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager
-    oro_dashboard.widget_model_factory.class:  Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
-    oro_dashboard.config_provider.class:       Oro\Bundle\DashboardBundle\Provider\ConfigProvider
+    oro_dashboard.manager.class:                  Oro\Bundle\DashboardBundle\Model\Manager
+    oro_dashboard.configuration.manager.class:    Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager
+    oro_dashboard.widget_model_factory.class:     Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
+    oro_dashboard.dashboard_model_factory.class:  Oro\Bundle\DashboardBundle\Model\DashboardModelFactory
+    oro_dashboard.config_provider.class:          Oro\Bundle\DashboardBundle\Provider\ConfigProvider
+    oro_dashboard.repository.class:               Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
+    oro_dashboard.dashboard_entity.class:         Oro\Bundle\DashboardBundle\Entity\Dashboard
 
 services:
     oro_dashboard.manager:
@@ -10,9 +13,14 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @oro_security.security_facade
-            - @doctrine.orm.entity_manager
+            - @oro_dashboard.repository
+            - @oro_dashboard.dashboard_model_factory
+
+    oro_dashboard.dashboard_model_factory:
+        class: %oro_dashboard.dashboard_model_factory.class%
+        arguments:
             - @oro_dashboard.widget_model_factory
-            - @oro_security.acl_helper
+            - @oro_dashboard.config_provider
 
     oro_dashboard.configuration.manager:
         class: %oro_dashboard.configuration.manager.class%
@@ -30,3 +38,11 @@ services:
         class: %oro_dashboard.config_provider.class%
         arguments:
             - []
+
+    oro_dashboard.repository:
+        class: %oro_dashboard.repository.class%
+        factory_service: doctrine # this is an instance of Registry
+        factory_method: getRepository
+        arguments: [ %oro_dashboard.dashboard_entity.class% ]
+        calls:
+            - ['setAclHelper', [@oro_security.acl_helper]]
