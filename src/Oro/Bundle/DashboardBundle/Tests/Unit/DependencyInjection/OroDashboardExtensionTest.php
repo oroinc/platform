@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
-use Oro\Bundle\DashboardBundle\Tests\Unit\fixtures\SecondTestBundle\SecondTestBundle;
-use Oro\Bundle\DashboardBundle\Tests\Unit\fixtures\FirstTestBundle\FirstTestBundle;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {
