@@ -3,8 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
-use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
-use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,9 +20,9 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoad()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->will($this->returnValue(array(new FirstTestBundle(), new SecondTestBundle())));
+        $firstBundle = 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle';
+        $secondBundle = 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle';
+        CumulativeResourceManager::getInstance()->setBundles(array($firstBundle, $secondBundle));
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
 
         $items = array(
