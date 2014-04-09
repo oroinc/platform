@@ -12,9 +12,18 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $target;
 
+    protected $bundlesState;
+
     protected function setUp()
     {
+        $this->bundlesState = CumulativeResourceManager::getInstance()->getBundles();
+
         $this->target = new OroDashboardExtension();
+    }
+
+    protected function tearDown()
+    {
+        CumulativeResourceManager::getInstance()->setBundles($this->bundlesState);
     }
 
     public function testLoad()
