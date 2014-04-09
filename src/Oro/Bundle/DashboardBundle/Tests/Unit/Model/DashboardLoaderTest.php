@@ -57,7 +57,7 @@ class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
         return [
             'without position' => [
                 'expectedException'        => '\Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException',
-                'expectedExceptionMessage' => 'Position for "widget" widget should not be empty',
+                'expectedExceptionMessage' => 'Layout position for "widget" widget should not be empty',
                 'dashboardName'            => 'dashboard',
                 'dashboardConfiguration'   => [
                     'widgets' => [
@@ -96,7 +96,7 @@ class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
                 'dashboardConfiguration'   => [
                     'widgets' => [
                         'widget' => [
-                            'position' => 10
+                            'layout_position' => [1, 10]
                         ]
                     ]
                 ],

@@ -29,12 +29,12 @@ class DashboardWidgetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->widget->getName());
     }
 
-    public function testPosition()
+    public function testLayoutPosition()
     {
-        $this->assertNull($this->widget->getPosition());
-        $value = 100;
-        $this->assertEquals($this->widget, $this->widget->setPosition($value));
-        $this->assertEquals($value, $this->widget->getPosition());
+        $this->assertNull($this->widget->getLayoutPosition());
+        $value = array(1, 100);
+        $this->assertEquals($this->widget, $this->widget->setLayoutPosition($value));
+        $this->assertEquals($value, $this->widget->getLayoutPosition());
     }
 
     public function testExpanded()

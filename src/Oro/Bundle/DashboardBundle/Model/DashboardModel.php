@@ -58,4 +58,39 @@ class DashboardModel
     {
         return $this->widgets;
     }
+
+    /**
+     * @param int $column
+     * @param bool $appendGreater
+     * @param bool $appendLesser
+     * @return array
+     */
+    public function getOrderedColumnWidgets($column, $appendGreater = false, $appendLesser = false)
+    {
+        $elements = $this->widgets->filter(
+            function ($element) use ($column, $appendGreater, $appendLesser) {
+                /** @var WidgetModel $element */
+                $actualColumn = current($element->getWidget()->getLayoutPosition());
+                return
+                    ($actualColumn == $column) ||
+                    ($appendGreater && $actualColumn > $column) ||
+                    ($appendLesser && $actualColumn < $column);
+            }
+        );
+
+        $result = $elements->getValues();
+
+        usort(
+            $result,
+            function ($first, $second) {
+                /** @var WidgetModel $first */
+                /** @var WidgetModel $second */
+                $firstPosition = $first->getWidget()->getLayoutPosition();
+                $secondPosition = $second->getWidget()->getLayoutPosition();
+                return $firstPosition[1] - $secondPosition[1];
+            }
+        );
+
+        return $result;
+    }
 }

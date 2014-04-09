@@ -68,7 +68,6 @@ class Dashboard
      *     targetEntity="Oro\Bundle\DashboardBundle\Entity\DashboardWidget",
      *     mappedBy="dashboard", cascade={"ALL"}, orphanRemoval=true
      * )
-     * @ORM\OrderBy({"position" = "ASC"})
      */
     protected $widgets;
 

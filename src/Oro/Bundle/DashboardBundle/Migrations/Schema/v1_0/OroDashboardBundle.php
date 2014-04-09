@@ -38,7 +38,7 @@ class OroDashboardBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('position', 'integer', []);
+        $table->addColumn('layout_position', 'simple_array', []);
         $table->addColumn('is_expanded', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['dashboard_id'], 'IDX_4B6C43ACB9D04D2B', []);
