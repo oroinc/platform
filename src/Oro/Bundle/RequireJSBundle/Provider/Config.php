@@ -33,6 +33,11 @@ class Config
     protected $template;
 
     /**
+     * @var array
+     */
+    protected $collectedConfig;
+
+    /**
      * @param ContainerInterface $container
      * @param EngineInterface $templating
      * @param $template
@@ -134,15 +139,20 @@ class Config
      */
     public function collectConfigs()
     {
-        $config = $this->container->getParameter('oro_require_js');
-        $bundles = $this->container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
-                $requirejs = Yaml::parse(realpath($file));
-                $config = array_merge_recursive($config, $requirejs);
+        if (!$this->collectedConfig) {
+            $config = $this->container->getParameter('oro_require_js');
+            $bundles = $this->container->getParameter('kernel.bundles');
+            foreach ($bundles as $bundle) {
+                $reflection = new \ReflectionClass($bundle);
+                if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
+                    $requirejs = Yaml::parse(realpath($file));
+                    $config = array_merge_recursive($config, $requirejs);
+                }
             }
+
+            $this->collectedConfig = $config;
         }
-        return $config;
+
+        return $this->collectedConfig;
     }
 }
