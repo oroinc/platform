@@ -14,7 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  * @db_isolation
  * @db_reindex
  */
-class ListCommandTest extends WebTestCase
+class LoadDashboardCommandTest extends WebTestCase
 {
     /**
      * @var Client

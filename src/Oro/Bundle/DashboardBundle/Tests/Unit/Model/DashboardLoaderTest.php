@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\DashboardBundle\Configuration\ConfigurationLoader;
-use Oro\Bundle\DashboardBundle\Configuration\ConfigurationManager;
+use Oro\Bundle\DashboardBundle\Model\DashboardLoader;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
+class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @param string $name
-     * @param array  $configuration
+     * @param string          $expectedException
+     * @param string          $expectedExceptionMessage
+     * @param string          $dashboardName
+     * @param array           $dashboardConfiguration
+     * @param Dashboard       $repositoryDashboard
+     * @param DashboardWidget $repositoryWidget
      *
      * @dataProvider configurationProvider
      */
@@ -27,11 +30,16 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException($expectedException, $expectedExceptionMessage);
 
         if ($repositoryDashboard) {
+            $repositoryWidget->setName('widget');
             $repositoryDashboard->addWidget($repositoryWidget);
             $repositoryDashboard->setName($dashboardName);
         }
-        $manager   = $this->createManager($repositoryDashboard);
-        $dashboard = $manager->saveDashboardConfiguration($dashboardName, $dashboardConfiguration);
+        $loader    = $this->createLoader($repositoryDashboard);
+        $dashboard = $loader->saveDashboardConfiguration(
+            $dashboardName,
+            $dashboardConfiguration,
+            new User()
+        );
 
         $this->assertEquals($dashboardName, $dashboard->getName());
 
@@ -98,79 +106,111 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testSaveDashboardConfigurations()
+    public function testRemoveNonExistingWidgets()
     {
-        $manager    = $this->createManager();
-        $dashboards = $manager->saveDashboardConfigurations();
-
-        $this->assertNotNull($dashboards);
-        $this->assertEquals('dashboard', $dashboards[0]->getName());
+        $loader = $this->createLoaderWithQueryBuilder();
+        $loader->removeNonExistingWidgets(['widget']);
     }
 
     /**
      * @param Dashboard $dashboard
-     * @return ConfigurationManager
+     * @return DashboardLoader
      */
-    protected function createManager(Dashboard $dashboard = null)
+    protected function createLoader(Dashboard $dashboard = null)
+    {
+        $entityManager = $this->createEntityManagerMock($dashboard);
+
+        return new DashboardLoader($entityManager);
+    }
+
+    /**
+     * @param Dashboard $dashboard
+     * @return DashboardLoader
+     */
+    protected function createLoaderWithQueryBuilder(Dashboard $dashboard = null)
+    {
+        $entityManager = $this->createEntityManagerMock($dashboard);
+
+        $entityManager
+            ->expects($this->any())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($this->createQueryBuilderMock()));
+
+        return new DashboardLoader($entityManager);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createEntityManagerMock(Dashboard $dashboard = null)
     {
         $entityManager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->setMethods(['getFirstMatchedUser', 'find', 'findBy', 'findAll', 'findOneBy', 'getClassName'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
 
         $repository
             ->expects($this->any())
             ->method('findOneBy')
             ->will($this->returnValue($dashboard));
 
-        $repository
-            ->expects($this->any())
-            ->method('getFirstMatchedUser')
-            ->will($this->returnValue(new User()));
-
-        $repository
-            ->expects($this->at(0))
-            ->method('findOneBy')
-            ->with($this->equalTo(['role' => User::ROLE_ADMINISTRATOR]))
-            ->will($this->returnValue(new User()));
-
         $entityManager
             ->expects($this->atLeastOnce())
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $configProvider = $this
-            ->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
+        return $entityManager;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createQueryBuilderMock()
+    {
+        $entityName = 'OroDashboardBundle:DashboardWidget';
+        $entityAlias = 'w';
+
+        $query = $this
+            ->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
+            ->setMethods(array('execute'))
+            ->getMockForAbstractClass();
+
+        $query
+            ->expects($this->once())
+            ->method('execute');
+
+        $queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(array('delete', 'where', 'setParameter', 'getQuery'))
             ->getMock();
 
-        $configProvider
-            ->expects($this->any())
-            ->method('getWidgetConfig')
-            ->will($this->returnValue([]));
+        $queryBuilder
+            ->expects($this->once())
+            ->method('delete')
+            ->with($this->equalTo($entityName), $this->equalTo($entityAlias))
+            ->will($this->returnSelf());
 
-        $configProvider
-            ->expects($this->any())
-            ->method('getDashboardConfigs')
-            ->will(
-                $this->returnValue(
-                    [
-                        'dashboard' => [
-                            'widgets' => []
-                        ]
-                    ]
-                )
-            );
+        $queryBuilder
+            ->expects($this->once())
+            ->method('where')
+            ->with('w.name NOT IN (:widgetNames)')
+            ->will($this->returnSelf());
 
-        return new ConfigurationManager(
-            $entityManager,
-            $configProvider
-        );
+        $queryBuilder
+            ->expects($this->once())
+            ->method('setParameter')
+            ->with($this->equalTo('widgetNames'), $this->equalTo(['widget']))
+            ->will($this->returnSelf());
+
+        $queryBuilder
+            ->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        return $queryBuilder;
     }
 }
