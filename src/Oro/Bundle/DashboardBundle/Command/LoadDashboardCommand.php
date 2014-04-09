@@ -92,8 +92,13 @@ class LoadDashboardCommand extends ContainerAwareCommand
         } else {
             $repository = $this->em->getRepository('OroUserBundle:Role');
             $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
-            $user       = $repository->getFirstMatchedUser($role);
+            if (!$role) {
+                throw new InvalidArgumentException(
+                    'At least one role needed to configure dashboard ownership'
+                );
+            }
 
+            $user       = $repository->getFirstMatchedUser($role);
             if (!$user) {
                 throw new InvalidArgumentException(
                     'At least one user needed to configure dashboard ownership'
