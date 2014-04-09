@@ -89,10 +89,10 @@ class MergeRenderer
         return $this->environment->render(
             $template,
             array(
-                'metadata' => $metadata,
-                'value' => $value,
                 'convertedValue' => $stringValue,
-                'isListValue' => $isListValue,
+                'isListValue'    => $isListValue,
+                'metadata'       => $metadata,
+                'value'          => $value,
             )
         );
     }

@@ -114,7 +114,7 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             array(
                 array(),
                 'allow_action',
-                false
+                true
             ),
             array(
                 array('add_acl_resource' => self::PERMISSION_ALLOW),

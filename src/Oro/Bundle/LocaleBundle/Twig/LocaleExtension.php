@@ -36,6 +36,10 @@ class LocaleExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_locale', array($this->localeSettings, 'getLocale')),
             new \Twig_SimpleFunction('oro_language', array($this->localeSettings, 'getLanguage')),
             new \Twig_SimpleFunction('oro_country', array($this->localeSettings, 'getCountry')),
+            new \Twig_SimpleFunction(
+                'oro_currency_symbol',
+                array($this->localeSettings, 'getCurrencySymbolByCurrency')
+            ),
             new \Twig_SimpleFunction('oro_currency', array($this->localeSettings, 'getCurrency')),
             new \Twig_SimpleFunction('oro_timezone', array($this->localeSettings, 'getTimeZone')),
             new \Twig_SimpleFunction('oro_timezone_offset', array($this, 'getTimeZoneOffset')),

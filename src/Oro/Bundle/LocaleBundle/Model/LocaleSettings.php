@@ -302,8 +302,12 @@ class LocaleSettings
      * @param string $currencyCode
      * @return null
      */
-    public function getCurrencySymbolByCurrency($currencyCode)
+    public function getCurrencySymbolByCurrency($currencyCode = null)
     {
+        if (!$currencyCode) {
+            $currencyCode = $this->getCurrency();
+        }
+
         if (!empty($this->currencyData[$currencyCode]['symbol'])) {
             return $this->currencyData[$currencyCode]['symbol'];
         }

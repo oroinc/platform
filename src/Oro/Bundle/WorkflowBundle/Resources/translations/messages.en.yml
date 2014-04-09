@@ -102,6 +102,7 @@ oro:
 
             related_entity.label:       Workflow Step
             related_entity.description: Related field for Workflow Step
+            grid.label:                 Step
 
         workflowdefinition:
             entity_label:                 Workflow
@@ -129,3 +130,11 @@ oro:
                 deactivate: Deactivate
         action:
             general: "Workflow manipulations"
+
+        entity_config:
+            active_workflow.label:        'Active workflow'
+            active_workflow.none:         'none'
+            show_step_in_grid.label:      'Workflow step in grid'
+            show_step_in_grid.choice:
+                hide:                     'Hide'
+                show:                     'Show'

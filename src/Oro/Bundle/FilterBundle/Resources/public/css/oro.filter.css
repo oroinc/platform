@@ -62,7 +62,7 @@
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
     display: none;
-    z-index: 700;
+    z-index: 10000;
     margin-top: 7px;
     top: auto;
 }
@@ -107,7 +107,7 @@
 
 .ui-multiselect-menu.select-filter-widget {
     padding: 2px;
-    z-index: 700;
+    z-index: 10000;
 }
 
 .ui-multiselect-menu.select-filter-widget ul {
@@ -241,4 +241,8 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 }
 .active-filter .field-select {
     display: block;
+}
+
+.ui-multiselect-menu.multiselect-filter-widget {
+    margin-top: 7px;
 }

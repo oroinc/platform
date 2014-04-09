@@ -16,8 +16,9 @@ oro:
             unite: Append
 
         form:
+            empty:         Empty
             master_record: Master Record
-            strategy: Strategy
-            select_all: Select All Values
-            merge_values: Merge Values
-            merge_button: Merge
+            strategy:      Strategy
+            select_all:    Select All Values
+            merge_values:  Merge Values
+            merge_button:  Merge
