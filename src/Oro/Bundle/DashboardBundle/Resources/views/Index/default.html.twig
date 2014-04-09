@@ -68,12 +68,9 @@
             </div>
         </div>
         <script type="text/javascript">
-            require(['jquery'],
-            function($){
-                $(function () {
-                    var $contentEl = $('.{{ contentClass }}');
-                    $contentEl.closest('.scrollable-container').css('background-color', $contentEl.css('background-color'));
-                });
+            require(['jquery', 'orodashboard/js/dashboard-container'],
+            function($, DashboardContainer){
+                var widgetContainer = new DashboardContainer();
             });
         </script>
     {% endblock widgets_content %}
@@ -81,11 +78,12 @@
 {% endblock content %}
 
 {% macro renderColumn(widgets, column) %}
-    <div class="responsive-cell column" data-column="column">
+    <div class="responsive-cell column" data-column="{{ column }}">
         {% for widget in widgets %}
             {{
                 oro_widget_render({
                     'widgetType': 'dashboard-item',
+                    'wid': 'dashboard-widget-' ~ widget.widget.id,
                     'url': path(widget.config.route, widget.config.route_parameters)
                 })
             }}
