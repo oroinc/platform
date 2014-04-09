@@ -26,30 +26,15 @@ define(function (require) {
     var pageCacheStates = {
         state: {},
 
-        registerStateObject: function(type, fields) {
-            this.state[type] = {};
-            _.each(fields, function(field) {
-                this.state[type][field] = '';
-            }, this);
+        saveObjectCache: function (key, state) {
+            this.state[key] = this.state[key] || {};
+            _.extend(this.state[key], state);
         },
 
-        saveObjectCache: function(type, values) {
-            _.each(values, function(value, key) {
-                this.state[type][key] = value;
-            }, this);
-        },
-
-        getObjectCache: function(type) {
-            // todo: temporary disable states for grid because it should be allowed to work with several grids on a page
-            // https://magecore.atlassian.net/browse/BAP-3758
-            if (type == 'grid') { return {}; }
-
-            return this.state[type];
+        getObjectCache: function (key) {
+            return this.state[key] || {};
         }
     };
-
-    pageCacheStates.registerStateObject('grid',['collection']);
-    pageCacheStates.registerStateObject('form',['form_data']);
 
     /**
      * Router for hash navigation
@@ -221,7 +206,7 @@ define(function (require) {
              * Processing all links in grid after grid load
              */
             mediator.bind("grid_load:complete", function (collection) {
-                this.updateCachedContent('grid', {'collection': collection});
+                this.updateCachedContent(collection.inputName, {'collection': collection});
                 if (pinbarView) {
                     var item = pinbarView.getItemForCurrentPage(true);
                     if (item.length && this.useCache) {
@@ -234,12 +219,13 @@ define(function (require) {
             /**
              * Loading grid collection from cache
              */
-            mediator.bind("datagrid_collection_set_before", function (obj) {
-                var data = this.getCachedData();
+            mediator.bind("datagrid_collection_set_before", function (payload) {
+                var gridName = payload.name,
+                    data = this.getCachedData();
                 if (data.states) {
-                    var girdState = data.states.getObjectCache('grid');
+                    var girdState = data.states.getObjectCache(gridName);
                     if (girdState.collection) {
-                        obj.collection = girdState.collection.clone();
+                        payload.collection = girdState.collection.clone();
                     }
                 }
             }, this);
@@ -248,12 +234,13 @@ define(function (require) {
              * Updating grid collection in cache
              */
             mediator.bind("datagrid_collection_set_after", function (collection) {
-                var data = this.getCachedData();
+                var gridName = collection.inputName,
+                    data = this.getCachedData();
                 if (data.states) {
-                    var girdState = data.states.getObjectCache('grid');
+                    var girdState = data.states.getObjectCache(gridName);
                     girdState.collection = collection;
                 } else { //updating temp cache with collection
-                    this.updateCachedContent('grid', {collection: collection});
+                    this.updateCachedContent(gridName, {collection: collection});
                 }
             }, this);
 
@@ -286,7 +273,7 @@ define(function (require) {
              * Add "pinned" page to cache
              */
             mediator.bind("pagestate_collected", function (pagestateModel) {
-                this.updateCachedContent('form', {'form_data': pagestateModel.get('pagestate').data});
+                this.updateCachedContent('form', {formData: pagestateModel.get('pagestate').data});
                 if (this.useCache) {
                     contentManager.addPage(this.getHashUrl(), this.tempCache);
                 }
@@ -355,7 +342,7 @@ define(function (require) {
                      */
                     //this.formState = formState;
                 }
-                if (formState && formState['form_data'].length) {
+                if (formState && formState.formData.length) {
                     this.confirmModal.open();
                 } else {
                     this.refreshPage();
@@ -522,8 +509,8 @@ define(function (require) {
             } else if (cacheData.states) {
                 formState = cacheData.states.getObjectCache('form');
             }
-            if (formState['form_data'] && formState['form_data'].length) {
-                pagestate.updateState(formState['form_data']);
+            if (formState.formData && formState.formData.length) {
+                pagestate.updateState(formState.formData);
                 pagestate.restore();
                 pagestate.needServerRestore = false;
             }
@@ -584,12 +571,12 @@ define(function (require) {
         /**
          * Save page content to cache
          *
-         * @param objectName
+         * @param key
          * @param state
          */
-        updateCachedContent: function(objectName, state) {
+        updateCachedContent: function (key, state) {
             if (this.tempCache.states) {
-                this.tempCache.states.saveObjectCache(objectName, state);
+                this.tempCache.states.saveObjectCache(key, state);
             }
         },
 
