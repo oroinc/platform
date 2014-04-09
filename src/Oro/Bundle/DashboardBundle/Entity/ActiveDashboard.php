@@ -10,23 +10,23 @@ use Oro\Bundle\UserBundle\Entity\User;
  * Dashboard
  *
  * @ORM\Entity
- * @ORM\Table(name="oro_active_dashboard")
+ * @ORM\Table(name="oro_dashboard_active")
  */
 class ActiveDashboard
 {
     /**
      * @var integer
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="user_id", type="integer")
      * @ORM\Id
      */
-    protected $id;
+    protected $user_id;
 
     /**
      * @var User
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $user;
 
@@ -34,7 +34,7 @@ class ActiveDashboard
      * @var Dashboard
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\DashboardBundle\Entity\Dashboard")
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
 
@@ -44,6 +44,7 @@ class ActiveDashboard
      */
     public function setUser($user)
     {
+        $this->user_id = $user->getId();
         $this->user = $user;
 
         return $this;

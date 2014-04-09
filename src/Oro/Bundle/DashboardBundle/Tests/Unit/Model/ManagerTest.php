@@ -24,11 +24,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $entityManager;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $dashboardModelFactory;
 
     /**
@@ -36,14 +31,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $dashboardRepository;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityManager;
+
     protected function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->setMethods(array('isGranted'))
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -56,97 +51,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->manager = new Manager(
             $this->configProvider,
-            $this->securityFacade,
             $this->dashboardRepository,
-            $this->dashboardModelFactory
+            $this->dashboardModelFactory,
+            $this->entityManager
         );
-    }
-
-    public function testGetDefaultDashboardName()
-    {
-        $expected = 'expected_dashboard';
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('default_dashboard')
-            ->will($this->returnValue($expected));
-
-        $firstDashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $firstDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $firstDashboard->expects($this->once())->method('getName')->will($this->returnValue(1));
-        $firstDashboardModel->expects($this->once())->method('getDashboard')->will($this->returnValue($firstDashboard));
-
-        $secondDashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $secondDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $secondDashboard->expects($this->once())->method('getName')->will($this->returnValue($expected));
-        $secondDashboardModel->expects($this->once())
-            ->method('getDashboard')
-            ->will($this->returnValue($secondDashboard));
-
-        $available = array($firstDashboardModel, $secondDashboardModel);
-
-        $actual = $this->manager->findDefaultDashboard($available);
-
-        $this->assertSame($secondDashboardModel, $actual);
-    }
-
-    public function testGetWidgetAttributesForTwig()
-    {
-        $expectedWidgetName = 'widget_name';
-        $configs = array(
-            'route'=>'sample route',
-            'route_parameters'=>'sample params',
-            'acl'=>'view_acl',
-            'items'=>array(),
-            'test-param'=>'param'
-        );
-        $expected = array('widgetName' => $expectedWidgetName, 'widgetTestParam' => 'param');
-        $this->configProvider->expects($this->once())
-            ->method('getWidgetConfig')
-            ->with($expectedWidgetName)
-            ->will($this->returnValue($configs));
-
-        $actual = $this->manager->getWidgetAttributesForTwig($expectedWidgetName);
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testGetWidgetItems()
-    {
-        $expectedWidgetName = 'widget_name';
-
-        $expectedItem = 'expected_item';
-        $expectedValue = array('label' => 'test label', 'acl' => 'valid_acl');
-        $notGrantedItem = 'not_granted_item';
-        $notGrantedValue = array('label' => 'not granted label', 'acl' => 'invalid_acl');
-        $configs = array(
-            $expectedItem => $expectedValue,
-            $notGrantedItem => $notGrantedValue
-        );
-        unset($expectedValue['acl']);
-        $expected = array($expectedItem => $expectedValue);
-        $this->configProvider->expects($this->once())
-            ->method('getWidgetConfig')
-            ->with($expectedWidgetName)
-            ->will($this->returnValue(array('items' => $configs)));
-
-        $this->securityFacade->expects($this->exactly(2))
-            ->method('isGranted')
-            ->will(
-                $this->returnCallback(
-                    function ($parameter) use ($notGrantedValue) {
-                        return $notGrantedValue['acl'] != $parameter;
-                    }
-                )
-            );
-
-        $actual = $this->manager->getWidgetItems($expectedWidgetName);
-        $this->assertEquals($expected, $actual);
     }
 
     public function testGetDashboards()
@@ -157,21 +71,48 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->dashboardRepository->expects($this->once())
             ->method('getAvailableDashboards')
             ->will($this->returnValue($dashboards));
-        $this->securityFacade->expects($this->at(0))
-            ->method('isGranted')
-            ->with('VIEW', $firstDashboard)
-            ->will($this->returnValue(false));
-        $this->securityFacade->expects($this->at(1))
-            ->method('isGranted')
-            ->with('VIEW', $secondDashboard)
-            ->will($this->returnValue(true));
-        $this->dashboardModelFactory->expects($this->once())
+        $this->dashboardModelFactory->expects($this->exactly(2))
             ->method('getDashboardModel')
-            ->with($secondDashboard)
-            ->will($this->returnValue($secondDashboard));
+            ->with($secondDashboard);
         $dashboards = $this->manager->getDashboards();
 
-        $this->assertCount(1, $dashboards);
-        $this->assertEquals($secondDashboard, $dashboards[0]);
+        $this->assertCount(2, $dashboards);
+    }
+
+    public function testGetUserDashboardIfActiveExist()
+    {
+        $expectedId = 42;
+        $expected = array('user_id' => $expectedId);
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardModel = $this->getMockBuilder('\Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dashboardModel->expects($this->once())->method('getDashboard')->will($this->returnValue($dashboard));
+        $user->expects($this->once())->method('getId')->will($this->returnValue($expectedId));
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with($expected)
+            ->will($this->returnValue($dashboardModel));
+        $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
+        $this->manager->getUserDashboard($user);
+    }
+
+    public function testGetUserDashboardIfActiveNotExist()
+    {
+        $expectedName = 'main';
+        $expected = array('name' => $expectedName);
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $user->expects($this->once())->method('getId')->will($this->returnValue(42));
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
+        $this->configProvider->expects($this->once())->method('getConfig')->will($this->returnValue($expectedName));
+        $this->dashboardRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with($expected)
+            ->will($this->returnValue($dashboard));
+        $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
+        $this->manager->getUserDashboard($user);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Exception;
 
-class InvalidConfigurationException extends \Exception
+class InvalidConfigurationException extends \Exception implements Exception
 {
     public function __construct($message = "")
     {

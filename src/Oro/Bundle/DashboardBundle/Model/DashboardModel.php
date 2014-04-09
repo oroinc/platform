@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
 class DashboardModel

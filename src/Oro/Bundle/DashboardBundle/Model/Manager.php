@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
-use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class Manager
 {
@@ -17,19 +17,9 @@ class Manager
     protected $configProvider;
 
     /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
-
-    /**
      * @var DashboardRepository
      */
     protected $dashboardRepository;
-
-    /**
-     * @var AclHelper
-     */
-    protected $aclHelper;
 
     /**
      * @var DashboardModelFactory
@@ -37,42 +27,28 @@ class Manager
     protected $dashboardModelFactory;
 
     /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
      * Constructor
      *
-     * @param ConfigProvider        $configProvider
-     * @param SecurityFacade        $securityFacade
-     * @param DashboardRepository   $dashboardRepository
-     * @param DashboardModelFactory $dashboardModelFactory
+     * @param ConfigProvider              $configProvider
+     * @param DashboardRepository         $dashboardRepository
+     * @param DashboardModelFactory       $dashboardModelFactory
+     * @param EntityManager $entityManager
      */
     public function __construct(
         ConfigProvider $configProvider,
-        SecurityFacade $securityFacade,
         DashboardRepository $dashboardRepository,
-        DashboardModelFactory $dashboardModelFactory
+        DashboardModelFactory $dashboardModelFactory,
+        EntityManager $entityManager
     ) {
-        $this->securityFacade = $securityFacade;
         $this->dashboardRepository = $dashboardRepository;
         $this->configProvider = $configProvider;
         $this->dashboardModelFactory = $dashboardModelFactory;
-    }
-
-    /**
-     * Returns name of default dashboard
-     *
-     * @param DashboardModel[] $availableDashboards
-     * @throws InvalidArgumentException
-     * @return string
-     */
-    public function findDefaultDashboard(array $availableDashboards)
-    {
-        $name = $this->configProvider->getConfig('default_dashboard');
-        foreach ($availableDashboards as $dashboard) {
-            if ($dashboard->getDashboard()->getName() == $name) {
-                return $dashboard;
-            }
-        }
-
-        throw new InvalidArgumentException();
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -85,63 +61,56 @@ class Manager
     {
         $result = [];
         foreach ($this->dashboardRepository->getAvailableDashboards() as $dashboard) {
-            if ($this->securityFacade->isGranted('VIEW', $dashboard)) {
-                $result[] = $this->dashboardModelFactory->getDashboardModel($dashboard);
-            }
+            $result[] = $this->dashboardModelFactory->getDashboardModel($dashboard);
         }
 
         return $result;
     }
 
     /**
-     * Returns widget attributes with attribute name converted to use in widget's TWIG template
-     *
-     * @param string $widgetName The name of widget
-     * @return array
+     * @param User $user
+     * @param int  $dashboardId
+     * @return bool
      */
-    public function getWidgetAttributesForTwig($widgetName)
+    public function setUserActiveDashboard(User $user, $dashboardId)
     {
-        $result = [
-            'widgetName' => $widgetName
-        ];
+        $dashboard = $this->dashboardRepository->find($dashboardId);
 
-        $widget = $this->configProvider->getWidgetConfig($widgetName);
-        unset($widget['route']);
-        unset($widget['route_parameters']);
-        unset($widget['acl']);
-        unset($widget['items']);
-
-        foreach ($widget as $key => $val) {
-            $attrName = 'widget';
-            foreach (explode('_', str_replace('-', '_', $key)) as $keyPart) {
-                $attrName .= ucfirst($keyPart);
-            }
-            $result[$attrName] = $val;
+        if (!$dashboard) {
+            return false;
         }
 
-        return $result;
+        $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+            ->findOneBy(array('user_id' => $user->getId()));
+
+        if (!$activeDashboard) {
+            $activeDashboard = new ActiveDashboard();
+            $activeDashboard->setUser($user);
+        }
+
+        $activeDashboard->setDashboard($dashboard);
+
+        $this->entityManager->persist($activeDashboard);
+        $this->entityManager->flush();
+
+        return true;
     }
 
     /**
-     * Returns a list of items for the given widget
-     *
-     * @param string $widgetName The name of widget
-     * @return array
+     * @param User $user
+     * @return DashboardModel
      */
-    public function getWidgetItems($widgetName)
+    public function getUserDashboard(User $user)
     {
-        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
+        $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+            ->findOneBy(array('user_id' => $user->getId()));
 
-        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
-
-        foreach ($items as $itemName => &$item) {
-            if (!isset($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
-                unset($item['acl']);
-            } else {
-                unset($items[$itemName]);
-            }
+        if (!$activeDashboard) {
+            $name = $this->configProvider->getConfig('default_dashboard');
+            $dashboard = $this->dashboardRepository->findOneBy(array('name' => $name));
+            return $this->dashboardModelFactory->getDashboardModel($dashboard);
         }
 
-        return $items;
+        return $this->dashboardModelFactory->getDashboardModel($activeDashboard->getDashboard());
     }
 }

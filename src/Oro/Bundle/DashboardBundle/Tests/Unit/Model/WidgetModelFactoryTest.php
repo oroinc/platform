@@ -37,18 +37,18 @@ class WidgetModelFactoryTest extends \PHPUnit_Framework_TestCase
 
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
-        $item = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget', array('getName'));
-        $item->expects($this->once())->method('getName')->will($this->returnValue($firstWidgetName));
-        $secondItem = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget', array('getName'));
-        $secondItem->expects($this->once())->method('getName')->will($this->returnValue($secondWidgetName));
-        $widgets = array($item, $secondItem);
+        $testWidget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget', array('getName'));
+        $testWidget->expects($this->once())->method('getName')->will($this->returnValue($firstWidgetName));
+        $secondITestWidget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget', array('getName'));
+        $secondITestWidget->expects($this->once())->method('getName')->will($this->returnValue($secondWidgetName));
+        $widgets = array($testWidget, $secondITestWidget);
 
         $dashboard->expects($this->once())->method('getWidgets')->will($this->returnValue($widgets));
 
         $models = $factory->getModels($dashboard);
 
         $this->assertCount(1, $models);
-        $this->assertEquals($secondItem, $models[0]->getWidget());
+        $this->assertEquals($secondITestWidget, $models[0]->getWidget());
         $this->assertEquals($secondWidgetConfig, $models[0]->getConfig());
     }
 }

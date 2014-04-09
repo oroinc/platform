@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
-use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -40,21 +38,12 @@ class DashboardController extends Controller
         $currentDashboard = null;
 
         if ($changeActive) {
-            $currentDashboard = $this->findCurrentDashboard($id, $dashboards);
-            if (!$currentDashboard) {
+            if (!$manager->setUserActiveDashboard($user, $id)) {
                 throw new NotFoundHttpException();
             }
-            $this->setActiveDashboard($user, $currentDashboard);
-        } elseif ($id) {
-            $currentDashboard = $this->findCurrentDashboard($id, $dashboards);
-        } else {
-            $activeDashboard = $this->findUserActiveDashboard($user);
-            $currentDashboard = $this->findCurrentDashboard($activeDashboard->getDashboard()->getId(), $dashboards);
         }
 
-        if (!$currentDashboard) {
-            $currentDashboard = $manager->findDefaultDashboard($dashboards);
-        }
+        $currentDashboard = $manager->getUserDashboard($user);
 
         $config = $currentDashboard->getConfig();
 
@@ -74,7 +63,7 @@ class DashboardController extends Controller
     {
         return $this->render(
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
-            $this->get('oro_dashboard.manager')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -87,8 +76,8 @@ class DashboardController extends Controller
      */
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
-        /** @var Manager $manager */
-        $manager = $this->get('oro_dashboard.manager');
+        /** @var WidgetAttributes $manager */
+        $manager = $this->get('oro_dashboard.widget_attributes');
 
         $params = array_merge(
             [
@@ -101,53 +90,5 @@ class DashboardController extends Controller
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
             $params
         );
-    }
-
-    protected function findUserActiveDashboard(User $user)
-    {
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
-
-        /**
-         * @var ActiveDashboard $currentActive
-         */
-        return $em->getRepository('OroDashboardBundle:ActiveDashboard')->findOneBy(array('id' => $user->getId()));
-    }
-
-    /**
-     * @param $id
-     * @param DashboardModel[] $dashboards
-     * @return mixed
-     */
-    protected function findCurrentDashboard($id, array $dashboards)
-    {
-        foreach ($dashboards as $dashboard) {
-            if ($dashboard->getDashboard()->getId() == $id) {
-                return $dashboard;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param User $user
-     * @param DashboardModel $currentDashboard
-     */
-    protected function setActiveDashboard(User $user, DashboardModel $currentDashboard)
-    {
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
-        $activeDashboard = $this->findUserActiveDashboard($user);
-
-        if (!$activeDashboard) {
-            $activeDashboard = new ActiveDashboard();
-            $activeDashboard->setUser($user);
-        }
-
-        $activeDashboard->setDashboard($currentDashboard->getDashboard());
-
-        $em->persist($activeDashboard);
-        $em->flush();
     }
 }
