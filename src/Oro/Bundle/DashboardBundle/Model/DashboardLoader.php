@@ -61,13 +61,6 @@ class DashboardLoader
         if (isset($dashboardConfiguration['widgets'])) {
             $widgetsConfiguration = $dashboardConfiguration['widgets'];
 
-            foreach ($dashboard->getWidgets() as $widget) {
-                /* @var DashboardWidget $widget */
-                if (!array_key_exists($widget->getName(), $widgetsConfiguration)) {
-                    $dashboard->removeWidget($widget);
-                }
-            }
-
             foreach ($widgetsConfiguration as $widgetName => $widgetConfiguration) {
                 $this->saveWidgetConfiguration(
                     $dashboard,
@@ -80,6 +73,22 @@ class DashboardLoader
         }
 
         return $dashboard;
+    }
+
+    /**
+     * @param array $widgetNames Existing widgets names
+     */
+    public function removeNonExistingWidgets(array $widgetNames)
+    {
+        if ($widgetNames) {
+            $this->em
+                ->createQueryBuilder()
+                ->delete('OroDashboardBundle:DashboardWidget', 'w')
+                ->where('w.name NOT IN (:widgetNames)')
+                ->setParameter('widgetNames', $widgetNames)
+                ->getQuery()
+                ->execute();
+        }
     }
 
     /**

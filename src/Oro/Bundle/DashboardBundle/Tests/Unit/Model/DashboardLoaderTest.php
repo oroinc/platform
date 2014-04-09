@@ -30,11 +30,12 @@ class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException($expectedException, $expectedExceptionMessage);
 
         if ($repositoryDashboard) {
+            $repositoryWidget->setName('widget');
             $repositoryDashboard->addWidget($repositoryWidget);
             $repositoryDashboard->setName($dashboardName);
         }
-        $manager   = $this->createManager($repositoryDashboard);
-        $dashboard = $manager->saveDashboardConfiguration(
+        $loader    = $this->createLoader($repositoryDashboard);
+        $dashboard = $loader->saveDashboardConfiguration(
             $dashboardName,
             $dashboardConfiguration,
             new User()
@@ -105,11 +106,43 @@ class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testRemoveNonExistingWidgets()
+    {
+        $loader = $this->createLoaderWithQueryBuilder();
+        $loader->removeNonExistingWidgets(['widget']);
+    }
+
     /**
      * @param Dashboard $dashboard
      * @return DashboardLoader
      */
-    protected function createManager(Dashboard $dashboard = null)
+    protected function createLoader(Dashboard $dashboard = null)
+    {
+        $entityManager = $this->createEntityManagerMock($dashboard);
+
+        return new DashboardLoader($entityManager);
+    }
+
+    /**
+     * @param Dashboard $dashboard
+     * @return DashboardLoader
+     */
+    protected function createLoaderWithQueryBuilder(Dashboard $dashboard = null)
+    {
+        $entityManager = $this->createEntityManagerMock($dashboard);
+
+        $entityManager
+            ->expects($this->any())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($this->createQueryBuilderMock()));
+
+        return new DashboardLoader($entityManager);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createEntityManagerMock(Dashboard $dashboard = null)
     {
         $entityManager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -128,6 +161,56 @@ class DashboardLoaderTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        return new DashboardLoader($entityManager);
+        return $entityManager;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createQueryBuilderMock()
+    {
+        $entityName = 'OroDashboardBundle:DashboardWidget';
+        $entityAlias = 'w';
+
+        $query = $this
+            ->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('execute'))
+            ->getMockForAbstractClass();
+
+        $query
+            ->expects($this->once())
+            ->method('execute');
+
+        $queryBuilder = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->setMethods(array('delete', 'where', 'setParameter', 'getQuery'))
+            ->getMock();
+
+        $queryBuilder
+            ->expects($this->once())
+            ->method('delete')
+            ->with($this->equalTo($entityName), $this->equalTo($entityAlias))
+            ->will($this->returnSelf());
+
+        $queryBuilder
+            ->expects($this->once())
+            ->method('where')
+            ->with('w.name NOT IN (:widgetNames)')
+            ->will($this->returnSelf());
+
+        $queryBuilder
+            ->expects($this->once())
+            ->method('setParameter')
+            ->with($this->equalTo('widgetNames'), $this->equalTo(['widget']))
+            ->will($this->returnSelf());
+
+        $queryBuilder
+            ->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        return $queryBuilder;
     }
 }

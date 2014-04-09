@@ -50,9 +50,10 @@ class LoadDashboardCommand extends ContainerAwareCommand
 
         $this->em              = $container->get('doctrine.orm.entity_manager');
         $configurationProvider = $container->get('oro_dashboard.config_provider');
-        $configurationLoader   = $container->get('oro_dashboard.model.dashboard_loader');
+        $dashboardLoader       = $container->get('oro_dashboard.model.dashboard_loader');
 
         $dashboards = [];
+        $output->writeln('Load dashboard configuration');
         foreach ($configurationProvider->getDashboardConfigs() as $dashboardName => $dashboardConfig) {
             /* @todo: move to config provider */
             foreach ($dashboardConfig['widgets'] as $widgetName => $widgetOptions) {
@@ -62,7 +63,7 @@ class LoadDashboardCommand extends ContainerAwareCommand
                 );
             }
 
-            $dashboards[] = $configurationLoader->saveDashboardConfiguration(
+            $dashboards[] = $dashboardLoader->saveDashboardConfiguration(
                 $dashboardName,
                 $dashboardConfig,
                 $this->getUser($username)
@@ -75,8 +76,9 @@ class LoadDashboardCommand extends ContainerAwareCommand
 
         $this->em->flush($dashboards);
 
-
-        $output->writeln('Load dashboard configuration');
+        $dashboardLoader->removeNonExistingWidgets(
+            array_keys($configurationProvider->getWidgetConfigs())
+        );
     }
 
     /**
@@ -94,16 +96,17 @@ class LoadDashboardCommand extends ContainerAwareCommand
             $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
             if (!$role) {
                 throw new InvalidArgumentException(
-                    'At least one role needed to configure dashboard ownership'
+                    'Administrator role should exist to load dashboard configuration.'
                 );
             }
 
-            $user       = $repository->getFirstMatchedUser($role);
-            if (!$user) {
-                throw new InvalidArgumentException(
-                    'At least one user needed to configure dashboard ownership'
-                );
-            }
+            $user = $repository->getFirstMatchedUser($role);
+        }
+
+        if (!$user) {
+            throw new InvalidArgumentException(
+                'Administrator user should exist to load dashboard configuration.'
+            );
         }
 
         return $user;
