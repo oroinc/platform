@@ -294,10 +294,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _onSelectChange: function() {
             // set value
             this.applyValue();
-
             // update dropdown
-            var widget = this.$(this.containerSelector);
-            this.selectWidget.updateDropdownPosition(widget);
+            this.selectWidget.updateDropdownPosition();
         },
 
         /**

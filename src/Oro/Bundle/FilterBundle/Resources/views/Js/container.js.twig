@@ -1,35 +1,37 @@
 <script type="text/html" id="filter-container">
-    {% if isMobileVersion() %}
-        <div class="filter-box oro-clearfix-width">
-            <div class="dropdown">
-                <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">Filter Results</a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <div class="filter-container">
-                            <a id="reset-filter-button" href="javascript:void(0);">Reset</a>
-                            <select id="add-filter-select" multiple>
-                                <% _.each(filters, function (filter, name) { %>
-                                <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
-                                <%- filter.label %>
-                                </option>
-                                <% }); %>
-                            </select>
-                        </div>
-                    </li>
-                </ul>
+    <% if (!_.isEmpty(filters)) { %>
+        {% if isMobileVersion() %}
+            <div class="filter-box oro-clearfix-width">
+                <div class="dropdown">
+                    <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">Filter Results</a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <div class="filter-container">
+                                <a id="reset-filter-button" href="javascript:void(0);">Reset</a>
+                                <select id="add-filter-select" multiple>
+                                    <% _.each(filters, function (filter, name) { %>
+                                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                    <%- filter.label %>
+                                    </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    {% else %}
-        <div class="filter-box oro-clearfix-width">
-            <div class="filter-container">
-                <select id="add-filter-select" multiple>
-                    <% _.each(filters, function (filter, name) { %>
-                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
-                    <%- filter.label %>
-                    </option>
-                    <% }); %>
-                </select>
+        {% else %}
+            <div class="filter-box oro-clearfix-width">
+                <div class="filter-container">
+                    <select id="add-filter-select" multiple>
+                        <% _.each(filters, function (filter, name) { %>
+                        <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                        <%- filter.label %>
+                        </option>
+                        <% }); %>
+                    </select>
+                </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    <% } %>
 </script>

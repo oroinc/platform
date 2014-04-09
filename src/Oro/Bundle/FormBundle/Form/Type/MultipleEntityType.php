@@ -21,7 +21,7 @@ class MultipleEntityType extends AbstractType
     protected $entityManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade
      */
     protected $securityFacade;
 
@@ -115,7 +115,7 @@ class MultipleEntityType extends AbstractType
         $this->setOptionToView($view, $options, 'default_element');
 
         if (empty($options['add_acl_resource'])) {
-            $options['allow_action'] = false;
+            $options['allow_action'] = true;
         } else {
             $options['allow_action'] = $this->securityFacade->isGranted($options['add_acl_resource']);
         }
