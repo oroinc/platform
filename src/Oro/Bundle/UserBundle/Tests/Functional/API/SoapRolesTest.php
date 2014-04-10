@@ -57,7 +57,11 @@ class SoapRolesTest extends WebTestCase
         /** @var Role $managerRole */
         $managerRole = $roles->findOneBy(array('label' => 'Manager'));
 
-        $roleByName =  $this->client->getSoap()->getRoleByName('Manager');
+        if (is_null($managerRole)) {
+            $managerRole = $roles->findOneBy(array('label' => 'Marketing Manager'));
+        }
+
+        $roleByName =  $this->client->getSoap()->getRoleByName($managerRole->getLabel());
         $roleByName = ToolsAPI::classToArray($roleByName);
 
         $this->assertEquals($managerRole->getLabel(), $roleByName['label']);
