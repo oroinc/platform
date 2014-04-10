@@ -132,7 +132,6 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          */
         _setCollapsed: function() {
             this.state.expanded = false;
-            this.widget.addClass('collapsed');
             this.widgetContentContainer.hide();
             $('.collapse-expand-action-container .collapse-action', this.widget).hide();
             $('.collapse-expand-action-container .expand-action', this.widget).show();
@@ -152,7 +151,6 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          */
         _setExpanded: function() {
             this.state.expanded = true;
-            this.widget.removeClass('collapsed');
             this.widgetContentContainer.show();
             $('.collapse-expand-action-container .collapse-action', this.widget).show();
             $('.collapse-expand-action-container .expand-action', this.widget).hide();
