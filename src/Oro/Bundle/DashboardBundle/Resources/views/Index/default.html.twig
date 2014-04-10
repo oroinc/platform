@@ -56,14 +56,29 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        require(['orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
+            function(dashboardContainer, widgetPicker) {
+                {% set widgetIds = [] %}
+                {% for widget in dashboard.widgets %}
+                    {% set widgetIds = widgetIds|merge(['dashboard-widget-' ~ widget.widget.id]) %}
+                {% endfor %}
+                console.log(dashboardContainer);
+                dashboardContainer.initialize({
+                    widgetIds: {{ widgetIds|json_encode|raw }}
+                });
+                widgetPicker.init();
+            }
+        );
+    </script>
     {% block widgets_content %}
         {% set contentClass = contentClass|default('dashboard-container') %}
         <div class="scrollable-container">
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
-                    {{ __.renderColumn(dashboard.getOrderedColumnWidgets(1, false, true), 1) }}
-                    {{ __.renderColumn(dashboard.getOrderedColumnWidgets(2, true, false), 2) }}
+                    {{ _self.renderColumn(dashboard.getOrderedColumnWidgets(1, false, true), 1) }}
+                    {{ _self.renderColumn(dashboard.getOrderedColumnWidgets(2, true, false), 2) }}
                 {% endblock widgets %}
                 </div>
             </div>
@@ -91,16 +106,8 @@
                     </span>
                 {% endif %}
                 </p>
-                </div>
+            </div>
             {% endfor %}
-        </script>
-
-        <script type="text/javascript">
-            require(['jquery', 'orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
-            function($, DashboardContainer, WidgetPicker){
-                var widgetContainer = new DashboardContainer();
-                WidgetPicker.init();
-            });
         </script>
     {% endblock widgets_content %}
 </div>
