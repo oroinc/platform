@@ -72,7 +72,7 @@ class RestDataAuditApiTest extends WebTestCase
         $this->assertEquals($response['user']['username'], $resultActual['data']['username']['new']);
         $this->assertEquals($response['user']['email'], $resultActual['data']['email']['new']);
         $this->assertEquals($response['user']['enabled'], $resultActual['data']['enabled']['new']);
-        $this->assertEquals('User', $resultActual['data']['roles']['new']);
+        $this->assertContains($resultActual['data']['roles']['new'], array('User', 'Sales Rep'));
 
         return $result;
     }
