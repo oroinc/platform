@@ -19,7 +19,21 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
          */
         options: {
             widgetIds: [],
-            columnsSelector: '.dashboard-column'
+            handle: ".dashboard-widget > .title",
+            columnsSelector: '.dashboard-column',
+            placeholder: {
+                element: function(currentItem) {
+                    var height = $(currentItem).height();
+                    return $(
+                        '<div><div class="widget-placeholder" style="height: ' + height + 'px;">' +
+                            'Drag your widget here.' +
+                            '</div></div>'
+                    )[0];
+                },
+                update: function(container, p) {
+                    return;
+                }
+            }
         },
 
         /**
@@ -40,23 +54,12 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
                 );
             });
 
-            $(self.options.columnsSelector)
+
+            $(this.options.columnsSelector)
                 .sortable({
-                    handle: ".move-action",
-                    placeholder: {
-                        element: function(currentItem) {
-                            var height = $(currentItem).height();
-                            return $(
-                                '<div><div class="widget-placeholder" style="height: ' + height + 'px;">' +
-                                    'Drag your widget here.' +
-                                '</div></div>'
-                            )[0];
-                        },
-                        update: function(container, p) {
-                            return;
-                        }
-                    },
-                    connectWith: self.options.columnsSelector
+                    handle: this.options.handle,
+                    placeholder: this.options.placeholder,
+                    connectWith: this.options.columnsSelector
                 });
         },
 

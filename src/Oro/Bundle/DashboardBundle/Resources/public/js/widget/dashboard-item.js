@@ -56,8 +56,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             template: _.template('<div class="box-type1 dashboard-widget">' +
                 '<div class="title">' +
                     '<div class="pull-left collapse-expand-action-container">' +
-                        '<a class="collapse-action" href="#"><i class="icon-collapse hide-text"></i></a>' +
-                        '<a class="expand-action" href="#"><i class="icon-collapse-top hide-text"></i></a>' +
+                        '<a class="collapse-action" href="#"><i class="icon-collapse-alt hide-text"></i></a>' +
+                        '<a class="expand-action" href="#"><i class="icon-expand-alt hide-text"></i></a>' +
                     '</div>' +
                     '<span class="widget-title"><%- title %></span>' +
                     '<div class="pull-right default-actions-container">' +
@@ -133,6 +133,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         _setCollapsed: function() {
             this.state.expanded = false;
             this.widgetContentContainer.hide();
+            this.widget.addClass('collapsed');
             $('.collapse-expand-action-container .collapse-action', this.widget).hide();
             $('.collapse-expand-action-container .expand-action', this.widget).show();
         },
@@ -152,6 +153,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         _setExpanded: function() {
             this.state.expanded = true;
             this.widgetContentContainer.show();
+            this.widget.removeClass('collapsed');
             $('.collapse-expand-action-container .collapse-action', this.widget).show();
             $('.collapse-expand-action-container .expand-action', this.widget).hide();
         },
