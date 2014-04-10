@@ -11,6 +11,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -142,7 +143,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
 
     /**
      * @param integer $id
-     * @return \Oro\Bundle\DashboardBundle\Entity\DashboardWidget
+     * @return DashboardWidget
      */
     protected function getWidget($id)
     {
