@@ -8,9 +8,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\DashboardBundle\Provider\WidgetModelProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class DashboardController extends Controller
 {
@@ -26,14 +29,22 @@ class DashboardController extends Controller
         /** @var Manager $manager */
         $manager = $this->get('oro_dashboard.manager');
 
+        /** @var WidgetModelProvider $widgetModelProvider */
+        $widgetModelProvider = $this->get('oro_dashboard.widget_model_provider');
+
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
         /**
          * @var User $user
          */
         $user = $this->getUser();
-        if (!$user || ($changeActive && !$id)) {
-            throw new NotFoundHttpException();
+
+        if (!$user) {
+            throw new AccessDeniedException('User is not logged in');
+        }
+
+        if ($changeActive && !$id) {
+            throw new NotFoundHttpException('Incorrect request params');
         }
 
         $dashboards = $manager->getDashboards();
@@ -41,17 +52,28 @@ class DashboardController extends Controller
 
         if ($changeActive) {
             if (!$manager->setUserActiveDashboard($user, $id)) {
-                throw new NotFoundHttpException();
+                throw new NotFoundHttpException('Dashboard not found');
             }
         }
 
-        $currentDashboard = $manager->getUserDashboard($user);
+        $currentDashboard = $manager->getUserActiveDashboard($user);
+
+        if (!$currentDashboard) {
+            throw new NotFoundHttpException('Not found available dashboards');
+        }
 
         $config = $currentDashboard->getConfig();
 
         $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
-        return $this->render($template, array('dashboards' => $dashboards, 'dashboard' => $currentDashboard));
+        return $this->render(
+            $template,
+            array(
+                'dashboards' => $dashboards,
+                'dashboard' => $currentDashboard,
+                'widgets' => $widgetModelProvider->getAvailableWidgets()
+            )
+        );
     }
 
     /**

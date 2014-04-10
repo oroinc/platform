@@ -26,7 +26,7 @@ class WidgetsModelCollection extends AbstractLazyCollection
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     protected function doInitialize()
     {

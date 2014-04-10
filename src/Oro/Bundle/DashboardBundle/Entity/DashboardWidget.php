@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Dashboard widget
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardWidgetRepository")
  * @ORM\Table(name="oro_dashboard_widget")
  */
 class DashboardWidget
@@ -46,7 +46,7 @@ class DashboardWidget
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Dashboard", inversedBy="widgets", cascade={"persist"})
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
 

@@ -1,12 +1,15 @@
 parameters:
-    oro_dashboard.manager.class:                  Oro\Bundle\DashboardBundle\Model\Manager
-    oro_dashboard.widget_attributes.class:                  Oro\Bundle\DashboardBundle\Model\WidgetAttributes
-    oro_dashboard.widget_model_factory.class:     Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
-    oro_dashboard.dashboard_model_factory.class:  Oro\Bundle\DashboardBundle\Model\DashboardModelFactory
-    oro_dashboard.config_provider.class:          Oro\Bundle\DashboardBundle\Provider\ConfigProvider
-    oro_dashboard.repository.class:               Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
-    oro_dashboard.dashboard_entity.class:         Oro\Bundle\DashboardBundle\Entity\Dashboard
-    oro_dashboard.model.dashboard_loader.class: Oro\Bundle\DashboardBundle\Model\DashboardLoader
+    oro_dashboard.manager.class:                     Oro\Bundle\DashboardBundle\Model\Manager
+    oro_dashboard.widget_attributes.class:           Oro\Bundle\DashboardBundle\Model\WidgetAttributes
+    oro_dashboard.widget_model_factory.class:        Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
+    oro_dashboard.widget_model_provider.class:       Oro\Bundle\DashboardBundle\Provider\WidgetModelProvider
+    oro_dashboard.dashboard_model_factory.class:     Oro\Bundle\DashboardBundle\Model\DashboardModelFactory
+    oro_dashboard.config_provider.class:             Oro\Bundle\DashboardBundle\Provider\ConfigProvider
+    oro_dashboard.repository.class:                  Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
+    oro_dashboard.dashboard_widget_repository.class: Oro\Bundle\DashboardBundle\Entity\Repository\DashboardWidgetRepository
+    oro_dashboard.dashboard_entity.class:            Oro\Bundle\DashboardBundle\Entity\Dashboard
+    oro_dashboard.dashboard_widget_entity.class:     Oro\Bundle\DashboardBundle\Entity\DashboardWidget
+    oro_dashboard.model.dashboard_loader.class:      Oro\Bundle\DashboardBundle\Model\DashboardLoader
     
 services:
     oro_dashboard.widget_attributes:
@@ -40,7 +43,13 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @oro_security.security_facade
-    
+
+    oro_dashboard.widget_model_provider:
+        class: %oro_dashboard.widget_model_provider.class%
+        arguments:
+            - @oro_dashboard.dashboard_widget_repository
+            - @oro_dashboard.widget_model_factory
+
     oro_dashboard.config_provider:
         class: %oro_dashboard.config_provider.class%
         arguments:
@@ -51,5 +60,13 @@ services:
         factory_service: doctrine # this is an instance of Registry
         factory_method: getRepository
         arguments: [ %oro_dashboard.dashboard_entity.class% ]
+        calls:
+            - ['setAclHelper', [@oro_security.acl_helper]]
+
+    oro_dashboard.dashboard_widget_repository:
+        class: %oro_dashboard.dashboard_widget_repository.class%
+        factory_service: doctrine # this is an instance of Registry
+        factory_method: getRepository
+        arguments: [ %oro_dashboard.dashboard_widget_entity.class% ]
         calls:
             - ['setAclHelper', [@oro_security.acl_helper]]

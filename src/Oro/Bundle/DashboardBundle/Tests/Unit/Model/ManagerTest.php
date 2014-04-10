@@ -81,22 +81,20 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUserDashboardIfActiveExist()
     {
-        $expectedId = 42;
-        $expected = array('userId' => $expectedId);
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $expected = array('user' => $user);
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('\Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
         $dashboardModel->expects($this->once())->method('getDashboard')->will($this->returnValue($dashboard));
-        $user->expects($this->once())->method('getId')->will($this->returnValue($expectedId));
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())
             ->method('findOneBy')
             ->with($expected)
             ->will($this->returnValue($dashboardModel));
         $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
-        $this->manager->getUserDashboard($user);
+        $this->manager->getUserActiveDashboard($user);
     }
 
     public function testGetUserDashboardIfActiveNotExist()
@@ -105,7 +103,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $expected = array('name' => $expectedName);
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $user->expects($this->once())->method('getId')->will($this->returnValue(42));
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $this->configProvider->expects($this->once())->method('getConfig')->will($this->returnValue($expectedName));
         $this->dashboardRepository->expects($this->once())
@@ -113,15 +110,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($expected)
             ->will($this->returnValue($dashboard));
         $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
-        $this->manager->getUserDashboard($user);
+        $this->manager->getUserActiveDashboard($user);
     }
     public function testSetUserActiveDashboard()
     {
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $id = 42;
-        $userId = 56;
-        $expected = array('userId' => $userId);
-        $user->expects($this->once())->method('getId')->will($this->returnValue($userId));
+        $expected = array('user' => $user);
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $activeDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
         $this->assertFalse($this->manager->setUserActiveDashboard($user, $id));

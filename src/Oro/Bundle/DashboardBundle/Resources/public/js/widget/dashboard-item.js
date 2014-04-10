@@ -36,6 +36,14 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         },
 
         /**
+         * @property {Object}
+         */
+        state: {
+            expanded: true,
+            layoutPosition: [1, 0]
+        },
+
+        /**
          * Widget options
          *
          * @property {Object}
@@ -67,11 +75,36 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         }),
 
         /**
-         * Initialize
+         * Initialize widget
+         *
+         * @param {Object} options
          */
-        initialize: function() {
-            BlockWidget.prototype.initialize.apply(this, arguments);
-            this.once('widgetRender', this._initWidgetCollapseState);
+        initializeWidget: function(options) {
+            BlockWidget.prototype.initializeWidget.apply(this, arguments);
+            this._initState(options);
+        },
+
+        /**
+         * Initialize state
+         *
+         * @param {Object} options
+         * @private
+         */
+        _initState: function(options) {
+            if (options.state) {
+                this.state = _.extend(this.state, options.state);
+            }
+
+            if (this.state.layoutPosition) {
+                this.state.layoutPosition = _.map(
+                    this.state.layoutPosition,
+                    function (value) {
+                        return parseInt(value);
+                    }
+                );
+            }
+
+            this.once('renderComplete', this._initWidgetCollapseState);
         },
 
         /**
@@ -98,10 +131,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          * Set collapsed state
          */
         _setCollapsed: function() {
+            this.state.expanded = false;
             this.widget.addClass('collapsed');
             this.widgetContentContainer.hide();
-            $('.collapse-expand-action-container .collapse-action').hide();
-            $('.collapse-expand-action-container .expand-action').show();
+            $('.collapse-expand-action-container .collapse-action', this.widget).hide();
+            $('.collapse-expand-action-container .expand-action', this.widget).show();
         },
 
         /**
@@ -117,19 +151,20 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          * Set expanded state
          */
         _setExpanded: function() {
+            this.state.expanded = true;
             this.widget.removeClass('collapsed');
             this.widgetContentContainer.show();
-            $('.collapse-expand-action-container .collapse-action').show();
-            $('.collapse-expand-action-container .expand-action').hide();
+            $('.collapse-expand-action-container .collapse-action', this.widget).show();
+            $('.collapse-expand-action-container .expand-action', this.widget).hide();
         },
 
         /**
          * Is collapsed
          *
-         * @returns {HTMLElement}
+         * @returns {Boolean}
          */
         isCollapsed: function() {
-            return this.widget.hasClass('collapsed');
+            return !this.state.expanded;
         },
 
         /**

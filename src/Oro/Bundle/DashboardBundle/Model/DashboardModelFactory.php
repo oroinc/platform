@@ -31,8 +31,9 @@ class DashboardModelFactory
      */
     public function getDashboardModel(Dashboard $dashboard)
     {
-        if ($this->configProvider->hasDashboardConfig($dashboard->getName())) {
-            $dashboardConfig = $this->configProvider->getDashboardConfig($dashboard->getName());
+        $dashboardName = $dashboard->getName();
+        if (!empty($dashboardName) && $this->configProvider->hasDashboardConfig($dashboardName)) {
+            $dashboardConfig = $this->configProvider->getDashboardConfig($dashboardName);
         } else {
             $dashboardConfig = array();
         }
