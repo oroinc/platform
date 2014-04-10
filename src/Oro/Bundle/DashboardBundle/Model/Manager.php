@@ -80,7 +80,7 @@ class Manager
         }
 
         $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('userId' => $user->getId()));
+            ->findOneBy(array('user' => $user));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
