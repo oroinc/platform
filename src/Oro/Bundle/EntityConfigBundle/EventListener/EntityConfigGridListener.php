@@ -9,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 class EntityConfigGridListener extends AbstractConfigGridListener
 {
@@ -18,9 +17,6 @@ class EntityConfigGridListener extends AbstractConfigGridListener
 
     /** @var ConfigManager */
     protected $configManager;
-
-    /** @var array Filter choices for name and module column filters */
-    protected $filterChoices = ['name' => [], 'module' => []];
 
     /**
      * @param BuildAfter $event
@@ -49,49 +45,21 @@ class EntityConfigGridListener extends AbstractConfigGridListener
      *
      * @return array
      */
-    public function getChoicesName()
+    public function getModuleChoices()
     {
-        return $this->getObjectName();
-    }
+        $qb = $this->configManager->getEntityManager()->createQueryBuilder();
+        $qb->select('entity.moduleName')
+            ->distinct()
+            ->from(EntityConfigModel::ENTITY_NAME, 'entity')
+            ->orderBy('entity.moduleName');
+        $result = $qb->getQuery()->getArrayResult();
 
-    /**
-     * Call this method from datagrid.yml
-     * invoked in Manager when datagrid configuration prepared for grid build process
-     *
-     * @return array
-     */
-    public function getChoicesModule()
-    {
-        return $this->getObjectName('module');
-    }
-
-    /**
-     *
-     * @param  string $scope
-     * @return array
-     */
-    protected function getObjectName($scope = 'name')
-    {
-        if (empty($this->filterChoices[$scope])) {
-            $alias = 'ce';
-            $qb = $this->configManager->getEntityManager()->createQueryBuilder();
-            $qb->select($alias)
-                ->from(EntityConfigModel::ENTITY_NAME, $alias)
-                ->add('select', $alias . '.className')
-                ->distinct($alias.'.className');
-
-            $result = $qb->getQuery()->getArrayResult();
-
-            $options = ['name' => [], 'module' => []];
-            foreach ((array) $result as $value) {
-                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($value['className']);
-                $options['module'][$value['className']] = $moduleName;
-                $options['name'][$value['className']]   = $entityName;
-            }
-
-            $this->filterChoices = $options;
+        $modules = array();
+        foreach ($result as $row) {
+            $module = $row['moduleName'];
+            $modules[$module] = $module;
         }
 
-        return $this->filterChoices[$scope];
+        return $modules;
     }
 }
