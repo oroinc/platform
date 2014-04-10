@@ -20,7 +20,7 @@ class ActiveDashboard
      * @ORM\Column(name="user_id", type="integer")
      * @ORM\Id
      */
-    protected $user_id;
+    protected $userId;
 
     /**
      * @var User
@@ -44,7 +44,7 @@ class ActiveDashboard
      */
     public function setUser($user)
     {
-        $this->user_id = $user->getId();
+        $this->userId = $user->getId();
         $this->user = $user;
 
         return $this;

@@ -53,5 +53,29 @@ class OroDashboardBundle implements Migration
             ['onDelete' => null, 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_dashboard_widget **/
+
+        /** Generate table oro_dashboard_active **/
+        $table = $schema->createTable('oro_dashboard_active');
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['user_id']);
+        $table->addUniqueIndex(['dashboard_id'], 'UNIQ_858BA17EB9D04D2B');
+        /** End of generate table oro_dashboard_active **/
+
+        /** Generate foreign keys for table oro_dashboard_active **/
+        $table = $schema->getTable('oro_dashboard_active');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_dashboard'),
+            ['dashboard_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        /** End of generate foreign keys for table oro_dashboard_active **/
     }
 }

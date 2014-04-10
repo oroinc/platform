@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
@@ -81,7 +82,7 @@ class Manager
         }
 
         $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user_id' => $user->getId()));
+            ->findOneBy(array('userId' => $user->getId()));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
@@ -103,7 +104,7 @@ class Manager
     public function getUserDashboard(User $user)
     {
         $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user_id' => $user->getId()));
+            ->findOneBy(array('userId' => $user->getId()));
 
         if (!$activeDashboard) {
             $name = $this->configProvider->getConfig('default_dashboard');
