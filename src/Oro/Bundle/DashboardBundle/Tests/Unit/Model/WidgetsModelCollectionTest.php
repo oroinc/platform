@@ -32,7 +32,7 @@ class WidgetsModelCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testIterated()
     {
-        $expected = array(new \StdClass(), new \StdClass());
+        $expected = array(new \stdClass(), new \stdClass());
         $iteration = 0;
 
         $this->widgetFactory->expects($this->once())->method('getModels')->will($this->returnValue($expected));
@@ -44,7 +44,7 @@ class WidgetsModelCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $expected = array(new \StdClass(), new \StdClass());
+        $expected = array(new \stdClass(), new \stdClass());
         $this->widgetFactory->expects($this->once())->method('getModels')->will($this->returnValue($expected));
 
         $this->assertCount(count($expected), $this->collection);

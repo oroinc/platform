@@ -26,6 +26,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Can't find configuration for: not found config
      */
     public function testGetConfigHasNoKeyException()
     {

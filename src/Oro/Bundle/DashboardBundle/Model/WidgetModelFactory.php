@@ -43,13 +43,19 @@ class WidgetModelFactory
          * @var DashboardWidget $widget
          */
         foreach ($dashboard->getWidgets() as $widget) {
-            $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
-            $model = new WidgetModel($widgetConfig, $widget);
+            $model = $this->getModel($widget);
+            $widgetConfig = $model->getConfig();
             if (!isset($widgetConfig['acl']) || $this->securityFacade->isGranted($widgetConfig['acl'])) {
                 $widgets[] = $model;
             }
         }
 
         return $widgets;
+    }
+
+    public function getModel(DashboardWidget $widget)
+    {
+        $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
+        return new WidgetModel($widgetConfig, $widget);
     }
 }
