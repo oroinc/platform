@@ -13,8 +13,7 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
             util: {},
             select2: {
                 collapsibleResults: true,
-                dropdownAutoWidth: true,
-                minimumInputLength: 3
+                dropdownAutoWidth: true
             },
             exclude: [],
             fieldsLoaderSelector: ''

@@ -45,25 +45,30 @@ class SegmentManager
     public function getSegmentByEntityName($entityName, $term)
     {
         $result = [];
+        $query  = $this->em->getRepository("OroSegmentBundle:Segment")
+            ->createQueryBuilder('s')
+            ->where('s.entity = :entity')
+            ->setParameter('entity', $entityName);
 
         if (!empty($term)) {
-            $segments = $this->em->getRepository("OroSegmentBundle:Segment")->createQueryBuilder('s')
-                ->where('s.entity = :entity')
+            $query
                 ->andWhere('s.name LIKE :segmentName')
-                ->setParameter('entity', $entityName)
-                ->setParameter('segmentName', sprintf('%%%s%%', $term))
-                ->setMaxResults(20)
-                ->getQuery()
-                ->getResult();
-
-            foreach ($segments as $segment) {
-                $result[] = [
-                    'id'   => 'segment_' . $segment->getId(),
-                    'text' => $segment->getName(),
-                    'type' => 'segment',
-                ];
-            }
+                ->setParameter('segmentName', sprintf('%%%s%%', $term));
         }
+
+        $segments = $query
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
+
+        foreach ($segments as $segment) {
+            $result[] = [
+                'id'   => 'segment_' . $segment->getId(),
+                'text' => $segment->getName(),
+                'type' => 'segment',
+            ];
+        }
+
 
         return $result;
     }
