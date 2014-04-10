@@ -44,11 +44,18 @@
     -moz-border-radius: 3px;
     border-radius: 3px;
 
+    > .title {
+      cursor: move;
+    }
+
     .widget-actions-container, .default-actions-container {
       .action-wrapper {
         border-right: 1px solid #ddd;
         padding: 3px 13px;
       }
+    }
+    .move-action {
+      cursor: move;
     }
     .default-actions-container {
       .action-wrapper:last-child {
@@ -63,6 +70,17 @@
     .dashboard-widget-content {
       padding-top: 12px;
     }
+  }
+  .widget-placeholder {
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: #aaa;
+    font-size: 24px;
+    min-height: 200px;
+    padding: 20px;
+    text-align: center;
   }
   .dashboard-widget.collapsed .title {
     border-bottom: none;

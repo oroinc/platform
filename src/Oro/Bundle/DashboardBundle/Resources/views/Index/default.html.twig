@@ -59,29 +59,30 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        require(['orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
-            function(dashboardContainer, widgetPicker) {
-                {% set widgetIds = [] %}
-                {% for widget in dashboard.widgets %}
-                    {% set widgetIds = widgetIds|merge(['dashboard-widget-' ~ widget.widget.id]) %}
-                {% endfor %}
-                console.log(dashboardContainer);
-                dashboardContainer.initialize({
-                    widgetIds: {{ widgetIds|json_encode|raw }}
-                });
-                widgetPicker.init();
-            }
-        );
-    </script>
     {% block widgets_content %}
         {% set contentClass = contentClass|default('dashboard-container') %}
         <div class="scrollable-container">
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
-                    {{ _self.renderColumn(dashboard.getOrderedColumnWidgets(1, false, true), 1) }}
-                    {{ _self.renderColumn(dashboard.getOrderedColumnWidgets(2, true, false), 2) }}
+                    {{
+                        _self.renderWidgetsColumn({
+                            'widgets': dashboard.getOrderedColumnWidgets(1, false, true),
+                            'columnIndex': 1,
+                            'columnElementId': 'dashboard-column-1',
+                            'columnClass': 'dashboard-column',
+                            'widgetIdPrefix': 'dashboard-widget-'
+                        })
+                    }}
+                    {{
+                        _self.renderWidgetsColumn({
+                            'widgets': dashboard.getOrderedColumnWidgets(2, true, false),
+                            'columnIndex': 2,
+                            'columnElementId': 'dashboard-column-2',
+                            'columnClass': 'dashboard-column',
+                            'widgetIdPrefix': 'dashboard-widget-'
+                        })
+                    }}
                 {% endblock widgets %}
                 </div>
             </div>
@@ -120,20 +121,40 @@
             {% endfor %}
         </script>
     {% endblock widgets_content %}
+
+    <script type="text/javascript">
+        require(['orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
+            function(dashboardContainer, widgetPicker) {
+                {% set widgetIds = [] %}
+                {% for widget in dashboard.widgets %}
+                {% set widgetIds = widgetIds|merge(['dashboard-widget-' ~ widget.widget.id]) %}
+                {% endfor %}
+                dashboardContainer.initialize({
+                    widgetIds: {{ widgetIds|json_encode|raw }},
+                    columnsSelector: '.dashboard-column'
+                });
+				widgetPicker.init();
+            }
+        );
+    </script>
 </div>
 {% endblock content %}
 
-{% macro renderColumn(widgets, column) %}
-    <div class="responsive-cell column" data-column="{{ column }}">
-        {% for widget in widgets %}
+{% macro renderWidgetsColumn(options) %}
+    <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column" data-column="{{ options.columnIndex }}">
+        {% for widget in options.widgets %}
             {{
                 oro_widget_render({
                     'widgetType': 'dashboard-item',
-                    'wid': 'dashboard-widget-' ~ widget.widget.id,
-                    'url': path(widget.config.route, widget.config.route_parameters)
+                    'wid': options.widgetIdPrefix ~ widget.widget.id,
+                    'url': path(widget.config.route, widget.config.route_parameters),
+                    'state': {
+                        'layoutPosition': widget.widget.layoutPosition,
+                        'expanded': widget.widget.expanded
+                    }
                 })
             }}
         {% endfor %}
     </div>
 {% endmacro %}
-{% import _self as __ %}
+

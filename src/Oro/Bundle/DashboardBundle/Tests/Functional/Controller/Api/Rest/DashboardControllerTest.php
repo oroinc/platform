@@ -133,6 +133,9 @@ class DashboardControllerTest extends WebTestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function widgetsProvider()
     {
         return [

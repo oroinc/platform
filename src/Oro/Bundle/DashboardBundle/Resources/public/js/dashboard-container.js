@@ -1,9 +1,8 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item'
-    ], function (_, Backbone, mediator, widgetManager, DashboardItemWidget) {
+define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager',
+    'orodashboard/js/widget/dashboard-item', 'jquery-ui'
+    ], function ($, _, Backbone, mediator, widgetManager, DashboardItemWidget) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export orodashboard/js/dashboard-container
@@ -19,7 +18,22 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager'
          * @property {Object}
          */
         options: {
-            widgetIds: []
+            widgetIds: [],
+            handle: ".dashboard-widget > .title",
+            columnsSelector: '.dashboard-column',
+            placeholder: {
+                element: function(currentItem) {
+                    var height = $(currentItem).height();
+                    return $(
+                        '<div><div class="widget-placeholder" style="height: ' + height + 'px;">' +
+                            'Drag your widget here.' +
+                            '</div></div>'
+                    )[0];
+                },
+                update: function(container, p) {
+                    return;
+                }
+            }
         },
 
         /**
@@ -39,6 +53,14 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager'
                     }
                 );
             });
+
+
+            $(this.options.columnsSelector)
+                .sortable({
+                    handle: this.options.handle,
+                    placeholder: this.options.placeholder,
+                    connectWith: this.options.columnsSelector
+                });
         },
 
         /**
@@ -48,7 +70,17 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager'
          */
         add: function(widget) {
             this.widgets[widget.getWid()] = widget;
-            console.log(this);
+            this.getWidgetDraggableElement(widget).draggable();
+        },
+
+        /**
+         *
+         * @param {DashboardItemWidget} widget
+         * @param {function} callback
+         * @returns {HTMLElement}
+         */
+        getWidgetDraggableElement: function(widget, callback) {
+            return widget.widget.parent();
         }
     };
 
