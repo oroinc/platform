@@ -283,43 +283,45 @@
 }
 .dashboard-widgets-wrapper{
   width: 600px;
-  .modal-footer {
-    padding-top: 0;
-  }
   .dashboard-widget-title {
     display: block;
     padding: 0 0 10px;
   }
-  .dashboard-widget-container:first-child{
-    margin-top: 0px;
-  }
   .dashboard-widget-container {
     width: 100%;
-    height: 145px;
-    margin: 10px 0;
+    height: 158px;
+    padding: 15px;
     border-bottom: 2px solid #808080;
     position: relative;
-    .dashboard-widget-thumbnail {
+    .dashboard-widget-thumbnail{
       float: left;
-      margin: 5px 10px 0 0;
+      margin: 0 10px 0 0;
       width: 25%;
+      position: relative;
     }
-    div.dashboard-widget-thumbnail {
+    .dashboard-widget-thumbnail img, .dashboard-widget-thumbnail div{
+      height: 125px;
+    }
+    .dashboard-widget-thumbnail div{
       background-color: #808080;
-      height: 120px;
     }
     p{
       float: left;
-      width: 50%;
-      height: 90%;
+      height: 100%;
+      margin-top: -3px;
       overflow: hidden;
+      width: 50%;
     }
+  }
+  .modal-body{
+    padding: 0;
   }
   .modal-header {
     padding: 7px 15px 3px;
   }
   .modal-footer {
     height: 40px;
+    padding-top: 0;
     a.ok, a.cancel{
       display: none;
     }
