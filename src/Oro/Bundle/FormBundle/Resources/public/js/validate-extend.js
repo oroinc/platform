@@ -160,13 +160,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             var $el = getErrorTarget(element);
             $el.addClass('error')
                 .closest('.controls').addClass('validation-error');
-            $el.closest('.control-group').find('label').addClass('validation-error');
+            $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function (element) {
             var $el = $(element);
             $el.closest('.error').removeClass('error')
                 .closest('.controls').removeClass('validation-error');
-            $el.closest('.control-group').find('label').removeClass('validation-error');
+            $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
         ignore: ":hidden:not([type=hidden])"
