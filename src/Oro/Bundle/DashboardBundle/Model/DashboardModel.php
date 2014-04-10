@@ -93,4 +93,10 @@ class DashboardModel
 
         return $result;
     }
+
+    public function getLabel()
+    {
+        $label = $this->dashboard->getLabel();
+        return $label ? $label : $this->config['label'];
+    }
 }

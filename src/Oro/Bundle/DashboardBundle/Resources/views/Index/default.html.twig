@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% oro_title_set({params : {"%name%": dashboard.config.label|trans }}) %}
+{% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
 
 {% block content %}
 <div class="layout-content dashboard-contailer">
@@ -9,7 +9,7 @@
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-                        <h1 class="oro-subtitle">{{ dashboard.config.label|trans }}</h1>
+                        <h1 class="oro-subtitle">{{ dashboard.getLabel()|trans }}</h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -23,7 +23,7 @@
                             <select id="dashboard_selector">
                                 {% for dashboardModel in dashboards %}
                                     <option value="{{ dashboardModel.dashboard.id }}"{% if dashboardModel.dashboard.id == dashboard.dashboard.id %} selected="selected"{% endif %}>
-                                        {{ dashboardModel.config.label|trans }}
+                                        {{ dashboardModel.getLabel()|trans }}
                                     </option>
                                 {% endfor %}
                             </select>

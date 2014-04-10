@@ -96,7 +96,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($expected)
             ->will($this->returnValue($dashboardModel));
         $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
-        $this->manager->getUserDashboard($user);
+        $this->manager->getUserActiveDashboard($user);
     }
 
     public function testGetUserDashboardIfActiveNotExist()
@@ -113,7 +113,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($expected)
             ->will($this->returnValue($dashboard));
         $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
-        $this->manager->getUserDashboard($user);
+        $this->manager->getUserActiveDashboard($user);
     }
     public function testSetUserActiveDashboard()
     {

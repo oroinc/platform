@@ -32,6 +32,7 @@ class DashboardModelFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $expectedConfig  = array('label' => 'test label');
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard->expects($this->once())->method('getName')->will($this->returnValue('test'));
         $this->configProvider->expects($this->once())
             ->method('hasDashboardConfig')
             ->will($this->returnValue(true));

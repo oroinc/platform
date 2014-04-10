@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
-use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -55,7 +54,6 @@ class Manager
     /**
      * Returns all dashboards
      *
-     * @throws InvalidConfigurationException
      * @return DashboardModel[]
      */
     public function getDashboards()
@@ -99,17 +97,17 @@ class Manager
 
     /**
      * @param User $user
-     * @return DashboardModel
+     * @return DashboardModel|null
      */
-    public function getUserDashboard(User $user)
+    public function getUserActiveDashboard(User $user)
     {
         $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('userId' => $user->getId()));
+            ->findOneBy(array('user' => $user));
 
         if (!$activeDashboard) {
             $name = $this->configProvider->getConfig('default_dashboard');
             $dashboard = $this->dashboardRepository->findOneBy(array('name' => $name));
-            return $this->dashboardModelFactory->getDashboardModel($dashboard);
+            return $dashboard ? $this->dashboardModelFactory->getDashboardModel($dashboard) : null;
         }
 
         return $this->dashboardModelFactory->getDashboardModel($activeDashboard->getDashboard());
