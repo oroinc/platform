@@ -89,11 +89,13 @@
         <script type="text/html" id="available-dashboard-widgets">
             {% for widget in widgets %}
                 <div class="dashboard-widget-container">
+                    <div class="dashboard-widget-thumbnail">
                     {% if widget.config.thumbnail is defined %}
-                        <img class="dashboard-widget-thumbnail" src="{{ widget.config.thumbnail }}" alt="Preview" />
+                        <img src="{{ widget.config.thumbnail }}" alt="Preview" />
                     {% else %}
-                        <div class="dashboard-widget-thumbnail"></div>
+                        <div></div>
                     {% endif %}
+                    </div>
                     <p>
                     {% if widget.config.label is defined %}
                         <strong class="dashboard-widget-title">{{ widget.config.label|trans }}</strong>
@@ -110,8 +112,8 @@
                     {% endif %}
                     </p>
                     <div class="dashboard-widgets-pick-wrapper">
-                        <a class="btn main-group">
-                                    {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
+                        <a class="btn main-group add-widget-button">
+                            {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
                         </a>
                     </div>
                 </div>
