@@ -8,3 +8,6 @@ oro:
         no_data_found:    No data found
 
         no_one_available: You have no dashboards available
+
+        add_dashboard_widgets:
+            add_to_dashboard: Add
