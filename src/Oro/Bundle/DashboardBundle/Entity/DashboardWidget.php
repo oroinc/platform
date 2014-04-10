@@ -46,7 +46,7 @@ class DashboardWidget
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Dashboard", inversedBy="widgets", cascade={"persist"})
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
 

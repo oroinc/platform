@@ -17,7 +17,7 @@ class OroDashboardBundle implements Migration
         $table = $schema->createTable('oro_dashboard');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('name', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('label', 'string', ['length' => 255, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_DF2802EF9EB185F9', []);
@@ -50,7 +50,7 @@ class OroDashboardBundle implements Migration
             $schema->getTable('oro_dashboard'),
             ['dashboard_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_dashboard_widget **/
 
