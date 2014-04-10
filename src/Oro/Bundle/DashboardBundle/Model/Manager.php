@@ -75,7 +75,7 @@ class Manager
      */
     public function setUserActiveDashboard(User $user, $dashboardId)
     {
-        $dashboard = $this->dashboardRepository->find($dashboardId);
+        $dashboard = $this->dashboardRepository->getAvailableDashboard($dashboardId);
 
         if (!$dashboard) {
             return false;

@@ -82,7 +82,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetUserDashboardIfActiveExist()
     {
         $expectedId = 42;
-        $expected = array('user_id' => $expectedId);
+        $expected = array('userId' => $expectedId);
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('\Oro\Bundle\DashboardBundle\Model\DashboardModel')
@@ -114,5 +114,30 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dashboard));
         $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
         $this->manager->getUserDashboard($user);
+    }
+    public function testSetUserActiveDashboard()
+    {
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $id = 42;
+        $userId = 56;
+        $expected = array('userId' => $userId);
+        $user->expects($this->once())->method('getId')->will($this->returnValue($userId));
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $activeDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
+        $this->assertFalse($this->manager->setUserActiveDashboard($user, $id));
+        $this->dashboardRepository->expects($this->once())
+            ->method('getAvailableDashboard')
+            ->with($id)
+            ->will($this->returnValue($dashboard));
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with($expected)
+            ->will($this->returnValue($activeDashboard));
+        $activeDashboard->expects($this->once())->method('setDashboard')->with($dashboard);
+        $this->entityManager->expects($this->once())->method('persist')->with($activeDashboard);
+        $this->entityManager->expects($this->once())->method('getRepository')->will($this->returnValue($repository));
+        $this->assertTrue($this->manager->setUserActiveDashboard($user, $id));
     }
 }

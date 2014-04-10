@@ -23,6 +23,7 @@ class DashboardRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
         $this->qb->expects($this->any())->method('select')->will($this->returnValue($this->qb));
         $this->qb->expects($this->any())->method('from')->will($this->returnValue($this->qb));
+        $this->qb->expects($this->any())->method('where')->will($this->returnValue($this->qb));
         $entityManager->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($this->qb));
         $this->repository = new DashboardRepository($entityManager, $meta);
     }
@@ -38,5 +39,23 @@ class DashboardRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository->setAclHelper($acl);
 
         $this->repository->getAvailableDashboards();
+    }
+
+    public function testGetAvailableDashboard()
+    {
+        $id = 42;
+        $acl = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $query = $this->getMock('StdClass', array('getOneOrNullResult', 'setParameters'));
+        $query->expects($this->once())->method('getOneOrNullResult');
+        $query->expects($this->once())
+            ->method('setParameters')
+            ->with(array('id' => $id))
+            ->will($this->returnValue($query));
+        $acl->expects($this->once())->method('apply')->with($this->qb)->will($this->returnValue($query));
+        $this->repository->setAclHelper($acl);
+
+        $this->repository->getAvailableDashboard($id);
     }
 }

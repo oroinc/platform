@@ -30,4 +30,14 @@ class DashboardRepository extends EntityRepository
         $qb = $this->createQueryBuilder('d');
         return $this->aclHelper->apply($qb)->execute();
     }
+
+    /**
+     * @param $id
+     * @return Dashboard|null
+     */
+    public function getAvailableDashboard($id)
+    {
+        $qb = $this->createQueryBuilder('d')->where('d.id=:id');
+        return $this->aclHelper->apply($qb)->setParameters(array('id' => $id))->getOneOrNullResult();
+    }
 }
