@@ -102,17 +102,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         add: function(widget) {
             this.widgets[widget.getWid()] = widget;
-            this.getWidgetDraggableElement(widget).draggable();
-        },
-
-        /**
-         *
-         * @param {DashboardItemWidget} widget
-         * @param {function} callback
-         * @returns {HTMLElement}
-         */
-        getWidgetDraggableElement: function(widget, callback) {
-            return widget.widget.parent();
         }
     };
 
