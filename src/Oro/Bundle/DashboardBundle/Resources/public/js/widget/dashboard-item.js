@@ -39,8 +39,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          * @property {Object}
          */
         state: {
-            expanded: true,
-            layoutPosition: [1, 0]
+            id: 0,
+            expanded: true
         },
 
         /**
@@ -92,7 +92,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          */
         _initState: function(options) {
             if (options.state) {
-                this.state = _.extend(this.state, options.state);
+                this.state = _.extend({}, this.state, options.state);
             }
 
             if (this.state.layoutPosition) {
@@ -102,6 +102,10 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
                         return parseInt(value);
                     }
                 );
+            }
+
+            if (!this.state.id) {
+                throw new Error('Dashboard widget id should be defined.');
             }
 
             this.once('renderComplete', this._initWidgetCollapseState);
