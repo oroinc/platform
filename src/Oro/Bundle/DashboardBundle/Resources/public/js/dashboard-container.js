@@ -46,8 +46,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var self = this;
             this.options = _.extend({}, this.options, options);
 
-            mediator.on('dashboard:widget:add', function(elementHtml){
-                self.addToDashboard(elementHtml);
+            mediator.on('dashboard:widget:add', function(widgetModel){
+                self.addToDashboard(widgetModel);
             });
 
             _.each(this.options.widgetIds, function (wid) {
@@ -60,15 +60,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             });
 
             this._updateLayoutView();
-
-            mediator.on('dashboard:model:new:element', function(wid){
-                widgetManager.getWidgetInstance(
-                    wid,
-                    function (widget) {
-                        self.add(widget);
-                    }
-                );
-            });
 
             $(this.options.columnsSelector)
                 .sortable({
@@ -100,8 +91,27 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             $(this.options.columnsSelector).css({minHeight: 'auto'});
         },
 
-        addToDashboard: function(html){
-            $('#dashboard-column-0').prepend(html);
+        /**
+         * @param {object} widgetModel
+         */
+        addToDashboard: function(widgetModel){
+            var wid = 'dashboard-widget-' + widgetModel.widget.id;
+            var containerId = 'widget-container-'+wid;
+            $('#dashboard-column-0').prepend($('<div id="' + containerId + '"></div>'));
+            var state = {
+                'id': widgetModel.widget.id,
+                'expanded': widgetModel.widget.expanded,
+                'layoutPosition': widgetModel.widget.layoutPosition
+            };
+            var widgetParams = {
+                'widgetType': 'dashboard-item',
+                'wid': wid,
+                'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
+                'state': state,
+                'container': '#' + containerId
+            };
+            var widget = new DashboardItemWidget(widgetParams);
+            widget.render();
             $(this.options.columnsSelector).sortable('refresh');
         },
 

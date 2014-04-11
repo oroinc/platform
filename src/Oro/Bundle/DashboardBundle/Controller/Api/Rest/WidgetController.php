@@ -110,6 +110,8 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     /**
      * @param integer $dashboardId
      *
+     * @Rest\Put()
+     *
      * @Rest\QueryParam(
      *      name="layoutPositions",
      *      nullable=true,
@@ -146,6 +148,34 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $this->getEntityManager()->flush($widgets);
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @ApiDoc(
+     *      description="Add widget to dashboard",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_dashboard_edit")
+     *
+     * @return Response
+     */
+    public function postAddWidgetAction()
+    {
+        $widgetManager = $this->get('oro_dashboard.widget_manager');
+
+        $dashboardId = $this->getRequest()->get('dashboardId', null);
+        $widgetName = $this->getRequest()->get('widgetName', null);
+
+        if (!$dashboardId || empty($widgetName)) {
+            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+        }
+
+        $widgetModel = $widgetManager->createWidget($widgetName, $dashboardId);
+        if (!$widgetModel) {
+            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+        }
+
+        return $this->handleView($this->view($widgetModel, Codes::HTTP_OK));
     }
 
     /**

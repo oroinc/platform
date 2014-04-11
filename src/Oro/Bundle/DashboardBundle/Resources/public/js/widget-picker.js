@@ -48,12 +48,12 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 var endLoading = event.data.widgetPicker.endLoading.bind(
                     event.data.widgetPicker, text, event.data.controls, $this.parents('.dashboard-widget-container')
                 );
-                var routingParams = {widgetName: $this.data('widget-name'), id: event.data.widgetPicker.dashboardId};
-                var url = routing.generate('oro_dashboard_widget_add', routingParams);
-                require(['text!'+url+'#rand='+Math.random()], function(html){
-                    mediator.trigger('dashboard:widget:add', html);
+                var params = {widgetName: $this.data('widget-name'), dashboardId: event.data.widgetPicker.dashboardId};
+                var url = routing.generate('oro_api_post_dashboard_widget_add_widget');
+                $.post(url, params, function(response){
+                    mediator.trigger('dashboard:widget:add', response);
                     endLoading();
-                });
+                }, 'json');
             }
         },
 

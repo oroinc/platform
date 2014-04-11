@@ -75,26 +75,6 @@ class DashboardController extends Controller
     }
 
     /**
-     * @Route("/add-widget/{id}/{widgetName}", name="oro_dashboard_widget_add")
-     * @Acl(
-     *      id="oro_dashboard_edit",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="OroDashboardBundle:Dashboard"
-     * )
-     */
-    public function addWidgetAction($id, $widgetName)
-    {
-        $widgetManager = $this->get('oro_dashboard.widget_manager');
-        $widgetModel = $widgetManager->createWidget($widgetName, $id);
-        if (!$widgetModel) {
-            return new NotFoundHttpException('Incorrect params');
-        }
-
-        return $this->render("OroDashboardBundle:Dashboard:renderWidget.html.twig", array('widget' => $widgetModel));
-    }
-
-    /**
      * @Route(
      *      "/widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_widget",
