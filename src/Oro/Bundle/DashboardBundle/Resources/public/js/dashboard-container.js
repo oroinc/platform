@@ -61,6 +61,15 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
 
             this._updateLayoutView();
 
+            mediator.on('dashboard:model:new:element', function(wid){
+                widgetManager.getWidgetInstance(
+                    wid,
+                    function (widget) {
+                        self.add(widget);
+                    }
+                );
+            });
+
             $(this.options.columnsSelector)
                 .sortable({
                     handle: this.options.handle,
@@ -77,9 +86,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         addToDashboard: function(html){
-            var column = $('#dashboard-column-1');
-            column.prepend(html);
-            column.find('')
+            $('#dashboard-column-0').prepend(html);
             $(this.options.columnsSelector).sortable('refresh');
         },
 

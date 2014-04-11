@@ -109,6 +109,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                 throw new Error('Dashboard widget id should be defined.');
             }
 
+            //todo: remove
+
+            mediator.trigger('dashboard:model:new:element', this.state.id);
             this.once('renderComplete', this._initWidgetCollapseState);
         },
 
