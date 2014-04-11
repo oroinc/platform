@@ -82,9 +82,8 @@ class WidgetManager
             if ($position[1] < $min) {
                 $min = $position[1];
             }
-            $widgetEntity->setLayoutPosition($position);
         }
-        $widget->setLayoutPosition(array(1, --$min));
+        $widget->setLayoutPosition(array(0, --$min));
         $widget->setDashboard($dashboard);
 
         $this->entityManager->persist($widget);
