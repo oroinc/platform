@@ -69,6 +69,10 @@
   }
 }
 .grid-container {
-  /* hotfix for scrolling datagrid's table on iPhone */
-  width: 95%
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+  table.grid {
+    width: auto;
+    max-width: none;
+  }
 }
