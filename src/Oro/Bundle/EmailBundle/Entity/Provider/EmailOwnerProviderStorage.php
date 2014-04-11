@@ -37,15 +37,23 @@ class EmailOwnerProviderStorage
      *
      * @param EmailOwnerProviderInterface $provider
      * @return string
+     * @throws \RuntimeException
      */
     public function getEmailOwnerFieldName(EmailOwnerProviderInterface $provider)
     {
         $key = 0;
-        foreach ($this->emailOwnerProviders as $p) {
-            $key++;
-            if ($p === $provider) {
+        for ($i = 0, $size = count($this->emailOwnerProviders); $i < $size; $i++) {
+            if ($this->emailOwnerProviders[$i] === $provider) {
+                $key = $i + 1;
                 break;
             }
+        }
+
+        if ($key === 0) {
+            throw new \RuntimeException(
+                'The provider for "%s" must be registers in EmailOwnerProviderStorage',
+                $provider->getEmailOwnerClass()
+            );
         }
 
         return sprintf('owner%d', $key);
