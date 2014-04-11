@@ -68,18 +68,16 @@
                 {% block widgets %}
                     {{
                         _self.renderWidgetsColumn({
-                            'widgets': dashboard.getOrderedColumnWidgets(1, false, true),
-                            'columnIndex': 1,
-                            'columnElementId': 'dashboard-column-1',
+                            'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
+                            'columnElementId': 'dashboard-column-0',
                             'columnClass': 'dashboard-column',
                             'widgetIdPrefix': widgetIdPrefix
                         })
                     }}
                     {{
                         _self.renderWidgetsColumn({
-                            'widgets': dashboard.getOrderedColumnWidgets(2, true, false),
-                            'columnIndex': 2,
-                            'columnElementId': 'dashboard-column-2',
+                            'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
+                            'columnElementId': 'dashboard-column-1',
                             'columnClass': 'dashboard-column',
                             'widgetIdPrefix': widgetIdPrefix
                         })
@@ -143,7 +141,7 @@
 {% endblock content %}
 
 {% macro renderWidgetsColumn(options) %}
-    <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column" data-column="{{ options.columnIndex }}">
+    <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column">
         {% for widget in options.widgets %}
             {{
                 oro_widget_render({
@@ -152,10 +150,17 @@
                     'url': path(widget.config.route, widget.config.route_parameters),
                     'state': {
                         'id': widget.widget.id,
-                        'expanded': widget.widget.expanded
+                        'expanded': widget.widget.expanded,
+                        'layoutPosition': widget.widget.layoutPosition,
                     }
                 })
             }}
         {% endfor %}
+        {#<div class="empty-text">
+            <div class="widget-placeholder">
+                {{ 'oro.dashboard.empty_column_message'|trans|raw }}
+            </div>
+        </div>
+        <div></div>#}
     </div>
 {% endmacro %}

@@ -9,4 +9,4 @@ oro_dashboard_config:
         main:
             widgets:
                 my_calendar:
-                    layout_position: [2, 20]
+                    layout_position: [1, 20]

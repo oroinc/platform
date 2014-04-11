@@ -126,9 +126,9 @@ class Configuration implements ConfigurationInterface
                                                             );
                                                         }
                                                         $value = array_values($value);
-                                                        if ($value[0] < 1) {
+                                                        if ($value[0] < 0) {
                                                             throw new \Exception(
-                                                                'First element should be greater than 0.'
+                                                                'First element should be greater or equal than 0.'
                                                             );
                                                         }
                                                         return array_values($value);

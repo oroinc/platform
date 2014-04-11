@@ -10,7 +10,7 @@ oro_dashboard_config:
             label:      oro.dashboard.title.main
             widgets:
                 quick_launchpad:
-                    layout_position:   [1, 10]
+                    layout_position:   [0, 10]
         quick_launchpad:
             label:      oro.dashboard.title.quick_launchpad
             twig:       OroDashboardBundle:Index:quickLaunchpad.html.twig

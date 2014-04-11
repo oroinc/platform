@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
-    ], function (_, Backbone, mediator, BlockWidget) {
+define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
+    function (_, Backbone, mediator, BlockWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -25,11 +25,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
                 event.preventDefault();
                 this.expand();
             },
-            'click .collapse-expand-action-container .move-action': function(event) {
+            'click .default-actions-container .move-action': function(event) {
                 event.preventDefault();
                 this.onMove();
             },
-            'click .collapse-expand-action-container .remove-action': function(event) {
+            'click .default-actions-container .remove-action': function(event) {
                 event.preventDefault();
                 this.onRemoveFromDashboard();
             }
@@ -40,7 +40,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
          */
         state: {
             id: 0,
-            expanded: true
+            expanded: true,
+            layoutPosition: [0, 0]
         },
 
         /**
