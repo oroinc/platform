@@ -149,9 +149,8 @@ services:
         arguments:
           - @doctrine.orm.entity_manager
           - @oro_datagrid.datagrid.request_params
+          - @oro_email.email_synchronization_manager
           - @oro_email.datagrid_query_factory
-        calls:
-          - [setEmailSync, [@?oro_imap.email_synchronizer=]]
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-email-grid, method: onBuildAfter }
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
@@ -161,8 +160,7 @@ services:
         arguments:
           - @doctrine.orm.entity_manager
           - @oro_datagrid.datagrid.request_params
-        calls:
-          - [setEmailSync, [@?oro_imap.email_synchronizer=]]
+          - @oro_email.email_synchronization_manager
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -473,11 +474,39 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testImapConfiguration()
     {
         $entity = new User();
-        $imapConfiguration = new ImapEmailOrigin();
+        $imapConfiguration = $this->getMock('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin');
+        $imapConfiguration->expects($this->once())
+            ->method('setIsActive')
+            ->with(false);
 
-        $this->assertEmpty($entity->getImapConfiguration());
+        $this->assertCount(0, $entity->getEmailOrigins());
+        $this->assertNull($entity->getImapConfiguration());
+
         $entity->setImapConfiguration($imapConfiguration);
-
         $this->assertEquals($imapConfiguration, $entity->getImapConfiguration());
+        $this->assertCount(1, $entity->getEmailOrigins());
+
+        $entity->setImapConfiguration(null);
+        $this->assertNull($entity->getImapConfiguration());
+        $this->assertCount(0, $entity->getEmailOrigins());
+    }
+
+    public function testEmailOrigins()
+    {
+        $entity = new User();
+        $origin1 = new InternalEmailOrigin();
+        $origin2 = new InternalEmailOrigin();
+
+        $this->assertCount(0, $entity->getEmailOrigins());
+
+        $entity->addEmailOrigin($origin1);
+        $entity->addEmailOrigin($origin2);
+        $this->assertCount(2, $entity->getEmailOrigins());
+        $this->assertSame($origin1, $entity->getEmailOrigins()->first());
+        $this->assertSame($origin2, $entity->getEmailOrigins()->last());
+
+        $entity->removeEmailOrigin($origin1);
+        $this->assertCount(1, $entity->getEmailOrigins());
+        $this->assertSame($origin2, $entity->getEmailOrigins()->first());
     }
 }

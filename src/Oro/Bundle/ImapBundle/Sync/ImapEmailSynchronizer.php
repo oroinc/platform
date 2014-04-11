@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
@@ -41,6 +43,14 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(EmailOrigin $origin)
+    {
+        return ($origin instanceof ImapEmailOrigin);
     }
 
     /**

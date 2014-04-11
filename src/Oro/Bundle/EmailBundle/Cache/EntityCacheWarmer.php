@@ -9,11 +9,9 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 class EntityCacheWarmer extends CacheWarmer
 {
     /**
-     * A list of class names of all email owners
-     *
-     * @var string[]
+     * @var EmailOwnerProviderStorage
      */
-    protected $emailOwnerClasses = array();
+    protected $emailOwnerProviderStorage;
 
     /**
      * @var string
@@ -44,10 +42,7 @@ class EntityCacheWarmer extends CacheWarmer
         $entityCacheNamespace,
         $entityProxyNameTemplate
     ) {
-        foreach ($emailOwnerProviderStorage->getProviders() as $provider) {
-            $this->emailOwnerClasses[count($this->emailOwnerClasses) + 1] = $provider->getEmailOwnerClass();
-        }
-
+        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityCacheDir          = $entityCacheDir;
         $this->entityCacheNamespace    = $entityCacheNamespace;
         $this->entityProxyNameTemplate = $entityProxyNameTemplate;
@@ -108,20 +103,12 @@ class EntityCacheWarmer extends CacheWarmer
         }
 
         $args = array();
-        foreach ($this->emailOwnerClasses as $key => $emailOwnerClass) {
-            $prefix = strtolower(substr($emailOwnerClass, 0, strpos($emailOwnerClass, '\\')));
-            if ($prefix === 'oro' || $prefix === 'orocrm') {
-                // do not use prefix if email's owner is a part of BAP and CRM
-                $prefix = '';
-            } else {
-                $prefix .= '_';
-            }
-            $suffix = strtolower(substr($emailOwnerClass, strrpos($emailOwnerClass, '\\') + 1));
-
+        $providers = $this->emailOwnerProviderStorage->getProviders();
+        foreach ($providers as $provider) {
             $args[] = array(
-                'targetEntity' => $emailOwnerClass,
-                'columnName'   => sprintf('owner_%s%s_id', $prefix, $suffix),
-                'fieldName'    => sprintf('owner%d', $key)
+                'targetEntity' => $provider->getEmailOwnerClass(),
+                'columnName'   => $this->emailOwnerProviderStorage->getEmailOwnerColumnName($provider),
+                'fieldName'    => $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider)
             );
         }
 
