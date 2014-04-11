@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
-use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -11,12 +10,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\DashboardBundle\Provider\WidgetModelProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
-use Oro\Bundle\DashboardBundle\Model\WidgetModelFactory;
 
 class DashboardController extends Controller
 {
@@ -32,8 +28,7 @@ class DashboardController extends Controller
         /** @var Manager $manager */
         $manager = $this->get('oro_dashboard.manager');
 
-        /** @var WidgetModelProvider $widgetModelProvider */
-        $widgetModelProvider = $this->get('oro_dashboard.widget_model_provider');
+        $widgetManager = $this->get('oro_dashboard.widget_manager');
 
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
@@ -74,7 +69,7 @@ class DashboardController extends Controller
             array(
                 'dashboards' => $dashboards,
                 'dashboard' => $currentDashboard,
-                'widgets' => $widgetModelProvider->getAvailableWidgets()
+                'widgets' => $widgetManager->getAvailableWidgets()
             )
         );
     }

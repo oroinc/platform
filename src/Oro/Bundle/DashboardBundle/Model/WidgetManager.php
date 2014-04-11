@@ -73,34 +73,40 @@ class WidgetManager
 
         $widget->setExpanded(true);
         $widget->setName($widgetName);
-        $widget->setLayoutPosition(array(1,1));
 
-        $engaged =  false;
+        $min = 1;
 
         /** @var DashboardWidget $widgetEntity */
         foreach ($dashboard->getWidgets() as $widgetEntity) {
             $position = $widgetEntity->getLayoutPosition();
-            if ($position[1] == 1) {
-                $engaged = true;
-                break;
+            if ($position[1] < $min) {
+                $min = $position[1];
             }
+            $widgetEntity->setLayoutPosition($position);
         }
-
-        if ($engaged) {
-            /** @var DashboardWidget $widgetEntity */
-            foreach ($dashboard->getWidgets() as $widgetEntity) {
-                $position = $widgetEntity->getLayoutPosition();
-                ++$position[1];
-                $widgetEntity->setLayoutPosition($position);
-            }
-        }
-
-        $this->entityManager->persist($widget);
-
+        $widget->setLayoutPosition(array(1, --$min));
         $widget->setDashboard($dashboard);
 
+        $this->entityManager->persist($widget);
         $this->entityManager->flush($widget);
 
         return $this->widgetModelFactory->getModel($widget);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableWidgets()
+    {
+        $availableWidgets = array();
+        $widgets = $this->configProvider->getWidgetConfigs();
+        foreach ($widgets as $widgetName => $widgetConfig) {
+            if (isset($widgetConfig['acl']) && !$this->securityFacade->isGranted($widgetConfig['acl'])) {
+                continue;
+            }
+            $availableWidgets[$widgetName] = $widgetConfig;
+        }
+
+        return $availableWidgets;
     }
 }
