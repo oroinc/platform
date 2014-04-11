@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
@@ -21,6 +21,11 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         EmailAddressManager $emailAddressManager
     ) {
         parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
+    }
+
+    public function supports(EmailOrigin $origin)
+    {
+        return true;
     }
 
     protected function getEmailOriginClass()

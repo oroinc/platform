@@ -64,6 +64,14 @@ abstract class AbstractEmailSynchronizer
     }
 
     /**
+     * Returns TRUE if this class supports synchronization of the given origin.
+     *
+     * @param EmailOrigin $origin
+     * @return bool
+     */
+    abstract public function supports(EmailOrigin $origin);
+
+    /**
      * Performs a synchronization of emails for one email origin.
      * Algorithm how an email origin is selected see in findOriginToSync method.
      *

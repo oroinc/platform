@@ -2,32 +2,31 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+
 class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
 {
     public function testWarmUpAndIsOptional()
     {
-        $storage = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $oroProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $oroProvider->expects($this->once())
+        $oroProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue('Oro\TestUser'));
 
         $oroCrmProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $oroCrmProvider->expects($this->once())
+        $oroCrmProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue('OroCRM\TestContact'));
 
         $acmeProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $acmeProvider->expects($this->once())
+        $acmeProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue('Acme\TestUser'));
 
-        $storage->expects($this->once())
-            ->method('getProviders')
-            ->will($this->returnValue(array($oroProvider, $oroCrmProvider, $acmeProvider)));
+        $storage = new EmailOwnerProviderStorage();
+        $storage->addProvider($oroProvider);
+        $storage->addProvider($oroCrmProvider);
+        $storage->addProvider($acmeProvider);
 
         $warmer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer')
             ->setConstructorArgs(array($storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy'))
