@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\DashboardBundle\Provider\WidgetModelProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Model\WidgetModelFactory;
 
 class DashboardController extends Controller
 {
@@ -74,6 +77,30 @@ class DashboardController extends Controller
                 'widgets' => $widgetModelProvider->getAvailableWidgets()
             )
         );
+    }
+
+    /**
+     * @Route("/add-widget/{id}/{widgetName}", name="oro_dashboard_widget_add")
+     * @Acl(
+     *      id="oro_dashboard_edit",
+     *      type="entity",
+     *      permission="EDIT",
+     *      class="OroDashboardBundle:Dashboard"
+     * )
+     */
+    public function addWidgetAction($id, $widgetName)
+    {
+        $widgetManager = $this->get('oro_dashboard.widget_manager');
+        $widgetModel = $widgetManager->createWidget($widgetName, $id);
+        if (!$widgetModel) {
+            return new NotFoundHttpException('Incorrect params');
+        }
+
+        $uid = preg_replace('/[^0-9a-z]/im', '_', uniqid('', true));
+
+        $params = array('widget' => $widgetModel, 'uid' => $uid);
+
+        return $this->render("OroDashboardBundle:Dashboard:renderWidget.html.twig", $params);
     }
 
     /**

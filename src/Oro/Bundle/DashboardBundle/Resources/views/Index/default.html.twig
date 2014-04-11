@@ -102,7 +102,7 @@
                         <strong class="dashboard-widget-title">{{ widget.config.label|trans }}</strong>
                     {% endif %}
                     {% if widget.config.description is defined %}
-                        <span class="dashboard-widget-description">{{ widget.config.description }}</span>
+                        <span class="dashboard-widget-description">{{ widget.config.description|trans }}</span>
                         {% else %}
                         <span class="dashboard-widget-description">
                             Lorem ipsum dolor sit amet, fugit movet fastidii ut vim, vel at etiam libris audire,
@@ -113,7 +113,7 @@
                     {% endif %}
                     </p>
                     <div class="dashboard-widgets-pick-wrapper">
-                        <a class="btn main-group add-widget-button">
+                        <a class="btn main-group add-widget-button" data-widget-name="{{ widget.widget.name }}">
                             {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
                         </a>
                     </div>

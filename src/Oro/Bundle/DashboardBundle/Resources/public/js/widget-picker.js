@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator'],
-    function (_, modal, mediator, __) {
+define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'],
+    function (_, modal, mediator, __, routing) {
     'use strict';
 
     /**
@@ -9,15 +9,21 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
      */
     return {
         dialog: null,
-        init: function(){
+        dashboardId: null,
+        init: function(dashboardId){
             var self = this;
-
+            self.dashboardId = dashboardId;
             var widgetPickerDialog = modal.extend({
                open: function() {
                    Backbone.BootstrapModal.prototype.open.apply(this, arguments);
                    var controls = $('.add-widget-button');
-                   var params = { widgetPicker: self, controls: controls };
-                   controls.bind('click', params, self.clickAddToDashboardDelegate);
+                   $('.dashboard-widget-container').bind('click', {}, function(event){
+                       event.stopImmediatePropagation();
+                       if (!$(event.target).hasClass('add-widget-button')) {
+                           $(this).find('.add-widget-button').click();
+                       }
+                   });
+                   controls.bind('click', {widgetPicker: self, controls: controls}, self.clickAddToDashboardDelegate);
                 }
             });
 
@@ -27,7 +33,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 'title': __('oro.dashboard.add_dashboard_widgets.title')
             });
 
-            $('.dashboard-widgets-add').bind('click', { widgetPicker: this }, this.clickAddWidgetDelegate);
+            $('.dashboard-widgets-add').bind('click', { widgetPicker: this}, this.clickAddWidgetDelegate);
         },
 
         /**
@@ -39,32 +45,43 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
             if (!$this.hasClass('disabled')) {
                 var text = $this.html();
                 event.data.widgetPicker.startLoading(event.data.controls);
-                console.log('write event trigger here');
                 var endLoading = event.data.widgetPicker.endLoading.bind(
-                    event.data.widgetPicker, text, event.data.controls, $this
+                    event.data.widgetPicker, text, event.data.controls, $this.parents('.dashboard-widget-container')
                 );
-                setTimeout(endLoading, 1000);
+                var routingParams = {widgetName: $this.data('widget-name'), id: event.data.widgetPicker.dashboardId};
+                var url = routing.generate('oro_dashboard_widget_add', routingParams);
+                require(['text!'+url], function(html){
+                    mediator.trigger('dashboard:widget:add', html);
+                    endLoading();
+                });
             }
         },
 
+        /**
+         * @param {jQuery} controls collection
+         */
         startLoading: function(controls){
             controls.addClass('disabled');
             controls.html(__('oro.dashboard.add_dashboard_widgets.adding'));
         },
 
-        endLoading: function(text, controls, addedWidget){
+        /**
+         * @param {string} text
+         * @param {jQuery} controls collection
+         * @param {jQuery} widgetContainer single element
+         */
+        endLoading: function(text, controls, widgetContainer){
             controls.removeClass('disabled');
             controls.html(text);
-            var widgetContainer = addedWidget.parents('.dashboard-widget-container');
             var previous = widgetContainer.css('background-color');
-            widgetContainer.animate(
-                {backgroundColor: "#F5F55B"},
-                50,
-                'swing',
-                function () {
-                    widgetContainer.animate({backgroundColor: previous}, 500);
-                }
-            );
+            var animateFinish = function () {
+                animateFinish = function(){
+                    widgetContainer.css({backgroundColor: ''});
+                };
+                widgetContainer.animate({backgroundColor: previous}, animateFinish);
+            };
+
+            widgetContainer.animate({backgroundColor: "#F5F55B"}, 50, animateFinish);
         },
 
         /**

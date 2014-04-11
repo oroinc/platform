@@ -34,10 +34,10 @@ class Manager
     /**
      * Constructor
      *
-     * @param ConfigProvider              $configProvider
-     * @param DashboardRepository         $dashboardRepository
-     * @param DashboardModelFactory       $dashboardModelFactory
-     * @param EntityManager $entityManager
+     * @param ConfigProvider        $configProvider
+     * @param DashboardRepository   $dashboardRepository
+     * @param DashboardModelFactory $dashboardModelFactory
+     * @param EntityManager         $entityManager
      */
     public function __construct(
         ConfigProvider $configProvider,
