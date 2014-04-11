@@ -187,7 +187,7 @@ abstract class OroKernel extends Kernel
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if (class_exists('ProxyManager\Configuration')) {
+        if ($container->getParameter('installed') && class_exists('ProxyManager\Configuration')) {
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
