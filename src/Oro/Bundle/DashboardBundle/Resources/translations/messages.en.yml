@@ -1,7 +1,9 @@
 oro:
     dashboard:
+        entity_label: Dashboard
+        entity_plural_label: Dashboards
+
         title:
-            not_found: Dashboard
             main: Dashboard
             quick_launchpad: Quick Launchpad
 

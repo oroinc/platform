@@ -85,7 +85,7 @@ class Dashboard
     }
 
     /**
-     * @param mixed $label
+     * @param string $label
      * @return Dashboard
      */
     public function setLabel($label)
@@ -96,7 +96,7 @@ class Dashboard
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLabel()
     {
@@ -126,7 +126,7 @@ class Dashboard
      * @param User $owner
      * @return Dashboard
      */
-    public function setOwner($owner)
+    public function setOwner(User $owner)
     {
         $this->owner = $owner;
 
@@ -150,7 +150,7 @@ class Dashboard
     }
 
     /**
-     * @return $this
+     * @return Dashboard
      */
     public function resetWidgets()
     {
@@ -161,7 +161,6 @@ class Dashboard
 
     /**
      * @param DashboardWidget $widget
-     * @return $this
      * @return Dashboard
      */
     public function addWidget(DashboardWidget $widget)

@@ -59,7 +59,6 @@ class OroDashboardBundle implements Migration
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['user_id']);
-        $table->addUniqueIndex(['dashboard_id'], 'UNIQ_858BA17EB9D04D2B');
         /** End of generate table oro_dashboard_active **/
 
         /** Generate foreign keys for table oro_dashboard_active **/

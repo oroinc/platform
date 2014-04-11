@@ -32,7 +32,7 @@ class DashboardRepository extends EntityRepository
     }
 
     /**
-     * @param $id
+     * @param integer $id
      * @return Dashboard|null
      */
     public function getAvailableDashboard($id)

@@ -1,7 +1,7 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widget-manager',
-    'orodashboard/js/widget/dashboard-item', 'jquery-ui'
-    ], function ($, _, Backbone, mediator, widgetManager, DashboardItemWidget) {
+define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/mediator',
+    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'jquery-ui'
+    ], function ($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget) {
     'use strict';
 
     /**
@@ -26,8 +26,8 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
                     var height = $(currentItem).height();
                     return $(
                         '<div><div class="widget-placeholder" style="height: ' + height + 'px;">' +
-                            'Drag your widget here.' +
-                            '</div></div>'
+                            __('oro.dashboard.drop_placeholder_label') +
+                        '</div></div>'
                     )[0];
                 },
                 update: function(container, p) {
@@ -43,7 +43,10 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
          */
         initialize: function(options) {
             var self = this;
-            this.options = _.extend(this.options, options);
+            this.options = _.extend({}, this.options, options);
+            this.options.urls = {
+                savePositions: routing.generate('oro_api_positions_dashboard_widget', {dashboardId: this.options.dashboardId})
+            };
 
             mediator.on('dashboard:widget:add', function(elementHtml){
                 self.addToDashboard(elementHtml);
@@ -58,12 +61,14 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
                 );
             });
 
-
             $(this.options.columnsSelector)
                 .sortable({
                     handle: this.options.handle,
                     placeholder: this.options.placeholder,
-                    connectWith: this.options.columnsSelector
+                    connectWith: this.options.columnsSelector,
+                    stop: function(event, ui) {
+                        self.saveLayoutPosition();
+                    }
                 });
         },
 
@@ -73,23 +78,38 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/widge
         },
 
         /**
+         * Save layout position
+         */
+        saveLayoutPosition: function() {
+            var self = this;
+            var data = {
+                layoutPositions: {}
+            };
+            $(this.options.columnsSelector).each(function(index, columnElement) {
+                var columnIndex = $(columnElement).data('column');
+                $('> div', columnElement).each(function (widgetIndex, widgetContainer) {
+                    var wid = $('.widget-content', widgetContainer).data('wid');
+                    if (self.widgets[wid]) {
+                        var id = self.widgets[wid].state.id;
+                        data.layoutPositions[id] = [columnIndex, widgetIndex];
+                    }
+                });
+            });
+
+            $.ajax({
+                url: this.options.urls.savePositions,
+                type: 'PUT',
+                data: $.param(data)
+            });
+        },
+
+        /**
          * Add dashboard widget
          *
          * @param {DashboardItemWidget} widget
          */
         add: function(widget) {
             this.widgets[widget.getWid()] = widget;
-            this.getWidgetDraggableElement(widget).draggable();
-        },
-
-        /**
-         *
-         * @param {DashboardItemWidget} widget
-         * @param {function} callback
-         * @returns {HTMLElement}
-         */
-        getWidgetDraggableElement: function(widget, callback) {
-            return widget.widget.parent();
         }
     };
 

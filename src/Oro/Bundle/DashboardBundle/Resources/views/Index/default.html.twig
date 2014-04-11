@@ -2,6 +2,7 @@
 {% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
 
 {% block content %}
+{% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
 <div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -71,7 +72,7 @@
                             'columnIndex': 1,
                             'columnElementId': 'dashboard-column-1',
                             'columnClass': 'dashboard-column',
-                            'widgetIdPrefix': 'dashboard-widget-'
+                            'widgetIdPrefix': widgetIdPrefix
                         })
                     }}
                     {{
@@ -80,7 +81,7 @@
                             'columnIndex': 2,
                             'columnElementId': 'dashboard-column-2',
                             'columnClass': 'dashboard-column',
-                            'widgetIdPrefix': 'dashboard-widget-'
+                            'widgetIdPrefix': widgetIdPrefix
                         })
                     }}
                 {% endblock widgets %}
@@ -127,10 +128,11 @@
             function(dashboardContainer, widgetPicker) {
                 {% set widgetIds = [] %}
                 {% for widget in dashboard.widgets %}
-                {% set widgetIds = widgetIds|merge(['dashboard-widget-' ~ widget.widget.id]) %}
+                {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.widget.id]) %}
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
+                    dashboardId: {{ dashboard.dashboard.id }},
                     columnsSelector: '.dashboard-column'
                 });
 				widgetPicker.init();
@@ -149,7 +151,7 @@
                     'wid': options.widgetIdPrefix ~ widget.widget.id,
                     'url': path(widget.config.route, widget.config.route_parameters),
                     'state': {
-                        'layoutPosition': widget.widget.layoutPosition,
+                        'id': widget.widget.id,
                         'expanded': widget.widget.expanded
                     }
                 })
@@ -157,4 +159,3 @@
         {% endfor %}
     </div>
 {% endmacro %}
-

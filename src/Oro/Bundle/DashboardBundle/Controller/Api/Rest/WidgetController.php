@@ -11,9 +11,10 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
@@ -23,25 +24,27 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 class WidgetController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * @param integer $id
+     * @param integer $dashboardId
+     * @param integer $widgetId
      *
      * @ApiDoc(
      *      description="Delete dashboard widget",
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_widget",
+     *      id="oro_dashboard_dashboard",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroDashboardBundle:DashboardWidget"
+     *      class="OroDashboardBundle:Dashboard"
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction($dashboardId, $widgetId)
     {
-        $widget = $this->getWidget($id);
+        $dashboard = $this->getDashboard($dashboardId);
+        $widget    = $this->getWidget($widgetId);
 
-        if (!$widget) {
+        if (!$dashboard || !$widget) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
@@ -52,7 +55,8 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
-     * @param integer $id
+     * @param integer $dashboardId
+     * @param integer $widgetId
      *
      * @Rest\QueryParam(
      *      name="isExpanded",
@@ -73,18 +77,19 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_widget",
+     *      id="oro_dashboard_dashboard",
      *      type="entity",
      *      permission="UPDATE",
-     *      class="OroDashboardBundle:DashboardWidget"
+     *      class="OroDashboardBundle:Dashboard"
      * )
      * @return Response
      */
-    public function putAction($id)
+    public function putAction($dashboardId, $widgetId)
     {
-        $widget = $this->getWidget($id);
+        $dashboard = $this->getDashboard($dashboardId);
+        $widget    = $this->getWidget($widgetId);
 
-        if (!$widget) {
+        if (!$dashboard || !$widget) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
@@ -102,6 +107,8 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * @param integer $dashboardId
+     *
      * @Rest\Put()
      *
      * @Rest\QueryParam(
@@ -116,15 +123,21 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_widget",
+     *      id="oro_dashboard_dashboard",
      *      type="entity",
      *      permission="UPDATE",
-     *      class="OroDashboardBundle:DashboardWidget"
+     *      class="OroDashboardBundle:Dashboard"
      * )
      * @return Response
      */
-    public function positionsAction()
+    public function positionsAction($dashboardId)
     {
+        $dashboard = $this->getDashboard($dashboardId);
+
+        if (!$dashboard) {
+            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+        }
+
         $layoutPositions = $this->getRequest()->get('layoutPositions', []);
         $widgets         = [];
 
@@ -146,6 +159,20 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * @return DashboardWidget
      */
     protected function getWidget($id)
+    {
+        $entity = $this
+            ->getEntityManager()
+            ->getRepository('OroDashboardBundle:Dashboard')
+            ->find($id);
+
+        return $entity;
+    }
+
+    /**
+     * @param integer $id
+     * @return Dashboard
+     */
+    protected function getDashboard($id)
     {
         $entity = $this
             ->getEntityManager()

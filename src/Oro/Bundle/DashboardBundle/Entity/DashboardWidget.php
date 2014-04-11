@@ -40,7 +40,7 @@ class DashboardWidget
      *
      * @ORM\Column(name="is_expanded", type="boolean")
      */
-    protected $expanded;
+    protected $expanded = true;
 
     /**
      * @var Dashboard
@@ -49,11 +49,6 @@ class DashboardWidget
      * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
-
-    public function __construct()
-    {
-        $this->expanded = true;
-    }
 
     /**
      * @return int
