@@ -110,8 +110,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
             }
 
             //todo: remove
-
-            mediator.trigger('dashboard:model:new:element', this.state.id);
+            mediator.trigger('dashboard:model:new:element', options.wid);
             this.once('renderComplete', this._initWidgetCollapseState);
         },
 
