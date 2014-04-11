@@ -176,7 +176,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     {
         $entity = $this
             ->getEntityManager()
-            ->getRepository('OroDashboardBundle:DashboardWidget')
+            ->getRepository('OroDashboardBundle:Dashboard')
             ->find($id);
 
         return $entity;
