@@ -8,9 +8,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroTextListType;
 
 class OroTextListTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroTextListType
-     */
+    /** @var OroTextListType */
     protected $formType;
 
     protected function setUp()
