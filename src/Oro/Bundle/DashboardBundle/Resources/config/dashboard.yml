@@ -8,9 +8,3 @@ oro_dashboard_config:
     dashboards:
         main:
             label:      oro.dashboard.title.main
-            widgets:
-                quick_launchpad:
-                    layout_position:   [0, 10]
-        quick_launchpad:
-            label:      oro.dashboard.title.quick_launchpad
-            twig:       OroDashboardBundle:Index:quickLaunchpad.html.twig

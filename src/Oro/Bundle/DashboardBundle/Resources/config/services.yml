@@ -8,8 +8,7 @@ parameters:
     oro_dashboard.repository.class:                  Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
     oro_dashboard.dashboard_entity.class:            Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class:     Oro\Bundle\DashboardBundle\Entity\DashboardWidget
-    oro_dashboard.model.dashboard_loader.class:      Oro\Bundle\DashboardBundle\Model\DashboardLoader
-    
+
 services:
     oro_dashboard.widget_attributes:
         class: %oro_dashboard.widget_attributes.class%
@@ -37,12 +36,6 @@ services:
         class: %oro_dashboard.dashboard_model_factory.class%
         arguments:
             - @oro_dashboard.widget_model_factory
-            - @oro_dashboard.config_provider
-
-    oro_dashboard.model.dashboard_loader:
-        class: %oro_dashboard.model.dashboard_loader.class%
-        arguments:
-            - @doctrine.orm.entity_manager
             - @oro_dashboard.config_provider
 
     oro_dashboard.widget_model_factory:

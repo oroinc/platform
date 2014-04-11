@@ -250,14 +250,6 @@ class InstallCommand extends ContainerAwareCommand
         }
         $configManager->flush();
 
-        $commandExecutor->runCommand(
-            'oro:dashboard:load',
-            array(
-                '--process-isolation' => true,
-                '--username' => $userName
-            )
-        );
-
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
