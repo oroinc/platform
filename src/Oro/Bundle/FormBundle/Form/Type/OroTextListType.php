@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 
-class OroListType extends TextareaType
+class OroTextListType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -19,7 +19,7 @@ class OroListType extends TextareaType
         parent::buildForm($builder, $options);
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->getPreSubmitClosure());
-        $builder->addModelTransformer(new ArrayToStringTransformer("\n", true));
+        $builder->addModelTransformer(new ArrayToStringTransformer(",", true));
     }
 
     /**
@@ -44,7 +44,7 @@ class OroListType extends TextareaType
      */
     public function getParent()
     {
-        return 'textarea';
+        return 'text';
     }
 
     /**
@@ -52,6 +52,6 @@ class OroListType extends TextareaType
      */
     public function getName()
     {
-        return 'oro_list';
+        return 'oro_textlist';
     }
 }

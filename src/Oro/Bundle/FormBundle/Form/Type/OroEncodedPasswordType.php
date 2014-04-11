@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
-class OroEncodedPassword extends PasswordType
+class OroEncodedPasswordType extends AbstractType
 {
     /** @var Mcrypt */
     protected $encryptor;
