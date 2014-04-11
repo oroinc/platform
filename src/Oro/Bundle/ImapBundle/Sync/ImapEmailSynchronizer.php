@@ -50,7 +50,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     public function supports(EmailOrigin $origin)
     {
-        return ($origin instanceof ImapEmailOrigin);
+        return $origin instanceof ImapEmailOrigin;
     }
 
     /**

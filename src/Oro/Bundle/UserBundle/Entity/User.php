@@ -1414,7 +1414,7 @@ class User extends ExtendUser implements
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
-                return ($item instanceof ImapEmailOrigin);
+                return $item instanceof ImapEmailOrigin;
             }
         );
 
