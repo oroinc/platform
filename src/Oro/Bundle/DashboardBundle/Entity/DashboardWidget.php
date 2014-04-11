@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Dashboard widget
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardWidgetRepository")
+ * @ORM\Entity
  * @ORM\Table(name="oro_dashboard_widget")
  */
 class DashboardWidget
