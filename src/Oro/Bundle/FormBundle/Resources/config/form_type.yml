@@ -10,6 +10,8 @@ parameters:
     oro_form.type.multiple_entity.class:                         Oro\Bundle\FormBundle\Form\Type\MultipleEntityType
     oro_form.type.collection.class:                              Oro\Bundle\FormBundle\Form\Type\CollectionType
     oro_form.type.entity_create_or_select.class:                 Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType
+    oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
+    oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -130,3 +132,14 @@ services:
         tags:
             - { name: form.type_extension, alias: repeated }
 
+    oro_form.type.encoded_password:
+        class: %oro_form.type.encoded_password.class%
+        arguments:
+            - @oro_security.encoder.mcrypt
+        tags:
+            - { name: form.type, alias: oro_encoded_password }
+
+    oro_form.type.textlist:
+        class: %oro_form.type.textlist.class%
+        tags:
+            - { name: form.type, alias: oro_textlist }
