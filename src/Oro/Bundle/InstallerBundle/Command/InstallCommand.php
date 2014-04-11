@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
@@ -226,18 +227,17 @@ class InstallCommand extends ContainerAwareCommand
             ? strtolower($options['sample-data']) == 'y'
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
-        // create an administrator
+        // Update administrator with user input
         $commandExecutor->runCommand(
-            'oro:user:create',
+            'oro:user:update',
             array(
+                'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                 '--process-isolation' => true,
                 '--user-name' => $userName,
                 '--user-email' => $userEmail,
                 '--user-firstname' => $userFirstName,
                 '--user-lastname' => $userLastName,
-                '--user-password' => $userPassword,
-                '--user-role' => 'ROLE_ADMINISTRATOR',
-                '--user-business-unit' => 'Main'
+                '--user-password' => $userPassword
             )
         );
 
