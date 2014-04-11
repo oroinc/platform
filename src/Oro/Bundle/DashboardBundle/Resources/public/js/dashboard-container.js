@@ -128,8 +128,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
 
             $.ajax({
                 url: this._getRemoveWidgetUrl(widget),
-                type: 'DELETE',
-                data: $.param(data)
+                type: 'DELETE'
             });
         },
 
