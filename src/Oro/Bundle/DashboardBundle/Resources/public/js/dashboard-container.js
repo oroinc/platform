@@ -76,13 +76,28 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                     placeholder: this.options.placeholder,
                     connectWith: this.options.columnsSelector,
                     start: function() {
+                        self._lockLayoutHeight();
                         self._updateLayoutView(true);
                     },
                     stop: function(event, ui) {
+                        self._releaseLayoutHeight();
                         self.saveLayoutPosition();
                         self._updateLayoutView();
                     }
                 });
+        },
+
+        _lockLayoutHeight: function() {
+            var maxHeight = 0;
+            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+                var currentHeight = $(columnElement).height();
+                maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
+            });
+            $(this.options.columnsSelector).css({minHeight: maxHeight + 'px'});
+        },
+
+        _releaseLayoutHeight: function() {
+            $(this.options.columnsSelector).css({minHeight: 'auto'});
         },
 
         addToDashboard: function(html){
@@ -150,7 +165,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         _updateLayoutView: function(hide) {
-            return;
             var self = this;
             if (hide) {
                 $(self.options.emptyTextSelector, this.options.columnsSelector).hide();
