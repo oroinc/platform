@@ -59,7 +59,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 );
             });
 
-            this._updateLayoutView();
+            this._updateEmptyTextVisibility();
 
             mediator.on('dashboard:model:new:element', function(wid){
                 widgetManager.getWidgetInstance(
@@ -77,27 +77,14 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                     connectWith: this.options.columnsSelector,
                     start: function() {
                         self._lockLayoutHeight();
-                        self._updateLayoutView(true);
+                        self._hideEmptyText();
                     },
                     stop: function(event, ui) {
                         self._releaseLayoutHeight();
                         self.saveLayoutPosition();
-                        self._updateLayoutView();
+                        self._updateEmptyTextVisibility();
                     }
                 });
-        },
-
-        _lockLayoutHeight: function() {
-            var maxHeight = 0;
-            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
-                var currentHeight = $(columnElement).height();
-                maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
-            });
-            $(this.options.columnsSelector).css({minHeight: maxHeight + 'px'});
-        },
-
-        _releaseLayoutHeight: function() {
-            $(this.options.columnsSelector).css({minHeight: 'auto'});
         },
 
         addToDashboard: function(html){
@@ -138,7 +125,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         add: function(widget) {
             this.widgets[widget.getWid()] = widget;
-            this._updateLayoutView();
+            this._updateEmptyTextVisibility();
             widget.on('removeFromDashboard', _.bind(this._onRemove, this))
             widget.on('collapse expand', _.bind(this._onCollapseOrExpand, this))
         },
@@ -148,7 +135,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             widget.remove();
             container.remove();
             delete this.widgets[widget.getWid()];
-            this._updateLayoutView();
+            this._updateEmptyTextVisibility();
 
             $.ajax({
                 url: this._getRemoveWidgetUrl(widget),
@@ -164,21 +151,54 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             });
         },
 
-        _updateLayoutView: function(hide) {
-            var self = this;
-            if (hide) {
-                $(self.options.emptyTextSelector, this.options.columnsSelector).hide();
-            } else {
-                $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
-                    if (self._isEmptyColumn(columnIndex)) {
-                        $(self.options.emptyTextSelector, columnElement).show();
-                    } else {
-                        $(self.options.emptyTextSelector, columnElement).hide();
-                    }
-                });
-            }
+        /**
+         * @private
+         */
+        _lockLayoutHeight: function() {
+            var maxHeight = 0;
+            $(this.options.columnsSelector).css({minHeight: '0px'});
+            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+                var currentHeight = $(columnElement).height();
+                maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
+            });
+            $(this.options.columnsSelector).css({minHeight: (maxHeight + 200) + 'px'});
         },
 
+        /**
+         * @private
+         */
+        _releaseLayoutHeight: function() {
+            $(this.options.columnsSelector).css({minHeight: '0px'});
+        },
+
+        /**
+         * @private
+         */
+        _hideEmptyText: function() {
+            $(this.options.emptyTextSelector, this.options.columnsSelector).css('visibility', 'hidden');
+        },
+
+
+        /**
+         * @private
+         */
+        _updateEmptyTextVisibility: function() {
+            var self = this;
+
+            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+                if (self._isEmptyColumn(columnIndex)) {
+                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'visible');
+                } else {
+                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'hidden');
+                }
+            });
+        },
+
+        /**
+         * @param {integer} columnIndex
+         * @returns {boolean}
+         * @private
+         */
         _isEmptyColumn: function(columnIndex) {
             var result = true;
 
@@ -191,10 +211,19 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             return result;
         },
 
+        /**
+         * @returns {string}
+         * @private
+         */
         _getSaveLayoutPositionsUrl: function() {
             return routing.generate('oro_api_put_dashboard_widget_positions', {dashboardId: this.options.dashboardId});
         },
 
+        /**
+         * @param {DashboardItemWidget} widget
+         * @returns {string}
+         * @private
+         */
         _getUpdateWidgetUrl: function(widget) {
             return routing.generate('oro_api_put_dashboard_widget', {
                 dashboardId: this.options.dashboardId,
@@ -202,6 +231,11 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             });
         },
 
+        /**
+         * @param {DashboardItemWidget} widget
+         * @returns {string}
+         * @private
+         */
         _getRemoveWidgetUrl: function(widget) {
             return routing.generate('oro_api_delete_dashboard_widget', {
                 dashboardId: this.options.dashboardId,
