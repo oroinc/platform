@@ -57,7 +57,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 );
             });
 
-
             $(this.options.columnsSelector)
                 .sortable({
                     handle: this.options.handle,
