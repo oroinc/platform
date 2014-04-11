@@ -79,7 +79,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * @Acl(
      *      id="oro_dashboard_dashboard",
      *      type="entity",
-     *      permission="UPDATE",
+     *      permission="EDIT",
      *      class="OroDashboardBundle:Dashboard"
      * )
      * @return Response
@@ -109,8 +109,6 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     /**
      * @param integer $dashboardId
      *
-     * @Rest\Put()
-     *
      * @Rest\QueryParam(
      *      name="layoutPositions",
      *      nullable=true,
@@ -125,12 +123,12 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * @Acl(
      *      id="oro_dashboard_dashboard",
      *      type="entity",
-     *      permission="UPDATE",
+     *      permission="EDIT",
      *      class="OroDashboardBundle:Dashboard"
      * )
      * @return Response
      */
-    public function positionsAction($dashboardId)
+    public function putPositionsAction($dashboardId)
     {
         $dashboard = $this->getDashboard($dashboardId);
 

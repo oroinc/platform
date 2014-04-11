@@ -192,7 +192,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         _getSaveLayoutPositionsUrl: function() {
-            return routing.generate('oro_api_positions_dashboard_widget', {dashboardId: this.options.dashboardId});
+            return routing.generate('oro_api_put_dashboard_widget_positions', {dashboardId: this.options.dashboardId});
         },
 
         _getUpdateWidgetUrl: function(widget) {
