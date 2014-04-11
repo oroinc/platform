@@ -46,6 +46,10 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var self = this;
             this.options = _.extend({}, this.options, options);
 
+            mediator.on('dashboard:widget:add', function(elementHtml){
+                self.addToDashboard(elementHtml);
+            });
+
             _.each(this.options.widgetIds, function (wid) {
                 widgetManager.getWidgetInstance(
                     wid,
@@ -70,6 +74,11 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                         self._updateLayoutView();
                     }
                 });
+        },
+
+        addToDashboard: function(html){
+            $('#dashboard-column-1').prepend(html);
+            $(this.options.columnsSelector).sortable('refresh');
         },
 
         /**
