@@ -81,3 +81,4 @@ services:
         class: %oro_config.form.handler.config.class%
         arguments:
             - @oro_config.global
+
