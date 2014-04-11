@@ -65,7 +65,7 @@ class WidgetManager
 
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
-        if (isset($widgetConfig['acl']) && $this->securityFacade->isGranted($widgetConfig['acl'])) {
+        if (isset($widgetConfig['acl']) && !$this->securityFacade->isGranted($widgetConfig['acl'])) {
             return null;
         }
 
@@ -73,9 +73,32 @@ class WidgetManager
 
         $widget->setExpanded(true);
         $widget->setName($widgetName);
-        $widget->setDashboard();
+        $widget->setLayoutPosition(array(1,1));
+
+        $engaged =  false;
+
+        /** @var DashboardWidget $widgetEntity */
+        foreach ($dashboard->getWidgets() as $widgetEntity) {
+            $position = $widgetEntity->getLayoutPosition();
+            if ($position[1] == 1) {
+                $engaged = true;
+                break;
+            }
+        }
+
+        if ($engaged) {
+            /** @var DashboardWidget $widgetEntity */
+            foreach ($dashboard->getWidgets() as $widgetEntity) {
+                $position = $widgetEntity->getLayoutPosition();
+                ++$position[1];
+                $widgetEntity->setLayoutPosition($position);
+            }
+        }
 
         $this->entityManager->persist($widget);
+
+        $widget->setDashboard($dashboard);
+
         $this->entityManager->flush($widget);
 
         return $this->widgetModelFactory->getModel($widget);

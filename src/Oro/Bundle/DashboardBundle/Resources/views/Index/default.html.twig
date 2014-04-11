@@ -135,7 +135,7 @@
                     dashboardId: {{ dashboard.dashboard.id }},
                     columnsSelector: '.dashboard-column'
                 });
-				widgetPicker.init();
+				widgetPicker.init({{ dashboard.dashboard.id }});
             }
         );
     </script>

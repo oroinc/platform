@@ -1,10 +1,10 @@
 {{ oro_widget_render({
         'widgetType': 'dashboard-item',
-        'wid': 'dashboard-widget-' ~ uid ~ '-' ~ widget.widget.id,
+        'wid': 'dashboard-widget-' ~ widget.widget.id,
         'url': path(widget.config.route, widget.config.route_parameters),
         'state': {
-                'layoutPosition': widget.widget.layoutPosition,
-                'expanded': widget.widget.expanded
+            'id': widget.widget.id,
+            'expanded': widget.widget.expanded
         }
    })
 }}

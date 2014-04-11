@@ -96,11 +96,7 @@ class DashboardController extends Controller
             return new NotFoundHttpException('Incorrect params');
         }
 
-        $uid = preg_replace('/[^0-9a-z]/im', '_', uniqid('', true));
-
-        $params = array('widget' => $widgetModel, 'uid' => $uid);
-
-        return $this->render("OroDashboardBundle:Dashboard:renderWidget.html.twig", $params);
+        return $this->render("OroDashboardBundle:Dashboard:renderWidget.html.twig", array('widget' => $widgetModel));
     }
 
     /**
