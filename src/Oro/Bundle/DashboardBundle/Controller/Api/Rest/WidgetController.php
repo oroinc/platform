@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Rest\RouteResource("dashboard_widget")
@@ -32,7 +33,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_dashboard",
+     *      id="oro_dashboard_delete",
      *      type="entity",
      *      permission="DELETE",
      *      class="OroDashboardBundle:Dashboard"
@@ -77,7 +78,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_dashboard_dashboard",
+     *      id="oro_dashboard_edit",
      *      type="entity",
      *      permission="EDIT",
      *      class="OroDashboardBundle:Dashboard"
@@ -120,12 +121,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      description="Update dashboard widgets positions",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_dashboard_dashboard",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="OroDashboardBundle:Dashboard"
-     * )
+     * @AclAncestor("oro_dashboard_edit")
      * @return Response
      */
     public function putPositionsAction($dashboardId)
