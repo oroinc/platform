@@ -46,9 +46,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var self = this;
             this.options = _.extend({}, this.options, options);
 
-            mediator.on('dashboard:widget:add', function(widgetModel){
-                self.addToDashboard(widgetModel);
-            });
+            mediator.off('dashboard:widget:add', this.addToDashboard, this);
+            mediator.on('dashboard:widget:add', this.addToDashboard, this);
 
             _.each(this.options.widgetIds, function (wid) {
                 widgetManager.getWidgetInstance(
@@ -88,7 +87,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             var state = {
                 'id': widgetModel.widget.id,
                 'expanded': widgetModel.widget.expanded,
-                'layoutPosition': widgetModel.widget.layoutPosition
+                'layoutPosition': widgetModel.widget.layout_position
             };
             var widgetParams = {
                 'widgetType': 'dashboard-item',
@@ -99,6 +98,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();
+            this.add(widget);
             $(this.options.columnsSelector).sortable('refresh');
         },
 
