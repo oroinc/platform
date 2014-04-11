@@ -21,9 +21,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             widgetIds: [],
             handle: ".dashboard-widget > .title",
             columnsSelector: '.dashboard-column',
-            urls: {
-                savePositions: routing.generate('oro_api_positions_dashboard_widget')
-            },
             placeholder: {
                 element: function(currentItem) {
                     var height = $(currentItem).height();
@@ -47,6 +44,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         initialize: function(options) {
             var self = this;
             this.options = _.extend({}, this.options, options);
+            this.options.urls = {
+                savePositions: routing.generate('oro_api_positions_dashboard_widget', {dashboardId: this.options.dashboardId})
+            };
 
             _.each(this.options.widgetIds, function (wid) {
                 widgetManager.getWidgetInstance(

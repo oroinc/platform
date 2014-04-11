@@ -132,6 +132,7 @@
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
+                    dashboardId: {{ dashboard.dashboard.id }},
                     columnsSelector: '.dashboard-column'
                 });
 				widgetPicker.init();
