@@ -1,4 +1,5 @@
 /*global define*/
+/*jslint nomen:true*/
 define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'
     ], function ($, _, mediator) {
     'use strict';
@@ -45,16 +46,15 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
             }
             this.element = options.element;
 
-            if (options.parameters) {
-                _.extend(this.parameters, options.parameters);
-            }
-
             if (_.has(options, 'contextSearch')) {
                 this.contextSearch = options.contextSearch;
             }
 
+            options.parameters = options.parameters || {};
+            _.defaults(options.parameters, this.parameters);
+
             // initialize multiselect widget
-            this.multiselect(this.parameters);
+            this.multiselect(options.parameters);
 
             // initialize multiselect filter
             if (this.contextSearch) {
@@ -174,15 +174,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
 
         /**
          *  Set dropdown position according to button element
-         *
-         * @param {Object} button
          */
-        updateDropdownPosition: function(button) {
-            var position = button.offset();
-            this.getWidget().css({
-                top: position.top + button.outerHeight(),
-                left: position.left
-            });
+        updateDropdownPosition: function() {
+            this.multiselect('updatePos');
         }
     };
 
