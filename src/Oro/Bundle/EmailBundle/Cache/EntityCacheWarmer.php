@@ -43,9 +43,9 @@ class EntityCacheWarmer extends CacheWarmer
         $entityProxyNameTemplate
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->entityCacheDir          = $entityCacheDir;
-        $this->entityCacheNamespace    = $entityCacheNamespace;
-        $this->entityProxyNameTemplate = $entityProxyNameTemplate;
+        $this->entityCacheDir            = $entityCacheDir;
+        $this->entityCacheNamespace      = $entityCacheNamespace;
+        $this->entityProxyNameTemplate   = $entityProxyNameTemplate;
     }
 
     /**
@@ -102,7 +102,7 @@ class EntityCacheWarmer extends CacheWarmer
             $fs->mkdir($this->entityCacheDir, 0777);
         }
 
-        $args = array();
+        $args      = array();
         $providers = $this->emailOwnerProviderStorage->getProviders();
         foreach ($providers as $provider) {
             $args[] = array(
