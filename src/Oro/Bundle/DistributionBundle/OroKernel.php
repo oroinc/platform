@@ -193,5 +193,9 @@ abstract class OroKernel extends Kernel
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         $cache->write($content, $container->getResources());
+
+        if (!$this->debug) {
+            $cache->write(php_strip_whitespace($cache), $container->getResources());
+        }
     }
 }

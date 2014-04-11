@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
+namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
