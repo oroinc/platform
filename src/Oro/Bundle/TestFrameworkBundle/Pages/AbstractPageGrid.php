@@ -180,9 +180,10 @@ abstract class AbstractPageGrid extends AbstractPage
      * Verify entity exist on the current page
      *
      * @param array $entityData
+     * @param int $column
      * @return \PHPUnit_Extensions_Selenium2TestCase_Element
      */
-    public function getEntity($entityData)
+    public function getEntity($entityData, $column = 1)
     {
         $xpath = '';
         foreach ($entityData as $entityField) {
@@ -191,7 +192,7 @@ abstract class AbstractPageGrid extends AbstractPage
             }
             $xpath .=  "td[contains(.,'{$entityField}')]";
         }
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]";
+        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]/td[{$column}]";
         return $this->test->byXPath($xpath);
     }
 

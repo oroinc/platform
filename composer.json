@@ -9,6 +9,12 @@
             "homepage": "http://www.orocrm.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packagist.orocrm.com"
+        }
+    ],
     "require": {
         "php": ">=5.4.4",
         "ext-intl": "*",
@@ -68,6 +74,7 @@
     },
     "autoload": {
         "psr-0": {
+              "Oro\\Component": "src/",
               "Oro\\Bundle": "src/"
         }
     }
