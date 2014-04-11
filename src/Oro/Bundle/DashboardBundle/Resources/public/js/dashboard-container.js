@@ -124,12 +124,22 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @param {DashboardItemWidget} widget
          */
         add: function(widget) {
-            this.widgets[widget.getWid()] = widget;
+            var wid = widget.getWid();
+            this.widgets[wid] = widget;
             this._updateEmptyTextVisibility();
-            widget.on('removeFromDashboard', _.bind(this._onRemove, this))
-            widget.on('collapse expand', _.bind(this._onCollapseOrExpand, this))
+
+            widget.off('removeFromDashboard', this._onRemove, this);
+            widget.on('removeFromDashboard', this._onRemove, this);
+
+            widget.off('collapse expand', this._onCollapseOrExpand, this);
+            widget.on('collapse expand', this._onCollapseOrExpand, this);
         },
 
+        /**
+         * @param {HTMLElement} el
+         * @param {DashboardItemWidget} widget
+         * @private
+         */
         _onRemove: function(el, widget) {
             var container = widget.widget.parent();
             widget.remove();
@@ -143,6 +153,11 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             });
         },
 
+        /**
+         * @param {HTMLElement} el
+         * @param {DashboardItemWidget} widget
+         * @private
+         */
         _onCollapseOrExpand: function(el, widget) {
             $.ajax({
                 url: this._getUpdateWidgetUrl(widget),
