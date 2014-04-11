@@ -33,6 +33,30 @@ widgets: [
 ]
 ```
 
+## Widget configurate in YAML
+You can setup default data for you widget in the `widget.yml` file, which placed in the folder by this direction
+`SomeBundle/Resources/public/sidebar_widget/widget_name/widget.yml`. This file can contains next item-settings:
+
+* **title** - title text of your widget;
+* **iCss** - css icon class from `Font Awesome` icons. When this property is set, then **icon** setting will be ignored;
+* **icon** - path to the icon image of your widget in the assets folder;
+* **cssClass** - css class for the container of your widget;
+* **module** - alias of the path to your widget in the asset folder, which should be declare in the `require.yml` file;
+* **placement** - possible sides placement for your widget. Available positions: `right`, `left`, `both`;
+* **settings** - custom settings of your widget;
+
+Example:
+
+```yml
+title:     "Task list"
+iCss:      "icon-list-alt"
+module:    "orocrm/sidebar/widget/assigned_tasks"
+placement: "both"
+cssClass:  "sidebar-widget-assigned-tasks"
+settings:
+    perPage: 5
+```
+
 ## Creating Widgets
 The widget is a module, exporting 3 entities: default settings, ContentView and SetupView.
 ContentView and SetupView are Backbonejs views. defaults is template for widget's settings. Example:

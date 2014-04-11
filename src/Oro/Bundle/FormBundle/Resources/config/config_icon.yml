@@ -199,7 +199,7 @@ oro_icon_select:
     tablet:                 icon-tablet
     tag:                    icon-tag
     tags:                   icon-tags
-    tasks:                  icon-tasks
+    tasks:                  icon-list-alt
     terminal:               icon-terminal
     thumbs down:            icon-thumbs-down
     thumbs down alt:        icon-thumbs-down-alt

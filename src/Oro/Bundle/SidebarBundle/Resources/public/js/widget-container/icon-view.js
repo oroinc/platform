@@ -3,12 +3,13 @@
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
+    var $ = require('jquery'),
+        _ = require('underscore'),
+        Backbone = require('backbone'),
 
-    var iconTemplate = require('text!./templates/icon-template.html');
-    var constants = require('../constants');
+        iconTemplate      = require('text!./templates/icon-template.html'),
+        iconImageTemplate = require('text!./templates/icon-image-template.html'),
+        constants         = require('../constants');
 
     /**
      * @export  orosidebar/js/widget-container/icon-view
@@ -17,7 +18,6 @@ define(function (require) {
      */
     var IconView = Backbone.View.extend({
         className: 'sidebar-icon',
-        template: _.template(iconTemplate),
 
         events: {
             'click': 'onClick'
@@ -29,8 +29,10 @@ define(function (require) {
         },
 
         render: function () {
-            var view = this;
-            var model = view.model;
+            var view  = this,
+                model = view.model;
+
+            view.template = _.template(view.model.has('iCss') ? iconTemplate : iconImageTemplate);
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);

@@ -1,10 +1,10 @@
 /*jslint nomen: true, vars: true*/
 /*global define, requirejs*/
 
-define(['jquery', 'underscore', 'backbone', '../constants',
+define(['jquery', 'underscore', 'backbone', '../constants', './icon-view',
     'text!./templates/widget-min-template.html',
     'text!./templates/widget-max-template.html'
-    ], function ($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
+    ], function ($, _, Backbone, constants, IconView, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     /**
@@ -30,9 +30,12 @@ define(['jquery', 'underscore', 'backbone', '../constants',
         },
 
         render: function () {
-            var view = this;
-            var model = view.model;
-            var template = null;
+            var view     = this,
+                model    = view.model,
+                template = null,
+                iconView = new IconView({model: model});
+
+            model.set('iconView', iconView.render().$el.html());
 
             if (model.get('state') === constants.WIDGET_MINIMIZED) {
                 template = view.templateMin;
@@ -42,7 +45,6 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
-
 
             if (view.model.get('cssClass')) {
                 view.$el.attr('class', view.model.get('cssClass'));

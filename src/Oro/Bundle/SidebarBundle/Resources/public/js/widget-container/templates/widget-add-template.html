@@ -3,7 +3,7 @@
         <ol>
             <% _.each(availableWidgets, function (widget, name) { %>
             <li class="ui-state-default" data-widget-name="<%= name %>">
-                <img src="<%= widget.icon %>"/>
+                <%= widget.iconView %>
                 <span><%= widget.title %></span>
             </li>
             <% }); %>
