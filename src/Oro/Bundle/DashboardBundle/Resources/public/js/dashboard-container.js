@@ -77,7 +77,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         addToDashboard: function(html){
-            $('#dashboard-column-1').prepend(html);
+            var column = $('#dashboard-column-1');
+            column.prepend(html);
+            column.find('')
             $(this.options.columnsSelector).sortable('refresh');
         },
 

@@ -50,7 +50,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 );
                 var routingParams = {widgetName: $this.data('widget-name'), id: event.data.widgetPicker.dashboardId};
                 var url = routing.generate('oro_dashboard_widget_add', routingParams);
-                require(['text!'+url], function(html){
+                require(['text!'+url+'#rand='+Math.random()], function(html){
                     mediator.trigger('dashboard:widget:add', html);
                     endLoading();
                 });
