@@ -58,11 +58,12 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgetItems()
     {
         $expectedWidgetName = 'widget_name';
-
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
         $expectedItem = 'expected_item';
-        $expectedValue = array('label' => 'test label', 'acl' => 'valid_acl');
+        $expectedValue = array('label' => 'test label', 'acl' => $allowedAcl);
         $notGrantedItem = 'not_granted_item';
-        $notGrantedValue = array('label' => 'not granted label', 'acl' => 'invalid_acl');
+        $notGrantedValue = array('label' => 'not granted label', 'acl' => $notAllowedAcl);
         $configs = array(
             $expectedItem => $expectedValue,
             $notGrantedItem => $notGrantedValue
@@ -74,17 +75,9 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->with($expectedWidgetName)
             ->will($this->returnValue(array('items' => $configs)));
 
-        $this->securityFacade->expects($this->exactly(2))
-            ->method('isGranted')
-            ->will(
-                $this->returnCallback(
-                    function ($parameter) use ($notGrantedValue) {
-                        return $notGrantedValue['acl'] != $parameter;
-                    }
-                )
-            );
+        $map = array(array($notAllowedAcl, null, false), array($allowedAcl, null, true));
+        $this->securityFacade->expects($this->exactly(2))->method('isGranted')->will($this->returnValueMap($map));
 
-        $actual = $this->target->getWidgetItems($expectedWidgetName);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $this->target->getWidgetItems($expectedWidgetName));
     }
 }

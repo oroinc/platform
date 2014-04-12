@@ -10,10 +10,11 @@ class WidgetModelFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $firstWidgetName = 'first_widget_name';
         $secondWidgetName = 'second_widget_name';
-
-        $secondWidgetConfig = array('acl' => 'allowed');
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
+        $secondWidgetConfig = array('acl' => $allowedAcl);
         $config = array(
-            array($firstWidgetName, array('acl' => 'not_allowed')),
+            array($firstWidgetName, array('acl' => $notAllowedAcl)),
             array($secondWidgetName, $secondWidgetConfig)
         );
 
@@ -24,15 +25,8 @@ class WidgetModelFactoryTest extends \PHPUnit_Framework_TestCase
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade->expects($this->exactly(2))
-            ->method('isGranted')
-            ->will(
-                $this->returnCallback(
-                    function ($acl) {
-                        return $acl == 'allowed';
-                    }
-                )
-            );
+        $map = array(array($notAllowedAcl, null, false), array($allowedAcl, null, true));
+        $securityFacade->expects($this->exactly(2))->method('isGranted')->will($this->returnValueMap($map));
         $factory = new WidgetModelFactory($configProvider, $securityFacade);
 
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
