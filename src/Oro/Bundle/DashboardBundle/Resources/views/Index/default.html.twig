@@ -17,6 +17,7 @@
                 {% block titleNavButtons %}
                 <div class="pull-right title-buttons-container">
                     {% placeholder dashboard_navButtons_before %}
+
                     {% block navButtons %}
                         {% if dashboards|length > 1 %}
                         <div class="dashboard-selector-container pull-left">
@@ -29,10 +30,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
-                            <i class="icon-plus"></i>
-                            Add widget
-                        </a>
+
                         <script type="text/javascript">
                             require(['jquery', 'routing', 'oronavigation/js/navigation'],
                             function($, routing, Navigation){
@@ -54,6 +52,10 @@
                         </script>
                         {% endif %}
                     {% endblock navButtons %}
+                    <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
+                        <i class="icon-plus"></i>
+                        Add widget
+                    </a>
                     {% placeholder dashboard_navButtons_after %}
                 </div>
                 {% endblock titleNavButtons %}
@@ -91,25 +93,20 @@
                 <div class="dashboard-widget-container">
                     <div class="dashboard-widget-thumbnail">
                     {% if widget.thumbnail is defined %}
-                        <img src="{{ widget.thumbnail }}" alt="Preview" />
+                        <img src="{{ asset(widget.thumbnail) }}" alt="Preview" />
                     {% else %}
-                        <div></div>
+                        <img src="{{ asset("bundles/orodashboard/img/no_thumbnail.png") }}" alt="Preview" />
                     {% endif %}
                     </div>
                     <p>
                     {% if widget.label is defined %}
                         <strong class="dashboard-widget-title">{{ widget.label|trans }}</strong>
                     {% endif %}
-                    {% if widget.description is defined %}
-                        <span class="dashboard-widget-description">{{ widget.description|trans }}</span>
-                        {% else %}
-                        <span class="dashboard-widget-description">
-                            Lorem ipsum dolor sit amet, fugit movet fastidii ut vim, vel at etiam libris audire,
-                            atqui everti quaestio mel cu. Id sit veri nonumy disputando, pri cu tota prima
-                            cotidieque. Mea utamur periculis id, ocurreret euripidis in cum, sed alterum platonem
-                            ut. Pri latine recusabo ad, an ius virtute ponderum.
-                        </span>
-                    {% endif %}
+                    <span class="dashboard-widget-description">
+                        {% if widget.description is defined %}
+                            {{ widget.description|trans }}
+                        {% endif %}
+                    </span>
                     </p>
                     <div class="dashboard-widgets-pick-wrapper">
                         <a class="btn main-group add-widget-button" data-widget-name="{{ widgetName }}">

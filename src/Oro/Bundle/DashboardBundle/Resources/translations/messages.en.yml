@@ -7,6 +7,8 @@ oro:
             main: Dashboard
             quick_launchpad: Quick Launchpad
 
+        quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
+
         no_data_found:    No data found
 
         no_one_available: You have no dashboards available
