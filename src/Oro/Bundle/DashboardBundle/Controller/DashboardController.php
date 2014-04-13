@@ -9,7 +9,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -25,9 +24,6 @@ class DashboardController extends Controller
      */
     public function indexAction($id = null)
     {
-        /** @var Manager $manager */
-        $manager = $this->get('oro_dashboard.manager');
-
         $widgetManager = $this->get('oro_dashboard.widget_manager');
 
         $changeActive = $this->get('request')->get('change_dashboard', false);
@@ -45,16 +41,16 @@ class DashboardController extends Controller
             throw new NotFoundHttpException('Incorrect request params');
         }
 
-        $dashboards = $manager->getDashboards();
+        $dashboards = $this->getDashboardManager()->getDashboards();
         $currentDashboard = null;
 
         if ($changeActive) {
-            if (!$manager->setUserActiveDashboard($user, $id)) {
+            if (!$this->getDashboardManager()->setUserActiveDashboard($user, $id)) {
                 throw new NotFoundHttpException('Dashboard not found');
             }
         }
 
-        $currentDashboard = $manager->getUserActiveDashboard($user);
+        $currentDashboard = $this->getDashboardManager()->getUserActiveDashboard($user);
 
         if (!$currentDashboard) {
             throw new NotFoundHttpException('Not found available dashboards');
@@ -112,5 +108,27 @@ class DashboardController extends Controller
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
             $params
         );
+    }
+
+    /**
+     * @Route(
+     *      "/launchpad",
+     *      name="oro_dashboard_quick_launchpad"
+     * )
+     * @Template("OroDashboardBundle:Index:quickLaunchpad.html.twig")
+     */
+    public function quickLaunchpadAction()
+    {
+        return [
+            'dashboards' => $this->getDashboardManager()->getDashboards(),
+        ];
+    }
+
+    /**
+     * @return Manager
+     */
+    protected function getDashboardManager()
+    {
+        return $this->get('oro_dashboard.manager');
     }
 }

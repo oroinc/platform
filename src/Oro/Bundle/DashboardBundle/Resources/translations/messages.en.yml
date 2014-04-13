@@ -6,6 +6,7 @@ oro:
         title:
             main: Dashboard
             quick_launchpad: Quick Launchpad
+            chose_dashboard: Choose dashboard
 
         quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
 
@@ -17,3 +18,5 @@ oro:
 
         add_dashboard_widgets:
             add_to_dashboard: Add
+
+        list: List
