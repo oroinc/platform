@@ -1,6 +1,6 @@
 <?php
 
-namespace OroCRM\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
+namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 
