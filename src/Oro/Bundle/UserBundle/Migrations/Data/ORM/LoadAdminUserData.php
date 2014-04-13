@@ -26,7 +26,10 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData'];
+        return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData',
+            'Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData',
+        ];
     }
 
     /**
