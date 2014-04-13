@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Model\WidgetManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -161,16 +162,14 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      */
     public function postAddWidgetAction()
     {
-        $widgetManager = $this->get('oro_dashboard.widget_manager');
+        $dashboardId = $this->getRequest()->get('dashboardId');
+        $widgetName = $this->getRequest()->get('widgetName');
 
-        $dashboardId = $this->getRequest()->get('dashboardId', null);
-        $widgetName = $this->getRequest()->get('widgetName', null);
-
-        if (!$dashboardId || empty($widgetName)) {
+        if (!$dashboardId || !$widgetName) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
-        $widgetModel = $widgetManager->createWidget($widgetName, $dashboardId);
+        $widgetModel = $this->getWidgetManager()->createWidget($widgetName, $dashboardId);
         if (!$widgetModel) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
@@ -212,5 +211,13 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     protected function getEntityManager()
     {
         return $this->getDoctrine()->getManager();
+    }
+
+    /**
+     * @return WidgetManager
+     */
+    protected function getWidgetManager()
+    {
+        return $this->get('oro_dashboard.widget_manager');
     }
 }
