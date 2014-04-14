@@ -15,22 +15,11 @@ class UpdateModuleAndEntityFields extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        /** @var EntityRepository $repository */
-        $repository = $manager->getRepository('OroEntityConfigBundle:EntityConfigModel');
-        /** @var EntityConfigModel[] $outdatedEntities */
-        $outdatedEntities = $repository->createQueryBuilder('entity')
-            ->where('entity.moduleName = :empty')
-            ->orWhere('entity.entityName = :empty')
-            ->setParameter('empty', '')
-            ->getQuery()
-            ->execute();
-
-        if (empty($outdatedEntities)) {
-            return;
-        }
+        /** @var EntityConfigModel[] $entities */
+        $entities = $manager->getRepository('OroEntityConfigBundle:EntityConfigModel')->findAll();
 
         // update empty fields
-        foreach ($outdatedEntities as $entity) {
+        foreach ($entities as $entity) {
             $entity->setClassName($entity->getClassName());
         }
 

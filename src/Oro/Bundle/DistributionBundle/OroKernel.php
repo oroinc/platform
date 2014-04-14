@@ -5,6 +5,9 @@ namespace Oro\Bundle\DistributionBundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
@@ -174,5 +177,25 @@ abstract class OroKernel extends Kernel
 
         // sort be priority
         return ($p1 < $p2) ? -1 : 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    {
+        // cache the container
+        $dumper = new PhpDumper($container);
+
+        if ($container->getParameter('installed') && class_exists('ProxyManager\Configuration')) {
+            $dumper->setProxyDumper(new ProxyDumper());
+        }
+
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
+        $cache->write($content, $container->getResources());
+
+        if (!$this->debug) {
+            $cache->write(php_strip_whitespace($cache), $container->getResources());
+        }
     }
 }
