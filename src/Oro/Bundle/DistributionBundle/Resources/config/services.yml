@@ -45,6 +45,7 @@ services:
           - %oro_distribution.composer_json%
         tags:
             - { name: monolog.logger, channel: oro_distribution }
+        lazy: true
 
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%

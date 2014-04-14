@@ -84,6 +84,7 @@ services:
     oro_organization.method.get_ownership_type:
         tags:
             - { name: oro_service_method, service: oro_organization.form.type.ownership_type, method: getOwnershipsArray }
+        lazy: true
 
     oro_organization.form.type.business_unit_tree_select_type:
         class:                        %oro_organization.form.type.business_unit_tree_select_type.class%
@@ -178,6 +179,7 @@ services:
             - @oro_security.owner.ownership_metadata_provider
             - @doctrine.orm.entity_manager
             - @oro_security.acl.object_id_accessor
+        lazy: true
 
     oro_organization.owner_assignment_checker.default:
         class: %oro_organization.owner_assignment_checker.default.class%

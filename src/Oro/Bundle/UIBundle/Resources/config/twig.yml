@@ -9,6 +9,9 @@ parameters:
     oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
     oro_ui.twig.tab.class:               Oro\Bundle\UIBundle\Twig\TabExtension
 
+    twig.class:                          Oro\Bundle\UIBundle\Twig\Environment
+    twig.cache_warmer.class:             Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
+
 services:
     oro_ui.twig.ceil_extension:
         class: %oro_ui.twig.ceil.class%
