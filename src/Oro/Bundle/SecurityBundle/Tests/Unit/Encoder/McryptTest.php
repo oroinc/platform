@@ -45,6 +45,26 @@ class McryptTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider keyDataProvider
+     * @param string $key
+     */
+    public function testKeyLengthChecks($key)
+    {
+        new Mcrypt($key);
+    }
+
+    public function keyDataProvider()
+    {
+        return array(
+            'null key' => array(null),
+            '0 length' => array(''),
+            '1 length' => array('a'),
+            '32 length' => array('1234567890123456789012'),
+            '33 length' => array('12345678901234567890123')
+        );
+    }
+
+    /**
      * @return Mcrypt
      */
     protected function getInstance()
