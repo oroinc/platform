@@ -47,27 +47,15 @@ class EntityConfigModel extends AbstractConfigModel
     protected $className;
 
     /**
-     * @var string
-     * @ORM\Column(name="module_name", type="string", length=255)
-     */
-    protected $moduleName;
-
-    /**
-     * @var string
-     * @ORM\Column(name="entity_name", type="string", length=255)
-     */
-    protected $entityName;
-
-    /**
      * @param string|null $className
      */
     public function __construct($className = null)
     {
-        $this->setClassName($className);
-
         $this->mode          = ConfigModelManager::MODE_DEFAULT;
         $this->fields        = new ArrayCollection();
         $this->indexedValues = new ArrayCollection();
+
+        $this->setClassName($className);
     }
 
     /**
@@ -85,7 +73,10 @@ class EntityConfigModel extends AbstractConfigModel
     public function setClassName($className)
     {
         $this->className = $className;
-        list($this->moduleName, $this->entityName) = ConfigHelper::getModuleAndEntityNames($className);
+
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+        $this->addToIndex('entity_config', 'module_name', $moduleName);
+        $this->addToIndex('entity_config', 'entity_name', $entityName);
 
         return $this;
     }
@@ -96,22 +87,6 @@ class EntityConfigModel extends AbstractConfigModel
     public function getClassName()
     {
         return $this->className;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getModuleName()
-    {
-        return $this->moduleName;
     }
 
     /**
