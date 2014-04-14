@@ -97,7 +97,7 @@ class WidgetControllerTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        ToolsAPI::assertJsonResponse($result, 200);
         $content = json_decode($result->getContent(), true);
         $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
         $this->assertEquals($widgetName, $content['widget']['name']);
