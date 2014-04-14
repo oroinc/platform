@@ -167,6 +167,7 @@ services:
             - %oro_email.cache.available_in_template_key%
             - @security.context
             - @oro_email.twig.email_sandbox
+        lazy: true
 
     oro_email.twig.email_security_policy:
         class: %oro_email.twig.email_security_policy.class%
@@ -193,6 +194,7 @@ services:
         arguments:
             - @security.context
             - @oro_entity_config.provider.email
+        lazy: true
 
     oro_email.validator.variables_validator:
         class: Oro\Bundle\EmailBundle\Validator\VariablesValidator
