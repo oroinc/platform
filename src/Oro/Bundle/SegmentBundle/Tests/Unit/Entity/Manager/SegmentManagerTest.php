@@ -59,10 +59,65 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['test' => 'testLabel'], $result);
     }
 
+    public function testGetSegmentByEntityNameWithEmptyTerm()
+    {
+        $entityName = 'Acme\Entity\Demo';
+
+        $segment = new Segment();
+        $segment->setName('test');
+        $segments = [
+            $segment
+        ];
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+
+        $query->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue($segments));
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('where')
+            ->will($this->returnSelf());
+        $qb->expects($this->never())
+            ->method('andWhere');
+        $qb->expects($this->exactly(1))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('setMaxResults')
+            ->with(20)
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with($this->equalTo('OroSegmentBundle:Segment'))
+            ->will($this->returnValue($repo));
+
+        $result = $this->manager->getSegmentByEntityName($entityName, null);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('test', $result[0]['text']);
+        $this->assertEquals('segment', $result[0]['type']);
+    }
+
     public function testGetSegmentByEntityName()
     {
-        $this->assertEmpty($this->manager->getSegmentByEntityName('test', null));
-
         $entityName = 'Acme\Entity\Demo';
 
         $segment = new Segment();
