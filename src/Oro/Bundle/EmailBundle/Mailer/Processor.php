@@ -74,29 +74,23 @@ class Processor
         );
 
         if ($emailOwner instanceof User) {
-            $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
-        }
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                function ($item) {
+                    return $item instanceof InternalEmailOrigin;
+                }
+            );
 
-        $origin = $this->em
-            ->getRepository('OroEmailBundle:InternalEmailOrigin')
-            ->findOneBy(array('internalName' => $originName));
-
-        if (!$origin) {
-            $outboxFolder = new EmailFolder();
-            $outboxFolder
-                ->setType(EmailFolder::SENT)
-                ->setName(EmailFolder::SENT)
-                ->setFullName(EmailFolder::SENT);
-
-            $origin = new InternalEmailOrigin();
-            $origin
-                ->setName($originName)
-                ->addFolder($outboxFolder);
-
-            $emailOwner->addEmailOrigin($origin);
-
-            $this->em->persist($origin);
-            $this->em->persist($emailOwner);
+            $origin = $origins->isEmpty() ? null : $origins->first();
+            if ($origin == null) {
+                $this->addOriginToUser(
+                    $emailOwner,
+                    InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId()
+                );
+            }
+        } else {
+            $origin = $this->em
+                ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                ->findOneBy(array('internalName' => $originName));
         }
 
         $this->emailEntityBuilder->setOrigin($origin);
@@ -117,6 +111,29 @@ class Processor
         $this->em->flush();
 
         return $email;
+    }
+
+    /**
+     * @param User   $emailOwner
+     * @param string $originName
+     */
+    protected function addOriginToUser(User $emailOwner, $originName)
+    {
+        $outboxFolder = new EmailFolder();
+        $outboxFolder
+            ->setType(EmailFolder::SENT)
+            ->setName(EmailFolder::SENT)
+            ->setFullName(EmailFolder::SENT);
+
+        $origin = new InternalEmailOrigin();
+        $origin
+            ->setName($originName)
+            ->addFolder($outboxFolder);
+
+        $emailOwner->addEmailOrigin($origin);
+
+        $this->em->persist($origin);
+        $this->em->persist($emailOwner);
     }
 
     /**
