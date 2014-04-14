@@ -4,6 +4,8 @@ oro_dashboard_config:
             label:      oro.dashboard.title.quick_launchpad
             route:      oro_dashboard_itemized_widget
             route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad }
+            thumbnail:  bundles/orodashboard/img/no_thumbnail.png
+            description: oro.dashboard.quick_launchpad_widget_descriptions
 
     dashboards:
         main:

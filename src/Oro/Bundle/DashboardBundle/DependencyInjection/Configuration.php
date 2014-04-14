@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const UNSPECIFIED_COLUMN = 1;
+    const FIRST_COLUMN = 0;
     const UNSPECIFIED_POSITION = 9999;
 
     /**

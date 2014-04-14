@@ -6,12 +6,17 @@ oro:
         title:
             main: Dashboard
             quick_launchpad: Quick Launchpad
+            chose_dashboard: Choose dashboard
+
+        quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
 
         no_data_found:    No data found
 
         no_one_available: You have no dashboards available
 
-        empty_column_message: Drag your widgets here or <a href="#">add a new widget</a>.
+        empty_column_message: Drag your widgets here or <a class="dashboard-widgets-add" href="#">add a new widget</a>.
 
         add_dashboard_widgets:
             add_to_dashboard: Add
+
+        list: List

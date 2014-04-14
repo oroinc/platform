@@ -22,9 +22,11 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
     {
         $mainDashboard = $this->createAdminDashboard($manager, 'main');
 
-        $this->addNewDashboardWidget($manager, $mainDashboard, 'quick_launchpad')
+        if ($mainDashboard) {
+            $this->addNewDashboardWidget($manager, $mainDashboard, 'quick_launchpad')
             ->setLayoutPosition([0, 10]);
 
-        $manager->flush();
+            $manager->flush();
+        }
     }
 }

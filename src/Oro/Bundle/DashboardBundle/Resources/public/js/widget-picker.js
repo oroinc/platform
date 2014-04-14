@@ -43,36 +43,41 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         clickAddToDashboardDelegate: function(event){
             var $this = $(this);
             if (!$this.hasClass('disabled')) {
-                var text = $this.html();
-                event.data.widgetPicker.startLoading(event.data.controls);
-                var endLoading = event.data.widgetPicker.endLoading.bind(
-                    event.data.widgetPicker, text, event.data.controls, $this.parents('.dashboard-widget-container')
+                var widgetContainer = $this.parents('.dashboard-widget-container');
+                var self = event.data.widgetPicker;
+                var controls = event.data.controls;
+                self.startLoading(controls, widgetContainer);
+                $.post(
+                    routing.generate('oro_api_post_dashboard_widget_add_widget'),
+                    {widgetName: $this.data('widget-name'), dashboardId: self.dashboardId},
+                    function(response){
+                        mediator.trigger('dashboard:widget:add', response);
+                        self.endLoading(controls, widgetContainer);
+                    }, 'json'
                 );
-                var params = {widgetName: $this.data('widget-name'), dashboardId: event.data.widgetPicker.dashboardId};
-                var url = routing.generate('oro_api_post_dashboard_widget_add_widget');
-                $.post(url, params, function(response){
-                    mediator.trigger('dashboard:widget:add', response);
-                    endLoading();
-                }, 'json');
             }
         },
 
         /**
          * @param {jQuery} controls collection
+         * @param {jQuery} widgetContainer current widget container
          */
-        startLoading: function(controls){
+        startLoading: function(controls, widgetContainer){
             controls.addClass('disabled');
-            controls.html(__('oro.dashboard.add_dashboard_widgets.adding'));
+            var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
+            widgetButtonWrapper.append($('<div class="loading-content"></div>'));
+            widgetButtonWrapper.find('.add-widget-button').hide();
         },
 
         /**
-         * @param {string} text
          * @param {jQuery} controls collection
-         * @param {jQuery} widgetContainer single element
+         * @param {jQuery} widgetContainer current widget container
          */
-        endLoading: function(text, controls, widgetContainer){
+        endLoading: function(controls, widgetContainer){
             controls.removeClass('disabled');
-            controls.html(text);
+            var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
+            widgetButtonWrapper.find('.loading-content').remove();
+            widgetButtonWrapper.find('.add-widget-button').show();
             var previous = widgetContainer.css('background-color');
             var animateFinish = function () {
                 animateFinish = function(){

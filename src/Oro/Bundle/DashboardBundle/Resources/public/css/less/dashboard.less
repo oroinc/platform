@@ -311,11 +311,8 @@
       width: 25%;
       position: relative;
     }
-    .dashboard-widget-thumbnail img, .dashboard-widget-thumbnail div{
+    .dashboard-widget-thumbnail img{
       height: 125px;
-    }
-    .dashboard-widget-thumbnail div{
-      background-color: #808080;
     }
     p{
       float: left;
@@ -344,8 +341,20 @@
     height: 130px;
     display: table-cell;
     vertical-align: middle;
+    .loading-content {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      background-color: transparent;
+    }
+  }
+
+  .loading-content{
+    background: transparent url('../../img/loader.gif') no-repeat center left;
   }
 }
-.dashboard-widgets-add {
-  margin: 0 0 0 11px;
+.navigation {
+  .dashboard-widgets-add {
+    margin: 0 0 0 11px;
+  }
 }
