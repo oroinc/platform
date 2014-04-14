@@ -125,7 +125,7 @@ class OroEntityExtendBundle extends Bundle
     private function isCommandExecuting($commandName)
     {
         if (!empty($_SERVER['argv'])) {
-            return isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
+            return in_array($commandName, $_SERVER['argv']);
         } else {
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
                 $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
