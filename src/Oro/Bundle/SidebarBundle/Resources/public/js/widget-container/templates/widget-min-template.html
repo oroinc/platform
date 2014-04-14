@@ -3,7 +3,11 @@
         <a href="#" class="sidebar-widget-header-toggle">
             <i class="icon-caret-right"></i>
         </a>
-        <%= iconView %>
+        <% if (iconClass) { %>
+            <i class="<%= iconClass %>" title="<%= title %>"></i>
+        <% } else { %>
+            <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
+        <% } %>
         <span  class="widget-title"><%= title %></span>
     </span>
 </div>

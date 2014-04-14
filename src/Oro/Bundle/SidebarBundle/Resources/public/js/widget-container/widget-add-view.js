@@ -7,7 +7,6 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
 
-    var IconView = require('./icon-view');
     var widgetAddTemplate = require('text!./templates/widget-add-template.html');
     var WidgetContainerModel = require('./model');
 
@@ -29,19 +28,9 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            var availableWidgets = options.sidebar.getAvailableWidgets(),
-                widgets          = options.sidebar.getWidgets();
-
-            widgets.each(function (widget) {
-                var iconView   = new IconView({model: widget}),
-                    widgetName = widget.get('widgetName');
-                availableWidgets[widgetName].iconView = iconView.render().$el.html();
-            });
-
             options.content = _.template(widgetAddTemplate, {
-                'availableWidgets': availableWidgets
+                'availableWidgets': options.sidebar.getAvailableWidgets()
             });
-
             options.title = 'Select widget to add';
 
             Modal.prototype.initialize.apply(this, arguments);

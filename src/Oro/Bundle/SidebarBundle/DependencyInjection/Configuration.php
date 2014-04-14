@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('icon')
                                 ->defaultValue(null)
                             ->end()
-                            ->scalarNode('iCss')
+                            ->scalarNode('iconClass')
                                 ->defaultValue(null)
                             ->end()
                             ->scalarNode('module')

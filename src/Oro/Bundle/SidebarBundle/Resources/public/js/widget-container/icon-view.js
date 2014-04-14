@@ -7,9 +7,8 @@ define(function (require) {
         _ = require('underscore'),
         Backbone = require('backbone'),
 
-        iconTemplate      = require('text!./templates/icon-template.html'),
-        iconImageTemplate = require('text!./templates/icon-image-template.html'),
-        constants         = require('../constants');
+        iconTemplate = require('text!./templates/icon-template.html'),
+        constants    = require('../constants');
 
     /**
      * @export  orosidebar/js/widget-container/icon-view
@@ -25,14 +24,13 @@ define(function (require) {
 
         initialize: function () {
             var view = this;
+            view.template = _.template(iconTemplate);
             view.listenTo(view.model, 'change', view.render);
         },
 
         render: function () {
             var view  = this,
                 model = view.model;
-
-            view.template = _.template(view.model.has('iCss') ? iconTemplate : iconImageTemplate);
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
