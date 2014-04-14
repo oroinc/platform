@@ -54,7 +54,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
             actionsContainer: '.widget-actions-container',
             contentContainer: '.row-fluid',
             contentClasses: [],
-            template: _.template('<div class="box-type1 dashboard-widget">' +
+            allowEdit: false,
+            template: _.template('<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
                 '<div class="title">' +
                     '<div class="pull-left collapse-expand-action-container">' +
                         '<a class="collapse-action" href="#"><i class="icon-collapse-alt hide-text"></i></a>' +
@@ -74,6 +75,16 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                 '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
             '</div>')
         }),
+
+        /**
+         * Initialize
+         *
+         * @param {Object} options
+         */
+        initialize: function(options) {
+            this.options.templateParams.allowEdit = this.options.allowEdit;
+            BlockWidget.prototype.initialize.apply(this, arguments);
+        },
 
         /**
          * Initialize widget

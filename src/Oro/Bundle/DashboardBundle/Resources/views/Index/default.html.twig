@@ -3,6 +3,7 @@
 
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
+{% set allowEdit = resource_granted('EDIT', dashboard.dashboard) %}
 <div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -52,10 +53,12 @@
                         </script>
                         {% endif %}
                     {% endblock navButtons %}
-                    <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
-                        <i class="icon-plus"></i>
-                        Add widget
-                    </a>
+                    {% if allowEdit %}
+                        <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
+                            <i class="icon-plus"></i>
+                            Add widget
+                        </a>
+                    {% endif %}
                     {% placeholder dashboard_navButtons_after %}
                 </div>
                 {% endblock titleNavButtons %}
@@ -73,7 +76,8 @@
                             'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
                             'columnElementId': 'dashboard-column-0',
                             'columnClass': 'dashboard-column',
-                            'widgetIdPrefix': widgetIdPrefix
+                            'widgetIdPrefix': widgetIdPrefix,
+                            'allowEdit': allowEdit
                         })
                     }}
                     {{
@@ -81,7 +85,8 @@
                             'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
                             'columnElementId': 'dashboard-column-1',
                             'columnClass': 'dashboard-column',
-                            'widgetIdPrefix': widgetIdPrefix
+                            'widgetIdPrefix': widgetIdPrefix,
+                            'allowEdit': allowEdit
                         })
                     }}
                 {% endblock widgets %}
@@ -123,12 +128,13 @@
             function(dashboardContainer, widgetPicker) {
                 {% set widgetIds = [] %}
                 {% for widget in dashboard.widgets %}
-                {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.widget.id]) %}
+                    {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.widget.id]) %}
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
                     dashboardId: {{ dashboard.dashboard.id }},
-                    columnsSelector: '.dashboard-column'
+                    columnsSelector: '.dashboard-column',
+                    allowEdit: {{ allowEdit ? 'true' : 'false' }}
                 });
 				widgetPicker.init({{ dashboard.dashboard.id }});
             }
@@ -149,7 +155,8 @@
                         'id': widget.widget.id,
                         'expanded': widget.widget.expanded,
                         'layoutPosition': widget.widget.layoutPosition,
-                    }
+                    },
+                    'allowEdit': options.allowEdit
                 })
             }}
         {% endfor %}

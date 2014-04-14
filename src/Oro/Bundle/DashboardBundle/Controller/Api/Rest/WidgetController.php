@@ -29,37 +29,6 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * @param integer $dashboardId
      * @param integer $widgetId
      *
-     * @ApiDoc(
-     *      description="Delete dashboard widget",
-     *      resource=true
-     * )
-     * @Acl(
-     *      id="oro_dashboard_delete",
-     *      type="entity",
-     *      permission="DELETE",
-     *      class="OroDashboardBundle:Dashboard"
-     * )
-     * @return Response
-     */
-    public function deleteAction($dashboardId, $widgetId)
-    {
-        $dashboard = $this->getDashboard($dashboardId);
-        $widget    = $this->getWidget($widgetId);
-
-        if (!$dashboard || !$widget) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
-        }
-
-        $this->getEntityManager()->remove($widget);
-        $this->getEntityManager()->flush();
-
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
-    }
-
-    /**
-     * @param integer $dashboardId
-     * @param integer $widgetId
-     *
      * @Rest\QueryParam(
      *      name="isExpanded",
      *      requirements="(1)|(0)",
@@ -104,6 +73,32 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         );
 
         $this->getEntityManager()->flush($widget);
+
+        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @param integer $dashboardId
+     * @param integer $widgetId
+     *
+     * @ApiDoc(
+     *      description="Delete dashboard widget",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_dashboard_edit")
+     * @return Response
+     */
+    public function deleteAction($dashboardId, $widgetId)
+    {
+        $dashboard = $this->getDashboard($dashboardId);
+        $widget    = $this->getWidget($widgetId);
+
+        if (!$dashboard || !$widget) {
+            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+        }
+
+        $this->getEntityManager()->remove($widget);
+        $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
     }
@@ -157,7 +152,6 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @AclAncestor("oro_dashboard_edit")
-     *
      * @return Response
      */
     public function postAddWidgetAction()

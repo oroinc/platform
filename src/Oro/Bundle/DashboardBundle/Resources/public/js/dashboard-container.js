@@ -22,6 +22,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             handle: ".dashboard-widget > .title",
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
+            allowEdit: false,
             placeholder: {
                 element: function(currentItem) {
                     var height = $(currentItem).height();
@@ -60,21 +61,23 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
 
             this._updateEmptyTextVisibility();
 
-            $(this.options.columnsSelector)
-                .sortable({
-                    handle: this.options.handle,
-                    placeholder: this.options.placeholder,
-                    connectWith: this.options.columnsSelector,
-                    start: function() {
-                        self._lockLayoutHeight();
-                        self._hideEmptyText();
-                    },
-                    stop: function(event, ui) {
-                        self._releaseLayoutHeight();
-                        self.saveLayoutPosition();
-                        self._updateEmptyTextVisibility();
-                    }
-                });
+            if (this.options.allowEdit) {
+                $(this.options.columnsSelector)
+                    .sortable({
+                        handle: this.options.handle,
+                        placeholder: this.options.placeholder,
+                        connectWith: this.options.columnsSelector,
+                        start: function() {
+                            self._lockLayoutHeight();
+                            self._hideEmptyText();
+                        },
+                        stop: function(event, ui) {
+                            self._releaseLayoutHeight();
+                            self.saveLayoutPosition();
+                            self._updateEmptyTextVisibility();
+                        }
+                    });
+            }
         },
 
         /**
@@ -96,12 +99,16 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
                 'state': state,
                 'loadingMaskEnabled': false,
-                'container': '#' + containerId
+                'container': '#' + containerId,
+                'allowEdit': this.options.allowEdit
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();
             this.add(widget);
-            $(this.options.columnsSelector).sortable('refresh');
+
+            if (this.options.allowEdit) {
+                $(this.options.columnsSelector).sortable('refresh');
+            }
         },
 
         /**

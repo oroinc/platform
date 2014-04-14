@@ -19,6 +19,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             actionsContainer: '.widget-actions-container',
             contentContainer: '.row-fluid',
             contentClasses: [],
+            templateParams: {},
             template: _.template('<div class="box-type1">' +
                 '<div class="title"<% if (_.isNull(title)) { %>style="display: none;"<% } %>>' +
                     '<div class="pull-right widget-actions-container"></div>' +
@@ -34,10 +35,11 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);
             }
-            this.widget = $(this.options.template({
+            var params = _.extend({
                 'title': this.options.title,
                 'contentClasses': this.options.contentClasses
-            }));
+            }, this.options.templateParams);
+            this.widget = $(this.options.template(params));
             this.widgetContentContainer = this.widget.find(this.options.contentContainer);
             this.initializeWidget(options);
         },
