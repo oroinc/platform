@@ -75,11 +75,6 @@ class OroEntityExtendBundle extends Bundle
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
 
-            // $_SERVER['argv'] may be empty in some cases. In this case check for isCommandExecuting will always fail.
-            // This will produce infinite command execution. To prevent this initial empty aliases file is created
-            // before command execution. In command it will be overridden and will contain generated aliases cache.
-            file_put_contents($aliasesPath, '{}');
-
             // Execute aliases cache generation process
             $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
             $process->setTimeout(100000);
@@ -129,6 +124,20 @@ class OroEntityExtendBundle extends Bundle
      */
     private function isCommandExecuting($commandName)
     {
-        return isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
+        if (!empty($_SERVER['argv'])) {
+            return isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
+        } else {
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
+            } else {
+                $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $commandName);
+            }
+
+            $process = new Process($cmd);
+            $process->run();
+            $results = $process->getOutput();
+
+            return !empty($results);
+        }
     }
 }
