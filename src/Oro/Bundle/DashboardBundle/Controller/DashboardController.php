@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
@@ -53,7 +52,7 @@ class DashboardController extends Controller
         $currentDashboard = $this->getDashboardManager()->getUserActiveDashboard($user);
 
         if (!$currentDashboard) {
-            throw new NotFoundHttpException('Not found available dashboards');
+            return $this->quickLaunchpadAction();
         }
 
         $config = $currentDashboard->getConfig();
@@ -115,13 +114,15 @@ class DashboardController extends Controller
      *      "/launchpad",
      *      name="oro_dashboard_quick_launchpad"
      * )
-     * @Template("OroDashboardBundle:Index:quickLaunchpad.html.twig")
      */
     public function quickLaunchpadAction()
     {
-        return [
-            'dashboards' => $this->getDashboardManager()->getDashboards(),
-        ];
+        return $this->render(
+            'OroDashboardBundle:Index:quickLaunchpad.html.twig',
+            [
+                'dashboards' => $this->getDashboardManager()->getDashboards(),
+            ]
+        );
     }
 
     /**
