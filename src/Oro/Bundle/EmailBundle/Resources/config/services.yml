@@ -225,6 +225,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.email.entity.builder=
             - @oro_email.direct_mailer
+            - @oro_email.email.owner.provider
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%

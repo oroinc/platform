@@ -177,7 +177,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $emailOriginRepo->expects($this->once())
             ->method('findOneBy')
-            ->with(array('name' => InternalEmailOrigin::BAP))
+            ->with(array('internalName' => InternalEmailOrigin::BAP))
             ->will($this->returnValue($origin));
         $this->em->expects($this->once())
             ->method('getRepository')

@@ -48,25 +48,30 @@ class UserEmailGridListener
                 $this->queryFactory->prepareQuery($queryBuilder);
             }
 
+            $originIds = []; // to make sure param bind passed
             if ($id = $this->requestParams->get('userId')) {
                 $user = $this->em
                     ->getRepository('OroUserBundle:User')
                     ->find($id);
 
                 $emailOrigins = $user->getEmailOrigins();
-                $origin = $user->getImapConfiguration();
-                $originId = $origin !== null ? $origin->getId() : 0;
+                if (count($emailOrigins)) {
+                    foreach ($emailOrigins as $emailOrigin) {
+                        $originIds[] = $emailOrigin->getId();
+                    }
+                }
+
+                //$origin = $user->getImapConfiguration();
+                //$originId = $origin !== null ? $origin->getId() : 0;
 
                 $additionalParameters = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
 
-                if (!empty($emailOrigins) && array_key_exists('refresh', $additionalParameters)) {
+                if (count($emailOrigins) && array_key_exists('refresh', $additionalParameters)) {
                     $this->emailSyncManager->syncOrigins($emailOrigins);
                 }
-            } else {
-                $originId = 0; // to make sure param bind passed
             }
 
-            $queryBuilder->setParameter('origin_id', $originId);
+            $queryBuilder->setParameter('origin_id', $originIds);
         }
     }
 }
