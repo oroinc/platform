@@ -12,8 +12,6 @@ datagrid:
             query:
                 select:
                     - ce.id
-                    - ce.entityName
-                    - ce.moduleName
                     - ce.updated
                     - ce.mode
                 from:
@@ -22,12 +20,6 @@ datagrid:
                     and:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
         columns:
-            entity:
-                label: oro.entity_config.entity_config.entity_name.label
-                data_name: entityName
-            module:
-                label: oro.entity_config.entity_config.module_name.label
-                data_name: moduleName
             updated:
                 label: oro.entity_config.entity_config.updated.label
                 frontend_type: datetime
@@ -59,26 +51,12 @@ datagrid:
                 link: update_link
         sorters:
             columns:
-                entity:
-                    data_name: ce.entityName
-                module:
-                    data_name: ce.moduleName
                 updated:
                     data_name: ce.updated
             default:
                 entity: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
-                entity:
-                    type: string
-                    data_name: ce.entityName
-                module:
-                    type: choice
-                    data_name: ce.moduleName
-                    options:
-                        field_options:
-                            multiple: true
-                            choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getModuleChoices
                 updated:
                     type: datetime
                     data_name: ce.updated
