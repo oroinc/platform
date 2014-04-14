@@ -55,15 +55,12 @@ class UserEmailGridListener
                     ->find($id);
 
                 $emailOrigins = $user->getEmailOrigins();
-                if ($emailOrigins->count()) {
-                    foreach ($emailOrigins as $emailOrigin) {
-                        $originIds[] = $emailOrigin->getId();
-                    }
+                foreach ($emailOrigins as $emailOrigin) {
+                    $originIds[] = $emailOrigin->getId();
                 }
 
                 $additionalParameters = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
-
-                if (count($emailOrigins) && array_key_exists('refresh', $additionalParameters)) {
+                if (!empty($originIds) && array_key_exists('refresh', $additionalParameters)) {
                     $this->emailSyncManager->syncOrigins($emailOrigins);
                 }
             }
