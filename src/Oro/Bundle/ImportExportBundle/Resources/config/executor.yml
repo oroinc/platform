@@ -9,3 +9,4 @@ services:
             - @akeneo_batch.job_repository
             - @oro_importexport.context_registry
             - @doctrine
+        lazy: true

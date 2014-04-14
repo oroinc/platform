@@ -25,6 +25,7 @@ services:
             - @templating
             - OroTranslationBundle:Translation:translation.js.twig
             - ""
+        lazy: true
 
     oro_translation.extractor.php_code_extractor:
         class: %oro_translation.extractor.php_code_extractor.class%
@@ -41,6 +42,7 @@ services:
             - @translation.loader
             - @oro_translation.database_translation.persister
             - %kernel.root_dir%
+        lazy: true
 
     oro_translation.statistic_provider:
         class: %oro_translation.statistic_provider.class%
@@ -102,6 +104,7 @@ services:
             - %oro_translation.js_translation.domains%
             - %kernel.root_dir%
             - %kernel.default_locale%
+        lazy: true
 
     oro_translation.twig.translation_status.extension:
         class: %oro_translation.twig.translation_status.extension.class%
