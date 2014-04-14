@@ -8,6 +8,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
@@ -44,10 +45,20 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
      * Load default administrator
      *
      * @param ObjectManager $manager
+     * @throws \RuntimeException
      */
     public function load(ObjectManager $manager)
     {
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+        $adminRole = $manager->getRepository('OroUserBundle:Role')
+            ->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+
+        if (!$adminRole) {
+            throw new \RuntimeException('Administrator role should exist.');
+        }
+
+        if ($this->isUserWithRoleExist($manager, $adminRole)) {
+            return;
+        }
 
         $businessUnit = $manager
             ->getRepository('OroOrganizationBundle:BusinessUnit')
@@ -61,9 +72,19 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->setEnabled(true)
             ->setOwner($businessUnit)
             ->setPlainPassword(md5(uniqid(mt_rand(), true)))
-            ->addRole($role)
+            ->addRole($adminRole)
             ->addBusinessUnit($businessUnit);
 
         $this->userManager->updateUser($adminUser);
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param Role $role
+     * @return bool
+     */
+    protected function isUserWithRoleExist(ObjectManager $manager, Role $role)
+    {
+        return null !== $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
     }
 }
