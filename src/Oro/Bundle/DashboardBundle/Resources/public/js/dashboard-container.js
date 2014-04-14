@@ -95,6 +95,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                 'wid': wid,
                 'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
                 'state': state,
+                'loadingMaskEnabled': false,
                 'container': '#' + containerId
             };
             var widget = new DashboardItemWidget(widgetParams);
