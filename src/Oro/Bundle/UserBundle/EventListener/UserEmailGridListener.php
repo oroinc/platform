@@ -55,14 +55,11 @@ class UserEmailGridListener
                     ->find($id);
 
                 $emailOrigins = $user->getEmailOrigins();
-                if (count($emailOrigins)) {
+                if ($emailOrigins->count()) {
                     foreach ($emailOrigins as $emailOrigin) {
                         $originIds[] = $emailOrigin->getId();
                     }
                 }
-
-                //$origin = $user->getImapConfiguration();
-                //$originId = $origin !== null ? $origin->getId() : 0;
 
                 $additionalParameters = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
 
@@ -71,7 +68,7 @@ class UserEmailGridListener
                 }
             }
 
-            $queryBuilder->setParameter('origin_id', $originIds);
+            $queryBuilder->setParameter('origin_ids', $originIds);
         }
     }
 }

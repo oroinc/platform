@@ -260,7 +260,7 @@ datagrid:
                             alias: o
                 where:
                     and:
-                        - o.id IN (:origin_id)
+                        - o.id IN (:origin_ids)
 
     user-relation-grid:
         source:
@@ -443,7 +443,7 @@ datagrid:
                             alias: a
                 where:
                     and:
-                        - o.id IN (:origin_id)
+                        - o.id IN (:origin_ids)
         properties:
             id: ~
         options:
