@@ -14,9 +14,10 @@ class EntityConfigGridListener extends AbstractConfigGridListener
 {
     const GRID_NAME = 'entityconfig-grid';
 
-
-    /** @var ConfigManager */
-    protected $configManager;
+    /**
+     * @var array|null
+     */
+    protected $moduleChoices;
 
     /**
      * @param BuildAfter $event
@@ -47,19 +48,26 @@ class EntityConfigGridListener extends AbstractConfigGridListener
      */
     public function getModuleChoices()
     {
-        $qb = $this->configManager->getEntityManager()->createQueryBuilder();
-        $qb->select('entity.moduleName')
-            ->distinct()
-            ->from(EntityConfigModel::ENTITY_NAME, 'entity')
-            ->orderBy('entity.moduleName');
-        $result = $qb->getQuery()->getArrayResult();
+        if (null === $this->moduleChoices) {
+            $repository = $this->configManager->getEntityManager()
+                ->getRepository('OroEntityConfigBundle:ConfigModelIndexValue');
 
-        $modules = array();
-        foreach ($result as $row) {
-            $module = $row['moduleName'];
-            $modules[$module] = $module;
+            $queryBuilder = $repository->createQueryBuilder('indexValue')
+                ->select('indexValue.value')
+                ->distinct()
+                ->where('indexValue.scope = :scope')->setParameter('scope', 'entity_config')
+                ->andWhere('indexValue.code = :code')->setParameter('code', 'module_name')
+                ->orderBy('indexValue.value');
+
+            $result = $queryBuilder->getQuery()->getArrayResult();
+
+            $this->moduleChoices = array();
+            foreach ($result as $row) {
+                $module = $row['value'];
+                $this->moduleChoices[$module] = $module;
+            }
         }
 
-        return $modules;
+        return $this->moduleChoices;
     }
 }
