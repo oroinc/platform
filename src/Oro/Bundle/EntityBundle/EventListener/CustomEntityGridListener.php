@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -10,6 +9,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -72,15 +73,18 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /**
      * @param ConfigManager     $configManager
+     * @param SystemAwareResolver $datagridResolver
      * @param RequestParameters $requestParameters
      * @param Router            $router
      */
     public function __construct(
         ConfigManager $configManager,
+        SystemAwareResolver $datagridResolver,
         RequestParameters $requestParameters,
         Router $router
     ) {
-        $this->configManager = $configManager;
+        parent::__construct($configManager, $datagridResolver);
+
         $this->requestParams = $requestParameters;
         $this->router        = $router;
     }
