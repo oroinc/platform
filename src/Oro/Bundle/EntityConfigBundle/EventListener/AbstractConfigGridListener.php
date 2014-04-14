@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -37,15 +38,24 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     const PATH_FILTERS  = '[filters]';
     const PATH_ACTIONS  = '[actions]';
 
-    /** @var ConfigManager */
+    /**
+     * @var ConfigManager
+     */
     protected $configManager;
 
     /**
-     * @param ConfigManager $configManager
+     * @var SystemAwareResolver
      */
-    public function __construct(ConfigManager $configManager)
+    protected $datagridResolver;
+
+    /**
+     * @param ConfigManager $configManager
+     * @param SystemAwareResolver $datagridResolver
+     */
+    public function __construct(ConfigManager $configManager, SystemAwareResolver $datagridResolver)
     {
         $this->configManager = $configManager;
+        $this->datagridResolver = $datagridResolver;
     }
 
     /**
@@ -89,6 +99,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             'sorters' => $filtersSorters['sorters'],
             'filters' => $filtersSorters['filters'],
         ];
+
+        $additionalColumnSettings = $this->datagridResolver->resolve($config->getName(), $additionalColumnSettings);
 
         foreach (['columns', 'sorters', 'filters'] as $itemName) {
             $path = '[' . $itemName . ']';
@@ -201,6 +213,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     'type'                     => isset($field['filter_type']) ? $field['filter_type'] : 'string',
                     'frontend_type'            => $field['frontend_type'],
                     'label'                    => $field['label'],
+                    'options'                  => isset($field['filter_options']) ? $field['filter_options'] : [],
                     FilterUtility::ENABLED_KEY => isset($field['show_filter']) ? $field['show_filter'] : true,
                 ];
 
