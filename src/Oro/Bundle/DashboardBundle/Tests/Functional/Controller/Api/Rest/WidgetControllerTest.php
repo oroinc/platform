@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
@@ -14,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @db_isolation
  * @db_reindex
  */
-class DashboardControllerTest extends WebTestCase
+class WidgetControllerTest extends WebTestCase
 {
     /**
      * @var Client
@@ -50,7 +51,13 @@ class DashboardControllerTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_dashboard_widget', ['id' => $this->widget->getId()]),
+            $this->client->generate(
+                'oro_api_put_dashboard_widget',
+                [
+                    'dashboardId' => $this->widget->getDashboard()->getId(),
+                    'widgetId'    => $this->widget->getId(),
+                ]
+            ),
             $data,
             [],
             ToolsAPI::generateWsseHeader()
@@ -72,7 +79,13 @@ class DashboardControllerTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_dashboard_widget', ['id' => $this->widget->getId()]),
+            $this->client->generate(
+                'oro_api_delete_dashboard_widget',
+                [
+                    'dashboardId' => $this->widget->getDashboard()->getId(),
+                    'widgetId'    => $this->widget->getId(),
+                ]
+            ),
             [],
             [],
             ToolsAPI::generateWsseHeader()
@@ -82,7 +95,13 @@ class DashboardControllerTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_dashboard_widget', ['id' => $this->widget->getId()]),
+            $this->client->generate(
+                'oro_api_delete_dashboard_widget',
+                [
+                    'dashboardId' => $this->widget->getDashboard()->getId(),
+                    'widgetId'    => $this->widget->getId(),
+                ]
+            ),
             [],
             [],
             ToolsAPI::generateWsseHeader()
@@ -104,7 +123,8 @@ class DashboardControllerTest extends WebTestCase
         }
         $this->em->flush();
 
-        $data = ['layoutPositions' => []];
+        $dashboard = null;
+        $data      = ['layoutPositions' => []];
         foreach ($widgets as $widget) {
             /* @var DashboardWidget $widget */
             $data['layoutPositions'][$widget->getId()] = array_map(
@@ -113,11 +133,18 @@ class DashboardControllerTest extends WebTestCase
                 },
                 $widget->getLayoutPosition()
             );
+
+            $dashboard = $widget->getDashboard();
         }
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_positions_dashboard_widget'),
+            $this->client->generate(
+                'oro_api_put_dashboard_widget_positions',
+                [
+                    'dashboardId' => $dashboard->getId(),
+                ]
+            ),
             $data,
             [],
             ToolsAPI::generateWsseHeader()
@@ -168,11 +195,17 @@ class DashboardControllerTest extends WebTestCase
      */
     protected function createWidget($name = 'widget', $isExpanded = true, array $layoutPositions = [1, 1])
     {
+        $dashboard = new Dashboard();
+        $dashboard->setName('dashboard');
+
         $widget = new DashboardWidget();
         $widget
             ->setName($name)
             ->setExpanded($isExpanded)
-            ->setLayoutPosition($layoutPositions);
+            ->setLayoutPosition($layoutPositions)
+            ->setDashboard($dashboard);
+
+        $dashboard->addWidget($widget);
 
         return $widget;
     }

@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -22,11 +23,15 @@ class FieldConfigGridListener extends AbstractConfigGridListener
 
     /**
      * @param ConfigManager $configManager
+     * @param SystemAwareResolver $datagridResolver
      * @param RequestParameters $requestParams
      */
-    public function __construct(ConfigManager $configManager, RequestParameters $requestParams)
-    {
-        parent::__construct($configManager);
+    public function __construct(
+        ConfigManager $configManager,
+        SystemAwareResolver $datagridResolver,
+        RequestParameters $requestParams
+    ) {
+        parent::__construct($configManager, $datagridResolver);
 
         $this->requestParams = $requestParams;
     }
