@@ -22,16 +22,21 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
 
     public function testAutoescapeOption()
     {
-        $loader = new \Twig_Loader_Array(array(
-            'html' => '{{ foo }} {{ foo }}',
-            'js'   => '{{ bar }} {{ bar }}',
-        ));
+        $loader = new \Twig_Loader_Array(
+            array(
+                'html' => '{{ foo }} {{ foo }}',
+                'js'   => '{{ bar }} {{ bar }}',
+            )
+        );
 
-        $twig = new Environment($loader, array(
-            'debug'      => true,
-            'cache'      => false,
-            'autoescape' => array($this, 'escapingStrategyCallback'),
-        ));
+        $twig = new Environment(
+            $loader,
+            array(
+                'debug'      => true,
+                'cache'      => false,
+                'autoescape' => array($this, 'escapingStrategyCallback'),
+            )
+        );
 
         $this->assertEquals('foo&lt;br/ &gt; foo&lt;br/ &gt;', $twig->render('html', array('foo' => 'foo<br/ >')));
         $this->assertEquals(
