@@ -68,10 +68,9 @@ class Processor
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $emailAddress = $this->getAddresses($model->getFrom());
         $emailOwner   = $this->emailOwnerProvider->findEmailOwner(
             $this->em,
-            key($emailAddress)
+            EmailUtil::extractPureEmailAddress($model->getFrom())
         );
 
         if ($emailOwner instanceof User) {
