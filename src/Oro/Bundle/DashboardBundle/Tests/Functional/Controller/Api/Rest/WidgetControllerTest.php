@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
@@ -32,10 +33,16 @@ class WidgetControllerTest extends WebTestCase
      */
     protected $widget;
 
+    /**
+     * @var ConfigProvider
+     */
+    protected $configProvider;
+
     protected function setUp()
     {
         $this->client = static::createClient([], ToolsAPI::generateWsseHeader());
         $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider = $this->client->getContainer()->get('oro_dashboard.config_provider');
 
         $this->widget = $this->createWidget();
         $this->em->persist($this->widget);
@@ -71,6 +78,32 @@ class WidgetControllerTest extends WebTestCase
         $this->assertEquals($data['layoutPosition'], $this->widget->getLayoutPosition());
     }
 
+    public function testAddWidget()
+    {
+        $widgets = $this->configProvider->getWidgetConfigs();
+
+        $widgetNames = array_keys($widgets);
+
+        $widgetName = $widgetNames[0];
+        $id = $this->widget->getDashboard()->getId();
+        $this->client->request(
+            'POST',
+            $this->client->generate(
+                'oro_api_post_dashboard_widget_add_widget'
+            ),
+            array('dashboardId' => $id, 'widgetName' => $widgetName),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
+
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 204);
+        $content = json_decode($result->getContent(), true);
+        $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
+        $this->assertEquals($widgetName, $content['widget']['name']);
+        $this->assertEquals($id, $content['widget']['dashboard']['id']);
+
+    }
 
     /**
      * @depends testPut
