@@ -1,5 +1,9 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
+{% block list_wrapper %}
+    {{ block('list') }}
+{% endblock %}
+
 {% block item %}
     {% if isDesktopVersion() %}
         {%- set itemClass = 'dropdown' %}
