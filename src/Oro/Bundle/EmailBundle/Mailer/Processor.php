@@ -68,7 +68,7 @@ class Processor
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $emailOwner   = $this->emailOwnerProvider->findEmailOwner(
+        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
             $this->em,
             EmailUtil::extractPureEmailAddress($model->getFrom())
         );
@@ -82,10 +82,7 @@ class Processor
 
             $origin = $origins->isEmpty() ? null : $origins->first();
             if ($origin == null) {
-                $this->addOriginToUser(
-                    $emailOwner,
-                    InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId()
-                );
+                $origin = $this->createUserInternalOrigin($emailOwner);
             }
         } else {
             $origin = $this->em
@@ -114,11 +111,13 @@ class Processor
     }
 
     /**
-     * @param User   $emailOwner
-     * @param string $originName
+     * @param User $emailOwner
+     * @return InternalEmailOrigin
      */
-    protected function addOriginToUser(User $emailOwner, $originName)
+    protected function createUserInternalOrigin(User $emailOwner)
     {
+        $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
+
         $outboxFolder = new EmailFolder();
         $outboxFolder
             ->setType(EmailFolder::SENT)
@@ -134,6 +133,8 @@ class Processor
 
         $this->em->persist($origin);
         $this->em->persist($emailOwner);
+
+        return $origin;
     }
 
     /**
