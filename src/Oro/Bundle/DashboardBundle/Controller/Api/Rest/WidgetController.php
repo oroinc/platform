@@ -147,11 +147,29 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * @Rest\QueryParam(
+     *      name="dashboardId",
+     *      nullable=false,
+     *      strict=true,
+     *      description="Dashboard id"
+     * )
+     * @Rest\QueryParam(
+     *      name="widgetName",
+     *      nullable=false,
+     *      strict=true,
+     *      description="Dashboard widget name"
+     * )
      * @ApiDoc(
      *      description="Add widget to dashboard",
      *      resource=true
      * )
      * @AclAncestor("oro_dashboard_edit")
+     * @Acl(
+     *      id="oro_dashboard_widget_create",
+     *      type="create",
+     *      permission="CREATE",
+     *      class="OroDashboardBundle:DashboardWidget"
+     * )
      * @return Response
      */
     public function postAddWidgetAction()
