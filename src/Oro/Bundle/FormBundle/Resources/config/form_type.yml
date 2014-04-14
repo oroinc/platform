@@ -18,6 +18,7 @@ parameters:
     oro_form.extension.js_validation.class:                      Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension
     oro_form.extension.js_validation.constraints_provider.class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
     oro_form.extension.js_validation.repeated.class:             Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
+    oro_form.extension.random_id.class:                          Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension
 
 services:
     # Form types
@@ -129,4 +130,9 @@ services:
         class: %oro_form.extension.js_validation.repeated.class%
         tags:
             - { name: form.type_extension, alias: repeated }
+
+    oro_form.extension.random_id:
+        class: %oro_form.extension.random_id.class%
+        tags:
+            - { name: form.type_extension, alias: form }
 
