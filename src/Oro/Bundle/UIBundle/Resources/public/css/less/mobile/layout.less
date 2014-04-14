@@ -19,12 +19,14 @@
   position: fixed;
   width: 100%;
   height: @headerHeight;
-  margin-top: -@headerHeight;
+  top: 0;
 }
 #main {
   height: 100%;
   #container {
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
     height: 100%;
   }
 }
