@@ -18,17 +18,17 @@
 {% block linkElement %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
 
-    {% if item.hasChildren and item.displayChildren and item.level is sameas(0)%}
+    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
         {% set linkAttributes = linkAttributes|merge({
             'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
             'data-toggle': 'dropdown'
-        })%}
+        }) %}
     {% endif %}
 
-    {% if item.uri is empty or item.uri=='#'%}
+    {% if item.uri is empty or item.uri=='#' %}
         {% set linkAttributes = linkAttributes|merge({
             'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
-        })%}
+        }) %}
     {% endif %}
 
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
