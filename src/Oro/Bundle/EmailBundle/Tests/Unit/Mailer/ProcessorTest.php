@@ -10,20 +10,17 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailEntityBuilder;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailOwnerProvider;
 
     /**
      * @var Processor
@@ -41,7 +38,16 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer = $this->getMockBuilder('\Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailProcessor = new Processor($this->em, $this->emailEntityBuilder, $this->mailer);
+        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailProcessor = new Processor(
+            $this->em,
+            $this->emailEntityBuilder,
+            $this->mailer,
+            $this->emailOwnerProvider
+        );
     }
 
     /**
@@ -177,7 +183,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $emailOriginRepo->expects($this->once())
             ->method('findOneBy')
-            ->with(array('name' => InternalEmailOrigin::BAP))
+            ->with(array('internalName' => InternalEmailOrigin::BAP))
             ->will($this->returnValue($origin));
         $this->em->expects($this->once())
             ->method('getRepository')
