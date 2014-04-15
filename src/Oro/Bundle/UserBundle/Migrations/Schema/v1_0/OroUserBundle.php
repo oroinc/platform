@@ -130,7 +130,9 @@ class OroUserBundle implements Migration
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
         $table->addUniqueIndex(['status_id'], 'UNIQ_F82840BC6BF700BD');
-        $table->addUniqueIndex(['imap_configuration_id'], 'UNIQ_F82840BC678BF607');
+        if ($addImapConfigurationId) {
+            $table->addUniqueIndex(['imap_configuration_id'], 'UNIQ_F82840BC678BF607');
+        }
         $table->addIndex(['business_unit_owner_id'], 'IDX_F82840BC59294170', []);
         /** End of generate table oro_user **/
     }
