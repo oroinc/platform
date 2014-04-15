@@ -20,6 +20,7 @@ services:
         class: %oro_reminder.sender.class%
         arguments:
             - @oro_reminder.send_processor_registry
+        lazy: true
 
     oro_reminder.send_processor_registry:
         class: %oro_reminder.send_processor_registry.class%

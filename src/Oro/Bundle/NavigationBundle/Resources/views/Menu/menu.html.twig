@@ -95,9 +95,14 @@
             {# render the list of children#}
             {%- set childrenClasses = childrenClasses|merge(['menu_level_' ~ item.level]) %}
             {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
-            {{ block('list') }}
+            {{ block('list_wrapper') }}
         </li>
     {% endif %}
+{% endblock %}
+
+{# list wrapper block is used to allow modification of execution context in child templates #}
+{% block list_wrapper %}
+    {{ block('list') }}
 {% endblock %}
 
 {% block linkElement %}
