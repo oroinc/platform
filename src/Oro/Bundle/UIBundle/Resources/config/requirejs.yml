@@ -45,6 +45,9 @@ config:
                 - 'jquery'
                 - 'underscore'
                 - 'backbone'
+        'jquery.ajax.queue':
+            deps:
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/jquery-extend'
@@ -74,6 +77,7 @@ config:
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
+        'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'flotr2': 'bundles/oroui/lib/flotr2/flotr2.amd.js'

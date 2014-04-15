@@ -51,46 +51,22 @@ class SyncProcessor
     }
 
     /**
-     * {@inheritdoc}
+     * Process channel synchronization
+     * By default, if $connector is empty, will process all connectors of given channel
+     *
+     * @param Channel $channel    Channel object
+     * @param string  $connector  Connector name
+     * @param array   $parameters Connector additional parameters
      */
-    public function process(Channel $channel)
+    public function process(Channel $channel, $connector = '', array $parameters = [])
     {
-        /** @var Channel $channel */
-        $connectors = $channel->getConnectors();
-
-        foreach ((array)$connectors as $connector) {
-            try {
-                $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-                /**
-                 * Clone object here because it will be modified and changes should not be shared between
-                 */
-                $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
-            } catch (\Exception $e) {
-                // log and continue
-                $this->logger->error($e->getMessage());
-                $status = new Status();
-                $status->setCode(Status::STATUS_FAILED)
-                    ->setMessage($e->getMessage())
-                    ->setConnector($connector);
-
-                $this->em->getRepository('OroIntegrationBundle:Channel')
-                    ->addStatus($channel, $status);
-                continue;
+        if ($connector) {
+            $this->processChannelConnector($channel, $connector, $parameters, false);
+        } else {
+            $connectors = $channel->getConnectors();
+            foreach ((array)$connectors as $connector) {
+                $this->processChannelConnector($channel, $connector);
             }
-            $jobName = $realConnector->getImportJobName();
-
-            $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
-                ProcessorRegistry::TYPE_IMPORT,
-                $realConnector->getImportEntityFQCN()
-            );
-            $configuration    = [
-                ProcessorRegistry::TYPE_IMPORT => [
-                    'processorAlias' => reset($processorAliases),
-                    'entityName'     => $realConnector->getImportEntityFQCN(),
-                    'channel'        => $channel->getId()
-                ],
-            ];
-            $this->processImport($connector, $jobName, $configuration, $channel);
         }
     }
 
@@ -105,12 +81,61 @@ class SyncProcessor
     }
 
     /**
+     * Process channel connector
+     *
+     * @param Channel $channel    Channel object
+     * @param string  $connector  Connector name
+     * @param array   $parameters Connector additional parameters
+     * @param boolean $saveStatus Do we need to save new status to bd
+     */
+    protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
+    {
+        try {
+            $this->logger->info(sprintf('Start processing "%s" connector', $connector));
+            /**
+             * Clone object here because it will be modified and changes should not be shared between
+             */
+            $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
+        } catch (\Exception $e) {
+            // log and continue
+            $this->logger->error($e->getMessage());
+            $status = new Status();
+            $status->setCode(Status::STATUS_FAILED)
+                ->setMessage($e->getMessage())
+                ->setConnector($connector);
+
+            $this->em->getRepository('OroIntegrationBundle:Channel')
+                ->addStatus($channel, $status);
+            return;
+        }
+        $jobName = $realConnector->getImportJobName();
+
+        $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
+            ProcessorRegistry::TYPE_IMPORT,
+            $realConnector->getImportEntityFQCN()
+        );
+        $configuration    = [
+            ProcessorRegistry::TYPE_IMPORT =>
+                array_merge(
+                    [
+                        'processorAlias' => reset($processorAliases),
+                        'entityName'     => $realConnector->getImportEntityFQCN(),
+                        'channel'        => $channel->getId()
+                    ],
+                    $parameters
+                ),
+        ];
+        $this->processImport($connector, $jobName, $configuration, $channel, $saveStatus);
+    }
+
+    /**
      * @param string  $connector
      * @param string  $jobName
      * @param array   $configuration
      * @param Channel $channel
+     * @param boolean $saveStatus
      */
-    protected function processImport($connector, $jobName, $configuration, Channel $channel)
+    protected function processImport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
     {
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
 
@@ -166,7 +191,9 @@ class SyncProcessor
 
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
-        $this->em->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($channel, $status);
+        if ($saveStatus) {
+            $this->em->getRepository('OroIntegrationBundle:Channel')
+                ->addStatus($channel, $status);
+        }
     }
 }

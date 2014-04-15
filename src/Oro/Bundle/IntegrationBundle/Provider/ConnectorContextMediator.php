@@ -4,11 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class ConnectorContextMediator
 {
@@ -27,15 +27,21 @@ class ConnectorContextMediator
     /**
      * Get prepared transport
      *
-     * @param ContextInterface $context
+     * @param ContextInterface|Channel $source
      *
+     * @throws \LogicException
      * @return TransportInterface
      */
-    public function getTransport(ContextInterface $context)
+    public function getTransport($source)
     {
-        $channel = $this->getChannel($context);
+        if ($source instanceof ContextInterface) {
+            $source = $this->getChannel($source);
+        } elseif (!$source instanceof Channel) {
+            throw new \LogicException('Expected type ContextInterface or Channel');
+        }
+
         return clone $this->registryLink->getService()
-            ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
+            ->getTransportTypeBySettingEntity($source->getTransport(), $source->getType());
     }
 
     /**
