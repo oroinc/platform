@@ -87,10 +87,11 @@ Login: Login
 oro:
     dashboard:
         recent_emails:
-            title:      Recent Emails
-            inbox:      Inbox
-            sent:       Sent
-            view_all:   View All
+            title:       Recent Emails
+            inbox:       Inbox
+            sent:        Sent
+            view_all:    View All
+            description: This widget allows you to see most recent additions to your inbox and outbox
 
     user:
         menu:

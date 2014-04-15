@@ -29,18 +29,24 @@ class ControllersTest extends WebTestCase
     public function testIndex()
     {
         $dashboards = $this->client->getKernel()->getContainer()->get('oro_dashboard.manager')->getDashboards();
-        foreach ($dashboards as $dashboardName => $dashboard) {
+        foreach ($dashboards as $dashboard) {
             $this->client->request(
                 'GET',
                 $this->client->generate(
                     'oro_dashboard_index',
-                    array('name' => $dashboardName)
+                    array('id' => $dashboard->getDashboard()->getId())
                 )
             );
             $result = $this->client->getResponse();
             ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
             $this->assertContains(
-                $this->client->getKernel()->getContainer()->get('translator')->trans($dashboard),
+                $this->client->getKernel()
+                    ->getContainer()
+                    ->get('translator')
+                    ->trans(
+                        $dashboard->getDashboard()
+                        ->getName()
+                    ),
                 $result->getContent()
             );
         }

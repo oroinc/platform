@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
@@ -55,7 +56,15 @@ class InstallCommand extends ContainerAwareCommand
         } elseif ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
-            $commandExecutor->runCommand('cache:clear', array('--no-optional-warmers' => true));
+            $commandExecutor->runCommand(
+                'cache:clear',
+                array(
+                    '--no-optional-warmers' => true,
+                    '--process-isolation' => true,
+                    '--process-timeout' => 300,
+                    '--no-debug' => false
+                )
+            );
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -226,18 +235,17 @@ class InstallCommand extends ContainerAwareCommand
             ? strtolower($options['sample-data']) == 'y'
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
-        // create an administrator
+        // Update administrator with user input
         $commandExecutor->runCommand(
-            'oro:user:create',
+            'oro:user:update',
             array(
+                'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                 '--process-isolation' => true,
                 '--user-name' => $userName,
                 '--user-email' => $userEmail,
                 '--user-firstname' => $userFirstName,
                 '--user-lastname' => $userLastName,
-                '--user-password' => $userPassword,
-                '--user-role' => 'ROLE_ADMINISTRATOR',
-                '--user-business-unit' => 'Main'
+                '--user-password' => $userPassword
             )
         );
 
@@ -277,12 +285,12 @@ class InstallCommand extends ContainerAwareCommand
 
         $commandExecutor
             ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
+            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js', '--process-isolation' => true))
             ->runCommand('oro:localization:dump')
             ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
-            ->runCommand('assetic:dump')
-            ->runCommand('oro:translation:dump')
-            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
+            ->runCommand('assetic:dump', array('--process-isolation' => true))
+            ->runCommand('oro:translation:dump', array('--process-isolation' => true))
+            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -290,7 +298,15 @@ class InstallCommand extends ContainerAwareCommand
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand('cache:clear', array('--process-isolation' => true, '--process-timeout' => 300));
+        // --no-debug set to false, as Twig cache clear memory usage dramatically rise with true
+        $commandExecutor->runCommand(
+            'cache:clear',
+            array(
+                '--process-isolation' => true,
+                '--process-timeout' => 300,
+                '--no-debug' => false
+            )
+        );
 
         $output->writeln('');
 
