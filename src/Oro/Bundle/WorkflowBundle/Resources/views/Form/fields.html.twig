@@ -1,0 +1,10 @@
+{% block oro_workflow_transition_row %}
+    <fieldset class="form-horizontal">
+        {{ form_rest(form) }}
+    </fieldset>
+
+    <div class="widget-actions">
+        <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
+        <button type="submit" class="btn btn-success">{{ 'Submit'|trans }}</button>
+    </div>
+{% endblock %}

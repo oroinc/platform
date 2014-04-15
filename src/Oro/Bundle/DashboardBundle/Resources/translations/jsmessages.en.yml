@@ -1,0 +1,6 @@
+oro:
+  dashboard:
+    drop_placeholder_label: Drag your widget here.
+    add_dashboard_widgets:
+      title: Dashboard Widgets
+      adding: Adding...
