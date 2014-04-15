@@ -54,7 +54,7 @@ class ControllersTest extends WebTestCase
             $this->client,
             'entityconfig-grid',
             array(
-                'entityconfig-grid[_filter][name][value][0]' => 'Extend\\Entity\\testExtendedEntity'
+                'entityconfig-grid[_filter][name][value]' => 'testExtendedEntity'
             )
         );
 
