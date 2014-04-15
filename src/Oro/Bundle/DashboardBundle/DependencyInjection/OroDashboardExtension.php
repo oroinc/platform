@@ -50,8 +50,10 @@ class OroDashboardExtension extends Extension
     {
         foreach ($widgets as $widgetName => &$widget) {
             $widget['route_parameters']['widget'] = $widgetName;
-            if (isset($widget['items'])) {
+            if (!empty($widget['items'])) {
                 $this->sortItemsByPosition($widget['items']);
+            } else {
+                unset($widget['items']);
             }
         }
     }
@@ -83,5 +85,9 @@ class OroDashboardExtension extends Extension
                 }
             }
         );
+
+        foreach ($items as &$item) {
+            unset($item['position']);
+        }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,24 +35,18 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
 
         $items = array(
-            'create' => array(
-                'label'            => 'Create opportunity',
-                'route'            => 'orocrm_sales_opportunity_create',
-                'acl'              => 'orocrm_sales_opportunity_create',
-                'route_parameters' => array()
-            ),
             'index'  => array(
                 'label'            => 'List',
                 'route'            => 'orocrm_sales_opportunity_index',
                 'acl'              => 'orocrm_sales_opportunity_view',
                 'route_parameters' => array()
             ),
-            'create_without_position' => array(
+            'create' => array(
                 'label'            => 'Create opportunity',
                 'route'            => 'orocrm_sales_opportunity_create',
                 'acl'              => 'orocrm_sales_opportunity_create',
                 'route_parameters' => array()
-            ),
+            )
         );
 
         $quickLaunchpadWidget = array(
@@ -75,26 +69,19 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
         );
 
         $expected = array(
-            'widgets'           => array(
-                'quick_launchpad'        => $quickLaunchpadWidget,
+            'widgets' => array(
+                'quick_launchpad' => $quickLaunchpadWidget,
                 'second_quick_launchpad' => $secondQuickLaunchpadWidget
             ),
-            'dashboards'        => array(
-                'main'                  => array(
-                    'label'   => 'oro.dashboard.title.main',
-                    'widgets' => array(
-                        'second_quick_launchpad' => array(),
-                        'quick_launchpad'        => array(
-                            'route' => 'alternative_quick_lanchpad_route_to_dashboard_only',
-                            'route_parameters'=> array('bundle' => 'TestOverrideBundle', 'name' => 'TestOverrideName')
-                        )
-                    )
+            'dashboards' => array(
+                'main' => array(
+                    'label' => 'oro.dashboard.title.main'
                 ),
                 'alternative_dashboard' => array(
-                    'label'   => 'oro.dashboard.title.alternative_dashboard',
-                    'widgets' => array(
-                        'quick_launchpad' => array()
-                    )
+                    'label' => 'oro.dashboard.title.alternative_dashboard'
+                ),
+                'empty_board' => array(
+                    'label' => 'oro.dashboard.title.empty_board'
                 )
             ),
             'default_dashboard' => 'main1'
