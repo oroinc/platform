@@ -31,16 +31,20 @@ define(function (require) {
                 view.setupView.render();
                 view.$el.find('.sidebar-widgetsetup').append(view.setupView.$el);
 
-                view.on('ok', function () {
+                view.once('ok', function () {
                     view.setupView.trigger('ok');
+                });
 
+                view.on('ok', function () {
                     model.save();
                 });
 
-                view.on('cancel', function () {
+                view.once('cancel', function () {
                     view.setupView.trigger('cancel');
                     view.setupView.remove();
+                });
 
+                view.on('cancel', function () {
                     model.set(JSON.parse(options.snapshot), { silent: true });
                     model.trigger('change');
                 });
