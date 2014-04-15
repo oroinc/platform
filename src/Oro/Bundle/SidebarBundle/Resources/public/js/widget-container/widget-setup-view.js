@@ -20,6 +20,7 @@ define(function (require) {
             var model = view.model;
 
             options.content = '<div class="sidebar-widgetsetup"></div>';
+            options.snapshot = options.snapshot || {};
 
             var moduleId = model.get('module');
 
@@ -30,13 +31,18 @@ define(function (require) {
                 view.setupView.render();
                 view.$el.find('.sidebar-widgetsetup').append(view.setupView.$el);
 
-                view.once('ok', function () {
+                view.on('ok', function () {
                     view.setupView.trigger('ok');
+
+                    model.save();
                 });
 
-                view.once('cancel', function () {
+                view.on('cancel', function () {
                     view.setupView.trigger('cancel');
                     view.setupView.remove();
+
+                    model.set(JSON.parse(options.snapshot), { silent: true });
+                    model.trigger('change');
                 });
 
                 view.setupView.once('close', function () {
