@@ -94,6 +94,10 @@ abstract class AbstractEmailSynchronizer
             $this->log = new NullLogger();
         }
 
+        if (!$this->checkConfiguration()) {
+            $this->log->notice('Exit because synchronization was not configured.');
+        }
+
         $startTime = $this->getCurrentUtcDateTime();
         $this->resetHangedOrigins();
 
@@ -176,6 +180,17 @@ abstract class AbstractEmailSynchronizer
                 )
             );
         }
+    }
+
+    /**
+     * Checks configuration
+     * This method can be used for preliminary check if the synchronization can be launched
+     *
+     * @return bool
+     */
+    protected function checkConfiguration()
+    {
+        return true;
     }
 
     /**
