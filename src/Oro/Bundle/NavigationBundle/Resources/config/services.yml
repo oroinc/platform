@@ -181,6 +181,7 @@ services:
             - @security.context
             - @doctrine.orm.entity_manager
             - @oro_navigation.title_service
+        lazy: true
 
     oro_navigation.event.doctrine_tag_subscriber:
         class: %oro_navigation.event.doctrine_tag_subscriber.class%
@@ -276,6 +277,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
         arguments:                    [@security.context, @templating]
+        lazy: true
 
     oro_navigation.twig.hash_nav_extension:
         class:        %oro_navigation.twig_hash_nav_extension.class%

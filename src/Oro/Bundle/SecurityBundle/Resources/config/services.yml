@@ -63,6 +63,7 @@ services:
             - @logger
         tags:
             - { name: monolog.logger, channel: security }
+        lazy: true
 
     oro_security.acl.manager:
         class: %oro_security.acl.manager.class%
@@ -71,6 +72,7 @@ services:
             - @oro_security.acl.extension_selector
             - @?security.acl.dbal.provider
             - @oro_security.acl.ace_provider
+        lazy: true
 
     oro_security.acl.privilege_repository:
         class: %oro_security.acl.privilege_repository.class%
