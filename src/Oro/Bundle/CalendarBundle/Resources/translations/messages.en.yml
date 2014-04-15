@@ -13,6 +13,8 @@ oro:
     calendar:
         form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
 
+        my_calendar_widget_descriptions: This widget displays a calendar for today.
+
         menu:
             view_default.label: My Calendar
 
