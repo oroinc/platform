@@ -19,6 +19,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             actionsContainer: '.widget-actions-container',
             contentContainer: '.row-fluid',
             contentClasses: [],
+            templateParams: {},
             template: _.template('<div class="box-type1">' +
                 '<div class="title"<% if (_.isNull(title)) { %>style="display: none;"<% } %>>' +
                     '<div class="pull-right widget-actions-container"></div>' +
@@ -34,10 +35,11 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);
             }
-            this.widget = $(this.options.template({
+            var params = _.extend({
                 'title': this.options.title,
                 'contentClasses': this.options.contentClasses
-            }));
+            }, this.options.templateParams);
+            this.widget = $(this.options.template(params));
             this.widgetContentContainer = this.widget.find(this.options.contentContainer);
             this.initializeWidget(options);
         },
@@ -95,6 +97,35 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
         _showRemote: function() {
             this.widgetContentContainer.empty();
             this.widgetContentContainer.append(this.$el);
+        },
+
+        delegateEvents: function(events) {
+            AbstractWidget.prototype.delegateEvents.apply(this, arguments);
+            this._delegateWidgetEvents(events);
+        },
+
+        _delegateWidgetEvents: function(events) {
+            var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+            if (!(events || (events = _.result(this, 'widgetEvents')))) return;
+            this._undelegateWidgetEvents();
+            for (var key in events) {
+                var method = events[key];
+                if (!_.isFunction(method)) method = this[events[key]];
+                if (!method) throw new Error('Method "' + events[key] + '" does not exist');
+                var match = key.match(delegateEventSplitter);
+                var eventName = match[1], selector = match[2];
+                method = _.bind(method, this);
+                eventName += '.delegateWidgetEvents' + this.cid;
+                if (selector === '') {
+                    this.widget.on(eventName, method);
+                } else {
+                    this.widget.on(eventName, selector, method);
+                }
+            }
+        },
+
+        _undelegateWidgetEvents: function() {
+            this.widget.off('.delegateWidgetEvents' + this.cid);
         }
     });
 });

@@ -3,46 +3,69 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Oro\Bundle\DashboardBundle\Manager;
+
+use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/index/{name}",
+     *      "/index/{id}",
      *      name="oro_dashboard_index",
-     *      requirements={"name"="[\w-]*"},
-     *      defaults={"name" = ""}
+     *      defaults={"id" = ""}
      * )
      */
-    public function indexAction($name = null)
+    public function indexAction($id = null)
     {
-        /** @var Manager $manager */
-        $manager = $this->get('oro_dashboard.manager');
-        if (empty($name)) {
-            $name = $manager->getDefaultDashboardName();
-        }
+        $widgetManager = $this->get('oro_dashboard.widget_manager');
+
+        $changeActive = $this->get('request')->get('change_dashboard', false);
+
         /**
-         * @todo: change work with session after user state will be implement
+         * @var User $user
          */
-        if ($this->get('request')->get('change_dashboard', false)) {
-            $this->get('session')->set('saved_dashboard', $name);
-        } else {
-            $name = $this->get('session')->get('saved_dashboard', $manager->getDefaultDashboardName());
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedException('User is not logged in');
         }
-        $dashboard = $manager->getDashboard($name);
-        $template  = isset($dashboard['twig']) ? $dashboard['twig'] : 'OroDashboardBundle:Index:default.html.twig';
+
+        if ($changeActive && !$id) {
+            throw new NotFoundHttpException('Incorrect request params');
+        }
+
+        $dashboards = $this->getDashboardManager()->getDashboards();
+        $currentDashboard = null;
+
+        if ($changeActive) {
+            if (!$this->getDashboardManager()->setUserActiveDashboard($user, $id)) {
+                throw new NotFoundHttpException('Dashboard not found');
+            }
+        }
+
+        $currentDashboard = $this->getDashboardManager()->getUserActiveDashboard($user);
+
+        if (!$currentDashboard) {
+            return $this->quickLaunchpadAction();
+        }
+
+        $config = $currentDashboard->getConfig();
+
+        $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
         return $this->render(
             $template,
-            [
-                'pageTitle'     => $dashboard['label'],
-                'dashboardName' => $name,
-                'dashboards'    => $manager->getDashboards(),
-                'widgets'       => $manager->getDashboardWidgets($name),
-            ]
+            array(
+                'dashboards' => $dashboards,
+                'dashboard' => $currentDashboard,
+                'widgets' => $widgetManager->getAvailableWidgets()
+            )
         );
     }
 
@@ -57,7 +80,7 @@ class DashboardController extends Controller
     {
         return $this->render(
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
-            $this->get('oro_dashboard.manager')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -70,8 +93,8 @@ class DashboardController extends Controller
      */
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
-        /** @var Manager $manager */
-        $manager = $this->get('oro_dashboard.manager');
+        /** @var WidgetAttributes $manager */
+        $manager = $this->get('oro_dashboard.widget_attributes');
 
         $params = array_merge(
             [
@@ -84,5 +107,29 @@ class DashboardController extends Controller
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
             $params
         );
+    }
+
+    /**
+     * @Route(
+     *      "/launchpad",
+     *      name="oro_dashboard_quick_launchpad"
+     * )
+     */
+    public function quickLaunchpadAction()
+    {
+        return $this->render(
+            'OroDashboardBundle:Index:quickLaunchpad.html.twig',
+            [
+                'dashboards' => $this->getDashboardManager()->getDashboards(),
+            ]
+        );
+    }
+
+    /**
+     * @return Manager
+     */
+    protected function getDashboardManager()
+    {
+        return $this->get('oro_dashboard.manager');
     }
 }
