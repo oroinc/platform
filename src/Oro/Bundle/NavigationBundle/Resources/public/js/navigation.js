@@ -540,8 +540,11 @@ define(function (require) {
             if (entryPoint.indexOf('.php') !== -1) {
                 entryPoint = entryPoint.substr(0, entryPoint.indexOf('.php') + 4);
             }
+			if (entryPoint[entryPoint.length-1] != '/') {
+                entryPoint += '/';
+            }
             if(debugBarToken) {
-                var url = entryPoint + '/_wdt/' + debugBarToken;
+                var url = entryPoint + '_wdt/' + debugBarToken;
                 $.get(
                     this.baseUrl + url,
                     _.bind(function(data) {
