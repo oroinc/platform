@@ -80,11 +80,11 @@ class WidgetManager
         /** @var DashboardWidget $widgetEntity */
         foreach ($dashboard->getWidgets() as $widgetEntity) {
             $position = $widgetEntity->getLayoutPosition();
-            if ($position[0] == Configuration::FIRST_COLUMN && $position[1] < $min) {
+            if ($position[0] == 0 && $position[1] < $min) {
                 $min = $position[1];
             }
         }
-        $widget->setLayoutPosition(array(Configuration::FIRST_COLUMN, --$min));
+        $widget->setLayoutPosition(array(0, --$min));
         $widget->setDashboard($dashboard);
 
         $this->entityManager->persist($widget);

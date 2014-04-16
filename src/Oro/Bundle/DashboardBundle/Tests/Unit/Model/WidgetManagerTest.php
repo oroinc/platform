@@ -127,7 +127,7 @@ class WidgetManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->initRepository();
         $expectedId = 42;
-        $expectedPosition = array(Configuration::FIRST_COLUMN, -1);
+        $expectedPosition = array(0, -1);
 
         $expectedWidget = new DashboardWidget();
         $widgetName = 'widget name';
@@ -137,7 +137,7 @@ class WidgetManagerTest extends \PHPUnit_Framework_TestCase
         $widgets = array($widget);
         $widget->expects($this->once())
             ->method('getLayoutPosition')
-            ->will($this->returnValue(array(Configuration::FIRST_COLUMN, 0)));
+            ->will($this->returnValue(array(0, 0)));
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboard->expects($this->once())->method('getWidgets')->will($this->returnValue($widgets));
         $expectedWidget->setDashboard($dashboard);
