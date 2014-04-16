@@ -13,8 +13,8 @@ class DashboardType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('label');
-        $builder->add('owner');
+        $builder->add('label', 'text', array('required' => true, 'label' => 'oro.dashboard.label'));
+        $builder->add('owner', 'oro_user_select', array('required' => true, 'label' => 'oro.dashboard.owner'));
     }
 
     /**

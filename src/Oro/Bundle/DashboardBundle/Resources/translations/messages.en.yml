@@ -21,5 +21,9 @@ oro:
 
         list: List
 
+        saved_message: Dashboard saved successfully
+
         dashboards_tab_label: Dashboards
         dashboards_list_menu_label: Manage dashboards
+        label: Label
+        owner: Owner

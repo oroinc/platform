@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
-use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -12,6 +10,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -91,9 +91,33 @@ class DashboardController extends Controller
         return $this->update(new Dashboard());
     }
 
-    protected function update($dashboard)
+    protected function update(Dashboard $dashboard)
     {
         $form = $this->createForm(new DashboardType(), $dashboard, array());
+        $request = $this->getRequest();
+        if ($request->isMethod('POST')) {
+            $form->submit($request);
+            if ($form->isValid()) {
+                $this->getDoctrine()->getManager()->persist($dashboard);
+                $this->getDoctrine()->getManager()->flush();
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                );
+
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    array(
+                        'route' => 'oro_dashboard_update',
+                        'parameters' => array('id' => $dashboard->getId()),
+                    ),
+                    array(
+                        'route' => 'oro_dashboard_index',
+                        'parameters' => array('id' => $dashboard->getId(), 'change_dashboard' => true),
+                    )
+                );
+            }
+        }
+
         return array('entity' => $dashboard, 'form'=> $form->createView());
     }
 
