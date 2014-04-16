@@ -58,7 +58,7 @@ datagrid:
                 params:     [ id ]
             delete_link:
                 type:       url
-                route:      oro_dashboard_index
+                route:      oro_api_delete_dashboard
                 params:     [ id ]
         actions:
             view:
