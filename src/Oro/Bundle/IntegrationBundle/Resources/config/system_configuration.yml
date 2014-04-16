@@ -2,4 +2,4 @@ oro_system_configuration:
     groups:
         integrations:
             title: 'Integrations'
-            icon:  'icon-exchange'
+
