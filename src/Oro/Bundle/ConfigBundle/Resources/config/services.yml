@@ -49,6 +49,7 @@ services:
             - @oro_security.security_facade
         tags:
             -  { name: oro_config.configuration_provider }
+        lazy: true
 
     oro_config.form.config_subscriber:
         class: %oro_config.form.config_subscriber.class%

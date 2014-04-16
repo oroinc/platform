@@ -428,6 +428,10 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             $notExistingCurrencyCode,
             $this->localeSettings->getCurrencySymbolByCurrency($notExistingCurrencyCode)
         );
+        $this->assertEquals(
+            $existingCurrencySymbol,
+            $this->localeSettings->getCurrencySymbolByCurrency()
+        );
     }
 
     public function testGetLocaleByCode()

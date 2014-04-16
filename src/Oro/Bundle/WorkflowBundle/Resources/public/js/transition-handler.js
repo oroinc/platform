@@ -27,7 +27,7 @@ function($, _, Modal, performTransition) {
                     url: element.data('dialog-url'),
                     stateEnabled: false,
                     incrementalPosition: false,
-                    loadingMaskEnabled: false,
+                    loadingMaskEnabled: true,
                     dialogOptions: {
                         modal: true,
                         resizable: false,

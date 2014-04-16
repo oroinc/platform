@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 
 class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +35,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder'))
+            ->setMethods(array('createQueryBuilder', 'getRepository'))
             ->getMock();
 
         $this->processorRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
@@ -42,8 +45,8 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->channel  = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log      = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
     }
 
     /**
@@ -89,5 +92,52 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = $this->getSyncProcessor(['processImport']);
 
         $processor->process($this->channel);
+    }
+
+    public function testOneChannelConnectorProcess()
+    {
+        $connector = 'testConnector';
+        $this->channel->expects($this->never())
+            ->method('getConnectors');
+        $this->channel->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue('testChannel'));
+        $realConnector = new TestConnector();
+        $this->registry->expects($this->once())
+            ->method('getConnectorType')
+            ->will($this->returnValue($realConnector));
+        $this->processorRegistry->expects($this->once())
+            ->method('getProcessorAliasesByEntity')
+            ->will($this->returnValue([]));
+        $this->em->expects($this->never())
+            ->method('getRepository');
+        $jobResult = new JobResult();
+        $jobResult->setContext(new TestContext());
+        $jobResult->setSuccessful(true);
+        $this->jobExecutor->expects($this->once())
+            ->method('executeJob')
+            ->with(
+                'import',
+                'test job',
+                [
+                    'import' => [
+                        'processorAlias' => false,
+                        'entityName'     => 'testEntity',
+                        'channel'        => 'testChannel',
+                        'testParameter'  => 'testValue'
+                    ]
+                ]
+            )
+            ->will($this->returnValue($jobResult));
+
+        $processor = new SyncProcessor(
+            $this->em,
+            $this->processorRegistry,
+            $this->jobExecutor,
+            $this->registry,
+            $this->log
+        );
+
+        $processor->process($this->channel, $connector, ['testParameter' => 'testValue']);
     }
 }

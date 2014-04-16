@@ -64,6 +64,7 @@ services:
         class: %oro_migration.tools.schema_dumper.class%
         arguments:
             - @twig
+        lazy: true
 
     oro_migration.twig.schema_dumper:
         class: %oro_migration.twig.schema_dumper.class%

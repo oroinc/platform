@@ -12,6 +12,7 @@ services:
             - @session
             - @router
             - @translator
+        lazy: true
 
     oro_importexport.handler.export:
         class: %oro_importexport.handler.export.class%
@@ -21,3 +22,4 @@ services:
             - @oro_importexport.file.file_system_operator
             - @oro_importexport.file.mime_type_guesser
             - @router
+        lazy: true

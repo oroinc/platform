@@ -43,25 +43,18 @@ class ControllersTest extends WebTestCase
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
         $this->assertContains("Entity saved", $crawler->html());
+        preg_match('/\/view\/(\d+)/', $this->client->getHistory()->current()->getUri(), $matches);
+        $this->assertCount(2, $matches);
+        return $matches[1];
     }
 
     /**
      * @depends testCreate
+     * @param int $id
+     * @return int
      */
-    public function testUpdate()
+    public function testUpdate($id)
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
-            'entityconfig-grid',
-            array(
-                'entityconfig-grid[_filter][name][value][0]' => 'Extend\\Entity\\testExtendedEntity'
-            )
-        );
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
-        $result = reset($result['data']);
-        $id = $result['id'];
         $crawler = $this->client->request(
             'GET',
             $this->client->generate('oro_entityconfig_update', array('id' => $id))

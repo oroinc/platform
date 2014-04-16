@@ -114,6 +114,15 @@
     {{ form_widget(form) }}
 {% endblock %}
 
+{# used to populate selected data on pintab restore #}
+{% block oro_combobox_dataconfig_onselect %}
+    $field.on('select2-init', function(e) {
+        $(e.target).on('change', function(e){
+            $(this).data('selected-data', e.added);
+        });
+    });
+{% endblock %}
+
 {% block oro_combobox_dataconfig_autocomplete %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
@@ -129,6 +138,8 @@
             return data;
         }
     };
+
+    {{ block('oro_combobox_dataconfig_onselect') }}
 {% endblock %}
 
 {% block oro_combobox_dataconfig_relation %}
