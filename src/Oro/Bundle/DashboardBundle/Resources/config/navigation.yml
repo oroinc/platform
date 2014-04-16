@@ -1,7 +1,3 @@
-oro_titles:
-    oro_dashboard_index: "%%name%%"
-    oro_dashboard_quick_launchpad: oro.dashboard.title.quick_launchpad
-
 oro_menu_config:
     items:
         dashboard_tab:
@@ -14,6 +10,7 @@ oro_menu_config:
             route: 'oro_dashboard_management'
             extras:
                 position: 10
+                routes: ['oro_dashboard_update', 'oro_dashboard_create']
 
     tree:
         application_menu:
@@ -21,3 +18,11 @@ oro_menu_config:
                 dashboard_tab:
                     children:
                         daboards_management: ~
+
+oro_titles:
+    oro_dashboard_index: "%%name%%"
+    oro_dashboard_quick_launchpad: oro.dashboard.title.quick_launchpad
+
+    daboards_management: 'Dashboards'
+    oro_dashboard_edit: '%%name%% - Edit - Dasboards'
+    oro_dashboard_create: 'Create Dashboard'

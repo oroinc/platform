@@ -1,0 +1,56 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% oro_title_set({params : {"%name%": 'oro.dashboard.entity_label'|trans }}) %}
+{% set formAction = form.vars.value.id
+                    ? path('oro_dashboard_update', { 'id': form.vars.value.id })
+                    : path('oro_dashboard_create')  %}
+
+{% block pageHeader %}
+    {% if form.vars.value.id %}
+        {% set breadcrumbs = {
+            'entity':      [],
+            'indexPath':   path('oro_dashboard_management'),
+            'indexLabel': 'Manage dashboards'|trans,
+            'entityTitle': entity.name
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.dashboard.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('oro_dashboard_management')) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock %}
+
+{% block content_data %}
+    {% set id = 'task-form' %}
+
+    {% set dataBlocks = [{
+        'title': 'orocrm.task.block.general'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.label),
+                    form_row(form.owner),
+                ]
+            }
+        ]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock %}
+
+

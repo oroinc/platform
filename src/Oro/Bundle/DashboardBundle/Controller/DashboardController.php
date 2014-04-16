@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
@@ -68,6 +71,30 @@ class DashboardController extends Controller
                 'widgets' => $widgetManager->getAvailableWidgets()
             )
         );
+    }
+
+    /**
+     * @Route("/dashboard-update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
+     * @Template()
+     */
+    public function updateAction(Dashboard $dashboard)
+    {
+        return $this->update($dashboard);
+    }
+
+    /**
+     * @Route("/dashboard-create", name="oro_dashboard_create")
+     * @Template("OroDashboardBundle:Dashboard:update.html.twig")
+     */
+    public function createAction()
+    {
+        return $this->update(new Dashboard());
+    }
+
+    protected function update($dashboard)
+    {
+        $form = $this->createForm(new DashboardType(), $dashboard, array());
+        return array('entity' => $dashboard, 'form'=> $form->createView());
     }
 
     /**
