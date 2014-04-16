@@ -121,7 +121,7 @@ To implement your filter you have to do following:
 Tips and tricks
 ----------------
 
-## Do not show filters for some grid whether they are defined in configuration.
+### Do not show filters for some grid whether they are defined in configuration.
 
 If you have some grid with defined filters, but on some page you should to show the same grid but without filters.
 There are two ways to do this:
