@@ -161,6 +161,10 @@ abstract class AbstractEmailSynchronizer
             $this->log = new NullLogger();
         }
 
+        if (!$this->checkConfiguration()) {
+            $this->log->notice('Exit because synchronization was not configured.');
+        }
+
         $failedOriginIds = array();
         foreach ($originIds as $originId) {
             $origin = $this->findOrigin($originId);
