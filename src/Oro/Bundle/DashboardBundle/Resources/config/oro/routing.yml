@@ -1,7 +1,7 @@
 oro_dashboard:
     resource:     "@OroDashboardBundle/Controller"
     type:         annotation
-    prefix:       /dashboard
+    prefix:       /
 
 oro_dashboard_api:
     resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController
