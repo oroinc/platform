@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository")
  * @ORM\Table(name="oro_dashboard")
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *  defaultValues={
  *      "ownership"={
@@ -248,7 +249,7 @@ class Dashboard
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = $this->updatedAt = new \DateTime();
     }
 
     /**
@@ -256,6 +257,6 @@ class Dashboard
      */
     public function preUpdate()
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

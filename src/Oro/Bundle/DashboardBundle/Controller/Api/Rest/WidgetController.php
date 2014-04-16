@@ -106,8 +106,6 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     /**
      * @param integer $dashboardId
      *
-     * @Rest\Put()
-     *
      * @Rest\QueryParam(
      *      name="layoutPositions",
      *      nullable=true,
