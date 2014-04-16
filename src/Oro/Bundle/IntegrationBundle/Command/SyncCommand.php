@@ -50,7 +50,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 'If option exists sync will be performed for given connector name'
             )
             ->addArgument(
-                'connector-paramenets',
+                'connector-parameters',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                 'Additional connector parameters array. Format - parameterKey=parameterValue',
                 []
@@ -65,8 +65,8 @@ class SyncCommand extends AbstractSyncCronCommand
     {
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
-        $channelId           = $input->getOption('connector');
-        $connector           = $input->getOption('channel-id');
+        $connector           = $input->getOption('connector');
+        $channelId           = $input->getOption('channel-id');
         $connectorParameters = $this->getConnectorParameters($input);
         $repository          = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
@@ -121,7 +121,7 @@ class SyncCommand extends AbstractSyncCronCommand
     protected function getConnectorParameters(InputInterface $input)
     {
         $result              = [];
-        $connectorParameters = $input->getArgument('connector-paramenets');
+        $connectorParameters = $input->getArgument('connector-parameters');
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {
                 $parameterConfigArray = explode('=', $parameterString);
