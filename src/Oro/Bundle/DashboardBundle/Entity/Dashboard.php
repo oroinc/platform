@@ -54,6 +54,13 @@ class Dashboard
     protected $label;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_default", type="boolean", nullable=false, options={"default"=0})
+     */
+    protected $isDefault = false;
+
+    /**
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
@@ -65,7 +72,7 @@ class Dashboard
      * @var Collection
      *
      * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\DashboardBundle\Entity\DashboardWidget",
+     *     targetEntity="Oro\Bundle\DashboardBundle\Entity\Widget",
      *     mappedBy="dashboard", cascade={"ALL"}, orphanRemoval=true
      * )
      */
@@ -142,6 +149,24 @@ class Dashboard
     }
 
     /**
+     * @return bool
+     */
+    public function isDefault()
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * @param bool $isDefault
+     * @return Dashboard
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = (bool)$isDefault;
+        return $this;
+    }
+
+    /**
      * @return Collection
      */
     public function getWidgets()
@@ -160,10 +185,10 @@ class Dashboard
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return Dashboard
      */
-    public function addWidget(DashboardWidget $widget)
+    public function addWidget(Widget $widget)
     {
         if (!$this->getWidgets()->contains($widget)) {
             $this->getWidgets()->add($widget);
@@ -174,19 +199,19 @@ class Dashboard
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return boolean
      */
-    public function removeWidget(DashboardWidget $widget)
+    public function removeWidget(Widget $widget)
     {
         return $this->getWidgets()->removeElement($widget);
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return boolean
      */
-    public function hasWidget(DashboardWidget $widget)
+    public function hasWidget(Widget $widget)
     {
         return $this->getWidgets()->contains($widget);
     }

@@ -5,26 +5,16 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
-use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class Manager
 {
     /**
-     * @var ConfigProvider
+     * @var Factory
      */
-    protected $configProvider;
-
-    /**
-     * @var DashboardRepository
-     */
-    protected $dashboardRepository;
-
-    /**
-     * @var DashboardModelFactory
-     */
-    protected $dashboardModelFactory;
+    protected $factory;
 
     /**
      * @var EntityManager
@@ -34,82 +24,202 @@ class Manager
     /**
      * Constructor
      *
-     * @param ConfigProvider        $configProvider
-     * @param DashboardRepository   $dashboardRepository
-     * @param DashboardModelFactory $dashboardModelFactory
-     * @param EntityManager         $entityManager
+     * @param Factory $factory
+     * @param EntityManager $entityManager
      */
-    public function __construct(
-        ConfigProvider $configProvider,
-        DashboardRepository $dashboardRepository,
-        DashboardModelFactory $dashboardModelFactory,
-        EntityManager $entityManager
-    ) {
-        $this->dashboardRepository = $dashboardRepository;
-        $this->configProvider = $configProvider;
-        $this->dashboardModelFactory = $dashboardModelFactory;
+    public function __construct(Factory $factory, EntityManager $entityManager)
+    {
+        $this->factory = $factory;
         $this->entityManager = $entityManager;
     }
 
     /**
-     * Returns all dashboards
+     * Find dashboard model by id
      *
+     * @param integer $id
+     * @return DashboardModel|null
+     */
+    public function findDashboardModel($id)
+    {
+        $entity = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->find($id);
+
+        if ($entity) {
+            return $this->getDashboardModel($entity);
+        }
+
+        return null;
+    }
+
+    /**
+     * Find dashboard widget model by id
+     *
+     * @param integer $id
+     * @return WidgetModel|null
+     */
+    public function findWidgetModel($id)
+    {
+        $entity = $this->entityManager->getRepository('OroDashboardBundle:Widget')->find($id);
+
+        if ($entity) {
+            return $this->getWidgetModel($entity);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get dashboard
+     *
+     * @param Dashboard $entity
+     * @return DashboardModel
+     */
+    public function getDashboardModel(Dashboard $entity)
+    {
+        return $this->factory->createDashboardModel($entity);
+    }
+
+    /**
+     * Get dashboard widget
+     *
+     * @param Widget $entity
+     * @return WidgetModel
+     */
+    public function getWidgetModel(Widget $entity)
+    {
+        return $this->factory->createWidgetModel($entity);
+    }
+
+    /**
+     * Get all dashboards
+     *
+     * @param array $entities
      * @return DashboardModel[]
      */
-    public function getDashboards()
+    public function getDashboardModels(array $entities)
     {
         $result = [];
-        foreach ($this->dashboardRepository->getAvailableDashboards() as $dashboard) {
-            $result[] = $this->dashboardModelFactory->getDashboardModel($dashboard);
+        foreach ($entities as $entity) {
+            $result[] = $this->factory->createDashboardModel($entity);
         }
 
         return $result;
     }
 
     /**
-     * @param User $user
-     * @param int  $dashboardId
-     * @return bool
+     * Create dashboard
+     *
+     * @return DashboardModel
      */
-    public function setUserActiveDashboard(User $user, $dashboardId)
+    public function createDashboardModel()
     {
-        $dashboard = $this->dashboardRepository->getAvailableDashboard($dashboardId);
+        $dashboard = new Dashboard();
 
-        if (!$dashboard) {
-            return false;
+        $this->entityManager->persist($dashboard);
+
+        return $this->factory->createDashboardModel($dashboard);
+    }
+
+    /**
+     * Create dashboard widget
+     *
+     * @param string $widgetName
+     * @return WidgetModel
+     */
+    public function createWidgetModel($widgetName)
+    {
+        $widget = new Widget();
+
+        $widget->setExpanded(true);
+        $widget->setName($widgetName);
+
+        $this->entityManager->persist($widget);
+
+        return $this->factory->createWidgetModel($widget);
+    }
+
+    /**
+     * @param DashboardModel $dashboardModel
+     */
+    public function removeDashboardModel(DashboardModel $dashboardModel)
+    {
+        $this->entityManager->remove($dashboardModel->getEntity());
+    }
+
+    /**
+     * @param WidgetModel $widgetModel
+     */
+    public function removeWidgetModel(WidgetModel $widgetModel)
+    {
+        $this->entityManager->remove($widgetModel->getEntity());
+    }
+
+    /**
+     * Find active dashboard or default dashboard
+     *
+     * @param User $user
+     * @return DashboardModel|null
+     */
+    public function findUserActiveOrDefaultDashboard(User $user)
+    {
+        $activeDashboard = $this->findUserActiveDashboard($user);
+        return $activeDashboard ? $activeDashboard : $this->findDefaultDashboard();
+    }
+
+    /**
+     * Find active dashboard
+     *
+     * @param User $user
+     * @return DashboardModel|null
+     */
+    public function findUserActiveDashboard(User $user)
+    {
+        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+            ->findOneBy(array('user' => $user));
+
+        if ($dashboard) {
+            return $this->getDashboardModel($dashboard);
         }
 
+        return null;
+    }
+
+    /**
+     * Find default dashboard
+     *
+     * @return DashboardModel|null
+     */
+    public function findDefaultDashboard()
+    {
+        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+            ->findDefaultDashboard();
+
+        if ($dashboard) {
+            return $this->getDashboardModel($dashboard);
+        }
+
+        return null;
+    }
+
+    /**
+     * Set current dashboard as active for passed user
+     *
+     * @param DashboardModel $dashboard
+     * @param User $user
+     * @return bool
+     */
+    public function setUserActiveDashboard(DashboardModel $dashboard, User $user)
+    {
         $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
             $activeDashboard->setUser($user);
+            $this->entityManager->persist($activeDashboard);
         }
 
-        $activeDashboard->setDashboard($dashboard);
+        $activeDashboard->setDashboard($dashboard->getEntity());
 
-        $this->entityManager->persist($activeDashboard);
         $this->entityManager->flush();
-
-        return true;
-    }
-
-    /**
-     * @param User $user
-     * @return DashboardModel|null
-     */
-    public function getUserActiveDashboard(User $user)
-    {
-        $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user' => $user));
-
-        if (!$activeDashboard) {
-            $name = $this->configProvider->getConfig('default_dashboard');
-            $dashboard = $this->dashboardRepository->findOneBy(array('name' => $name));
-            return $dashboard ? $this->dashboardModelFactory->getDashboardModel($dashboard) : null;
-        }
-
-        return $this->dashboardModelFactory->getDashboardModel($activeDashboard->getDashboard());
     }
 }

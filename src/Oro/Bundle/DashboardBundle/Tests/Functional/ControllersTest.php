@@ -34,7 +34,7 @@ class ControllersTest extends WebTestCase
                 'GET',
                 $this->client->generate(
                     'oro_dashboard_index',
-                    array('id' => $dashboard->getDashboard()->getId())
+                    array('id' => $dashboard->getId())
                 )
             );
             $result = $this->client->getResponse();
@@ -44,7 +44,7 @@ class ControllersTest extends WebTestCase
                     ->getContainer()
                     ->get('translator')
                     ->trans(
-                        $dashboard->getDashboard()
+                        $dashboard->getDashboardEntity()
                         ->getName()
                     ),
                 $result->getContent()

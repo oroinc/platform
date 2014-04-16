@@ -3,68 +3,60 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class DashboardController extends Controller
 {
     /**
+     * @param integer $id
+     *
      * @Route(
      *      "/index/{id}",
      *      name="oro_dashboard_index",
      *      defaults={"id" = ""}
      * )
+     * @Acl(
+     *      id="oro_dashboard_view",
+     *      type="entity",
+     *      permission="VIEW",
+     *      class="OroDashboardBundle:Dashboard"
+     * )
      */
     public function indexAction($id = null)
     {
-        $widgetManager = $this->get('oro_dashboard.widget_manager');
-
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
-        /**
-         * @var User $user
-         */
-        $user = $this->getUser();
-
-        if (!$user) {
-            throw new AccessDeniedException('User is not logged in');
-        }
-
-        if ($changeActive && !$id) {
-            throw new NotFoundHttpException('Incorrect request params');
-        }
-
-        $dashboards = $this->getDashboardManager()->getDashboards();
-        $currentDashboard = null;
+        $dashboards = $this->findAllowedDashboards();
+        $currentDashboard = $this->findAllowedDashboard($id);
 
         if ($changeActive) {
-            if (!$this->getDashboardManager()->setUserActiveDashboard($user, $id)) {
-                throw new NotFoundHttpException('Dashboard not found');
+            if (!$id) {
+                throw new BadRequestHttpException();
             }
+            $this->getDashboardManager()->setUserActiveDashboard($currentDashboard, $this->getUser());
         }
-
-        $currentDashboard = $this->getDashboardManager()->getUserActiveDashboard($user);
 
         if (!$currentDashboard) {
             return $this->quickLaunchpadAction();
         }
 
-        $config = $currentDashboard->getConfig();
-
-        $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
-
         return $this->render(
-            $template,
+            $currentDashboard->getTemplate(),
             array(
                 'dashboards' => $dashboards,
                 'dashboard' => $currentDashboard,
-                'widgets' => $widgetManager->getAvailableWidgets()
+                'widgets' => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
             )
         );
     }
@@ -120,9 +112,52 @@ class DashboardController extends Controller
         return $this->render(
             'OroDashboardBundle:Index:quickLaunchpad.html.twig',
             [
-                'dashboards' => $this->getDashboardManager()->getDashboards(),
+                'dashboards' => $this->findAllowedDashboards(),
             ]
         );
+    }
+
+    /**
+     * Get dashboard with granted permission. If dashboard id is not specified, gets current active or default dashboard
+     *
+     * @param integer|null $id
+     * @param string $permission
+     * @return DashboardModel|null
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function findAllowedDashboard($id = null, $permission = 'VIEW')
+    {
+        if ($id) {
+            $dashboard = $this->getDashboardManager()->findDashboardModel($id);
+            if (!$dashboard) {
+                throw new NotFoundHttpException(sprintf('Dashboard #%s is not found.', $id));
+            }
+            if (!$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())) {
+                throw new AccessDeniedException(
+                    sprintf("Don't have permissions for dashboard #%s", $dashboard->getId())
+                );
+            }
+        } else {
+            $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
+            if (!$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())) {
+                $dashboard = null;
+            }
+        }
+
+        return $dashboard;
+    }
+
+    /**
+     * @param string $permission
+     * @return DashboardModel[]
+     */
+    protected function findAllowedDashboards($permission = 'VIEW')
+    {
+        $qb = $this->getDashboardRepository()->createQueryBuilder('dashboard');
+        $aclHelper = $this->get('oro_security.acl_helper');
+
+        return $this->getDashboardManager()->getDashboardModels($aclHelper->apply($qb, $permission)->execute());
     }
 
     /**
@@ -131,5 +166,13 @@ class DashboardController extends Controller
     protected function getDashboardManager()
     {
         return $this->get('oro_dashboard.manager');
+    }
+
+    /**
+     * @return DashboardRepository
+     */
+    protected function getDashboardRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
     }
 }

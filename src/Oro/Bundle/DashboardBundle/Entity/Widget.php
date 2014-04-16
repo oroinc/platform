@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="oro_dashboard_widget")
  */
-class DashboardWidget
+class Widget
 {
     /**
      * @var integer
@@ -60,7 +60,7 @@ class DashboardWidget
 
     /**
      * @param string $name
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setName($name)
     {
@@ -78,7 +78,7 @@ class DashboardWidget
 
     /**
      * @param array $layoutPosition
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setLayoutPosition(array $layoutPosition)
     {
@@ -96,7 +96,7 @@ class DashboardWidget
 
     /**
      * @param boolean $expanded
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setExpanded($expanded)
     {
@@ -114,7 +114,7 @@ class DashboardWidget
 
     /**
      * @param Dashboard $dashboard
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setDashboard(Dashboard $dashboard)
     {

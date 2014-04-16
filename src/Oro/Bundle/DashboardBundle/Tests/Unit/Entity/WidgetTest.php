@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 
-class DashboardWidgetTest extends \PHPUnit_Framework_TestCase
+class WidgetTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DashboardWidget
+     * @var Widget
      */
     protected $widget;
 
     protected function setUp()
     {
-        $this->widget = new DashboardWidget();
+        $this->widget = new Widget();
     }
 
     public function testId()

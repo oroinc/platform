@@ -10,10 +10,10 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
     {
         $expectedConfig = array('label'=>'sample');
 
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\DashboardWidget');
-        $model = new WidgetModel($expectedConfig, $widget);
+        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $model = new WidgetModel($widget, $expectedConfig);
 
         $this->assertEquals($model->getConfig(), $expectedConfig);
-        $this->assertSame($model->getWidget(), $widget);
+        $this->assertSame($model->getEntity(), $widget);
     }
 }

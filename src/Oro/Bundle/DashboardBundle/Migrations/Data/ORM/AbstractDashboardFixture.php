@@ -6,7 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -63,11 +63,11 @@ abstract class AbstractDashboardFixture extends AbstractFixture
      * @param ObjectManager $manager
      * @param Dashboard $dashboard
      * @param string $widgetName
-     * @return DashboardWidget
+     * @return Widget
      */
-    protected function addNewDashboardWidget(ObjectManager $manager, Dashboard $dashboard, $widgetName)
+    protected function addNewWidget(ObjectManager $manager, Dashboard $dashboard, $widgetName)
     {
-        $result = new DashboardWidget();
+        $result = new Widget();
         $result->setName($widgetName);
 
         $dashboard->addWidget($result);

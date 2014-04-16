@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 
 class WidgetModel
 {
@@ -12,9 +12,19 @@ class WidgetModel
     protected $config;
 
     /**
-     * @var DashboardWidget
+     * @var Widget
      */
-    protected $widget;
+    protected $entity;
+
+    /**
+     * @param Widget $widget
+     * @param array $config
+     */
+    public function __construct(Widget $widget, array $config)
+    {
+        $this->entity = $widget;
+        $this->config = $config;
+    }
 
     /**
      * @return array
@@ -25,20 +35,72 @@ class WidgetModel
     }
 
     /**
-     * @return DashboardWidget
+     * @return Widget
      */
-    public function getWidget()
+    public function getEntity()
     {
-        return $this->widget;
+        return $this->entity;
     }
 
     /**
-     * @param array           $config
-     * @param DashboardWidget $widget
+     * @return int
      */
-    public function __construct(array $config, DashboardWidget $widget)
+    public function getId()
     {
-        $this->config = $config;
-        $this->widget = $widget;
+        return $this->getEntity()->getId();
+    }
+
+    /**
+     * @param string $name
+     * @return Widget
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getEntity()->getName();
+    }
+
+    /**
+     * @param array $layoutPosition
+     * @return Widget
+     */
+    public function setLayoutPosition(array $layoutPosition)
+    {
+        $this->getEntity()->setLayoutPosition($layoutPosition);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLayoutPosition()
+    {
+        return $this->getEntity()->getLayoutPosition();
+    }
+
+    /**
+     * @param boolean $expanded
+     * @return Widget
+     */
+    public function setExpanded($expanded)
+    {
+        $this->getEntity()->setExpanded($expanded);
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExpanded()
+    {
+        return $this->getEntity()->isExpanded();
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Oro\Bundle\DashboardBundle\Model\DashboardModelFactory;
+use Oro\Bundle\DashboardBundle\Model\Factory;
 
-class DashboardModelFactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DashboardModelFactory
+     * @var Factory
      */
     protected $dashboardFactory;
 
@@ -18,30 +18,29 @@ class DashboardModelFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $widgetModelFactory = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModelFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->dashboardFactory = new DashboardModelFactory($widgetModelFactory, $this->configProvider);
+        $this->dashboardFactory = new Factory($this->configProvider);
     }
 
-    public function testGetDashboardModel()
+    public function testCreateDashboardModel()
     {
         $expectedConfig  = array('label' => 'test label');
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboard->expects($this->once())->method('getName')->will($this->returnValue('test'));
+
         $this->configProvider->expects($this->once())
             ->method('hasDashboardConfig')
             ->will($this->returnValue(true));
+
         $this->configProvider->expects($this->once())
             ->method('getDashboardConfig')
             ->will($this->returnValue($expectedConfig));
 
-        $result = $this->dashboardFactory->getDashboardModel($dashboard);
+        $result = $this->dashboardFactory->createDashboardModel($dashboard);
         $this->assertEquals($expectedConfig, $result->getConfig());
-        $this->assertSame($dashboard, $result->getDashboard());
+        $this->assertSame($dashboard, $result->getEntity());
     }
 }

@@ -84,14 +84,14 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @param {object} widgetModel
          */
         addToDashboard: function(widgetModel){
-            var wid = 'dashboard-widget-' + widgetModel.widget.id;
+            var wid = 'dashboard-widget-' + widgetModel.entity.id;
             var containerId = 'widget-container-'+wid;
-            var column = widgetModel.widget.layout_position[0] ? widgetModel.widget.layout_position[0] : 0;
+            var column = widgetModel.entity.layout_position[0] ? widgetModel.entity.layout_position[0] : 0;
             $('#dashboard-column-'+column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
-                'id': widgetModel.widget.id,
-                'expanded': widgetModel.widget.expanded,
-                'layoutPosition': widgetModel.widget.layout_position
+                'id': widgetModel.entity.id,
+                'expanded': widgetModel.entity.expanded,
+                'layoutPosition': widgetModel.entity.layout_position
             };
             var widgetParams = {
                 'widgetType': 'dashboard-item',

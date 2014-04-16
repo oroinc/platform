@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Provider;
+namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 

@@ -5,14 +5,14 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface
+class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData'];
+        return ['Oro\Bundle\DashboardBundle\Migrations\Data\ORM\LoadDashboardData'];
     }
 
     /**
@@ -20,11 +20,10 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
      */
     public function load(ObjectManager $manager)
     {
-        $mainDashboard = $this->createAdminDashboard($manager, 'main');
+        $mainDashboard = $this->findAdminDashboard($manager, 'main');
 
         if ($mainDashboard) {
-            $this->addNewWidget($manager, $mainDashboard, 'quick_launchpad')
-                ->setLayoutPosition([0, 10]);
+            $mainDashboard->setIsDefault(true);
 
             $manager->flush();
         }

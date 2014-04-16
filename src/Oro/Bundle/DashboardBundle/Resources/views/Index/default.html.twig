@@ -3,7 +3,7 @@
 
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
-{% set allowEdit = resource_granted('EDIT', dashboard.dashboard) %}
+{% set allowEdit = resource_granted('EDIT', dashboard.entity) %}
 <div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -128,15 +128,15 @@
             function(dashboardContainer, widgetPicker) {
                 {% set widgetIds = [] %}
                 {% for widget in dashboard.widgets %}
-                    {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.widget.id]) %}
+                    {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.id]) %}
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
-                    dashboardId: {{ dashboard.dashboard.id }},
+                    dashboardId: {{ dashboard.id }},
                     columnsSelector: '.dashboard-column',
                     allowEdit: {{ allowEdit ? 'true' : 'false' }}
                 });
-				widgetPicker.init({{ dashboard.dashboard.id }});
+				widgetPicker.init({{ dashboard.id }});
             }
         );
     </script>
@@ -149,12 +149,12 @@
             {{
                 oro_widget_render({
                     'widgetType': 'dashboard-item',
-                    'wid': options.widgetIdPrefix ~ widget.widget.id,
+                    'wid': options.widgetIdPrefix ~ widget.id,
                     'url': path(widget.config.route, widget.config.route_parameters),
                     'state': {
-                        'id': widget.widget.id,
-                        'expanded': widget.widget.expanded,
-                        'layoutPosition': widget.widget.layoutPosition,
+                        'id': widget.id,
+                        'expanded': widget.expanded,
+                        'layoutPosition': widget.layoutPosition,
                     },
                     'allowEdit': options.allowEdit
                 })

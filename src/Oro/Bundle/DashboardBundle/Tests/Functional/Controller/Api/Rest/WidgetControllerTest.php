@@ -5,8 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
-use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
@@ -29,7 +29,7 @@ class WidgetControllerTest extends WebTestCase
     protected $em;
 
     /**
-     * @var DashboardWidget
+     * @var Widget
      */
     protected $widget;
 
@@ -159,7 +159,7 @@ class WidgetControllerTest extends WebTestCase
         $dashboard = null;
         $data      = ['layoutPositions' => []];
         foreach ($widgets as $widget) {
-            /* @var DashboardWidget $widget */
+            /* @var Widget $widget */
             $data['layoutPositions'][$widget->getId()] = array_map(
                 function ($item) {
                     return $item * 10;
@@ -224,14 +224,14 @@ class WidgetControllerTest extends WebTestCase
      * @param string $name
      * @param bool   $isExpanded
      * @param array  $layoutPositions
-     * @return DashboardWidget
+     * @return Widget
      */
     protected function createWidget($name = 'widget', $isExpanded = true, array $layoutPositions = [1, 1])
     {
         $dashboard = new Dashboard();
         $dashboard->setName('dashboard');
 
-        $widget = new DashboardWidget();
+        $widget = new Widget();
         $widget
             ->setName($name)
             ->setExpanded($isExpanded)

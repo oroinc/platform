@@ -13,9 +13,12 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use Oro\Bundle\DashboardBundle\Model\Manager;
+
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
-use Oro\Bundle\DashboardBundle\Model\WidgetManager;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -57,11 +60,15 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      */
     public function putAction($dashboardId, $widgetId)
     {
-        $dashboard = $this->getDashboard($dashboardId);
-        $widget    = $this->getWidget($widgetId);
+        $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
+        $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+        }
+
+        if (!$dashboard->hasWidget($widget)) {
+            return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
         }
 
         $widget->setExpanded(
@@ -72,7 +79,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
             $this->getRequest()->get('layoutPosition', $widget->getLayoutPosition())
         );
 
-        $this->getEntityManager()->flush($widget);
+        $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
     }
@@ -90,14 +97,18 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      */
     public function deleteAction($dashboardId, $widgetId)
     {
-        $dashboard = $this->getDashboard($dashboardId);
-        $widget    = $this->getWidget($widgetId);
+        $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
+        $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
-        $this->getEntityManager()->remove($widget);
+        if (!$dashboard->hasWidget($widget)) {
+            return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
+        }
+
+        $this->getDashboardManager()->removeWidgetModel($widget);
         $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
@@ -124,24 +135,21 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      */
     public function putPositionsAction($dashboardId)
     {
-        $dashboard = $this->getDashboard($dashboardId);
+        $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
         if (!$dashboard) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
         $layoutPositions = $this->getRequest()->get('layoutPositions', []);
-        $widgets         = [];
 
         foreach ($layoutPositions as $widgetId => $layoutPosition) {
-            if ($widget = $this->getWidget($widgetId)) {
+            if ($widget = $dashboard->getWidgetById($widgetId)) {
                 $widget->setLayoutPosition($layoutPosition);
-
-                $widgets[] = $widget;
             }
         }
 
-        $this->getEntityManager()->flush($widgets);
+        $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
     }
@@ -164,12 +172,6 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @AclAncestor("oro_dashboard_edit")
-     * @Acl(
-     *      id="oro_dashboard_widget_create",
-     *      type="create",
-     *      permission="CREATE",
-     *      class="OroDashboardBundle:DashboardWidget"
-     * )
      * @return Response
      */
     public function postAddWidgetAction()
@@ -177,44 +179,18 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         $dashboardId = $this->getRequest()->get('dashboardId');
         $widgetName = $this->getRequest()->get('widgetName');
 
-        if (!$dashboardId || !$widgetName) {
+        $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
+
+        if (!$dashboard || !$widgetName) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
-        $widgetModel = $this->getWidgetManager()->createWidget($widgetName, $dashboardId);
-        if (!$widgetModel) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
-        }
+        $widget = $this->getDashboardManager()->createWidgetModel($widgetName);
+        $dashboard->addWidget($widget, true);
 
-        return $this->handleView($this->view($widgetModel, Codes::HTTP_OK));
-    }
+        $this->getEntityManager()->flush();
 
-    /**
-     * @param integer $id
-     * @return DashboardWidget
-     */
-    protected function getWidget($id)
-    {
-        $entity = $this
-            ->getEntityManager()
-            ->getRepository('OroDashboardBundle:DashboardWidget')
-            ->find($id);
-
-        return $entity;
-    }
-
-    /**
-     * @param integer $id
-     * @return Dashboard
-     */
-    protected function getDashboard($id)
-    {
-        $entity = $this
-            ->getEntityManager()
-            ->getRepository('OroDashboardBundle:Dashboard')
-            ->find($id);
-
-        return $entity;
+        return $this->handleView($this->view($widget, Codes::HTTP_OK));
     }
 
     /**
@@ -226,10 +202,10 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
-     * @return WidgetManager
+     * @return Manager
      */
-    protected function getWidgetManager()
+    protected function getDashboardManager()
     {
-        return $this->get('oro_dashboard.widget_manager');
+        return $this->get('oro_dashboard.manager');
     }
 }
