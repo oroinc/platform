@@ -6,7 +6,7 @@
 {% block navButtons %}
     {% if resource_granted('oro_dashboard_create') %}
         {{ UI.addButton({
-            'path' : 'oro_dashboard_index',
+            'path' : path('oro_dashboard_create'),
             'entity_label': 'oro.dashboard.entity_label'|trans
         }) }}
     {% endif %}

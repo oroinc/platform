@@ -54,7 +54,7 @@ datagrid:
                 params:     [ id ]
             update_link:
                 type:       url
-                route:      oro_dashboard_index
+                route:      oro_dashboard_update
                 params:     [ id ]
             delete_link:
                 type:       url

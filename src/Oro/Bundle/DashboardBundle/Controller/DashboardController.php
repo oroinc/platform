@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -12,7 +11,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -124,6 +122,15 @@ class DashboardController extends Controller
 
     /**
      * @Route("/dashboard-update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
+     * @Acl(
+     *      id="oro_dashboard_update",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="EDIT"
+     * )
+     *
+     * @ParamConverter("dashboard", options={"id" = "id"})
+     *
      * @Template()
      */
     public function updateAction(Dashboard $dashboard)
@@ -133,6 +140,12 @@ class DashboardController extends Controller
 
     /**
      * @Route("/dashboard-create", name="oro_dashboard_create")
+     * @Acl(
+     *      id="oro_dashboard_create",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="CREATE"
+     * )
      * @Template("OroDashboardBundle:Dashboard:update.html.twig")
      */
     public function createAction()
@@ -142,11 +155,17 @@ class DashboardController extends Controller
 
     protected function update(Dashboard $dashboard)
     {
-        $form = $this->createForm(new DashboardType(), $dashboard, array());
+        $form = $this->createForm($this->container->get('oro_dashboard.form.type.edit'), $dashboard, array());
         $request = $this->getRequest();
         if ($request->isMethod('POST')) {
             $form->submit($request);
             if ($form->isValid()) {
+                if ($dashboard->getId()) {
+                    $dashboard->setUpdatedAt(new \DateTime());
+                } else {
+                    $dashboard->setCreatedAt(new \DateTime());
+                }
+
                 $this->getDoctrine()->getManager()->persist($dashboard);
                 $this->getDoctrine()->getManager()->flush();
                 $this->get('session')->getFlashBag()->add(
@@ -160,7 +179,7 @@ class DashboardController extends Controller
                         'parameters' => array('id' => $dashboard->getId()),
                     ),
                     array(
-                        'route' => 'oro_dashboard_index',
+                        'route' => 'oro_dashboard_open',
                         'parameters' => array('id' => $dashboard->getId(), 'change_dashboard' => true),
                     )
                 );
@@ -168,19 +187,6 @@ class DashboardController extends Controller
         }
 
         return array('entity' => $dashboard, 'form'=> $form->createView());
-    }
-
-    /**
-     * todo: Test action remove it after close https://magecore.atlassian.net/browse/BAP-3267
-     *
-     * @Route(
-     *      "/manage-dashboards",
-     *      name="oro_dashboard_management"
-     * )
-     */
-    public function manageAction()
-    {
-        return new Response('works');
     }
 
     /**

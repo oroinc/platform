@@ -9,8 +9,8 @@
     {% if form.vars.value.id %}
         {% set breadcrumbs = {
             'entity':      [],
-            'indexPath':   path('oro_dashboard_management'),
-            'indexLabel': 'Manage dashboards'|trans,
+            'indexPath':   path('oro_dashboard_index'),
+            'indexLabel': 'oro.dashboard.entity_plural_label'|trans,
             'entityTitle': entity.name
         } %}
         {{ parent() }}
@@ -21,7 +21,7 @@
 {% endblock pageHeader %}
 
 {% block navButtons %}
-    {{ UI.cancelButton(path('oro_dashboard_management')) }}
+    {{ UI.cancelButton(path('oro_dashboard_index')) }}
     {% set html = UI.saveAndCloseButton() %}
     {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
         {% set html = html ~ UI.saveAndStayButton() %}

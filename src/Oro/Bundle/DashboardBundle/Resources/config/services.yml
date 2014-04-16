@@ -10,6 +10,7 @@ parameters:
     oro_dashboard.dashboard_entity.class:            Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class:     Oro\Bundle\DashboardBundle\Entity\DashboardWidget
     oro_dashboard.navigation_listener.class:         Oro\Bundle\DashboardBundle\EventListener\NavigationListener
+    oro_dashboard.form.type.edit.class:              Oro\Bundle\DashboardBundle\Form\Type\DashboardType
 
 services:
     oro_dashboard.widget_attributes:
@@ -58,6 +59,11 @@ services:
             - @oro_dashboard.manager
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_dashboard.form.type.edit:
+        class: %oro_dashboard.form.type.edit.class%
+        tags:
+            - { name: form.type, alias: "oro_dashboard_edit" }
 
     oro_dashboard.repository:
         class: %oro_dashboard.repository.class%
