@@ -78,4 +78,34 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->dashboard->removeWidget($widget));
         $this->assertFalse($this->dashboard->hasWidget($widget));
     }
+
+    public function testCreatedAt()
+    {
+        $this->assertNull($this->dashboard->getCreatedAt());
+        $date = new \DateTime();
+        $this->assertEquals($this->dashboard, $this->dashboard->setCreatedAt($date));
+        $this->assertEquals($date, $this->dashboard->getCreatedAt());
+    }
+
+    public function testUpdatedAt()
+    {
+        $this->assertNull($this->dashboard->getUpdatedAt());
+        $date = new \DateTime();
+        $this->assertEquals($this->dashboard, $this->dashboard->setUpdatedAt($date));
+        $this->assertEquals($date, $this->dashboard->getUpdatedAt());
+    }
+
+    public function testPrePersist()
+    {
+        $this->assertNull($this->dashboard->getCreatedAt());
+        $this->dashboard->prePersist();
+        $this->assertInstanceOf('\DateTime', $this->dashboard->getCreatedAt());
+    }
+
+    public function testPeUpdate()
+    {
+        $this->assertNull($this->dashboard->getUpdatedAt());
+        $this->dashboard->preUpdate();
+        $this->assertInstanceOf('\DateTime', $this->dashboard->getUpdatedAt());
+    }
 }

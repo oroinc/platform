@@ -1,4 +1,5 @@
 parameters:
+    oro_dasboard.entity.dashboard.class:             Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.manager.class:                     Oro\Bundle\DashboardBundle\Model\Manager
     oro_dashboard.widget_manager.class:              Oro\Bundle\DashboardBundle\Model\WidgetManager
     oro_dashboard.widget_attributes.class:           Oro\Bundle\DashboardBundle\Model\WidgetAttributes

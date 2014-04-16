@@ -7,22 +7,73 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @Route("/dashboard")
+ */
 class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/index/{id}",
+     *      ".{_format}",
      *      name="oro_dashboard_index",
+     *      requirements={"_format"="html|json"},
+     *      defaults={"_format" = "html"}
+     * )
+     *
+     * @Acl(
+     *      id="oro_dashboard_view",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="VIEW"
+     * )
+     *
+     * @Template
+     */
+    public function indexAction()
+    {
+        return [];
+    }
+
+    /**
+     * @Route(
+     *      "/view/{id}.{_format}",
+     *      name="oro_dashboard_view",
+     *      requirements={"_format"="html|json", "id"="\d+"},
+     *      defaults={"_format" = "html"}
+     * )
+     *
+     * @ParamConverter("dashboard", options={"id" = "id"})
+     *
+     * @AclAncestor("oro_dashboard_view")
+     *
+     * @Template
+     */
+    public function viewAction(Dashboard $dashboard)
+    {
+        return [
+            'entity' => $dashboard
+        ];
+    }
+
+    /**
+     * @Route(
+     *      "/open/{id}",
+     *      name="oro_dashboard_open",
      *      defaults={"id" = ""}
      * )
      */
-    public function indexAction($id = null)
+    public function openAction($id = null)
     {
         $widgetManager = $this->get('oro_dashboard.widget_manager');
 
@@ -41,7 +92,7 @@ class DashboardController extends Controller
             throw new NotFoundHttpException('Incorrect request params');
         }
 
-        $dashboards = $this->getDashboardManager()->getDashboards();
+        $dashboards       = $this->getDashboardManager()->getDashboards();
         $currentDashboard = null;
 
         if ($changeActive) {
@@ -58,14 +109,14 @@ class DashboardController extends Controller
 
         $config = $currentDashboard->getConfig();
 
-        $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
+        $template = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
         return $this->render(
             $template,
             array(
                 'dashboards' => $dashboards,
-                'dashboard' => $currentDashboard,
-                'widgets' => $widgetManager->getAvailableWidgets()
+                'dashboard'  => $currentDashboard,
+                'widgets'    => $widgetManager->getAvailableWidgets()
             )
         );
     }

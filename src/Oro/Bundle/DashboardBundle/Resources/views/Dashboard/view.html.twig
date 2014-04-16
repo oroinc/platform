@@ -1,0 +1,73 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+
+{% oro_title_set({params : {"%entity.name%": entity.name|default('N/A') }}) %}
+
+{% block navButtons %}
+    {% if resource_granted('EDIT', entity) %}
+        {{ UI.editButton({
+            'path' : '',
+            'entity_label': 'oro.dashboard.entity_label'|trans
+        }) }}
+    {% endif %}
+    {% if resource_granted('DELETE', entity) %}
+        {{ UI.deleteButton({
+            'dataUrl': '',
+            'dataRedirect': path('oro_dashboard_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-user',
+            'dataId': entity.id,
+            'entity_label': 'oro.dashboard.entity_label'|trans
+        }) }}
+    {% endif %}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_dashboard_index'),
+        'indexLabel': 'oro.dashboard.entity_plural_label'|trans,
+        'entityTitle': entity.name
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {%- set dashboardInformation -%}
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.dashboard.name.label'|trans, entity.name) }}
+                {{ UI.renderProperty('oro.dashboard.label.label'|trans, entity.label) }}
+
+                {%- set ownerData -%}
+                    {%- if entity.owner -%}
+                        {% if resource_granted('oro_user_user_view') %}
+                            <a href="{{ path('oro_user_view', {'id': entity.owner.id}) }}">
+                                {{ entity.owner|oro_format_name|escape }}
+                            </a>
+                        {% else %}
+                            {{ entity.owner|oro_format_name|escape }}
+                        {% endif %}
+                    {%- endif -%}
+                {%- endset -%}
+                {{ UI.renderHtmlProperty('oro.dashboard.owner.label'|trans, ownerData) }}
+            </div>
+        </div>
+    {%- endset -%}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.dashboard.block.general'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [dashboardInformation]}
+            ]
+        }
+    ] %}
+
+    {% set id = 'dashboardView' %}
+    {% set data = { 'dataBlocks': dataBlocks } %}
+
+    {{ parent() }}
+{% endblock content_data %}
