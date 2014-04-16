@@ -382,20 +382,10 @@ define(function (require) {
                 return;
             }
 
-            var widgetSnapshot = JSON.stringify(widget);
-
             var widgetSetupView = new WidgetSetupView({
                 model: widget,
-                okCloses: false
-            });
-
-            widgetSetupView.on('ok', function () {
-                widget.save();
-            });
-
-            widgetSetupView.on('cancel', function () {
-                widget.set(JSON.parse(widgetSnapshot), { silent: true });
-                widget.trigger('change');
+                okCloses: false,
+                snapshot: JSON.stringify(widget)
             });
 
             widgetSetupView.open();
