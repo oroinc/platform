@@ -86,7 +86,7 @@ define(function (require) {
                 var options, collectionOptions, collection, grid, payload;
 
                 // collection can be stored in the page cache
-                payload = {name: this.metadata.options.name};
+                payload = {name: this.metadata.options.gridName};
                 mediator.trigger('datagrid_collection_set_before', payload);
                 if (payload.collection) {
                     collection = payload.collection;
