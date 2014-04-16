@@ -20,3 +20,6 @@ oro:
             add_to_dashboard: Add
 
         list: List
+
+        dashboards_tab_label: Dashboards
+        dashboards_list_menu_label: Manage dashboards

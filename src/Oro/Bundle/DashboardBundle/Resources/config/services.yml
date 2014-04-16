@@ -8,6 +8,7 @@ parameters:
     oro_dashboard.repository.class:                  Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
     oro_dashboard.dashboard_entity.class:            Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class:     Oro\Bundle\DashboardBundle\Entity\DashboardWidget
+    oro_dashboard.navigation_listener.class:         Oro\Bundle\DashboardBundle\EventListener\NavigationListener
 
 services:
     oro_dashboard.widget_attributes:
@@ -48,6 +49,14 @@ services:
         class: %oro_dashboard.config_provider.class%
         arguments:
             - []
+
+    oro_dashboard.navigation_listener:
+        class: %oro_dashboard.navigation_listener.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_dashboard.manager
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
     oro_dashboard.repository:
         class: %oro_dashboard.repository.class%

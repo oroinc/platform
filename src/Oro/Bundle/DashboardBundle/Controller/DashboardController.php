@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -67,6 +68,19 @@ class DashboardController extends Controller
                 'widgets' => $widgetManager->getAvailableWidgets()
             )
         );
+    }
+
+    /**
+     * todo: Test action remove it after close https://magecore.atlassian.net/browse/BAP-3267
+     *
+     * @Route(
+     *      "/manage-dashboards",
+     *      name="oro_dashboard_management"
+     * )
+     */
+    public function manageAction()
+    {
+        return new Response('works');
     }
 
     /**
