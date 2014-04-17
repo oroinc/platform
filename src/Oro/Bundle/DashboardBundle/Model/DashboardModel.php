@@ -80,6 +80,14 @@ class DashboardModel
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getEntity()->getName();
+    }
+
+    /**
      * Add widget to dashboard
      *
      * @param WidgetModel $widget

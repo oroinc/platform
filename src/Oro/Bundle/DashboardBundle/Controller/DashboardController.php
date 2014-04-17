@@ -13,12 +13,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 
+/**
+ * @Route("/dashboard")
+ */
 class DashboardController extends Controller
 {
     /**
@@ -75,6 +79,8 @@ class DashboardController extends Controller
      *      permission="VIEW",
      *      class="OroDashboardBundle:Dashboard"
      * )
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function openAction($id = null)
     {
@@ -115,13 +121,12 @@ class DashboardController extends Controller
      *      permission="EDIT"
      * )
      *
-     * @ParamConverter("dashboard", options={"id" = "id"})
-     *
      * @Template()
      */
-    public function updateAction(Dashboard $dashboard)
+    public function updateAction($id)
     {
-        return $this->update($dashboard);
+        $dashboardModel = $this->getDashboardManager()->findDashboardModel($id);
+        return $this->update($dashboardModel);
     }
 
     /**
@@ -136,21 +141,26 @@ class DashboardController extends Controller
      */
     public function createAction()
     {
-        return $this->update(new Dashboard());
+        $dashboardModel = $this->getDashboardManager()->createDashboardModel();
+
+        return $this->update($dashboardModel);
     }
 
     /**
-     * @param Dashboard $dashboard
+     * @param DashboardModel $dashboardModel
      * @return mixed
      */
-    protected function update(Dashboard $dashboard)
+    protected function update(DashboardModel $dashboardModel)
     {
-        $form = $this->createForm($this->container->get('oro_dashboard.form.type.edit'), $dashboard, array());
+        $form = $this->createForm(
+            $this->container->get('oro_dashboard.form.type.edit'),
+            $dashboardModel->getEntity(), //todo: remove somehow
+            array()
+        );
         $request = $this->getRequest();
         if ($request->isMethod('POST')) {
-            $form->submit($request);
-            if ($form->isValid()) {
-                $this->getDashboardManager()->save($dashboard);
+            if ($form->submit($request)->isValid()) {
+                $this->getEntityManager()->flush();
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.dashboard.saved_message')
@@ -159,17 +169,17 @@ class DashboardController extends Controller
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     array(
                         'route' => 'oro_dashboard_update',
-                        'parameters' => array('id' => $dashboard->getId()),
+                        'parameters' => array('id' => $dashboardModel->getId()),
                     ),
                     array(
                         'route' => 'oro_dashboard_open',
-                        'parameters' => array('id' => $dashboard->getId(), 'change_dashboard' => true),
+                        'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
                     )
                 );
             }
         }
 
-        return array('entity' => $dashboard, 'form'=> $form->createView());
+        return array('entity' => $dashboardModel, 'form'=> $form->createView());
     }
 
     /**
@@ -267,11 +277,21 @@ class DashboardController extends Controller
         return $this->get('oro_dashboard.manager');
     }
 
+
+
     /**
      * @return DashboardRepository
      */
     protected function getDashboardRepository()
     {
         return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
+    }
+
+    /**
+     * @return OroEntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->container->get('doctrine.orm.entity_manager');
     }
 }
