@@ -71,11 +71,11 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
             return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
         }
 
-        $widget->setExpanded(
+        $widget->getState()->setExpanded(
             $this->getRequest()->get('isExpanded', $widget->isExpanded())
         );
 
-        $widget->setLayoutPosition(
+        $widget->getState()->setLayoutPosition(
             $this->getRequest()->get('layoutPosition', $widget->getLayoutPosition())
         );
 

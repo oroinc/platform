@@ -1,4 +1,5 @@
 parameters:
+    oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
     oro_dashboard.widget_attributes.class:       Oro\Bundle\DashboardBundle\Model\WidgetAttributes
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
@@ -26,6 +27,13 @@ services:
         class: %oro_dashboard.factory.class%
         arguments:
             - @oro_dashboard.config_provider
+            - @oro_dashboard.manager.state
+
+    oro_dashboard.manager.state:
+        class: %oro_dashboard.manager.state.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @security.context
 
     oro_dashboard.config_provider:
         class: %oro_dashboard.config_provider.class%

@@ -57,7 +57,7 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getOwner());
     }
 
-    public function testAddWidgets()
+    public function testAddAndResetWidgets()
     {
         $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $widget->expects($this->once())->method('setDashboard')
@@ -66,6 +66,8 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->dashboard, $this->dashboard->addWidget($widget));
         $this->assertEquals(1, $this->dashboard->getWidgets()->count());
         $this->assertTrue($this->dashboard->getWidgets()->contains($widget));
+        $this->dashboard->resetWidgets();
+        $this->assertEquals(0, $this->dashboard->getWidgets()->count());
     }
 
     public function testHasWidget()

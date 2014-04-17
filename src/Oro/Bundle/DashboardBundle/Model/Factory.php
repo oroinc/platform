@@ -13,11 +13,20 @@ class Factory
     protected $configProvider;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @var StateManager
      */
-    public function __construct(ConfigProvider $configProvider)
-    {
+    protected $stateManager;
+
+    /**
+     * @param ConfigProvider $configProvider
+     * @param StateManager   $stateManager
+     */
+    public function __construct(
+        ConfigProvider $configProvider,
+        StateManager $stateManager
+    ) {
         $this->configProvider = $configProvider;
+        $this->stateManager   = $stateManager;
     }
 
     /**
@@ -29,7 +38,7 @@ class Factory
     public function createDashboardModel(Dashboard $dashboard)
     {
         $dashboardName = $dashboard->getName();
-        if (!empty($dashboardName) && $this->configProvider->hasDashboardConfig($dashboardName)) {
+        if (!empty($dashboardName)) {
             $dashboardConfig = $this->configProvider->getDashboardConfig($dashboardName);
         } else {
             $dashboardConfig = array();
@@ -49,8 +58,9 @@ class Factory
     public function createWidgetModel(Widget $widget)
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
+        $widgetState  = $this->stateManager->getWidgetState($widget);
 
-        return new WidgetModel($widget, $widgetConfig);
+        return new WidgetModel($widget, $widgetConfig, $widgetState);
     }
 
     /**

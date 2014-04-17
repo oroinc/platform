@@ -103,7 +103,7 @@ class Manager
     {
         $result = [];
         foreach ($entities as $entity) {
-            $result[] = $this->factory->createDashboardModel($entity);
+            $result[] = $this->getDashboardModel($entity);
         }
 
         return $result;
@@ -120,7 +120,7 @@ class Manager
 
         $this->entityManager->persist($dashboard);
 
-        return $this->factory->createDashboardModel($dashboard);
+        return $this->getDashboardModel($dashboard);
     }
 
     /**
@@ -138,7 +138,7 @@ class Manager
 
         $this->entityManager->persist($widget);
 
-        return $this->factory->createWidgetModel($widget);
+        return $this->getWidgetModel($widget);
     }
 
     /**
@@ -230,11 +230,11 @@ class Manager
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
             $activeDashboard->setUser($user);
-            $activeDashboard->setDashboard($dashboard->getEntity());
+
             $this->entityManager->persist($activeDashboard);
-        } else {
-            $activeDashboard->setDashboard($dashboard->getEntity());
         }
+
+        $activeDashboard->setDashboard($dashboard->getEntity());
 
         $this->entityManager->flush();
     }
