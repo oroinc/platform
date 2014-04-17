@@ -25,7 +25,7 @@
                             <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
                             <select id="dashboard_selector">
                                 {% for dashboardModel in dashboards %}
-                                    <option value="{{ dashboardModel.dashboard.id }}"{% if dashboardModel.dashboard.id == dashboard.dashboard.id %} selected="selected"{% endif %}>
+                                    <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
                                         {{ dashboardModel.getLabel()|trans }}
                                     </option>
                                 {% endfor %}

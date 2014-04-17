@@ -181,7 +181,7 @@ class Manager
             ->findOneBy(array('user' => $user));
 
         if ($dashboard) {
-            return $this->getDashboardModel($dashboard);
+            return $this->getDashboardModel($dashboard->getDashboard());
         }
 
         return null;
