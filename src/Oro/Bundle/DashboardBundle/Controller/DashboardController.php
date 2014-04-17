@@ -150,14 +150,7 @@ class DashboardController extends Controller
         if ($request->isMethod('POST')) {
             $form->submit($request);
             if ($form->isValid()) {
-                if ($dashboard->getId()) {
-                    $dashboard->setUpdatedAt(new \DateTime());
-                } else {
-                    $dashboard->setCreatedAt(new \DateTime());
-                }
-
-                $this->getDoctrine()->getManager()->persist($dashboard);
-                $this->getDoctrine()->getManager()->flush();
+                $this->getDashboardManager()->save($dashboard);
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.dashboard.saved_message')
