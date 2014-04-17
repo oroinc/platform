@@ -11,7 +11,7 @@ datagrid:
                     - owner.id as ownerId
                     - CONCAT(owner.firstName, CONCAT(' ', owner.lastName)) as ownerName
                 from:
-                    - { table: %oro_dasboard.entity.dashboard.class%, alias: dashboard }
+                    - { table: %oro_dashboard.dashboard_entity.class%, alias: dashboard }
                 join:
                     left:
                         - { join: dashboard.owner, alias: owner }

@@ -39,9 +39,8 @@ class NavigationListener
             return;
         }
 
-        $dashboards = $this->manager->getDashboards();
+        $dashboards = $this->manager->findAllowedDashboards();
         foreach ($dashboards as $dashboard) {
-            $id = $dashboard->getDashboard()->getId();
             $options = array(
                 'label'           => $dashboard->getLabel(),
                 'route'           => 'oro_dashboard_index',
@@ -49,11 +48,11 @@ class NavigationListener
                     'position' => 1
                 ),
                 'routeParameters' => array(
-                    'id'               => $id,
+                    'id'               => $dashboard->getId(),
                     'change_dashboard' => true
                 )
             );
-            $dashboardTab->addChild($id . '_dashboard_menu_item', $options);
+            $dashboardTab->addChild($dashboard->getId() . '_dashboard_menu_item', $options);
         }
 
         $dashboardTab->addChild('divider-' . rand(1, 99999))

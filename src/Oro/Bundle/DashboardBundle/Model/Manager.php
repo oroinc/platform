@@ -4,6 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -26,11 +28,13 @@ class Manager
      *
      * @param Factory $factory
      * @param EntityManager $entityManager
+     * @param AclHelper $aclHelper
      */
-    public function __construct(Factory $factory, EntityManager $entityManager)
+    public function __construct(Factory $factory, EntityManager $entityManager, AclHelper $aclHelper)
     {
         $this->factory = $factory;
         $this->entityManager = $entityManager;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -198,6 +202,16 @@ class Manager
         }
 
         return null;
+    }
+
+    /**
+     * @param string $permission
+     * @return DashboardModel[]
+     */
+    public function findAllowedDashboards($permission = 'VIEW')
+    {
+        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
+        return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
     /**

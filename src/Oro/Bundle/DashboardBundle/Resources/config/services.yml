@@ -5,6 +5,8 @@ parameters:
     oro_dashboard.config_provider.class:         Oro\Bundle\DashboardBundle\Model\ConfigProvider
     oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
+    oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
+    oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
 
 services:
     oro_dashboard.widget_attributes:
@@ -18,6 +20,7 @@ services:
         arguments:
             - @oro_dashboard.factory
             - @doctrine.orm.entity_manager
+            - @oro_security.acl_helper
 
     oro_dashboard.factory:
         class: %oro_dashboard.factory.class%
