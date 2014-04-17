@@ -216,7 +216,7 @@ class WidgetController extends Controller
         $workflowManager = $this->get('oro_workflow.manager');
         $entity = $this->getEntityReference($entityClass, $entityId);
 
-        if ($workflowManager->checkIsWorkflowActiveByEntity($entity)) {
+        if ($workflowManager->isResetAllowed($entity)) {
             $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
             if ($workflowItem) {
                 $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);

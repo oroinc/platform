@@ -166,7 +166,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
 
         $this->workflowManager->expects($this->once())
-            ->method('checkIsWorkflowActiveByEntity')
+            ->method('isResetAllowed')
             ->with($entity)
             ->will($this->returnValue($expected));
 
