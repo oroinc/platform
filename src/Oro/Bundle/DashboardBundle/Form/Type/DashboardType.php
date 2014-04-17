@@ -4,17 +4,28 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DashboardType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('label', 'text', array('required' => true, 'label' => 'oro.dashboard.label'));
-        $builder->add('owner', 'oro_user_select', array('required' => true, 'label' => 'oro.dashboard.owner'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'data_class' => 'Oro\Bundle\DashboardBundle\Entity\Dashboard',
+            ]
+        );
     }
 
     /**
@@ -24,6 +35,6 @@ class DashboardType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_dashboard_edit';
+        return 'oro_dashboard';
     }
 }

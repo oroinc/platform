@@ -10,7 +10,7 @@ oro_menu_config:
             route: 'oro_dashboard_index'
             extras:
                 position: 10
-                routes: ['oro_dashboard_update', 'oro_dashboard_create']
+                routes: ['oro_dashboard_update', 'oro_dashboard_create', 'oro_dashboard_view']
 
     tree:
         application_menu:
