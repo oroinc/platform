@@ -53,6 +53,7 @@ class KnownEmailAddressChecker
      * Check if at least one of the given email addresses is known
      *
      * @param mixed $_ Email address(es) to check
+     *                 Each parameter can be a string or array of strings
      * @return bool
      */
     public function isAtLeastOneKnownEmailAddress($_)
