@@ -11,8 +11,6 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
