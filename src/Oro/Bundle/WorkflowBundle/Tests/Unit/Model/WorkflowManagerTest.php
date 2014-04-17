@@ -88,6 +88,74 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($startTransitions, $this->workflowManager->getStartTransitions($workflow));
     }
 
+    /**
+     * @dataProvider getActiveWorkflowDataProvider
+     */
+    public function testIsResetAllowed($workflowItemDefinition, $activeDefinition, $result)
+    {
+        $entity       = new \DateTime('now');
+        $entityId     = 1;
+        $entityClass  = get_class($entity);
+        $workflowItem = null === $workflowItemDefinition ? null : $this->createWorkflowItem($workflowItemDefinition);
+
+        if (null === $activeDefinition) {
+            $workflow = null;
+        } else {
+            $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+                ->disableOriginalConstructor()
+                ->setMethods(null)
+                ->getMock();
+            $workflow->setName($activeDefinition);
+        }
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->will($this->returnValue($entityClass));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue($entityId));
+
+        $workflowItemsRepository =
+            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+                ->disableOriginalConstructor()
+                ->setMethods(array('findByEntityMetadata'))
+                ->getMock();
+        $workflowItemsRepository->expects($this->once())
+            ->method('findByEntityMetadata')
+            ->with($entityClass, $entityId)
+            ->will($this->returnValue($workflowItem));
+        $this->registry->expects($this->any())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowItem')
+            ->will($this->returnValue($workflowItemsRepository));
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue($workflow));
+
+        $this->assertEquals($result, $this->workflowManager->isResetAllowed($entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function getActiveWorkflowDataProvider()
+    {
+        return array(
+            array('active-workflow', 'active-workflow', true),
+            array('active-workflow', 'current-workflow', false),
+            array(null, 'current-workflow', false),
+            array(null, 'active-workflow', false),
+            array('current-workflow', null, false),
+            array('active-workflow', null, false),
+            array(null, null, false),
+        );
+    }
+
     public function testGetTransitionsByWorkflowItem()
     {
         $workflowName = 'test_workflow';

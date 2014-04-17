@@ -1,4 +1,4 @@
-{% if entity is defined and entity and has_workflow_item(entity) and resource_granted('oro_workflow') %}
+{% if entity is defined and entity and is_workflow_active(entity) and resource_granted('oro_workflow') %}
     <div class="workflow-steps-container">
     {{
         oro_widget_render({
