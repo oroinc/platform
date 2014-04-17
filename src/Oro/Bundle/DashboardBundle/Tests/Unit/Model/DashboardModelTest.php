@@ -175,6 +175,68 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->widgets[1], $this->dashboardModel->getWidgetById($secondWidgetId));
     }
 
+    /**
+     * @dataProvider getOrderedColumnWidgetsDataProvider
+     */
+    public function testGetOrderedColumnWidgets(
+        $column,
+        $appendGreater,
+        $appendLesser,
+        $layoutPositions,
+        $expectedLayoutPositions
+    ) {
+        $this->widgets->clear();
+        foreach ($layoutPositions as $layoutPosition) {
+            $widget = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $widget->expects($this->any())->method('getLayoutPosition')->will($this->returnValue($layoutPosition));
+            $this->widgets->add($widget);
+        }
+
+        $actualLayoutPositions = array();
+        $orderedWidgets = $this->dashboardModel->getOrderedColumnWidgets($column, $appendGreater, $appendLesser);
+        foreach ($orderedWidgets as $widget) {
+            $actualLayoutPositions[] = $widget->getLayoutPosition();
+        }
+
+        $this->assertSame($expectedLayoutPositions, $actualLayoutPositions);
+    }
+
+    public function getOrderedColumnWidgetsDataProvider()
+    {
+        return array(
+            array(
+                'column' => 0,
+                'appendGreater' => true,
+                'appendLesser' => true,
+                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
+                'expectedLayoutPositions' => array(array(2, 0), array(1, 0), array(0, 0), array(0, 1), array(0, 2)),
+            ),
+            array(
+                'column' => 1,
+                'appendGreater' => true,
+                'appendLesser' => false,
+                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
+                'expectedLayoutPositions' => array(array(1, 0), array(2, 0)),
+            ),
+            array(
+                'column' => 1,
+                'appendGreater' => false,
+                'appendLesser' => false,
+                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
+                'expectedLayoutPositions' => array(array(1, 0)),
+            ),
+            array(
+                'column' => 0,
+                'appendGreater' => false,
+                'appendLesser' => false,
+                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
+                'expectedLayoutPositions' => array(array(0, 0), array(0, 1), array(0, 2)),
+            ),
+        );
+    }
+
     public function testHasWidget()
     {
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
