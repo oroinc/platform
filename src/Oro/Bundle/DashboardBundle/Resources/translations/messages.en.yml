@@ -30,8 +30,12 @@ oro:
 
         saved_message: Dashboard saved successfully
 
-        dashboards_tab_label: Dashboards
-        dashboards_list_menu_label: Manage dashboards
+        menu:
+            dashboards_tab:
+                label: Dashboards
+            dashboards_list:
+                label: Manage dashboards
+
         label: Label
         owner: Owner
 

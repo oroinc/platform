@@ -108,7 +108,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
             return $this->handleView($this->view(array(), Codes::HTTP_BAD_REQUEST));
         }
 
-        $this->getDashboardManager()->removeWidgetModel($widget);
+        $this->getDashboardManager()->remove($widget);
         $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
@@ -185,8 +185,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
 
         $widget = $this->getDashboardManager()->createWidgetModel($widgetName);
         $dashboard->addWidget($widget, true);
-
-        $this->getEntityManager()->flush();
+        $this->getDashboardManager()->save($widget);
 
         return $this->handleView($this->view($widget, Codes::HTTP_OK));
     }

@@ -226,10 +226,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\Dashboard'))
             ->will($this->returnValue($dashboardModel));
 
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\Dashboard'));
-
         $this->assertEquals($dashboardModel, $this->manager->createDashboardModel());
     }
 
@@ -255,19 +251,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($widgetModel));
 
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\Widget'));
-
         $this->assertEquals($widgetModel, $this->manager->createWidgetModel($widgetName));
     }
 
-    public function testRemoveWidgetModel()
+    public function testRemove()
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\IEntityModel');
         $widgetModel->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));
@@ -276,24 +266,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('remove')
             ->with($widgetEntity);
 
-        $this->manager->removeWidgetModel($widgetModel);
-    }
-
-    public function testRemoveDashboardModel()
-    {
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $dashboardModel->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($dashboardEntity));
-
-        $this->entityManager->expects($this->once())
-            ->method('remove')
-            ->with($dashboardEntity);
-
-        $this->manager->removeDashboardModel($dashboardModel);
+        $this->manager->remove($widgetModel);
     }
 
     public function testFindUserActiveDashboard()

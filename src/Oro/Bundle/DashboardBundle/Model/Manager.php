@@ -118,8 +118,6 @@ class Manager
     {
         $dashboard = new Dashboard();
 
-        $this->entityManager->persist($dashboard);
-
         return $this->getDashboardModel($dashboard);
     }
 
@@ -136,25 +134,24 @@ class Manager
         $widget->setExpanded(true);
         $widget->setName($widgetName);
 
-        $this->entityManager->persist($widget);
-
         return $this->getWidgetModel($widget);
     }
 
     /**
-     * @param DashboardModel $dashboardModel
+     * @param IEntityModel $entityModel
      */
-    public function removeDashboardModel(DashboardModel $dashboardModel)
+    public function save(IEntityModel $entityModel)
     {
-        $this->entityManager->remove($dashboardModel->getEntity());
+        $this->entityManager->persist($entityModel->getEntity());
+        $this->entityManager->flush($entityModel->getEntity());
     }
 
     /**
-     * @param WidgetModel $widgetModel
+     * @param IEntityModel $entityModel
      */
-    public function removeWidgetModel(WidgetModel $widgetModel)
+    public function remove(IEntityModel $entityModel)
     {
-        $this->entityManager->remove($widgetModel->getEntity());
+        $this->entityManager->remove($entityModel->getEntity());
     }
 
     /**

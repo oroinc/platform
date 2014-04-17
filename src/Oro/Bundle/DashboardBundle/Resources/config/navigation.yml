@@ -1,12 +1,12 @@
 oro_menu_config:
     items:
         dashboard_tab:
-            label: 'oro.dashboard.dashboards_tab_label'
+            label: 'oro.dashboard.menu.dashboards_tab.label'
             uri: '#'
             extras:
                 position: 10
         oro_dashboard_index:
-            label: 'oro.dashboard.dashboards_list_menu_label'
+            label: 'oro.dashboard.menu.dashboards_list.label'
             route: 'oro_dashboard_index'
             extras:
                 position: 10
