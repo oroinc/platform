@@ -19,6 +19,28 @@ use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 class DashboardController extends Controller
 {
     /**
+     * @Route(
+     *      ".{_format}",
+     *      name="oro_dashboard_index",
+     *      requirements={"_format"="html|json"},
+     *      defaults={"_format" = "html"}
+     * )
+     *
+     * @Acl(
+     *      id="oro_dashboard_view",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="VIEW"
+     * )
+     *
+     * @Template
+     */
+    public function indexAction()
+    {
+        return [];
+    }
+
+    /**
      * @param integer $id
      *
      * @Route(
@@ -33,7 +55,7 @@ class DashboardController extends Controller
      *      class="OroDashboardBundle:Dashboard"
      * )
      */
-    public function indexAction($id = null)
+    public function openAction($id = null)
     {
         $changeActive = $this->get('request')->get('change_dashboard', false);
 

@@ -1,0 +1,82 @@
+datagrid:
+    dashboards-grid:
+        source:
+            type: orm
+            acl_resource: oro_dashboard_view
+            query:
+                select:
+                    - dashboard.id
+                    - dashboard.name
+                    - dashboard.label
+                    - owner.id as ownerId
+                    - CONCAT(owner.firstName, CONCAT(' ', owner.lastName)) as ownerName
+                from:
+                    - { table: %oro_dasboard.entity.dashboard.class%, alias: dashboard }
+                join:
+                    left:
+                        - { join: dashboard.owner, alias: owner }
+        columns:
+            name:
+                label: oro.dashboard.name.label
+            label:
+                label: oro.dashboard.label.label
+            ownerName:
+                type: twig
+                label: oro.dashboard.owner.label
+                frontend_type: html
+                template: OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+        sorters:
+            columns:
+                name:
+                    data_name: dashboard.name
+                label:
+                    data_name: dashboard.label
+                ownerName:
+                    data_name: dashboard.ownerName
+            default:
+                dueDate: ASC
+        filters:
+            columns:
+                name:
+                    type:      string
+                    data_name: dashboard.name
+                label:
+                    type:      string
+                    data_name: dashboard.label
+                ownerName:
+                    type:      string
+                    data_name: ownerName
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_dashboard_view
+                params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_dashboard_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_api_delete_dashboard
+                params:     [ id ]
+        actions:
+            view:
+                type:          navigate
+                acl_resource:  oro_dashboard_view
+                label:         View
+                icon:          user
+                link:          view_link
+                rowAction:     true
+            update:
+                type:          navigate
+                acl_resource:  oro_dashboard_edit
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_dashboard_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link

@@ -9,8 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroDashboardBundle implements Migration
 {
     /**
-     * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -19,5 +18,8 @@ class OroDashboardBundle implements Migration
         $table->addColumn('is_default', 'boolean', ['default' => '0']);
         $table->addIndex(['is_default'], 'dashboard_is_default_idx');
 
+		// added fields "createdAt" and "updatedAt"
+        $table->addColumn('createdAt', 'datetime');
+        $table->addColumn('updatedAt', 'datetime', ['notnull' => false]);
     }
 }
