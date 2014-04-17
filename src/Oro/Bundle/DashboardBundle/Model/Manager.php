@@ -223,16 +223,18 @@ class Manager
      */
     public function setUserActiveDashboard(DashboardModel $dashboard, User $user)
     {
-        $activeDashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+        $activeDashboard = $this->entityManager
+            ->getRepository('OroDashboardBundle:ActiveDashboard')
             ->findOneBy(array('user' => $user));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
             $activeDashboard->setUser($user);
+            $activeDashboard->setDashboard($dashboard->getEntity());
             $this->entityManager->persist($activeDashboard);
+        } else {
+            $activeDashboard->setDashboard($dashboard->getEntity());
         }
-
-        $activeDashboard->setDashboard($dashboard->getEntity());
 
         $this->entityManager->flush();
     }

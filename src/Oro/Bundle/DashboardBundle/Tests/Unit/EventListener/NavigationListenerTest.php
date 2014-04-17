@@ -57,8 +57,6 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnNavigationConfigureAddCorrectItems()
     {
-        $this->markTestSkipped();
-
         $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -71,19 +69,15 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $dashboard->expects($this->once())->method('getId')->will($this->returnValue($id));
-        $dashboardModel->expects($this->once())->method('getDashboard')->will($this->returnValue($dashboard));
+        $dashboardModel->expects($this->exactly(2))->method('getId')->will($this->returnValue($id));
         $dashboardModel->expects($this->once())->method('getLabel')->will($this->returnValue($expectedLabel));
 
         $secondDashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
-        $secondDashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $secondDashboard->expects($this->once())->method('getId')->will($this->returnValue($secondId));
-        $secondDashboardModel->expects($this->once())
-            ->method('getDashboard')
-            ->will($this->returnValue($secondDashboard));
+        $secondDashboardModel->expects($this->exactly(2))
+            ->method('getId')
+            ->will($this->returnValue($secondId));
         $secondDashboardModel->expects($this->once())
             ->method('getLabel')
             ->will($this->returnValue($secondExpectedLabel));
@@ -95,7 +89,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $expectedOptions = array(
             'label'           => $expectedLabel,
-            'route'           => 'oro_dashboard_index',
+            'route'           => 'oro_dashboard_open',
             'extras'          => array(
                 'position' => 1
             ),
@@ -106,7 +100,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         );
         $secondExpectedOptions = array(
             'label'           => $secondExpectedLabel,
-            'route'           => 'oro_dashboard_index',
+            'route'           => 'oro_dashboard_open',
             'extras'          => array(
                 'position' => 1
             ),
@@ -134,7 +128,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $menu->expects($this->once())->method('getChild')->will($this->returnValue($item));
         $event->expects($this->once())->method('getMenu')->will($this->returnValue($menu));
         $this->securityFacade->expects($this->once())->method('hasLoggedUser')->will($this->returnValue(true));
-        $this->manager->expects($this->once())->method('getDashboards')->will($this->returnValue($dashboards));
+        $this->manager->expects($this->once())->method('findAllowedDashboards')->will($this->returnValue($dashboards));
 
         $this->navigationListener->onNavigationConfigure($event);
     }

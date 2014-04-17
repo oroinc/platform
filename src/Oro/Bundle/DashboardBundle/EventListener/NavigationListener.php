@@ -42,13 +42,13 @@ class NavigationListener
         $dashboards = $this->manager->findAllowedDashboards();
         foreach ($dashboards as $dashboard) {
             $options = array(
-                'label'           => $dashboard->getLabel(),
-                'route'           => 'oro_dashboard_open',
-                'extras'          => array(
+                'label' => $dashboard->getLabel(),
+                'route' => 'oro_dashboard_open',
+                'extras' => array(
                     'position' => 1
                 ),
                 'routeParameters' => array(
-                    'id'               => $dashboard->getId(),
+                    'id' => $dashboard->getId(),
                     'change_dashboard' => true
                 )
             );
