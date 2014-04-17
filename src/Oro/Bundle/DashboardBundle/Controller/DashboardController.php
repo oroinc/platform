@@ -66,7 +66,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param integer $id
+     * @param Dashboard $dashboard
      *
      * @Route(
      *      "/open/{id}",
@@ -82,15 +82,15 @@ class DashboardController extends Controller
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function openAction($id = null)
+    public function openAction(Dashboard $dashboard = null)
     {
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
         $dashboards = $this->getDashboardManager()->findAllowedDashboards();
-        $currentDashboard = $this->findAllowedDashboard($id);
+        $currentDashboard = $this->findAllowedDashboard($dashboard);
 
         if ($changeActive) {
-            if (!$id) {
+            if (!$dashboard) {
                 throw new BadRequestHttpException();
             }
             $this->getDashboardManager()->setUserActiveDashboard($currentDashboard, $this->getUser());
@@ -123,9 +123,9 @@ class DashboardController extends Controller
      *
      * @Template()
      */
-    public function updateAction($id)
+    public function updateAction(Dashboard $dashboard)
     {
-        $dashboardModel = $this->getDashboardManager()->findDashboardModel($id);
+        $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
         return $this->update($dashboardModel);
     }
 
@@ -241,24 +241,16 @@ class DashboardController extends Controller
     /**
      * Get dashboard with granted permission. If dashboard id is not specified, gets current active or default dashboard
      *
-     * @param integer|null $id
+     * @param Dashboard $dashboard $dashboard
      * @param string $permission
      * @return DashboardModel|null
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    protected function findAllowedDashboard($id = null, $permission = 'VIEW')
+    protected function findAllowedDashboard(Dashboard $dashboard = null, $permission = 'VIEW')
     {
-        if ($id) {
-            $dashboard = $this->getDashboardManager()->findDashboardModel($id);
-            if (!$dashboard) {
-                throw new NotFoundHttpException(sprintf('Dashboard #%s is not found.', $id));
-            }
-            if (!$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())) {
-                throw new AccessDeniedException(
-                    sprintf("Don't have permissions for dashboard #%s", $dashboard->getId())
-                );
-            }
+        if ($dashboard) {
+            $dashboard = $this->getDashboardManager()->getDashboardModel($dashboard);
         } else {
             $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
             if ($dashboard &&

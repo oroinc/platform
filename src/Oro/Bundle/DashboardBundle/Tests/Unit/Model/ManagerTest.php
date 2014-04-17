@@ -254,6 +254,25 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($widgetModel, $this->manager->createWidgetModel($widgetName));
     }
 
+    public function testSave()
+    {
+        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
+        $widgetModel->expects($this->exactly(2))
+            ->method('getEntity')
+            ->will($this->returnValue($widgetEntity));
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($widgetEntity);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->with($widgetEntity);
+
+        $this->manager->save($widgetModel);
+    }
+
     public function testRemove()
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');

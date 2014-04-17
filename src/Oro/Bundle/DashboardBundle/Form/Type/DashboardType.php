@@ -8,7 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DashboardType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
