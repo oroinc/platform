@@ -15,16 +15,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 class ActiveDashboard
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="user_id", type="integer")
-     * @ORM\Id
-     */
-    protected $userId;
-
-    /**
      * @var User
      *
+     * @ORM\Id
      * @ORM\OneToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
@@ -44,7 +37,6 @@ class ActiveDashboard
      */
     public function setUser($user)
     {
-        $this->userId = $user->getId();
         $this->user = $user;
 
         return $this;

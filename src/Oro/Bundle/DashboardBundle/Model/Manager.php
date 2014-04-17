@@ -230,11 +230,11 @@ class Manager
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
             $activeDashboard->setUser($user);
-            $activeDashboard->setDashboard($dashboard->getEntity());
+
             $this->entityManager->persist($activeDashboard);
-        } else {
-            $activeDashboard->setDashboard($dashboard->getEntity());
         }
+
+        $activeDashboard->setDashboard($dashboard->getEntity());
 
         $this->entityManager->flush();
     }

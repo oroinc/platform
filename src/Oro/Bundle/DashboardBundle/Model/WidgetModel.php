@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 
 class WidgetModel
 {
@@ -17,13 +18,20 @@ class WidgetModel
     protected $entity;
 
     /**
-     * @param Widget $widget
-     * @param array $config
+     * @var WidgetState
      */
-    public function __construct(Widget $widget, array $config)
+    protected $state;
+
+    /**
+     * @param Widget      $widget
+     * @param array       $config
+     * @param WidgetState $widgetState
+     */
+    public function __construct(Widget $widget, array $config, WidgetState $widgetState = null)
     {
         $this->entity = $widget;
         $this->config = $config;
+        $this->state  = $widgetState;
     }
 
     /**
@@ -40,6 +48,22 @@ class WidgetModel
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    /**
+     * @return WidgetState
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param WidgetState $state
+     */
+    public function setState(WidgetState $state)
+    {
+        $this->state = $state;
     }
 
     /**
@@ -74,7 +98,10 @@ class WidgetModel
      */
     public function setLayoutPosition(array $layoutPosition)
     {
-        $this->getEntity()->setLayoutPosition($layoutPosition);
+        if ($state = $this->getState()) {
+            $state->setLayoutPosition($layoutPosition);
+        }
+
         return $this;
     }
 
@@ -83,7 +110,9 @@ class WidgetModel
      */
     public function getLayoutPosition()
     {
-        return $this->getEntity()->getLayoutPosition();
+        return $this->getState() ?
+            $this->getState()->getLayoutPosition() :
+            $this->getEntity()->getLayoutPosition();
     }
 
     /**
@@ -92,7 +121,10 @@ class WidgetModel
      */
     public function setExpanded($expanded)
     {
-        $this->getEntity()->setExpanded($expanded);
+        if ($state = $this->getState()) {
+            $state->setExpanded($expanded);
+        }
+
         return $this;
     }
 
@@ -101,6 +133,8 @@ class WidgetModel
      */
     public function isExpanded()
     {
-        return $this->getEntity()->isExpanded();
+        return $this->getState() ?
+            $this->getState()->isExpanded() :
+            $this->getEntity()->isExpanded();
     }
 }
