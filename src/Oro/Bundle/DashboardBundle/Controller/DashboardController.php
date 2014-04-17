@@ -261,7 +261,9 @@ class DashboardController extends Controller
             }
         } else {
             $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
-            if (!$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())) {
+            if ($dashboard &&
+                !$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())
+            ) {
                 $dashboard = null;
             }
         }
