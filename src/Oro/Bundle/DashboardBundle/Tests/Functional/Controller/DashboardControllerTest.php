@@ -67,7 +67,7 @@ class DashboardControllerTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->client->generate(
-                    'oro_dashboard_open',
+                    'oro_dashboard_view',
                     array('id' => $dashboard->getDashboard()->getId())
                 )
             );

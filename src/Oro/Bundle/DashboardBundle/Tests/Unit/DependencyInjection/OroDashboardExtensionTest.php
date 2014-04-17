@@ -94,13 +94,13 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     'dashboards' => array(
                         'main' => array(
-                            'label' => 'oro.dashboard.title.main'
+                            'twig' => 'OroDashboardBundle:Index:default.html.twig'
                         ),
                         'alternative_dashboard' => array(
-                            'label' => 'oro.dashboard.title.alternative_dashboard'
+                            'twig' => 'OroDashboardBundle:Index:default.html.twig'
                         ),
                         'empty_board' => array(
-                            'label' => 'oro.dashboard.title.empty_board'
+                            'twig' => 'OroDashboardBundle:Index:default.html.twig'
                         )
                     ),
                     'default_dashboard' => 'main1'

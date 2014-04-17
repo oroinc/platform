@@ -27,7 +27,7 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      ".{_format}",
+     *      "/index.{_format}",
      *      name="oro_dashboard_index",
      *      requirements={"_format"="html|json"},
      *      defaults={"_format" = "html"}
@@ -48,29 +48,11 @@ class DashboardController extends Controller
     }
 
     /**
-     * @Route(
-     *      "/view/{id}.{_format}",
-     *      name="oro_dashboard_view",
-     *      requirements={"_format"="html|json", "id"="\d+"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @ParamConverter("dashboard", options={"id" = "id"})
-     * @AclAncestor("oro_dashboard_view")
-     * @Template
-     */
-    public function viewAction(Dashboard $dashboard)
-    {
-        return [
-            'entity' => $dashboard
-        ];
-    }
-
-    /**
      * @param integer $id
      *
      * @Route(
-     *      "/open/{id}",
-     *      name="oro_dashboard_open",
+     *      "/view/{id}",
+     *      name="oro_dashboard_view",
      *      defaults={"id" = ""}
      * )
      * @Acl(
@@ -82,7 +64,7 @@ class DashboardController extends Controller
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function openAction($id = null)
+    public function viewAction($id = null)
     {
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
@@ -110,7 +92,7 @@ class DashboardController extends Controller
         );
     }
 
-
+    /**
 
     /**
      * @Route("/dashboard-update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
@@ -172,7 +154,7 @@ class DashboardController extends Controller
                         'parameters' => array('id' => $dashboardModel->getId()),
                     ),
                     array(
-                        'route' => 'oro_dashboard_open',
+                        'route' => 'oro_dashboard_view',
                         'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
                     )
                 );

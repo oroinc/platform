@@ -6,18 +6,17 @@ datagrid:
             query:
                 select:
                     - dashboard.id
-                    - dashboard.name
                     - dashboard.label
                     - owner.id as ownerId
                     - CONCAT(owner.firstName, CONCAT(' ', owner.lastName)) as ownerName
+                    - dashboard.createdAt
+                    - dashboard.updatedAt
                 from:
                     - { table: %oro_dashboard.dashboard_entity.class%, alias: dashboard }
                 join:
                     left:
                         - { join: dashboard.owner, alias: owner }
         columns:
-            name:
-                label: oro.dashboard.name.label
             label:
                 label: oro.dashboard.label.label
             ownerName:
@@ -25,27 +24,38 @@ datagrid:
                 label: oro.dashboard.owner.label
                 frontend_type: html
                 template: OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+            createdAt:
+                label:   oro.dashboard.created_at.label
+                frontend_type: datetime
+            updatedAt:
+                label:   oro.dashboard.updated_at.label
+                frontend_type: datetime
         sorters:
             columns:
-                name:
-                    data_name: dashboard.name
                 label:
                     data_name: dashboard.label
                 ownerName:
                     data_name: dashboard.ownerName
+                createdAt:
+                    data_name: dashboard.createdAt
+                updatedAt:
+                    data_name: dashboard.updatedAt
             default:
                 dueDate: ASC
         filters:
             columns:
-                name:
-                    type:      string
-                    data_name: dashboard.name
                 label:
                     type:      string
                     data_name: dashboard.label
                 ownerName:
                     type:      string
                     data_name: ownerName
+                createdAt:
+                    type:      datetime
+                    data_name: dashboard.createdAt
+                updatedAt:
+                    type:      datetime
+                    data_name: dashboard.updatedAt
         properties:
             id: ~
             view_link:

@@ -45,7 +45,7 @@ class NavigationListener
             foreach ($dashboards as $dashboard) {
                 $options = array(
                     'label' => $dashboard->getLabel(),
-                    'route' => 'oro_dashboard_open',
+                    'route' => 'oro_dashboard_view',
                     'extras' => array(
                         'position' => 1
                     ),

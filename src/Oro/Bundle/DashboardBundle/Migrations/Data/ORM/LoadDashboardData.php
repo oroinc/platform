@@ -4,9 +4,24 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface
+class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -23,6 +38,10 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
         $mainDashboard = $this->createAdminDashboard($manager, 'main');
 
         if ($mainDashboard) {
+            $mainDashboard->setLabel(
+                $this->container->get('translator')->trans('oro.dashboard.title.main')
+            );
+
             $this->addNewWidget($manager, $mainDashboard, 'quick_launchpad')
                 ->setLayoutPosition([0, 10]);
 

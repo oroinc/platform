@@ -1,6 +1,8 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans} }) %}
+
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
-{% oro_title_set({params : {"%name%": 'oro.dashboard.entity_label'|trans }}) %}
 {% set formAction = form.vars.value.id
                     ? path('oro_dashboard_update', { 'id': form.vars.value.id })
                     : path('oro_dashboard_create')  %}

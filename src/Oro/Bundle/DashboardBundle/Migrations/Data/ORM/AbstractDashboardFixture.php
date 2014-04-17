@@ -49,8 +49,9 @@ abstract class AbstractDashboardFixture extends AbstractFixture
     protected function createAdminDashboard(ObjectManager $manager, $dashboardName)
     {
         $result = new Dashboard();
-        $result->setName($dashboardName);
-        $result->setOwner($this->getAdminUser($manager));
+        $result
+            ->setName($dashboardName)
+            ->setOwner($this->getAdminUser($manager));
 
         $manager->persist($result);
 

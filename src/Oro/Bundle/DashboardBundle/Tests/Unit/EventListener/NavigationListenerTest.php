@@ -89,7 +89,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $expectedOptions = array(
             'label'           => $expectedLabel,
-            'route'           => 'oro_dashboard_open',
+            'route'           => 'oro_dashboard_view',
             'extras'          => array(
                 'position' => 1
             ),
@@ -100,7 +100,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         );
         $secondExpectedOptions = array(
             'label'           => $secondExpectedLabel,
-            'route'           => 'oro_dashboard_open',
+            'route'           => 'oro_dashboard_view',
             'extras'          => array(
                 'position' => 1
             ),
