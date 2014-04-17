@@ -28,15 +28,15 @@ class DashboardModel
     protected $entity;
 
     /**
-     * @param Dashboard  $dashboard
+     * @param Dashboard $dashboard
      * @param Collection $widgets
-     * @param array      $config
+     * @param array $config
      */
     public function __construct(Dashboard $dashboard, Collection $widgets, array $config)
     {
+        $this->entity = $dashboard;
         $this->widgets = $widgets;
         $this->config = $config;
-        $this->entity = $dashboard;
     }
 
     /**
@@ -93,13 +93,14 @@ class DashboardModel
      * @param WidgetModel $widget
      * @param bool $calculateLayoutPosition
      */
-    public function addWidget($widget, $calculateLayoutPosition = false)
+    public function addWidget(WidgetModel $widget, $calculateLayoutPosition = false)
     {
         if ($calculateLayoutPosition) {
             $minPosition = $this->getMinLayoutPosition();
             $minPosition[1] = $minPosition[1] - 1;
             $widget->setLayoutPosition($minPosition);
         }
+        $this->widgets->add($widget);
         $this->getEntity()->addWidget($widget->getEntity());
     }
 
@@ -110,7 +111,7 @@ class DashboardModel
      */
     protected function getMinLayoutPosition()
     {
-        $result = array(self::FIRST_COLUMN, 0);
+        $result = array(self::FIRST_COLUMN, 1);
 
         /** @var WidgetModel $currentWidget */
         foreach ($this->getWidgets() as $currentWidget) {

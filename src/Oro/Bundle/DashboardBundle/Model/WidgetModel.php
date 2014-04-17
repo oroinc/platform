@@ -80,7 +80,7 @@ class WidgetModel
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->getEntity()->setName($name);
         return $this;
     }
 
