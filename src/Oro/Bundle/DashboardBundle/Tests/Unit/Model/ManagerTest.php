@@ -456,20 +456,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(array('user' => $user))
             ->will($this->returnValue(null));
 
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with(
-                $this->callback(
-                    function ($activeDashboard) use ($user, $dashboard) {
-                        /** @var ActiveDashboard $activeDashboard */
-                        $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard', $activeDashboard);
-                        $this->assertEquals($user, $activeDashboard->getUser());
-                        $this->assertEquals($dashboard, $activeDashboard->getDashboard());
-                        return true;
-                    }
-                )
-            );
-
+        $this->entityManager->expects($this->once())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
 
         $this->manager->setUserActiveDashboard($dashboardModel, $user);

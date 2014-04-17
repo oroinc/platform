@@ -16,20 +16,34 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected $configProvider;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $stateManager;
+
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
+        $this->configProvider = $this
+            ->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->dashboardFactory = new Factory($this->configProvider);
+        $this->stateManager = $this
+            ->getMockBuilder('Oro\Bundle\DashboardBundle\Model\StateManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->dashboardFactory = new Factory(
+            $this->configProvider,
+            $this->stateManager
+        );
     }
 
     public function testCreateDashboardModel()
     {
-        $expectedConfig  = array('label' => 'test label');
+        $expectedConfig = array('label' => 'test label');
 
-        $name = 'test';
+        $name      = 'test';
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboard->expects($this->once())->method('getName')->will($this->returnValue($name));
 
@@ -45,7 +59,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateDashboardModelWithoutConfig()
     {
-        $expectedConfig  = array();
+        $expectedConfig = array();
 
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboard->expects($this->once())->method('getName')->will($this->returnValue(null));
@@ -61,9 +75,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateWidgetModel()
     {
-        $expectedConfig  = array('label' => 'test label');
+        $expectedConfig = array('label' => 'test label');
 
-        $name = 'test';
+        $name   = 'test';
         $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widget->expects($this->once())->method('getName')->will($this->returnValue($name));
 
@@ -71,6 +85,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getWidgetConfig')
             ->with($name)
             ->will($this->returnValue($expectedConfig));
+
+        $widgetState = $this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
+        $this->stateManager
+            ->expects($this->once())
+            ->method('getWidgetState')
+            ->with($widget)
+            ->will($this->returnValue($widgetState));
 
         $result = $this->dashboardFactory->createWidgetModel($widget);
         $this->assertEquals($expectedConfig, $result->getConfig());

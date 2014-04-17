@@ -27,7 +27,7 @@ class WidgetModel
      * @param array       $config
      * @param WidgetState $widgetState
      */
-    public function __construct(Widget $widget, array $config, WidgetState $widgetState = null)
+    public function __construct(Widget $widget, array $config, WidgetState $widgetState)
     {
         $this->entity = $widget;
         $this->config = $config;
@@ -56,14 +56,6 @@ class WidgetModel
     public function getState()
     {
         return $this->state;
-    }
-
-    /**
-     * @param WidgetState $state
-     */
-    public function setState(WidgetState $state)
-    {
-        $this->state = $state;
     }
 
     /**
@@ -98,9 +90,7 @@ class WidgetModel
      */
     public function setLayoutPosition(array $layoutPosition)
     {
-        if ($state = $this->getState()) {
-            $state->setLayoutPosition($layoutPosition);
-        }
+        $this->getState()->setLayoutPosition($layoutPosition);
 
         return $this;
     }
@@ -110,9 +100,7 @@ class WidgetModel
      */
     public function getLayoutPosition()
     {
-        return $this->getState() ?
-            $this->getState()->getLayoutPosition() :
-            $this->getEntity()->getLayoutPosition();
+        return $this->getState()->getLayoutPosition();
     }
 
     /**
@@ -121,9 +109,7 @@ class WidgetModel
      */
     public function setExpanded($expanded)
     {
-        if ($state = $this->getState()) {
-            $state->setExpanded($expanded);
-        }
+        $this->getState()->setExpanded($expanded);
 
         return $this;
     }
@@ -133,8 +119,6 @@ class WidgetModel
      */
     public function isExpanded()
     {
-        return $this->getState() ?
-            $this->getState()->isExpanded() :
-            $this->getEntity()->isExpanded();
+        return $this->getState()->isExpanded();
     }
 }
