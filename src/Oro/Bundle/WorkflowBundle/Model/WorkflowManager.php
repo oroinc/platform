@@ -110,6 +110,20 @@ class WorkflowManager
     }
 
     /**
+     * Perform reset workflow item data.
+     *
+     * @param WorkflowItem $workflowItem
+     * @throws \Exception
+     */
+    public function resetWorkflowData(WorkflowItem $workflowItem)
+    {
+        $entity = $workflowItem->getEntity();
+
+        $this->getWorkflow($workflowItem)->resetWorkflowData($workflowItem);
+        $this->startWorkflow($this->getApplicableWorkflow($entity)->getName(), $entity);
+    }
+
+    /**
      * @param string $workflow
      * @param object $entity
      * @param string|Transition|null $transition

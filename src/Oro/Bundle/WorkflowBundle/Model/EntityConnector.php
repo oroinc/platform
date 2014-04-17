@@ -113,4 +113,13 @@ class EntityConnector
             && $this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP)
             && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP);
     }
+
+    /**
+     * @param object $entity
+     */
+    public function resetWorkflowData($entity)
+    {
+        $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM, null);
+        $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP, null);
+    }
 }

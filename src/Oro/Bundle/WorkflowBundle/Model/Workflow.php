@@ -277,6 +277,16 @@ class Workflow
     }
 
     /**
+     * Reset workflow item data.
+     *
+     * @param $entity
+     */
+    public function resetWorkflowData($entity)
+    {
+        $this->entityConnector->resetWorkflowData($entity);
+    }
+
+    /**
      * Create workflow item.
      *
      * @param object $entity
