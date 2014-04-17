@@ -36,3 +36,7 @@
 "Step saved.": "Step saved."
 "Copy of": "Copy of"
 "Clone step": "Clone step"
+"Workflow reset": "Workflow reset"
+"Cannot reset workflow item data.": "Cannot reset workflow item data."
+"Workflow data have been successfully resetted": "Workflow data have been successfully resetted"
+"Yes, Reset": "Yes, Reset"

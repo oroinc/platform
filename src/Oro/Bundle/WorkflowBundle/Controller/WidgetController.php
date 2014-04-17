@@ -214,10 +214,10 @@ class WidgetController extends Controller
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $entity = $this->getEntityReference($entityClass, $entityId);
+        $entity          = $this->getEntityReference($entityClass, $entityId);
+        $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
 
         if ($workflowManager->checkIsWorkflowActiveByEntity($entity)) {
-            $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
             if ($workflowItem) {
                 $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
             } else {
@@ -229,6 +229,7 @@ class WidgetController extends Controller
         }
 
         return array(
+            'workflowItem_id' => $workflowItem->getId(),
             'entity_id'       => $entityId,
             'showResetButton' => $showResetButton,
             'transitionsData' => $transitionsData

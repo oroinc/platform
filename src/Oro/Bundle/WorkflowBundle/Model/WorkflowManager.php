@@ -119,7 +119,7 @@ class WorkflowManager
     {
         $entity = $workflowItem->getEntity();
 
-        $this->getWorkflow($workflowItem)->resetWorkflowData($workflowItem);
+        $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
         $this->startWorkflow($this->getApplicableWorkflow($entity)->getName(), $entity);
     }
 
