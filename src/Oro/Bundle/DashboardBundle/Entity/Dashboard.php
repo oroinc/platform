@@ -274,7 +274,7 @@ class Dashboard
      */
     public function prePersist()
     {
-        $this->createdAt = $this->updatedAt = new \DateTime();
+        $this->createdAt = new \DateTime();
     }
 
     /**
@@ -282,6 +282,6 @@ class Dashboard
      */
     public function preUpdate()
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime();
     }
 }
