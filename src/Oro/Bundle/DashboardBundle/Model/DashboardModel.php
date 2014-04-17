@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
-class DashboardModel implements IEntityModel
+class DashboardModel implements EntityModelInterface
 {
     const FIRST_COLUMN = 0;
 

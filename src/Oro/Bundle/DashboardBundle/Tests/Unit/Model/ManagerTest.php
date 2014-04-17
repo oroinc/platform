@@ -257,7 +257,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\IEntityModel');
+        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
         $widgetModel->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));

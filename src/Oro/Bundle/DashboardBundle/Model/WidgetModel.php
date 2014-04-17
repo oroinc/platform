@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 
-class WidgetModel implements IEntityModel
+class WidgetModel implements EntityModelInterface
 {
     /**
      * @var array
