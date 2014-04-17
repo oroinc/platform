@@ -89,6 +89,6 @@ class WorkflowExtension extends \Twig_Extension
      */
     public function isWorkflowActive($entity)
     {
-        return $this->workflowManager->checkIsWorkflowActiveByEntity($entity);
+        return $this->workflowManager->isResetAllowed($entity);
     }
 }

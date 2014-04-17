@@ -217,7 +217,7 @@ class WidgetController extends Controller
         $entity          = $this->getEntityReference($entityClass, $entityId);
         $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
 
-        if ($workflowManager->checkIsWorkflowActiveByEntity($entity)) {
+        if ($workflowManager->isResetAllowed($entity)) {
             if ($workflowItem) {
                 $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
             } else {

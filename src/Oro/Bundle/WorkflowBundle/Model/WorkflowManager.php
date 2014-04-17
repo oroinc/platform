@@ -300,12 +300,13 @@ class WorkflowManager
      * @param object $entity
      * @return bool
      */
-    public function checkIsWorkflowActiveByEntity($entity)
+    public function isResetAllowed($entity)
     {
-        $current = $this->getWorkflowItemByEntity($entity);
-        $active  = $this->getApplicableWorkflow($entity);
+        $currentWorkflowItem = $this->getWorkflowItemByEntity($entity);
+        $activeWorkflow      = $this->getApplicableWorkflow($entity);
 
-        return !empty($active) && !empty($current) && $current->getWorkflowName() === $active->getName();
+        return !empty($activeWorkflow) && !empty($currentWorkflowItem) &&
+                $currentWorkflowItem->getWorkflowName() === $activeWorkflow->getName();
     }
 
     /**

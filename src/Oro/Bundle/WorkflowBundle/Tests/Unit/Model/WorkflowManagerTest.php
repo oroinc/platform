@@ -91,16 +91,22 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getActiveWorkflowDataProvider
      */
-    public function testCheckIsWorkflowActiveByEntity($entity, $entityId, $workflowItemName, $workflowName, $result)
+    public function testIsResetAllowed($workflowItemDefinition, $activeDefinition, $result)
     {
+        $entity       = new \DateTime('now');
+        $entityId     = 1;
         $entityClass  = get_class($entity);
-        $workflowItem = $this->createWorkflowItem($workflowItemName);
+        $workflowItem = null === $workflowItemDefinition ? null : $this->createWorkflowItem($workflowItemDefinition);
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
-        $workflow->setName($workflowName);
+        if (null === $activeDefinition) {
+            $workflow = null;
+        } else {
+            $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+                ->disableOriginalConstructor()
+                ->setMethods(null)
+                ->getMock();
+            $workflow->setName($activeDefinition);
+        }
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
@@ -131,7 +137,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entityClass)
             ->will($this->returnValue($workflow));
 
-        $this->assertEquals($result, $this->workflowManager->checkIsWorkflowActiveByEntity($entity));
+        $this->assertEquals($result, $this->workflowManager->isResetAllowed($entity));
     }
 
     /**
@@ -140,8 +146,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function getActiveWorkflowDataProvider()
     {
         return array(
-            array(new \DateTime('now'), 1, 'active-workflow', 'current-workflow', false),
-            array(new \DateTime('now'), 1, 'active-workflow', 'active-workflow', true),
+            array('active-workflow', 'active-workflow', true),
+            array('active-workflow', 'current-workflow', false),
+            array(null, 'current-workflow', false),
+            array(null, 'active-workflow', false),
+            array('current-workflow', null, false),
+            array('active-workflow', null, false),
+            array(null, null, false),
         );
     }
 
