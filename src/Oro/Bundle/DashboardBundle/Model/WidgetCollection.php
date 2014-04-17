@@ -22,12 +22,12 @@ class WidgetCollection extends AbstractLazyCollection
 
     /**
      * @param Dashboard $dashboard
-     * @param Factory $widgetModelFactory
+     * @param Factory $factory
      */
-    public function __construct(Dashboard $dashboard, Factory $widgetModelFactory)
+    public function __construct(Dashboard $dashboard, Factory $factory)
     {
         $this->dashboard = $dashboard;
-        $this->factory = $widgetModelFactory;
+        $this->factory = $factory;
     }
 
     /**
