@@ -77,8 +77,9 @@ class User extends ExtendUser implements
     FullNameInterface,
     NotificationEmailInterface
 {
-    const ROLE_DEFAULT   = 'ROLE_USER';
-    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_DEFAULT       = 'ROLE_USER';
+    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * @ORM\Id

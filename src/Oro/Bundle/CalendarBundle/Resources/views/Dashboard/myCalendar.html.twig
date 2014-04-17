@@ -26,12 +26,10 @@
         require(['jquery', 'underscore', 'oroui/js/widget-manager'],
         function($, _, widgetManager){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
-                widget.on('renderComplete', function(el) {
-                    widget.getAction('new-event', 'adopted', function(newEventAction) {
-                        newEventAction.on('click', function (e) {
-                            var currentDate = new Date();
-                            $('#{{ calendarId }}').data('calendar').select(currentDate, currentDate);
-                        });
+                widget.getAction('new-event', 'adopted', function(newEventAction) {
+                    newEventAction.on('click', function (e) {
+                        var currentDate = new Date();
+                        $('#{{ calendarId }}').data('calendar').select(currentDate, currentDate);
                     });
                 });
             });
@@ -55,4 +53,3 @@
 
     {{ parent() }}
 {% endblock %}
-
