@@ -295,6 +295,20 @@ class WorkflowManager
     }
 
     /**
+     * Check that entity workflow item is equal to the active workflow item.
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function checkIsWorkflowActiveByEntity($entity)
+    {
+        $current = $this->getWorkflowItemByEntity($entity);
+        $active  = $this->getApplicableWorkflow($entity);
+
+        return !empty($active) && !empty($current) && $current->getWorkflowName() === $active->getName();
+    }
+
+    /**
      * @param ConfigInterface $entityConfig
      */
     protected function persistEntityConfig(ConfigInterface $entityConfig)

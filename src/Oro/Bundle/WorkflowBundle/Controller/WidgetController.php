@@ -41,7 +41,7 @@ class WidgetController extends Controller
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+        $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
 
         $steps = array();
         $currentStep = null;
@@ -209,20 +209,28 @@ class WidgetController extends Controller
      */
     public function buttonsAction($entityClass, $entityId)
     {
+        $showResetButton = false;
+        $transitionsData = array();
+
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $entity = $this->getEntityReference($entityClass, $entityId);
 
-        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
-        if ($workflowItem) {
-            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        if ($workflowManager->checkIsWorkflowActiveByEntity($entity)) {
+            $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+            if ($workflowItem) {
+                $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+            } else {
+                $workflow = $workflowManager->getApplicableWorkflow($entity);
+                $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
+            }
         } else {
-            $workflow = $workflowManager->getApplicableWorkflow($entity);
-            $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
+            $showResetButton = true;
         }
 
         return array(
-            'entity_id' => $entityId,
+            'entity_id'       => $entityId,
+            'showResetButton' => $showResetButton,
             'transitionsData' => $transitionsData
         );
     }
