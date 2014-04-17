@@ -28,61 +28,23 @@ class DashboardControllerTest extends WebTestCase
         $this->client->request('GET', $this->client->generate('oro_dashboard_index'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains('main', $result->getContent());
-    }
-
-    public function testView()
-    {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
-            'dashboards-grid',
-            array(
-                'dashboards-grid[_filter][name][value]' => 'main'
-            )
-        );
-
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
-        $result = reset($result['data']);
-
-        $crawler = $this->client->request(
-            'GET',
-            $this->client->generate('oro_dashboard_view', array('id' => $result['id']))
-        );
-
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains('main', $crawler->html());
-        $this->assertContains('John Doe', $crawler->html());
+        $this->assertContains('Dashboard', $result->getContent());
     }
 
     /**
      * simple test
      */
-    public function testOpen()
+    public function testView()
     {
-        $dashboards = $this->client->getKernel()->getContainer()->get('oro_dashboard.manager')->getDashboards();
-        foreach ($dashboards as $dashboard) {
-            $this->client->request(
-                'GET',
-                $this->client->generate(
-                    'oro_dashboard_view',
-                    array('id' => $dashboard->getDashboard()->getId())
-                )
-            );
-            $result = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-            $this->assertContains(
-                $this->client->getKernel()
-                    ->getContainer()
-                    ->get('translator')
-                    ->trans(
-                        $dashboard->getDashboard()
-                            ->getName()
-                    ),
-                $result->getContent()
-            );
-        }
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_dashboard_view')
+        );
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertContains(
+            'Dashboard',
+            $result->getContent()
+        );
     }
 }

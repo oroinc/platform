@@ -4,15 +4,11 @@ namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
@@ -27,7 +23,7 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/index.{_format}",
+     *      ".{_format}",
      *      name="oro_dashboard_index",
      *      requirements={"_format"="html|json"},
      *      defaults={"_format" = "html"}
@@ -91,8 +87,6 @@ class DashboardController extends Controller
             )
         );
     }
-
-    /**
 
     /**
      * @Route("/update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
