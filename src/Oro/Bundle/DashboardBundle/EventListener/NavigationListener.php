@@ -40,24 +40,27 @@ class NavigationListener
         }
 
         $dashboards = $this->manager->findAllowedDashboards();
-        foreach ($dashboards as $dashboard) {
-            $options = array(
-                'label' => $dashboard->getLabel(),
-                'route' => 'oro_dashboard_open',
-                'extras' => array(
-                    'position' => 1
-                ),
-                'routeParameters' => array(
-                    'id' => $dashboard->getId(),
-                    'change_dashboard' => true
-                )
-            );
-            $dashboardTab->addChild($dashboard->getId() . '_dashboard_menu_item', $options);
-        }
 
-        $dashboardTab->addChild('divider-' . rand(1, 99999))
-            ->setLabel('')
-            ->setAttribute('class', 'divider')
-            ->setExtra('position', 2);
+        if (count($dashboards)>0) {
+            foreach ($dashboards as $dashboard) {
+                $options = array(
+                    'label' => $dashboard->getLabel(),
+                    'route' => 'oro_dashboard_open',
+                    'extras' => array(
+                        'position' => 1
+                    ),
+                    'routeParameters' => array(
+                        'id' => $dashboard->getId(),
+                        'change_dashboard' => true
+                    )
+                );
+                $dashboardTab->addChild($dashboard->getId() . '_dashboard_menu_item', $options);
+            }
+
+            $dashboardTab->addChild('divider-' . rand(1, 99999))
+                ->setLabel('')
+                ->setAttribute('class', 'divider')
+                ->setExtra('position', 2);
+        }
     }
 }

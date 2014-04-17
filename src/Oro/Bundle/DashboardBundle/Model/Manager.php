@@ -139,18 +139,18 @@ class Manager
     }
 
     /**
-     * @param IEntityModel $entityModel
+     * @param EntityModelInterface $entityModel
      */
-    public function save(IEntityModel $entityModel)
+    public function save(EntityModelInterface $entityModel)
     {
         $this->entityManager->persist($entityModel->getEntity());
         $this->entityManager->flush($entityModel->getEntity());
     }
 
     /**
-     * @param IEntityModel $entityModel
+     * @param EntityModelInterface $entityModel
      */
-    public function remove(IEntityModel $entityModel)
+    public function remove(EntityModelInterface $entityModel)
     {
         $this->entityManager->remove($entityModel->getEntity());
     }

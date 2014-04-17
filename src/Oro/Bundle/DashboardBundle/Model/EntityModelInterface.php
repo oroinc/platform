@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-interface IEntityModel
+interface EntityModelInterface
 {
+    /**
+     * @return object
+     */
     public function getEntity();
 }
