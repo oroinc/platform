@@ -113,7 +113,7 @@ class DashboardController extends Controller
 
 
     /**
-     * @Route("/dashboard-update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
+     * @Route("/update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
      * @Acl(
      *      id="oro_dashboard_update",
      *      type="entity",
@@ -130,7 +130,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @Route("/dashboard-create", name="oro_dashboard_create")
+     * @Route("/create", name="oro_dashboard_create")
      * @Acl(
      *      id="oro_dashboard_create",
      *      type="entity",
