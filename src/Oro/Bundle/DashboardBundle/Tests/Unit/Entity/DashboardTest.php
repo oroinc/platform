@@ -109,7 +109,6 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->dashboard->getCreatedAt());
         $this->dashboard->prePersist();
         $this->assertInstanceOf('\DateTime', $this->dashboard->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $this->dashboard->getUpdatedAt());
     }
 
     public function testPreUpdate()
