@@ -29,7 +29,7 @@ class Factory
     public function createDashboardModel(Dashboard $dashboard)
     {
         $dashboardName = $dashboard->getName();
-        if (!empty($dashboardName) && $this->configProvider->hasDashboardConfig($dashboardName)) {
+        if (!empty($dashboardName)) {
             $dashboardConfig = $this->configProvider->getDashboardConfig($dashboardName);
         } else {
             $dashboardConfig = array();
