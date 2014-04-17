@@ -4,11 +4,13 @@ namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 abstract class AbstractEmailSynchronizer
 {
@@ -35,6 +37,11 @@ abstract class AbstractEmailSynchronizer
      * @var EmailAddressManager
      */
     protected $emailAddressManager;
+
+    /**
+     * @var KnownEmailAddressChecker
+     */
+    protected $knownEmailAddressChecker;
 
     /**
      * Constructor
@@ -205,13 +212,14 @@ abstract class AbstractEmailSynchronizer
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
+        $this->ensureKnownEmailAddressCheckerCreated();
         $processor = $this->createSynchronizationProcessor($origin);
 
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
-                $synchronizedAt = $this->getCurrentUtcDateTime();
-                $processor->process($origin);
-                $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $synchronizedAt);
+                $syncStartTime = $this->getCurrentUtcDateTime();
+                $processor->process($origin, $syncStartTime);
+                $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->log->notice('Skip because it is already in process.');
             }
@@ -232,6 +240,20 @@ abstract class AbstractEmailSynchronizer
             );
 
             throw $ex;
+        }
+    }
+
+    /**
+     * Makes sure $this->knownEmailAddressChecker initialized
+     */
+    protected function ensureKnownEmailAddressCheckerCreated()
+    {
+        if (!$this->knownEmailAddressChecker) {
+            $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
+                $this->log,
+                $this->em,
+                $this->emailAddressManager
+            );
         }
     }
 
