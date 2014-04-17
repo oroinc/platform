@@ -51,4 +51,4 @@ services:
     oro_dashboard.form.type.edit:
         class: %oro_dashboard.form.type.edit.class%
         tags:
-            - { name: form.type, alias: "oro_dashboard_edit" }
+            - { name: form.type, alias: "oro_dashboard" }
