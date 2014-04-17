@@ -72,3 +72,4 @@ services:
         arguments: [ %oro_dashboard.dashboard_entity.class% ]
         calls:
             - ['setAclHelper', [@oro_security.acl_helper]]
+            - ['setConfigProvider', [@oro_dashboard.config_provider]]

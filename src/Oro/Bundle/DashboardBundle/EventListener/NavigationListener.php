@@ -44,7 +44,7 @@ class NavigationListener
             $id = $dashboard->getDashboard()->getId();
             $options = array(
                 'label'           => $dashboard->getLabel(),
-                'route'           => 'oro_dashboard_index',
+                'route'           => 'oro_dashboard_open',
                 'extras'          => array(
                     'position' => 1
                 ),

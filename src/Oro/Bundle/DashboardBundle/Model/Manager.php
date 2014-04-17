@@ -5,17 +5,13 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class Manager
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
     /**
      * @var DashboardRepository
      */
@@ -105,11 +101,22 @@ class Manager
             ->findOneBy(array('user' => $user));
 
         if (!$activeDashboard) {
-            $name = $this->configProvider->getConfig('default_dashboard');
-            $dashboard = $this->dashboardRepository->findOneBy(array('name' => $name));
+            $dashboard = $this->dashboardRepository->getDefaultDashboard();
             return $dashboard ? $this->dashboardModelFactory->getDashboardModel($dashboard) : null;
         }
 
         return $this->dashboardModelFactory->getDashboardModel($activeDashboard->getDashboard());
+    }
+
+    public function save(Dashboard $dashboard)
+    {
+        if ($dashboard->getId()) {
+            $dashboard->setUpdatedAt(new \DateTime());
+        } else {
+            $dashboard->setCreatedAt(new \DateTime());
+        }
+
+        $this->entityManager->persist($dashboard);
+        $this->entityManager->flush();
     }
 }
