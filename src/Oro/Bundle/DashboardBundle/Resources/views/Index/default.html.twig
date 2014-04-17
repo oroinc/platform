@@ -1,4 +1,5 @@
 {% extends bap.layout %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
 
 {% block content %}
@@ -59,6 +60,42 @@
                             Add widget
                         </a>
                     {% endif %}
+                    {% set html %}
+                        {% if resource_granted('EDIT', dashboard.entity) %}
+                            {{ UI.dropdownItem({
+                                'path': path('oro_dashboard_update', {id:dashboard.id}),
+                                'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
+                                'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
+                                'iCss': 'icon-edit'
+                            }) }}
+                        {% endif %}
+                        {% if resource_granted('CREATE', dashboard.entity) %}
+                            {{ UI.dropdownItem({
+                                'path': path('oro_dashboard_create', {id:dashboard.id}),
+                                'title': 'oro.dashboard.create_dashboard_link.title'|trans,
+                                'label': 'oro.dashboard.create_dashboard_link.text'|trans,
+                                'iCss': 'icon-plus'
+                            }) }}
+                        {% endif %}
+                        {% if resource_granted('DELETE', dashboard.entity) %}
+                            <li>
+                                {{  UI.deleteLink({
+                                    'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
+                                    'dataRedirect': path('oro_dashboard_index'),
+                                    'aCss': 'no-hash remove-button',
+                                    'id': 'btn-remove-user',
+                                    'dataId': dashboard.id,
+                                    'entity_label': 'oro.dashboard.entity_label'|trans
+                                }) }}
+                            </li>
+                        {% endif %}
+                    {% endset %}
+                    {{ UI.dropdownButton({
+                        'label': 'oro.dashboard.tools_dropdown.label'|trans,
+                        'iCss': 'icon icon-cog',
+                        'aCss': 'pull-right',
+                        'html': html
+                    }) }}
                     {% placeholder dashboard_navButtons_after %}
                 </div>
                 {% endblock titleNavButtons %}

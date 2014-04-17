@@ -34,3 +34,15 @@ oro:
         dashboards_list_menu_label: Manage dashboards
         label: Label
         owner: Owner
+
+        tools_dropdown:
+            label: Tools
+        edit_dashboard_link:
+            title: Edit current dashboard
+            text:  Edit
+        create_dashboard_link:
+            title: Create new dashboard
+            text:  Create
+        delete_dashboard_link:
+            title: Remove current dashboard
+            text:  Delete dashboard
