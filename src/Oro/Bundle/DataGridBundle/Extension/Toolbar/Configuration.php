@@ -30,6 +30,8 @@ class Configuration implements ConfigurationInterface
         $builder->root('toolbarOptions')
             ->children()
                 ->booleanNode('hide')->defaultFalse()->end()
+                ->booleanNode('addResetAction')->defaultTrue()->end()
+                ->booleanNode('addRefreshAction')->defaultTrue()->end()
                 ->arrayNode('pageSize')->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hide')->defaultFalse()->end()

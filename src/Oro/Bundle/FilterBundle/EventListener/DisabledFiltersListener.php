@@ -11,8 +11,9 @@ class DisabledFiltersListener
 
     /**
      * Checks whether 'datagrid-no-filters' parameters exits and if it's equals true
-     * Removes filters node from grid's config.
-     * This might be used when should be possible to display same grid with/with out filters in different places.
+     * Removes filters node and reset button from grid's config.
+     * This might be used when should be possible to display same grid with/with out
+     * filters and reset button in different places.
      *
      * @param BuildBefore $event
      */
@@ -23,6 +24,7 @@ class DisabledFiltersListener
         if (isset($params[self::PARAM_NAME]) && $params[self::PARAM_NAME]) {
             $config = $event->getConfig();
             $config->offsetUnsetByPath(Configuration::FILTERS_PATH);
+            $config->offsetAddToArray('options', ['toolbarOptions' => ['addResetAction' => false]]);
         }
     }
 }
