@@ -5,7 +5,9 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 
 class DashboardSelectType extends AbstractType
 {
@@ -27,7 +29,7 @@ class DashboardSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return 'entity';
     }
 
     /**
@@ -37,24 +39,25 @@ class DashboardSelectType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices' => $this->getDashboardsList(),
+                'class' => 'OroDashboardBundle:Dashboard',
+                'property' => 'label',
+                'choices' => $this->getChoices(),
                 'empty_value' => 'oro.dashboard.start_dashboard.empty_value',
             )
         );
     }
 
     /**
-     * @return array
+     * @return Dashboard
      */
-    protected function getDashboardsList()
+    protected function getChoices()
     {
-        $result = array();
-
-        foreach ($this->manager->findAllowedDashboards() as $dashboardModel) {
-            $result[$dashboardModel->getId()] = $dashboardModel->getLabel();
-        }
-
-        return $result;
+        return array_map(
+            function (DashboardModel $dashboardModel) {
+                return $dashboardModel->getEntity();
+            },
+            $this->manager->findAllowedDashboards()
+        );
     }
 
     /**

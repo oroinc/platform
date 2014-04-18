@@ -140,11 +140,51 @@ class Manager
 
     /**
      * @param EntityModelInterface $entityModel
+     * @param boolean $flush
      */
-    public function save(EntityModelInterface $entityModel)
+    public function save(EntityModelInterface $entityModel, $flush = true)
     {
+        if ($entityModel instanceof DashboardModel && $entityModel->getStartDashboard() && !$entityModel->getId()) {
+            $this->copyWidgets($entityModel, $entityModel->getStartDashboard());
+        }
+
         $this->entityManager->persist($entityModel->getEntity());
-        $this->entityManager->flush($entityModel->getEntity());
+
+        if ($flush) {
+            $this->entityManager->flush($entityModel->getEntity());
+        }
+    }
+
+    /**
+     * Copy widgets from source entity to dashboard model
+     *
+     * @param DashboardModel $target
+     * @param Dashboard $source
+     */
+    protected function copyWidgets(DashboardModel $target, Dashboard $source)
+    {
+        foreach ($source->getWidgets() as $sourceWidget) {
+            $widgetModel = $this->copyWidgetModel($sourceWidget);
+            $this->save($widgetModel, false);
+            $target->addWidget($widgetModel);
+        }
+    }
+
+    /**
+     * Copy widget model by entity
+     *
+     * @param Widget $sourceWidget
+     * @return WidgetModel
+     */
+    protected function copyWidgetModel(Widget $sourceWidget)
+    {
+        $widget = new Widget();
+
+        $widget->setExpanded($sourceWidget->isExpanded());
+        $widget->setLayoutPosition($sourceWidget->getLayoutPosition());
+        $widget->setName($sourceWidget->getName());
+
+        return $this->getWidgetModel($widget);
     }
 
     /**

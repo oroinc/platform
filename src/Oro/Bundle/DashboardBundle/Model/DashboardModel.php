@@ -8,8 +8,6 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
 class DashboardModel implements EntityModelInterface
 {
-    const FIRST_COLUMN = 0;
-
     const DEFAULT_TEMPLATE = 'OroDashboardBundle:Index:default.html.twig';
 
     /**
@@ -88,43 +86,48 @@ class DashboardModel implements EntityModelInterface
     }
 
     /**
+     * @return string
+     */
+    public function getStartDashboard()
+    {
+        return $this->getEntity()->getStartDashboard();
+    }
+
+    /**
      * Add widget to dashboard
      *
      * @param WidgetModel $widget
-     * @param bool $calculateLayoutPosition
+     * @param int|null $layoutColumn
      */
-    public function addWidget(WidgetModel $widget, $calculateLayoutPosition = false)
+    public function addWidget(WidgetModel $widget, $layoutColumn = null)
     {
-        if ($calculateLayoutPosition) {
-            $minPosition = $this->getMinLayoutPosition();
-            $minPosition[1] = $minPosition[1] - 1;
-            $widget->setLayoutPosition($minPosition);
+        if (null !== $layoutColumn) {
+            $widget->setLayoutPosition($this->getMinLayoutPosition($layoutColumn));
         }
         $this->widgets->add($widget);
         $this->getEntity()->addWidget($widget->getEntity());
     }
 
     /**
-     * Get min layout position
+     * Get min layout position in passed column
      *
+     * @param int $column
      * @return array
      */
-    protected function getMinLayoutPosition()
+    protected function getMinLayoutPosition($column)
     {
-        $result = array(self::FIRST_COLUMN, 1);
+        $result = array($column, 1);
 
         /** @var WidgetModel $currentWidget */
         foreach ($this->getWidgets() as $currentWidget) {
             $position = $currentWidget->getLayoutPosition();
 
-            if ($position[0] < $result[0]) {
-                $result = $position;
-            }
-
             if ($position[0] == $result[0] && $position[1] < $result[1]) {
                 $result = $position;
             }
         }
+
+        $result[1] = $result[1] - 1;
 
         return $result;
     }

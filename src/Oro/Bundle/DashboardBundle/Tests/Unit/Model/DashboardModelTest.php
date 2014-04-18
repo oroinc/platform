@@ -82,6 +82,16 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($name, $this->dashboardModel->getName());
     }
 
+    public function testGetStartDashboard()
+    {
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $this->dashboardEntity->expects($this->once())
+            ->method('getStartDashboard')
+            ->will($this->returnValue($dashboard));
+
+        $this->assertEquals($dashboard, $this->dashboardModel->getStartDashboard());
+    }
+
     public function testAddWidget()
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
@@ -104,7 +114,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider addWidgetRecalculatePositionDataProvider
      */
-    public function testAddWidgetRecalculatePosition(array $layoutPositions, array $expectedLayoutPosition)
+    public function testAddWidgetMinColumnPosition(array $layoutPositions, $column, array $expectedLayoutPosition)
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
@@ -129,7 +139,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($layoutPosition));
         }
 
-        $this->dashboardModel->addWidget($widgetModel, true);
+        $this->dashboardModel->addWidget($widgetModel, $column);
         $this->assertEquals($widgetModel, $this->widgets[2]);
 
     }
@@ -142,6 +152,15 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
                     array(0, 50),
                     array(0, 100),
                 ),
+                'column' => 0,
+                'expectedLayoutPosition' => array(0, 0)
+            ),
+            array(
+                'layoutPositions' => array(
+                    array(0, 50),
+                    array(1, 0),
+                ),
+                'column' => 0,
                 'expectedLayoutPosition' => array(0, 0)
             ),
             array(
@@ -149,13 +168,15 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
                     array(1, -100),
                     array(1, 100),
                 ),
-                'expectedLayoutPosition' => array(0, 0)
+                'column' => 1,
+                'expectedLayoutPosition' => array(1, -101)
             ),
             array(
                 'layoutPositions' => array(
                     array(0, -100),
                     array(0, 100),
                 ),
+                'column' => 0,
                 'expectedLayoutPosition' => array(0, -101)
             ),
         );
