@@ -27,11 +27,11 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /**
      * Constructor
      *
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailAddressManager $emailAddressManager
+     * @param EntityManager        $em
+     * @param EmailEntityBuilder   $emailEntityBuilder
+     * @param EmailAddressManager  $emailAddressManager
      * @param ImapConnectorFactory $connectorFactory
-     * @param Mcrypt $encryptor
+     * @param Mcrypt               $encryptor
      */
     public function __construct(
         EntityManager $em,
@@ -42,7 +42,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     ) {
         parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
         $this->connectorFactory = $connectorFactory;
-        $this->encryptor = $encryptor;
+        $this->encryptor        = $encryptor;
     }
 
     /**
@@ -82,6 +82,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             $this->em,
             $this->emailEntityBuilder,
             $this->emailAddressManager,
+            $this->knownEmailAddressChecker,
             new ImapEmailManager($this->connectorFactory->createImapConnector($config))
         );
     }
