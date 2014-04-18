@@ -796,4 +796,28 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowManager->deactivateWorkflow($entityClass);
     }
+
+    public function testResetWorkflowData()
+    {
+        $name = 'testWorkflow';
+        $entityClass = 'Test:Entity';
+
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition->setName($name)->setRelatedEntity($entityClass);
+
+        $workflowItemsRepository =
+            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+                ->disableOriginalConstructor()
+                ->setMethods(array('resetWorkflowData'))
+                ->getMock();
+        $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
+            ->with($entityClass, array($name));
+
+        $this->registry->expects($this->any())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowItem')
+            ->will($this->returnValue($workflowItemsRepository));
+
+        $this->workflowManager->resetWorkflowData($workflowDefinition);
+    }
 }

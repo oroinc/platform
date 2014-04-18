@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
@@ -276,13 +277,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
         $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
         $this->assertEquals($configuration['label'], $actualTransition->getLabel(), 'Incorrect label');
-        if (array_key_exists('display_type', $configuration)) {
-            $this->assertEquals(
-                $configuration['display_type'],
-                $actualTransition->getDisplayType(),
-                'Incorrect display type'
-            );
+
+        $expectedDisplayType = WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
+        if (isset($configuration['display_type'])) {
+            $expectedDisplayType = $configuration['display_type'];
         }
+        $this->assertEquals($expectedDisplayType, $actualTransition->getDisplayType(), 'Incorrect display type');
+
         $this->assertEquals(
             $configuration['frontend_options'],
             $actualTransition->getFrontendOptions(),

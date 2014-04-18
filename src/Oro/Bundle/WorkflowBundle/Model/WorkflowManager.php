@@ -230,10 +230,7 @@ class WorkflowManager
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
 
-        /** @var WorkflowItemRepository $workflowItemsRepository */
-        $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
-
-        return $workflowItemsRepository->findByEntityMetadata($entityClass, $entityIdentifier);
+        return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**
@@ -286,6 +283,17 @@ class WorkflowManager
     }
 
     /**
+     * @param WorkflowDefinition $workflowDefinition
+     */
+    public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
+    {
+        $this->getWorkflowItemRepository()->resetWorkflowData(
+            $workflowDefinition->getRelatedEntity(),
+            array($workflowDefinition->getName())
+        );
+    }
+
+    /**
      * @param string $entityClass
      * @param string|null $workflowName
      */
@@ -333,5 +341,13 @@ class WorkflowManager
     {
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
+    }
+
+    /**
+     * @return WorkflowItemRepository
+     */
+    protected function getWorkflowItemRepository()
+    {
+        return $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
     }
 }

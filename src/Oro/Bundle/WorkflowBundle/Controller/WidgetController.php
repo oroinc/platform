@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,6 +22,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
 /**
  * @Route("/workflowwidget")
@@ -279,24 +278,56 @@ class WidgetController extends Controller
         $transitionsData = array();
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
+
         $transitions = $workflowManager->getStartTransitions($workflow);
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
-                $errors = new ArrayCollection();
-                $isAllowed = $workflowManager
-                    ->isStartTransitionAvailable($workflow, $transition, $entity, array(), $errors);
-                if ($isAllowed || !$transition->isUnavailableHidden()) {
-                    $transitionsData[] = array(
-                        'workflow' => $workflowManager->getWorkflow($workflow),
-                        'transition' => $transition,
-                        'isAllowed' => $isAllowed,
-                        'errors' => $errors
-                    );
+                $transitionData = $this->getStartTransitionData($workflow, $transition, $entity);
+                if ($transitionData !== null) {
+                    $transitionsData[] = $transitionData;
                 }
             }
         }
+
+        // extra case to show start transition
+        if (empty($transitionsData) && $workflow->getDefinition()->getStartStep()) {
+            $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
+            if ($defaultStartTransition) {
+                $startTransitionData = $this->getStartTransitionData($workflow, $defaultStartTransition, $entity);
+                if ($startTransitionData !== null) {
+                    $transitionsData[] = $startTransitionData;
+                }
+            }
+        }
+
         return $transitionsData;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param Transition $transition
+     * @param object $entity
+     * @return array|null
+     */
+    protected function getStartTransitionData(Workflow $workflow, Transition $transition, $entity)
+    {
+        /** @var WorkflowManager $workflowManager */
+        $workflowManager = $this->get('oro_workflow.manager');
+
+        $errors = new ArrayCollection();
+        $isAllowed = $workflowManager
+            ->isStartTransitionAvailable($workflow, $transition, $entity, array(), $errors);
+        if ($isAllowed || !$transition->isUnavailableHidden()) {
+            return array(
+                'workflow' => $workflowManager->getWorkflow($workflow),
+                'transition' => $transition,
+                'isAllowed' => $isAllowed,
+                'errors' => $errors
+            );
+        }
+
+        return null;
     }
 
     /**
