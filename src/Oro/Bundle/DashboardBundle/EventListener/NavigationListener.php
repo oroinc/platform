@@ -54,12 +54,17 @@ class NavigationListener
                         'change_dashboard' => true
                     )
                 );
-                $dashboardTab->addChild($dashboard->getId() . '_dashboard_menu_item', $options);
+                $dashboardTab
+                    ->addChild(
+                        $dashboard->getId() . '_dashboard_menu_item',
+                        $options
+                    )
+                    ->setAttribute('data-menu', $dashboard->getId());
             }
 
             $dashboardTab->addChild('divider-' . rand(1, 99999))
                 ->setLabel('')
-                ->setAttribute('class', 'divider')
+                ->setAttribute('class', 'divider menu-divider')
                 ->setExtra('position', 2);
         }
     }

@@ -10,3 +10,20 @@
         }) }}
     {% endif %}
 {% endblock %}
+
+{% block content %}
+    {{ parent() }}
+    <script type="text/javascript">
+        require(
+            ['jquery', 'oroui/js/mediator'],
+            function ($, mediator) {
+                mediator.on('datagrid:removeRow:{{ gridName }}', function(model){
+                    $('[data-menu="' + model.get('id') + '"]').remove();
+                    if (!$('[data-menu]').length) {
+                        $('.menu-divider').remove();
+                    }
+                });
+            }
+        );
+    </script>
+{% endblock %}
