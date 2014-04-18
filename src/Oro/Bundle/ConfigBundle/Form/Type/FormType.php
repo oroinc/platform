@@ -24,6 +24,13 @@ class FormType extends AbstractType
     {
         parent::buildForm($builder, $options);
         $builder->addEventSubscriber($this->subscriber);
+
+        $blockConfig = array_shift($options['block_config']);
+        $configurator = empty($blockConfig['configurator']) ? false : $blockConfig['configurator'];
+
+        if (is_callable($configurator)) {
+            call_user_func_array($configurator, [$builder, $options]);
+        }
     }
 
     /**
