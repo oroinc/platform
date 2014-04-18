@@ -47,7 +47,7 @@
   }
 
   .dashboard-widget.editable {
-    > .title {
+    .sortable {
       cursor: move;
     }
 
@@ -66,6 +66,11 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+    
+    .actions-container {
+      position: relative;
+      top: -32px;
+    }
 
     .default-actions-container {
       display: none;
