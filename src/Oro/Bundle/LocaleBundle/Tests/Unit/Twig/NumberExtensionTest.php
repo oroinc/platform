@@ -26,18 +26,21 @@ class NumberExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFuntions()
     {
-        $filters = $this->extension->getFunctions();
+        $functions = $this->extension->getFunctions();
 
-        $this->assertCount(3, $filters);
+        $this->assertCount(4, $functions);
 
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[0]);
-        $this->assertEquals('oro_locale_number_attribute', $filters[0]->getName());
+        $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
+        $this->assertEquals('oro_locale_number_attribute', $functions[0]->getName());
 
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[1]);
-        $this->assertEquals('oro_locale_number_text_attribute', $filters[1]->getName());
+        $this->assertInstanceOf('Twig_SimpleFunction', $functions[1]);
+        $this->assertEquals('oro_locale_number_text_attribute', $functions[1]->getName());
 
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[2]);
-        $this->assertEquals('oro_locale_number_symbol', $filters[2]->getName());
+        $this->assertInstanceOf('Twig_SimpleFunction', $functions[2]);
+        $this->assertEquals('oro_locale_number_symbol', $functions[2]->getName());
+
+        $this->assertInstanceOf('Twig_SimpleFunction', $functions[3]);
+        $this->assertEquals('oro_currency_symbol_prepend', $functions[3]->getName());
 
     }
 

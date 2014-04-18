@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class RoleRepository extends EntityRepository
 {
@@ -39,5 +40,19 @@ class RoleRepository extends EntityRepository
             ->getArrayResult();
 
         return !empty($findResult);
+    }
+
+    /**
+     * @param Role $role
+     * @return User
+     */
+    public function getFirstMatchedUser(Role $role)
+    {
+        return $this
+            ->getUserQueryBuilder($role)
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

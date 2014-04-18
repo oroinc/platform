@@ -3,7 +3,10 @@
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
+
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class SetupStep extends AbstractStep
 {
@@ -26,7 +29,17 @@ class SetupStep extends AbstractStep
 
     public function forwardAction(ProcessContextInterface $context)
     {
+        $adminUser = $this
+            ->getDoctrine()
+            ->getRepository('OroUserBundle:User')
+            ->findOneBy(array('username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME));
+
+        if (!$adminUser) {
+            throw new \RuntimeException("Admin user wasn't loaded in fixtures.");
+        }
+
         $form = $this->createForm('oro_installer_setup');
+        $form->setData($adminUser);
 
         $form->handleRequest($this->getRequest());
 
@@ -37,24 +50,7 @@ class SetupStep extends AbstractStep
                 $form->has('loadFixtures') && $form->get('loadFixtures')->getData()
             );
 
-            $user = $form->getData();
-            $role = $this
-                ->getDoctrine()
-                ->getRepository('OroUserBundle:Role')
-                ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-
-            $businessUnit = $this
-                ->getDoctrine()
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->findOneBy(array('name' => 'Main'));
-
-            $user
-                ->setEnabled(true)
-                ->setOwner($businessUnit)
-                ->addBusinessUnit($businessUnit)
-                ->addRole($role);
-
-            $this->get('oro_user.manager')->updateUser($user);
+            $this->get('oro_user.manager')->updateUser($adminUser);
 
             // update company name and title if specified
             /** @var ConfigManager $configManager */
