@@ -60,13 +60,8 @@ class ConfigurationType extends AbstractType
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new ImapEmailOrigin();
                         $event->getForm()->setData($newConfiguration);
-
-                        // deactivate old one
-                        $entity->setIsActive(false);
                     }
                 } elseif ($entity instanceof ImapEmailOrigin) {
-                    // deactivate old one
-                    $entity->setIsActive(false);
                     $event->getForm()->setData(null);
                 }
             }
