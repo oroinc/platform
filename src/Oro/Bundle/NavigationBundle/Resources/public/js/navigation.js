@@ -539,6 +539,8 @@ define(function (require) {
             var entryPoint = window.location.pathname;
             if (entryPoint.indexOf('.php') !== -1) {
                 entryPoint = entryPoint.substr(0, entryPoint.indexOf('.php') + 4);
+            } else {
+                entryPoint = '';
             }
             if(debugBarToken) {
                 var url = entryPoint + '/_wdt/' + debugBarToken;
