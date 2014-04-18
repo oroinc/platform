@@ -162,7 +162,11 @@
         {% endfor %}
         <div class="empty-text">
             <div class="widget-placeholder">
-                {{ 'oro.dashboard.empty_column_message'|trans|raw }}
+                {% if options.allowEdit %}
+                    {{ 'oro.dashboard.empty_column_message.allowed'|trans|raw }}
+                {% else %}
+                    {{ 'oro.dashboard.empty_column_message.denied'|trans }}
+                {% endif %}
             </div>
         </div>
     </div>
