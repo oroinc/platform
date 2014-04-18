@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
@@ -35,7 +36,6 @@ class DashboardController extends Controller
      *      class="OroDashboardBundle:Dashboard",
      *      permission="VIEW"
      * )
-     *
      * @Template
      */
     public function indexAction()
@@ -51,13 +51,7 @@ class DashboardController extends Controller
      *      name="oro_dashboard_view",
      *      defaults={"id" = ""}
      * )
-     * @Acl(
-     *      id="oro_dashboard_view",
-     *      type="entity",
-     *      permission="VIEW",
-     *      class="OroDashboardBundle:Dashboard"
-     * )
-     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @AclAncestor("oro_dashboard_view")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Dashboard $dashboard = null)
@@ -67,10 +61,7 @@ class DashboardController extends Controller
         $dashboards = $this->getDashboardManager()->findAllowedDashboards();
         $currentDashboard = $this->findAllowedDashboard($dashboard);
 
-        if ($changeActive) {
-            if (!$dashboard) {
-                throw new BadRequestHttpException();
-            }
+        if ($changeActive && $dashboard) {
             $this->getDashboardManager()->setUserActiveDashboard($currentDashboard, $this->getUser());
         }
 
@@ -220,8 +211,6 @@ class DashboardController extends Controller
      * @param Dashboard $dashboard $dashboard
      * @param string $permission
      * @return DashboardModel|null
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function findAllowedDashboard(Dashboard $dashboard = null, $permission = 'VIEW')
     {
@@ -247,8 +236,6 @@ class DashboardController extends Controller
         return $this->get('oro_dashboard.manager');
     }
 
-
-
     /**
      * @return DashboardRepository
      */
@@ -258,7 +245,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return OroEntityManager
+     * @return EntityManager
      */
     protected function getEntityManager()
     {
