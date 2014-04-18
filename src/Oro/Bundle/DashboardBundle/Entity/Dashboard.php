@@ -93,6 +93,12 @@ class Dashboard
      */
     protected $updatedAt;
 
+    /**
+     * @var Dashboard
+     */
+    protected $startFrom;
+
+
     public function __construct()
     {
         $this->widgets = new ArrayCollection();
@@ -267,6 +273,22 @@ class Dashboard
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * @param Dashboard $startFrom
+     */
+    public function setStartFrom($startFrom)
+    {
+        $this->startFrom = $startFrom;
+    }
+
+    /**
+     * @return Dashboard
+     */
+    public function getStartFrom()
+    {
+        return $this->startFrom;
     }
 
     /**

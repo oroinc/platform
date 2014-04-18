@@ -3,6 +3,9 @@ oro:
         entity_label: Dashboard
         entity_plural_label: Dashboards
 
+        form:
+            start_from: Empty Dashboard
+
         title:
             main: Dashboard
             quick_launchpad: Quick Launchpad
@@ -16,6 +19,7 @@ oro:
         owner.label: Owner
         created_at.label: Created At
         updated_at.label: Updated At
+        start_from: Start from
 
         quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
 

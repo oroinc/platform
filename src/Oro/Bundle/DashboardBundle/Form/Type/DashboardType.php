@@ -13,6 +13,11 @@ class DashboardType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add(
+            'startFrom',
+            'oro_select_dashboard',
+            array('required' => false, 'label' => 'oro.dashboard.start_from')
+        );
         $builder->add('label', 'text', array('required' => true, 'label' => 'oro.dashboard.label'));
     }
 
@@ -21,11 +26,7 @@ class DashboardType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'data_class' => 'Oro\Bundle\DashboardBundle\Entity\Dashboard',
-            ]
-        );
+        $resolver->setDefaults(array('data_class' => 'Oro\Bundle\DashboardBundle\Entity\Dashboard'));
     }
 
     /**

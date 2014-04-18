@@ -2,19 +2,44 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DashboardSelectType
+use Oro\Bundle\DashboardBundle\Model\Manager;
+
+class DashboardSelectType extends AbstractType
 {
+
+    /**
+     * @var Manager
+     */
+    protected $manager;
+
+    /**
+     * @param Manager $manager
+     */
+    public function __construct(Manager $manager)
+    {
+        $this->manager = $manager;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDashboardsList()
+    {
+        $choices = array();
+
+        foreach ($this->manager->findAllowedDashboards() as $dashboardModel) {
+            $choices[$dashboardModel->getId()] = $dashboardModel->getLabel();
+        }
+
+        return $choices;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('label', 'text', array('required' => true, 'label' => 'oro.dashboard.label'));
-    }
-
     public function getParent()
     {
         return 'choice';
@@ -26,16 +51,15 @@ class DashboardSelectType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            [
-                'data_class' => 'Oro\Bundle\DashboardBundle\Entity\Dashboard',
-            ]
+            array(
+                'choices' => $this->getDashboardsList(),
+                'empty_value' => 'oro.dashboard.form.start_from',
+            )
         );
     }
 
     /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
+     * {@inheritdoc}
      */
     public function getName()
     {
