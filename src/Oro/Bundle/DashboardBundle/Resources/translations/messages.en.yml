@@ -27,7 +27,9 @@ oro:
 
         no_one_available: You have no dashboards available
 
-        empty_column_message: Drag your widgets here or <a class="dashboard-widgets-add" href="#">add a new widget</a>.
+        empty_column_message:
+            allowed: Drag your widgets here or <a class="dashboard-widgets-add" href="#">add a new widget</a>.
+            denied: No available widgets
 
         add_dashboard_widgets:
             add_to_dashboard: Add

@@ -55,25 +55,35 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
             contentContainer: '.row-fluid',
             contentClasses: [],
             allowEdit: false,
-            template: _.template('<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
-                '<div class="title">' +
-                    '<div class="pull-left collapse-expand-action-container">' +
-                        '<a class="collapse-action" href="#"><i class="icon-collapse-alt hide-text"></i></a>' +
-                        '<a class="expand-action" href="#"><i class="icon-expand-alt hide-text"></i></a>' +
+            template: _.template(
+                '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
+                    '<div class="pull-left actions-container collapse-expand-action-container">' +
+                        '<a class="collapse-action" href="#" title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
+                            '<i class="icon-collapse-alt hide-text"></i>' +
+                        '</a>' +
+                        '<a class="expand-action" href="#" title="<%- _.__(\'oro.dashboard.widget.expand\') %>">' +
+                            '<i class="icon-expand-alt hide-text"></i>' +
+                        '</a>' +
                     '</div>' +
-                    '<span class="widget-title"><%- title %></span>' +
-                    '<div class="pull-right default-actions-container">' +
-                        '<span class="action-wrapper">' +
-                            '<a class="move-action" href="#"><i class="icon-move hide-text"></i></a>' +
+                    '<div class="title sortable">' +
+                        '<span class="widget-title"><%- title %></span>' +
+                    '</div>' +
+                    '<div class="pull-right actions-container default-actions-container">' +
+                        '<span class="action-wrapper sortable">' +
+                            '<a class="move-action" href="#" title="<%- _.__(\'oro.dashboard.widget.move\') %>">' +
+                                '<i class="icon-move hide-text"></i>' +
+                            '</a>' +
                         '</span>' +
                         '<span class="action-wrapper">' +
-                            '<a class="remove-action" href="#"><i class="icon-trash hide-text"></i></a>' +
+                            '<a class="remove-action" href="#" title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
+                                '<i class="icon-trash hide-text"></i>' +
+                            '</a>' +
                         '</span>' +
                     '</div>' +
-                    '<div class="pull-right widget-actions-container"></div>' +
-                '</div>' +
-                '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
-            '</div>')
+                    '<div class="pull-right actions-container widget-actions-container"></div>' +
+                    '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
+                '</div>'
+            )
         }),
 
         /**
@@ -92,8 +102,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          * @param {Object} options
          */
         initializeWidget: function(options) {
-            BlockWidget.prototype.initializeWidget.apply(this, arguments);
             this._initState(options);
+            BlockWidget.prototype.initializeWidget.apply(this, arguments);
         },
 
         /**

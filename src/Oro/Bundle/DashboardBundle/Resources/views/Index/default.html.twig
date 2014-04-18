@@ -5,7 +5,7 @@
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
 {% set allowEdit = resource_granted('EDIT', dashboard.entity) %}
-<div class="layout-content dashboard-contailer">
+<div class="layout-content dashboard-container-wrapper">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
@@ -206,7 +206,11 @@
         {% endfor %}
         <div class="empty-text">
             <div class="widget-placeholder">
-                {{ 'oro.dashboard.empty_column_message'|trans|raw }}
+                {% if options.allowEdit %}
+                    {{ 'oro.dashboard.empty_column_message.allowed'|trans|raw }}
+                {% else %}
+                    {{ 'oro.dashboard.empty_column_message.denied'|trans }}
+                {% endif %}
             </div>
         </div>
     </div>

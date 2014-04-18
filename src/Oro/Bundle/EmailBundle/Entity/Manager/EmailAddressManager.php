@@ -59,7 +59,7 @@ class EmailAddressManager
      *
      * @return string
      */
-    protected function getEmailAddressProxyClass()
+    public function getEmailAddressProxyClass()
     {
         return sprintf('%s\%s', $this->entityCacheNamespace, sprintf($this->entityProxyNameTemplate, 'EmailAddress'));
     }

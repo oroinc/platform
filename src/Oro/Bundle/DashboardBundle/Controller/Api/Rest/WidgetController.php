@@ -176,6 +176,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     {
         $dashboardId = $this->getRequest()->get('dashboardId');
         $widgetName = $this->getRequest()->get('widgetName');
+        $targetColumn = (int)$this->getRequest()->get('targetColumn', 0);
 
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
@@ -184,7 +185,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
         }
 
         $widget = $this->getDashboardManager()->createWidgetModel($widgetName);
-        $dashboard->addWidget($widget, true);
+        $dashboard->addWidget($widget, true, $targetColumn);
         $this->getDashboardManager()->save($widget);
 
         return $this->handleView($this->view($widget, Codes::HTTP_OK));
