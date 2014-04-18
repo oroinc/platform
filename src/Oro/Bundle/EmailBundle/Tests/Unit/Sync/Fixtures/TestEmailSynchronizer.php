@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
@@ -18,9 +19,11 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
     public function __construct(
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager
+        EmailAddressManager $emailAddressManager,
+        KnownEmailAddressChecker $knownEmailAddressChecker
     ) {
         parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
+        $this->knownEmailAddressChecker = $knownEmailAddressChecker;
     }
 
     public function supports(EmailOrigin $origin)
@@ -39,7 +42,8 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
             $this->log,
             $this->em,
             $this->emailEntityBuilder,
-            $this->emailAddressManager
+            $this->emailAddressManager,
+            $this->knownEmailAddressChecker
         );
     }
 
