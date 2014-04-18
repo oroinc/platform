@@ -18,7 +18,8 @@ class DisabledFiltersListenerTest extends \PHPUnit_Framework_TestCase
     /** @var array */
     protected $testConfigWithOutFilters = [
         'query'   => ['someQueryData'],
-        'sorters' => 'someSortersData'
+        'sorters' => 'someSortersData',
+        'options' => ['toolbarOptions'=>['addResetAction'=>false]],
     ];
 
     /** @var DisabledFiltersListener */
