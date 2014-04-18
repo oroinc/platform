@@ -226,7 +226,7 @@ class WorkflowController extends FOSRestController
      */
     public function deleteAction(WorkflowItem $workflowItem)
     {
-        $this->get('oro_workflow.manager')->resetWorkflowData($workflowItem);
+        $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 

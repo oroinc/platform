@@ -115,7 +115,7 @@ class WorkflowManager
      * @param WorkflowItem $workflowItem
      * @throws \Exception
      */
-    public function resetWorkflowData(WorkflowItem $workflowItem)
+    public function resetWorkflowItem(WorkflowItem $workflowItem)
     {
         $entity = $workflowItem->getEntity();
 
