@@ -26,7 +26,7 @@ class ActiveDashboard
     /**
      * @var Dashboard
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\DashboardBundle\Entity\Dashboard")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\DashboardBundle\Entity\Dashboard")
      * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;

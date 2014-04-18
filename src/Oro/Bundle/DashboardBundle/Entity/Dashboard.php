@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * Dashboard
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository")
- * @ORM\Table(name="oro_dashboard")
+ * @ORM\Table(name="oro_dashboard", indexes={@ORM\Index(name="dashboard_is_default_idx", columns={"is_default"})})
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *  defaultValues={

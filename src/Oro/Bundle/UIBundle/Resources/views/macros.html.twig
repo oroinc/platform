@@ -145,16 +145,16 @@
     {% endif %}
     {% spaceless %}
     <a href="{{ parameters.path }}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {% if parameters.data is defined %}
-                {% for dataItemName,dataItemValue in parameters.data %}
-                    data-{{ dataItemName }}="{{ dataItemValue|raw }}"
-                {% endfor %}
-            {% endif %}
+        {% if (parameters.id is defined) %}
+            id="{{ parameters.id }}"
+        {% endif %}
+        {% if parameters.data is defined %}
+            {% for dataItemName,dataItemValue in parameters.data %}
+                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+            {% endfor %}
+        {% endif %}
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-           title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+       title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -363,15 +363,14 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
-
     {% set aCss = 'btn icons-holder-text' %}
 
     {% if parameters.disabled is defined and parameters.disabled %}
-        {% set aCss = aCss~' disabled' %}
+        {% set aCss = aCss ~ ' disabled' %}
     {% endif %}
 
     {% if parameters.aCss is defined %}
-        {% set aCss = aCss ~ ' ' ~aCss~parameters.aCss %}
+        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
     {% endif %}
 
     {% set parameters = parameters|merge({'aCss': aCss}) %}
@@ -406,7 +405,7 @@
         'aCss': parameters.aCss,
         'title': title,
         'label': label,
-        'path': 'javascript:void(0)'
+        'path': 'javascript:void(0);'
     } %}
 
 

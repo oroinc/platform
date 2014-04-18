@@ -1,7 +1,6 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'dashboards-grid' %}
-{% set pageTitle = 'oro.dashboard.entity_plural_label'|trans %}
 
 {% block navButtons %}
     {% if resource_granted('oro_dashboard_create') %}
@@ -10,4 +9,21 @@
             'entity_label': 'oro.dashboard.entity_label'|trans
         }) }}
     {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ parent() }}
+    <script type="text/javascript">
+        require(
+            ['jquery', 'oroui/js/mediator'],
+            function ($, mediator) {
+                mediator.on('datagrid:removeRow:{{ gridName }}', function(model){
+                    $('[data-menu="' + model.get('id') + '"]').remove();
+                    if (!$('[data-menu]').length) {
+                        $('.menu-divider').remove();
+                    }
+                });
+            }
+        );
+    </script>
 {% endblock %}
