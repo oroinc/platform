@@ -16,7 +16,7 @@
   }
 }
 
-.dashboard-contailer {
+.dashboard-container-wrapper {
   .responsive-section {
     background: @dashboardBackgroundColor;
     padding-top: 13px;
@@ -26,6 +26,10 @@
       padding-bottom: 13px;
     }
   }
+  .scrollable-container {
+    background: @dashboardBackgroundColor;
+  }
+
   .launchpad-container {
     .box-type1 {
       border: 0;
@@ -104,6 +108,13 @@
     .dashboard-widget-content {
       padding-top: 12px;
     }
+  }
+
+  .hidden-empty-text{
+    height: 0!important;
+    visibility: hidden;
+    padding: 0!important;
+    margin: 0!important;
   }
 
   .widget-placeholder {
