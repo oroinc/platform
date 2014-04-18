@@ -333,7 +333,7 @@ abstract class AbstractEmailSynchronizer
                 . ' + (:now - COALESCE(o.syncCodeUpdatedAt, :min))'
                 . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
             )
-            ->where('o.isActive = :isActive AND o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border')
+            ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
