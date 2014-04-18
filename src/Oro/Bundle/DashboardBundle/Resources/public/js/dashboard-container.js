@@ -191,12 +191,13 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         _lockLayoutHeight: function() {
             var maxHeight = 0;
-            $(this.options.columnsSelector).css({minHeight: '0px'});
+            this._releaseLayoutHeight();
             $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
                 var currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
-            $(this.options.columnsSelector).css({minHeight: (maxHeight + 200) + 'px'});
+            $(this.options.columnsSelector).css({minHeight: maxHeight + 'px'});
+            $(this.options.columnsSelector).sortable('refresh');
         },
 
         /**
