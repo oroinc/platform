@@ -1,18 +1,18 @@
 oro_menu_config:
     items:
         oro_cron_job:
-            label: Job Queue
-            route: oro_cron_job_index
+            label: 'oro.cron.menu.cron_job.label'
+            route: 'oro_cron_job_index'
             extras:
                 position:    60
                 description: 'Cron job queue'
                 routes:      ['oro_cron_job_*']
 
         oro_cron_job_shortcut:
-            label: Jobs List
-            route: oro_cron_job_index
+            label: 'oro.cron.menu.cron_job_shortcut.label'
+            route: 'oro_cron_job_index'
             extras:
-                description: 'List of cron jobs'
+                description: 'oro.cron.menu.cron_job_shortcut.description'
 
     tree:
         application_menu:
@@ -27,4 +27,4 @@ oro_menu_config:
 
 oro_titles:
     oro_cron_job_index: ~
-    oro_cron_job_view:  Job %%command%% (ID: %%id%%)
+    oro_cron_job_view: 'Job %%command%% (ID: %%id%%)'

@@ -139,7 +139,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
-        $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
+        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
@@ -147,6 +147,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             if (e.keyCode === 27) {
                 $(e.currentTarget).parent().removeClass('open');
             }
+        });
+
+        // fixes submit by enter key press on select element
+        $(document).on('keydown', 'form select', function(e) {
+            if (e.keyCode === 13) {
+                $(e.target.form).submit();
+            }
+        });
+
+        $(document).on('focus', '.select2-focusser, .select2-input', function (e) {
+            $('.hasDatepicker').datepicker('hide')
         });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';

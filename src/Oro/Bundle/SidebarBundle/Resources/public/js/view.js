@@ -118,10 +118,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -154,10 +155,11 @@ define(function (require) {
             });
 
             $content.sortable({
-                revert: true,
-                axis: 'y',
+                axis:        'y',
                 containment: 'parent',
-                delay: WIDGET_SORT_DELAY,
+                delay:       WIDGET_SORT_DELAY,
+                revert:      true,
+                tolerance:   'pointer',
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -380,20 +382,10 @@ define(function (require) {
                 return;
             }
 
-            var widgetSnapshot = JSON.stringify(widget);
-
             var widgetSetupView = new WidgetSetupView({
                 model: widget,
-                okCloses: false
-            });
-
-            widgetSetupView.on('ok', function () {
-                widget.save();
-            });
-
-            widgetSetupView.on('cancel', function () {
-                widget.set(JSON.parse(widgetSnapshot), { silent: true });
-                widget.trigger('change');
+                okCloses: false,
+                snapshot: JSON.stringify(widget)
             });
 
             widgetSetupView.open();

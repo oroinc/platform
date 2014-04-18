@@ -1,5 +1,8 @@
 oro:
     email:
+        menu:
+            emailtemplate_list.description: List of email templates
+
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template: "Choose a template..."
         datagrid:
@@ -69,4 +72,4 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
-
+"Click to insert variable or drag it.": "Click to insert variable or drag it."

@@ -15,7 +15,6 @@ oro:
         success_message:
             label: Success message
             default: Form has been submitted successfully
-            tooltip: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
         created_at:
             label: Created
         updated_at:

@@ -59,6 +59,7 @@ services:
             - @akeneo_batch.job_repository
             - @oro_importexport.context_registry
             - @doctrine
+        lazy: true
 
     # writer
     oro_integration.writer.persistent_batch_writer:
@@ -76,6 +77,7 @@ services:
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
           - @oro_integration.logger.strategy
+        lazy: true
 
     oro_integration.provider.channel_type.simple:
         class: %oro_integration.provider.channel_type.simple.class%

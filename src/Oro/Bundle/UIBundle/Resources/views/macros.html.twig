@@ -24,6 +24,33 @@
     </div>
 {% endmacro %}
 
+{% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
+    {% set details_anchor = details_anchor|default(null) %}
+    {% set details_link = details_link|default(null) %}
+    {% set details_enabled = details_enabled|default(false) %}
+    {% set tooltip_parameters = tooltip_parameters|default({}) %}
+    {% set tooltip_placement = tooltip_placement|default(null) %}
+    {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+
+    {# Help link logic #}
+    {% if details_enabled or details_anchor or details_link %}
+        {% set helpLink = details_link|default(get_help_link()) %}
+        {% if details_anchor %}
+            {% set helpLink = helpLink ~ '#' ~ details_anchor %}
+        {% endif %}
+        {% set tooltip = tooltip
+            ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">'
+            ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
+        %}
+    {% endif %}
+    {# End help link logic #}
+
+    <i class="icon-info-sign tooltip-icon"
+       {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
+       data-content="{{ tooltip }}"
+       data-toggle="popover"></i>
+{% endmacro %}
+
 {#
     Render flexible attribute row
     Parameters:

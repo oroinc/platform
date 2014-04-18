@@ -111,7 +111,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            $.post(url, data,function (res) {
+            $.post(url, data,function (res, status, jqXHR) {
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
                     $form.replaceWith(formContent);
@@ -119,6 +119,8 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
 
                     // trigger hash navigation event for processing UI decorators
                     navigation.processClicks(formContent.find('a'));
+                    // update wdt
+                    navigation.updateDebugToolbar(jqXHR);
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
             }).always(function () {

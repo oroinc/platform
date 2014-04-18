@@ -45,7 +45,6 @@ class TranslationExtractor implements ExtractorInterface
 
         foreach ($titles as $titleRecord) {
             $catalogue->set($titleRecord['shortTitle'], $this->prefix . $titleRecord['shortTitle']);
-            $catalogue->set($titleRecord['title'], $this->prefix . $titleRecord['title']);
         }
 
         return $catalogue;

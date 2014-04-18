@@ -18,13 +18,19 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityProvider;
+
     public function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()->getMock();
-        $this->provider = new SearchProvider($this->entityManager, $this->mapper);
+        $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = new SearchProvider($this->entityManager, $this->mapper, $this->securityProvider);
     }
 
     public function tearDown()
@@ -64,6 +70,10 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->once())->method('createQueryBuilder')
             ->will($this->returnValue($qb));
+
+        $this->securityProvider->expects($this->once())
+            ->method('applyAcl')
+            ->with($qb, 't');
 
         $this->mapper->expects($this->once())->method('getEntityConfig')->with(self::TEST_ENTITY_NAME);
 

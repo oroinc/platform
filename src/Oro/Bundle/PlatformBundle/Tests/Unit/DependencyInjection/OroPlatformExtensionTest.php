@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
+
+use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 
 class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
 {

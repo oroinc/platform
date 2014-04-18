@@ -13,17 +13,18 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
      */
     return Backbone.View.extend({
         options: {
-            template: null,
-            elementTemplate: null,
+            addedElement:              null,
+            allowAction:               true,
+            collection:                null,
+            defaultElement:            null,
+            elementTemplate:           null,
             entitiesContainerSelector: '.entities',
-            name: null,
-            collection: null,
-            selectionUrl: null,
-            addedElement: null,
-            removedElement: null,
-            defaultElement: null,
-            itemsPerRow: 4,
-            selectorWindowTitle: null
+            itemsPerRow:               4,
+            name:                      null,
+            removedElement:            null,
+            selectionUrl:              null,
+            selectorWindowTitle:       null,
+            template:                  null
         },
 
         events: {
@@ -31,7 +32,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template)
+            this.template = _.template(this.options.template);
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
@@ -42,6 +43,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
             }
+
             this.initialCollectionItems = [];
             this.addedCollectionItems = [];
             this.removedCollectionItems = [];
@@ -216,6 +218,11 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
 
         render: function() {
             this.$el.html(this.template());
+
+            if (!this.options.allowAction) {
+                this.$el.children('.actions.clearfix').remove();
+            }
+
             this.$entitiesContainer = this.$el.find(this.options.entitiesContainerSelector);
 
             return this;

@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -45,18 +47,18 @@ class OroUIExtension extends Extension
     {
         $placeholders = array();
         $items = array();
-        $bundles = $container->getParameter('kernel.bundles');
 
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/placeholders.yml')) {
-                $placeholderData = Yaml::parse(realpath($file));
-                if (isset($placeholderData['placeholders'])) {
-                    $placeholders = array_replace_recursive($placeholders, $placeholderData['placeholders']);
-                }
-                if (isset($placeholderData['items'])) {
-                    $items = array_replace_recursive($items, $placeholderData['items']);
-                }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_placeholders',
+            new YamlCumulativeFileLoader('Resources/config/placeholders.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            if (isset($resource->data['placeholders'])) {
+                $placeholders = array_replace_recursive($placeholders, $resource->data['placeholders']);
+            }
+            if (isset($resource->data['items'])) {
+                $items = array_replace_recursive($items, $resource->data['items']);
             }
         }
 

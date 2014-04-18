@@ -12,7 +12,6 @@ datagrid:
             query:
                 select:
                     - ce.id
-                    - ce.className
                     - ce.updated
                     - ce.mode
                 from:
@@ -21,18 +20,8 @@ datagrid:
                     and:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
         columns:
-            name:
-                label: Name
-                data_name: className
-                frontend_type: select
-                choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getChoicesName
-            module:
-                label: Module
-                data_name: className
-                frontend_type: select
-                choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getChoicesModule
             updated:
-                label: Update at
+                label: oro.entity_config.entity_config.updated.label
                 frontend_type: datetime
 
         properties:
@@ -62,30 +51,12 @@ datagrid:
                 link: update_link
         sorters:
             columns:
-                name:
-                    data_name: ce.className
-                module:
-                    data_name: ce.className
                 updated:
                     data_name: ce.updated
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                entity: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
-                name:
-                    type: choice
-                    data_name: ce.className
-                    options:
-                        field_options:
-                            multiple: true
-                            choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getChoicesName
-                module:
-                    type: choice
-                    data_name: ce.className
-                    options:
-                        field_options:
-                            multiple: true
-                            choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getChoicesModule
                 updated:
                     type: datetime
                     data_name: ce.updated
@@ -113,10 +84,10 @@ datagrid:
 
         columns:
             fieldName:
-                label: Name
+                label: oro.entity_config.field_config.field_name.label
                 frontend_type: string
             type:
-                label: Data Type
+                label: oro.entity_config.field_config.field_name.label
                 frontend_type: string
 
         properties:
@@ -174,18 +145,18 @@ datagrid:
 
         columns:
             author:
-                label: Author
+                label: oro.entity_config.config_log.user.label
                 type: field
                 frontend_type: string
             diffs:
-                label: Diffs
+                label: oro.entity_config.config_log.diffs.label
                 type: twig
                 template: OroEntityConfigBundle:Audit:data.html.twig
                 frontend_type: html
                 context:
                     config_manager: @oro_entity_config.config_manager
             loggedAt:
-                label: Logged at
+                label: oro.entity_config.config_log.logged_at.label
                 type: field
                 frontend_type: datetime
 

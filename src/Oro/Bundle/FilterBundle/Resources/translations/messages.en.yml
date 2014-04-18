@@ -1,45 +1,45 @@
 oro:
     filter:
         form:
-            label_type_equal:             '='
-            label_type_not_equal:         '<>'
-            label_type_greater_equal:     '>='
-            label_type_greater_than:      '>'
-            label_type_less_equal:        '<='
-            label_type_less_than:         '<'
-            label_type_in:                'is any of'
-            label_type_not_in:            'is not any of'
-            label_type_yes:               'Yes'
-            label_type_no:                'No'
-            label_type_contains:          'contains'
-            label_type_not_contains:      'does not contain'
-            label_type_equals:            'is equal to'
-            label_type_start_with:        'starts with'
-            label_type_end_with:          'ends with'
-            label_date_type_between:      'between'
-            label_date_type_not_between:  'not between'
-            label_date_type_more_than:    'more than'
-            label_date_type_less_than:    'less than'
-            label_not_selected:           'Not Selected'
-            label_selected:               'Selected'
-            label_date_part.value:        'value'
-            label_date_part.dayofweek:    'day of week'
-            label_date_part.week:         'week'
-            label_date_part.day:          'day'
-            label_date_part.month:        'month'
-            label_date_part.quarter:      'quarter'
-            label_date_part.dayofyear:    'day of year'
-            label_date_part.year:         'year'
-            label_date_var.now:           'now'
-            label_date_var.today:         'today'
-            label_date_var.sow:           'start of the week'
-            label_date_var.som:           'start of the month'
-            label_date_var.soq:           'start of the quarter'
-            label_date_var.soy:           'start of the year'
-            label_date_var.this_day:      'current day'
-            label_date_var.this_week:     'current week'
-            label_date_var.this_month:    'current month'
-            label_date_var.this_quarter:  'current quarter'
-            label_date_var.this_year:     'current year'
-            label_date_var.this_fdq:      'first day of quarter'
-            label_date_var.this_fmq:      'first month of quarter'
+            label_type_equal:             =
+            label_type_not_equal:         <>
+            label_type_greater_equal:     >=
+            label_type_greater_than:      >
+            label_type_less_equal:        <=
+            label_type_less_than:         <
+            label_type_in:                is any of
+            label_type_not_in:            is not any of
+            label_type_yes:               Yes
+            label_type_no:                No
+            label_type_contains:          contains
+            label_type_not_contains:      does not contain
+            label_type_equals:            is equal to
+            label_type_start_with:        starts with
+            label_type_end_with:          ends with
+            label_date_type_between:      between
+            label_date_type_not_between:  not between
+            label_date_type_more_than:    more than
+            label_date_type_less_than:    less than
+            label_not_selected:           Not Selected
+            label_selected:               Selected
+            label_date_part.value:        value
+            label_date_part.dayofweek:    day of week
+            label_date_part.week:         week
+            label_date_part.day:          day
+            label_date_part.month:        month
+            label_date_part.quarter:      quarter
+            label_date_part.dayofyear:    day of year
+            label_date_part.year:         year
+            label_date_var.now:           now
+            label_date_var.today:         today
+            label_date_var.sow:           start of the week
+            label_date_var.som:           start of the month
+            label_date_var.soq:           start of the quarter
+            label_date_var.soy:           start of the year
+            label_date_var.this_day:      current day
+            label_date_var.this_week:     current week
+            label_date_var.this_month:    current month
+            label_date_var.this_quarter:  current quarter
+            label_date_var.this_year:     current year
+            label_date_var.this_fdq:      first day of quarter
+            label_date_var.this_fmq:      first month of quarter

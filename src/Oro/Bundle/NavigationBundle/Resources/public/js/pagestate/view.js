@@ -100,10 +100,27 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
             var data = {};
 
             Backbone.$('form[data-collect=true]').each(function(index, el){
-                data[index] = Backbone.$(el)
+                var items = Backbone.$(el)
                     .find('input, textarea, select')
-                    .not(':input[type=button], :input[type=submit], :input[type=reset], :input[type=password], :input[type=file], :input[name$="[_token]"]')
-                    .serializeArray();
+                    .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
+                         ':input[type=password], :input[type=file],   :input[name$="[_token]"], ' +
+                         '.select2[type=hidden]');
+
+                data[index] = items.serializeArray();
+
+                // collect select2 selected data
+                items = Backbone.$(el).find('.select2[type=hidden], .select2[type=select]')
+                _.each(items, function (item) {
+                    var $item = $(item),
+                        itemData = {name: item.name, value: $item.val()},
+                        selectedData = $(item).select2('data');
+
+                    if (!_.isEmpty(selectedData)) {
+                        itemData.selectedData = [selectedData];
+                    }
+
+                    data[index].push(itemData);
+                });
             });
 
             this.model.set({
@@ -139,6 +156,9 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
                             element.find('option[value="'+ input.value +'"]').prop('selected', true);
                             break;
                         default:
+                            if (input.selectedData) {
+                                element.data('selected-data', input.selectedData);
+                            }
                             element.val(input.value);
                     }
                 });

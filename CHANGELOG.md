@@ -1,3 +1,21 @@
+CHANGELOG for 1.0.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.1 versions.
+
+* 1.0.1 (2014-04-18)
+ * Issue #3979 – Problems with DB server verification on install
+ * Issue #3916 – Memory consumption is too high on installation
+ * Issue #3918 – Problems with installation of packages from console
+ * Issue #3841 – Very slow installation of packages
+ * Issue #3916 – Installed application is not working correctly because of knp-menu version
+ * Issue #3839 – Cache regeneration is too slow
+ * Issue #3525 – Broken filters on Entity Configuration grid
+ * Issue #3974 – Settings are not saved in sidebar widgets 
+ * Issue #3962 – Workflow window opens with a significant delay
+ * Issue #2203 – Incorrect timezone processing in Calendar
+ * Issue #3909 – Multi-selection filters might be too long
+ * Issue #3899 – Broken link from Opportunity to related Contact Request
+
 CHANGELOG for 1.0.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0 versions.
