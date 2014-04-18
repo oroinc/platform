@@ -72,18 +72,18 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param string $entityName
+     * @param string $entityClass
      * @param array $excludedWorkflowNames
      * @throws \Exception
      */
-    public function resetWorkflowData($entityName, $excludedWorkflowNames = array())
+    public function resetWorkflowData($entityClass, $excludedWorkflowNames = array())
     {
         $entityManager = $this->getEntityManager();
 
         // select entities for reset
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select('workflowItem.id')
-            ->from($entityName, 'entity')
+            ->from($entityClass, 'entity')
             ->innerJoin('entity.workflowItem', 'workflowItem')
             ->innerJoin('workflowItem.definition', 'workflowDefinition')
             ->orderBy('workflowItem.id');
@@ -95,6 +95,10 @@ class WorkflowItemRepository extends EntityRepository
         $iterator = new DeletionQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(self::DELETE_BATCH_SIZE);
 
+        if ($iterator->count() == 0) {
+            return;
+        }
+
         // wrap all operation into transaction
         $entityManager->beginTransaction();
         try {
@@ -103,12 +107,12 @@ class WorkflowItemRepository extends EntityRepository
             foreach ($iterator as $workflowItem) {
                 $workflowItemIds[] = $workflowItem['id'];
                 if (count($workflowItemIds) == self::DELETE_BATCH_SIZE) {
-                    $this->clearWorkflowItems($entityName, $workflowItemIds);
+                    $this->clearWorkflowItems($entityClass, $workflowItemIds);
                     $workflowItemIds = array();
                 }
             }
             if ($workflowItemIds) {
-                $this->clearWorkflowItems($entityName, $workflowItemIds);
+                $this->clearWorkflowItems($entityClass, $workflowItemIds);
             }
             $entityManager->commit();
         } catch (\Exception $e) {
@@ -118,10 +122,10 @@ class WorkflowItemRepository extends EntityRepository
     }
 
     /**
-     * @param string $entityName
+     * @param string $entityClass
      * @param array $workflowItemIds
      */
-    protected function clearWorkflowItems($entityName, array $workflowItemIds)
+    protected function clearWorkflowItems($entityClass, array $workflowItemIds)
     {
         if (empty($workflowItemIds)) {
             return;
@@ -132,7 +136,7 @@ class WorkflowItemRepository extends EntityRepository
         $entityManager = $this->getEntityManager();
 
         $updateCondition = $expressionBuilder->in('entity.workflowItem', $workflowItemIds);
-        $updateDql = "UPDATE {$entityName} entity
+        $updateDql = "UPDATE {$entityClass} entity
             SET entity.workflowItem = NULL, entity.workflowStep = NULL
             WHERE {$updateCondition}";
 
