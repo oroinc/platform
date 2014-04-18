@@ -238,6 +238,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
         parse: function(resp, options) {
             resp.options = resp.options || {};
             this.state.totalRecords = resp.options.totalRecords || 0;
+            this.state.hideToolbar = resp.options.hideToolbar;
             this.state = this._checkState(this.state);
             return resp.data;
         },
@@ -283,6 +284,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 state.pageSize = pageSize = this.finiteInt(pageSize, "pageSize");
                 state.currentPage = currentPage = this.finiteInt(currentPage, "currentPage");
                 state.firstPage = firstPage = this.finiteInt(firstPage, "firstPage");
+
 
                 if (pageSize < 0) {
                     throw new RangeError("`pageSize` must be >= 0");

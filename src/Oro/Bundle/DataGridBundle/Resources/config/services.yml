@@ -13,6 +13,8 @@ parameters:
     oro_datagrid.configuration.provider.class:       Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
     oro_datagrid.configuration.provider.chain.class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
     oro_datagrid.event_listener.ormdatasource_acl.class: Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
+    oro_datagrid.event_listener.hide_toolbar_by_records.class: Oro\Bundle\DataGridBundle\EventListener\DisableToolbarByRecordCountListener
+
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
