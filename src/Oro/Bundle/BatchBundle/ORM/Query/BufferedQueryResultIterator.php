@@ -93,14 +93,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     /**
      * @var int
      */
-    private $firstResult;
+    protected $firstResult;
 
     /**
      * The maximum number of results the original query object was set to retrieve
      *
      * @var int
      */
-    private $maxResults;
+    protected $maxResults;
 
     /**
      * Constructor

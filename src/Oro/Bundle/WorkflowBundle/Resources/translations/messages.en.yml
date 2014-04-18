@@ -131,6 +131,9 @@ oro:
         action:
             general: "Workflow manipulations"
 
+        transition:
+            start: "Start %workflow%"
+
         entity_config:
             active_workflow.label:        'Active workflow'
             active_workflow.none:         'none'
