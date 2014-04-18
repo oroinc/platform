@@ -1,0 +1,19 @@
+{% block navbar %}
+    <div class="nav pull-left top-search shortcuts">
+        {% placeholder navbar %}
+    </div>
+{% endblock navbar %}
+
+{% block application_menu %}
+    {% placeholder application_menu %}
+{% endblock application_menu %}
+
+{% block user_menu %}
+    {% placeholder user_menu %}
+    {# Disabled notification icon till it will be implemented
+    {% block notifications %}
+    <li class="divider-vertical small-divider"></li>
+    <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
+    {% endblock notifications %}
+    #}
+{% endblock %}
