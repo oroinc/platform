@@ -34,6 +34,14 @@
 {% block content_data %}
     {% set id = 'task-form' %}
 
+    {% set dataBlock %}
+        {{ form_row(form.label) }}
+        {% if form.startFrom is defined %}
+            {{ form_row(form.startFrom) }}
+        {% endif %}
+        {{ form_row(form.owner) }}
+    {% endset %}
+
     {% set dataBlocks = [{
         'title': 'orocrm.task.block.general'|trans,
         'class': 'active',
@@ -41,9 +49,7 @@
             {
                 'title': '',
                 'data': [
-                    form_row(form.label),
-                    form_row(form.startFrom),
-                    form_row(form.owner),
+                    dataBlock
                 ]
             }
         ]
