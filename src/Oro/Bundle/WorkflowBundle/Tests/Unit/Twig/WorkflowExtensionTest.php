@@ -36,7 +36,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             'has_workflow',
             'has_workflow_start_step',
             'has_workflow_item',
-            'is_workflow_active',
+            'is_workflow_reset_allowed',
         );
 
         /** @var \Twig_SimpleFunction $function */
@@ -170,6 +170,6 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue($expected));
 
-        $this->assertEquals($expected, $this->extension->isWorkflowActive($entity));
+        $this->assertEquals($expected, $this->extension->isResetAllowed($entity));
     }
 }

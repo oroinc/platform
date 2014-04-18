@@ -146,8 +146,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function getActiveWorkflowDataProvider()
     {
         return array(
-            array('active-workflow', 'active-workflow', true),
-            array('active-workflow', 'current-workflow', false),
+            array('active-workflow', 'active-workflow', false),
+            array('active-workflow', 'current-workflow', true),
             array(null, 'current-workflow', false),
             array(null, 'active-workflow', false),
             array('current-workflow', null, false),

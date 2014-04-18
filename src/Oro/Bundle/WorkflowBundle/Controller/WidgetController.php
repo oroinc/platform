@@ -218,21 +218,21 @@ class WidgetController extends Controller
         $workflowItem    = $workflowManager->getWorkflowItemByEntity($entity);
 
         if ($workflowManager->isResetAllowed($entity)) {
+            $showResetButton = true;
+        } else {
             if ($workflowItem) {
                 $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
             } else {
                 $workflow = $workflowManager->getApplicableWorkflow($entity);
                 $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
             }
-        } else {
-            $showResetButton = true;
         }
 
         return array(
-            'workflowItem_id' => $workflowItem->getId(),
             'entity_id'       => $entityId,
             'showResetButton' => $showResetButton,
-            'transitionsData' => $transitionsData
+            'transitionsData' => $transitionsData,
+            'workflowItem'    => $workflowItem
         );
     }
 
