@@ -113,6 +113,9 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testIsAtLeastOneKnownEmailAddressSequence()
     {
         $query1 = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
