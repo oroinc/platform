@@ -412,7 +412,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('where')
-            ->with('o.isActive = :isActive AND o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border')
+            ->with('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->will($this->returnValue($qb));
         $qb->expects($this->at($index++))
             ->method('orderBy')
