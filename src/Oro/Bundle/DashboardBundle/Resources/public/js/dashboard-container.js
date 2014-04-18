@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         options: {
             widgetIds: [],
-            handle: ".dashboard-widget > .title",
+            handle: ".dashboard-widget .sortable",
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
             allowEdit: false,
