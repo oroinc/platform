@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
@@ -12,7 +13,6 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use OroCRM\Bundle\TaskBundle\Entity\Task;
 
 class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -248,19 +248,16 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param boolean $withStartStep
-     * @dataProvider resetWorkflowDataProvider
+     * @dataProvider resetWorkflowItemProvider
      */
-    public function testResetWorkflowData($withStartStep)
+    public function testResetWorkflowItem($withStartStep)
     {
         $workflowName       = self::TEST_WORKFLOW_NAME;
         $activeWorkflowName = self::TEST_WORKFLOW_NAME . '_active';
         $workflowItem       = $this->createWorkflowItem();
-        $entity             = new Task();
+        $entity             = new WorkflowAwareEntity();
         $workflowStep       = new WorkflowStep();
 
-        $entity->setDescription('testDescription');
-        $entity->setDueDate(new \DateTime());
-        $entity->setId(1);
         $entity->setWorkflowItem($workflowItem);
         $entity->setWorkflowStep($workflowStep);
 
@@ -311,13 +308,17 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->will($this->returnValue($entityManager));
+
         if ($withStartStep) {
             $this->registry->expects($this->once())
                 ->method('getManager')
                 ->will($this->returnValue($entityManager));
+        } else {
+            $this->registry->expects($this->never())
+                ->method('getManager');
         }
 
-        $this->workflowManager->resetWorkflowData($workflowItem);
+        $this->workflowManager->resetWorkflowItem($workflowItem);
         $this->assertNull($entity->getWorkflowStep());
         $this->assertNull($entity->getWorkflowItem());
     }
@@ -325,7 +326,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function resetWorkflowDataProvider()
+    public function resetWorkflowItemProvider()
     {
         return array(
             array(true),
@@ -337,10 +338,10 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Reset workflow exception message
      */
-    public function testResetWorkflowDataException()
+    public function testResetWorkflowItemException()
     {
         $workflowItem = $this->createWorkflowItem();
-        $entity       = new Task();
+        $entity       = new WorkflowAwareEntity();
         $workflowItem->setEntity($entity);
 
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
@@ -369,7 +370,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_WORKFLOW_NAME)
             ->will($this->returnValue($workflow));
 
-        $this->workflowManager->resetWorkflowData($workflowItem);
+        $this->workflowManager->resetWorkflowItem($workflowItem);
     }
 
     public function testStartWorkflow()
