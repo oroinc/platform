@@ -1,7 +1,6 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'dashboards-grid' %}
-{% set pageTitle = 'oro.dashboard.entity_plural_label'|trans %}
 
 {% block navButtons %}
     {% if resource_granted('oro_dashboard_create') %}
