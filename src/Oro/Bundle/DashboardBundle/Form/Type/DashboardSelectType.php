@@ -9,7 +9,6 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 
 class DashboardSelectType extends AbstractType
 {
-
     /**
      * @var Manager
      */
@@ -21,20 +20,6 @@ class DashboardSelectType extends AbstractType
     public function __construct(Manager $manager)
     {
         $this->manager = $manager;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDashboardsList()
-    {
-        $choices = array();
-
-        foreach ($this->manager->findAllowedDashboards() as $dashboardModel) {
-            $choices[$dashboardModel->getId()] = $dashboardModel->getLabel();
-        }
-
-        return $choices;
     }
 
     /**
@@ -53,9 +38,23 @@ class DashboardSelectType extends AbstractType
         $resolver->setDefaults(
             array(
                 'choices' => $this->getDashboardsList(),
-                'empty_value' => 'oro.dashboard.form.start_from',
+                'empty_value' => 'oro.dashboard.start_dashboard.empty_value',
             )
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDashboardsList()
+    {
+        $result = array();
+
+        foreach ($this->manager->findAllowedDashboards() as $dashboardModel) {
+            $result[$dashboardModel->getId()] = $dashboardModel->getLabel();
+        }
+
+        return $result;
     }
 
     /**
@@ -63,6 +62,6 @@ class DashboardSelectType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_select_dashboard';
+        return 'oro_dashboard_select';
     }
 }

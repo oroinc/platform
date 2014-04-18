@@ -6,8 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-
 class DashboardType extends AbstractType
 {
     /**
@@ -16,15 +14,12 @@ class DashboardType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('label', 'text', array('required' => true, 'label' => 'oro.dashboard.label'));
-        /**
-         * @var Dashboard $dataObject
-         */
-        $dataObject = $builder->getData();
-        if (!$dataObject->getId()) {
+
+        if ($options['create_new']) {
             $builder->add(
-                'startFrom',
-                'oro_select_dashboard',
-                array('required' => false, 'label' => 'oro.dashboard.start_from')
+                'startDashboard',
+                'oro_dashboard_select',
+                array('required' => false, 'label' => 'oro.dashboard.start_dashboard')
             );
         }
     }
@@ -34,13 +29,16 @@ class DashboardType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array('data_class' => 'Oro\Bundle\DashboardBundle\Entity\Dashboard'));
+        $resolver->setDefaults(
+            array(
+                'create_new' => false,
+                'data_class' => 'Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard'
+            )
+        );
     }
 
     /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
+     * {@inheritdoc}
      */
     public function getName()
     {

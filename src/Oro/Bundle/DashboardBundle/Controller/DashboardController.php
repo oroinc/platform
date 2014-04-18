@@ -121,9 +121,12 @@ class DashboardController extends Controller
     {
         $form = $this->createForm(
             $this->container->get('oro_dashboard.form.type.edit'),
-            $dashboardModel->getEntity(), //todo: remove somehow
-            array()
+            $dashboardModel->getEntity(),
+            array(
+                'create_new' => !$dashboardModel->getId()
+            )
         );
+
         $request = $this->getRequest();
         if ($request->isMethod('POST')) {
             if ($form->submit($request)->isValid()) {

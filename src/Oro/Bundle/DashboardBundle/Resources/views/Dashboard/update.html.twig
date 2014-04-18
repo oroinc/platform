@@ -36,8 +36,8 @@
 
     {% set dataBlock %}
         {{ form_row(form.label) }}
-        {% if form.startFrom is defined %}
-            {{ form_row(form.startFrom) }}
+        {% if form.startDashboard is defined %}
+            {{ form_row(form.startDashboard) }}
         {% endif %}
         {{ form_row(form.owner) }}
     {% endset %}

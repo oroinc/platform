@@ -59,4 +59,4 @@ services:
         arguments:
             - @oro_dashboard.manager
         tags:
-            - { name: form.type, alias: "oro_select_dashboard" }
+            - { name: form.type, alias: "oro_dashboard_select" }

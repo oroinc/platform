@@ -96,8 +96,7 @@ class Dashboard
     /**
      * @var Dashboard
      */
-    protected $startFrom;
-
+    protected $startDashboard;
 
     public function __construct()
     {
@@ -276,19 +275,22 @@ class Dashboard
     }
 
     /**
-     * @param Dashboard $startFrom
+     * @param Dashboard $dashboard
+     * @return Dashboard
      */
-    public function setStartFrom($startFrom)
+    public function setStartDashboard(Dashboard $dashboard = null)
     {
-        $this->startFrom = $startFrom;
+        $this->startDashboard = $dashboard;
+
+        return $this;
     }
 
     /**
      * @return Dashboard
      */
-    public function getStartFrom()
+    public function getStartDashboard()
     {
-        return $this->startFrom;
+        return $this->startDashboard;
     }
 
     /**
