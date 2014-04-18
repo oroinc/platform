@@ -29,6 +29,8 @@ class ConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $encryptor = $this->encryptor;
+
+        // pre-populate password, imap origin change
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
