@@ -40,7 +40,7 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyFields)
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
  * @ORM\Table(name="oro_user")
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
