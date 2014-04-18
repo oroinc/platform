@@ -60,7 +60,12 @@
                             Add widget
                         </a>
                     {% endif %}
-                    {% set html %}
+
+                    {% if resource_granted('DELETE', dashboard.entity)
+                        or resource_granted('CREATE', dashboard.entity)
+                        or resource_granted('EDIT', dashboard.entity)%}
+
+                        {% set html %}
                         {% if resource_granted('EDIT', dashboard.entity) %}
                             {{ UI.dropdownItem({
                                 'path': path('oro_dashboard_update', {id:dashboard.id}),
@@ -89,13 +94,15 @@
                                 }) }}
                             </li>
                         {% endif %}
-                    {% endset %}
-                    {{ UI.dropdownButton({
-                        'label': 'oro.dashboard.tools_dropdown.label'|trans,
-                        'iCss': 'icon icon-cog',
-                        'aCss': 'pull-right',
-                        'html': html
-                    }) }}
+                        {% endset %}
+
+                        {{ UI.dropdownButton({
+                            'label': 'oro.dashboard.tools_dropdown.label'|trans,
+                            'iCss': 'icon icon-cog',
+                            'aCss': 'pull-right',
+                            'html': html
+                        }) }}
+                    {% endif %}
                     {% placeholder dashboard_navButtons_after %}
                 </div>
                 {% endblock titleNavButtons %}
