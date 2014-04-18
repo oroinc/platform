@@ -24,7 +24,7 @@ class DisabledFiltersListener
         if (isset($params[self::PARAM_NAME]) && $params[self::PARAM_NAME]) {
             $config = $event->getConfig();
             $config->offsetUnsetByPath(Configuration::FILTERS_PATH);
-            $config->offsetAddToArray('options', ['toolbarOptions'=>['addResetAction'=>false]]);
+            $config->offsetAddToArray('options', ['toolbarOptions' => ['addResetAction' => false]]);
         }
     }
 }
