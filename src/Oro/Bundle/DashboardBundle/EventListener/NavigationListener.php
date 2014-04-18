@@ -43,6 +43,8 @@ class NavigationListener
 
         if (count($dashboards)>0) {
             foreach ($dashboards as $dashboard) {
+                $dashboardId = $dashboard->getId();
+
                 $options = array(
                     'label' => $dashboard->getLabel(),
                     'route' => 'oro_dashboard_view',
@@ -50,19 +52,20 @@ class NavigationListener
                         'position' => 1
                     ),
                     'routeParameters' => array(
-                        'id' => $dashboard->getId(),
+                        'id' => $dashboardId,
                         'change_dashboard' => true
                     )
                 );
                 $dashboardTab
                     ->addChild(
-                        $dashboard->getId() . '_dashboard_menu_item',
+                        $dashboardId . '_dashboard_menu_item',
                         $options
                     )
-                    ->setAttribute('data-menu', $dashboard->getId());
+                    ->setAttribute('data-menu', $dashboardId);
             }
 
-            $dashboardTab->addChild('divider-' . rand(1, 99999))
+            $dashboardTab
+                ->addChild('divider-' . rand(1, 99999))
                 ->setLabel('')
                 ->setAttribute('class', 'divider menu-divider')
                 ->setExtra('position', 2);

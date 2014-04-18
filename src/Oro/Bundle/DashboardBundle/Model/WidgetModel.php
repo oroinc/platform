@@ -90,7 +90,7 @@ class WidgetModel implements EntityModelInterface
      */
     public function setLayoutPosition(array $layoutPosition)
     {
-        $this->getState()->setLayoutPosition($layoutPosition);
+        $this->getEntity()->setLayoutPosition($layoutPosition);
 
         return $this;
     }
@@ -100,7 +100,7 @@ class WidgetModel implements EntityModelInterface
      */
     public function getLayoutPosition()
     {
-        return $this->getState()->getLayoutPosition();
+        return $this->getEntity()->getLayoutPosition();
     }
 
     /**

@@ -9,10 +9,6 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    public static $position = [1, 2];
-    /**
-     * @var array
-     */
     public static $expanded = true;
 
     /**
@@ -41,11 +37,6 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $this->widgetState  = $this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
-
-        $this->widgetState
-            ->expects($this->any())
-            ->method('getLayoutPosition')
-            ->will($this->returnValue(self::$position));
 
         $this->widgetState
             ->expects($this->any())
@@ -97,7 +88,8 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
     public function testSetName()
     {
         $name = 'Name';
-        $this->widgetEntity->expects($this->once())
+        $this->widgetEntity
+            ->expects($this->once())
             ->method('setName')
             ->with($name);
 
@@ -106,13 +98,20 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLayoutPosition()
     {
-        $this->assertEquals(self::$position, $this->widgetModel->getLayoutPosition());
+        $layoutPosition = array(1, 2);
+        $this
+            ->widgetEntity
+            ->expects($this->once())
+            ->method('getLayoutPosition')
+            ->will($this->returnValue($layoutPosition));
+
+        $this->assertEquals($layoutPosition, $this->widgetModel->getLayoutPosition());
     }
 
     public function testSetLayoutPosition()
     {
         $layoutPosition = array(1, 2);
-        $this->widgetState
+        $this->widgetEntity
             ->expects($this->once())
             ->method('setLayoutPosition')
             ->with($layoutPosition);

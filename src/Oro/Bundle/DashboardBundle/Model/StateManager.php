@@ -67,9 +67,7 @@ class StateManager
         $state = new WidgetState();
         $state
             ->setOwner($this->getUser())
-            ->setWidget($widget)
-            ->setExpanded($widget->isExpanded())
-            ->setLayoutPosition($widget->getLayoutPosition());
+            ->setWidget($widget);
 
         $this->em->persist($state);
 

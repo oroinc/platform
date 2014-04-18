@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
@@ -38,11 +39,17 @@ class WidgetControllerTest extends WebTestCase
      */
     protected $configProvider;
 
+    /**
+     * @var Manager
+     */
+    protected $dashboardManager;
+
     protected function setUp()
     {
         $this->client = static::createClient([], ToolsAPI::generateWsseHeader());
         $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
         $this->configProvider = $this->client->getContainer()->get('oro_dashboard.config_provider');
+        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
         $this->em->persist($this->widget);
@@ -74,8 +81,10 @@ class WidgetControllerTest extends WebTestCase
 
         $this->em->refresh($this->widget);
 
-        $this->assertEquals($data['isExpanded'], $this->widget->isExpanded());
+        $model = $this->dashboardManager->findWidgetModel($this->widget->getId());
+        $this->assertEquals($data['isExpanded'], $model->isExpanded());
         $this->assertEquals($data['layoutPosition'], $this->widget->getLayoutPosition());
+        $this->assertEquals($data['layoutPosition'], $model->getLayoutPosition());
     }
 
     public function testAddWidget()
@@ -98,10 +107,10 @@ class WidgetControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
-        $content = json_decode($result->getContent(), true);
+        $content = ToolsAPI::jsonToArray($result->getContent());
         $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
-        $this->assertEquals($widgetName, $content['widget']['name']);
-        $this->assertEquals($id, $content['widget']['dashboard']['id']);
+        $this->assertEquals($widgetName, $content['entity']['name']);
+        $this->assertEquals($id, $content['entity']['dashboard']['id']);
 
     }
 
@@ -185,8 +194,6 @@ class WidgetControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-
-
         foreach ($widgets as $key => $widget) {
             $this->em->refresh($widget);
             $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());
@@ -201,8 +208,8 @@ class WidgetControllerTest extends WebTestCase
         return [
             'multiple' => [
                 'widgets'           => [
-                    $this->createWidget('widget1', false),
-                    $this->createWidget('widget2', true, [2, 2]),
+                    $this->createWidget(),
+                    $this->createWidget('quick_launchpad', [2, 2]),
                 ],
                 'expectedPositions' => [
                     [10, 10],
@@ -211,7 +218,7 @@ class WidgetControllerTest extends WebTestCase
             ],
             'single'   => [
                 'widgets'           => [
-                    $this->createWidget('widget1', false)
+                    $this->createWidget()
                 ],
                 'expectedPositions' => [
                     [10, 10]
@@ -222,19 +229,17 @@ class WidgetControllerTest extends WebTestCase
 
     /**
      * @param string $name
-     * @param bool   $isExpanded
      * @param array  $layoutPositions
      * @return Widget
      */
-    protected function createWidget($name = 'widget', $isExpanded = true, array $layoutPositions = [1, 1])
+    protected function createWidget($name = 'quick_launchpad', array $layoutPositions = [1, 1])
     {
         $dashboard = new Dashboard();
-        $dashboard->setName('dashboard');
+        $dashboard->setName('main');
 
         $widget = new Widget();
         $widget
             ->setName($name)
-            ->setExpanded($isExpanded)
             ->setLayoutPosition($layoutPositions)
             ->setDashboard($dashboard);
 

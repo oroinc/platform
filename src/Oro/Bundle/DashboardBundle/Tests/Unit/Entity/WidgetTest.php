@@ -37,13 +37,6 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->widget->getLayoutPosition());
     }
 
-    public function testExpanded()
-    {
-        $this->assertTrue($this->widget->isExpanded());
-        $this->assertEquals($this->widget, $this->widget->setExpanded(false));
-        $this->assertFalse($this->widget->isExpanded());
-    }
-
     public function testDashboard()
     {
         $dashboard = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard');

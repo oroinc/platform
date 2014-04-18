@@ -57,8 +57,6 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnNavigationConfigureAddCorrectItems()
     {
-        $this->markTestSkipped();
-
         $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -71,13 +69,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
-        $dashboardModel->expects($this->exactly(2))->method('getId')->will($this->returnValue($id));
+        $dashboardModel->expects($this->once())->method('getId')->will($this->returnValue($id));
         $dashboardModel->expects($this->once())->method('getLabel')->will($this->returnValue($expectedLabel));
 
         $secondDashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
-        $secondDashboardModel->expects($this->exactly(2))
+        $secondDashboardModel->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($secondId));
         $secondDashboardModel->expects($this->once())
@@ -114,16 +112,22 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $menu = $this->getMock('Knp\Menu\ItemInterface');
         $item = $this->getMock('Knp\Menu\ItemInterface');
+        $child = $this->getMock('Knp\Menu\ItemInterface');
+        $child->expects($this->atLeastOnce())->method('setAttribute')->with('data-menu')->will($this->returnSelf());
 
         $divider = $this->getMock('Knp\Menu\ItemInterface');
         $divider->expects($this->once())->method('setLabel')->with('')->will($this->returnSelf());
-        $divider->expects($this->once())->method('setAttribute')->with('class', 'divider')->will($this->returnSelf());
+        $divider->expects($this->once())->method('setAttribute')->with('class', 'divider menu-divider')->will($this->returnSelf());
         $divider->expects($this->once())->method('setExtra')->with('position', '2')->will($this->returnSelf());
 
-        $item->expects($this->at(0))->method('addChild')->with($menuItemAlias, $this->equalTo($expectedOptions));
+        $item->expects($this->at(0))
+            ->method('addChild')
+            ->with($menuItemAlias, $this->equalTo($expectedOptions))
+            ->will($this->returnValue($child));
         $item->expects($this->at(1))
             ->method('addChild')
-            ->with($secondMenuItemAlias, $this->equalTo($secondExpectedOptions));
+            ->with($secondMenuItemAlias, $this->equalTo($secondExpectedOptions))
+            ->will($this->returnValue($child));
         $item->expects($this->at(2))->method('addChild')->will($this->returnValue($divider));
 
 

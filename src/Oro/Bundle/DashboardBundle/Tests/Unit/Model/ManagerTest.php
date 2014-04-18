@@ -244,7 +244,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                     function ($entity) use ($widgetName) {
                         $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\Widget', $entity);
                         $this->assertEquals($widgetName, $entity->getName());
-                        $this->assertTrue($entity->isExpanded());
                         return true;
                     }
                 )

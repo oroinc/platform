@@ -37,14 +37,6 @@ class WidgetStateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($widget, $this->state->getWidget());
     }
 
-    public function testLayoutPosition()
-    {
-        $position = [1,1];
-        $this->assertNull($this->state->getLayoutPosition());
-        $this->assertEquals($this->state, $this->state->setLayoutPosition($position));
-        $this->assertEquals($position, $this->state->getLayoutPosition());
-    }
-
     public function testExpanded()
     {
         $this->assertTrue($this->state->isExpanded());

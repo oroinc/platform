@@ -36,13 +36,6 @@ class Widget
     protected $layoutPosition;
 
     /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_expanded", type="boolean")
-     */
-    protected $expanded = true;
-
-    /**
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Dashboard", inversedBy="widgets", cascade={"persist"})
@@ -92,24 +85,6 @@ class Widget
     public function getLayoutPosition()
     {
         return $this->layoutPosition;
-    }
-
-    /**
-     * @param boolean $expanded
-     * @return Widget
-     */
-    public function setExpanded($expanded)
-    {
-        $this->expanded = (bool)$expanded;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExpanded()
-    {
-        return $this->expanded;
     }
 
     /**

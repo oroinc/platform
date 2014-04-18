@@ -22,16 +22,31 @@ class OroDashboardBundle implements Migration
         $table->addColumn('createdAt', 'datetime');
         $table->addColumn('updatedAt', 'datetime', ['notnull' => false]);
 
+        $table = $schema->getTable('oro_dashboard_widget');
+        $table->dropColumn('is_expanded');
+
         /** Generate table oro_dashboard_user_widget **/
         $table = $schema->createTable('oro_dashboard_user_widget');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('widget_id', 'integer', ['notnull' => false]);
         $table->addColumn('is_expanded', 'boolean', []);
-        $table->addColumn('layout_position', 'simple_array', ['comment' => '(DC2Type:simple_array)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['widget_id'], 'IDX_4B4F5F87FBE885E2', []);
         $table->addIndex(['user_owner_id'], 'IDX_4B4F5F879EB185F9', []);
         /** End of generate table oro_dashboard_user_widget **/
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_owner_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_dashboard_widget'),
+            ['widget_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
     }
 }
