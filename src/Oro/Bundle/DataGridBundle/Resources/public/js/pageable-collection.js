@@ -285,7 +285,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 state.currentPage = currentPage = this.finiteInt(currentPage, "currentPage");
                 state.firstPage = firstPage = this.finiteInt(firstPage, "firstPage");
 
-
                 if (pageSize < 0) {
                     throw new RangeError("`pageSize` must be >= 0");
                 }
