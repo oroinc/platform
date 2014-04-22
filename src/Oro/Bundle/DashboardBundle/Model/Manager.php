@@ -61,7 +61,7 @@ class Manager
      * @param array|null $orderBy
      * @return DashboardModel|null
      */
-    public function findOneDashboardModelBy(array $criteria, $orderBy = null)
+    public function findOneDashboardModelBy(array $criteria, array $orderBy = null)
     {
         $entity = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
             ->findOneBy($criteria, $orderBy);
