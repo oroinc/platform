@@ -16,6 +16,7 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @Route("/dashboard")
@@ -62,7 +63,11 @@ class DashboardController extends Controller
         $currentDashboard = $this->findAllowedDashboard($dashboard);
 
         if ($changeActive && $dashboard) {
-            $this->getDashboardManager()->setUserActiveDashboard($currentDashboard, $this->getUser());
+            $this->getDashboardManager()->setUserActiveDashboard(
+                $currentDashboard,
+                $this->getUser(),
+                true
+            );
         }
 
         if (!$currentDashboard) {
@@ -225,7 +230,7 @@ class DashboardController extends Controller
         } else {
             $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
             if ($dashboard &&
-                !$this->get('oro_security.security_facade')->isGranted($permission, $dashboard->getEntity())
+                !$this->getSecurityFacade()->isGranted($permission, $dashboard->getEntity())
             ) {
                 $dashboard = null;
             }
@@ -256,5 +261,13 @@ class DashboardController extends Controller
     protected function getEntityManager()
     {
         return $this->container->get('doctrine.orm.entity_manager');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }

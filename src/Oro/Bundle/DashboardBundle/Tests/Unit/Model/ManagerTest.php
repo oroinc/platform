@@ -428,7 +428,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->never())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
 
-        $this->manager->setUserActiveDashboard($dashboardModel, $user);
+        $this->manager->setUserActiveDashboard($dashboardModel, $user, true);
     }
 
     public function testSetUserActiveDashboardCreateNew()
@@ -450,6 +450,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())->method('persist');
         $this->entityManager->expects($this->once())->method('flush');
 
-        $this->manager->setUserActiveDashboard($dashboardModel, $user);
+        $this->manager->setUserActiveDashboard($dashboardModel, $user, true);
     }
 }

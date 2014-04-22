@@ -155,37 +155,6 @@ class Manager
     }
 
     /**
-     * Copy widgets from source entity to dashboard model
-     *
-     * @param DashboardModel $target
-     * @param Dashboard $source
-     */
-    protected function copyWidgets(DashboardModel $target, Dashboard $source)
-    {
-        foreach ($source->getWidgets() as $sourceWidget) {
-            $widgetModel = $this->copyWidgetModel($sourceWidget);
-            $this->save($widgetModel, false);
-            $target->addWidget($widgetModel);
-        }
-    }
-
-    /**
-     * Copy widget model by entity
-     *
-     * @param Widget $sourceWidget
-     * @return WidgetModel
-     */
-    protected function copyWidgetModel(Widget $sourceWidget)
-    {
-        $widget = new Widget();
-
-        $widget->setLayoutPosition($sourceWidget->getLayoutPosition());
-        $widget->setName($sourceWidget->getName());
-
-        return $this->getWidgetModel($widget);
-    }
-
-    /**
      * @param EntityModelInterface $entityModel
      */
     public function remove(EntityModelInterface $entityModel)
@@ -254,10 +223,11 @@ class Manager
      * Set current dashboard as active for passed user
      *
      * @param DashboardModel $dashboard
-     * @param User $user
+     * @param User           $user
+     * @param bool           $flush
      * @return bool
      */
-    public function setUserActiveDashboard(DashboardModel $dashboard, User $user)
+    public function setUserActiveDashboard(DashboardModel $dashboard, User $user, $flush = false)
     {
         $activeDashboard = $this->entityManager
             ->getRepository('OroDashboardBundle:ActiveDashboard')
@@ -270,8 +240,42 @@ class Manager
             $this->entityManager->persist($activeDashboard);
         }
 
-        $activeDashboard->setDashboard($dashboard->getEntity());
+        $entity = $dashboard->getEntity();
+        $activeDashboard->setDashboard($entity);
 
-        $this->entityManager->flush();
+        if ($flush) {
+            $this->entityManager->flush($entity);
+        }
+    }
+
+    /**
+     * Copy widgets from source entity to dashboard model
+     *
+     * @param DashboardModel $target
+     * @param Dashboard $source
+     */
+    protected function copyWidgets(DashboardModel $target, Dashboard $source)
+    {
+        foreach ($source->getWidgets() as $sourceWidget) {
+            $widgetModel = $this->copyWidgetModel($sourceWidget);
+            $this->save($widgetModel, false);
+            $target->addWidget($widgetModel);
+        }
+    }
+
+    /**
+     * Copy widget model by entity
+     *
+     * @param Widget $sourceWidget
+     * @return WidgetModel
+     */
+    protected function copyWidgetModel(Widget $sourceWidget)
+    {
+        $widget = new Widget();
+
+        $widget->setLayoutPosition($sourceWidget->getLayoutPosition());
+        $widget->setName($sourceWidget->getName());
+
+        return $this->getWidgetModel($widget);
     }
 }
