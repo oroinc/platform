@@ -55,9 +55,10 @@ class WidgetManager
      *
      * @param string $widgetName
      * @param int    $dashboardId
+     * @param int    $targetColumn
      * @return null|WidgetModel
      */
-    public function createWidget($widgetName, $dashboardId)
+    public function createWidget($widgetName, $dashboardId, $targetColumn = 0)
     {
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->find($dashboardId);
         if (!$this->configProvider->hasWidgetConfig($widgetName) || !$dashboard) {
@@ -80,11 +81,11 @@ class WidgetManager
         /** @var DashboardWidget $widgetEntity */
         foreach ($dashboard->getWidgets() as $widgetEntity) {
             $position = $widgetEntity->getLayoutPosition();
-            if ($position[0] == 0 && $position[1] < $min) {
+            if ($position[$targetColumn] == 0 && $position[1] < $min) {
                 $min = $position[1];
             }
         }
-        $widget->setLayoutPosition(array(0, --$min));
+        $widget->setLayoutPosition(array($targetColumn, --$min));
         $widget->setDashboard($dashboard);
 
         $this->entityManager->persist($widget);

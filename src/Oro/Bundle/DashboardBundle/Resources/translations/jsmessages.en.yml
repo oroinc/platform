@@ -4,3 +4,8 @@ oro:
     add_dashboard_widgets:
       title: Dashboard Widgets
       adding: Adding...
+    widget:
+      collapse: Collapse
+      expand: Expand
+      move: Move
+      remove: Delete

@@ -2,7 +2,6 @@
 
 namespace {{ namespace }};
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
@@ -51,7 +50,7 @@ class {{ className }} extends EmailAddress
      */
     public function beforeSave()
     {
-        $date = EmailUtil::currentUTCDateTime();
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->setCreatedAt($date);
         $this->setUpdatedAt($date);
     }
@@ -61,6 +60,6 @@ class {{ className }} extends EmailAddress
      */
     public function beforeUpdate()
     {
-        $this->setUpdatedAt(EmailUtil::currentUTCDateTime());
+        $this->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 }

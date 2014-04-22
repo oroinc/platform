@@ -53,8 +53,9 @@ class EmailQueryFactory
         $this->className = $className;
         $this->alias = 'o'; // default
 
-        for ($i = 1; $i <= count($emailOwnerProviderStorage->getProviders()); $i++) {
-            $this->emailOwnerFieldNames[] = sprintf('owner%d', $i);
+        $providers = $emailOwnerProviderStorage->getProviders();
+        foreach ($providers as $provider) {
+            $this->emailOwnerFieldNames[] = $emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
         }
 
         $firstNames = array();
