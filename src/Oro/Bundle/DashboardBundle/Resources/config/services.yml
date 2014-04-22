@@ -34,7 +34,7 @@ services:
         class: %oro_dashboard.manager.state.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @security.context
+            - @oro_security.security_facade
 
     oro_dashboard.config_provider:
         class: %oro_dashboard.config_provider.class%

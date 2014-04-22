@@ -5,10 +5,11 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
-use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -17,7 +18,7 @@ class StateManager
     /**
      * @var EntityManager
      */
-    protected $em;
+    protected $entityManager;
 
     /**
      * @var SecurityContextInterface
@@ -25,15 +26,15 @@ class StateManager
     protected $securityContext;
 
     /**
-     * @param EntityManager            $em
-     * @param SecurityContextInterface $securityContext
+     * @param EntityManager $em
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         EntityManager $em,
-        SecurityContextInterface $securityContext
+        SecurityFacade $securityFacade
     ) {
-        $this->em              = $em;
-        $this->securityContext = $securityContext;
+        $this->entityManager = $em;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -42,17 +43,25 @@ class StateManager
      */
     public function getWidgetState(Widget $widget)
     {
-        $state = $this->em
+        $user = $this->securityFacade->getLoggedUser();
+
+        if (!$user instanceof User) {
+            $state = new WidgetStateNullObject();
+            $state->setWidget($widget);
+            return $state;
+        }
+
+        $state = $this->entityManager
             ->getRepository('OroDashboardBundle:WidgetState')
             ->findOneBy(
                 [
-                    'owner'  => $this->getUser(),
+                    'owner'  => $user,
                     'widget' => $widget
                 ]
             );
 
         if (!$state) {
-            $state = $this->createWidgetState($widget);
+            $state = $this->createWidgetState($widget, $user);
         }
 
         return $state;
@@ -60,38 +69,18 @@ class StateManager
 
     /**
      * @param Widget $widget
+     * @param User $user
      * @return WidgetState
      */
-    protected function createWidgetState(Widget $widget)
+    protected function createWidgetState(Widget $widget, User $user)
     {
         $state = new WidgetState();
         $state
-            ->setOwner($this->getUser())
+            ->setOwner($user)
             ->setWidget($widget);
 
-        $this->em->persist($state);
+        $this->entityManager->persist($state);
 
         return $state;
-    }
-
-    /**
-     * Get the current authenticated user
-     *
-     * @return UserInterface|User|null
-     * @throws InvalidArgumentException
-     */
-    protected function getUser()
-    {
-        $token = $this->securityContext->getToken();
-        if ($token) {
-            $user = $token->getUser();
-            if ($user instanceof UserInterface) {
-                return $user;
-            }
-        }
-
-        throw new InvalidArgumentException(
-            'User not logged'
-        );
     }
 }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
 class DashboardModel implements EntityModelInterface
@@ -86,6 +87,16 @@ class DashboardModel implements EntityModelInterface
     }
 
     /**
+     * @param string $name
+     * @return DashboardModel
+     */
+    public function setName($name)
+    {
+        $this->getEntity()->setName($name);
+        return $this;
+    }
+
+    /**
      * @return Dashboard
      */
     public function getStartDashboard()
@@ -94,10 +105,21 @@ class DashboardModel implements EntityModelInterface
     }
 
     /**
+     * @param Dashboard $startDashboard
+     * @return DashboardModel
+     */
+    public function setStartDashboard(Dashboard $startDashboard)
+    {
+        $this->getEntity()->setStartDashboard($startDashboard);
+        return $this;
+    }
+
+    /**
      * Add widget to dashboard
      *
      * @param WidgetModel $widget
      * @param int|null $layoutColumn
+     * @return DashboardModel
      */
     public function addWidget(WidgetModel $widget, $layoutColumn = null)
     {
@@ -106,6 +128,8 @@ class DashboardModel implements EntityModelInterface
         }
         $this->widgets->add($widget);
         $this->getEntity()->addWidget($widget->getEntity());
+
+        return $this;
     }
 
     /**
@@ -174,6 +198,24 @@ class DashboardModel implements EntityModelInterface
     }
 
     /**
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->entity->isDefault();
+    }
+
+    /**
+     * @param boolean $isDefault
+     * @return DashboardModel
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->getEntity()->setIsDefault($isDefault);
+        return $this;
+    }
+
+    /**
      * Get dashboard label
      *
      * @return string
@@ -182,6 +224,36 @@ class DashboardModel implements EntityModelInterface
     {
         $label = $this->entity->getLabel();
         return $label ? $label : (isset($this->config['label']) ? $this->config['label'] : '');
+    }
+
+    /**
+     * @param string $label
+     * @return DashboardModel
+     */
+    public function setLabel($label)
+    {
+        $this->getEntity()->setLabel($label);
+        return $this;
+    }
+
+    /**
+     * Get dashboard owner
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->entity->getOwner();
+    }
+
+    /**
+     * @param User $owner
+     * @return DashboardModel
+     */
+    public function setOwner(User $owner)
+    {
+        $this->getEntity()->setOwner($owner);
+        return $this;
     }
 
     /**

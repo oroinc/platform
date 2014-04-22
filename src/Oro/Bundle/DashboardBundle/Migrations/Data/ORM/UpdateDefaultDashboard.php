@@ -5,25 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface,
- ContainerAwareInterface
+class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -37,7 +20,7 @@ class UpdateDefaultDashboard extends AbstractDashboardFixture implements Depende
      */
     public function load(ObjectManager $manager)
     {
-        $mainDashboard = $this->findAdminDashboard($manager, 'main');
+        $mainDashboard = $this->findAdminDashboardModel($manager, 'main');
 
         if ($mainDashboard) {
             $mainDashboard->setIsDefault(true);

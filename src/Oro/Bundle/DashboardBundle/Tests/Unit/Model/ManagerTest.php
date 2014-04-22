@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
@@ -120,6 +118,42 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->assertNull($this->manager->findDashboardModel($id));
+    }
+
+    public function testFindOneDashboardModelBy()
+    {
+        $criteria = array('label' => 'Foo');
+        $orderBy = array('label' => 'ASC');
+
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->dashboardRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with($criteria, $orderBy)
+            ->will($this->returnValue($dashboard));
+
+        $this->factory->expects($this->once())
+            ->method('createDashboardModel')
+            ->with($dashboard)
+            ->will($this->returnValue($dashboardModel));
+
+        $this->assertEquals($dashboardModel, $this->manager->findOneDashboardModelBy($criteria, $orderBy));
+    }
+
+    public function testFindOneDashboardModelByEmpty()
+    {
+        $criteria = array('label' => 'Foo');
+        $orderBy = array('label' => 'ASC');
+
+        $this->dashboardRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with($criteria, $orderBy)
+            ->will($this->returnValue(null));
+
+        $this->assertNull($this->manager->findOneDashboardModelBy($criteria, $orderBy));
     }
 
     public function testFindWidgetModel()

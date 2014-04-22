@@ -9,7 +9,12 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $securityFacade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $repository;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -21,79 +26,122 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $widget;
 
+    /**
+     * @var StateManager
+     */
+    protected $stateManager;
+
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-
-        $repository = $this
-            ->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $repository
-            ->expects($this->any())
-            ->method('findOneBy')
-            ->will($this->returnValue(null));
+        $this->repository = $this
+            ->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entityManager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager
-            ->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
-
-        $this->widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $this->widget
-            ->expects($this->any())
-            ->method('isExpanded')
-            ->will($this->returnValue(true));
-
-        $this->widget
-            ->expects($this->any())
-            ->method('getLayoutPosition')
-            ->will($this->returnValue([0, 0]));
-    }
-
-    public function testGetWidgetState()
-    {
-        $user  = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        $token
-            ->expects($this->atLeastOnce())
-            ->method('getUser')
-            ->will($this->returnValue($user));
-
-        $this->securityContext
-            ->expects($this->atLeastOnce())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $stateManager = new StateManager(
+        $this->stateManager = new StateManager(
             $this->entityManager,
-            $this->securityContext
+            $this->securityFacade
         );
-        $stateManager->getWidgetState($this->widget);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage User not logged
-     */
-    public function testGetWidgetStateNotLogged()
+    public function testGetWidgetStateNotLoggedUser()
     {
-        $this->securityContext
-            ->expects($this->atLeastOnce())
-            ->method('getToken')
+        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getLoggedUser')
             ->will($this->returnValue(null));
 
-        $stateManager = new StateManager(
-            $this->entityManager,
-            $this->securityContext
+        $this->repository->expects($this->never())->method($this->anything());
+        $this->entityManager->expects($this->never())->method($this->anything());
+
+
+        $state = $this->stateManager->getWidgetState($widget);
+
+        $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject', $state);
+        $this->assertEquals($widget, $state->getWidget());
+    }
+
+    public function testGetWidgetStateExist()
+    {
+        $widgetState = $this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
+        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($this->repository));
+
+        $this->repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(
+                array(
+                    'owner'  => $user,
+                    'widget' => $widget
+                )
+            )
+            ->will($this->returnValue($widgetState));
+
+        $this->assertEquals($widgetState, $this->stateManager->getWidgetState($widget));
+    }
+
+    public function testGetWidgetStateNew()
+    {
+        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
+        $this->securityFacade
+            ->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $this->entityManager
+            ->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($this->repository));
+
+        $this->repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(
+                array(
+                    'owner'  => $user,
+                    'widget' => $widget
+                )
+            )
+            ->will($this->returnValue(null));
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with(
+                $this->callback(
+                    function ($entity) use ($widget, $user) {
+                        $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\WidgetState', $entity);
+                        $this->assertEquals($widget, $entity->getWidget());
+                        $this->assertEquals($user, $entity->getOwner());
+                        return true;
+                    }
+                )
+            );
+
+        $this->assertInstanceOf(
+            'Oro\Bundle\DashboardBundle\Entity\WidgetState',
+            $this->stateManager->getWidgetState($widget)
         );
-        $stateManager->getWidgetState($this->widget);
     }
 }

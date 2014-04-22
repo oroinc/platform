@@ -55,6 +55,25 @@ class Manager
     }
 
     /**
+     * Find dashboard model by criteria
+     *
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @return DashboardModel|null
+     */
+    public function findOneDashboardModelBy(array $criteria, $orderBy = null)
+    {
+        $entity = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+            ->findOneBy($criteria, $orderBy);
+
+        if ($entity) {
+            return $this->getDashboardModel($entity);
+        }
+
+        return null;
+    }
+
+    /**
      * Find dashboard widget model by id
      *
      * @param integer $id

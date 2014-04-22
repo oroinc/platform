@@ -82,6 +82,16 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($name, $this->dashboardModel->getName());
     }
 
+    public function testSetName()
+    {
+        $name = 'Name';
+        $this->dashboardEntity->expects($this->once())
+            ->method('setName')
+            ->with($name);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setName($name));
+    }
+
     public function testGetStartDashboard()
     {
         $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
@@ -90,6 +100,16 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dashboard));
 
         $this->assertEquals($dashboard, $this->dashboardModel->getStartDashboard());
+    }
+
+    public function testSetStartDashboard()
+    {
+        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $this->dashboardEntity->expects($this->once())
+            ->method('setStartDashboard')
+            ->with($dashboard);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setStartDashboard($dashboard));
     }
 
     public function testAddWidget()
@@ -107,7 +127,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
             ->method('addWidget')
             ->with($widgetEntity);
 
-        $this->dashboardModel->addWidget($widgetModel);
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->addWidget($widgetModel));
         $this->assertEquals($widgetModel, $this->widgets[2]);
     }
 
@@ -278,6 +298,46 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->dashboardModel->hasWidget($widgetModel));
     }
 
+    public function testIsDefault()
+    {
+        $isDefault = true;
+        $this->dashboardEntity->expects($this->once())
+            ->method('isDefault')
+            ->will($this->returnValue($isDefault));
+
+        $this->assertEquals($isDefault, $this->dashboardModel->isDefault());
+    }
+
+    public function testSetIsDefault()
+    {
+        $isDefault = true;
+        $this->dashboardEntity->expects($this->once())
+            ->method('setIsDefault')
+            ->with($isDefault);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setIsDefault($isDefault));
+    }
+
+    public function testGetOwner()
+    {
+        $owner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->dashboardEntity->expects($this->once())
+            ->method('getOwner')
+            ->will($this->returnValue($owner));
+
+        $this->assertEquals($owner, $this->dashboardModel->getOwner());
+    }
+
+    public function testSetOwner()
+    {
+        $owner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->dashboardEntity->expects($this->once())
+            ->method('setOwner')
+            ->with($owner);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOwner($owner));
+    }
+
     public function testGetLabelFromEntity()
     {
         $label = 'Label';
@@ -286,6 +346,16 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($label));
 
         $this->assertEquals($label, $this->dashboardModel->getLabel());
+    }
+
+    public function testSetLabel()
+    {
+        $label = 'Label';
+        $this->dashboardEntity->expects($this->once())
+            ->method('setLabel')
+            ->with($label);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setLabel($label));
     }
 
     public function testGetLabelFromConfig()

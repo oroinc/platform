@@ -68,7 +68,7 @@ class WidgetModel implements EntityModelInterface
 
     /**
      * @param string $name
-     * @return Widget
+     * @return WidgetModel
      */
     public function setName($name)
     {
@@ -86,7 +86,7 @@ class WidgetModel implements EntityModelInterface
 
     /**
      * @param array $layoutPosition
-     * @return Widget
+     * @return WidgetModel
      */
     public function setLayoutPosition(array $layoutPosition)
     {
@@ -105,7 +105,7 @@ class WidgetModel implements EntityModelInterface
 
     /**
      * @param boolean $expanded
-     * @return Widget
+     * @return WidgetModel
      */
     public function setExpanded($expanded)
     {
