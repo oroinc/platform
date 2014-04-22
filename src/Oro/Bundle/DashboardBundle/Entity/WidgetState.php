@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * Dashboard
  *
  * @ORM\Entity
- * @ORM\Table(name="oro_dashboard_user_widget")
+ * @ORM\Table(name="oro_dashboard_widget_state")
  */
 class WidgetState
 {
