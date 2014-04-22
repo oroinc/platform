@@ -10,8 +10,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareInterface
 {
-    const FIRST  = 'test_flow';
-    const SECOND = 'test_start_step_flow';
+    const NO_START_STEP  = 'test_flow';
+    const WITH_START_STEP = 'test_start_step_flow';
 
     /**
      * @var ContainerInterface

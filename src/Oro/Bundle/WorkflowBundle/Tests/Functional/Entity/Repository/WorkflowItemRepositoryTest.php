@@ -40,41 +40,41 @@ class WorkflowItemRepositoryTest extends FunctionalTestCase
         // assert input state
         $inputEntityIds = $this->getEntityIdsByWorkflow();
         $this->assertEmpty($inputEntityIds['none']);
-        $this->assertArrayHasKey(LoadWorkflowDefinitions::FIRST, $inputEntityIds);
-        $this->assertArrayHasKey(LoadWorkflowDefinitions::SECOND, $inputEntityIds);
-        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::FIRST]);
-        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::SECOND]);
+        $this->assertArrayHasKey(LoadWorkflowDefinitions::NO_START_STEP, $inputEntityIds);
+        $this->assertArrayHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $inputEntityIds);
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP]);
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP]);
 
         // reset only second workflow data with more than one batch
         $this->repository->resetWorkflowData(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
-            array(LoadWorkflowDefinitions::FIRST),
+            array(LoadWorkflowDefinitions::NO_START_STEP),
             LoadWorkflowAwareEntities::COUNT - 1
         );
 
         $updatedEntityIds = $this->getEntityIdsByWorkflow();
-        $this->assertArrayHasKey(LoadWorkflowDefinitions::FIRST, $inputEntityIds);
-        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::SECOND, $updatedEntityIds);
+        $this->assertArrayHasKey(LoadWorkflowDefinitions::NO_START_STEP, $inputEntityIds);
+        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $updatedEntityIds);
         $this->assertCount(LoadWorkflowAwareEntities::COUNT, $updatedEntityIds['none']);
-        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::FIRST]);
+        $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP]);
         $this->assertEquals(
-            $inputEntityIds[LoadWorkflowDefinitions::FIRST],
-            $updatedEntityIds[LoadWorkflowDefinitions::FIRST]
+            $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP],
+            $updatedEntityIds[LoadWorkflowDefinitions::NO_START_STEP]
         );
-        $this->assertEquals($inputEntityIds[LoadWorkflowDefinitions::SECOND], $updatedEntityIds['none']);
+        $this->assertEquals($inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP], $updatedEntityIds['none']);
         $this->assertEntitiesHaveNoWorkflowData($updatedEntityIds['none']);
 
         // reset all workflow data
         $this->repository->resetWorkflowData('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
 
         $emptyEntityIds = $this->getEntityIdsByWorkflow();
-        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::FIRST, $emptyEntityIds);
-        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::SECOND, $emptyEntityIds);
+        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::NO_START_STEP, $emptyEntityIds);
+        $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $emptyEntityIds);
         $this->assertCount(LoadWorkflowAwareEntities::COUNT * 2, $emptyEntityIds['none']);
         $this->assertEquals(
             array_merge(
-                $inputEntityIds[LoadWorkflowDefinitions::FIRST],
-                $inputEntityIds[LoadWorkflowDefinitions::SECOND]
+                $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP],
+                $inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP]
             ),
             $emptyEntityIds['none']
         );

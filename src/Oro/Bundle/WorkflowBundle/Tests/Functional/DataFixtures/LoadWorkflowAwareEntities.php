@@ -20,8 +20,8 @@ class LoadWorkflowAwareEntities extends AbstractFixture
     {
         $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
 
-        $firstDefinition = $workflowDefinitionRepository->find(LoadWorkflowDefinitions::FIRST);
-        $secondDefinition = $workflowDefinitionRepository->find(LoadWorkflowDefinitions::SECOND);
+        $firstDefinition = $workflowDefinitionRepository->find(LoadWorkflowDefinitions::NO_START_STEP);
+        $secondDefinition = $workflowDefinitionRepository->find(LoadWorkflowDefinitions::WITH_START_STEP);
 
         if ($firstDefinition) {
             $this->generateEntities($manager, $firstDefinition);
