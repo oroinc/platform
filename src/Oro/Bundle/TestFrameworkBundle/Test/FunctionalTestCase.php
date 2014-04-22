@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 
@@ -38,7 +39,11 @@ abstract class FunctionalTestCase extends WebTestCase
     {
         $fixtures = array();
         foreach ($classNames as $className) {
-            $fixtures[] = new $className();
+            $fixture = new $className();
+            if ($fixture instanceof ContainerAwareInterface) {
+                $fixture->setContainer($this->container);
+            }
+            $fixtures[] = $fixture;
         }
 
         $executor = new ORMExecutor($this->getContainer()->get('doctrine.orm.entity_manager'));

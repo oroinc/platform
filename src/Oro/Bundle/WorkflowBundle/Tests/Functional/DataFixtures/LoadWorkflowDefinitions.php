@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Parser;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\Persistence\ObjectManager;
 
 class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareInterface
 {
-    const FIRST  = 'test_flow';
-    const SECOND = 'test_start_step_flow';
+    const NO_START_STEP  = 'test_flow';
+    const WITH_START_STEP = 'test_start_step_flow';
 
     /**
      * @var ContainerInterface
