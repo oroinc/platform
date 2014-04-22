@@ -177,7 +177,9 @@ class ConfigManager
             $value = $config->getOrCreateValue($newItemKey[0], $newItemKey[1]);
             $value->setValue($newItemValue);
 
-            $config->getValues()->add($value);
+            if (!$value->getId()) {
+                $config->getValues()->add($value);
+            }
         }
 
         $this->om->persist($config);
