@@ -90,6 +90,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $workflowItemDefinition
+     * @param string $activeDefinition
+     * @param bool $result
      * @dataProvider getActiveWorkflowDataProvider
      */
     public function testIsResetAllowed($workflowItemDefinition, $activeDefinition, $result)
