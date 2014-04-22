@@ -71,7 +71,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                         '<span class="widget-title"><%- title %></span>' +
                     '</div>' +
                     '<div class="pull-right actions-container">' +
-                        '<div class="pull-right action-container default-actions-container">' +
+                        '<div class="pull-right default-actions-container">' +
                             '<span class="action-wrapper sortable">' +
                                 '<a class="move-action" href="#" title="<%- _.__(\'oro.dashboard.widget.move\') %>">' +
                                     '<i class="icon-move hide-text"></i>' +
@@ -83,7 +83,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                                 '</a>' +
                             '</span>' +
                         '</div>' +
-                        '<div class="pull-left action-container widget-actions-container"></div>' +
+                        '<div class="pull-left widget-actions-container"></div>' +
                     '</div>' +
                     '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
                 '</div>'
