@@ -15,17 +15,16 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
-use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
-use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class SegmentFilter extends EntityFilter
 {
-    /** @var DynamicSegmentQueryBuilder */
-    protected $dynamicSegmentQueryBuilder;
+    /** @var ServiceLink */
+    protected $dynamicSegmentQueryBuilderLink;
 
-    /** @var StaticSegmentQueryBuilder */
-    protected $staticSegmentQueryBuilder;
+    /** @var ServiceLink */
+    protected $staticSegmentQueryBuilderLink;
 
     /** @var EntityNameProvider */
     protected $entityNameProvider;
@@ -39,30 +38,30 @@ class SegmentFilter extends EntityFilter
     /**
      * Constructor
      *
-     * @param FormFactoryInterface        $factory
-     * @param FilterUtility               $util
-     * @param DynamicSegmentQueryBuilder  $dynamicSegmentQueryBuilder
-     * @param StaticSegmentQueryBuilder   $staticSegmentQueryBuilder
-     * @param EntityNameProvider          $entityNameProvider
-     * @param ConfigProvider              $entityConfigProvider
-     * @param ConfigProvider              $extendConfigProvider
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     * @param ServiceLink          $dynamicSegmentQueryBuilderLink
+     * @param ServiceLink          $staticSegmentQueryBuilderLink
+     * @param EntityNameProvider   $entityNameProvider
+     * @param ConfigProvider       $entityConfigProvider
+     * @param ConfigProvider       $extendConfigProvider
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        DynamicSegmentQueryBuilder $dynamicSegmentQueryBuilder,
-        StaticSegmentQueryBuilder $staticSegmentQueryBuilder,
+        ServiceLink $dynamicSegmentQueryBuilderLink,
+        ServiceLink $staticSegmentQueryBuilderLink,
         EntityNameProvider $entityNameProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider
     ) {
         parent::__construct($factory, $util);
 
-        $this->dynamicSegmentQueryBuilder = $dynamicSegmentQueryBuilder;
-        $this->staticSegmentQueryBuilder  = $staticSegmentQueryBuilder;
-        $this->entityNameProvider         = $entityNameProvider;
-        $this->entityConfigProvider       = $entityConfigProvider;
-        $this->extendConfigProvider       = $extendConfigProvider;
+        $this->dynamicSegmentQueryBuilderLink = $dynamicSegmentQueryBuilderLink;
+        $this->staticSegmentQueryBuilderLink  = $staticSegmentQueryBuilderLink;
+        $this->entityNameProvider             = $entityNameProvider;
+        $this->entityConfigProvider           = $entityConfigProvider;
+        $this->extendConfigProvider           = $extendConfigProvider;
     }
 
     /**
@@ -117,9 +116,9 @@ class SegmentFilter extends EntityFilter
                 [
                     'csrf_protection' => false,
                     'field_options'   => [
-                        'class'    => 'OroSegmentBundle:Segment',
-                        'property' => 'name',
-                        'required' => true,
+                        'class'         => 'OroSegmentBundle:Segment',
+                        'property'      => 'name',
+                        'required'      => true,
                         'query_builder' => function (EntityRepository $repo) use ($entityName) {
                             return $repo->createQueryBuilder('s')
                                 ->where('s.entity = :entity')
@@ -145,9 +144,9 @@ class SegmentFilter extends EntityFilter
         /** @var Segment $segment */
         $segment = $data['value'];
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
-            $query = $this->dynamicSegmentQueryBuilder->build($segment);
+            $query = $this->dynamicSegmentQueryBuilderLink->getService()->build($segment);
         } else {
-            $query = $this->staticSegmentQueryBuilder->build($segment);
+            $query = $this->staticSegmentQueryBuilderLink->getService()->build($segment);
         }
         $field = $this->get(FilterUtility::DATA_NAME_KEY);
         $expr  = $ds->expr()->in($field, $query->getDQL());
