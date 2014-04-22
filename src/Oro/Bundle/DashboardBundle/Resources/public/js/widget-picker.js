@@ -91,7 +91,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _startLoading: function(controls, widgetContainer){
             controls.addClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.append($('<div class="loading-content"></div>'));
+            widgetButtonWrapper.addClass('loading-content');
             widgetButtonWrapper.find('.add-widget-button').hide();
         },
 
@@ -103,7 +103,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _endLoading: function(controls, widgetContainer){
             controls.removeClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.find('.loading-content').remove();
+            widgetButtonWrapper.removeClass('loading-content');
             widgetButtonWrapper.find('.add-widget-button').show();
             var previous = widgetContainer.css('background-color');
             var animateFinish = function () {
