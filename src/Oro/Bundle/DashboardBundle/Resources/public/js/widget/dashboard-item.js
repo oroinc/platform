@@ -57,8 +57,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
             allowEdit: false,
             template: _.template(
                 '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
-                    '<div class="pull-right actions-container">' +
-                        '<div class="pull-left actions-container collapse-expand-action-container">' +
+                    '<div class="pull-left actions-container">' +
+                        '<div class="pull-left collapse-expand-action-container">' +
                             '<a class="collapse-action" href="#" title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
                                 '<i class="icon-collapse-alt hide-text"></i>' +
                             '</a>' +

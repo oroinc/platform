@@ -73,6 +73,14 @@
       height: 0px;
     }
 
+    .actions-container.pull-left {
+      top: 10px;
+    }
+
+    .actions-container.pull-right {
+      top: -32px;
+    }
+
     .default-actions-container {
       display: none;
     }
@@ -106,7 +114,7 @@
     }
 
     .title {
-      padding-left: 18;
+      padding-left: 12px;
       padding-right: 0;
       border-bottom: 1px solid #ddd;
     }
@@ -406,6 +414,12 @@
   }
 }
 
-.mobile-version .dashboard-widget .title {
-  height: 70px;
+.mobile-version .dashboard-widget {
+  .title {
+    height: 70px;
+  }
+
+  .action-wrapper.sortable {
+    display: none;
+  }
 }
