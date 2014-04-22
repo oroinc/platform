@@ -16,7 +16,7 @@ oro:
         owner.label: Owner
         created_at.label: Created At
         updated_at.label: Updated At
-        start_dashboard: Start from
+        start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
 
         quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
@@ -53,9 +53,6 @@ oro:
         create_dashboard_link:
             title: Create new dashboard
             text:  Create
-        clone_dashboard_link:
-            title: Copy dashboard to new one
-            text:  Clone
         delete_dashboard_link:
             title: Remove current dashboard
             text:  Delete dashboard
