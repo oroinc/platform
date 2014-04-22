@@ -176,12 +176,13 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     {
         $dashboardId = $this->getRequest()->get('dashboardId');
         $widgetName = $this->getRequest()->get('widgetName');
+        $targetColumn = (int)$this->getRequest()->get('targetColumn', 0);
 
         if (!$dashboardId || !$widgetName) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
 
-        $widgetModel = $this->getWidgetManager()->createWidget($widgetName, $dashboardId);
+        $widgetModel = $this->getWidgetManager()->createWidget($widgetName, $dashboardId, $targetColumn);
         if (!$widgetModel) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }

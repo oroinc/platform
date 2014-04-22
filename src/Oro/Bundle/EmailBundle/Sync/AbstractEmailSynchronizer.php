@@ -4,11 +4,13 @@ namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 abstract class AbstractEmailSynchronizer
 {
@@ -35,6 +37,11 @@ abstract class AbstractEmailSynchronizer
      * @var EmailAddressManager
      */
     protected $emailAddressManager;
+
+    /**
+     * @var KnownEmailAddressChecker
+     */
+    protected $knownEmailAddressChecker;
 
     /**
      * Constructor
@@ -64,6 +71,14 @@ abstract class AbstractEmailSynchronizer
     }
 
     /**
+     * Returns TRUE if this class supports synchronization of the given origin.
+     *
+     * @param EmailOrigin $origin
+     * @return bool
+     */
+    abstract public function supports(EmailOrigin $origin);
+
+    /**
      * Performs a synchronization of emails for one email origin.
      * Algorithm how an email origin is selected see in findOriginToSync method.
      *
@@ -84,6 +99,10 @@ abstract class AbstractEmailSynchronizer
     {
         if ($this->log === null) {
             $this->log = new NullLogger();
+        }
+
+        if (!$this->checkConfiguration()) {
+            $this->log->notice('Exit because synchronization was not configured.');
         }
 
         $startTime = $this->getCurrentUtcDateTime();
@@ -149,6 +168,10 @@ abstract class AbstractEmailSynchronizer
             $this->log = new NullLogger();
         }
 
+        if (!$this->checkConfiguration()) {
+            $this->log->notice('Exit because synchronization was not configured.');
+        }
+
         $failedOriginIds = array();
         foreach ($originIds as $originId) {
             $origin = $this->findOrigin($originId);
@@ -171,6 +194,17 @@ abstract class AbstractEmailSynchronizer
     }
 
     /**
+     * Checks configuration
+     * This method can be used for preliminary check if the synchronization can be launched
+     *
+     * @return bool
+     */
+    protected function checkConfiguration()
+    {
+        return true;
+    }
+
+    /**
      * Performs a synchronization of emails for the given email origin.
      *
      * @param EmailOrigin $origin
@@ -178,13 +212,14 @@ abstract class AbstractEmailSynchronizer
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
+        $this->ensureKnownEmailAddressCheckerCreated();
         $processor = $this->createSynchronizationProcessor($origin);
 
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
-                $synchronizedAt = $this->getCurrentUtcDateTime();
-                $processor->process($origin);
-                $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $synchronizedAt);
+                $syncStartTime = $this->getCurrentUtcDateTime();
+                $processor->process($origin, $syncStartTime);
+                $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
                 $this->log->notice('Skip because it is already in process.');
             }
@@ -205,6 +240,20 @@ abstract class AbstractEmailSynchronizer
             );
 
             throw $ex;
+        }
+    }
+
+    /**
+     * Makes sure $this->knownEmailAddressChecker initialized
+     */
+    protected function ensureKnownEmailAddressCheckerCreated()
+    {
+        if (!$this->knownEmailAddressChecker) {
+            $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
+                $this->log,
+                $this->em,
+                $this->emailAddressManager
+            );
         }
     }
 
@@ -284,7 +333,7 @@ abstract class AbstractEmailSynchronizer
                 . ' + (:now - COALESCE(o.syncCodeUpdatedAt, :min))'
                 . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
             )
-            ->where('o.isActive = :isActive AND o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border')
+            ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)

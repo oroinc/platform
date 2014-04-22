@@ -260,7 +260,7 @@ datagrid:
                             alias: o
                 where:
                     and:
-                        - o.id = :origin_id
+                        - o.id IN (:origin_ids)
 
     user-relation-grid:
         source:
@@ -443,7 +443,7 @@ datagrid:
                             alias: a
                 where:
                     and:
-                        - o.id = :origin_id
+                        - o.id IN (:origin_ids)
         properties:
             id: ~
         options:
@@ -479,7 +479,10 @@ datagrid:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
-            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+            columns:
+                receivedAt:  { data_name: e.receivedAt }
+            default:
+                receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     dashboard-recent-emails-sent-grid:
         options:
@@ -505,4 +508,7 @@ datagrid:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
-            default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+            columns:
+                sentAt:  { data_name: e.sentAt }
+            default:
+                sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
