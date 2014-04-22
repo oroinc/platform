@@ -121,6 +121,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'no definitions' => array(
                 array()
             ),
+            'definitions as null' => array(
+                array('some' => null)
+            ),
             'unknown definition' => array(
                 array('known' => array())
             )

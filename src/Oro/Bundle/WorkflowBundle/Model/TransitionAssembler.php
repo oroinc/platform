@@ -83,6 +83,9 @@ class TransitionAssembler extends AbstractAssembler
     {
         $definitions = array();
         foreach ($configuration as $name => $options) {
+            if (empty($options)) {
+                $options = array();
+            }
             $definitions[$name] = array(
                 'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
                 'conditions' => $this->getOption($options, 'conditions', array()),
