@@ -23,7 +23,7 @@
                     {% block navButtons %}
                         {% if dashboards|length > 1 %}
                         <div class="dashboard-selector-container pull-left">
-                            <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                            <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                             <select id="dashboard_selector">
                                 {% for dashboardModel in dashboards %}
                                     <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
@@ -161,7 +161,7 @@
                     </span>
                     </p>
                     <div class="dashboard-widgets-pick-wrapper">
-                        <a class="btn main-group add-widget-button" data-widget-name="{{ widgetName }}">
+                        <a class="btn add-widget-button" data-widget-name="{{ widgetName }}">
                             {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
                         </a>
                     </div>
@@ -207,7 +207,7 @@
                 })
             }}
         {% endfor %}
-        <div class="empty-text">
+        <div class="empty-text{% if options.widgets|length > 0 %} hidden-empty-text{% endif %}">
             <div class="widget-placeholder">
                 {% if options.allowEdit %}
                     {{ 'oro.dashboard.empty_column_message.allowed'|trans|raw }}

@@ -73,9 +73,18 @@
       padding: 10px 5px;
       border-bottom: 1px solid #ddd;
     }
-
+    
     .actions-container {
       position: relative;
+      top: -32px;
+      height: 0px;
+    }
+
+    .actions-container.pull-left {
+      top: 10px;
+    }
+
+    .actions-container.pull-right {
       top: -32px;
     }
 
@@ -107,7 +116,7 @@
     }
 
     .title {
-      padding-left: 0;
+      padding-left: 18;
       padding-right: 0;
       border-bottom: 1px solid #ddd;
     }
@@ -122,6 +131,7 @@
     visibility: hidden;
     padding: 0!important;
     margin: 0!important;
+    overflow: hidden!important;
   }
 
   .widget-placeholder {
@@ -404,5 +414,15 @@
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
+  }
+}
+
+.mobile-version .dashboard-widget {
+  .title {
+    height: 70px;
+  }
+
+  .action-wrapper.sortable {
+    display: none;
   }
 }
