@@ -12,6 +12,7 @@ parameters:
     oro_datagrid.event_listener.base_orm_relation.class: Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
     oro_datagrid.configuration.provider.class:       Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
     oro_datagrid.configuration.provider.chain.class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
+    oro_datagrid.event.dispatcher.class:             Oro\Bundle\DataGridBundle\Event\EventDispatcher
     oro_datagrid.event_listener.ormdatasource_acl.class: Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
     oro_datagrid.event_listener.hide_toolbar_by_records.class: Oro\Bundle\DataGridBundle\EventListener\DisableToolbarByRecordCountListener
 
@@ -27,12 +28,16 @@ services:
         tags:
             - { name: oro_service_link,  service: oro_datagrid.datagrid.manager }
 
+    oro_datagrid.event.dispatcher:
+        class: %oro_datagrid.event.dispatcher.class%
+        arguments: [@event_dispatcher]
+
     oro_datagrid.datagrid.builder:
         class: %oro_datagrid.datagrid.builder.class%
         arguments:
             - %oro_datagrid.datagrid.base.class%
             - %oro_datagrid.extension.acceptor.class%
-            - @event_dispatcher
+            - @oro_datagrid.event.dispatcher
             - @oro_security.security_facade
         lazy: true
 
