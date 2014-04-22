@@ -22,7 +22,7 @@
                     {% block navButtons %}
                         {% if dashboards|length > 1 %}
                         <div class="dashboard-selector-container pull-left">
-                            <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                            <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                             <select id="dashboard_selector">
                                 {% for dashboardModel in dashboards %}
                                     <option value="{{ dashboardModel.dashboard.id }}"{% if dashboardModel.dashboard.id == dashboard.dashboard.id %} selected="selected"{% endif %}>
@@ -160,7 +160,7 @@
                 })
             }}
         {% endfor %}
-        <div class="empty-text">
+        <div class="empty-text{% if options.widgets|length > 0 %} hidden-empty-text{% endif %}">
             <div class="widget-placeholder">
                 {% if options.allowEdit %}
                     {{ 'oro.dashboard.empty_column_message.allowed'|trans|raw }}
