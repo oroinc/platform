@@ -6,10 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(name="test_workflow_aware_entity")
  * @ORM\Entity
+ * @Config
  */
 class WorkflowAwareEntity
 {
@@ -92,7 +94,7 @@ class WorkflowAwareEntity
     }
 
     /**
-     * @param WorkflowItem $workflowStep
+     * @param WorkflowStep $workflowStep
      * @return WorkflowAwareEntity
      */
     public function setWorkflowStep($workflowStep)
