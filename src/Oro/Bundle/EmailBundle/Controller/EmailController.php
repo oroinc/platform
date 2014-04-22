@@ -132,6 +132,21 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/base-widget", name="oro_email_widget_base_emails")
+     * @Template
+     * @AclAncestor("oro_email_view")
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function baseEmailsAction(Request $request)
+    {
+        return array(
+            'datagridParameters' => $request->query->all()
+        );
+    }
+
+    /**
      * Get email cache manager
      *
      * @return EmailCacheManager
