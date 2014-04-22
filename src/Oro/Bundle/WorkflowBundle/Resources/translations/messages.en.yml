@@ -66,6 +66,8 @@ Create Workflow: Create Workflow
 Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
+Reset workflow data: Reset workflow data
+workflow_reset_attention: Attention: this action will reset all existing workflow data
 
 oro:
     workflow:

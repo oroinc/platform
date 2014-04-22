@@ -110,6 +110,37 @@ class WorkflowManager
     }
 
     /**
+     * Perform reset workflow item data.
+     *
+     * @param WorkflowItem $workflowItem
+     * @throws \Exception
+     */
+    public function resetWorkflowItem(WorkflowItem $workflowItem)
+    {
+        $entity = $workflowItem->getEntity();
+
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass('OroWorkflowBundle:WorkflowItem');
+        $em->beginTransaction();
+
+        try {
+            $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
+            $em->remove($workflowItem);
+            $em->flush();
+
+            $activeWorkflow = $this->getApplicableWorkflow($entity);
+            if ($activeWorkflow->getDefinition()->getStartStep()) {
+                $this->startWorkflow($activeWorkflow->getName(), $entity);
+            }
+
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * @param string $workflow
      * @param object $entity
      * @param string|Transition|null $transition
@@ -299,8 +330,8 @@ class WorkflowManager
         $currentWorkflowItem = $this->getWorkflowItemByEntity($entity);
         $activeWorkflow      = $this->getApplicableWorkflow($entity);
 
-        return !empty($activeWorkflow) && !empty($currentWorkflowItem) &&
-                $currentWorkflowItem->getWorkflowName() === $activeWorkflow->getName();
+        return $activeWorkflow && $currentWorkflowItem &&
+               $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
     }
 
     /**
