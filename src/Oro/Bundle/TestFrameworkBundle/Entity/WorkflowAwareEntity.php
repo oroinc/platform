@@ -92,7 +92,7 @@ class WorkflowAwareEntity
     }
 
     /**
-     * @param WorkflowItem $workflowStep
+     * @param WorkflowStep $workflowStep
      * @return WorkflowAwareEntity
      */
     public function setWorkflowStep($workflowStep)
