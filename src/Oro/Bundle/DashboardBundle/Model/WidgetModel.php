@@ -8,14 +8,14 @@ use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 class WidgetModel implements EntityModelInterface
 {
     /**
-     * @var array
-     */
-    protected $config;
-
-    /**
      * @var Widget
      */
     protected $entity;
+
+    /**
+     * @var array
+     */
+    protected $config;
 
     /**
      * @var WidgetState

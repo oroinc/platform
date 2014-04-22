@@ -11,9 +11,9 @@ class DashboardModel implements EntityModelInterface
     const DEFAULT_TEMPLATE = 'OroDashboardBundle:Index:default.html.twig';
 
     /**
-     * @var Collection
+     * @var Dashboard
      */
-    protected $widgets;
+    protected $entity;
 
     /**
      * @var array
@@ -21,9 +21,9 @@ class DashboardModel implements EntityModelInterface
     protected $config;
 
     /**
-     * @var Dashboard
+     * @var Collection
      */
-    protected $entity;
+    protected $widgets;
 
     /**
      * @param Dashboard $dashboard
@@ -106,30 +106,6 @@ class DashboardModel implements EntityModelInterface
         }
         $this->widgets->add($widget);
         $this->getEntity()->addWidget($widget->getEntity());
-    }
-
-    /**
-     * Get min layout position in passed column
-     *
-     * @param int $column
-     * @return array
-     */
-    protected function getMinLayoutPosition($column)
-    {
-        $result = array($column, 1);
-
-        /** @var WidgetModel $currentWidget */
-        foreach ($this->getWidgets() as $currentWidget) {
-            $position = $currentWidget->getLayoutPosition();
-
-            if ($position[0] == $result[0] && $position[1] < $result[1]) {
-                $result = $position;
-            }
-        }
-
-        $result[1] = $result[1] - 1;
-
-        return $result;
     }
 
     /**
@@ -217,5 +193,29 @@ class DashboardModel implements EntityModelInterface
     {
         $config = $this->getConfig();
         return isset($config['twig']) ? $config['twig'] : self::DEFAULT_TEMPLATE;
+    }
+
+    /**
+     * Get min layout position in passed column
+     *
+     * @param int $column
+     * @return array
+     */
+    protected function getMinLayoutPosition($column)
+    {
+        $result = array($column, 1);
+
+        /** @var WidgetModel $currentWidget */
+        foreach ($this->getWidgets() as $currentWidget) {
+            $position = $currentWidget->getLayoutPosition();
+
+            if ($position[0] == $result[0] && $position[1] < $result[1]) {
+                $result = $position;
+            }
+        }
+
+        $result[1] = $result[1] - 1;
+
+        return $result;
     }
 }
