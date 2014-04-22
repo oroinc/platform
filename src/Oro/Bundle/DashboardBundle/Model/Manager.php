@@ -263,7 +263,7 @@ class Manager
         $activeDashboard->setDashboard($entity);
 
         if ($flush) {
-            $this->entityManager->flush($entity);
+            $this->entityManager->flush($activeDashboard);
         }
     }
 

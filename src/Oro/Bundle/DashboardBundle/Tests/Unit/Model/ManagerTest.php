@@ -620,7 +620,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $activeDashboard->expects($this->once())->method('setDashboard')->with($dashboard);
         $this->entityManager->expects($this->never())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())->method('flush')->with($activeDashboard);
 
         $this->manager->setUserActiveDashboard($dashboardModel, $user, true);
     }
@@ -642,7 +642,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->entityManager->expects($this->once())->method('persist');
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard'));
 
         $this->manager->setUserActiveDashboard($dashboardModel, $user, true);
     }
