@@ -179,7 +179,6 @@ class Manager
     {
         $widget = new Widget();
 
-        $widget->setExpanded($sourceWidget->isExpanded());
         $widget->setLayoutPosition($sourceWidget->getLayoutPosition());
         $widget->setName($sourceWidget->getName());
 

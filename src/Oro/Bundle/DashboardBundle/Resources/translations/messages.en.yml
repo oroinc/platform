@@ -53,6 +53,9 @@ oro:
         create_dashboard_link:
             title: Create new dashboard
             text:  Create
+        clone_dashboard_link:
+            title: Copy dashboard to new one
+            text:  Clone
         delete_dashboard_link:
             title: Remove current dashboard
             text:  Delete dashboard

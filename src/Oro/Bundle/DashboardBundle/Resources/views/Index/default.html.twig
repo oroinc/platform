@@ -73,10 +73,16 @@
                             {% endif %}
                             {% if resource_granted('CREATE', dashboard.entity) %}
                                 {{ UI.dropdownItem({
-                                    'path': path('oro_dashboard_create', {id:dashboard.id}),
+                                    'path': path('oro_dashboard_create'),
                                     'title': 'oro.dashboard.create_dashboard_link.title'|trans,
                                     'label': 'oro.dashboard.create_dashboard_link.text'|trans,
                                     'iCss': 'icon-plus'
+                                }) }}
+                                {{ UI.dropdownItem({
+                                    'path': path('oro_dashboard_create', {id:dashboard.id}),
+                                    'title': 'oro.dashboard.clone_dashboard_link.title'|trans,
+                                    'label': 'oro.dashboard.clone_dashboard_link.text'|trans,
+                                    'iCss': 'icon-copy'
                                 }) }}
                             {% endif %}
                             {% if resource_granted('DELETE', dashboard.entity) %}

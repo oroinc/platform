@@ -97,7 +97,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @Route("/create", name="oro_dashboard_create")
+     * @Route("/create/{id}", name="oro_dashboard_create",  defaults={"id"=0})
      * @Acl(
      *      id="oro_dashboard_create",
      *      type="entity",
@@ -106,9 +106,12 @@ class DashboardController extends Controller
      * )
      * @Template("OroDashboardBundle:Dashboard:update.html.twig")
      */
-    public function createAction()
+    public function createAction(Dashboard $startFrom = null)
     {
         $dashboardModel = $this->getDashboardManager()->createDashboardModel();
+        if ($startFrom) {
+            $dashboardModel->getEntity()->setStartDashboard($startFrom);
+        }
 
         return $this->update($dashboardModel);
     }
