@@ -91,7 +91,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             $('#dashboard-column-'+column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
                 'id': widgetModel.entity.id,
-                'expanded': widgetModel.entity.expanded,
+                'expanded': widgetModel.state.expanded,
                 'layoutPosition': widgetModel.entity.layout_position
             };
             var widgetParams = {
