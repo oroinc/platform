@@ -9,43 +9,45 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class Processor
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var EmailEntityBuilder
-     */
+    /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $mailer;
 
+    /** @var  EmailOwnerProvider */
+    protected $emailOwnerProvider;
+
     /**
-     * @param EntityManager $em
+     * @param EntityManager      $em
      * @param EmailEntityBuilder $emailEntityBuilder
-     * @param \Swift_Mailer $mailer
+     * @param \Swift_Mailer      $mailer
+     * @param EmailOwnerProvider $emailOwnerProvider
      */
     public function __construct(
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        \Swift_Mailer $mailer
+        \Swift_Mailer $mailer,
+        EmailOwnerProvider $emailOwnerProvider
     ) {
-        $this->em = $em;
+        $this->em                 = $em;
         $this->emailEntityBuilder = $emailEntityBuilder;
-        $this->mailer = $mailer;
+        $this->mailer             = $mailer;
+        $this->emailOwnerProvider = $emailOwnerProvider;
     }
 
     /**
      * Process email model sending.
      *
-     * @param Email $model
+     * @param Email  $model
      * @param string $originName
      * @return \Oro\Bundle\EmailBundle\Entity\Email
      * @throws \Swift_SwiftException
@@ -54,6 +56,7 @@ class Processor
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
+
         $message = $this->mailer->createMessage();
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
@@ -65,10 +68,30 @@ class Processor
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $origin = $this->em
-            ->getRepository('OroEmailBundle:InternalEmailOrigin')
-            ->findOneBy(array('name' => $originName));
+        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+            $this->em,
+            EmailUtil::extractPureEmailAddress($model->getFrom())
+        );
+
+        if ($emailOwner instanceof User) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                function ($item) {
+                    return $item instanceof InternalEmailOrigin;
+                }
+            );
+
+            $origin = $origins->isEmpty() ? null : $origins->first();
+            if ($origin == null) {
+                $origin = $this->createUserInternalOrigin($emailOwner);
+            }
+        } else {
+            $origin = $this->em
+                ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                ->findOneBy(array('internalName' => $originName));
+        }
+
         $this->emailEntityBuilder->setOrigin($origin);
+
         $email = $this->emailEntityBuilder->email(
             $model->getSubject(),
             $model->getFrom(),
@@ -77,13 +100,41 @@ class Processor
             $messageDate,
             $messageDate
         );
+
         $email->setFolder($origin->getFolder(EmailFolder::SENT));
-        $emailBody = $this->emailEntityBuilder->body($model->getBody(), false, true);
-        $email->setEmailBody($emailBody);
+        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
+
         $this->emailEntityBuilder->getBatch()->persist($this->em);
         $this->em->flush();
 
         return $email;
+    }
+
+    /**
+     * @param User $emailOwner
+     * @return InternalEmailOrigin
+     */
+    protected function createUserInternalOrigin(User $emailOwner)
+    {
+        $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
+
+        $outboxFolder = new EmailFolder();
+        $outboxFolder
+            ->setType(EmailFolder::SENT)
+            ->setName(EmailFolder::SENT)
+            ->setFullName(EmailFolder::SENT);
+
+        $origin = new InternalEmailOrigin();
+        $origin
+            ->setName($originName)
+            ->addFolder($outboxFolder);
+
+        $emailOwner->addEmailOrigin($origin);
+
+        $this->em->persist($origin);
+        $this->em->persist($emailOwner);
+
+        return $origin;
     }
 
     /**
