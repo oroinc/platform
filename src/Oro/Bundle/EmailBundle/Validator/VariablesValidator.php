@@ -24,6 +24,11 @@ class VariablesValidator extends ConstraintValidator
     /** @var EntityManager */
     protected $entityManager;
 
+    /**
+     * @param \Twig_Environment            $twig
+     * @param SecurityContextInterface     $securityContext
+     * @param EntityManager                $entityManager
+     */
     public function __construct(
         \Twig_Environment $twig,
         SecurityContextInterface $securityContext,
@@ -53,35 +58,35 @@ class VariablesValidator extends ConstraintValidator
             }
         }
 
-        $relatedEntity = false;
+        $errors = array();
         if (class_exists($emailTemplate->getEntityName())) {
-            $className     = $emailTemplate->getEntityName();
-            $relatedEntity = new $className;
+            $className = $emailTemplate->getEntityName();
 
-            $metadata = $this->entityManager->getClassMetadata($className);
+            /** @var ClassMetadataInfo $metadata */
+            $classMetadata   = $this->entityManager->getClassMetadata($className);
+            $entity          = $classMetadata->newInstance();
 
-            foreach ($metadata->getAssociationMappings() as $mapping) {
-                $targetEntity = new $mapping['targetEntity'];
-                $fieldName    = $mapping['fieldName'];
-                if (!in_array($mapping['type'], [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::MANY_TO_MANY])) {
-                    $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
+            $errors = array();
+
+            /** @var \Twig_Extension_Sandbox $sandbox */
+            $sandbox = $this->twig->getExtension('sandbox');
+            $sandbox->enableSandbox();
+
+            foreach ($fieldsToValidate as $fieldName => $template) {
+                  try {
+                    $this->twig->render(
+                        $template,
+                        array(
+                            'entity' => $entity,
+                            'user'   => $this->getUser()
+                        )
+                    );
+                } catch (\Twig_Sandbox_SecurityError $e) {
+                    $errors[$fieldName] = true;
                 }
             }
-        }
 
-        $errors = array();
-        foreach ($fieldsToValidate as $field => $value) {
-            try {
-                $this->twig->render(
-                    $value,
-                    array(
-                        'entity' => $relatedEntity,
-                        'user'   => $this->getUser()
-                    )
-                );
-            } catch (\Exception $e) {
-                $errors[$field] = true;
-            }
+            $sandbox->disableSandbox();
         }
 
         if (!empty($errors)) {
