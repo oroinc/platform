@@ -241,4 +241,4 @@ services:
         arguments:
             - @oro_email.datagrid_query_factory
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.email-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
