@@ -137,14 +137,4 @@ class EmailUtil
 
         return (strpos($emailAddress, '<') !== false);
     }
-
-    /**
-     * Return current UTC date/time
-     *
-     * @return \DateTime
-     */
-    public static function currentUTCDateTime()
-    {
-        return new \DateTime('now', new \DateTimeZone('UTC'));
-    }
 }

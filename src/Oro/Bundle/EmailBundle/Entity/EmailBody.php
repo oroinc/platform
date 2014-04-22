@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
@@ -265,6 +264,6 @@ class EmailBody
      */
     public function beforeSave()
     {
-        $this->created = EmailUtil::currentUTCDateTime();
+        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
