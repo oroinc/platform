@@ -103,10 +103,10 @@
 {% endmacro %}
 
 {% macro renderResetButton(data, blockId) %}
-    {% set resetButtonId = 'workflow-item-reset' %}
+    {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
     <a href="javascript:void(0);"
-       data-url="{{ data.deleteUrl }}"
-       data-message="{{ 'workflow_reset_attention'|trans }}"
+       data-url="{{ data.url }}"
+       data-message="{{ 'Attention&#058; This action will reset all existing workflow data'|trans }}"
        title="{{ data.title|trans }}"
        class="btn icons-holder-text btn-primary"
        id="{{ resetButtonId }}">
@@ -120,16 +120,15 @@
                 'use strict';
 
                 $(function() {
-                    var container = $('#{{ blockId }}');
-                    (function(resetBtn) {
-                        resetBtn.data('executor', function() {
-                            workflowResetHandler.call(resetBtn);
-                        });
-                        resetBtn.on('click', function(e) {
-                            e.preventDefault();
-                            $(this).data('executor').call();
-                        });
-                    })(container.find('#{{ resetButtonId }}'));
+                    var container = $('#{{ blockId }}'),
+                        resetBtn  = container.find('#{{ resetButtonId }}');
+                    resetBtn.data('executor', function() {
+                        workflowResetHandler.call(resetBtn);
+                    });
+                    resetBtn.on('click', function(e) {
+                        e.preventDefault();
+                        $(this).data('executor').call();
+                    });
                 });
             });
     </script>

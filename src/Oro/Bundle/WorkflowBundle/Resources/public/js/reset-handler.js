@@ -4,10 +4,9 @@ define([
     'orotranslation/js/translator',
     'oroui/js/modal',
     'oronavigation/js/navigation',
-    'oroui/js/messenger',
-    'oroui/js/delete-confirmation'
+    'oroui/js/messenger'
 ],
-function($, _, __, Modal, Navigation, Messenger, DeleteConfirmation) {
+function($, _, __, Modal, Navigation, Messenger) {
     'use strict';
 
     var navigation = Navigation.getInstance();
@@ -28,7 +27,7 @@ function($, _, __, Modal, Navigation, Messenger, DeleteConfirmation) {
             element.data('_in-progress', false);
         };
 
-        var confirmReset = new DeleteConfirmation({
+        var confirmReset = new Modal({
             title:   __('Workflow reset'),
             content: element.data('message'),
             okText:  __('Yes, Reset')
@@ -39,15 +38,12 @@ function($, _, __, Modal, Navigation, Messenger, DeleteConfirmation) {
                 url:  element.data('url'),
                 type: 'DELETE',
                 success: function(responce) {
-                    var doReload = function() {
-                        if (navigation) {
-                            navigation.loadPage(true);
-                        } else {
-                            window.location.reload();
-                        }
-                    };
+                    if (navigation) {
+                        navigation.loadPage(true);
+                    } else {
+                        window.location.reload();
+                    }
 
-                    element.one('reset_success', doReload);
                     element.trigger('reset_success', [responce]);
                 },
                 error: function(xhr, textStatus, error) {

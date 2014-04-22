@@ -119,7 +119,7 @@ class EntityConnector
      */
     public function resetWorkflowData($entity)
     {
-        $this->setWorkflowItem($entity);
-        $this->setWorkflowStep($entity);
+        $this->setWorkflowItem($entity, null);
+        $this->setWorkflowStep($entity, null);
     }
 }

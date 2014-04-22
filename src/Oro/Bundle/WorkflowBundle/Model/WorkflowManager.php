@@ -111,12 +111,17 @@ class WorkflowManager
 
     /**
      * Perform reset workflow item data.
+     * Setting $workflowItem and $workflowStep references into null, removing of workflow item.
+     * If current active workflow definition have a start step, then start step will be performed
      *
      * @param WorkflowItem $workflowItem
+     * @return WorkflowItem active workflowItem when current active workflow definition have a start step,
+     *         otherwise - null
      * @throws \Exception
      */
     public function resetWorkflowItem(WorkflowItem $workflowItem)
     {
+        $activeWorkflowItem = null;
         $entity = $workflowItem->getEntity();
 
         /** @var EntityManager $em */
@@ -130,7 +135,7 @@ class WorkflowManager
 
             $activeWorkflow = $this->getApplicableWorkflow($entity);
             if ($activeWorkflow->getDefinition()->getStartStep()) {
-                $this->startWorkflow($activeWorkflow->getName(), $entity);
+                $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
             }
 
             $em->commit();
@@ -138,6 +143,8 @@ class WorkflowManager
             $em->rollback();
             throw $e;
         }
+
+        return $activeWorkflowItem;
     }
 
     /**
