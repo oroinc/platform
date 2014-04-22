@@ -8,7 +8,8 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface, ContainerAwareInterface
+class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface,
+ ContainerAwareInterface
 {
     /**
      * @var ContainerInterface

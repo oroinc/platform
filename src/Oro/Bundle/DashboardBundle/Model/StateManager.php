@@ -94,4 +94,4 @@ class StateManager
             'User not logged'
         );
     }
-} 
+}

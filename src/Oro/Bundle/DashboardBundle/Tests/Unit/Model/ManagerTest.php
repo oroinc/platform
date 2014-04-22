@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 
@@ -257,6 +258,24 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
+        $widgetModel->expects($this->once())
+            ->method('getEntity')
+            ->will($this->returnValue($widgetEntity));
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($widgetEntity);
+
+        $this->entityManager->expects($this->never())
+            ->method('flush');
+
+        $this->manager->save($widgetModel);
+    }
+
+    public function testSaveWithFlush()
+    {
+        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
         $widgetModel->expects($this->exactly(2))
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));
@@ -269,7 +288,148 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('flush')
             ->with($widgetEntity);
 
-        $this->manager->save($widgetModel);
+        $this->manager->save($widgetModel, true);
+    }
+
+    public function testSaveDashboardWithoutCopyEmptyStartDashboard()
+    {
+        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+
+        $dashboardModel->expects($this->once())
+            ->method('getStartDashboard')
+            ->will($this->returnValue(null));
+
+        $dashboardModel->expects($this->once())
+            ->method('getEntity')
+            ->will($this->returnValue($dashboardEntity));
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($dashboardEntity);
+
+        $this->manager->save($dashboardModel, false);
+    }
+
+    public function testSaveDashboardWithoutCopyNotNew()
+    {
+        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $startDashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+
+        $dashboardModel->expects($this->once())
+            ->method('getStartDashboard')
+            ->will($this->returnValue($startDashboardEntity));
+
+        $dashboardModel->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        $dashboardModel->expects($this->once())
+            ->method('getEntity')
+            ->will($this->returnValue($dashboardEntity));
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($dashboardEntity);
+
+        $this->manager->save($dashboardModel, false);
+    }
+
+    public function testSaveDashboardWithCopy()
+    {
+        $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $startDashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $startDashboardWidgets = array(
+            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+        );
+        $copyWidgets = array(
+            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+        );
+        $copyWidgetModels = array(
+            $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
+                ->disableOriginalConstructor()
+                ->getMock(),
+            $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
+                ->disableOriginalConstructor()
+                ->getMock(),
+        );
+
+        $expectedCopyWidgetsData = array(
+            array('layoutPosition' => array(0, 1), 'name' => 'foo'),
+            array('layoutPosition' => array(1, 0), 'name' => 'bar'),
+        );
+
+        $dashboardModel->expects($this->exactly(2))
+            ->method('getStartDashboard')
+            ->will($this->returnValue($startDashboardEntity));
+
+        $dashboardModel->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(null));
+
+        $startDashboardEntity->expects($this->once())
+            ->method('getWidgets')
+            ->will($this->returnValue($startDashboardWidgets));
+
+        $index = 0;
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $widgetMock */
+        foreach ($startDashboardWidgets as $index => $widgetMock) {
+            $expectedData = $expectedCopyWidgetsData[$index];
+
+            $widgetMock->expects($this->once())
+                ->method('getLayoutPosition')
+                ->will($this->returnValue($expectedData['layoutPosition']));
+
+            $widgetMock->expects($this->once())
+                ->method('getName')
+                ->will($this->returnValue($expectedData['name']));
+
+            $this->factory->expects($this->at($index))
+                ->method('createWidgetModel')
+                ->with(
+                    $this->callback(
+                        function ($entity) use ($expectedData) {
+                            $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\Widget', $entity);
+                            $this->assertEquals($expectedData['layoutPosition'], $entity->getLayoutPosition());
+                            $this->assertEquals($expectedData['name'], $entity->getName());
+                            return true;
+                        }
+                    )
+                )
+                ->will($this->returnValue($copyWidgetModels[$index]));
+
+            $copyWidgetModels[$index]->expects($this->once())
+                ->method('getEntity')
+                ->will($this->returnValue($copyWidgets[$index]));
+
+            $this->entityManager->expects($this->at($index))
+                ->method('persist')
+                ->with($copyWidgets[$index]);
+        }
+
+        $dashboardModel->expects($this->once())
+            ->method('getEntity')
+            ->will($this->returnValue($dashboardEntity));
+
+        $this->entityManager->expects($this->at($index + 1))
+            ->method('persist')
+            ->with($dashboardEntity);
+
+        $this->manager->save($dashboardModel, false);
     }
 
     public function testRemove()

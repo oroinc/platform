@@ -117,7 +117,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
         $divider = $this->getMock('Knp\Menu\ItemInterface');
         $divider->expects($this->once())->method('setLabel')->with('')->will($this->returnSelf());
-        $divider->expects($this->once())->method('setAttribute')->with('class', 'divider menu-divider')->will($this->returnSelf());
+        $divider->expects($this->once())->method('setAttribute')->with('class', 'divider menu-divider')
+            ->will($this->returnSelf());
         $divider->expects($this->once())->method('setExtra')->with('position', '2')->will($this->returnSelf());
 
         $item->expects($this->at(0))

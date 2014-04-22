@@ -133,7 +133,7 @@ class DashboardController extends Controller
         $request = $this->getRequest();
         if ($request->isMethod('POST')) {
             if ($form->submit($request)->isValid()) {
-                $this->getDashboardManager()->save($dashboardModel);
+                $this->getDashboardManager()->save($dashboardModel, true);
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.dashboard.saved_message')

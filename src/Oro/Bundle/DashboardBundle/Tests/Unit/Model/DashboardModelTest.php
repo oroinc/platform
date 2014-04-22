@@ -186,14 +186,15 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
     {
         $firstWidgetId = 100;
         $secondWidgetId = 101;
-        $this->widgets[0]->expects($this->once())
+        $this->widgets[0]->expects($this->exactly(2))
             ->method('getId')
             ->will($this->returnValue($firstWidgetId));
-        $this->widgets[1]->expects($this->once())
+        $this->widgets[1]->expects($this->exactly(2))
             ->method('getId')
             ->will($this->returnValue($secondWidgetId));
 
         $this->assertEquals($this->widgets[1], $this->dashboardModel->getWidgetById($secondWidgetId));
+        $this->assertNull($this->dashboardModel->getWidgetById('undefined'));
     }
 
     /**

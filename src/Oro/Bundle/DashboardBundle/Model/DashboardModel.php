@@ -86,7 +86,7 @@ class DashboardModel implements EntityModelInterface
     }
 
     /**
-     * @return string
+     * @return Dashboard
      */
     public function getStartDashboard()
     {

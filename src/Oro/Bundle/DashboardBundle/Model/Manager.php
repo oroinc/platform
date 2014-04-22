@@ -141,7 +141,7 @@ class Manager
      * @param EntityModelInterface $entityModel
      * @param boolean $flush
      */
-    public function save(EntityModelInterface $entityModel, $flush = true)
+    public function save(EntityModelInterface $entityModel, $flush = false)
     {
         if ($entityModel instanceof DashboardModel && $entityModel->getStartDashboard() && !$entityModel->getId()) {
             $this->copyWidgets($entityModel, $entityModel->getStartDashboard());
