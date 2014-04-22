@@ -190,14 +190,20 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _lockLayoutHeight: function() {
-            var maxHeight = 0;
             this._releaseLayoutHeight();
-            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+            var columns = $(this.options.columnsSelector);
+            var scrollableContainer = columns.parents('.scrollable-container').first();
+            var container = scrollableContainer.find('.dashboard-container');
+            var padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
+            var maxHeight = scrollableContainer.height() - padding;
+
+            columns.each(function(columnIndex, columnElement) {
                 var currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
-            $(this.options.columnsSelector).css({minHeight: maxHeight + 'px'});
-            $(this.options.columnsSelector).sortable('refresh');
+
+            columns.css({minHeight: maxHeight + 'px'});
+            columns.sortable('refresh');
         },
 
         /**
