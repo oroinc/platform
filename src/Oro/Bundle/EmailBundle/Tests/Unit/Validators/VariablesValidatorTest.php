@@ -9,12 +9,15 @@ use Oro\Bundle\EmailBundle\Validator\Constraints\VariablesConstraint;
 
 class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_SUBJECT       = 'testSubject';
-    const TEST_TRANS_SUBJECT = 'testTransSubject';
-    const TEST_CONTENT       = 'testContent';
+    const TEST_SUBJECT       = '{{entity.subject}}';
+    const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
+    const TEST_CONTENT       = '{{entity.content}}';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $twig;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $sandbox;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityContext;
@@ -42,8 +45,30 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->twig            = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()->getMock();
+        $this->twig = $this
+            ->getMockBuilder('\Twig_Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->sandbox = $this
+            ->getMockBuilder('\Twig_Extension_Sandbox')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->sandbox
+            ->expects($this->once())
+            ->method('enableSandbox');
+
+        $this->sandbox
+            ->expects($this->once())
+            ->method('disableSandbox');
+
+        $this->twig
+            ->expects($this->once())
+            ->method('getExtension')
+            ->with($this->equalTo('sandbox'))
+            ->will($this->returnValue($this->sandbox));
+
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $token                 = $this->getMockForAbstractClass(
             'Symfony\Component\Security\Core\Authentication\Token\TokenInterface'
@@ -84,7 +109,7 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
                         'stdClass' => [
                             'targetEntity' => '\stdClass',
                             'fieldName'    => 'stdClass',
-                            'type' => 1
+                            'type'         => 1
                         ]
                     ]
                 )
@@ -95,7 +120,13 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getClassMetadata')
             ->will($this->returnValue($this->classMetadata));
 
-        $this->template            = new EmailTemplate();
+        $this->template = new EmailTemplate();
+
+        $this->template
+            ->setContent(self::TEST_CONTENT)
+            ->setSubject(self::TEST_SUBJECT)
+            ->setEntityName('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity');
+
         $this->variablesConstraint = new VariablesConstraint();
 
         $this->validator = new VariablesValidator(
@@ -119,10 +150,6 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateNotErrors()
     {
-        $this->template->setContent(self::TEST_CONTENT)
-            ->setSubject(self::TEST_SUBJECT);
-        $this->template->setEntityName('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity');
-
         $phpUnit  = $this;
         $user     = $this->user;
         $callback = function ($template, $params) use ($phpUnit, $user) {
@@ -137,29 +164,63 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             );
             $phpUnit->assertInstanceOf(get_class($user), $params['user']);
         };
-        $this->twig->expects($this->at(0))->method('render')->with(self::TEST_SUBJECT)
-            ->will($this->returnCallback($callback));
-        $this->twig->expects($this->at(1))->method('render')->with(self::TEST_CONTENT)
-            ->will($this->returnCallback($callback));
+
+        $map = [
+            [self::TEST_SUBJECT, $callback],
+            [self::TEST_CONTENT, $callback]
+        ];
+
+        $this->twig->expects($this->exactly(2))->method('render')->will($this->returnValueMap($map));
 
         $this->context->expects($this->never())->method('addViolation');
 
         $this->validator->validate($this->template, $this->variablesConstraint);
     }
 
-    public function testValidateErrors()
+    public function testValidateSandboxErrors()
     {
         $trans = new EmailTemplateTranslation();
-        $trans->setField('subject')
+        $trans
+            ->setField('subject')
             ->setContent(self::TEST_TRANS_SUBJECT);
-        $this->template->setContent(self::TEST_CONTENT)
-            ->setSubject(self::TEST_SUBJECT)
-            ->getTranslations()->add($trans);
+        $this->template->getTranslations()->add($trans);
 
-        $this->twig->expects($this->at(0))->method('render')->with(self::TEST_SUBJECT);
-        $this->twig->expects($this->at(1))->method('render')->with(self::TEST_CONTENT);
-        $this->twig->expects($this->at(2))->method('render')->with(self::TEST_TRANS_SUBJECT)
-            ->will($this->throwException(new \Exception()));
+        $map = [
+            [self::TEST_SUBJECT],
+            [self::TEST_CONTENT],
+            [self::TEST_TRANS_SUBJECT]
+        ];
+
+        $this->twig->expects($this->exactly(3))->method('render')->will($this->returnValueMap($map));
+
+        $this->twig->expects($this->at(2))->method('render')->will(
+            $this->throwException(new \Twig_Sandbox_SecurityError('message'))
+        );
+
+        $this->context->expects($this->once())->method('addViolation')->with($this->variablesConstraint->message);
+
+        $this->validator->validate($this->template, $this->variablesConstraint);
+    }
+
+    public function testValidateRuntimeErrors()
+    {
+        $trans = new EmailTemplateTranslation();
+        $trans
+            ->setField('subject')
+            ->setContent(self::TEST_TRANS_SUBJECT);
+        $this->template->getTranslations()->add($trans);
+
+        $map = [
+            [self::TEST_SUBJECT],
+            [self::TEST_CONTENT],
+            [self::TEST_TRANS_SUBJECT]
+        ];
+
+        $this->twig->expects($this->exactly(3))->method('render')->will($this->returnValueMap($map));
+
+        $this->twig->expects($this->at(2))->method('render')->will(
+            $this->throwException(new \Twig_Error_Runtime('message'))
+        );
 
         $this->context->expects($this->once())->method('addViolation')->with($this->variablesConstraint->message);
 

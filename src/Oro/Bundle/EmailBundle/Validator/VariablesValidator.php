@@ -83,6 +83,8 @@ class VariablesValidator extends ConstraintValidator
                     );
                 } catch (\Twig_Sandbox_SecurityError $e) {
                     $errors[$fieldName] = true;
+                } catch (\Twig_Error_Runtime $e) {
+                    $errors[$fieldName] = true;
                 }
             }
 
