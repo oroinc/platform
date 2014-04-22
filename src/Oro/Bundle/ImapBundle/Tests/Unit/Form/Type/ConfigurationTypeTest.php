@@ -151,7 +151,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         );
 
         $this->assertNotSame($entity, $form->getData());
-        $this->assertFalse($entity->getIsActive());
 
         $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
         $this->assertTrue($form->getData()->getIsActive());
@@ -181,7 +180,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         );
 
         $this->assertNotSame($entity, $form->getData());
-        $this->assertFalse($entity->getIsActive());
 
         $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
         $this->assertNull($form->getData());

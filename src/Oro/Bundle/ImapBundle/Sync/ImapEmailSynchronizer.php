@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
@@ -25,11 +27,11 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /**
      * Constructor
      *
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailAddressManager $emailAddressManager
+     * @param EntityManager        $em
+     * @param EmailEntityBuilder   $emailEntityBuilder
+     * @param EmailAddressManager  $emailAddressManager
      * @param ImapConnectorFactory $connectorFactory
-     * @param Mcrypt $encryptor
+     * @param Mcrypt               $encryptor
      */
     public function __construct(
         EntityManager $em,
@@ -40,7 +42,15 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     ) {
         parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
         $this->connectorFactory = $connectorFactory;
-        $this->encryptor = $encryptor;
+        $this->encryptor        = $encryptor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(EmailOrigin $origin)
+    {
+        return $origin instanceof ImapEmailOrigin;
     }
 
     /**
@@ -72,6 +82,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             $this->em,
             $this->emailEntityBuilder,
             $this->emailAddressManager,
+            $this->knownEmailAddressChecker,
             new ImapEmailManager($this->connectorFactory->createImapConnector($config))
         );
     }

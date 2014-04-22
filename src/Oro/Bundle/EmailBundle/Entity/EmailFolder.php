@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
@@ -16,11 +15,11 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
-    const INBOX = 'inbox';
-    const SENT = 'sent';
-    const TRASH = 'trash';
+    const INBOX  = 'inbox';
+    const SENT   = 'sent';
+    const TRASH  = 'trash';
     const DRAFTS = 'drafts';
-    const OTHER = 'other';
+    const OTHER  = 'other';
 
     /**
      * @var integer
