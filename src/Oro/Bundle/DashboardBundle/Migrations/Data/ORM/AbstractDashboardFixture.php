@@ -5,14 +5,14 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\DashboardBundle\Model\DashboardModel;
-use Oro\Bundle\DashboardBundle\Model\WidgetModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\WidgetModel;
 
 abstract class AbstractDashboardFixture extends AbstractFixture implements ContainerAwareInterface
 {
