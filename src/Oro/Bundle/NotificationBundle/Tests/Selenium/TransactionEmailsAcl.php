@@ -64,7 +64,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
             ->add()
-            ->assertTitle('Add Notification Rule - Notifications - Emails - System')
+            ->assertTitle('Add Notification Rule - Notification Rules - Emails - System')
             ->setEmail($email)
             ->setEntityName('User')
             ->setEvent('Entity create')
@@ -73,7 +73,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->setGroups(array('Marketing'))
             ->save()
             ->assertMessage('Email notification rule saved')
-            ->assertTitle('Notifications - Emails - System')
+            ->assertTitle('Notification Rules - Emails - System')
             ->close();
 
         return $email;
@@ -153,7 +153,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->setPassword('123123q')
             ->submit()
             ->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create notification rule')]");
+            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create Notification Rule')]");
     }
 
     public function viewListAcl($login, $roleName, $username)

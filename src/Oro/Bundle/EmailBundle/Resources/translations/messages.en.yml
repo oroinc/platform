@@ -1,5 +1,8 @@
 oro:
     email:
+        menu:
+            emailtemplate_list.description: List of email templates
+
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template: "Choose a template..."
         datagrid:
@@ -10,7 +13,7 @@ oro:
                     delete: "Delete"
                 filter:
                     type:
-                        html: "HTML"
+                        html: "Html"
                         txt: "Plain text"
                 page_size:
                     all: "All"
@@ -44,7 +47,6 @@ oro:
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
-            new_entity:          New email template
             edit_entity:         Edit email template "%name%"
             clone_entity:        Clone email template
             entity_description:  Represent email template
@@ -70,4 +72,4 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
-
+"Click to insert variable or drag it.": "Click to insert variable or drag it."

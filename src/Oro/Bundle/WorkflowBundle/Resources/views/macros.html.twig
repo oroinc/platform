@@ -61,7 +61,7 @@
 
 {% macro renderTransitionsJs(transitionsData, blockId) %}
     <script type="text/javascript">
-        require(['jquery', 'oroworkflow/js/transition-handler', 'popover-extra-placements'],
+        require(['jquery', 'oroworkflow/js/transition-handler'],
         function($, workflowTransitionHandler) {
             'use strict';
 
@@ -87,7 +87,8 @@
                         if (transitionBtn.data('transition-condition-messages')) {
                             transitionBtn.popover({
                                 'html': true,
-                                'placement': 'bottomRight',
+                                'placement': 'bottom',
+                                'container': $('body'),
                                 'trigger': 'hover',
                                 'title': '<i class="icon-exclamation-sign"></i>' + {{ 'Unmet conditions'|trans|json_encode|raw }},
                                 'content': transitionBtn.data('transition-condition-messages')

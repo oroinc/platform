@@ -1,57 +1,43 @@
 {% extends bap.layout %}
-{% oro_title_set({params : {"%name%": pageTitle|trans }}) %}
-
-{% macro renderCell(widgets, isEven) %}
-    {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
-        <div class="responsive-cell">
-            {% set index = 1 %}
-            {% for widget in widgets %}
-                {% if (isEven and index is even) or (not isEven and index is odd) %}
-                    {{
-                        oro_widget_render({
-                            'widgetType': 'block',
-                            'url': path(widget.route, widget.route_parameters)
-                        })
-                    }}
-                {% endif %}
-                {% set index = index + 1 %}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-{% import _self as __ %}
+{% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
 
 {% block content %}
-<div class="layout-content dashboard-contailer">
+{% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
+{% set allowEdit = resource_granted('EDIT', dashboard.dashboard) %}
+<div class="layout-content dashboard-container-wrapper">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-                        <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
+                        <h1 class="oro-subtitle">{{ dashboard.getLabel()|trans }}</h1>
                     </div>
                 </div>
                 {% endblock title %}
                 {% block titleNavButtons %}
                 <div class="pull-right title-buttons-container">
                     {% placeholder dashboard_navButtons_before %}
+
                     {% block navButtons %}
                         {% if dashboards|length > 1 %}
-                        <div class="dashboard-selector-container">
-                            <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                        <div class="dashboard-selector-container pull-left">
+                            <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                             <select id="dashboard_selector">
-                                {% for name,label in dashboards %}
-                                    <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
+                                {% for dashboardModel in dashboards %}
+                                    <option value="{{ dashboardModel.dashboard.id }}"{% if dashboardModel.dashboard.id == dashboard.dashboard.id %} selected="selected"{% endif %}>
+                                        {{ dashboardModel.getLabel()|trans }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>
+
                         <script type="text/javascript">
                             require(['jquery', 'routing', 'oronavigation/js/navigation'],
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
+                                        var url = routing.generate('oro_dashboard_index', {id: $(e.currentTarget).val(), change_dashboard: true}),
                                             navigation = Navigation.getInstance();
                                         if (navigation) {
                                             navigation.processRedirect({
@@ -67,6 +53,12 @@
                         </script>
                         {% endif %}
                     {% endblock navButtons %}
+                    {% if allowEdit %}
+                        <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
+                            <i class="icon-plus"></i>
+                            Add widget
+                        </a>
+                    {% endif %}
                     {% placeholder dashboard_navButtons_after %}
                 </div>
                 {% endblock titleNavButtons %}
@@ -79,21 +71,103 @@
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
-                    {{ __.renderCell(widgets, false) }}
-                    {{ __.renderCell(widgets, true) }}
+                    {{
+                        _self.renderWidgetsColumn({
+                            'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
+                            'columnElementId': 'dashboard-column-0',
+                            'columnClass': 'dashboard-column',
+                            'widgetIdPrefix': widgetIdPrefix,
+                            'allowEdit': allowEdit
+                        })
+                    }}
+                    {{
+                        _self.renderWidgetsColumn({
+                            'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
+                            'columnElementId': 'dashboard-column-1',
+                            'columnClass': 'dashboard-column',
+                            'widgetIdPrefix': widgetIdPrefix,
+                            'allowEdit': allowEdit
+                        })
+                    }}
                 {% endblock widgets %}
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-            require(['jquery'],
-            function($){
-                $(function () {
-                    var $contentEl = $('.{{ contentClass }}');
-                    $contentEl.closest('.scrollable-container').css('background-color', $contentEl.css('background-color'));
-                });
-            });
+        <script type="text/html" id="available-dashboard-widgets">
+            {% for widgetName, widget in widgets %}
+                <div class="dashboard-widget-container">
+                    <div class="dashboard-widget-thumbnail">
+                    {% if widget.thumbnail is defined %}
+                        <img src="{{ asset(widget.thumbnail) }}" alt="Preview" />
+                    {% else %}
+                        <img src="{{ asset("bundles/orodashboard/img/no_thumbnail.png") }}" alt="Preview" />
+                    {% endif %}
+                    </div>
+                    <p>
+                    {% if widget.label is defined %}
+                        <strong class="dashboard-widget-title">{{ widget.label|trans }}</strong>
+                    {% endif %}
+                    <span class="dashboard-widget-description">
+                        {% if widget.description is defined %}
+                            {{ widget.description|trans }}
+                        {% endif %}
+                    </span>
+                    </p>
+                    <div class="dashboard-widgets-pick-wrapper">
+                        <a class="btn add-widget-button" data-widget-name="{{ widgetName }}">
+                            {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </script>
     {% endblock widgets_content %}
+
+    <script type="text/javascript">
+        require(['orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
+            function(dashboardContainer, widgetPicker) {
+                {% set widgetIds = [] %}
+                {% for widget in dashboard.widgets %}
+                    {% set widgetIds = widgetIds|merge([widgetIdPrefix ~ widget.widget.id]) %}
+                {% endfor %}
+                dashboardContainer.initialize({
+                    widgetIds: {{ widgetIds|json_encode|raw }},
+                    dashboardId: {{ dashboard.dashboard.id }},
+                    columnsSelector: '.dashboard-column',
+                    allowEdit: {{ allowEdit ? 'true' : 'false' }}
+                });
+				widgetPicker.init({{ dashboard.dashboard.id }});
+            }
+        );
+    </script>
 </div>
 {% endblock content %}
+
+{% macro renderWidgetsColumn(options) %}
+    <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column">
+        {% for widget in options.widgets %}
+            {{
+                oro_widget_render({
+                    'widgetType': 'dashboard-item',
+                    'wid': options.widgetIdPrefix ~ widget.widget.id,
+                    'url': path(widget.config.route, widget.config.route_parameters),
+                    'state': {
+                        'id': widget.widget.id,
+                        'expanded': widget.widget.expanded,
+                        'layoutPosition': widget.widget.layoutPosition,
+                    },
+                    'allowEdit': options.allowEdit
+                })
+            }}
+        {% endfor %}
+        <div class="empty-text{% if options.widgets|length > 0 %} hidden-empty-text{% endif %}">
+            <div class="widget-placeholder">
+                {% if options.allowEdit %}
+                    {{ 'oro.dashboard.empty_column_message.allowed'|trans|raw }}
+                {% else %}
+                    {{ 'oro.dashboard.empty_column_message.denied'|trans }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}

@@ -293,10 +293,6 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ACL_NAME,
                 false
             ],
-            'ACL combined resource given' => [
-                sprintf('%s;%s', self::TEST_ACL_NAME, self::TEST_ACL_DESCRIPTOR),
-                true
-            ]
         ];
     }
 

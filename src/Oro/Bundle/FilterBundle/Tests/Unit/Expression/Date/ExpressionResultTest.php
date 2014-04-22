@@ -55,14 +55,17 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $result);
 
-        $expectedResult = date('d');
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $expectedResult = $dateTime->format('d');
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
-        $expectedResult = date('d', strtotime('today +3 days'));
+        $dateTime->add(new \DateInterval('P3D'));
+        $expectedResult = $dateTime->format('d');
         $expression->add(new ExpressionResult(3));
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
-        $expectedResult = date('d', strtotime('today -5 days'));
+        $dateTime->sub(new \DateInterval('P8D'));
+        $expectedResult = $dateTime->format('d');
         $expression->subtract(new ExpressionResult(8));
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
@@ -71,7 +74,8 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $result);
 
-        $expectedResult = date('d');
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $expectedResult = $dateTime->format('d');
         $this->assertSame((int)$expectedResult, (int)$result->day);
         $this->assertEquals(0, (int)$result->hour);
         $this->assertEquals(0, (int)$result->minute);
@@ -82,15 +86,16 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_WEEK));
         $result     = $expression->getValue();
 
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('this week'))->format('d');
+        $expectedResult = date('d', strtotime('this week'));
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
         $expression->add(new ExpressionResult(3));
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('this week +3 weeks'))->format('d');
+
+        $expectedResult = date('d', strtotime('this week +3 weeks'));
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
         $expression->subtract(new ExpressionResult(8));
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('this week -5 weeks'))->format('d');
+        $expectedResult = date('d', strtotime('this week -5 weeks'));
         $this->assertSame((int)$expectedResult, (int)$result->day);
     }
 
@@ -99,18 +104,22 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_QUARTER));
         $result     = $expression->getValue();
 
-        $curMonth   = date('m');
-        $curQuarter = (int)ceil($curMonth / 3);
-
-        $this->assertSame($curQuarter, (int)$result->quarter);
+        $expectedQuarter = (int)ceil(date('m') / 3);
+        $this->assertSame($expectedQuarter, (int)$result->quarter);
 
         $expression->add(new ExpressionResult(1));
-        $expected = (int)ceil((\DateTime::createFromFormat('U', strtotime('today +3 month'))->format('m')) / 3);
-        $this->assertSame($expected, (int)$result->quarter);
+        $expectedQuarter += 1;
+        if ($expectedQuarter > 4) {
+            $expectedQuarter -= 4;
+        }
+        $this->assertSame($expectedQuarter, (int)$result->quarter);
 
         $expression->subtract(new ExpressionResult(3));
-        $expected = (int)ceil((\DateTime::createFromFormat('U', strtotime('today -6 month'))->format('m')) / 3);
-        $this->assertSame($expected, (int)$result->quarter);
+        $expectedQuarter -= 3;
+        if ($expectedQuarter < 1) {
+            $expectedQuarter += 4;
+        }
+        $this->assertSame($expectedQuarter, (int)$result->quarter);
     }
 
     public function testThisMonthModify()
@@ -118,16 +127,22 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_MONTH));
         $result     = $expression->getValue();
 
-        $curMonth = (int)date('m');
-        $this->assertSame($curMonth, (int)$result->month);
+        $expectedMonth = (int)date('m');
+        $this->assertSame($expectedMonth, (int)$result->month);
 
         $expression->add(new ExpressionResult(3));
-        $expected = (int)(\DateTime::createFromFormat('U', strtotime('today +3 month'))->format('m'));
-        $this->assertSame($expected, (int)$result->month);
+        $expectedMonth += 3;
+        if ($expectedMonth > 12) {
+            $expectedMonth -= 12;
+        }
+        $this->assertSame($expectedMonth, (int)$result->month);
 
         $expression->subtract(new ExpressionResult(2));
-        $expected = (int)(\DateTime::createFromFormat('U', strtotime('today +1 month'))->format('m'));
-        $this->assertSame($expected, (int)$result->month);
+        $expectedMonth -= 2;
+        if ($expectedMonth < 1) {
+            $expectedMonth += 12;
+        }
+        $this->assertSame($expectedMonth, (int)$result->month);
     }
 
     public function testThisYearModify()
@@ -195,53 +210,81 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_DAY));
         $expression->add($expressionModify);
 
-        $expectedResult = date('d', strtotime('today +2 days'));
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $dateTime->add(new \DateInterval('P2D'));
+        $expectedResult = $dateTime->format('d');
         $result         = $expression->getValue();
         $this->assertSame((int)$expectedResult, (int)$result->day);
     }
 
-    public function testReverseSubtraction()
+    public function testReverseSubtractionDay()
     {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
         $expression       = new ExpressionResult(33);
         $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_DAY));
         $expression->subtract($expressionModify);
 
-        $day    = date('d');
-        $result = $expression->getValue();
-        $this->assertSame(33 - (int)$day, (int)$result);
+        $result      = $expression->getValue();
+        $expectedDay = 33 - $dateTime->format('d');
+        $this->assertSame($expectedDay, (int)$result);
+    }
 
-        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_YEAR));
+    public function testReverseSubtractionMonth()
+    {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $expression       = new ExpressionResult(12);
+        $expressionModify = new ExpressionResult(
+            new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_MONTH)
+        );
+        $expression->subtract($expressionModify);
+
+        $result        = $expression->getValue();
+        $expectedMonth = 12 - (int)$dateTime->format('m');
+        $this->assertSame($expectedMonth, (int)$result);
+    }
+
+    public function testReverseSubtractionYear()
+    {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
         $expression       = new ExpressionResult(5000);
+        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_YEAR));
         $expression->subtract($expressionModify);
 
-        $year   = date('Y');
-        $result = $expression->getValue();
-        $this->assertSame(5000 - (int)$year, (int)$result);
+        $result        = $expression->getValue();
+        $expectedMonth = 5000 - (int)$dateTime->format('Y');
+        $this->assertSame($expectedMonth, (int)$result);
+    }
 
-        $expressionModify
-                    = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_MONTH));
-        $expression = new ExpressionResult(12);
+    public function testReverseSubtractionQuarter()
+    {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $expression       = new ExpressionResult(4);
+        $expressionModify = new ExpressionResult(
+            new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_QUARTER)
+        );
         $expression->subtract($expressionModify);
 
-        $month  = date('m');
-        $result = $expression->getValue();
-        $this->assertSame(12 - (int)$month, (int)$result);
+        $result        = $expression->getValue();
+        $expectedMonth = 4 - (int)ceil((int)$dateTime->format('m')/3);
+        $this->assertSame($expectedMonth, (int)$result);
+    }
 
-        $expressionModify
-                    = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_QUARTER));
-        $expression = new ExpressionResult(4);
-        $expression->subtract($expressionModify);
+    public function testReverseSubtractionWeek()
+    {
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
+        $dateTime->modify('this week');
 
-        $curMonth   = date('m');
-        $curQuarter = (int)ceil($curMonth / 3);
-        $result     = $expression->getValue();
-        $this->assertSame(4 - (int)$curQuarter, (int)$result);
-
-        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_WEEK));
         $expression       = new ExpressionResult(200);
+        $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_WEEK));
         $expression->subtract($expressionModify);
-        $expectedResult = date('W');
-        $result         = $expression->getValue();
-        $this->assertSame(200 - (int)$expectedResult, (int)$result);
+
+        $result        = $expression->getValue();
+        $expectedWeek = 200 - (int)$dateTime->format('W');
+        $this->assertSame($expectedWeek, (int)$result);
     }
 }

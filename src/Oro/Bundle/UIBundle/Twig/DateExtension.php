@@ -39,6 +39,9 @@ class DateExtension extends \Twig_Extension
      */
     public function getAge($date, $options)
     {
+        if (!$date) {
+            return null;
+        }
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
             return null;
@@ -56,6 +59,9 @@ class DateExtension extends \Twig_Extension
      */
     public function getAgeAsString($date, $options)
     {
+        if (!$date) {
+            return '';
+        }
         $dateDiff = $this->getDateDiff($date, $options);
         if (!$dateDiff->invert) {
             $age = $dateDiff->y;
@@ -67,6 +73,9 @@ class DateExtension extends \Twig_Extension
 
     protected function getDateDiff($date, $options)
     {
+        if (!$date) {
+            return null;
+        }
         if (!$date instanceof \DateTime) {
             $format = isset($options['format']) ? $options['format'] : 'Y-m-d';
             $tz = (isset($options['timezone'])) ? new \DateTimeZone($options['timezone']) : new \DateTimeZone('UTC');

@@ -151,6 +151,21 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             return this.settings.timezone_offset;
         },
 
+        /**
+         * Calculates minutes of time zone shift
+         * analog of (new Date).getTimezoneOffset()
+         *
+         * @returns {number}
+         */
+        getTimeZoneShift: function () {
+            var tz = localeSettings.getTimeZoneOffset(),
+                matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
+                sign = Number(matches[1] + '1'),
+                hours = Number(matches[2]),
+                minutes = Number(matches[3]);
+            return sign * (hours * 60 + minutes);
+        },
+
         getNameFormats: function() {
             return this.settings.format.name;
         },

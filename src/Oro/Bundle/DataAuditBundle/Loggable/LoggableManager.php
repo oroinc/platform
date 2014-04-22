@@ -113,15 +113,6 @@ class LoggableManager
     }
 
     /**
-     * @param $name
-     * @return bool
-     */
-    public function hasConfig($name)
-    {
-        return isset($this->configs[$name]);
-    }
-
-    /**
      * @param $username
      * @throws \InvalidArgumentException
      */
@@ -168,8 +159,7 @@ class LoggableManager
     {
         $this->em = $em;
         $uow      = $em->getUnitOfWork();
-
-        $oid = spl_object_hash($entity);
+        $oid      = spl_object_hash($entity);
 
         if ($this->pendingLogEntityInserts && array_key_exists($oid, $this->pendingLogEntityInserts)) {
             $logEntry     = $this->pendingLogEntityInserts[$oid];
@@ -216,10 +206,10 @@ class LoggableManager
      */
     protected function calculateCollectionData(PersistentCollection $collection)
     {
-        $ownerEntity = $collection->getOwner();
+        $ownerEntity          = $collection->getOwner();
         $ownerEntityClassName = $this->getEntityClassName($ownerEntity);
 
-        if ($this->hasConfig($ownerEntityClassName)) {
+        if ($this->checkAuditable($ownerEntityClassName)) {
             $meta              = $this->getConfig($ownerEntityClassName);
             $collectionMapping = $collection->getMapping();
 
@@ -227,7 +217,6 @@ class LoggableManager
                 $method = $meta->propertyMetadata[$collectionMapping['fieldName']]->method;
 
                 // calculate collection changes
-                // TODO: Fix bug with collection diff calculation. https://magecore.atlassian.net/browse/BAP-2724
                 $newCollection = $collection->toArray();
                 $oldCollection = $collection->getSnapshot();
 
@@ -271,7 +260,7 @@ class LoggableManager
         }
 
         $entityClassName = $this->getEntityClassName($entity);
-        if (!$this->hasConfig($entityClassName) || !$this->checkAuditable($entityClassName)) {
+        if (!$this->checkAuditable($entityClassName)) {
             return;
         }
 
@@ -318,10 +307,37 @@ class LoggableManager
                     continue;
                 }
 
+                $fieldMapping = null;
+                if ($entityMeta->hasField($field)) {
+                    $fieldMapping = $entityMeta->getFieldMapping($field);
+                    if ($fieldMapping['type'] == 'date') {
+                        // leave only date
+                        $utc = new \DateTimeZone('UTC');
+                        if ($old && $old instanceof \DateTime) {
+                            $old->setTimezone($utc);
+                            $old = new \DateTime($old->format('Y-m-d'), $utc);
+                        }
+                        if ($new && $new instanceof \DateTime) {
+                            $new->setTimezone($utc);
+                            $new = new \DateTime($new->format('Y-m-d'), $utc);
+                        }
+                    }
+                }
+
                 if ($old instanceof \DateTime && $new instanceof \DateTime
                     && $old->getTimestamp() == $new->getTimestamp()
                 ) {
                     continue;
+                }
+
+                // need to distinguish date and datetime
+                if ($fieldMapping && in_array($fieldMapping['type'], array('date', 'datetime'))) {
+                    if ($old instanceof \DateTime) {
+                        $old = array('type' => $fieldMapping['type'], 'value' => $old);
+                    }
+                    if ($new instanceof \DateTime) {
+                        $new = array('type' => $fieldMapping['type'], 'value' => $new);
+                    }
                 }
 
                 if ($entityMeta->isSingleValuedAssociation($field) && $new) {
@@ -411,6 +427,7 @@ class LoggableManager
         ) {
             $this->loadUser();
         }
+
         return self::$userCache[$this->username];
     }
 
@@ -493,6 +510,7 @@ class LoggableManager
 
             if (count($classMetadata->propertyMetadata)) {
                 $this->addConfig($classMetadata);
+
                 return true;
             }
         }
@@ -520,7 +538,7 @@ class LoggableManager
     protected function getEntityIdentifierString($entity)
     {
         $className = $this->getEntityClassName($entity);
-        $metadata = $this->em->getClassMetadata($className);
+        $metadata  = $this->em->getClassMetadata($className);
 
         return serialize($metadata->getIdentifierValues($entity));
     }

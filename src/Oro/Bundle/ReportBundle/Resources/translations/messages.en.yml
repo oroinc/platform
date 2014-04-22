@@ -27,6 +27,8 @@ oro:
                     hint: Maximum value
 
     report:
+        menu:
+            manage_reports.label:   Manage Custom Reports
         type:
             table: Table
         datagrid:
@@ -43,7 +45,6 @@ oro:
 
         entity_label:        Report
         entity_plural_label: Reports
-        new_entity:          New report
         entity_description:  Represent Report
         id.label:           Id
         type.label:         Report type

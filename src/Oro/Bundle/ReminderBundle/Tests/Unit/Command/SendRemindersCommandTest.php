@@ -98,28 +98,33 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->sender
             ->expects($this->at(0))
-            ->method('send')
+            ->method('push')
             ->with($reminders[0]);
+
+        $this->sender
+            ->expects($this->at(1))
+            ->method('push')
+            ->with($reminders[1]);
+
+        $this->sender
+            ->expects($this->at(2))
+            ->method('push')
+            ->with($reminders[1]);
+
+        $this->sender
+            ->expects($this->at(3))
+            ->method('send')
+            ->with();
 
         $reminders[0]
             ->expects($this->exactly(2))
             ->method('getState')
             ->will($this->returnValue(Reminder::STATE_SENT));
 
-        $this->sender
-            ->expects($this->at(1))
-            ->method('send')
-            ->with($reminders[1]);
-
         $reminders[1]
             ->expects($this->exactly(2))
             ->method('getState')
             ->will($this->returnValue(Reminder::STATE_NOT_SENT));
-
-        $this->sender
-            ->expects($this->at(2))
-            ->method('send')
-            ->with($reminders[1]);
 
         $reminders[2]
             ->expects($this->exactly(2))
@@ -187,8 +192,10 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->at(0))->method('beginTransaction');
 
-        $this->sender->expects($this->once())->method('send')
-            ->with($reminder)
+        $this->sender->expects($this->at(0))->method('push')
+            ->with($reminder);
+
+        $this->sender->expects($this->at(1))->method('send')
             ->will($this->throwException(new \Exception('Test Exception')));
 
         $this->entityManager->expects($this->at(1))->method('rollback');

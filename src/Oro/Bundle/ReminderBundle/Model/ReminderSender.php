@@ -23,13 +23,23 @@ class ReminderSender implements ReminderSenderInterface
     }
 
     /**
-     * Handle reminder sending
+     * Push reminder to processor
      *
      * @param Reminder $reminder
      */
-    public function send(Reminder $reminder)
+    public function push(Reminder $reminder)
     {
         $processor = $this->registry->getProcessor($reminder->getMethod());
-        $processor->process($reminder);
+        $processor->push($reminder);
+    }
+
+    /**
+     * Handle all reminders sending
+     */
+    public function send()
+    {
+        foreach ($this->registry->getProcessors() as $processor) {
+            $processor->process();
+        }
     }
 }

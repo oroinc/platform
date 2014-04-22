@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -24,10 +25,16 @@ class TabExtension extends \Twig_Extension
      */
     protected $router;
 
-    public function __construct(MenuExtension $menuExtension, RouterInterface $router)
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    public function __construct(MenuExtension $menuExtension, RouterInterface $router, SecurityFacade $securityFacade)
     {
         $this->menuExtension = $menuExtension;
         $this->router = $router;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -109,12 +116,14 @@ class TabExtension extends \Twig_Extension
                 }
             }
 
-            $tabs[] = [
-                'alias'      => $child->getName(),
-                'label'      => $child->getLabel(),
-                'widgetType' => $child->getExtra('widgetType', self::DEFAULT_WIDGET_TYPE),
-                'url'        => $url
-            ];
+            if ($this->securityFacade->isGranted($child->getExtra('widgetAcl'))) {
+                $tabs[] = [
+                    'alias'      => $child->getName(),
+                    'label'      => $child->getLabel(),
+                    'widgetType' => $child->getExtra('widgetType', self::DEFAULT_WIDGET_TYPE),
+                    'url'        => $url
+                ];
+            }
         }
 
         return $tabs;

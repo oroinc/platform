@@ -26,7 +26,7 @@ define(function (require) {
 
         container.find('[data-toggle="tooltip"]').tooltip();
 
-        this.initPopover($('form label'));
+        this.initPopover(container.find('form label'));
         widgetControlInitializer.init(container);
 
 //        @todo: BAP-3374
@@ -36,41 +36,46 @@ define(function (require) {
     };
 
     layout.initPopover = function (container) {
-        var handlePopoverMouseout = function (e, popover) {
-            var popoverHandler = $(e.relatedTarget).closest('.popover');
-            if (!popoverHandler.length) {
-                popover.data('popover-timer',
-                    setTimeout(function () {
-                        popover.popover('hide');
-                        popover.data('popover-active', false);
-                    }, 500));
-            } else {
-                popoverHandler.one('mouseout', function (evt) {
-                    handlePopoverMouseout(evt, popover);
+        var $items = container.find('[data-toggle="popover"]');
+        $items.not('[data-close="false"]').each(function(i, el) {
+            //append close link
+            var content = $(el).data('content');
+            content += '<i class="icon-remove popover-close"></i>';
+            $(el).data('content', content);
+        });
+
+        $items.popover({
+            animation: false,
+            delay: { show: 0, hide: 0 },
+            html: true,
+            container: false,
+            trigger: 'manual'
+        }).on('click.popover', false, function (e) {
+            $(this).popover('toggle');
+            e.preventDefault();
+        });
+
+        $('body')
+            .on('click.popover-hide', function (e) {
+                $items.each(function () {
+                    //the 'is' for buttons that trigger popups
+                    //the 'has' for icons within a button that triggers a popup
+                    if (!$(this).is(e.target)
+                        && $(this).has(e.target).length === 0
+                        && ($('.popover').has(e.target).length === 0 || ~e.target.className.indexOf('popover-close'))) {
+                        $(this).popover('hide');
+                    }
                 });
-            }
-        };
-        container.find('[data-toggle="popover"]')
-            .popover({
-                animation: true,
-                delay: { show: 0, hide: 0 },
-                html: true,
-                trigger: 'manual'
-            })
-            .mouseover(function () {
-                var popoverEl = $(this);
-                clearTimeout(popoverEl.data('popover-timer'));
-                if (!popoverEl.data('popover-active')) {
-                    popoverEl.data('popover-active', true);
-                    $(this).popover('show');
+            }).on('click.popover-prevent', '.popover', function(e) {
+                if (e.target.tagName.toLowerCase() != 'a') {
+                    e.preventDefault();
                 }
-            })
-            .mouseout(function (e) {
-                var popover = $(this);
-                setTimeout(function () {
-                    handlePopoverMouseout(e, popover);
-                }, 500);
+            }).on('focus.popover-hide', 'select, input, textarea', function() {
+                $items.popover('hide');
             });
+        mediator.once('hash_navigation_request:start', function () {
+            $('body').off('click.popover-hide').off('click.popover-prevent').off('focus.popover-hide');
+        });
     };
 
     layout.hideProgressBar = function () {

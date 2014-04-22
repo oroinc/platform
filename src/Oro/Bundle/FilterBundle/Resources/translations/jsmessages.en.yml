@@ -26,4 +26,10 @@ oro:
             tab:
                 calendar: Calendar
                 variables: Variables
-
+        embedded:
+            choice:
+                field_to_value: field value
+            date:
+                field_to_value: field
+            select:
+                field_to_value: field value is

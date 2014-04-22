@@ -26,7 +26,7 @@ class EmailTemplates extends AbstractPageFilteredGrid
      */
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create template']")->click();
+        $this->test->byXPath("//a[@title='Create Template']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -56,7 +56,11 @@ class EmailTemplates extends AbstractPageFilteredGrid
     {
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $action->click();
+        $action->click();
+
         $this->waitForAjax();
         $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Delete']")->click();
         $this->waitForAjax();
@@ -71,7 +75,9 @@ class EmailTemplates extends AbstractPageFilteredGrid
     {
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $action->click();
+        $action->click();
         $this->waitForAjax();
         $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Clone']")->click();
         $this->waitPageToLoad();

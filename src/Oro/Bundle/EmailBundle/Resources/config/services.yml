@@ -15,6 +15,7 @@ parameters:
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
+    oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -166,6 +167,7 @@ services:
             - %oro_email.cache.available_in_template_key%
             - @security.context
             - @oro_email.twig.email_sandbox
+        lazy: true
 
     oro_email.twig.email_security_policy:
         class: %oro_email.twig.email_security_policy.class%
@@ -192,6 +194,7 @@ services:
         arguments:
             - @security.context
             - @oro_entity_config.provider.email
+        lazy: true
 
     oro_email.validator.variables_validator:
         class: Oro\Bundle\EmailBundle\Validator\VariablesValidator
@@ -224,6 +227,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.email.entity.builder=
             - @oro_email.direct_mailer
+            - @oro_email.email.owner.provider
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
@@ -240,3 +244,8 @@ services:
             - @oro_email.datagrid_query_factory
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.email-grid, method: onBuildAfter }
+
+    oro_email.email_synchronization_manager:
+        class: %oro_email.email_synchronization_manager.class%
+        arguments:
+            - @service_container

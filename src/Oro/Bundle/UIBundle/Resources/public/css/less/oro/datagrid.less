@@ -57,10 +57,17 @@
     }
     label {
       cursor: auto;
+      &.dib{
+        line-height: 29px;
+      }
     }
   }
   .page-size {
-    .control-label { text-align:right; }
+    .control-label {
+      text-align:right;
+      width: auto;
+      padding-top: 7px;
+    }
   }
   .btn-group {
     .btn {
@@ -255,10 +262,6 @@
     margin: 0;
   }
 }
-.widget-content .grid-toolbar {
-  .pagination-centered {
-    white-space: nowrap;
-    float: left;
-    width: auto;
-  }
+.filter-criteria-hint {
+  text-transform: none;
 }

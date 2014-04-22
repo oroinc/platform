@@ -8,9 +8,10 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 
 class WorkflowEntityVoter implements VoterInterface
 {
@@ -109,7 +110,13 @@ class WorkflowEntityVoter implements VoterInterface
 
         // both entity and identity objects are supported
         $class = $this->getEntityClass($object);
-        $identifier = $this->getEntityIdentifier($object);
+
+        try {
+            $identifier = $this->getEntityIdentifier($object);
+        } catch (NotManageableEntityException $e) {
+            return self::ACCESS_ABSTAIN;
+        }
+
         if (null === $identifier) {
             return self::ACCESS_ABSTAIN;
         }

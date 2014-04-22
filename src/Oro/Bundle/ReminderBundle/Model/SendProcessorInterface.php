@@ -10,11 +10,16 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 interface SendProcessorInterface
 {
     /**
-     * Process reminder send
+     * Push reminder to process queue
      *
      * @param Reminder $reminder
      */
-    public function process(Reminder $reminder);
+    public function push(Reminder $reminder);
+
+    /**
+     * Process reminder send
+     */
+    public function process();
 
     /**
      * Gets unique name of processor

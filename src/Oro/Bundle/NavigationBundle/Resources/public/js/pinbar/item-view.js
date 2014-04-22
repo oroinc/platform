@@ -55,12 +55,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
             mediator.trigger("pinbar_item_remove_before", this.model);
             this.model.destroy({
                 wait: true,
-                error: _.bind(function(model, xhr, options) {
+                error: _.bind(function(model, xhr) {
                     if (xhr.status == 404 && !app.debug) {
                         // Suppress error if it's 404 response and not debug mode
                         this.removeItem();
                     } else {
-                        error.dispatch(model, xhr, options);
+                        error.handle({}, xhr, {enforce: true});
                     }
                 }, this)
             });
@@ -120,7 +120,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
 
         outdatedContentHandler: function (event) {
             var navigation = Navigation.getInstance(),
-                modelUrl = navigation.removeGridParams(this.model.get('url')) ,
+                modelUrl = this.cleanupUrl(navigation.removeGridParams(this.model.get('url'))),
                 $el = this.$el,
                 self = this,
                 refreshHandler = function (obj) {
@@ -132,7 +132,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
                     }
                 };
 
-            if (!event.isCurrentPage && modelUrl == event.url) {
+            if (!event.isCurrentPage && modelUrl == this.cleanupUrl(event.url)) {
                 var $noteEl = $el.find('.pin-status');
                 if (!$noteEl.is('.outdated')) {
                     this.markOutdated($noteEl);

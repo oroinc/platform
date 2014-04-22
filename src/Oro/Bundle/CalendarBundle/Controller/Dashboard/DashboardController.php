@@ -56,7 +56,7 @@ class DashboardController extends Controller
         );
         $result = array_merge(
             $result,
-            $this->get('oro_dashboard.manager')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
         );
 
         return $result;

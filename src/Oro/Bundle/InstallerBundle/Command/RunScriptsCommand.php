@@ -33,7 +33,8 @@ class RunScriptsCommand extends ContainerAwareCommand
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
-            $this->getApplication()
+            $this->getApplication(),
+            $this->getContainer()->get('oro_cache.oro_data_cache_manager')
         );
         $scriptExecutor = new ScriptExecutor(
             $output,

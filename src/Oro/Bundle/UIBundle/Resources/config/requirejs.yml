@@ -30,19 +30,9 @@ config:
         'flotr2':
             deps:
                 - 'jquery'
-        'flotr2/funnel':
-            deps:
-                - 'flotr2'
-                - 'jquery'
         'bootstrap':
             deps:
                 - 'jquery'
-        'bootstrap-tooltip':
-            deps:
-                - 'bootstrap'
-        'popover-extra-placements':
-            deps:
-                - 'bootstrap-tooltip'
         'underscore':
             exports: '_'
         'backbone':
@@ -55,18 +45,23 @@ config:
                 - 'jquery'
                 - 'underscore'
                 - 'backbone'
+        'jquery.ajax.queue':
+            deps:
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/jquery-extend'
-            'jquery.select2': 'oroui/js/select2-setup'
+            'jquery.select2': 'oroui/js/select2-extend'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery-ui-timepicker': 'oroui/js/jquery-ui-timepicker-l10n'
         'oroui/js/jquery-extend':
             'jquery': 'jquery'
-        'oroui/js/select2-setup':
+        'oroui/js/select2-extend':
             'jquery.select2': 'jquery.select2'
-        'oroui/js/jquery-ui-datepicker-l10n':
+        'oroui/js/jquery-ui-extend':
             'jquery-ui': 'jquery-ui'
+        'oroui/js/jquery-ui-datepicker-l10n':
+            'jquery-ui': 'oroui/js/jquery-ui-extend'
         'oroui/js/jquery-ui-timepicker-l10n':
             'jquery-ui-timepicker': 'jquery-ui-timepicker'
     paths:
@@ -82,14 +77,12 @@ config:
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
+        'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'flotr2': 'bundles/oroui/lib/flotr2/flotr2.amd.js'
-        'flotr2/funnel': 'bundles/oroui/js/funnel.js'
         'bean': 'bundles/oroui/lib/flotr2/bean.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
-        'bootstrap-tooltip': 'bundles/oroui/lib/bootstrap/js/bootstrap-tooltip.js'
-        'popover-extra-placements': 'bundles/oroui/lib/bootstrap/js/popover-extra-placements.js'
         'underscore': 'bundles/oroui/lib/underscore.js'
         'backbone': 'bundles/oroui/lib/backbone.js'
         'backbone/bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
@@ -122,3 +115,4 @@ config:
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
+        'oroui/js/flotr2/funnel': 'bundles/oroui/js/flotr2/funnel.js'

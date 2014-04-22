@@ -40,10 +40,12 @@ services:
           - @oro_distribution.composer.installer
           - @oro_distribution.composer.io
           - @oro_distribution.script_runner
+          - @oro_platform.maintenance
           - @logger
           - %oro_distribution.composer_json%
         tags:
             - { name: monolog.logger, channel: oro_distribution }
+        lazy: true
 
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%

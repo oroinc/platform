@@ -66,9 +66,9 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
                 var prevVal = $el.data('current');
                 if (!this.isEmpty()) {
                     var confirm = new DeleteConfirmation({
-                        title:   __('Change Type'),
+                        title:   __('oro.integration.change_type'),
                         okText:  __('Yes, I Agree'),
-                        content: __('Are you sure you want to change type?')
+                        content: __('oro.integration.submit')
                     });
                     confirm.on('ok', _.bind(function () {
                         this.processChange($el);
@@ -111,7 +111,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            $.post(url, data,function (res) {
+            $.post(url, data,function (res, status, jqXHR) {
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
                     $form.replaceWith(formContent);
@@ -119,6 +119,8 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
 
                     // trigger hash navigation event for processing UI decorators
                     navigation.processClicks(formContent.find('a'));
+                    // update wdt
+                    navigation.updateDebugToolbar(jqXHR);
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
             }).always(function () {

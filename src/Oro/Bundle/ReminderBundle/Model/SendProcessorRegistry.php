@@ -26,6 +26,16 @@ class SendProcessorRegistry
     }
 
     /**
+     * Get all processors
+     *
+     * @return SendProcessorInterface[]
+     */
+    public function getProcessors()
+    {
+        return $this->processors;
+    }
+
+    /**
      * Get processor by method
      *
      * @param string $method

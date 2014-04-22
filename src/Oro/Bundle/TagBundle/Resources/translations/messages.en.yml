@@ -1,16 +1,20 @@
 oro:
     tag:
+        menu:
+            shortcut_new_tag.label: Create new tag
+            shortcut_new_tag.description: Create new tag
+            tag_list.description: Tags list
+
         controller:
             tag.saved.message: "Tag saved"
         form:
             choose_tag: "Choose a tag"
-            choose_or_create_tag: "Choose or create a tag"
+            choose_or_create_tag: "Select an existing tag or create new"
         datagrid:
             usage_count: Usage Count
 
         entity_label:        Tag
         entity_plural_label: Tags
-        new_entity:          New tag
         entity_description:  Show records tagged by this tag
         id.label:         Id
         name.label:       Tag

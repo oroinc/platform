@@ -17,6 +17,7 @@ parameters:
     oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
 
     oro_tag.provider.search_provider.class: Oro\Bundle\TagBundle\Provider\SearchProvider
+    oro_tag.security_provider.class: Oro\Bundle\TagBundle\Security\SecurityProvider
 
     oro_tag.twig.tag.extension.class: Oro\Bundle\TagBundle\Twig\TagExtension
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
@@ -67,6 +68,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_search.mapper
+            - @oro_tag.security_provider
 
     # Tag API
     oro_tag.tag.manager.api:
@@ -136,12 +138,19 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_tag.security_provider:
+        class: %oro_tag.security_provider.class%
+        arguments:
+            - @oro_search.security_provider
+
     oro_tag.event_listener.search_results_grid_listener:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_datagrid.datagrid.request_params
+          - @oro_tag.security_provider
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
+        lazy: true
 
     oro_tag.owner_assignment_checker.tag:
         class: %oro_tag.owner_assignment_checker.tag.class%

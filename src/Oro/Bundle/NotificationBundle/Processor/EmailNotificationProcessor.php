@@ -8,8 +8,7 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
@@ -17,40 +16,30 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
     const SEND_COMMAND = 'swiftmailer:spool:send';
 
-    /**
-     * @var EmailRenderer
-     */
+    /** @var EmailRenderer */
     protected $renderer;
 
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $mailer;
 
-    /**
-     * @var string
-     */
-    protected $sendFrom;
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $messageLimit = 100;
 
-    /**
-     * @var string
-     */
+    /** @var ConfigManager */
+    protected $cm;
+
+    /** @var string */
     protected $env = 'prod';
 
     /**
      * Constructor
      *
      * @param LoggerInterface $logger
-     * @param EntityManager $em
-     * @param EntityPool $entityPool
-     * @param EmailRenderer $emailRenderer
-     * @param \Swift_Mailer $mailer
-     * @param string $sendFrom
+     * @param EntityManager   $em
+     * @param EntityPool      $entityPool
+     * @param EmailRenderer   $emailRenderer
+     * @param \Swift_Mailer   $mailer
+     * @param ConfigManager   $cm
      */
     public function __construct(
         LoggerInterface $logger,
@@ -58,12 +47,12 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        $sendFrom
+        ConfigManager $cm
     ) {
         parent::__construct($logger, $em, $entityPool);
         $this->renderer = $emailRenderer;
-        $this->mailer = $mailer;
-        $this->sendFrom = $sendFrom;
+        $this->mailer   = $mailer;
+        $this->cm       = $cm;
     }
 
     /**
@@ -123,38 +112,20 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
                 continue;
             }
 
-            $params = new ParameterBag(
-                array(
-                    'subject' => $subjectRendered,
-                    'body'    => $templateRendered,
-                    'from'    => $this->sendFrom,
-                    'to'      => $notification->getRecipientEmails(),
-                    'type'    => $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html'
-                )
-            );
-
-            $this->notify($params);
-            $this->addJob(self::SEND_COMMAND);
-        }
-    }
-
-    /**
-     * Process with actual notification
-     *
-     * @param ParameterBag $params
-     */
-    protected function notify(ParameterBag $params)
-    {
-        $recipients = $params->get('to');
-        if ($recipients) {
-            foreach ($recipients as $email) {
+            $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
+            $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
+            $type        = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
+            $recipients  = $notification->getRecipientEmails();
+            foreach ((array)$recipients as $email) {
                 $message = \Swift_Message::newInstance()
-                    ->setSubject($params->get('subject'))
-                    ->setFrom($params->get('from'))
+                    ->setSubject($subjectRendered)
+                    ->setFrom($senderEmail, $senderName)
                     ->setTo($email)
-                    ->setBody($params->get('body'), $params->get('type'));
+                    ->setBody($templateRendered, $type);
                 $this->mailer->send($message);
             }
+
+            $this->addJob(self::SEND_COMMAND);
         }
     }
 
@@ -163,6 +134,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      *
      * @param string $command
      * @param array  $commandArgs
+     *
      * @return Job
      */
     protected function createJob($command, $commandArgs = [])

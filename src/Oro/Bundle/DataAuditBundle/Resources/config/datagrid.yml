@@ -75,7 +75,8 @@ datagrid:
                     data_name: author
                 loggedAt:
                     data_name: a.loggedAt
-            default: ~
+            default:
+                loggedAt: DESC
 
         filters:
             columns:

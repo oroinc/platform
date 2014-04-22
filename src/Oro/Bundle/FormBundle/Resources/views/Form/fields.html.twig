@@ -7,14 +7,14 @@
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['underscore', 'jquery', 'oroform/js/select2-config'
+        require(['underscore', 'jquery', 'oroform/js/select2-config', 'oroform/js/select2_relevancy_order_handler'
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for path in configs.extra_modules -%}
                     , '{{ path }}'
                 {%- endfor -%}
             {% endif -%}
             , 'jquery.select2'],
-        function(_, $, Select2Config
+        function(_, $, Select2Config, orderHandler
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
                 {%- for name in configs.extra_modules|keys -%}
                     , {{ name }}
@@ -40,6 +40,8 @@
                 {% if configs.extra_config is defined and configs.extra_config %}
                     {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
                 {% endif %}
+
+                orderHandler.handle(select2Config);
 
                 {% if excluded is not defined %}
                     {% set excluded = [] %}
@@ -112,6 +114,15 @@
     {{ form_widget(form) }}
 {% endblock %}
 
+{# used to populate selected data on pintab restore #}
+{% block oro_combobox_dataconfig_onselect %}
+    $field.on('select2-init', function(e) {
+        $(e.target).on('change', function(e){
+            $(this).data('selected-data', e.added);
+        });
+    });
+{% endblock %}
+
 {% block oro_combobox_dataconfig_autocomplete %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
@@ -127,6 +138,8 @@
             return data;
         }
     };
+
+    {{ block('oro_combobox_dataconfig_onselect') }}
 {% endblock %}
 
 {% block oro_combobox_dataconfig_relation %}
@@ -206,6 +219,7 @@
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ form.vars.grid_url|json_encode|raw }},
+                allowAction: {{ form.vars.allow_action|json_encode|raw }},
                 collection: new MultipleEntityCollection(),
                 selectorWindowTitle: {{ form.vars.selector_window_title|trans|json_encode|raw }}
             });
@@ -235,27 +249,23 @@
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {% if tooltip is defined and tooltip %}
-                {% set tooltip = tooltip|trans %}
-                {% if (tooltip_details_enabled is defined and tooltip_details_enabled)
-                    or (tooltip_details_anchor is defined or tooltip_details_link is defined) %}
-                    {% set helpLink = tooltip_details_link|default(get_help_link()) %}
-                    {% if tooltip_details_anchor is defined and tooltip_details_anchor %}
-                        {% set helpLink = helpLink ~ '#' ~ tooltip_details_anchor %}
-                    {% endif %}
-                    {% set tooltip = tooltip
-                        ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">' ~ 'Read more'|trans ~ '</a></div></div>' %}
-                {% endif %}
-                <i class="icon-info-sign tooltip-icon"
-                    {% if tooltip_placement is defined %}data-placement="{{ tooltip_placement }}"{% endif %}
-                    data-content="{{ tooltip }}"
-                    data-toggle="popover"></i>
+                {% import 'OroUIBundle::macros.html.twig' as ui %}
+                {{ ui.tooltip(
+                    tooltip,
+                    tooltip_parameters|default({}),
+                    tooltip_placement|default(null),
+                    tooltip_details_enabled|default(false),
+                    tooltip_details_link|default(null),
+                    tooltip_details_anchor|default(null)
+                ) }}
             {%- endif -%}
+
             {%- if is_translated_label is defined and is_translated_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
                 {{ label|raw }}
             {%- else -%}
-                {{ label|trans({}, translation_domain)|capitalize }}
+                {{ label|trans({}, translation_domain) }}
             {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
@@ -263,7 +273,7 @@
 {% endblock form_label %}
 
 {% block oro_money_row %}
-    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (' ~ currency_symbol ~')' %}
+    {% set label = label|trans({}, translation_domain) ~ ' (' ~ currency_symbol ~')' %}
     {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
 {% endblock %}
 
@@ -273,7 +283,7 @@
 {% endblock %}
 
 {% block percent_row %}
-    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
+    {% set label = label|trans({}, translation_domain) ~ ' (%)' %}
     {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
 {% endblock %}
 
@@ -474,8 +484,9 @@
     {% set btnGroupId = form.vars.id ~ '-btn-group' %}
     {% set viewsContainerId = form.vars.id ~ '-container' %}
     {% set gridWidgetAlias = form.vars.id ~ '-grid' %}
+    {% set routeParametersElement = form.vars.id ~ '-route-parameters' %}
 
-    <div class="create-select-entity-container">
+    <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
             <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}">
                 <span
@@ -517,9 +528,11 @@
         </div>
 
         <div class="entity-view-block {% if view_widgets|length > 1 %}row-fluid row-fluid-divider{% endif %}">
+            {% set allRouteParameters = {} %}
             {% for view_widget in view_widgets %}
                 <div class="responsive-cell">
                     {% set routeParameters = view_widget.route_parameters %}
+                    {% set allRouteParameters = allRouteParameters|merge({ (view_widget.widget_alias) : routeParameters }) %}
                     {{ oro_widget_render({
                         'widgetType': 'block',
                         'loadingElement': '#' ~ viewsContainerId ~ ' .create-select-entity-container',
@@ -530,6 +543,11 @@
                     }) }}
                 </div>
             {% endfor %}
+            <input type="hidden"
+               name="{{ routeParametersElement }}"
+               id="{{ routeParametersElement }}"
+               value="{{ allRouteParameters|json_encode|raw|escape }}"
+            />
         </div>
 
         {{ form_widget(form.existing_entity) }}
@@ -544,9 +562,12 @@
                     '#{{ viewsContainerId }}',
                     '#{{ form.mode.vars.id }}',
                     '#{{ form.existing_entity.vars.id }}',
+                    '#{{ routeParametersElement }}',
                     {{ gridWidgetAlias|json_encode|raw }},
                     {{ form.vars.view_widgets|json_encode|raw }},
-                    {{ form.vars.existing_entity_grid_id|json_encode|raw }}
+                    {{ form.vars.existing_entity_grid_id|json_encode|raw }},
+                    {{ currentMode|json_encode|raw }},
+                    {{ allRouteParameters|json_encode|raw }}
                 );
             });
         });

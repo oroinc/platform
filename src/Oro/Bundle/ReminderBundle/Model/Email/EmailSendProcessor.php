@@ -28,6 +28,11 @@ class EmailSendProcessor implements SendProcessorInterface
     protected $emailNotification;
 
     /**
+     * @var Reminder[]
+     */
+    protected $reminders = array();
+
+    /**
      * @param EmailNotificationProcessor $emailNotificationProcessor
      * @param EmailNotification          $emailNotification
      */
@@ -40,21 +45,39 @@ class EmailSendProcessor implements SendProcessorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function push(Reminder $reminder)
+    {
+        $this->reminders[] = $reminder;
+    }
+
+    /**
+     * Send all reminders using email
+     */
+    public function process()
+    {
+        foreach ($this->reminders as $reminder) {
+            $this->sendReminderEmail($reminder);
+        }
+        $this->reminders = array();
+    }
+
+    /**
      * Send reminder using email
      *
      * @param Reminder $reminder
      */
-    public function process(Reminder $reminder)
+    public function sendReminderEmail(Reminder $reminder)
     {
         $this->emailNotification->setReminder($reminder);
-
-        $reminder->setState(Reminder::STATE_SENT);
 
         try {
             $this->emailNotificationProcessor->process(
                 $this->emailNotification->getEntity(),
                 [$this->emailNotification]
             );
+            $reminder->setState(Reminder::STATE_SENT);
         } catch (\Exception $exception) {
             $reminder->setState(Reminder::STATE_FAIL);
             $reminder->setFailureException($exception);

@@ -9,5 +9,15 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
  */
 interface ReminderSenderInterface
 {
-    public function send(Reminder $reminder);
+    /**
+     * Push reminder for sending
+     *
+     * @param Reminder $reminder
+     */
+    public function push(Reminder $reminder);
+
+    /**
+     * Send all reminders
+     */
+    public function send();
 }

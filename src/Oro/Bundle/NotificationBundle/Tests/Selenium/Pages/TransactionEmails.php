@@ -28,7 +28,7 @@ class TransactionEmails extends AbstractPageFilteredGrid
      */
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create notification rule']")->click();
+        $this->test->byXPath("//a[@title='Create Notification Rule']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -53,7 +53,10 @@ class TransactionEmails extends AbstractPageFilteredGrid
     {
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $action->click();
+        $action->click();
         $this->waitForAjax();
         $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Delete']")->click();
         $this->waitForAjax();

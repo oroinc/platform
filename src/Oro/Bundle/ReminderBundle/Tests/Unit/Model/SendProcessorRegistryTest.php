@@ -31,6 +31,17 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry = new SendProcessorRegistry($this->processors);
     }
 
+    public function testGetProcessors()
+    {
+        $this->assertEquals(
+            array(
+                self::FOO_METHOD => $this->processors[self::FOO_METHOD],
+                self::BAR_METHOD => $this->processors[self::BAR_METHOD]
+            ),
+            $this->registry->getProcessors()
+        );
+    }
+
     public function testGetProcessor()
     {
         $this->assertEquals($this->processors[self::FOO_METHOD], $this->registry->getProcessor(self::FOO_METHOD));

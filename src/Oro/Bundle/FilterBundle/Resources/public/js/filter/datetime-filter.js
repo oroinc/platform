@@ -49,13 +49,10 @@ function ($, _, DateFilter, localeSettings) {
          * @inheritDoc
          */
         _initializeDateWidget: function (widgetSelector, options) {
-            var previousLogFunction = $.timepicker.log;
-            $.timepicker.log = function(){};
             // we replace warning log function because of incorrect datetime picker parsing default date
             // (all working correct except the message)
-            var datePicker = this.$(widgetSelector).datetimepicker(options);
-            $.timepicker.log = previousLogFunction;
-            return datePicker;
+            $.timepicker.log = function(){};
+            return this.$(widgetSelector).datetimepicker(options);
         },
 
         /**

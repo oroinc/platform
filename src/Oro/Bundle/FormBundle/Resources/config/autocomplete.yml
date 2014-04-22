@@ -18,6 +18,7 @@ services:
         calls:
             - [initSearchIndexer, ["@oro_search.index", %oro_search.entities_config%]]
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
+            - [setEntityManager, ["@doctrine.orm.entity_manager"]]
 
     oro_form.autocomplete.full_name.search_handler:
         class: %oro_form.autocomplete.full_name.search_handler.class%

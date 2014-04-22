@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,14 +20,14 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
  */
 class SyncCommand extends AbstractSyncCronCommand
 {
-    const COMMAND_NAME   = 'oro:cron:channels:sync';
+    const COMMAND_NAME = 'oro:cron:channels:sync';
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
-        return '0 1 * * *';
+        return '*/5 * * * *';
     }
 
     /**
@@ -42,6 +43,18 @@ class SyncCommand extends AbstractSyncCronCommand
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given channel id'
             )
+            ->addOption(
+                'connector',
+                'con',
+                InputOption::VALUE_OPTIONAL,
+                'If option exists sync will be performed for given connector name'
+            )
+            ->addArgument(
+                'connector-parameters',
+                InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+                'Additional connector parameters array. Format - parameterKey=parameterValue',
+                []
+            )
             ->setDescription('Runs synchronization for channel');
     }
 
@@ -52,10 +65,13 @@ class SyncCommand extends AbstractSyncCronCommand
     {
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
-        $channelId  = $input->getOption('channel-id');
-        $repository = $this->getService('doctrine.orm.entity_manager')->getRepository('OroIntegrationBundle:Channel');
-        $logger     = new OutputLogger($output);
-        $processor  = $this->getService(self::SYNC_PROCESSOR);
+        $connector           = $input->getOption('connector');
+        $channelId           = $input->getOption('channel-id');
+        $connectorParameters = $this->getConnectorParameters($input);
+        $repository          = $this->getService('doctrine.orm.entity_manager')
+            ->getRepository('OroIntegrationBundle:Channel');
+        $logger              = new OutputLogger($output);
+        $processor           = $this->getService(self::SYNC_PROCESSOR);
         $processor->getLoggerStrategy()->setLogger($logger);
 
         $this->getContainer()->get('doctrine.orm.entity_manager')
@@ -82,7 +98,7 @@ class SyncCommand extends AbstractSyncCronCommand
             try {
                 $logger->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
 
-                $processor->process($channel);
+                $processor->process($channel, $connector, $connectorParameters);
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
                 //process another channel even in case if exception thrown
@@ -93,5 +109,29 @@ class SyncCommand extends AbstractSyncCronCommand
         $logger->notice('Completed');
 
         return 0;
+    }
+
+    /**
+     * Get connector additional parameters array from the input
+     *
+     * @param InputInterface $input
+     * @return array key - parameter name, value - parameter value
+     * @throws \LogicException
+     */
+    protected function getConnectorParameters(InputInterface $input)
+    {
+        $result              = [];
+        $connectorParameters = $input->getArgument('connector-parameters');
+        if (!empty($connectorParameters)) {
+            foreach ($connectorParameters as $parameterString) {
+                $parameterConfigArray = explode('=', $parameterString);
+                if (!isset($parameterConfigArray[1])) {
+                    throw new \LogicException('Format for connector parameters is parameterKey=parameterValue');
+                }
+                $result[$parameterConfigArray[0]] = $parameterConfigArray[1];
+            }
+        }
+
+        return $result;
     }
 }

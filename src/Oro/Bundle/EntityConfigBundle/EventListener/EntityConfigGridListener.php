@@ -9,18 +9,15 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 class EntityConfigGridListener extends AbstractConfigGridListener
 {
     const GRID_NAME = 'entityconfig-grid';
 
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var array Filter choices for name and module column filters */
-    protected $filterChoices = ['name' => [], 'module' => []];
+    /**
+     * @var array|null
+     */
+    protected $moduleChoices;
 
     /**
      * @param BuildAfter $event
@@ -49,49 +46,28 @@ class EntityConfigGridListener extends AbstractConfigGridListener
      *
      * @return array
      */
-    public function getChoicesName()
+    public function getModuleChoices()
     {
-        return $this->getObjectName();
-    }
+        if (null === $this->moduleChoices) {
+            $repository = $this->configManager->getEntityManager()
+                ->getRepository('OroEntityConfigBundle:ConfigModelIndexValue');
 
-    /**
-     * Call this method from datagrid.yml
-     * invoked in Manager when datagrid configuration prepared for grid build process
-     *
-     * @return array
-     */
-    public function getChoicesModule()
-    {
-        return $this->getObjectName('module');
-    }
+            $queryBuilder = $repository->createQueryBuilder('indexValue')
+                ->select('indexValue.value')
+                ->distinct()
+                ->where('indexValue.scope = :scope')->setParameter('scope', 'entity_config')
+                ->andWhere('indexValue.code = :code')->setParameter('code', 'module_name')
+                ->orderBy('indexValue.value');
 
-    /**
-     *
-     * @param  string $scope
-     * @return array
-     */
-    protected function getObjectName($scope = 'name')
-    {
-        if (empty($this->filterChoices[$scope])) {
-            $alias = 'ce';
-            $qb = $this->configManager->getEntityManager()->createQueryBuilder();
-            $qb->select($alias)
-                ->from(EntityConfigModel::ENTITY_NAME, $alias)
-                ->add('select', $alias . '.className')
-                ->distinct($alias.'.className');
+            $result = $queryBuilder->getQuery()->getArrayResult();
 
-            $result = $qb->getQuery()->getArrayResult();
-
-            $options = ['name' => [], 'module' => []];
-            foreach ((array) $result as $value) {
-                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($value['className']);
-                $options['module'][$value['className']] = $moduleName;
-                $options['name'][$value['className']]   = $entityName;
+            $this->moduleChoices = array();
+            foreach ($result as $row) {
+                $module = $row['value'];
+                $this->moduleChoices[$module] = $module;
             }
-
-            $this->filterChoices = $options;
         }
 
-        return $this->filterChoices[$scope];
+        return $this->moduleChoices;
     }
 }

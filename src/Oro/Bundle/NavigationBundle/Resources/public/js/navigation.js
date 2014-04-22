@@ -40,6 +40,10 @@ define(function (require) {
         },
 
         getObjectCache: function(type) {
+            // todo: temporary disable states for grid because it should be allowed to work with several grids on a page
+            // https://magecore.atlassian.net/browse/BAP-3758
+            if (type == 'grid') { return {}; }
+
             return this.state[type];
         }
     };
@@ -50,7 +54,7 @@ define(function (require) {
     /**
      * Router for hash navigation
      *
-     * @export  oronavigation/js/navigation
+     * @_export  oronavigation/js/navigation
      * @class   oronavigation
      * @extends Backbone.Router
      */
@@ -189,6 +193,11 @@ define(function (require) {
             Backbone.Router.prototype.initialize.apply(this, arguments);
         },
 
+        isMaintenancePage: function(){
+            var metaError = $('meta[name="error"]');
+            return metaError.length && metaError.attr('content') == 503;
+        },
+
         /**
          * Returns cached jQuery object by name
          * @param name
@@ -300,6 +309,13 @@ define(function (require) {
                     this.gridChangeState();
                 }
                 this.processGridLinks();
+            }, this);
+
+            /**
+             * Add processing links of loaded widget content
+             */
+            mediator.bind("widget:contentLoad", function (widgetEl) {
+                this.processClicks(widgetEl.find(this.selectors.links));
             }, this);
 
             /**
@@ -438,7 +454,8 @@ define(function (require) {
         /**
          * Ajax call for loading page content
          */
-        loadPage: function() {
+        loadPage: function(forceLoad) {
+            forceLoad = forceLoad || false;
             if (!this.url) {
                 return;
             }
@@ -446,7 +463,7 @@ define(function (require) {
             this.beforeRequest();
 
             var cacheData = this.getCachedData();
-            if (cacheData) {
+            if (!forceLoad && cacheData) {
                 widgetManager.resetWidgets();
                 this.tempCache = cacheData;
                 this.handleResponse(cacheData, {fromCache: true});

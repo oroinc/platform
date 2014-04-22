@@ -8,6 +8,7 @@
         "php": ">=5.3.3",
         "symfony/symfony": ">=2.1",
         "genemu/form-bundle": "2.1.*",
+        "oro/security-bundle": "dev-master",
         "oro/search-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",

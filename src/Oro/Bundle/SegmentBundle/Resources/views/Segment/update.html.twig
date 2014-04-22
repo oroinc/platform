@@ -46,11 +46,17 @@
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.segment.new_entity'|trans } %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.segment.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
+    <style type="text/css">
+        {# TODO: Remove hiding of pin block after fixing of https://magecore.atlassian.net/browse/CRM-907 #}
+        #pin-button-div {display: none !important}
+    </style>
+
     {% set id = 'segment-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{

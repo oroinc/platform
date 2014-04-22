@@ -18,12 +18,9 @@ define(function (require) {
 
         $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
 
-        mediator.on('hash_navigation_request:refresh', function(){
-            scrollspy._init(container);
-        });
-
-        mediator.on('page-rendered', function(){
-            scrollspy._init(container);
+        container.find('[data-spy="scroll"]').each(function () {
+            var $spy = $(this);
+            $spy.scrollspy($spy.data());
         });
     };
 
@@ -75,25 +72,14 @@ define(function (require) {
                 var $row = $(this);
                 var titleHeight = $row.find('.scrollspy-title').outerHeight();
                 var rowAdjHeight = (isMultipleRows ? titleHeight + spyHeight : spyHeight) - debugBarHeight;
+                var naturalHeight = $row.height('auto').height();
 
-                var rowOrigHeight = $row.data('originalHeight');
-                if (!rowOrigHeight) {
-                    rowOrigHeight = $row.height();
-                    $row.data('originalHeight', rowOrigHeight);
+                if (rowAdjHeight > naturalHeight) {
+                    $row.outerHeight(rowAdjHeight);
                 }
-
-                if ($row.height() === rowAdjHeight) {
-                    return;
-                }
-
-                if (rowAdjHeight < rowOrigHeight) {
-                    rowAdjHeight = rowOrigHeight;
-                }
-
-                $row.outerHeight(rowAdjHeight);
             });
 
-            $spy.scrollspy('refresh');
+            $spy.scrollspy('refresh').scrollspy('process');
         });
     };
 
@@ -117,15 +103,6 @@ define(function (require) {
             });
         });
     };
-
-    scrollspy._init = function(container) {
-        container.find('[data-spy="scroll"]').each(function () {
-            $(this).scrollspy($(this).data());
-            $(this).scrollspy('refresh');
-            $('.scrollspy-nav ul.nav li').removeClass('active');
-            $('.scrollspy-nav ul.nav li:first').addClass('active');
-        });
-    }
 
     return scrollspy;
 });

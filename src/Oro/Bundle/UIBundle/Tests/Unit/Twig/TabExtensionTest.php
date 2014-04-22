@@ -27,6 +27,11 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     protected $environment;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityFacade;
+
+    /**
      * Set up test environment
      */
     public function setUp()
@@ -41,7 +46,12 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Symfony\Component\Routing\RouterInterface')
             ->getMock();
 
-        $this->extension = new TabExtension($this->menuExtension, $this->router);
+        $this->securityFacade = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new TabExtension($this->menuExtension, $this->router, $this->securityFacade);
 
         $this->environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
@@ -98,7 +108,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider menuProvider
      */
-    public function testGetTabs($options, $tab, $tabOptions)
+    public function testGetTabs($options, $tab, $tabOptions, $acl)
     {
         $child = $this->createMenuItem(null, $options);
         $parent = $this->createMenuItem($child);
@@ -119,8 +129,18 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->will(
+                $this->returnCallback(
+                    function ($aclResource) use ($acl) {
+                        return $acl[$aclResource];
+                    }
+                )
+            );
+
         $result = $this->extension->getTabs('menu', $tabOptions);
-        $this->assertEquals([$tab], $result);
+        $this->assertEquals($tab ? [$tab] : [], $result);
     }
 
     public function menuProvider()
@@ -130,6 +150,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 'options' => [
                     'name' => 'item',
                     'uri' => 'test',
+                    'widgetAcl' => 'testAcl',
                 ],
                 'tab' => [
                     'alias' => 'item',
@@ -137,12 +158,16 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
                     'url' => 'test'
                 ],
-                'tabOptions' => []
+                'tabOptions' => [],
+                'acl' => [
+                    'testAcl' => true
+                ]
             ],
             'route' => [
                 'options' => [
                     'name' => 'item',
                     'widgetRoute' => 'route',
+                    'widgetAcl' => 'testAcl',
                     'widgetRouteParameters' => ['type' => 'code'],
                 ],
                 'tab' => [
@@ -151,12 +176,16 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
                     'url' => 'route?' . http_build_query(['type' => 'code'])
                 ],
-                'tabOptions' => []
+                'tabOptions' => [],
+                'acl' => [
+                    'testAcl' => true
+                ]
             ],
             'routeMap' => [
                 'options' => [
                     'name' => 'item',
                     'widgetRoute' => 'route',
+                    'widgetAcl' => 'testAcl',
                     'widgetRouteParameters' => ['type' => 'code'],
                     'widgetRouteParametersMap' => ['type' => 'type2'],
                 ],
@@ -166,8 +195,23 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
                     'url' => 'route?' . http_build_query(['type' => 'test']),
                 ],
-                'tabOptions' => ['type2' => 'test']
-            ]
+                'tabOptions' => ['type2' => 'test'],
+                'acl' => [
+                    'testAcl' => true
+                ]
+            ],
+            'accessDenide' => [
+                'options' => [
+                    'name' => 'item',
+                    'uri' => 'test',
+                    'widgetAcl' => 'testAcl',
+                ],
+                'tab' => null,
+                'tabOptions' => [],
+                'acl' => [
+                    'testAcl' => false
+                ]
+            ],
         ];
     }
 
@@ -206,7 +250,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
 
         if (isset($options['name'])) {
             $menuItem
-                ->expects($this->once())
+                ->expects($this->any())
                 ->method('getName')
                 ->will($this->returnValue($options['name']));
         }

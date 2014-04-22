@@ -126,6 +126,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - %oro_notification.emailnotification.entity.class%
+        lazy: true
 
     oro_notification.email_processor:
         class: %oro_notification.email_processor.class%
@@ -135,7 +136,7 @@ services:
             - @oro_notification.entity_spool
             - @oro_email.email_renderer
             - @swiftmailer.mailer.db_spool_mailer
-            - %oro_notification.send_from%
+            - @oro_config.global
         calls:
             - [ setEnv, ['prod'] ]
             - [ setMessageLimit, [100] ]
@@ -179,9 +180,11 @@ services:
         class: %oro_notification.event_listener.email_notification_service.class%
         arguments:
             - @doctrine.orm.entity_manager
+        lazy: true
 
     oro_notification.email_notification_entity_provider:
         class: %oro_notification.email_notification_entity_provider.class%
         parent: oro_entity.entity_provider.abstract
         arguments:
             - @doctrine.orm.entity_manager
+        lazy: true

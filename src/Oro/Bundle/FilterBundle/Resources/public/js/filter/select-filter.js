@@ -173,7 +173,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
-                        my: 'left top+2',
+                        my: 'left top+7',
                         at: 'left bottom',
                         of: this.$(this.containerSelector)
                     },
@@ -181,6 +181,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
+                        this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
                     }, this),
                     close: _.bind(function() {
@@ -195,6 +196,24 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
 
             this.selectWidget.setViewDesign(this);
             this.$(this.buttonSelector).append('<span class="caret"></span>');
+            this.selectWidget.getWidget().on('keyup', _.bind(function (e) {
+                if (e.keyCode === 27) {
+                    this._onClickFilterArea(e);
+                }
+            }, this));
+        },
+
+        /**
+         * Remove styles from choices list
+         *
+         * @protected
+         */
+        _clearChoicesStyle: function() {
+            var labels = this.selectWidget.getWidget().find('label');
+            labels.removeClass('ui-state-hover');
+            if (_.isEmpty(this.value.value)) {
+                labels.removeClass('ui-state-active');
+            }
         },
 
         /**
@@ -242,9 +261,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             }
             var widget = this.selectWidget.getWidget(),
                 filterWidth = this.$(this.containerSelector).width(),
-                requiredWidth = Math.max(filterWidth + 10, this.minimumWidth);
+                requiredWidth = Math.max(filterWidth + 24, this.minimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
-            widget.find('input[type="search"]').width(requiredWidth - 22);
+            widget.find('input[type="search"]').width(requiredWidth - 30);
         },
 
         /**
@@ -275,10 +294,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _onSelectChange: function() {
             // set value
             this.applyValue();
-
             // update dropdown
-            var widget = this.$(this.containerSelector);
-            this.selectWidget.updateDropdownPosition(widget);
+            this.selectWidget.updateDropdownPosition();
         },
 
         /**
@@ -298,7 +315,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
             this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());;
+                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**

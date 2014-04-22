@@ -29,6 +29,8 @@ class ConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $encryptor = $this->encryptor;
+
+        // pre-populate password, imap origin change
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
@@ -60,13 +62,8 @@ class ConfigurationType extends AbstractType
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new ImapEmailOrigin();
                         $event->getForm()->setData($newConfiguration);
-
-                        // deactivate old one
-                        $entity->setIsActive(false);
                     }
                 } elseif ($entity instanceof ImapEmailOrigin) {
-                    // deactivate old one
-                    $entity->setIsActive(false);
                     $event->getForm()->setData(null);
                 }
             }
@@ -79,7 +76,8 @@ class ConfigurationType extends AbstractType
                 'ssl',
                 'choice',
                 array(
-                    'choices'     => array('ssl' => 'ssl', 'tsl' => 'tsl'),
+                    'label'       => 'SSL',
+                    'choices'     => array('ssl' => 'SSL', 'tsl' => 'TSL'),
                     'empty_data'  => null,
                     'empty_value' => '',
                     'required'    => false

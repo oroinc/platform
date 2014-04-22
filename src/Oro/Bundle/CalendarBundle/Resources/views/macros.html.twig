@@ -68,7 +68,7 @@
                 {% if eventsOptions.contentHeight is defined %}
                 contentHeight: {{ eventsOptions.contentHeight|json_encode|raw }},
                 {% endif %}
-                date: "{{ 'now'|date('Y-m-d') }}",
+                date: "{{ 'now'|date('c') }}",
                 firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
                 {% if eventsOptions.firstHour is defined %}
                 firstHour: {{ eventsOptions.firstHour|json_encode|raw }},

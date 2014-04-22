@@ -126,8 +126,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         onEventAdded: function (eventModel) {
             var fcEvent = eventModel.toJSON();
-            this.prepareViewModel(fcEvent);
-
+            // don't need time zone correction, on add event
+            this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -193,7 +193,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                         {
                             success: _.bind(this._hideMask, this),
                             error: _.bind(function (model, response) {
-                                this.showSaveEventError(response.responseJSON);
+                                this.showSaveEventError(response.responseJSON || {});
                             }, this)
                         }
                     );
@@ -205,7 +205,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadEvents: function (start, end, callback) {
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.getCollection().toJSON();
-                this.prepareViewModels(fcEvents);
+                _.each(fcEvents, this.prepareViewModel, this);
                 this._hideMask();
                 callback(fcEvents);
             }, this);
@@ -221,7 +221,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                         success: onEventsLoad,
                         error: _.bind(function (collection, response) {
                             callback({});
-                            this.showLoadEventsError(response.responseJSON);
+                            this.showLoadEventsError(response.responseJSON || {});
                         }, this)
                     });
                 } else {
@@ -234,21 +234,25 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
         },
 
-        prepareViewModels : function (fcEvents) {
-            _.each(fcEvents, this.prepareViewModel, this);
-        },
-
-        prepareViewModel : function (fcEvent) {
-            // convert start and end dates from backend formatted string to Date object
-            fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
-            fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
+        /**
+         * Prepares event entry for rendering in calendar plugin
+         *
+         * @param {Object} fcEvent
+         * @param {boolean=} applyTZCorrection by default applies time zone correction
+         */
+        prepareViewModel: function (fcEvent, applyTZCorrection) {
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
+            if (applyTZCorrection !== false) {
+                fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.start);
+                fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.end);
+            }
         },
 
         formatDateTimeForModel: function (date) {
+            date = dateTimeFormatter.applyTimeZoneCorrection(date, -1);
             return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
@@ -344,9 +348,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
-                if (_.isString(options.date)) {
-                    options.date = $.fullCalendar.parseISO8601(options.date, true);
-                }
+                options.date = dateTimeFormatter.applyTimeZoneCorrection(options.date);
                 options.year = options.date.getFullYear();
                 options.month = options.date.getMonth();
                 options.date = options.date.getDate();
