@@ -4,65 +4,91 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
     'use strict';
 
     /**
+     * @extends oro.Modal
+     */
+    var WidgetPickerDialog = modal.extend({
+        open: function() {
+            Backbone.BootstrapModal.prototype.open.apply(this, arguments);
+            var controls = $('.add-widget-button');
+            $('.dashboard-widget-container').bind('click', {}, function(event) {
+                event.stopImmediatePropagation();
+                if (!$(event.target).hasClass('add-widget-button')) {
+                    $(this).find('.add-widget-button').click();
+                }
+            });
+            controls.bind('click', {controls: controls}, this.options.clickAddToDashboardCallback);
+        }
+    });
+
+    /**
      * @export  orodashboard/js/widget-picker
      * @class   orodashboard.WidgetPicker
      */
     return {
+        /**
+         * @property {integer}
+         */
+        targetColumn: 0,
+
+        /**
+         * @property {Backbone.BootstrapModal}
+         */
         dialog: null,
+
+        /**
+         * @property {integer}
+         */
         dashboardId: null,
-        init: function(dashboardId){
-            var self = this;
-            self.dashboardId = dashboardId;
-            var widgetPickerDialog = modal.extend({
-               open: function() {
-                   Backbone.BootstrapModal.prototype.open.apply(this, arguments);
-                   var controls = $('.add-widget-button');
-                   $('.dashboard-widget-container').bind('click', {}, function(event){
-                       event.stopImmediatePropagation();
-                       if (!$(event.target).hasClass('add-widget-button')) {
-                           $(this).find('.add-widget-button').click();
-                       }
-                   });
-                   controls.bind('click', {widgetPicker: self, controls: controls}, self.clickAddToDashboardDelegate);
-                }
+
+        /**
+         * @param {integer} dashboardId
+         */
+        init: function(dashboardId) {
+            this.dashboardId = dashboardId;
+
+            this.dialog = new WidgetPickerDialog({
+                content: $('#available-dashboard-widgets').html(),
+                className: 'modal dashboard-widgets-wrapper',
+                title: __('oro.dashboard.add_dashboard_widgets.title'),
+                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this)
             });
 
-            this.dialog = new widgetPickerDialog({
-                'content': $('#available-dashboard-widgets').html(),
-                'className': 'modal dashboard-widgets-wrapper',
-                'title': __('oro.dashboard.add_dashboard_widgets.title')
-            });
-
-            $('.dashboard-widgets-add').bind('click', { widgetPicker: this}, this.clickAddWidgetDelegate);
+            $('.dashboard-widgets-add').bind('click', _.bind(this._onClickAddWidget, this));
         },
 
         /**
-         * @callback
          * @param {Event} event
+         * @private
          */
-        clickAddToDashboardDelegate: function(event){
-            var $this = $(this);
-            if (!$this.hasClass('disabled')) {
-                var widgetContainer = $this.parents('.dashboard-widget-container');
-                var self = event.data.widgetPicker;
-                var controls = event.data.controls;
-                self.startLoading(controls, widgetContainer);
-                $.post(
-                    routing.generate('oro_api_post_dashboard_widget_add_widget'),
-                    {widgetName: $this.data('widget-name'), dashboardId: self.dashboardId},
-                    function(response){
-                        mediator.trigger('dashboard:widget:add', response);
-                        self.endLoading(controls, widgetContainer);
-                    }, 'json'
-                );
+        _onClickAddToDashboard: function(event){
+            var $control = $(event.target);
+            if ($control.hasClass('disabled')) {
+                return;
             }
+            var widgetContainer = $control.parents('.dashboard-widget-container');
+            var controls = event.data.controls;
+            var self = this;
+            this._startLoading(controls, widgetContainer);
+            $.post(
+                routing.generate('oro_api_post_dashboard_widget_add_widget'),
+                {
+                    widgetName: $control.data('widget-name'),
+                    dashboardId: this.dashboardId,
+                    targetColumn: this.targetColumn
+                },
+                function (response) {
+                    mediator.trigger('dashboard:widget:add', response);
+                    self._endLoading(controls, widgetContainer);
+                }, 'json'
+            );
         },
 
         /**
          * @param {jQuery} controls collection
          * @param {jQuery} widgetContainer current widget container
+         * @private
          */
-        startLoading: function(controls, widgetContainer){
+        _startLoading: function(controls, widgetContainer){
             controls.addClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
             widgetButtonWrapper.append($('<div class="loading-content"></div>'));
@@ -72,15 +98,16 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         /**
          * @param {jQuery} controls collection
          * @param {jQuery} widgetContainer current widget container
+         * @private
          */
-        endLoading: function(controls, widgetContainer){
+        _endLoading: function(controls, widgetContainer){
             controls.removeClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
             widgetButtonWrapper.find('.loading-content').remove();
             widgetButtonWrapper.find('.add-widget-button').show();
             var previous = widgetContainer.css('background-color');
             var animateFinish = function () {
-                animateFinish = function(){
+                animateFinish = function() {
                     widgetContainer.css({backgroundColor: ''});
                 };
                 widgetContainer.animate({backgroundColor: previous}, animateFinish);
@@ -90,11 +117,13 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         },
 
         /**
-         * @callback
          * @param {Event} event
+         * @private
          */
-        clickAddWidgetDelegate: function(event){
-            event.data.widgetPicker.dialog.open();
+        _onClickAddWidget: function(event) {
+            var columnIndex = $(event.target).closest('.dashboard-column').index();
+            this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
+            this.dialog.open();
         }
     };
 });
