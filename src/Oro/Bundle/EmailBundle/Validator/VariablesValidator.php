@@ -25,9 +25,9 @@ class VariablesValidator extends ConstraintValidator
     protected $entityManager;
 
     /**
-     * @param \Twig_Environment            $twig
-     * @param SecurityContextInterface     $securityContext
-     * @param EntityManager                $entityManager
+     * @param \Twig_Environment        $twig
+     * @param SecurityContextInterface $securityContext
+     * @param EntityManager            $entityManager
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -63,8 +63,8 @@ class VariablesValidator extends ConstraintValidator
             $className = $emailTemplate->getEntityName();
 
             /** @var ClassMetadataInfo $metadata */
-            $classMetadata   = $this->entityManager->getClassMetadata($className);
-            $entity          = $classMetadata->newInstance();
+            $classMetadata = $this->entityManager->getClassMetadata($className);
+            $entity        = $classMetadata->newInstance();
 
             $errors = array();
 
@@ -73,7 +73,7 @@ class VariablesValidator extends ConstraintValidator
             $sandbox->enableSandbox();
 
             foreach ($fieldsToValidate as $fieldName => $template) {
-                  try {
+                try {
                     $this->twig->render(
                         $template,
                         array(
