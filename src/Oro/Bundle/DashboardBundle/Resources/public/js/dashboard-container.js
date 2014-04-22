@@ -82,22 +82,22 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         /**
-         * @param {object} widgetModel
+         * @param {object} data
          */
-        addToDashboard: function(widgetModel){
-            var wid = 'dashboard-widget-' + widgetModel.entity.id;
+        addToDashboard: function(data){
+            var wid = 'dashboard-widget-' + data.id;
             var containerId = 'widget-container-'+wid;
-            var column = widgetModel.entity.layout_position[0] ? widgetModel.entity.layout_position[0] : 0;
+            var column = data.layout_position[0] ? data.layout_position[0] : 0;
             $('#dashboard-column-'+column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
-                'id': widgetModel.entity.id,
-                'expanded': widgetModel.state.expanded,
-                'layoutPosition': widgetModel.entity.layout_position
+                'id': data.id,
+                'expanded': data.expanded,
+                'layoutPosition': data.layout_position
             };
             var widgetParams = {
                 'widgetType': 'dashboard-item',
                 'wid': wid,
-                'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
+                'url': routing.generate(data.config.route, data.config.route_parameters),
                 'state': state,
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
