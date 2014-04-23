@@ -35,7 +35,6 @@ class DashboardController extends FOSRestController implements ClassResourceInte
      *      permission="DELETE",
      *      class="OroDashboardBundle:Dashboard"
      * )
-     * @ParamConverter("dashboard", options={"id"="dashboard"})
      * @return Response
      */
     public function deleteAction(Dashboard $id)
