@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid\Action;
 
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxAction;
 
 class WorkflowActivateAction extends AjaxAction
 {
     /**
-     * @return array
+     * @return ActionConfiguration
      */
     public function getOptions()
     {
