@@ -18,6 +18,7 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
@@ -37,6 +38,9 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @var array
      */
@@ -45,11 +49,13 @@ class OrmTotalsExtension extends AbstractExtension
     public function __construct(
         Translator $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatter $dateTimeFormatter,
+        AclHelper $aclHelper
     ) {
         $this->translator        = $translator;
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->aclHelper         = $aclHelper;
     }
 
     /**
@@ -287,8 +293,7 @@ class OrmTotalsExtension extends AbstractExtension
 
         $this->addPageLimits($query, $pageData, $perPage);
 
-        $resultData = $query
-            ->getQuery()
+        $resultData = $this->aclHelper->apply($query)
             ->setFirstResult(null)
             ->setMaxResults(1)
             ->getScalarResult();

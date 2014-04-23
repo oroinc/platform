@@ -29,11 +29,25 @@ class OrmTotalsExtensionTest extends OrmTestCase
      */
     protected $config;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     */
     protected $translator;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     */
     protected $numberFormatter;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     */
     protected $dateTimeFormatter;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     */
+    protected $aclHelper;
 
     public function setUp()
     {
@@ -48,10 +62,15 @@ class OrmTotalsExtensionTest extends OrmTestCase
             ->getMock();
         $this->config = $this->getTestConfig();
 
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new OrmTotalsExtension(
             $this->translator,
             $this->numberFormatter,
-            $this->dateTimeFormatter
+            $this->dateTimeFormatter,
+            $this->aclHelper
         );
     }
 
