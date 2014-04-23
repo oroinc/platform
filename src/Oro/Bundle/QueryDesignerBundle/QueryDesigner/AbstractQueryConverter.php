@@ -12,7 +12,13 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
  * each table used in a query.
  * Examples:
  *      AcmeBundle\Entity\Order::products
- *      AcmeBundle\Entity\Order::products,AcmeBundle\Entity\Product::statuses
+ *          - represents "order -> products" join
+ *      AcmeBundle\Entity\Order::products+AcmeBundle\Entity\Product::statuses
+ *          - represents "order -> products -> statuses" join
+ *      AcmeBundle\Entity\Order::products+AcmeBundle\Entity\Product::AcmeBundle\Entity\User::product
+ *          - represents "order -> products -> users" unidirectional join
+ *            in this case the "product" association in "AcmeBundle\Entity\User" entity has no
+ *            inverse side association in AcmeBundle\Entity\Product entity
  * The join identifier for the root table is empty string.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
