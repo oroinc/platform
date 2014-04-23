@@ -8,6 +8,17 @@ oro:
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
 
+        block:
+            general: General Information
+
+        name.label: Name
+        label.label: Label
+        owner.label: Owner
+        created_at.label: Created At
+        updated_at.label: Updated At
+        start_dashboard: Clone from
+        start_dashboard.empty_value: Blank Dashboard
+
         quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
 
         no_data_found:    No data found
@@ -22,3 +33,26 @@ oro:
             add_to_dashboard: Add
 
         list: List
+
+        saved_message: Dashboard saved successfully
+
+        menu:
+            dashboards_tab:
+                label: Dashboards
+            dashboards_list:
+                label: Manage dashboards
+
+        label: Label
+        owner: Owner
+
+        tools_dropdown:
+            label: Tools
+        edit_dashboard_link:
+            title: Edit current dashboard
+            text:  Edit
+        create_dashboard_link:
+            title: Create new dashboard
+            text:  Create
+        delete_dashboard_link:
+            title: Remove current dashboard
+            text:  Delete dashboard
