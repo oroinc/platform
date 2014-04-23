@@ -16,19 +16,29 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
     const ENTITY_CLASS          = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity';
     const ABSTRACT_ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeAbstractEntity';
 
-    /** @var VariablesConstraint */
+    /**
+     * @var VariablesConstraint
+     */
     protected $variablesConstraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var EmailTemplate
+     */
     protected $template;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $user;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $twig;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $context;
 
     protected function setUp()
@@ -46,7 +56,7 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = $this
-            ->getMockForAbstractClass('Symfony\Component\Validator\ExecutionContextInterface');
+            ->getMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->template = new EmailTemplate();
     }
@@ -59,21 +69,19 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
         unset($this->context);
     }
 
-    public function testValidateNotErrors()
+    public function testValidateNoErrors()
     {
-        $phpUnit  = $this;
-        $user     = $this->user;
-        $callback = function ($template, $params) use ($phpUnit, $user) {
-            $phpUnit->assertInternalType('string', $template);
+        $callback = function ($template, $params) {
+            $this->assertInternalType('string', $template);
 
-            $phpUnit->assertArrayHasKey('entity', $params);
-            $phpUnit->assertArrayHasKey('user', $params);
+            $this->assertArrayHasKey('entity', $params);
+            $this->assertArrayHasKey('user', $params);
 
-            $phpUnit->assertInstanceOf(
+            $this->assertInstanceOf(
                 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity',
                 $params['entity']
             );
-            $phpUnit->assertInstanceOf(get_class($user), $params['user']);
+            $this->assertInstanceOf(get_class($this->user), $params['user']);
         };
 
         $map = [
@@ -101,16 +109,18 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->setContent(self::TEST_TRANS_SUBJECT);
         $this->template->getTranslations()->add($trans);
 
-        $map = [
-            [self::TEST_SUBJECT],
-            [self::TEST_CONTENT],
-            [self::TEST_TRANS_SUBJECT]
-        ];
-
         $this->twig
             ->expects($this->exactly(3))
             ->method('render')
-            ->will($this->returnValueMap($map));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_SUBJECT],
+                        [self::TEST_CONTENT],
+                        [self::TEST_TRANS_SUBJECT]
+                    ]
+                )
+            );
 
         $this->twig
             ->expects($this->at(2))
@@ -171,8 +181,11 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('sandbox'))
             ->will($this->returnValue($sandbox));
 
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $token           = $this->getMockForAbstractClass(
+        $securityContext = $this->getMock(
+            'Symfony\Component\Security\Core\SecurityContextInterface'
+        );
+
+        $token = $this->getMock(
             'Symfony\Component\Security\Core\Authentication\Token\TokenInterface'
         );
         $token->expects($this->any())
