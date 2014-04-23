@@ -15,6 +15,7 @@ test_flow:
             is_start: true
             display_type: page
             transition_definition: start_transiotion_definition
+
 test_start_step_flow:
     label: 'Test Flow'
     entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity

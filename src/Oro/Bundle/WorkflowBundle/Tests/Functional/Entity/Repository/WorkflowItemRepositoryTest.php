@@ -45,13 +45,14 @@ class WorkflowItemRepositoryTest extends FunctionalTestCase
         $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP]);
         $this->assertCount(LoadWorkflowAwareEntities::COUNT, $inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP]);
 
-        // reset only second workflow data with more than one batch
+        // reset only WITH_START_STEP workflow data with more than one batch
         $this->repository->resetWorkflowData(
             'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
             array(LoadWorkflowDefinitions::NO_START_STEP),
             LoadWorkflowAwareEntities::COUNT - 1
         );
 
+        // assert state: NO_START_STEP workflow entities weren't changed, WITH_START_STEP workflow entities were reset
         $updatedEntityIds = $this->getEntityIdsByWorkflow();
         $this->assertArrayHasKey(LoadWorkflowDefinitions::NO_START_STEP, $inputEntityIds);
         $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $updatedEntityIds);
@@ -67,6 +68,7 @@ class WorkflowItemRepositoryTest extends FunctionalTestCase
         // reset all workflow data
         $this->repository->resetWorkflowData('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
 
+        // assert state: both NO_START_STEP and WITH_START_STEP workflow entities were reset
         $emptyEntityIds = $this->getEntityIdsByWorkflow();
         $this->assertArrayNotHasKey(LoadWorkflowDefinitions::NO_START_STEP, $emptyEntityIds);
         $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $emptyEntityIds);
