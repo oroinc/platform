@@ -62,9 +62,10 @@ class WorkflowControllerTest extends WebTestCase
         $workflowManager = $this->getWorkflowManager();
         $repository      = $this->entityManager->getRepository('OroWorkflowBundle:WorkflowDefinition');
 
-        /** @var WorkflowDefinition $workflowDefinitionNoStartStep, $workflowDefinitionStartStep */
+        /** @var $workflowDefinitionNoStartStep WorkflowDefinition */
         $workflowDefinitionNoStartStep = $repository->find(LoadWorkflowDefinitions::NO_START_STEP);
-        $workflowDefinitionStartStep = $repository->find(LoadWorkflowDefinitions::WITH_START_STEP);
+        /** @var $workflowDefinitionStartStep WorkflowDefinition */
+        $workflowDefinitionStartStep   = $repository->find(LoadWorkflowDefinitions::WITH_START_STEP);
 
         if ($finalDefinitionHasStartStep) {
             $workflowFrom     = $workflowDefinitionNoStartStep;
@@ -82,12 +83,10 @@ class WorkflowControllerTest extends WebTestCase
         $workflowManager->activateWorkflow($workflowFrom);
         $this->assertActiveWorkflow($this->entityClass, $workflowFromName);
 
-        $this->markTestIncomplete('CRM-1052: Need to fix test logic');
-
         // create new test entity
         $entity = $this->createNewEntity();
         if ($finalDefinitionHasStartStep) {
-            $workflowManager->startWorkflow($workflowFromName, $entity);
+            $workflowManager->startWorkflow($workflowFromName, $entity, LoadWorkflowDefinitions::START_TRANSITION);
         }
         $this->assertEntityWorkflowItem($entity, $workflowFromName);
 

@@ -292,8 +292,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $activeWorkflow->setName($activeWorkflowName);
         $activeWorkflow->setDefinition($workflowDefinition);
-        $activeWorkflow->expects($withStartStep ? $this->once() : $this->never())
-            ->method('start');
+        if ($withStartStep) {
+            $workflowDefinition->setName($activeWorkflowName);
+            $workflowItemActive = $this->createWorkflowItem($activeWorkflowName);
+            $workflowItemActive->setEntity($entity);
+            $workflowItemActive->setDefinition($workflowDefinition);
+
+            $activeWorkflow->expects($this->once())
+                ->method('start')
+                ->with($entity, array(), null)
+                ->will($this->returnValue($workflowItemActive));
+        } else {
+            $activeWorkflow->expects($this->never())
+                ->method('start');
+        }
 
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
@@ -321,7 +333,14 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ->method('getManager');
         }
 
-        $this->workflowManager->resetWorkflowItem($workflowItem);
+        $activeWorkflowItem = $this->workflowManager->resetWorkflowItem($workflowItem);
+        if ($withStartStep) {
+            $this->assertNotNull($activeWorkflowItem);
+            $this->assertEquals($activeWorkflowName, $activeWorkflowItem->getDefinition()->getName());
+        } else {
+            $this->assertNull($activeWorkflowItem);
+        }
+
         $this->assertNull($entity->getWorkflowStep());
         $this->assertNull($entity->getWorkflowItem());
     }
