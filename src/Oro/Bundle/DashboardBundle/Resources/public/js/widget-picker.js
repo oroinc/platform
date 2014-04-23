@@ -10,13 +10,13 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         open: function() {
             Backbone.BootstrapModal.prototype.open.apply(this, arguments);
             var controls = $('.add-widget-button');
-            $('.dashboard-widget-container').bind('click', {}, function(event) {
-                event.stopImmediatePropagation();
-                if (!$(event.target).hasClass('add-widget-button')) {
-                    $(this).find('.add-widget-button').click();
-                }
+            $('.dashboard-picker-collapse').unbind('click').bind('click', {}, function () {
+                var $this = $(this);
+                var container = $this.parents('.dashboard-widget-container');
+                $this.toggleClass('collapsed-state');
+                container.find('.dashboard-widgets-description').fadeToggle();
             });
-            controls.bind('click', {controls: controls}, this.options.clickAddToDashboardCallback);
+            controls.unbind('click').bind('click', {controls: controls}, this.options.clickAddToDashboardCallback);
         }
     });
 

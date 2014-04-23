@@ -95,33 +95,41 @@
         </div>
         <script type="text/html" id="available-dashboard-widgets">
             {% for widgetName, widget in widgets %}
-                <div class="dashboard-widget-container">
-                    <div class="dashboard-widget-title">
-                        <i class="icon icon-collapse"></i>
-                        <div class="dashboard-widget-thumbnail">
-                        {% if widget.thumbnail is defined %}
-                        <img src="{{ asset(widget.thumbnail) }}" alt="Preview" />
-                        {% else %}
-                        <img src="{{ asset("bundles/orodashboard/img/no_thumbnail.png") }}" alt="Preview" />
-                        {% endif %}
-                        </div>
-                        {% if widget.label is defined %}
-                            <strong>{{ widget.label|trans }}</strong>
-                        {% endif %}
-                        <div class="dashboard-widgets-pick-wrapper">
-                            <a class="btn add-widget-button btn-primary" data-widget-name="{{ widgetName }}">
-                                {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
+            <div class="dashboard-widget-container">
+                <table>
+                    <tr class="dashboard-widget-title">
+                        <td class="dashboard-widget-small-column">
+                            <a href="javascript:void(0);" class="dashboard-picker-collapse">
                             </a>
-                        </div>
-                    </div>
-
-                    <p class="dashboard-widget-description">
-                    {% if widget.description is defined %}
-                            {{ widget.description|trans }}
-                    {% endif %}
-                    </p>
-
-                </div>
+                        </td>
+                        <td class="dashboard-widget-small-column">
+                            {% if widget.icon is defined %}
+                            <img class="dashboard-widget-icon" src="{{ asset(widget.icon) }}" alt="Preview" />
+                            {% else %}
+                            <img class="dashboard-widget-icon" src="{{ asset("bundles/orodashboard/img/no_icon.png") }}" alt="Preview" />
+                            {% endif %}
+                        </td>
+                        <td class="dashboard-widget-large-column">
+                            {% if widget.label is defined %}
+                                <strong>{{ widget.label|trans }}</strong>
+                            {% endif %}
+                        </td>
+                        <td class="dashboard-widgets-pick-wrapper">
+                            <a class="btn add-widget-button btn-primary" data-widget-name="{{ widgetName }}">
+                                    {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
+                                </a>
+                        </td>
+                    </tr>
+                    <tr class="dashboard-widgets-description">
+                        <td colspan="2"></td>
+                        <td class="dashboard-widget-large-column">
+                            {% if widget.description is defined %}
+                                {{ widget.description|trans }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
             {% endfor %}
         </script>
     {% endblock widgets_content %}
