@@ -10,7 +10,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -23,7 +25,7 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 class DashboardController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * @param integer $id
+     * @param integer Dashboard $id
      *
      * @ApiDoc(
      *      description="Delete dashboard",
@@ -35,16 +37,13 @@ class DashboardController extends FOSRestController implements ClassResourceInte
      *      permission="DELETE",
      *      class="OroDashboardBundle:Dashboard"
      * )
+     * @ParamConverter("dashboard", options={"id"="dashboard"})
+     * @throws ForbiddenException
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(Dashboard $id)
     {
-        $dashboard = $this->getDashboard($id);
-
-        if (!$dashboard) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
-        }
-
+        $dashboard = $id;
         $this->getEntityManager()->remove($dashboard);
         $this->getEntityManager()->flush();
 
