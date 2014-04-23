@@ -106,7 +106,6 @@
     {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
     <a href="javascript:void(0);"
        data-url="{{ data.url }}"
-       data-message="{{ 'Attention&#058; This action will reset all existing workflow data'|trans }}"
        title="{{ data.title|trans }}"
        class="btn icons-holder-text btn-primary"
        id="{{ resetButtonId }}">

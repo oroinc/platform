@@ -67,7 +67,6 @@ Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
 Reset workflow data: Reset workflow data
-Attention&#058; This action will reset all existing workflow data: Attention: This action will reset all existing workflow data
 
 oro:
     workflow:

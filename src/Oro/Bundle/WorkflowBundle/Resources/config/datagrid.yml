@@ -94,7 +94,7 @@ datagrid:
                 icon:          trash
                 link:          delete_link
             activate:
-                type:          ajax
+                type:          workflow-activate
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.activate
                 icon:          ok
