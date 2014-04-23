@@ -35,7 +35,7 @@ define(['underscore'
                         ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
                     result.push({
-                        entity: this.findEntity(_.first(pair)),
+                        entity: this.findEntity(pair[_.size(pair) - 2]),
                         label: label
                     });
                     prevFieldName = _.last(pair);
