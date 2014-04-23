@@ -1,34 +1,32 @@
-test_flow:
-    label: 'Test Flow'
-    entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
-    attributes: ~
-    steps:
-        open:
-            label: 'Open'
-            order: 10
-    transition_definitions:
-        start_transiotion_definition: ~
-    transitions:
-        __start__:
-            label: 'Start transiotion'
-            step_to: open
-            is_start: true
-            transition_definition: start_transiotion_definition
+workflows:
+    test_flow:
+        label: 'Test Flow'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        steps:
+            open:
+                label: 'Open'
+                order: 10
+        transition_definitions:
+            start_transiotion_definition: ~
+        transitions:
+            start_transition:
+                label: 'Start transiotion'
+                step_to: open
+                is_start: true
+                transition_definition: start_transiotion_definition
 
-test_start_step_flow:
-    label: 'Test Flow'
-    entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
-    start_step: open
-    attributes: ~
-    steps:
-       open:
-           label: 'Open'
-           order: 10
-    transition_definitions:
-       start_transiotion_definition: ~
-    transitions:
-       start_transition:
-           label: 'Start transiotion'
-           step_to: open
-           is_start: true
-           transition_definition: start_transiotion_definition
+    test_start_step_flow:
+        label: 'Test Flow With Start Step'
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        start_step: open
+        steps:
+           open:
+               label: 'Open'
+               order: 10
+        transition_definitions:
+           start_transiotion_definition: ~
+        transitions:
+           start_transition:
+               label: 'Start transiotion'
+               step_to: open
+               transition_definition: start_transiotion_definition

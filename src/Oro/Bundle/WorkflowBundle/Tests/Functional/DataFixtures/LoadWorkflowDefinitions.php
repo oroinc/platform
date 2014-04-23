@@ -4,7 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
+
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -32,11 +33,13 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
     public function load(ObjectManager $manager)
     {
         $hasDefinitions = false;
-        $yaml = new Parser();
 
-        $workflows = $yaml->parse(file_get_contents(__DIR__ . '/config/workflows.yml'));
+        $listConfiguration = $this->container->get('oro_workflow.configuration.config.workflow_list');
         $configurationBuilder = $this->container->get('oro_workflow.configuration.builder.workflow_definition');
-        $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflows);
+
+        $workflowConfiguration = Yaml::parse(file_get_contents(__DIR__ . '/config/workflows.yml'));
+        $workflowConfiguration = $listConfiguration->processConfiguration($workflowConfiguration);
+        $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
         foreach ($workflowDefinitions as $workflowDefinition) {
             if ($manager->getRepository('OroWorkflowBundle:WorkflowDefinition')->find($workflowDefinition->getName())) {
