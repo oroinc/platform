@@ -171,33 +171,7 @@
                                 </td>
                             </tr>
                         </table>
-                    </div>                  
-                    
-                    <div class="dashboard-widget-container">
-                        <div class="dashboard-widget-thumbnail">
-                        {% if widget.thumbnail is defined %}
-                            <img src="{{ asset(widget.thumbnail) }}" alt="Preview" />
-                        {% else %}
-                            <img src="{{ asset("bundles/orodashboard/img/no_thumbnail.png") }}" alt="Preview" />
-                        {% endif %}
-                        </div>
-                        <p>
-                        {% if widget.label is defined %}
-                            <strong class="dashboard-widget-title">{{ widget.label|trans }}</strong>
-                        {% endif %}
-                        <span class="dashboard-widget-description">
-                            {% if widget.description is defined %}
-                                {{ widget.description|trans }}
-                            {% endif %}
-                        </span>
-                        </p>
-                        <div class="dashboard-widgets-pick-wrapper">
-                            <a class="btn add-widget-button" data-widget-name="{{ widgetName }}">
-                                {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
-                            </a>
-                        </div>
                     </div>
-
                 {% endif %}
             {% endfor %}
         </script>
