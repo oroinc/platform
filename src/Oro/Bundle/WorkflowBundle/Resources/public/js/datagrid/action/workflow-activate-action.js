@@ -1,11 +1,6 @@
 /*global define*/
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/messenger',
-    'orodatagrid/js/datagrid/action/model-action'
-],
-function (_, __, messenger, ModelAction) {
+define(['orodatagrid/js/datagrid/action/model-action', 'oroworkflow/js/activation-handler'],
+function (ModelAction, ActivationHandler) {
     'use strict';
 
     /**
@@ -16,14 +11,21 @@ function (_, __, messenger, ModelAction) {
      * @extends orodatagrid.datagrid.action.ModelAction
      */
     return ModelAction.extend({
-        /** @property {Boolean} */
-        confirmation: true,
+        execute: function () {
+            var datagrid = this.datagrid;
 
-        /** @property {Array} */
-        defaultMessages: {
-            confirm_title: __('Workflow reset'),
-            confirm_content: __('Attention: This action will reset all workflow data for this entity.'),
-            confirm_ok: __('Yes, Reset')
+            this.on('activation_start', function() {
+                datagrid.showLoading();
+            });
+            this.on('activation_success', function() {
+                datagrid.hideLoading();
+                datagrid.collection.fetch();
+            });
+            this.on('activation_error', function(xhr) {
+                datagrid.hideLoading();
+            });
+
+            ActivationHandler.call(this, this.getLink());
         }
     });
 });
