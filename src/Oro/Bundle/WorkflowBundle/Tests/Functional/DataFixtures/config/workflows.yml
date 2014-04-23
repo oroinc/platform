@@ -9,11 +9,10 @@ test_flow:
     transition_definitions:
         start_transiotion_definition: ~
     transitions:
-        start_transition:
+        __start__:
             label: 'Start transiotion'
             step_to: open
             is_start: true
-            display_type: page
             transition_definition: start_transiotion_definition
 
 test_start_step_flow:
@@ -32,5 +31,4 @@ test_start_step_flow:
            label: 'Start transiotion'
            step_to: open
            is_start: true
-           display_type: page
            transition_definition: start_transiotion_definition

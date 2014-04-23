@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
  * @db_isolation
@@ -17,10 +21,17 @@ class WorkflowControllerTest extends WebTestCase
 {
     static protected $fixturesLoaded = false;
 
+    protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
+
     /**
      * @var Client
      */
     protected $client;
+
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
 
     protected function setUp()
     {
@@ -33,29 +44,89 @@ class WorkflowControllerTest extends WebTestCase
             $this->client->appendFixtures($path, array('LoadWorkflowDefinitions'));
             self::$fixturesLoaded = true;
         }
+
+        $this->entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass($this->entityClass);
     }
 
-    public function testDeleteAction()
+    /**
+     * @dataProvider deleteDataProvider
+     */
+    public function testDeleteAction($finalDefinitionHasStartStep)
     {
-        $manager = $this->client->getContainer()->get('doctrine')->getManager();
-        $entity = $manager->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')->findAll();
-        $this->assertNotEmpty($entity);
+        $workflowManager = $this->getWorkflowManager();
+        $repository      = $this->entityManager->getRepository('OroWorkflowBundle:WorkflowDefinition');
+
+        /** @var WorkflowDefinition $workflowDefinitionNoStartStep, $workflowDefinitionStartStep */
+        $workflowDefinitionNoStartStep = $repository->findOneBy(
+            array('name' => LoadWorkflowDefinitions::NO_START_STEP)
+        );
+        $workflowDefinitionStartStep = $repository->findOneBy(
+            array('name' => LoadWorkflowDefinitions::WITH_START_STEP)
+        );
+
+        if ($finalDefinitionHasStartStep) {
+            $workflowFrom     = $workflowDefinitionNoStartStep;
+            $workflowFromName = LoadWorkflowDefinitions::NO_START_STEP;
+            $workflowTo       = $workflowDefinitionStartStep;
+            $workflowToName   = LoadWorkflowDefinitions::WITH_START_STEP;
+        } else {
+            $workflowFrom     = $workflowDefinitionStartStep;
+            $workflowFromName = LoadWorkflowDefinitions::WITH_START_STEP;
+            $workflowTo       = $workflowDefinitionNoStartStep;
+            $workflowToName   = LoadWorkflowDefinitions::NO_START_STEP;
+        }
+
+        // activating workflow definition
+        $workflowManager->activateWorkflow($workflowFrom);
+        $this->assertActiveWorkflow($this->entityClass, $workflowFromName);
+
+        // create new test entity
+        $entity = $this->createNewEntity();
+        if ($finalDefinitionHasStartStep) {
+            $workflowManager->startWorkflow($workflowFromName, $entity);
+        }
+        $this->assertEntityWorkflowItem($entity, $workflowFromName);
+
+        // activating other workflow definition
+        $workflowManager->activateWorkflow($workflowTo);
+        $this->assertActiveWorkflow($this->entityClass, $workflowToName);
+
+        // assert the current entity still has relation to the not active workflow definition
+        $this->entityManager->refresh($entity);
+        $this->assertEntityWorkflowItem($entity, $workflowFromName);
+
+        // performing delete workflow item
+        $param = array('workflowItemId' => $entity->getWorkflowItem()->getId());
+        $this->client->request('DELETE', $this->client->generate('oro_api_workflow_delete', $param));
+
+        // check is deleting workflow item has been performed successfully
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 204);
+
+        $this->entityManager->refresh($entity);
+        if ($finalDefinitionHasStartStep) {
+            $this->assertEntityWorkflowItem($entity, $workflowToName);
+        } else {
+            $this->assertEntityWorkflowItem($entity, null);
+        }
+    }
+
+    public function deleteDataProvider()
+    {
+        return array(
+            array(true),
+            array(false),
+        );
     }
 
     public function testDeactivateAndActivateActions()
     {
-        $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
-        $entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass($entityClass);
-
         // set and assert active workflow
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
-        $this->assertActiveWorkflow($entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
 
         // create and assert test entity
-        $testEntity = new WorkflowAwareEntity();
-        $testEntity->setName('test');
-        $entityManager->persist($testEntity);
-        $entityManager->flush($testEntity);
+        $testEntity = $this->createNewEntity();
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         // deactivate workflow for entity
@@ -63,16 +134,16 @@ class WorkflowControllerTest extends WebTestCase
             'GET',
             $this->client->generate(
                 'oro_workflow_api_rest_workflow_deactivate',
-                array('entityClass' => $entityClass)
+                array('entityClass' => $this->entityClass)
             )
         );
         $result = $this->client->getResponse();
         $result = ToolsApi::jsonToArray($result->getContent());
         $this->assertActivationResult($result);
-        $this->assertActiveWorkflow($entityClass, null);
+        $this->assertActiveWorkflow($this->entityClass, null);
 
         // assert that entity still has relation to workflow
-        $entityManager->refresh($testEntity);
+        $this->entityManager->refresh($testEntity);
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
         // activate other workflow through API
@@ -86,11 +157,21 @@ class WorkflowControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $result = ToolsApi::jsonToArray($result->getContent());
         $this->assertActivationResult($result);
-        $this->assertActiveWorkflow($entityClass, LoadWorkflowDefinitions::NO_START_STEP);
+        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::NO_START_STEP);
 
         // assert that entity workflow item was reset
-        $entityManager->refresh($testEntity);
+        $this->entityManager->refresh($testEntity);
         $this->assertEntityWorkflowItem($testEntity, null);
+    }
+
+    protected function createNewEntity()
+    {
+        $testEntity = new WorkflowAwareEntity();
+        $testEntity->setName('test_' . uniqid());
+        $this->entityManager->persist($testEntity);
+        $this->entityManager->flush($testEntity);
+
+        return $testEntity;
     }
 
     /**
