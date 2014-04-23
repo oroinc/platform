@@ -51,9 +51,10 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $entityName         = str_replace('_', '\\', $entityName);
+        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
+        $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $deepLevel         = $this->getRequest()->query->has('deep-level')
             ? (int)$this->getRequest()->query->get('deep-level')
             : 0;
@@ -67,6 +68,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $entityName,
                 $withRelations,
                 $withEntityDetails,
+                $withUnidirectional,
                 $deepLevel,
                 $lastDeepLevelRelations
             );

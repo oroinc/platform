@@ -202,7 +202,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevel()
     {
         $this->prepareWithRelations();
-        $result   = $this->provider->getFields('Acme:Test', true, false, 1);
+        $result   = $this->provider->getFields('Acme:Test', true, false, false, 1);
         $expected = [
             [
                 'name'  => 'field3',
@@ -253,7 +253,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndEntityDetails()
     {
         $this->prepareWithRelations();
-        $result   = $this->provider->getFields('Acme:Test', true, true, 1);
+        $result   = $this->provider->getFields('Acme:Test', true, true, false, 1);
         $expected = [
             [
                 'name'  => 'field3',
@@ -307,7 +307,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelations()
     {
         $this->prepareWithRelations();
-        $result   = $this->provider->getFields('Acme:Test', true, false, 1, true);
+        $result   = $this->provider->getFields('Acme:Test', true, false, false, 1, true);
         $expected = [
             [
                 'name'  => 'field3',
@@ -358,7 +358,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetails()
     {
         $this->prepareWithRelations();
-        $result   = $this->provider->getFields('Acme:Test', true, true, 1, true);
+        $result   = $this->provider->getFields('Acme:Test', true, true, false, 1, true);
         $expected = [
             [
                 'name'  => 'field3',

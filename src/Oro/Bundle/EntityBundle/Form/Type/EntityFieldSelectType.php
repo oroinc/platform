@@ -156,6 +156,7 @@ class EntityFieldSelectType extends AbstractType
             $entityName,
             $withRelations,
             true,
+            false,
             $deepLevel,
             $lastDeepLevelRelations
         );

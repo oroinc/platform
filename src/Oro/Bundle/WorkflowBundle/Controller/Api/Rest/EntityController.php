@@ -49,6 +49,7 @@ class EntityController extends FOSRestController
                 $entityName,
                 $withRelations,
                 $withEntityDetails,
+                false,
                 $deepLevel,
                 $lastDeepLevelRelations
             );
