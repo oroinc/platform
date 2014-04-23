@@ -8,8 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
  */
 class DashboardControllerTest extends WebTestCase
 {
@@ -20,12 +18,18 @@ class DashboardControllerTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_dashboard_index'));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_dashboard_index'),
+            [],
+            [],
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
         $this->assertContains('Dashboard', $result->getContent());
@@ -38,7 +42,10 @@ class DashboardControllerTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_dashboard_view')
+            $this->client->generate('oro_dashboard_view'),
+            [],
+            [],
+            ToolsAPI::generateWsseHeader()
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');

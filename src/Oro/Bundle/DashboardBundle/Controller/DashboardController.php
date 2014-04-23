@@ -17,6 +17,7 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Route("/dashboard")
@@ -52,16 +53,21 @@ class DashboardController extends Controller
      *      name="oro_dashboard_view",
      *      defaults={"id" = ""}
      * )
-     * @AclAncestor("oro_dashboard_view")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Dashboard $dashboard = null)
     {
-        $changeActive = $this->get('request')->get('change_dashboard', false);
-
-        $dashboards = $this->getDashboardManager()->findAllowedDashboards();
         $currentDashboard = $this->findAllowedDashboard($dashboard);
 
+        if (!$currentDashboard) {
+            return $this->quickLaunchpadAction();
+        }
+
+        if (!$this->getSecurityFacade()->isGranted('VIEW', $currentDashboard->getEntity())) {
+            return $this->quickLaunchpadAction();
+        }
+
+        $changeActive = $this->get('request')->get('change_dashboard', false);
         if ($changeActive && $dashboard) {
             $this->getDashboardManager()->setUserActiveDashboard(
                 $currentDashboard,
@@ -70,16 +76,12 @@ class DashboardController extends Controller
             );
         }
 
-        if (!$currentDashboard) {
-            return $this->quickLaunchpadAction();
-        }
-
         return $this->render(
             $currentDashboard->getTemplate(),
             array(
-                'dashboards' => $dashboards,
-                'dashboard' => $currentDashboard,
-                'widgets' => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
+                'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
+                'dashboard'  => $currentDashboard,
+                'widgets'    => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
             )
         );
     }
@@ -142,18 +144,18 @@ class DashboardController extends Controller
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     array(
-                        'route' => 'oro_dashboard_update',
+                        'route'      => 'oro_dashboard_update',
                         'parameters' => array('id' => $dashboardModel->getId()),
                     ),
                     array(
-                        'route' => 'oro_dashboard_view',
+                        'route'      => 'oro_dashboard_view',
                         'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
                     )
                 );
             }
         }
 
-        return array('entity' => $dashboardModel, 'form'=> $form->createView());
+        return array('entity' => $dashboardModel, 'form' => $form->createView());
     }
 
     /**
@@ -216,7 +218,7 @@ class DashboardController extends Controller
      * Get dashboard with granted permission. If dashboard id is not specified, gets current active or default dashboard
      *
      * @param Dashboard $dashboard $dashboard
-     * @param string $permission
+     * @param string    $permission
      * @return DashboardModel|null
      */
     protected function findAllowedDashboard(Dashboard $dashboard = null, $permission = 'VIEW')

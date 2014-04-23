@@ -46,9 +46,9 @@ class WidgetControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = static::createClient([], ToolsAPI::generateWsseHeader());
-        $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-        $this->configProvider = $this->client->getContainer()->get('oro_dashboard.config_provider');
+        $this->client           = static::createClient([], ToolsAPI::generateWsseHeader());
+        $this->em               = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider   = $this->client->getContainer()->get('oro_dashboard.config_provider');
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
@@ -94,7 +94,7 @@ class WidgetControllerTest extends WebTestCase
         $widgetNames = array_keys($widgets);
 
         $widgetName = $widgetNames[0];
-        $id = $this->widget->getDashboard()->getId();
+        $id         = $this->widget->getDashboard()->getId();
         $this->client->request(
             'POST',
             $this->client->generate(
@@ -109,9 +109,7 @@ class WidgetControllerTest extends WebTestCase
         ToolsAPI::assertJsonResponse($result, 200);
         $content = ToolsAPI::jsonToArray($result->getContent());
         $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
-        $this->assertEquals($widgetName, $content['entity']['name']);
-        $this->assertEquals($id, $content['entity']['dashboard']['id']);
-
+        $this->assertEquals($widgetName, $content['name']);
     }
 
     /**
