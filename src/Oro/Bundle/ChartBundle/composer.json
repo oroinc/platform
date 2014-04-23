@@ -1,0 +1,24 @@
+{
+    "name": "oro/chart-bundle",
+    "type": "symfony-bundle",
+    "description": "Oro Chart Bundle",
+    "keywords": ["BAP"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.3.*",
+        "oro/ui-bundle": "dev-master",
+        "oro/locale-bundle": "dev-master",
+        "oro/requirejs-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\ChartBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/ChartBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
