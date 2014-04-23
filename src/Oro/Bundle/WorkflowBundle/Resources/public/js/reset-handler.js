@@ -46,11 +46,8 @@ function($, _, __, Modal, Navigation, Messenger) {
 
                     element.trigger('reset_success', [responce]);
                 },
-                error: function(xhr, textStatus, error) {
-                    element.one('reset_failure', function() {
-                        Messenger.notificationFlashMessage('error', __('Cannot reset workflow item data.'));
-                    });
-                    element.trigger('reset_failure', [xhr, textStatus, error]);
+                error: function() {
+                    Messenger.notificationFlashMessage('error', __('Cannot reset workflow item data.'));
                     resetInProgress();
                 }
             })
