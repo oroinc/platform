@@ -15,7 +15,7 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Update table oro_email **/
-        $table = $schema->createTable('oro_email');
+        $table = $schema->getTable('oro_email');
         $table->addIndex(['message_id'], 'IDX_email_message_id', []);
         /** End of update table oro_email **/
     }
