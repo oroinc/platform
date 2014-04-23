@@ -149,6 +149,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             }
         });
 
+        // fixes submit by enter key press on select element
+        $(document).on('keydown', 'form select', function(e) {
+            if (e.keyCode === 13) {
+                $(e.target.form).submit();
+            }
+        });
+
         $(document).on('focus', '.select2-focusser, .select2-input', function (e) {
             $('.hasDatepicker').datepicker('hide')
         });

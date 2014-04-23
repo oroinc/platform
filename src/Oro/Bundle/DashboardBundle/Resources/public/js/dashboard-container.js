@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         options: {
             widgetIds: [],
-            handle: ".dashboard-widget > .title",
+            handle: ".dashboard-widget .sortable",
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
             allowEdit: false,
@@ -50,6 +50,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             mediator.off('dashboard:widget:add', this.addToDashboard, this);
             mediator.on('dashboard:widget:add', this.addToDashboard, this);
 
+            this.widgets = {};//reset widgets state before add
             _.each(this.options.widgetIds, function (wid) {
                 widgetManager.getWidgetInstance(
                     wid,
@@ -189,13 +190,20 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _lockLayoutHeight: function() {
-            var maxHeight = 0;
-            $(this.options.columnsSelector).css({minHeight: '0px'});
-            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+            this._releaseLayoutHeight();
+            var columns = $(this.options.columnsSelector);
+            var scrollableContainer = columns.parents('.scrollable-container').first();
+            var container = scrollableContainer.find('.dashboard-container');
+            var padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
+            var maxHeight = scrollableContainer.height() - padding;
+
+            columns.each(function(columnIndex, columnElement) {
                 var currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
-            $(this.options.columnsSelector).css({minHeight: (maxHeight + 200) + 'px'});
+
+            columns.css({minHeight: maxHeight + 'px'});
+            columns.sortable('refresh');
         },
 
         /**
@@ -209,7 +217,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _hideEmptyText: function() {
-            $(this.options.emptyTextSelector, this.options.columnsSelector).css('visibility', 'hidden');
+            $(this.options.emptyTextSelector, this.options.columnsSelector).addClass('hidden-empty-text');
         },
 
 
@@ -221,9 +229,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
 
             $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
                 if (self._isEmptyColumn(columnIndex)) {
-                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'visible');
+                    $(self.options.emptyTextSelector, columnElement).removeClass('hidden-empty-text');
                 } else {
-                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'hidden');
+                    $(self.options.emptyTextSelector, columnElement).addClass('hidden-empty-text');
                 }
             });
         },

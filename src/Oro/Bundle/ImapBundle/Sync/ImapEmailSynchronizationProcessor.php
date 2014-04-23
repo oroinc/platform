@@ -3,23 +3,25 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
+
 use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 
 /**
  * @todo the implemented synchronization algorithm is just a demo and it will be fixed soon
@@ -36,29 +38,29 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Constructor
      *
-     * @param LoggerInterface $log
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailAddressManager $emailAddressManager
-     * @param ImapEmailManager $manager
+     * @param LoggerInterface          $log
+     * @param EntityManager            $em
+     * @param EmailEntityBuilder       $emailEntityBuilder
+     * @param EmailAddressManager      $emailAddressManager
+     * @param KnownEmailAddressChecker $knownEmailAddressChecker
+     * @param ImapEmailManager         $manager
      */
     public function __construct(
         LoggerInterface $log,
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
         EmailAddressManager $emailAddressManager,
+        KnownEmailAddressChecker $knownEmailAddressChecker,
         ImapEmailManager $manager
     ) {
-        parent::__construct($log, $em, $emailEntityBuilder, $emailAddressManager);
+        parent::__construct($log, $em, $emailEntityBuilder, $emailAddressManager, $knownEmailAddressChecker);
         $this->manager = $manager;
     }
 
     /**
-     * Performs a synchronization of emails for the given email origin.
-     *
-     * @param EmailOrigin $origin
+     * {@inheritdoc}
      */
-    public function process(EmailOrigin $origin)
+    public function process(EmailOrigin $origin, $syncStartTime)
     {
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
@@ -123,8 +125,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Addresses are delimited by OR operator.
      *
      * @param SearchQueryBuilder $sqb
-     * @param string $addressType
-     * @param EmailAddress[] $addresses
+     * @param string             $addressType
+     * @param EmailAddress[]     $addresses
      */
     protected function addEmailAddressesToSearchQueryBuilder(SearchQueryBuilder $sqb, $addressType, array $addresses)
     {
@@ -141,16 +143,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param \DateTime|null $lastSyncTime
      * @return array
-     *             key = index
-     *             value = array
+     *                 key = index
+     *                 value = array
      *                 'needFullSync' => true/false
      *                 'items' => EmailAddress[]
      */
     protected function getKnownEmailAddressBatches($lastSyncTime)
     {
-        $batches = array();
+        $batches    = array();
         $batchIndex = 0;
-        $count = 0;
+        $count      = 0;
         foreach ($this->getKnownEmailAddresses() as $emailAddress) {
             $needFullSync = !$lastSyncTime || $emailAddress->getUpdatedAt() > $lastSyncTime;
             if ($count >= self::EMAIL_ADDRESS_BATCH_SIZE
@@ -179,8 +181,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         $this->log->notice('Loading folders ...');
 
-        $repo = $this->em->getRepository('OroEmailBundle:EmailFolder');
-        $query = $repo->createQueryBuilder('f')
+        $repo    = $this->em->getRepository('OroEmailBundle:EmailFolder');
+        $query   = $repo->createQueryBuilder('f')
             ->where('f.origin = ?1')
             ->orderBy('f.name')
             ->setParameter(1, $origin)
@@ -198,7 +200,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Check the given folders and if needed correct them
      *
      * @param EmailFolder[] $folders
-     * @param EmailOrigin $origin
+     * @param EmailOrigin   $origin
      */
     protected function ensureFoldersInitialized(array &$folders, EmailOrigin $origin)
     {
@@ -250,8 +252,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Checks if the folder exists in the given list
      *
      * @param EmailFolder[] $folders
-     * @param string $folderType
-     * @param string $folderGlobalName
+     * @param string        $folderType
+     * @param string        $folderGlobalName
      * @return bool
      */
     protected function isFolderExist(array &$folders, $folderType, $folderGlobalName)
@@ -277,7 +279,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         $this->log->notice(sprintf('Load IMAP folder for "%s".', $folder->getFullName()));
 
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $repo  = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
         $query = $repo->createQueryBuilder('f')
             ->where('f.folder = ?1')
             ->setParameter(1, $folder)
@@ -307,16 +309,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails = $this->manager->getEmails($searchQuery);
 
         $needFolderFlush = true;
-        $count = 0;
-        $batch = array();
+        $count           = 0;
+        $batch           = array();
         foreach ($emails as $email) {
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
                 $this->saveEmails($batch, $folder);
                 $needFolderFlush = false;
-                $count = 0;
-                $batch = array();
+                $count           = 0;
+                $batch           = array();
             }
         }
         if ($count > 0) {
@@ -332,7 +334,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Saves emails into the database
      *
-     * @param Email[] $emails
+     * @param Email[]     $emails
      * @param EmailFolder $folder
      */
     protected function saveEmails(array $emails, EmailFolder $folder)
@@ -347,8 +349,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails
         );
 
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $query = $repo->createQueryBuilder('e')
+        $repo         = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $query        = $repo->createQueryBuilder('e')
             ->select('e.uid')
             ->innerJoin('e.email', 'se')
             ->innerJoin('se.folder', 'sf')
