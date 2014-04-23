@@ -110,13 +110,12 @@ class WorkflowManager
     }
 
     /**
-     * Perform reset workflow item data.
-     * Setting $workflowItem and $workflowStep references into null, removing of workflow item.
-     * If current active workflow definition have a start step, then start step will be performed
+     * Perform reset of workflow item data - set $workflowItem and $workflowStep references into null
+     * and remove workflow item. If active workflow definition has a start step,
+     * then active workflow will be started automatically.
      *
      * @param WorkflowItem $workflowItem
-     * @return WorkflowItem active workflowItem when current active workflow definition have a start step,
-     *         otherwise - null
+     * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
      * @throws \Exception
      */
     public function resetWorkflowItem(WorkflowItem $workflowItem)

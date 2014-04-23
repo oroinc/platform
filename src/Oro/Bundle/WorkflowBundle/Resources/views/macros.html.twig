@@ -120,8 +120,7 @@
                 'use strict';
 
                 $(function() {
-                    var container = $('#{{ blockId }}'),
-                        resetBtn  = container.find('#{{ resetButtonId }}');
+                    var resetBtn = $('#{{ blockId }}').find('#{{ resetButtonId }}');
                     resetBtn.data('executor', function() {
                         workflowResetHandler.call(resetBtn);
                     });
