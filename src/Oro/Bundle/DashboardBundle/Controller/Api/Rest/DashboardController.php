@@ -10,9 +10,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -48,20 +46,6 @@ class DashboardController extends FOSRestController implements ClassResourceInte
         $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
-    }
-
-    /**
-     * @param integer $id
-     * @return Dashboard
-     */
-    protected function getDashboard($id)
-    {
-        $entity = $this
-            ->getEntityManager()
-            ->getRepository('OroDashboardBundle:Dashboard')
-            ->find($id);
-
-        return $entity;
     }
 
     /**
