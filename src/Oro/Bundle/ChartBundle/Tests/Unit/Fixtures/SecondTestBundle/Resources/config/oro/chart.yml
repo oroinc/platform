@@ -1,1 +1,4 @@
-oro_chart: ~
+oro_chart:
+    advanced_chart:
+        label: Advanced Chart (overridden)
+        template: SecondTestBundle:Chart:advancedChart.html.twig
