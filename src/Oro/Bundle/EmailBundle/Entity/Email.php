@@ -131,8 +131,8 @@ class Email
     /**
      * @var string
      *
-     * @ORM\Column(name="message_id", type="string", length=255, nullable=false)
-     * @Soap\ComplexType("string", nillable=false)
+     * @ORM\Column(name="message_id", type="string", length=255)
+     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $messageId;

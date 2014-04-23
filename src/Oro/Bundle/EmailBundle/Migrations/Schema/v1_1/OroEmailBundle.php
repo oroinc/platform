@@ -15,7 +15,7 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPreQuery(
-            "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE(UUID(), '-',''),'@swift.generated') " .
+            "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE(UUID(), '-',''),'@bap.migration.generated') " .
             "WHERE message_id IS NULL"
         );
 

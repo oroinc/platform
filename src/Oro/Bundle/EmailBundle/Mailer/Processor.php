@@ -65,7 +65,7 @@ class Processor
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), 'text/plain');
 
-        $messageId = $messageDate->format('U') . '.' . uniqid('id_') . '@' . gethostname();
+        $messageId = $message->generateId();;
         $message->getHeaders()->addIdHeader('Message-ID', $messageId);
 
         if (!$this->mailer->send($message)) {
