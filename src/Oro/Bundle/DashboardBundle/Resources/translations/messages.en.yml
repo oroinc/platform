@@ -3,6 +3,8 @@ oro:
         entity_label: Dashboard
         entity_plural_label: Dashboards
 
+        management_title: Dashboard management
+
         title:
             main: Dashboard
             quick_launchpad: Quick Launchpad
