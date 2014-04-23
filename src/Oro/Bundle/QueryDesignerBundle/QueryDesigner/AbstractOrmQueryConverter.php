@@ -30,6 +30,97 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    {
+        if ($this->isUnidirectionalJoin($joinAlias)) {
+            $this->addUnidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias);
+        } else {
+            $this->addBidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias);
+        }
+    }
+
+    /**
+     * Checks if the given join alias represents unidirectional relationship
+     *
+     * @param string $joinAlias
+     * @return bool
+     */
+    protected function isUnidirectionalJoin($joinAlias)
+    {
+        return 3 === count($this->getUnidirectionalJoinParts($joinAlias));
+    }
+
+    /**
+     * Builds JOIN condition for unidirectional relationship
+     *
+     * @param string $joinTableAlias
+     * @param string $joinFieldName
+     * @param string $joinAlias
+     * @return string
+     */
+    protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
+    {
+        $joinParts       = $this->getUnidirectionalJoinParts($joinAlias);
+        $identifiers     = $this->getClassMetadata($joinParts[0])->getIdentifier();
+        $targetFieldName = array_shift($identifiers);
+
+        return sprintf(
+            '%s.%s = %s.%s',
+            $joinAlias,
+            $joinFieldName,
+            $joinTableAlias,
+            $targetFieldName
+        );
+    }
+
+    /**
+     * Extracts entity name for unidirectional relationship
+     *
+     * @param string $joinAlias
+     * @return string
+     */
+    protected function getUnidirectionalJoinEntity($joinAlias)
+    {
+        $joinParts = $this->getUnidirectionalJoinParts($joinAlias);
+
+        return $joinParts[1];
+    }
+
+    /**
+     * Splits the given unidirectional relationship into parts
+     *
+     * @param string $joinAlias
+     * @return string
+     */
+    protected function getUnidirectionalJoinParts($joinAlias)
+    {
+        return explode(
+            '::',
+            $this->getJoinIdentifierLastPart($this->getJoinIdentifierByTableAlias($joinAlias))
+        );
+    }
+
+    /**
+     * Performs conversion of unidirectional JOIN statement
+     *
+     * @param string $joinTableAlias
+     * @param string $joinFieldName
+     * @param string $joinAlias
+     */
+    abstract protected function addUnidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias);
+
+    /**
+     * Performs conversion of bidirectional JOIN statement
+     *
+     * @param string $joinTableAlias
+     * @param string $joinFieldName
+     * @param string $joinAlias
+     */
+    abstract protected function addBidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias);
+
+    /**
      * Gets a field data type
      *
      * @param string $className
