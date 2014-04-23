@@ -1,0 +1,8 @@
+parameters:
+    oro_chart.config_provider.class: Oro\Bundle\ChartBundle\Model\ConfigProvider
+
+services:
+    oro_chart.config_provider:
+        class: %oro_chart.config_provider.class%
+        arguments:
+            - []
