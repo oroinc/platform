@@ -12,7 +12,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 class OroChartExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
