@@ -3,7 +3,7 @@ oro:
         entity_label: Dashboard
         entity_plural_label: Dashboards
 
-        management_title: Dashboard management
+        management_title: Manage dashboards
 
         title:
             main: Dashboard
