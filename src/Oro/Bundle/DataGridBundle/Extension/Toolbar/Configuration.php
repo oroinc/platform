@@ -32,6 +32,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('hide')->defaultFalse()->end()
                 ->booleanNode('addResetAction')->defaultTrue()->end()
                 ->booleanNode('addRefreshAction')->defaultTrue()->end()
+                ->integerNode('turnOffToolbarRecordsNumber')->defaultValue(0)->end()
                 ->arrayNode('pageSize')->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hide')->defaultFalse()->end()
