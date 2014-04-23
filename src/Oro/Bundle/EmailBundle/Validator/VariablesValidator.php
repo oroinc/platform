@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Validator;
 
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -58,21 +58,25 @@ class VariablesValidator extends ConstraintValidator
             }
         }
 
-        $errors = array();
         if (class_exists($emailTemplate->getEntityName())) {
             $className = $emailTemplate->getEntityName();
 
             /** @var ClassMetadataInfo $metadata */
             $classMetadata = $this->entityManager->getClassMetadata($className);
-            $entity        = $classMetadata->newInstance();
+            if ($classMetadata->getReflectionClass()->isAbstract()) {
+                $this->context->addViolation(
+                    sprintf('Its not possible to create template for "%s"', $className)
+                );
+            }
 
-            $errors = array();
+            $entity = $classMetadata->newInstance();
 
             /** @var \Twig_Extension_Sandbox $sandbox */
             $sandbox = $this->twig->getExtension('sandbox');
             $sandbox->enableSandbox();
 
-            foreach ($fieldsToValidate as $fieldName => $template) {
+            $hasErrors = false;
+            foreach ($fieldsToValidate as $template) {
                 try {
                     $this->twig->render(
                         $template,
@@ -81,18 +85,16 @@ class VariablesValidator extends ConstraintValidator
                             'user'   => $this->getUser()
                         )
                     );
-                } catch (\Twig_Sandbox_SecurityError $e) {
-                    $errors[$fieldName] = true;
-                } catch (\Twig_Error_Runtime $e) {
-                    $errors[$fieldName] = true;
+                } catch (\Twig_Error $e) {
+                    $hasErrors = true;
                 }
             }
 
             $sandbox->disableSandbox();
-        }
 
-        if (!empty($errors)) {
-            $this->context->addViolation($constraint->message);
+            if ($hasErrors) {
+                $this->context->addViolation($constraint->message);
+            }
         }
     }
 
