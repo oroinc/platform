@@ -1,0 +1,9 @@
+Oro\Bundle\DashboardBundle\Entity\Dashboard:
+    properties:
+        label:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        owner:
+            - NotBlank: ~
+

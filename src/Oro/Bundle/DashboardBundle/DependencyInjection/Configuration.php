@@ -96,11 +96,6 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('label')
-                                ->info('The label name')
-                                ->isRequired()
-                                ->cannotBeEmpty()
-                            ->end()
                             ->scalarNode('twig')
                                 ->info(
                                     'The name of TWIG template.'

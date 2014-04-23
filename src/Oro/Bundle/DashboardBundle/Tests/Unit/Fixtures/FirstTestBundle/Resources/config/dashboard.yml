@@ -14,4 +14,4 @@ oro_dashboard_config:
                     acl:        orocrm_sales_opportunity_create
     dashboards:
         main:
-            label:      oro.dashboard.title.main
+            twig: OroDashboardBundle:Index:default.html.twig

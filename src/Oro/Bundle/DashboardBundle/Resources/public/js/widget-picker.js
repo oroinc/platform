@@ -104,7 +104,8 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
             controls.removeClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
             widgetButtonWrapper.removeClass('loading-content');
-            widgetButtonWrapper.find('.add-widget-button').show();
+            //fix case if modal window closed after press and before loading complete
+            widgetButtonWrapper.find('.add-widget-button').css('display', 'inline-block');
             var previous = widgetContainer.css('background-color');
             var animateFinish = function () {
                 animateFinish = function() {

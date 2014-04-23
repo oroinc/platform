@@ -153,7 +153,6 @@ class TitleService implements TitleServiceInterface
                 $suffix = '';
             }
         }
-        $trans = $this->translator;
         if (empty($params)) {
             $params = $this->getParams();
         }
@@ -161,7 +160,6 @@ class TitleService implements TitleServiceInterface
             if (is_null($title)) {
                 $title = $this->getShortTemplate();
             }
-            $translatedTemplate = $trans->trans($title, $params);
         } else {
             if (is_null($title)) {
                 $title = $this->getTemplate();
@@ -172,30 +170,27 @@ class TitleService implements TitleServiceInterface
             if (is_null($suffix)) {
                 $suffix = $this->suffix;
             }
-            $translatedTemplate = $trans->trans($prefix, $params) .
-                $trans->trans($title, $params) . $trans->trans($suffix, $params);
+            $title = $prefix . $title . $suffix;
         }
 
-        $this->translateTitleParts($translatedTemplate);
+        $this->translateTitleParts($title, $params);
 
-        return $translatedTemplate;
+        return $title;
     }
 
     /**
      * Checks if the given template contains several parts and if so translate each part individually
      *
      * @param string $translatedTemplate
+     * @param array  $params
      */
-    protected function translateTitleParts(&$translatedTemplate)
+    protected function translateTitleParts(&$translatedTemplate, array $params)
     {
         if ($translatedTemplate) {
             $delimiter = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
             $transItems = explode($delimiter, $translatedTemplate);
-            $messages   = $this->translator->getTranslations()['messages'];
             foreach ($transItems as $key => $transItem) {
-                if (isset($messages[$transItem])) {
-                    $transItems[$key] = $messages[$transItem];
-                }
+                $transItems[$key] = $this->translator->trans($transItem, $params);
             }
 
             $translatedTemplate = implode($delimiter, $transItems);

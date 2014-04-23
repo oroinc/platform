@@ -1,13 +1,14 @@
 parameters:
-    oro_dashboard.manager.class:                     Oro\Bundle\DashboardBundle\Model\Manager
-    oro_dashboard.widget_manager.class:              Oro\Bundle\DashboardBundle\Model\WidgetManager
-    oro_dashboard.widget_attributes.class:           Oro\Bundle\DashboardBundle\Model\WidgetAttributes
-    oro_dashboard.widget_model_factory.class:        Oro\Bundle\DashboardBundle\Model\WidgetModelFactory
-    oro_dashboard.dashboard_model_factory.class:     Oro\Bundle\DashboardBundle\Model\DashboardModelFactory
-    oro_dashboard.config_provider.class:             Oro\Bundle\DashboardBundle\Provider\ConfigProvider
-    oro_dashboard.repository.class:                  Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository
-    oro_dashboard.dashboard_entity.class:            Oro\Bundle\DashboardBundle\Entity\Dashboard
-    oro_dashboard.dashboard_widget_entity.class:     Oro\Bundle\DashboardBundle\Entity\DashboardWidget
+    oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
+    oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
+    oro_dashboard.widget_attributes.class:       Oro\Bundle\DashboardBundle\Model\WidgetAttributes
+    oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
+    oro_dashboard.config_provider.class:         Oro\Bundle\DashboardBundle\Model\ConfigProvider
+    oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
+    oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
+    oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
+    oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
+    oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
 
 services:
     oro_dashboard.widget_attributes:
@@ -19,29 +20,20 @@ services:
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%
         arguments:
-            - @oro_dashboard.config_provider
-            - @oro_dashboard.repository
-            - @oro_dashboard.dashboard_model_factory
+            - @oro_dashboard.factory
             - @doctrine.orm.entity_manager
+            - @oro_security.acl_helper
 
-    oro_dashboard.widget_manager:
-        class: %oro_dashboard.widget_manager.class%
+    oro_dashboard.factory:
+        class: %oro_dashboard.factory.class%
         arguments:
             - @oro_dashboard.config_provider
+            - @oro_dashboard.manager.state
+
+    oro_dashboard.manager.state:
+        class: %oro_dashboard.manager.state.class%
+        arguments:
             - @doctrine.orm.entity_manager
-            - @oro_security.security_facade
-            - @oro_dashboard.widget_model_factory
-
-    oro_dashboard.dashboard_model_factory:
-        class: %oro_dashboard.dashboard_model_factory.class%
-        arguments:
-            - @oro_dashboard.widget_model_factory
-            - @oro_dashboard.config_provider
-
-    oro_dashboard.widget_model_factory:
-        class: %oro_dashboard.widget_model_factory.class%
-        arguments:
-            - @oro_dashboard.config_provider
             - @oro_security.security_facade
 
     oro_dashboard.config_provider:
@@ -49,10 +41,22 @@ services:
         arguments:
             - []
 
-    oro_dashboard.repository:
-        class: %oro_dashboard.repository.class%
-        factory_service: doctrine # this is an instance of Registry
-        factory_method: getRepository
-        arguments: [ %oro_dashboard.dashboard_entity.class% ]
-        calls:
-            - ['setAclHelper', [@oro_security.acl_helper]]
+    oro_dashboard.navigation_listener:
+        class: %oro_dashboard.navigation_listener.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_dashboard.manager
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_dashboard.form.type.edit:
+        class: %oro_dashboard.form.type.edit.class%
+        tags:
+            - { name: form.type, alias: "oro_dashboard" }
+
+    oro_dashboard.form.type.select:
+        class: %oro_dashboard.form.type.select.class%
+        arguments:
+            - @oro_dashboard.manager
+        tags:
+            - { name: form.type, alias: "oro_dashboard_select" }

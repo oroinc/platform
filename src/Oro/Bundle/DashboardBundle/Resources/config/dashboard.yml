@@ -8,4 +8,4 @@ oro_dashboard_config:
 
     dashboards:
         main:
-            label:      oro.dashboard.title.main
+            twig: OroDashboardBundle:Index:default.html.twig
