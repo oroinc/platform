@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use JMS\Serializer\Annotation as JMS;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -12,7 +14,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * Email
  *
- * @ORM\Table(name="oro_email")
+ * @ORM\Table(
+ *      name="oro_email",
+ *      indexes={@ORM\Index(name="IDX_email_message_id", columns={"message_id"})}
+ * )
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  *
