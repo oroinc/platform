@@ -9,14 +9,14 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
     var WidgetPickerDialog = modal.extend({
         open: function() {
             Backbone.BootstrapModal.prototype.open.apply(this, arguments);
-            var controls = $('.add-widget-button');
-            $('.dashboard-picker-collapse').unbind('click').bind('click', {}, function () {
-                var $this = $(this);
-                var container = $this.parents('.dashboard-widget-container');
-                $this.toggleClass('collapsed-state');
-                container.find('.dashboard-widgets-description').fadeToggle();
-            });
-            controls.unbind('click').bind('click', {controls: controls}, this.options.clickAddToDashboardCallback);
+            var addWidgetControls = $('.add-widget-button');
+            var collapseControls = $('.dashboard-picker-collapse');
+
+            collapseControls.unbind('click', this.options.collapseCallback);
+            collapseControls.bind('click', {}, this.options.collapseCallback);
+
+            addWidgetControls.unbind('click', this.options.clickAddToDashboardCallback);
+            addWidgetControls.bind('click', {controls: addWidgetControls}, this.options.clickAddToDashboardCallback);
         }
     });
 
@@ -50,10 +50,21 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 content: $('#available-dashboard-widgets').html(),
                 className: 'modal dashboard-widgets-wrapper',
                 title: __('oro.dashboard.add_dashboard_widgets.title'),
-                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this)
+                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this),
+                collapseCallback: this._collapseDelegate
             });
 
             $('.dashboard-widgets-add').bind('click', _.bind(this._onClickAddWidget, this));
+        },
+
+        /**
+         * @private
+         */
+        _collapseDelegate: function(){
+            var $this = $(this);
+            var container = $this.parents('.dashboard-widget-container');
+            $this.toggleClass('collapsed-state');
+            container.find('.dashboard-widgets-description').fadeToggle();
         },
 
         /**
