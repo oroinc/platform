@@ -229,7 +229,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testReverseJoinFromColumns()
+    public function testUnidirectionalJoinFromColumns()
     {
         $gridName   = 'test_grid';
         $en         = 'Acme\Entity\TestEntity';
@@ -297,7 +297,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                                 'join'          => $enR1,
                                 'alias'         => 't2',
                                 'conditionType' => 'WITH',
-                                'condition'     => 't2.rc1 = t1.id'
+                                'condition'     => 't2.rc1 = t1'
                             ],
                             [
                                 'join'  => 't1.rc1',
@@ -307,7 +307,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                                 'join'          => $enR1,
                                 'alias'         => 't5',
                                 'conditionType' => 'WITH',
-                                'condition'     => 't5.rc1 = t4.id'
+                                'condition'     => 't5.rc1 = t4'
                             ],
                         ],
                         'inner' => [
@@ -315,7 +315,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                                 'join'          => $enR1,
                                 'alias'         => 't3',
                                 'conditionType' => 'WITH',
-                                'condition'     => 't3.rc2 = t1.id'
+                                'condition'     => 't3.rc2 = t1'
                             ],
                         ],
                     ]

@@ -62,17 +62,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
      */
     protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
     {
-        $joinParts       = $this->getUnidirectionalJoinParts($joinAlias);
-        $identifiers     = $this->getClassMetadata($joinParts[0])->getIdentifier();
-        $targetFieldName = array_shift($identifiers);
-
-        return sprintf(
-            '%s.%s = %s.%s',
-            $joinAlias,
-            $joinFieldName,
-            $joinTableAlias,
-            $targetFieldName
-        );
+        return sprintf('%s.%s = %s', $joinAlias, $joinFieldName, $joinTableAlias);
     }
 
     /**
