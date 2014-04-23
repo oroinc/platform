@@ -29,7 +29,7 @@ function($, _, __, Modal, Navigation, Messenger) {
 
         var confirmReset = new Modal({
             title:   __('Workflow reset'),
-            content: element.data('message'),
+            content: __('Attention: This action will reset workflow data for this record.'),
             okText:  __('Yes, Reset')
         });
 
