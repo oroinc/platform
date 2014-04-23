@@ -19,7 +19,6 @@ class DatagridHelper
             } else {
                 return ['delete' => true, 'deleteDifferent'=>false];
             }
-
         };
     }
 }
