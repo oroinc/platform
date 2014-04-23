@@ -82,22 +82,22 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         /**
-         * @param {object} widgetModel
+         * @param {object} data
          */
-        addToDashboard: function(widgetModel){
-            var wid = 'dashboard-widget-' + widgetModel.widget.id;
+        addToDashboard: function(data){
+            var wid = 'dashboard-widget-' + data.id;
             var containerId = 'widget-container-'+wid;
-            var column = widgetModel.widget.layout_position[0] ? widgetModel.widget.layout_position[0] : 0;
+            var column = data.layout_position[0] ? data.layout_position[0] : 0;
             $('#dashboard-column-'+column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
-                'id': widgetModel.widget.id,
-                'expanded': widgetModel.widget.expanded,
-                'layoutPosition': widgetModel.widget.layout_position
+                'id': data.id,
+                'expanded': data.expanded,
+                'layoutPosition': data.layout_position
             };
             var widgetParams = {
                 'widgetType': 'dashboard-item',
                 'wid': wid,
-                'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
+                'url': routing.generate(data.config.route, data.config.route_parameters),
                 'state': state,
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
@@ -190,14 +190,20 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _lockLayoutHeight: function() {
-            var maxHeight = 0;
             this._releaseLayoutHeight();
-            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+            var columns = $(this.options.columnsSelector);
+            var scrollableContainer = columns.parents('.scrollable-container').first();
+            var container = scrollableContainer.find('.dashboard-container');
+            var padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
+            var maxHeight = scrollableContainer.height() - padding;
+
+            columns.each(function(columnIndex, columnElement) {
                 var currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
-            $(this.options.columnsSelector).css({minHeight: maxHeight + 'px'});
-            $(this.options.columnsSelector).sortable('refresh');
+
+            columns.css({minHeight: maxHeight + 'px'});
+            columns.sortable('refresh');
         },
 
         /**

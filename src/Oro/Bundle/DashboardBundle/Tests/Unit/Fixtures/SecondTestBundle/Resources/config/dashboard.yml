@@ -5,8 +5,9 @@ oro_dashboard_config:
             route_parameters: { bundle: SecondTestBundle, name: secondQuickLaunchpad }
         quick_launchpad:
             route:      alternative_quick_lanchpad_route
+
     dashboards:
         alternative_dashboard:
-            label:      oro.dashboard.title.alternative_dashboard
+            twig: OroDashboardBundle:Index:default.html.twig
         empty_board:
-            label:      oro.dashboard.title.empty_board
+            twig: OroDashboardBundle:Index:default.html.twig
