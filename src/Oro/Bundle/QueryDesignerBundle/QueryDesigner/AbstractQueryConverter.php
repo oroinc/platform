@@ -155,6 +155,21 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Extracts the last item (part) from the given join identifier
+     *
+     * @param string $joinId
+     * @return string
+     */
+    public function getJoinIdentifierLastPart($joinId)
+    {
+        $lastItemDelimiter = strrpos($joinId, '+');
+
+        return false === $lastItemDelimiter
+            ? $joinId
+            : substr($joinId, $lastItemDelimiter + 1);
+    }
+
+    /**
      * Converts a query from the query designer format to a target format
      *
      * @param AbstractQueryDesigner $source
@@ -528,7 +543,7 @@ abstract class AbstractQueryConverter
      * Builds a join identifier for the given column
      *
      * @param string $columnName
-     * @return string
+     * @return array
      */
     protected function getJoinIdentifiers($columnName)
     {
@@ -568,14 +583,21 @@ abstract class AbstractQueryConverter
     {
         $lastDelimiter = strrpos($columnNameOrJoinId, '::');
         if (false === $lastDelimiter) {
-            return $this->entity;
-        }
-        $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
-        if (false === $lastItemDelimiter) {
-            return substr($columnNameOrJoinId, 0, $lastDelimiter);
+            $result = $this->entity;
+        } else {
+            $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
+            if (false === $lastItemDelimiter) {
+                $result = substr($columnNameOrJoinId, 0, $lastDelimiter);
+            } else {
+                $result = substr($columnNameOrJoinId, $lastItemDelimiter + 1, $lastDelimiter - $lastItemDelimiter - 1);
+            }
+            $lastDelimiter = strrpos($result, '::');
+            if (false !== $lastDelimiter) {
+                $result = substr($result, $lastDelimiter + 2);
+            }
         }
 
-        return substr($columnNameOrJoinId, $lastItemDelimiter + 1, $lastDelimiter - $lastItemDelimiter - 1);
+        return $result;
     }
 
     /**

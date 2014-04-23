@@ -59,17 +59,17 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->selectColumns     = [];
-        $this->groupingColumns   = [];
-        $this->from              = [];
-        $this->innerJoins        = [];
-        $this->leftJoins         = [];
+        $this->selectColumns   = [];
+        $this->groupingColumns = [];
+        $this->from            = [];
+        $this->innerJoins      = [];
+        $this->leftJoins       = [];
         parent::doConvert($source);
-        $this->selectColumns     = null;
-        $this->groupingColumns   = null;
-        $this->from              = null;
-        $this->innerJoins        = null;
-        $this->leftJoins         = null;
+        $this->selectColumns   = null;
+        $this->groupingColumns = null;
+        $this->from            = null;
+        $this->innerJoins      = null;
+        $this->leftJoins       = null;
 
         $this->config->offsetSetByPath('[source][type]', 'orm');
     }
@@ -202,7 +202,25 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function addUnidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    {
+        $join = [
+            'join'          => $this->getUnidirectionalJoinEntity($joinAlias),
+            'alias'         => $joinAlias,
+            'conditionType' => 'WITH',
+            'condition'     => $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
+        ];
+        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
+            $this->innerJoins[] = $join;
+        } else {
+            $this->leftJoins[] = $join;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addBidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
     {
         $join = [
             'join'  => sprintf('%s.%s', $joinTableAlias, $joinFieldName),

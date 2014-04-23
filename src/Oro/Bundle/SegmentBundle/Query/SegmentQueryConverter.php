@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
@@ -112,12 +111,29 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function addUnidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
     {
+        $entityName = $this->getUnidirectionalJoinEntity($joinAlias);
+        $condition  = $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias);
+
         if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
-            $this->qb->innerJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+            $this->qb->innerJoin($entityName, $joinAlias, 'WITH', $condition);
         } else {
-            $this->qb->leftJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+            $this->qb->leftJoin($entityName, $joinAlias, 'WITH', $condition);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addBidirectionalJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    {
+        $join = sprintf('%s.%s', $joinTableAlias, $joinFieldName);
+
+        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
+            $this->qb->innerJoin($join, $joinAlias);
+        } else {
+            $this->qb->leftJoin($join, $joinAlias);
         }
     }
 
