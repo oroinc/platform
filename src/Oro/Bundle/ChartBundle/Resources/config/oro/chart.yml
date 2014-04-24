@@ -14,9 +14,23 @@ oro_chart:
             type: boolean
             options: { required: true }
         default_settings:
-            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87']
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
         template: OroChartBundle:Chart:line.html.twig
-
+    pie_chart:
+        label: Line Chart
+        data_schema:
+          - name: label
+            label: Fraction Label
+            required: true
+          - name: value
+            label: Value
+            required: true
+        default_settings:
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
+            chartFontSize: 9
+            chartFontColor: '#454545'
+            chartHighlightColor: '#FF5E5E'
+        template: OroChartBundle:Chart:pie.html.twig
