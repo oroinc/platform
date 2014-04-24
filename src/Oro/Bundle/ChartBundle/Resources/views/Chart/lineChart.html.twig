@@ -1,0 +1,129 @@
+{# Chart variables format:
+
+    "options":
+        "name": "chart_name",
+        "data_schema" => array(
+            "label" => array("fieldName" => "name", "label" => "oro.xxx.firstName"),
+            "value" => array("fieldName" => "salary", "label" => "oro.xxx.salary"),
+        ),
+        "settings" => array(
+            "foo" => "bar"
+        ),
+    "config": { /** Chart config from in format of oro/chart.yml */ }
+    "data": [
+        {"label": "In progress", "value": 1000},
+        {"label": "Lost", "value": 500},
+        {"label": "Won", "value": 10000},
+    ]
+
+#}
+
+{% set chartColors = ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'] %}
+{% set chartFontSize = 9 %}
+{% set chartFontColor = '#454545' %}
+{% set chartHighlightColor = '#FF5E5E' %}
+
+{% set chartContainerId = 'line-chart-container-' ~ random() %}
+
+{% set chartData = [] %}
+{% set chartLabels = [] %}
+{% for item in data %}
+    {% set chartData = chartData|merge([[loop.index - 1, item.value]]) %}
+    {% set chartLabels = chartLabels|merge([item.label]) %}
+{% endfor %}
+
+<div id="{{ chartContainerId }}" class="chart-container">
+    <div class="clearfix">
+        <div class="bar-chart chart pull-left"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    require(['jquery', 'oroui/js/layout', 'flotr2', 'orolocale/js/formatter/number'],
+        function($, layout, Flotr, numberFormatter){
+            $(function () {
+                var $chartContainer = $('#{{ chartContainerId }}');
+                var $chart = $('.bar-chart', $chartContainer);
+                var setChartSize = function () {
+                    var chartWidth = Math.round($chartContainer.parent().width() * 0.9);
+                    if (chartWidth != $chart.width()) {
+                        $chart.width(chartWidth);
+                        $chart.height(Math.min(Math.round(chartWidth * 0.4), 350));
+                        return true;
+                    }
+                    return false;
+                };
+                var setChartContainerSize = function () {
+                    $chart.closest('.clearfix').width($chart.width());
+                };
+                var drawChart = function () {
+                    if (!$chart.get(0).clientWidth) {
+                        return;
+                    }
+                    var xLabels = {{ chartLabels|json_encode|raw }};
+                    var colors = {{ chartColors|json_encode|raw }};
+
+                    var chart = {
+                        data: {{ chartData|json_encode|raw }},
+                        color: colors[0],
+                        markers: {
+                            show: true,
+                            position: 'ct',
+                            labelFormatter: function (data) {
+                                return numberFormatter.formatCurrency(data.y);
+                            }
+                        }
+                    };
+                    Flotr.draw(
+                        $chart.get(0),
+                        [chart],
+                        {
+                            colors: {{ chartColors|json_encode|raw }},
+                            fontColor: {{ chartFontColor|json_encode|raw }},
+                            fontSize: {{ chartFontSize|json_encode|raw }},
+                            bars : {
+                                show : true,
+                                horizontal : false,
+                                shadowSize : 0,
+                                barWidth : 0.5
+                            },
+                            mouse : {
+                                track : true,
+                                relative : true,
+                                trackFormatter: function (data) {
+                                    return xLabels[parseInt(data.x)] + ': ' + numberFormatter.formatCurrency(data.y);
+                                }
+                            },
+                            yaxis: {
+                                min: 0,
+                                tickFormatter: function (y) {
+                                    return numberFormatter.formatCurrency(y);
+                                }
+                            },
+                            xaxis: {
+                                noTicks: 2,
+                                tickFormatter: function (x) {
+                                    return xLabels[parseInt(x)];
+                                }
+                            },
+                            grid: {
+                                verticalLines : false
+                            }
+                        }
+                    );
+                };
+
+                layout.onPageRendered(function () {
+                    setChartSize();
+                    drawChart();
+                    setChartContainerSize();
+                });
+
+                $(window).resize(function () {
+                    if (setChartSize()) {
+                        drawChart();
+                        setChartContainerSize();
+                    }
+                });
+            });
+        });
+</script>

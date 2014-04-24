@@ -78,6 +78,7 @@ class Configuration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    /** @todo Remove chart data transformer */
                     ->scalarNode('data_transformer')
                         ->info('Chart data transformer')
                         ->defaultValue(self::DEFAULT_DATA_TRANSFORMER_SERVICE)
