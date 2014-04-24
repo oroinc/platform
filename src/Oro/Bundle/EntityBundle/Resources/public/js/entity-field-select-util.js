@@ -31,6 +31,13 @@ define(['underscore'
                 _.each(_.rest(chain), _.bind(function (item, index) {
                     data = this._getChildren(this._getField(prevFieldName, data));
                     var pair = item.split('::');
+                    if (_.size(pair) == 3) {
+                        pair = [
+                            pair[0],
+                            pair[1] + '::' + pair[2]
+                        ];
+                    }
+
                     var label = index < lastItemIndex
                         ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
@@ -69,7 +76,12 @@ define(['underscore'
                 data = this._getChildren(result);
                 var lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function (item, index) {
-                    var fieldName = _.last(item.split('::'));
+                    var parts = item.split('::');
+                    var fieldName = _.last(parts);
+                    if (_.size(parts) == 3) {
+                        fieldName = parts[1] + '::' + parts[2];
+                    }
+
                     result = index < lastItemIndex
                         ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
@@ -99,6 +111,14 @@ define(['underscore'
         _getFieldGroupLabel: function (fieldName, data) {
             var field = this._getField(fieldName, data);
             return field ? field.text : null;
+        },
+
+        _getClassName: function () {
+            //TODO
+        },
+
+        _getFieldName: function () {
+            //TODO
         },
 
         _getField: function (fieldName, data) {
