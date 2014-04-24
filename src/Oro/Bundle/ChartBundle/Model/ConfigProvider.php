@@ -42,6 +42,14 @@ class ConfigProvider
     }
 
     /**
+     * @return array
+     */
+    public function getChartConfigs()
+    {
+        return $this->configs;
+    }
+
+    /**
      * @param string $chartName
      * @return bool
      */

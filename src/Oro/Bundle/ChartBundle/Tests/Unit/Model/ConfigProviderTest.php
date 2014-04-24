@@ -36,6 +36,14 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testGetChartConfigs()
+    {
+        $expected = array('chart_name' => array('config' => 'value'));
+        $configProvider = new ConfigProvider($expected);
+        $configs = $configProvider->getChartConfigs();
+        $this->assertEquals($expected, $configs);
+    }
+
     /**
      * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Can't find configuration for chart: any name

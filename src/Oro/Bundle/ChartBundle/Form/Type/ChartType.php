@@ -28,23 +28,7 @@ class ChartType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $chartConfig = $this->configProvider->getChartConfig($options['chart_name']);
-
-        foreach ($chartConfig['settings_schema'] as $field) {
-            $options = !empty($field['options']) ? $field['options'] : array();
-            $options['label'] = $field['label'];
-
-            $builder->add($field['name'], $field['type'], $options);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setRequired(array('chart_name'));
-        $resolver->setAllowedTypes(array('chart_name' => 'string'));
+        $chartConfigs = $this->configProvider->getChartConfigs();
     }
 
     /**
