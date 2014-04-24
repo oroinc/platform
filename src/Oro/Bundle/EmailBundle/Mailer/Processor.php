@@ -105,7 +105,7 @@ class Processor
             $messageDate
         );
 
-        $email->setFolders(new ArrayCollection([$origin->getFolder(EmailFolder::SENT)]));
+        $email->addFolder($origin->getFolder(EmailFolder::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
         $email->setMessageId($messageId);
 
