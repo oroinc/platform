@@ -106,8 +106,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          * @param {Object} options
          */
         initializeWidget: function(options) {
-            BlockWidget.prototype.initializeWidget.apply(this, arguments);
             this._initState(options);
+            BlockWidget.prototype.initializeWidget.apply(this, arguments);
         },
 
         /**

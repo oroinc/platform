@@ -1,0 +1,65 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans} }) %}
+
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% set formAction = form.vars.value.id
+                    ? path('oro_dashboard_update', { 'id': form.vars.value.id })
+                    : path('oro_dashboard_create')  %}
+
+{% block pageHeader %}
+    {% if form.vars.value.id %}
+        {% set breadcrumbs = {
+            'entity':      [],
+            'indexPath':   path('oro_dashboard_index'),
+            'indexLabel': 'oro.dashboard.management_title'|trans,
+            'entityTitle': entity.label
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.dashboard.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('oro_dashboard_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock %}
+
+{% block content_data %}
+    {% set id = 'task-form' %}
+
+    {% set dataBlock %}
+        {{ form_row(form.label) }}
+        {% if form.startDashboard is defined %}
+            {{ form_row(form.startDashboard) }}
+        {% endif %}
+        {{ form_row(form.owner) }}
+    {% endset %}
+
+    {% set dataBlocks = [{
+        'title': 'orocrm.task.block.general'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    dataBlock
+                ]
+            }
+        ]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock %}
+
+
