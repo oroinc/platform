@@ -589,14 +589,19 @@ abstract class AbstractQueryConverter
     {
         $lastDelimiter = strrpos($columnNameOrJoinId, '::');
         if (false === $lastDelimiter) {
+            // use base entity if the given value is a column name
             $result = $this->entity;
         } else {
+            // check if the given join id contains several parts delimited by + symbol
             $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
             if (false === $lastItemDelimiter) {
                 $result = substr($columnNameOrJoinId, 0, $lastDelimiter);
             } else {
+                // get class name from the last part
                 $result = substr($columnNameOrJoinId, $lastItemDelimiter + 1, $lastDelimiter - $lastItemDelimiter - 1);
             }
+            // check if the class name has :: delimiter (it means that it is unidirectional relationship)
+            // and if so the class name is after ::
             $lastDelimiter = strrpos($result, '::');
             if (false !== $lastDelimiter) {
                 $result = substr($result, $lastDelimiter + 2);
