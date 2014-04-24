@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Model;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DataGridManager;
 
 use Oro\Bundle\ChartBundle\Exception\BadMethodCallException;
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
@@ -78,6 +78,8 @@ class ChartViewBuilder
     public function setData(DataInterface $data)
     {
         $this->data = $data;
+
+        return $this;
     }
 
     /**
@@ -88,7 +90,9 @@ class ChartViewBuilder
      */
     public function setArrayData(array $data)
     {
-        $this->data = $this->setData(new ArrayData($data));
+        $this->setData(new ArrayData($data));
+
+        return $this;
     }
 
     /**
@@ -99,7 +103,9 @@ class ChartViewBuilder
      */
     public function setDataGridName($name)
     {
-        $this->data = $this->setData(new DataGridData($this->dataGridManager, $name));
+        $this->setData(new DataGridData($this->dataGridManager, $name));
+
+        return $this;
     }
 
     /**
@@ -111,6 +117,8 @@ class ChartViewBuilder
     public function setDataMapping(array $dataMapping)
     {
         $this->dataMapping = $dataMapping;
+
+        return $this;
     }
 
     /**
@@ -122,6 +130,8 @@ class ChartViewBuilder
     public function setOptions(array $options)
     {
         $this->options = $options;
+
+        return $this;
     }
 
     /**
@@ -131,9 +141,10 @@ class ChartViewBuilder
      */
     public function getView()
     {
+        $data = $this->getData();
         $vars = $this->getVars();
 
-        return new ChartView($this->twig, $vars['config']['template'], $this->getData(), $this->getVars());
+        return new ChartView($this->twig, $vars['config']['template'], $data, $vars);
     }
 
     /**
@@ -163,18 +174,13 @@ class ChartViewBuilder
 
         if (!isset($config['template'])) {
             throw new InvalidArgumentException(
-                sprintf('Chart "%s" config must have "template" key.', $options['name'])
+                sprintf('Config of chart "%s" must have "template" key.', $options['name'])
             );
         }
-
-        $result = array();
 
         if (isset($config['default_settings']) && is_array($config['default_settings'])) {
             $options['settings'] = array_replace_recursive($config['default_settings'], $options['settings']);
         }
-
-        $result['options'] = $options;
-        $result['config'] = $config;
 
         return array(
             'options' => $options,

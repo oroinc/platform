@@ -1,5 +1,6 @@
 parameters:
     oro_chart.config_provider.class:    Oro\Bundle\ChartBundle\Model\ConfigProvider
+    oro_chart.view_builder.class:       Oro\Bundle\ChartBundle\Model\ChartViewBuilder
     oro_chart.form.type.settings.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
     oro_chart.form.type.class:          Oro\Bundle\ChartBundle\Form\Type\ChartType
 
@@ -8,6 +9,14 @@ services:
         class: %oro_chart.config_provider.class%
         arguments:
             - []
+
+    oro_chart.view_builder:
+        class: %oro_chart.view_builder.class%
+        scope: prototype
+        arguments:
+            - @oro_chart.config_provider
+            - @twig
+            - @oro_datagrid.datagrid.manager
 
     oro_chart.form.type.settings:
         class: %oro_chart.form.type.settings.class%
@@ -22,4 +31,3 @@ services:
             - @oro_chart.config_provider
         tags:
             - { name: form.type, alias: oro_chart }
-
