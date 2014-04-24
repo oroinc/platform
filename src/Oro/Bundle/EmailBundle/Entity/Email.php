@@ -494,15 +494,15 @@ class Email
     /**
      * @param EmailFolder $folder
      *
-     * @return $this
+     * @return boolean
      */
     public function removeFolder(EmailFolder $folder)
     {
         if ($this->folders->contains($folder)) {
-            $this->folders->removeElement($folder);
+            return $this->folders->removeElement($folder);
         }
 
-        return $this;
+        return false;
     }
 
     /**
