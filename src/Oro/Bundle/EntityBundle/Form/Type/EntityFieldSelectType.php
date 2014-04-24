@@ -71,6 +71,7 @@ class EntityFieldSelectType extends AbstractType
             array(
                 'entity'                    => null,
                 'with_relations'            => false,
+                'with_unidirectional'       => false,
                 'deep_level'                => 0,
                 'last_deep_level_relations' => false,
                 'empty_value'               => '',
@@ -118,6 +119,31 @@ class EntityFieldSelectType extends AbstractType
     }
 
     /**
+     * Returns source data for the given entity
+     *
+     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
+     * @param int    $deepLevel              The maximum deep level of related entities.
+     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
+     *                                       should be returned.
+     * @return array
+     */
+    protected function getData($entityName, $withRelations, $withUnidirectional, $deepLevel, $lastDeepLevelRelations)
+    {
+        $fields = $this->entityFieldProvider->getFields(
+            $entityName,
+            $withRelations,
+            true,
+            $withUnidirectional,
+            $deepLevel,
+            $lastDeepLevelRelations
+        );
+
+        return $this->convertData($fields, $entityName, null);
+    }
+
+    /**
      * Applies dynamic attributes for 'attr' options
      *
      * @param Options $options
@@ -132,36 +158,13 @@ class EntityFieldSelectType extends AbstractType
             : $this->getData(
                 $options['entity'],
                 $options['with_relations'],
+                $options['with_unidirectional'],
                 $options['deep_level'],
                 $options['last_deep_level_relations']
             );
         $attr['data-data']   = json_encode($data);
 
         return $attr;
-    }
-
-    /**
-     * Returns source data for the given entity
-     *
-     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
-     *                                       should be returned.
-     * @return array
-     */
-    protected function getData($entityName, $withRelations, $deepLevel, $lastDeepLevelRelations)
-    {
-        $fields = $this->entityFieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            true,
-            false,
-            $deepLevel,
-            $lastDeepLevelRelations
-        );
-
-        return $this->convertData($fields, $entityName, null);
     }
 
     /**
