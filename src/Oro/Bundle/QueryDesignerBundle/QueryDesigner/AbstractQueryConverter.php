@@ -12,7 +12,13 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
  * each table used in a query.
  * Examples:
  *      AcmeBundle\Entity\Order::products
- *      AcmeBundle\Entity\Order::products,AcmeBundle\Entity\Product::statuses
+ *          - represents "order -> products" join
+ *      AcmeBundle\Entity\Order::products+AcmeBundle\Entity\Product::statuses
+ *          - represents "order -> products -> statuses" join
+ *      AcmeBundle\Entity\Order::products+AcmeBundle\Entity\Product::AcmeBundle\Entity\User::product
+ *          - represents "order -> products -> users" unidirectional join
+ *            in this case the "product" association in "AcmeBundle\Entity\User" entity has no
+ *            inverse side association in AcmeBundle\Entity\Product entity
  * The join identifier for the root table is empty string.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -152,6 +158,21 @@ abstract class AbstractQueryConverter
         }
 
         return substr($joinId, 0, $lastDelimiter);
+    }
+
+    /**
+     * Extracts the last item (part) from the given join identifier
+     *
+     * @param string $joinId
+     * @return string
+     */
+    public function getJoinIdentifierLastPart($joinId)
+    {
+        $lastItemDelimiter = strrpos($joinId, '+');
+
+        return false === $lastItemDelimiter
+            ? $joinId
+            : substr($joinId, $lastItemDelimiter + 1);
     }
 
     /**
@@ -528,7 +549,7 @@ abstract class AbstractQueryConverter
      * Builds a join identifier for the given column
      *
      * @param string $columnName
-     * @return string
+     * @return array
      */
     protected function getJoinIdentifiers($columnName)
     {
@@ -568,14 +589,26 @@ abstract class AbstractQueryConverter
     {
         $lastDelimiter = strrpos($columnNameOrJoinId, '::');
         if (false === $lastDelimiter) {
-            return $this->entity;
-        }
-        $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
-        if (false === $lastItemDelimiter) {
-            return substr($columnNameOrJoinId, 0, $lastDelimiter);
+            // use base entity if the given value is a column name
+            $result = $this->entity;
+        } else {
+            // check if the given join id contains several parts delimited by + symbol
+            $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
+            if (false === $lastItemDelimiter) {
+                $result = substr($columnNameOrJoinId, 0, $lastDelimiter);
+            } else {
+                // get class name from the last part
+                $result = substr($columnNameOrJoinId, $lastItemDelimiter + 1, $lastDelimiter - $lastItemDelimiter - 1);
+            }
+            // check if the class name has :: delimiter (it means that it is unidirectional relationship)
+            // and if so the class name is after ::
+            $lastDelimiter = strrpos($result, '::');
+            if (false !== $lastDelimiter) {
+                $result = substr($result, $lastDelimiter + 2);
+            }
         }
 
-        return substr($columnNameOrJoinId, $lastItemDelimiter + 1, $lastDelimiter - $lastItemDelimiter - 1);
+        return $result;
     }
 
     /**
