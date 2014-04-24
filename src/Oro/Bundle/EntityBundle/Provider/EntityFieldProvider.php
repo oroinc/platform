@@ -290,6 +290,7 @@ class EntityFieldProvider
             $relatedClassName = $dataItem['className'];
             $fieldName        = $dataItem['mapping']['fieldName'];
             $classMetadata    = $em->getClassMetadata($dataItem['className']);
+            $labelType        = ($dataItem['mapping']['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
             $relationData = [
                 'name'                => $name,
@@ -297,7 +298,7 @@ class EntityFieldProvider
                 'label'               =>
                     '000' .
                     $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName)->get('plural_label')
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
                     ),
                 'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
                 'related_entity_name' => $relatedClassName
