@@ -304,7 +304,12 @@ class EntityFieldProvider
                     '000' .
                     $this->translator->trans(
                         $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
-                    ) . ' (' . $fieldName . ')',
+                    ) .
+                    ' (' .
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
+                    ) .
+                    ')',
                 'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
                 'related_entity_name' => $relatedClassName
             ];
