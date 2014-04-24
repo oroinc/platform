@@ -31,7 +31,13 @@ class SimpleChannelDeleteProvider implements ChannelDeleteProviderInterface
      */
     public function processDelete(Channel $channel)
     {
-        $this->em->remove($channel);
-        $this->em->flush();
+        try {
+            $this->em->remove($channel);
+            $this->em->flush();
+        } catch (\Exception $error) {
+            return false;
+        }
+
+        return true;
     }
 }

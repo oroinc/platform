@@ -16,6 +16,7 @@ interface ChannelDeleteProviderInterface
      * Process delete channel
      *
      * @param Channel $channel
+     * @return bool
      */
     public function processDelete(Channel $channel);
 }

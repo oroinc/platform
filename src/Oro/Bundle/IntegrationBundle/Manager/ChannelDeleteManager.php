@@ -12,9 +12,14 @@ class ChannelDeleteManager
      */
     protected $deleteProviders;
 
+    /**
+     * Add delete channel provider
+     *
+     * @param ChannelDeleteProviderInterface $deleteProvider
+     */
     public function addProvider(ChannelDeleteProviderInterface $deleteProvider)
     {
-        $this->deleteProviders[] = $deleteProvider;
+        $this->deleteProviders[$deleteProvider->getSupportedChannelType()] = $deleteProvider;
     }
 
     /**
@@ -26,11 +31,8 @@ class ChannelDeleteManager
     public function deleteChannel(Channel $channel)
     {
         $channelType = $channel->getType();
-        /** @var $deleteProvider ChannelDeleteProviderInterface */
-        foreach ($this->deleteProviders as $deleteProvider) {
-            if ($deleteProvider->getSupportedChannelType() == $channelType) {
-                return $deleteProvider->processDelete($channel);
-            }
+        if (isset($this->deleteProviders[$channelType])) {
+            return $this->deleteProviders[$channelType]->processDelete($channel);
         }
 
         return false;
