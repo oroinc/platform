@@ -5,7 +5,9 @@
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">
-        {% placeholder page_title_before with {entity: entity} %}
+        {% block workflowStepListContainer %}
+            {% placeholder page_title_before with {entity: entity} %}
+        {% endblock  %}
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
@@ -39,6 +41,7 @@
                                         {% endif %}
                                         <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
                                     </div>
+                                    {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
                             </div>
                             <div class="clearfix">
@@ -61,9 +64,11 @@
                 </div>
                 <div class="pull-right">
                     <div class="pull-right title-buttons-container">
-                        {% placeholder view_navButtons_before with {entity: entity} %}
-                        {% block navButtons %}{% endblock navButtons %}
-                        {% placeholder view_navButtons_after with {entity: entity} %}
+                        {% block navButtonContainer %}
+                            {% placeholder view_navButtons_before with {entity: entity} %}
+                            {% block navButtons %}{% endblock navButtons %}
+                            {% placeholder view_navButtons_after with {entity: entity} %}
+                        {% endblock navButtonContainer%}
                     </div>
                     <div class="pull-right user-info-state">
                         <ul class="inline-decorate">

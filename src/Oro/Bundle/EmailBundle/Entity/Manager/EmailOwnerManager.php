@@ -40,7 +40,7 @@ class EmailOwnerManager
         EmailAddressManager $emailAddressManager
     ) {
         foreach ($emailOwnerProviderStorage->getProviders() as $provider) {
-            $fieldName = sprintf('owner%d', count($this->emailOwnerClasses) + 1);
+            $fieldName = $emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
             $this->emailOwnerClasses[$fieldName] = $provider->getEmailOwnerClass();
         }
         $this->emailAddressManager = $emailAddressManager;

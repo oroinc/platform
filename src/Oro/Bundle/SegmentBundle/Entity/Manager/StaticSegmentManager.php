@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
@@ -50,18 +51,21 @@ class StaticSegmentManager
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
 
-        $qb       = $this->dynamicSegmentQB->build($segment);
-        $iterator = new BufferedQueryResultIterator($qb);
+        $qb        = $this->dynamicSegmentQB->build($segment);
+        $iterator  = new BufferedQueryResultIterator($qb);
 
         $writeCount = 0;
         try {
             $this->em->beginTransaction();
+            $this->em->clear(ClassUtils::getClass($segment));
             foreach ($iterator as $data) {
                 // only not composite identifiers are supported
                 $id = reset($data);
 
                 $writeCount++;
-                $snapshot = new SegmentSnapshot($segment);
+
+                $reference = $this->em->getReference(ClassUtils::getClass($segment), $segment->getId());
+                $snapshot = new SegmentSnapshot($reference);
                 $snapshot->setEntityId($id);
                 $this->toWrite[] = $snapshot;
                 if (0 === $writeCount % $this->batchSize) {
