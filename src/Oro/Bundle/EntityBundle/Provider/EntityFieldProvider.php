@@ -287,11 +287,11 @@ class EntityFieldProvider
         $translate
     ) {
         $relations = $this->getUnidirectionalRelations($em, $className);
-        foreach ($relations as $name => $dataItem) {
-            $relatedClassName = $dataItem['className'];
-            $fieldName        = $dataItem['mapping']['fieldName'];
-            $classMetadata    = $em->getClassMetadata($dataItem['className']);
-            $labelType        = ($dataItem['mapping']['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
+        foreach ($relations as $name => $mapping) {
+            $relatedClassName = $mapping['sourceEntity'];
+            $fieldName        = $mapping['fieldName'];
+            $classMetadata    = $em->getClassMetadata($relatedClassName);
+            $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
             $relationData = [
                 'name'                => $name,
@@ -341,10 +341,7 @@ class EntityFieldProvider
                 if ($mapping['targetEntity'] == $className
                     && empty($mapping['inversedBy'])
                 ) {
-                    $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = [
-                        'className' => $mapping['sourceEntity'],
-                        'mapping'   => $mapping,
-                    ];
+                    $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = $mapping;
                 }
             }
         }
