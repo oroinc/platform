@@ -18,7 +18,6 @@
     width: 33px;
     position: fixed;
     z-index: 750;
-    overflow-y: auto;
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
