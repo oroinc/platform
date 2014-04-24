@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -83,14 +85,14 @@ class EntityFieldProvider
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
-     * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
-     * @param int    $deepLevel              The maximum deep level of related entities.
+     * @param string $entityName Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations Indicates whether association fields should be returned as well.
+     * @param bool   $withEntityDetails Indicates whether details of related entity should be returned as well.
+     * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
+     * @param int    $deepLevel The maximum deep level of related entities.
      * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
      *                                       should be returned.
-     * @param bool   $translate              Flag means that label, plural label should be translated
+     * @param bool   $translate Flag means that label, plural label should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -227,7 +229,7 @@ class EntityFieldProvider
             return;
         }
 
-        $metadata = $em->getClassMetadata($className);
+        $metadata         = $em->getClassMetadata($className);
         $associationNames = $metadata->getAssociationNames();
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
@@ -283,23 +285,20 @@ class EntityFieldProvider
         $lastDeepLevelRelations,
         $translate
     ) {
-        // entities metadata that linked to className entity
-        $relatedMappingMetadata = $this->getRelatedMappingMetadata($em, $className);
-        foreach ($relatedMappingMetadata as $metadataItem) {
-            $relatedClassName = $metadataItem->getName();
-            if (!$this->entityConfigProvider->hasConfig($relatedClassName)) {
-                continue;
-            }
-
-            $fieldName   = str_replace($metadataItem->namespace . '\\', '', $relatedClassName);
-
-            //$associations = $em->getClassMetadata($relatedClassName)->getAssociationsByTargetClass($className);
-            //$fieldName    = key($associations);
+        $relations = $this->getUnidirectionalRelations($em, $className);
+        foreach ($relations as $name => $dataItem) {
+            $relatedClassName = $dataItem['className'];
+            $fieldName        = $dataItem['mapping']['fieldName'];
+            $classMetadata    = $em->getClassMetadata($dataItem['className']);
 
             $relationData = [
-                'name'                => $metadataItem->getName() . '::'. $fieldName,
-                'type'                => $metadataItem->getTypeOfField($fieldName),
-                'label'               => '000'.$this->getFieldLabel($relatedClassName, $fieldName),
+                'name'                => $name,
+                'type'                => $classMetadata->getTypeOfField($fieldName),
+                'label'               =>
+                    '000' .
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get('plural_label')
+                    ),
                 'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
                 'related_entity_name' => $relatedClassName
             ];
@@ -316,48 +315,40 @@ class EntityFieldProvider
     }
 
     /**
-     * Return entities metadata that has one-way link to $className entity
+     * Return entities  that has one-way link to $className entity
      *
      * @param EntityManager $em
      * @param string        $className
      *
      * @return ClassMetadata[]|array
      */
-    protected function getRelatedMappingMetadata(EntityManager $em, $className)
+    protected function getUnidirectionalRelations(EntityManager $em, $className)
     {
-        $allMetadata = $em->getMetadataFactory()->getAllMetadata();
-        $resultMetadata = [];
-
         $relations = [];
 
-        foreach ($allMetadata as $metadata) {
-            /** @var ClassMetadata $metadata */
-            $targetMappings = $metadata->getAssociationMappings(); //getAssociationsByTargetClass($className);
-            /*if (empty($targetMappings) ) {
+        /** @var EntityConfigId[] $entityConfigIds */
+        $entityConfigIds = $this->entityConfigProvider->getIds();
+        foreach ($entityConfigIds as $entityConfigId) {
+            /** @var ClassMetadata $classMetadata */
+            $classMetadata  = $em->getClassMetadata($entityConfigId->getClassName());
+            $targetMappings = $classMetadata->getAssociationMappings();
+            if (empty($targetMappings)) {
                 continue;
-            }*/
-            foreach ($targetMappings as $mapping) {
-                if ($mapping['targetEntity'] == $className) {
-
-
-                    //!inversedBy
-
-
-                    $relations[$mapping['fieldName']] = $mapping;
-                }
             }
 
-            /*array_filter(
-                $targetMappings,
-                function ($item) {
-                    return empty($item['inversedBy']);
+            foreach ($targetMappings as $mapping) {
+                if ($mapping['targetEntity'] == $className
+                    && empty($mapping['inversedBy'])
+                ) {
+                    $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = [
+                        'className' => $mapping['sourceEntity'],
+                        'mapping'   => $mapping,
+                    ];
                 }
-            )*/
-
-            $resultMetadata[] = $metadata;
+            }
         }
 
-        return $resultMetadata;
+        return $relations;
     }
 
     /**
