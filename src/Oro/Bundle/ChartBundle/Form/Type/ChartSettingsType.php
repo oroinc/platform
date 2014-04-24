@@ -55,6 +55,6 @@ class ChartSettingsType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_chart';
+        return 'oro_chart_setting';
     }
 }

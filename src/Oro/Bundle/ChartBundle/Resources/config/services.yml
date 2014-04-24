@@ -1,15 +1,23 @@
 parameters:
     oro_chart.config_provider.class:    Oro\Bundle\ChartBundle\Model\ConfigProvider
     oro_chart.form.type.settings.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
+    oro_chart.form.type.class: Oro\Bundle\ChartBundle\Form\Type\ChartType
 services:
     oro_chart.config_provider:
         class: %oro_chart.config_provider.class%
         arguments:
             - []
 
-    oro_chart.form.type:
+    oro_chart.form.type.settings:
         class: %oro_chart.form.type.settings.class%
         arguments:
             - @oro_chart.config_provider
         tags:
-            - { name: form.type, alias: oro_config_form_type }
+            - { name: form.type, alias: oro_chart_setting }
+
+    oro_chart.form.type:
+        class: %oro_chart.form.type.class%
+        arguments:
+            - @oro_chart.config_provider
+        tags:
+            - { name: form.type, alias: oro_chart }
