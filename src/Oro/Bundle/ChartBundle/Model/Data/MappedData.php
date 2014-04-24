@@ -25,7 +25,7 @@ class MappedData implements DataInterface
         foreach ($this->sourceData->toArray() as $sourceItem) {
             $record = array();
             foreach ($this->mapping as $name => $fieldName) {
-                $record[] = array($name => $this->getValue($sourceItem, $fieldName));
+                $record[$name] = $this->getValue($sourceItem, $fieldName);
             }
             $result[] = $record;
         }
@@ -36,6 +36,11 @@ class MappedData implements DataInterface
     protected function getValue($sourceItem, $fieldName)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
+
+        if (is_array($sourceItem)) {
+            $fieldName = "[$fieldName]";
+        }
+
         return $accessor->getValue($sourceItem, $fieldName);
     }
 }

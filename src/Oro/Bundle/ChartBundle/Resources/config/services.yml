@@ -2,7 +2,7 @@ parameters:
     oro_chart.config_provider.class:    Oro\Bundle\ChartBundle\Model\ConfigProvider
     oro_chart.form.type.settings.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
     oro_chart.form.type.class:          Oro\Bundle\ChartBundle\Form\Type\ChartType
-    oro_chart.data_transformer.class:   Oro\Bundle\ChartBundle\Model\DataTransformer
+
 services:
     oro_chart.config_provider:
         class: %oro_chart.config_provider.class%
@@ -23,5 +23,3 @@ services:
         tags:
             - { name: form.type, alias: oro_chart }
 
-    oro_chart.data_transformer:
-        class: %oro_chart.data_transformer.class%
