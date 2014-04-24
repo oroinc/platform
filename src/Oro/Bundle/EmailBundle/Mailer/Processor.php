@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
@@ -104,7 +105,7 @@ class Processor
             $messageDate
         );
 
-        $email->setFolder($origin->getFolder(EmailFolder::SENT));
+        $email->setFolders(new ArrayCollection([$origin->getFolder(EmailFolder::SENT)]));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
         $email->setMessageId($messageId);
 

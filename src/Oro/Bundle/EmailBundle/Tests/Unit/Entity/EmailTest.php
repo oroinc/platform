@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
@@ -141,9 +143,9 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
 
         $entity = new Email();
-        $entity->setFolder($folder);
+        $entity->setFolders(new ArrayCollection([$folder]));
 
-        $this->assertTrue($folder === $entity->getFolder());
+        $this->assertTrue($folder === $entity->getFolders()->first());
     }
 
     public function testEmailBodyGetterAndSetter()

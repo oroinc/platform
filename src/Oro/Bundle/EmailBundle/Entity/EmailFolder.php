@@ -209,7 +209,7 @@ class EmailFolder
     {
         $this->emails[] = $email;
 
-        $email->setFolder($this);
+        $email->setFolders(new ArrayCollection([$this]));
 
         return $this;
     }

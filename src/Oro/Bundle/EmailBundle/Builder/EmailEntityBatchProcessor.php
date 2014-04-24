@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -270,9 +272,10 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
     {
+        // TODO: fix method logic after folder changed to folders
         foreach ($this->emails as $obj) {
-            if ($obj->getFolder() === $old) {
-                $obj->setFolder($new);
+            if ($obj->getFolders()->first() === $old) {
+                $obj->setFolders(new ArrayCollection([$new]));
             }
         }
     }

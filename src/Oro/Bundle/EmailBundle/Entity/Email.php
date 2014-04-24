@@ -34,9 +34,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Email
 {
-    const LOW_IMPORTANCE = -1;
+    const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
-    const HIGH_IMPORTANCE = 1;
+    const HIGH_IMPORTANCE   = 1;
 
     /**
      * @var integer
@@ -156,14 +156,14 @@ class Email
     protected $xThreadId;
 
     /**
-     * @var EmailFolder
+     * @var ArrayCollection|EmailFolder[] $folders
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id")
+     * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
+     * @ORM\JoinTable(name="orocrm_email_to_folder")
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
-    protected $folder;
+    protected $folders;
 
     /**
      * @var ArrayCollection
@@ -177,7 +177,8 @@ class Email
     {
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailBody = new ArrayCollection();
+        $this->emailBody  = new ArrayCollection();
+        $this->folders    = new ArrayCollection();
     }
 
     /**
@@ -467,24 +468,26 @@ class Email
     }
 
     /**
-     * Get email folder
+     * Get email folders
      *
-     * @return EmailFolder
+     * @return ArrayCollection|EmailFolder[]
      */
-    public function getFolder()
+    public function getFolders()
     {
-        return $this->folder;
+        return $this->folders;
     }
 
     /**
-     * Set email folder
+     * Set email folders
      *
-     * @param  EmailFolder $folder
+     * @param ArrayCollection|EmailFolder[] $folders
+     *
      * @return $this
+     *
      */
-    public function setFolder(EmailFolder $folder)
+    public function setFolders(ArrayCollection $folders)
     {
-        $this->folder = $folder;
+        $this->folders = $folders;
 
         return $this;
     }
