@@ -13,6 +13,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             routingParams: {
                 'with-relations': 1,
                 'with-entity-details': 1,
+                'with-unidirectional': 1,
                 'deep-level': 1
             },
             afterRevertCallback: null,

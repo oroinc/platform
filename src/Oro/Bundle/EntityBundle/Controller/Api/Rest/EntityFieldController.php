@@ -35,6 +35,9 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
+     *      name="with-unidirectional", requirements="(1)|(0)",
+     *      description="Indicates whether Unidirectional association fields should be returned.")
+     * @QueryParam(
      *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
      *      description="The maximum deep level of related entities.")
      * @QueryParam(
@@ -51,9 +54,10 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $entityName         = str_replace('_', '\\', $entityName);
+        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
+        $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $deepLevel         = $this->getRequest()->query->has('deep-level')
             ? (int)$this->getRequest()->query->get('deep-level')
             : 0;
@@ -67,6 +71,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $entityName,
                 $withRelations,
                 $withEntityDetails,
+                $withUnidirectional,
                 $deepLevel,
                 $lastDeepLevelRelations
             );

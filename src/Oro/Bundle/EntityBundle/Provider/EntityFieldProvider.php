@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -12,6 +14,8 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class EntityFieldProvider
@@ -85,6 +89,7 @@ class EntityFieldProvider
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
      * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
+     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
      * @param int    $deepLevel              The maximum deep level of related entities.
      * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
      *                                       should be returned.
@@ -112,6 +117,7 @@ class EntityFieldProvider
         $entityName,
         $withRelations = false,
         $withEntityDetails = false,
+        $withUnidirectional = false,
         $deepLevel = 0,
         $lastDeepLevelRelations = false,
         $translate = true
@@ -126,10 +132,23 @@ class EntityFieldProvider
                 $className,
                 $em,
                 $withEntityDetails,
+                $withUnidirectional,
                 $deepLevel - 1,
                 $lastDeepLevelRelations,
                 $translate
             );
+
+            if ($withUnidirectional) {
+                $this->addUnidirectionalRelations(
+                    $result,
+                    $className,
+                    $em,
+                    $withEntityDetails,
+                    $deepLevel - 1,
+                    $lastDeepLevelRelations,
+                    $translate
+                );
+            }
         }
         $this->sortFields($result);
 
@@ -194,6 +213,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withUnidirectional
      * @param int           $relationDeepLevel
      * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
@@ -203,45 +223,135 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withUnidirectional,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
     ) {
         // only configurable entities are supported
-        if ($this->entityConfigProvider->hasConfig($className)) {
-            $metadata = $em->getClassMetadata($className);
-            foreach ($metadata->getAssociationNames() as $associationName) {
-                $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                    // skip 'default_' extend field
-                    if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-                        $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-                        if ($this->isExtendField($className, $guessedFieldName)) {
-                            continue;
-                        }
-                    }
+        if (!$this->entityConfigProvider->hasConfig($className)) {
+            return;
+        }
 
-                    $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
-                    $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel      = $this->getFieldLabel($className, $associationName);
-                    $relationData    = array(
-                        'name'                => $associationName,
-                        'type'                => $targetMetadata->getTypeOfField($targetFieldName),
-                        'label'               => $fieldLabel,
-                        'relation_type'       => $this->getRelationType($className, $associationName),
-                        'related_entity_name' => $targetClassName
-                    );
-                    $this->addRelation(
-                        $result,
-                        $relationData,
-                        $withEntityDetails,
-                        $relationDeepLevel,
-                        $lastDeepLevelRelations,
-                        $translate
-                    );
+        $metadata         = $em->getClassMetadata($className);
+        $associationNames = $metadata->getAssociationNames();
+        foreach ($associationNames as $associationName) {
+            $targetClassName = $metadata->getAssociationTargetClass($associationName);
+            if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                // skip 'default_' extend field
+                if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+                    $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+                    if ($this->isExtendField($className, $guessedFieldName)) {
+                        continue;
+                    }
+                }
+
+                $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
+                $targetMetadata  = $em->getClassMetadata($targetClassName);
+                $fieldLabel      = $this->getFieldLabel($className, $associationName);
+                $relationData    = array(
+                    'name'                => $associationName,
+                    'type'                => $targetMetadata->getTypeOfField($targetFieldName),
+                    'label'               => $fieldLabel,
+                    'relation_type'       => $this->getRelationType($className, $associationName),
+                    'related_entity_name' => $targetClassName
+                );
+
+                $this->addRelation(
+                    $result,
+                    $relationData,
+                    $withEntityDetails,
+                    $withUnidirectional,
+                    $relationDeepLevel,
+                    $lastDeepLevelRelations,
+                    $translate
+                );
+            }
+        }
+    }
+
+    /**
+     * Adds remote entities relations to $className entity into $result
+     *
+     * @param array         $result
+     * @param string        $className
+     * @param EntityManager $em
+     * @param bool          $withEntityDetails
+     * @param int           $relationDeepLevel
+     * @param bool          $lastDeepLevelRelations
+     * @param bool          $translate
+     */
+    protected function addUnidirectionalRelations(
+        array &$result,
+        $className,
+        EntityManager $em,
+        $withEntityDetails,
+        $relationDeepLevel,
+        $lastDeepLevelRelations,
+        $translate
+    ) {
+        $relations = $this->getUnidirectionalRelations($em, $className);
+        foreach ($relations as $name => $mapping) {
+            $relatedClassName = $mapping['sourceEntity'];
+            $fieldName        = $mapping['fieldName'];
+            $classMetadata    = $em->getClassMetadata($relatedClassName);
+            $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
+
+            $relationData = [
+                'name'                => $name,
+                'type'                => $classMetadata->getTypeOfField($fieldName),
+                'label'               =>
+                    '000' .
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
+                    ) . ' (' . $fieldName . ')',
+                'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
+                'related_entity_name' => $relatedClassName
+            ];
+
+            $this->addRelation(
+                $result,
+                $relationData,
+                $withEntityDetails,
+                true,
+                $relationDeepLevel,
+                $lastDeepLevelRelations,
+                $translate
+            );
+        }
+    }
+
+    /**
+     * Return mapping data for entities that has one-way link to $className entity
+     *
+     * @param EntityManager $em
+     * @param string        $className
+     * @return array
+     */
+    protected function getUnidirectionalRelations(EntityManager $em, $className)
+    {
+        $relations = [];
+
+        /** @var EntityConfigId[] $entityConfigIds */
+        $entityConfigIds = $this->entityConfigProvider->getIds();
+        foreach ($entityConfigIds as $entityConfigId) {
+            /** @var ClassMetadata $classMetadata */
+            $classMetadata  = $em->getClassMetadata($entityConfigId->getClassName());
+            $targetMappings = $classMetadata->getAssociationMappings();
+            if (empty($targetMappings)) {
+                continue;
+            }
+
+            foreach ($targetMappings as $mapping) {
+                if ($mapping['targetEntity'] == $className
+                    && empty($mapping['inversedBy'])
+                ) {
+                    $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = $mapping;
                 }
             }
         }
+
+        return $relations;
     }
 
     /**
@@ -250,6 +360,7 @@ class EntityFieldProvider
      * @param array $result
      * @param array $relation
      * @param bool  $withEntityDetails
+     * @param bool  $withUnidirectional
      * @param int   $relationDeepLevel
      * @param bool  $lastDeepLevelRelations
      * @param bool  $translate
@@ -258,6 +369,7 @@ class EntityFieldProvider
         array &$result,
         array $relation,
         $withEntityDetails,
+        $withUnidirectional,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
@@ -286,6 +398,7 @@ class EntityFieldProvider
                     $relatedEntityName,
                     $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
                     $withEntityDetails,
+                    $withUnidirectional,
                     $relationDeepLevel,
                     $lastDeepLevelRelations,
                     $translate
