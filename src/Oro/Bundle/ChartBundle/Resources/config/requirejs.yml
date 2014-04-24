@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oro/chart/chart_form': 'bundles/orochart/js/chart_form.js'
