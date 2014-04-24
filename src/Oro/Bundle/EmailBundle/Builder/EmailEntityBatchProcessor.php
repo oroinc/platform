@@ -195,9 +195,74 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function persistEmails(EntityManager $em)
     {
+        $this->processDuplicateEmails($em);
         foreach ($this->emails as $email) {
             $em->persist($email);
         }
+    }
+
+    /**
+     * Replaces emails with already existing in DB emails to avoid duplicates
+     *
+     * @param EntityManager $em
+     */
+    protected function processDuplicateEmails(EntityManager $em)
+    {
+        $existingEmails = $this->getExistingEmails($em);
+        if (!empty($existingEmails)) {
+            // add existing emails to new folders and remove these emails from the list
+            foreach ($existingEmails as $existingEmail) {
+                foreach ($this->emails as $key => $email) {
+                    if ($this->areEmailsEqual($email, $existingEmail)) {
+                        $folders = $email->getFolders();
+                        foreach ($folders as $folder) {
+                            $existingEmail->addFolder($folder);
+                        }
+                        unset($this->emails[$key]);
+                    }
+                }
+            }
+            // add existing emails to the list
+            foreach ($existingEmails as $existingEmail) {
+                $this->emails[] = $existingEmail;
+            }
+        }
+    }
+
+    /**
+     * Loads emails already exist in the database for the current batch
+     *
+     * @param EntityManager $em
+     * @return Email[]
+     */
+    protected function getExistingEmails(EntityManager $em)
+    {
+        // get distinct list of Message-ID
+        $messageIds = [];
+        foreach ($this->emails as $email) {
+            $messageId = $email->getMessageId();
+            if (!empty($messageId)) {
+                $messageIds[$messageId] = $messageId;
+            }
+        }
+        if (empty($messageIds)) {
+            return [];
+        }
+
+        return $em->getRepository('OroEmailBundle:Email')
+            ->findBy(array('messageId' => array_values($messageIds)));
+    }
+
+    /**
+     * Determines whether two emails are the same email message
+     *
+     * @param Email $email1
+     * @param Email $email2
+     * @return bool
+     */
+    protected function areEmailsEqual(Email $email1, Email $email2)
+    {
+        return $email1->getMessageId() === $email2->getMessageId();
     }
 
     /**
