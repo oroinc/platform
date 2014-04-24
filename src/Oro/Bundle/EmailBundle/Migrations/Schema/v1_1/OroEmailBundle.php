@@ -21,7 +21,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface
     {
         $queries->addPreQuery(
             sprintf(
-                "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE(%s, '-',''), '%s') WHERE message_id IS NULL",
+                "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE('%s', '-',''), '%s') WHERE message_id IS NULL",
                 $this->platform->getGuidExpression(),
                 '@bap.migration.generated'
             )
