@@ -301,7 +301,6 @@ class EntityFieldProvider
                 'name'                => $name,
                 'type'                => $classMetadata->getTypeOfField($fieldName),
                 'label'               =>
-                    '000' .
                     $this->translator->trans(
                         $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
                     ) .
