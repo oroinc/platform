@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DataGridManager;
 
 class DataGridData implements DataInterface
 {
@@ -39,8 +39,8 @@ class DataGridData implements DataInterface
     public function toArray()
     {
         if (null === $this->data) {
-            $dataGrid = $this->dataGridManager->getDatagrid($this->dataGridName);
-            $this->data = $dataGrid->getData();
+            $resultData = $this->dataGridManager->getDatagrid($this->dataGridName)->getData();
+            $this->data = $resultData['data'];
         }
 
         return $this->data;
