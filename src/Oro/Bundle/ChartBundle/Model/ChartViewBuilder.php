@@ -167,7 +167,7 @@ class ChartViewBuilder
         }
 
         if (!isset($options['settings']) || !is_array($options['settings'])) {
-            $this->options['settings'] = array();
+            $options['settings'] = array();
         }
 
         $config = $this->configProvider->getChartConfig($options['name']);
