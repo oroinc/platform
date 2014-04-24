@@ -100,14 +100,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($message)
             ->will($this->returnValue(false));
 
-        $headers = $this->getMock('Swift_Mime_HeaderSet');
-        $headers->expects($this->once())
-            ->method('addIdHeader');
-
-        $message->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
-
         $model = $this->createEmailModel(
             array(
                 'from'    => 'test@test.com',
@@ -165,14 +157,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $message->expects($this->once())
             ->method('setBody')
             ->with($expectedMessageData['body'], 'text/plain');
-
-        $headers = $this->getMock('Swift_Mime_HeaderSet');
-        $headers->expects($this->once())
-            ->method('addIdHeader');
-
-        $message->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -306,15 +290,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     protected function processWithOwner($user, $withOrigin = false)
     {
         $message = $this->getMockForAbstractClass('\Swift_Mime_Message');
-
-        $headers = $this->getMock('Swift_Mime_HeaderSet');
-        $headers->expects($this->once())
-            ->method('addIdHeader');
-
-        $message->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
-
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
