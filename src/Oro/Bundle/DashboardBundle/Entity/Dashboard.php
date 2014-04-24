@@ -13,7 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * Dashboard
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository")
- * @ORM\Table(name="oro_dashboard")
+ * @ORM\Table(name="oro_dashboard", indexes={@ORM\Index(name="dashboard_is_default_idx", columns={"is_default"})})
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *  defaultValues={
  *      "ownership"={
@@ -54,6 +55,13 @@ class Dashboard
     protected $label;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_default", type="boolean", nullable=false, options={"default"=0})
+     */
+    protected $isDefault = false;
+
+    /**
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
@@ -65,11 +73,30 @@ class Dashboard
      * @var Collection
      *
      * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\DashboardBundle\Entity\DashboardWidget",
+     *     targetEntity="Oro\Bundle\DashboardBundle\Entity\Widget",
      *     mappedBy="dashboard", cascade={"ALL"}, orphanRemoval=true
      * )
      */
     protected $widgets;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $updatedAt;
+
+    /**
+     * @var Dashboard
+     */
+    protected $startDashboard;
 
     public function __construct()
     {
@@ -142,6 +169,24 @@ class Dashboard
     }
 
     /**
+     * @return bool
+     */
+    public function isDefault()
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * @param bool $isDefault
+     * @return Dashboard
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = (bool)$isDefault;
+        return $this;
+    }
+
+    /**
      * @return Collection
      */
     public function getWidgets()
@@ -160,10 +205,10 @@ class Dashboard
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return Dashboard
      */
-    public function addWidget(DashboardWidget $widget)
+    public function addWidget(Widget $widget)
     {
         if (!$this->getWidgets()->contains($widget)) {
             $this->getWidgets()->add($widget);
@@ -174,20 +219,93 @@ class Dashboard
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return boolean
      */
-    public function removeWidget(DashboardWidget $widget)
+    public function removeWidget(Widget $widget)
     {
         return $this->getWidgets()->removeElement($widget);
     }
 
     /**
-     * @param DashboardWidget $widget
+     * @param Widget $widget
      * @return boolean
      */
-    public function hasWidget(DashboardWidget $widget)
+    public function hasWidget(Widget $widget)
     {
         return $this->getWidgets()->contains($widget);
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return Dashboard
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     * @return Dashboard
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @param Dashboard $dashboard
+     * @return Dashboard
+     */
+    public function setStartDashboard(Dashboard $dashboard = null)
+    {
+        $this->startDashboard = $dashboard;
+
+        return $this;
+    }
+
+    /**
+     * @return Dashboard
+     */
+    public function getStartDashboard()
+    {
+        return $this->startDashboard;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

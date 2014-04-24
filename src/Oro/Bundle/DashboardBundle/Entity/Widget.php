@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="oro_dashboard_widget")
  */
-class DashboardWidget
+class Widget
 {
     /**
      * @var integer
@@ -36,13 +36,6 @@ class DashboardWidget
     protected $layoutPosition;
 
     /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_expanded", type="boolean")
-     */
-    protected $expanded = true;
-
-    /**
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Dashboard", inversedBy="widgets", cascade={"persist"})
@@ -60,7 +53,7 @@ class DashboardWidget
 
     /**
      * @param string $name
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setName($name)
     {
@@ -78,7 +71,7 @@ class DashboardWidget
 
     /**
      * @param array $layoutPosition
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setLayoutPosition(array $layoutPosition)
     {
@@ -95,26 +88,8 @@ class DashboardWidget
     }
 
     /**
-     * @param boolean $expanded
-     * @return DashboardWidget
-     */
-    public function setExpanded($expanded)
-    {
-        $this->expanded = (bool)$expanded;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isExpanded()
-    {
-        return $this->expanded;
-    }
-
-    /**
      * @param Dashboard $dashboard
-     * @return DashboardWidget
+     * @return Widget
      */
     public function setDashboard(Dashboard $dashboard)
     {

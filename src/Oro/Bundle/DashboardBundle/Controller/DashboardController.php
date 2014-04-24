@@ -2,71 +2,158 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @Route("/dashboard")
+ */
 class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/index/{id}",
+     *      ".{_format}",
      *      name="oro_dashboard_index",
+     *      requirements={"_format"="html|json"},
+     *      defaults={"_format" = "html"}
+     * )
+     *
+     * @Acl(
+     *      id="oro_dashboard_view",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="VIEW"
+     * )
+     * @Template
+     */
+    public function indexAction()
+    {
+        return [];
+    }
+
+    /**
+     * @param Dashboard $dashboard
+     *
+     * @Route(
+     *      "/view/{id}",
+     *      name="oro_dashboard_view",
      *      defaults={"id" = ""}
      * )
+     * @AclAncestor("oro_dashboard_view")
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($id = null)
+    public function viewAction(Dashboard $dashboard = null)
     {
-        $widgetManager = $this->get('oro_dashboard.widget_manager');
-
         $changeActive = $this->get('request')->get('change_dashboard', false);
 
-        /**
-         * @var User $user
-         */
-        $user = $this->getUser();
+        $dashboards = $this->getDashboardManager()->findAllowedDashboards();
+        $currentDashboard = $this->findAllowedDashboard($dashboard);
 
-        if (!$user) {
-            throw new AccessDeniedException('User is not logged in');
+        if ($changeActive && $dashboard) {
+            $this->getDashboardManager()->setUserActiveDashboard(
+                $currentDashboard,
+                $this->getUser(),
+                true
+            );
         }
-
-        if ($changeActive && !$id) {
-            throw new NotFoundHttpException('Incorrect request params');
-        }
-
-        $dashboards = $this->getDashboardManager()->getDashboards();
-        $currentDashboard = null;
-
-        if ($changeActive) {
-            if (!$this->getDashboardManager()->setUserActiveDashboard($user, $id)) {
-                throw new NotFoundHttpException('Dashboard not found');
-            }
-        }
-
-        $currentDashboard = $this->getDashboardManager()->getUserActiveDashboard($user);
 
         if (!$currentDashboard) {
             return $this->quickLaunchpadAction();
         }
 
-        $config = $currentDashboard->getConfig();
-
-        $template  = isset($config['twig']) ? $config['twig'] : 'OroDashboardBundle:Index:default.html.twig';
-
         return $this->render(
-            $template,
+            $currentDashboard->getTemplate(),
             array(
                 'dashboards' => $dashboards,
                 'dashboard' => $currentDashboard,
-                'widgets' => $widgetManager->getAvailableWidgets()
+                'widgets' => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
             )
         );
+    }
+
+    /**
+     * @Route("/update/{id}", name="oro_dashboard_update", requirements={"id"="\d+"},  defaults={"id"=0})
+     * @Acl(
+     *      id="oro_dashboard_update",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="EDIT"
+     * )
+     *
+     * @Template()
+     */
+    public function updateAction(Dashboard $dashboard)
+    {
+        $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
+        return $this->update($dashboardModel);
+    }
+
+    /**
+     * @Route("/create", name="oro_dashboard_create")
+     * @Acl(
+     *      id="oro_dashboard_create",
+     *      type="entity",
+     *      class="OroDashboardBundle:Dashboard",
+     *      permission="CREATE"
+     * )
+     * @Template("OroDashboardBundle:Dashboard:update.html.twig")
+     */
+    public function createAction()
+    {
+        $dashboardModel = $this->getDashboardManager()->createDashboardModel();
+        return $this->update($dashboardModel);
+    }
+
+    /**
+     * @param DashboardModel $dashboardModel
+     * @return mixed
+     */
+    protected function update(DashboardModel $dashboardModel)
+    {
+        $form = $this->createForm(
+            $this->container->get('oro_dashboard.form.type.edit'),
+            $dashboardModel->getEntity(),
+            array(
+                'create_new' => !$dashboardModel->getId()
+            )
+        );
+
+        $request = $this->getRequest();
+        if ($request->isMethod('POST')) {
+            if ($form->submit($request)->isValid()) {
+                $this->getDashboardManager()->save($dashboardModel, true);
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                );
+
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    array(
+                        'route' => 'oro_dashboard_update',
+                        'parameters' => array('id' => $dashboardModel->getId()),
+                    ),
+                    array(
+                        'route' => 'oro_dashboard_view',
+                        'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
+                    )
+                );
+            }
+        }
+
+        return array('entity' => $dashboardModel, 'form'=> $form->createView());
     }
 
     /**
@@ -120,9 +207,32 @@ class DashboardController extends Controller
         return $this->render(
             'OroDashboardBundle:Index:quickLaunchpad.html.twig',
             [
-                'dashboards' => $this->getDashboardManager()->getDashboards(),
+                'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
             ]
         );
+    }
+
+    /**
+     * Get dashboard with granted permission. If dashboard id is not specified, gets current active or default dashboard
+     *
+     * @param Dashboard $dashboard $dashboard
+     * @param string $permission
+     * @return DashboardModel|null
+     */
+    protected function findAllowedDashboard(Dashboard $dashboard = null, $permission = 'VIEW')
+    {
+        if ($dashboard) {
+            $dashboard = $this->getDashboardManager()->getDashboardModel($dashboard);
+        } else {
+            $dashboard = $this->getDashboardManager()->findUserActiveOrDefaultDashboard($this->getUser());
+            if ($dashboard &&
+                !$this->getSecurityFacade()->isGranted($permission, $dashboard->getEntity())
+            ) {
+                $dashboard = null;
+            }
+        }
+
+        return $dashboard;
     }
 
     /**
@@ -131,5 +241,29 @@ class DashboardController extends Controller
     protected function getDashboardManager()
     {
         return $this->get('oro_dashboard.manager');
+    }
+
+    /**
+     * @return DashboardRepository
+     */
+    protected function getDashboardRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->container->get('doctrine.orm.entity_manager');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }
