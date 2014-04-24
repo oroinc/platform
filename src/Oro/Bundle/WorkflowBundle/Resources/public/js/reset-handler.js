@@ -43,8 +43,6 @@ function($, _, __, Modal, Navigation, Messenger) {
                     } else {
                         window.location.reload();
                     }
-
-                    element.trigger('reset_success', [responce]);
                 },
                 error: function() {
                     Messenger.notificationFlashMessage('error', __('Cannot reset workflow item data.'));
