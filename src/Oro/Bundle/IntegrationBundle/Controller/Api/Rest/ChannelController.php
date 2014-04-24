@@ -41,20 +41,15 @@ class ChannelController extends FOSRestController
     public function deleteAction($id)
     {
         $entity   = $this->getManager()->find($id);
-
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-
-        // do not allow to remove synced channel
-        if (ChannelFormSubscriber::wasChannelSynced($entity)) {
+        if (!$this->get('oro_security.security_facade')->isGranted('DELETE', $entity)) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
-
-        $em = $this->getManager()->getObjectManager();
-        $em->remove($entity);
-        $em->flush();
-
+        if (!$this->get('oro_integration.channel_delete_manager')->deleteChannel($entity)) {
+            return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
+        }
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 
