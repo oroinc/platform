@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
@@ -62,22 +61,13 @@ class WorkflowControllerTest extends WebTestCase
         $workflowManager = $this->getWorkflowManager();
         $repository      = $this->entityManager->getRepository('OroWorkflowBundle:WorkflowDefinition');
 
-        /** @var $workflowDefinitionNoStartStep WorkflowDefinition */
         $workflowDefinitionNoStartStep = $repository->find(LoadWorkflowDefinitions::NO_START_STEP);
-        /** @var $workflowDefinitionStartStep WorkflowDefinition */
         $workflowDefinitionStartStep   = $repository->find(LoadWorkflowDefinitions::WITH_START_STEP);
 
-        if ($finalDefinitionHasStartStep) {
-            $workflowFrom     = $workflowDefinitionNoStartStep;
-            $workflowFromName = LoadWorkflowDefinitions::NO_START_STEP;
-            $workflowTo       = $workflowDefinitionStartStep;
-            $workflowToName   = LoadWorkflowDefinitions::WITH_START_STEP;
-        } else {
-            $workflowFrom     = $workflowDefinitionStartStep;
-            $workflowFromName = LoadWorkflowDefinitions::WITH_START_STEP;
-            $workflowTo       = $workflowDefinitionNoStartStep;
-            $workflowToName   = LoadWorkflowDefinitions::NO_START_STEP;
-        }
+        $workflowFrom = $finalDefinitionHasStartStep ? $workflowDefinitionNoStartStep : $workflowDefinitionStartStep;
+        $workflowTo   = $finalDefinitionHasStartStep ? $workflowDefinitionStartStep : $workflowDefinitionNoStartStep;
+        $workflowFromName = $workflowFrom->getName();
+        $workflowToName   = $workflowTo->getName();
 
         // activating workflow definition
         $workflowManager->activateWorkflow($workflowFrom);
@@ -98,9 +88,14 @@ class WorkflowControllerTest extends WebTestCase
         $this->entityManager->refresh($entity);
         $this->assertEntityWorkflowItem($entity, $workflowFromName);
 
-        // performing delete workflow item
-        $param = array('workflowItemId' => $entity->getWorkflowItem()->getId());
-        $this->client->request('DELETE', $this->client->generate('oro_api_workflow_delete', $param));
+        // performing delete workflow item using API
+        $this->client->request(
+            'DELETE',
+            $this->client->generate(
+                'oro_api_workflow_delete',
+                array('workflowItemId' => $entity->getWorkflowItem()->getId())
+            )
+        );
 
         // check is deleting workflow item has been performed successfully
         $result = $this->client->getResponse();
