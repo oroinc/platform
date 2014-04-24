@@ -5,6 +5,7 @@ namespace Oro\Bundle\ChartBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Config\FileLocator;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -17,6 +18,7 @@ class OroChartExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $chartConfigs = array();
+
 
         $configLoader = new CumulativeConfigLoader(
             'oro_chart',
@@ -35,6 +37,8 @@ class OroChartExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $chartConfigs);
 
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
         $container->getDefinition('oro_chart.config_provider')->replaceArgument(0, $config);
     }
 }
