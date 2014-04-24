@@ -32,16 +32,6 @@
     overflow-y: auto;
 }
 
-.sidebar-left {
-    left: 0;
-    margin-right: 7px;
-}
-
-.sidebar-right {
-    right: 0;
-    margin-left: 7px;
-}
-
 .sidebar-maximized {
     width: 200px;
 }

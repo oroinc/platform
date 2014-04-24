@@ -1,6 +1,10 @@
 @import "mixins";
-body, #page, #top-page {
+html, body, #page, #top-page {
   height: 100%;
+  overflow-y: visible; // prevents scroll bar appearance
+}
+html{
+  overflow-y: hidden;
 }
 .responsive-block{
   min-width: 350px;
