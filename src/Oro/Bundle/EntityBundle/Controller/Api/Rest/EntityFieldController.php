@@ -35,6 +35,9 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
+     *      name="with-unidirectional", requirements="(1)|(0)",
+     *      description="Indicates whether Unidirectional association fields should be returned.")
+     * @QueryParam(
      *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
      *      description="The maximum deep level of related entities.")
      * @QueryParam(

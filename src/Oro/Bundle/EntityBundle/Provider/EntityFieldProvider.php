@@ -317,12 +317,11 @@ class EntityFieldProvider
     }
 
     /**
-     * Return entities  that has one-way link to $className entity
+     * Return mapping data for entities that has one-way link to $className entity
      *
      * @param EntityManager $em
      * @param string        $className
-     *
-     * @return ClassMetadata[]|array
+     * @return array
      */
     protected function getUnidirectionalRelations(EntityManager $em, $className)
     {
