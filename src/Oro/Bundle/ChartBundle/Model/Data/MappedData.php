@@ -3,13 +3,29 @@
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class MappedData implements DataInterface
 {
+    /**
+     * @var array
+     */
     protected $mapping;
 
+    /**
+     * @var DataInterface
+     */
     protected $sourceData;
 
+    /**
+     * @var PropertyAccessor
+     */
+    protected $accessor = null;
+
+    /**
+     * @param array         $mapping
+     * @param DataInterface $sourceData
+     */
     public function __construct(array $mapping, DataInterface $sourceData)
     {
         $this->mapping = $mapping;
@@ -33,14 +49,29 @@ class MappedData implements DataInterface
         return $result;
     }
 
+    /**
+     * @param $sourceItem
+     * @param $fieldName
+     * @return mixed
+     */
     protected function getValue($sourceItem, $fieldName)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
-
         if (is_array($sourceItem)) {
             $fieldName = "[$fieldName]";
         }
 
-        return $accessor->getValue($sourceItem, $fieldName);
+        return $this->getAccessor()->getValue($sourceItem, $fieldName);
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getAccessor()
+    {
+        if ($this->accessor == null) {
+            $this->accessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->accessor;
     }
 }
