@@ -132,6 +132,7 @@ class EntityFieldProvider
                 $className,
                 $em,
                 $withEntityDetails,
+                $withUnidirectional,
                 $deepLevel - 1,
                 $lastDeepLevelRelations,
                 $translate
@@ -212,6 +213,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withUnidirectional
      * @param int           $relationDeepLevel
      * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
@@ -221,6 +223,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withUnidirectional,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
@@ -258,6 +261,7 @@ class EntityFieldProvider
                     $result,
                     $relationData,
                     $withEntityDetails,
+                    $withUnidirectional,
                     $relationDeepLevel,
                     $lastDeepLevelRelations,
                     $translate
@@ -300,7 +304,7 @@ class EntityFieldProvider
                     '000' .
                     $this->translator->trans(
                         $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
-                    ),
+                    ) . ' (' . $fieldName . ')',
                 'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
                 'related_entity_name' => $relatedClassName
             ];
@@ -309,6 +313,7 @@ class EntityFieldProvider
                 $result,
                 $relationData,
                 $withEntityDetails,
+                true,
                 $relationDeepLevel,
                 $lastDeepLevelRelations,
                 $translate
@@ -355,6 +360,7 @@ class EntityFieldProvider
      * @param array $result
      * @param array $relation
      * @param bool  $withEntityDetails
+     * @param bool  $withUnidirectional
      * @param int   $relationDeepLevel
      * @param bool  $lastDeepLevelRelations
      * @param bool  $translate
@@ -363,6 +369,7 @@ class EntityFieldProvider
         array &$result,
         array $relation,
         $withEntityDetails,
+        $withUnidirectional,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
@@ -391,7 +398,7 @@ class EntityFieldProvider
                     $relatedEntityName,
                     $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
                     $withEntityDetails,
-                    false,
+                    $withUnidirectional,
                     $relationDeepLevel,
                     $lastDeepLevelRelations,
                     $translate
