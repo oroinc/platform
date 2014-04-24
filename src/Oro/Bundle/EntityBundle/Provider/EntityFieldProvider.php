@@ -92,7 +92,7 @@ class EntityFieldProvider
      * @param int    $deepLevel              The maximum deep level of related entities.
      * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
      *                                       should be returned.
-     * @param bool   $translate Flag means that label, plural label should be translated
+     * @param bool   $translate              Flag means that label, plural label should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
