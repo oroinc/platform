@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -15,6 +14,8 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class EntityFieldProvider
