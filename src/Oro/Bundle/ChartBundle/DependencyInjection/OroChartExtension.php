@@ -22,6 +22,7 @@ class OroChartExtension extends Extension
 
         $chartConfigs = array();
 
+
         $configLoader = new CumulativeConfigLoader(
             'oro_chart',
             new YamlCumulativeFileLoader('Resources/config/oro/chart.yml')
@@ -39,6 +40,8 @@ class OroChartExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $chartConfigs);
 
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
         $container->getDefinition('oro_chart.config_provider')->replaceArgument(0, $config);
     }
 }
