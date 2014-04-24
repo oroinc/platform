@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Bundle\DashboardBundle\DataFixtures\ORM\LoadUserData;
+use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
 
 /**
  * @outputBuffering enabled
@@ -34,7 +34,7 @@ class DashboardControllerAclTest extends WebTestCase
     {
         $this->client = static::createClient(
             [],
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateBasicHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');

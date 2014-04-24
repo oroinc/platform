@@ -72,9 +72,7 @@ class WidgetControllerTest extends WebTestCase
                     'widgetId'    => $this->widget->getId(),
                 ]
             ),
-            $data,
-            [],
-            ToolsAPI::generateWsseHeader()
+            $data
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
@@ -100,9 +98,7 @@ class WidgetControllerTest extends WebTestCase
             $this->client->generate(
                 'oro_api_post_dashboard_widget_add_widget'
             ),
-            array('dashboardId' => $id, 'widgetName' => $widgetName),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            array('dashboardId' => $id, 'widgetName' => $widgetName)
         );
 
         $result = $this->client->getResponse();
@@ -125,10 +121,7 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $this->widget->getDashboard()->getId(),
                     'widgetId'    => $this->widget->getId(),
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
@@ -141,10 +134,7 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $this->widget->getDashboard()->getId(),
                     'widgetId'    => $this->widget->getId(),
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404);
@@ -185,9 +175,7 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $dashboard->getId(),
                 ]
             ),
-            $data,
-            [],
-            ToolsAPI::generateWsseHeader()
+            $data
         );
 
         $result = $this->client->getResponse();

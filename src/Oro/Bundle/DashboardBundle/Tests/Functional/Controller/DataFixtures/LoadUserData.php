@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\DataFixtures\ORM;
+namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
-    const USER_NAME = 'user_wo_permissions';
+    const USER_NAME     = 'user_wo_permissions';
     const USER_PASSWORD = 'user_api_key';
 
     /**

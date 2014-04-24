@@ -3,10 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Bundle\DashboardBundle\DataFixtures\ORM\LoadUserData;
 
 /**
  * @outputBuffering enabled
