@@ -297,14 +297,26 @@ class EntityFieldProvider
             $classMetadata    = $em->getClassMetadata($relatedClassName);
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
+            if ($translate) {
+                $label =
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
+                    ) .
+                    ' (' .
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
+                    ) .
+                    ')';
+            } else {
+                $label =
+                    $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) .
+                    ' (' . $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') . ')';
+            }
+
             $relationData = [
                 'name'                => $name,
                 'type'                => $classMetadata->getTypeOfField($fieldName),
-                'label'               =>
-                    '000' .
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
-                    ) . ' (' . $fieldName . ')',
+                'label'               => $label,
                 'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
                 'related_entity_name' => $relatedClassName
             ];
