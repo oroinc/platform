@@ -836,7 +836,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItemsRepository->expects($this->once())->method('resetWorkflowData')
             ->with($entityClass, array($name));
 
-        $this->registry->expects($this->any())
+        $this->registry->expects($this->once())
             ->method('getRepository')
             ->with('OroWorkflowBundle:WorkflowItem')
             ->will($this->returnValue($workflowItemsRepository));

@@ -11,7 +11,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
 
 class WorkflowItemRepository extends EntityRepository
 {
-    const DELETE_BATCH_SIZE = 200;
+    const DELETE_BATCH_SIZE = 1000;
 
     /**
      * Get workflow item associated with entity.
@@ -133,7 +133,6 @@ class WorkflowItemRepository extends EntityRepository
             return;
         }
 
-        $workflowItemName = $this->getEntityName();
         $expressionBuilder = $this->createQueryBuilder('workflowItem')->expr();
         $entityManager = $this->getEntityManager();
 
@@ -143,8 +142,7 @@ class WorkflowItemRepository extends EntityRepository
             WHERE {$updateCondition}";
 
         $deleteCondition = $expressionBuilder->in('workflowItem.id', $workflowItemIds);
-        $deleteDql = "DELETE {$workflowItemName} workflowItem
-            WHERE {$deleteCondition}";
+        $deleteDql = "DELETE OroWorkflowBundle:WorkflowItem workflowItem WHERE {$deleteCondition}";
 
         $entityManager->createQuery($updateDql)->execute();
         $entityManager->createQuery($deleteDql)->execute();
