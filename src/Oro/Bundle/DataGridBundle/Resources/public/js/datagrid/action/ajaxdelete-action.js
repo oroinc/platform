@@ -17,12 +17,12 @@ define(['./model-action', 'oroui/js/delete-confirmation', 'orotranslation/js/tra
         confirmModalConstructor: DeleteConfirmation,
 
         defaultMessages: {
-            confirm_title: __('Delete Confirmation'),
-            confirm_content: __('Are you sure you want to remove this item?'),
-            confirm_ok: __('Yes'),
-            success: __('Removed.'),
-            error: __('Not removed.'),
-            empty_selection: __('Please, select item to remove.')
+            confirm_title: 'Delete Confirmation',
+            confirm_content: 'Are you sure you want to remove this item?',
+            confirm_ok: 'Yes',
+            success: 'Removed.',
+            error: 'Not removed.',
+            empty_selection: 'Please, select item to remove.'
         }
     });
 });
