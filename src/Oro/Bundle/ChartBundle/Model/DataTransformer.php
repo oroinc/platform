@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Model;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
-class ChartDataTransformer implements DataTransformerInterface
+class DataTransformer implements DataTransformerInterface
 {
     /**
      * @param array                   $config
