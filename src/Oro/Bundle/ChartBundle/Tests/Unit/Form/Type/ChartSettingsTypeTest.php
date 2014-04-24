@@ -4,12 +4,12 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\ChartBundle\Form\Type\ChartType;
+use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
 
-class ChartTypeTest extends FormIntegrationTestCase
+class ChartSettingsTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var ChartType
+     * @var ChartSettingsType
      */
     protected $type;
 
@@ -24,7 +24,7 @@ class ChartTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new ChartType($this->configProvider);
+        $this->type = new ChartSettingsType($this->configProvider);
 
         parent::setUp();
     }
@@ -44,19 +44,19 @@ class ChartTypeTest extends FormIntegrationTestCase
      */
     public function testRequireOptionsIncorrectType()
     {
-        $this->factory->create($this->type, null, array('chart_name' => 11));
+        $this->factory->create($this->type, null, array(ChartSettingsType::NODE_NAME => 11));
     }
 
     public function testFieldAdded()
     {
-        $expectedName = 'expectedName';
-        $fieldName = 'firstFieldName';
-        $fieldLabel = 'firstFieldLabel';
-        $fieldType = 'text';
-        $fieldNameSecond = 'firstFieldNameSecond';
+        $expectedName     = 'expectedName';
+        $fieldName        = 'firstFieldName';
+        $fieldLabel       = 'firstFieldLabel';
+        $fieldType        = 'text';
+        $fieldNameSecond  = 'firstFieldNameSecond';
         $fieldLabelSecond = 'firstFieldLabelSecond';
-        $fieldTypeSecond = 'integer';
-        $settings = array(
+        $fieldTypeSecond  = 'integer';
+        $settings         = array(
             array(
                 'name'    => $fieldName,
                 'label'   => $fieldLabel,
@@ -70,14 +70,14 @@ class ChartTypeTest extends FormIntegrationTestCase
                 'options' => array('label' => 'unexpected label', 'required' => false)
             )
         );
-        $configs = array('settings_schema' => $settings);
+        $configs          = array(ChartSettingsType::NODE_SETTINGS => $settings);
 
         $this->configProvider->expects($this->once())
             ->method('getChartConfig')
             ->with($expectedName)
             ->will($this->returnValue($configs));
 
-        $form = $this->factory->create($this->type, null, array('chart_name' => $expectedName));
+        $form = $this->factory->create($this->type, null, array(ChartSettingsType::NODE_NAME => $expectedName));
 
         $this->assertTrue($form->has($fieldName));
         $this->assertTrue($form->has($fieldNameSecond));

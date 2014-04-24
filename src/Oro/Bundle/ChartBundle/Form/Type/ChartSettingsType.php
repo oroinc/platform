@@ -8,8 +8,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
-class ChartType extends AbstractType
+class ChartSettingsType extends AbstractType
 {
+    const NODE_NAME = 'chart_name';
+    const NODE_SETTINGS = 'settings_schema';
+
     /**
      * @var ConfigProvider
      */
@@ -28,10 +31,10 @@ class ChartType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $chartConfig = $this->configProvider->getChartConfig($options['chart_name']);
+        $chartConfig = $this->configProvider->getChartConfig($options[self::NODE_NAME]);
 
-        foreach ($chartConfig['settings_schema'] as $field) {
-            $options = !empty($field['options']) ? $field['options'] : array();
+        foreach ($chartConfig[self::NODE_SETTINGS] as $field) {
+            $options          = !empty($field['options']) ? $field['options'] : array();
             $options['label'] = $field['label'];
 
             $builder->add($field['name'], $field['type'], $options);
@@ -43,8 +46,8 @@ class ChartType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('chart_name'));
-        $resolver->setAllowedTypes(array('chart_name' => 'string'));
+        $resolver->setRequired(array(self::NODE_NAME));
+        $resolver->setAllowedTypes(array(self::NODE_NAME => 'string'));
     }
 
     /**
