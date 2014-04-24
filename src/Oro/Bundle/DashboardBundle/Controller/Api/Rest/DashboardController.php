@@ -23,7 +23,7 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 class DashboardController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * @param integer $id
+     * @param integer Dashboard $id
      *
      * @ApiDoc(
      *      description="Delete dashboard",
@@ -37,32 +37,13 @@ class DashboardController extends FOSRestController implements ClassResourceInte
      * )
      * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(Dashboard $id)
     {
-        $dashboard = $this->getDashboard($id);
-
-        if (!$dashboard) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
-        }
-
+        $dashboard = $id;
         $this->getEntityManager()->remove($dashboard);
         $this->getEntityManager()->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
-    }
-
-    /**
-     * @param integer $id
-     * @return Dashboard
-     */
-    protected function getDashboard($id)
-    {
-        $entity = $this
-            ->getEntityManager()
-            ->getRepository('OroDashboardBundle:Dashboard')
-            ->find($id);
-
-        return $entity;
     }
 
     /**

@@ -136,7 +136,7 @@
         </div>
         <script type="text/html" id="available-dashboard-widgets">
             {% for widgetName, widget in widgets %}
-                {% if widget.config.acl is not defined or resource_granted(widget.config.acl) %}
+                {% if widget.acl is not defined or resource_granted(widget.acl) %}
                     <div class="dashboard-widget-container">
                         <table>
                             <tr class="dashboard-widget-title">

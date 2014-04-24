@@ -133,6 +133,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @private
          */
         _onClickAddWidget: function(event) {
+            event.preventDefault();
             var columnIndex = $(event.target).closest('.dashboard-column').index();
             this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
             this.dialog.open();
