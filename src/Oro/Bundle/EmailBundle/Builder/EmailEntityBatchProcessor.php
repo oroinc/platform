@@ -337,10 +337,9 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
     {
-        // TODO: fix method logic after folder changed to folders
         foreach ($this->emails as $obj) {
-            if ($obj->getFolders()->first() === $old) {
-                $obj->setFolders(new ArrayCollection([$new]));
+            if ($obj->removeFolder($old)) {
+                $obj->addFolder($new);
             }
         }
     }

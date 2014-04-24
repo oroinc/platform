@@ -209,8 +209,6 @@ class EmailFolder
     {
         $this->emails[] = $email;
 
-        $email->setFolders(new ArrayCollection([$this]));
-
         return $this;
     }
 

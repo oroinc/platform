@@ -478,18 +478,31 @@ class Email
     }
 
     /**
-     * Set email folders
-     *
-     * @param ArrayCollection|EmailFolder[] $folders
+     * @param EmailFolder $folder
      *
      * @return $this
-     *
      */
-    public function setFolders(ArrayCollection $folders)
+    public function addFolder(EmailFolder $folder)
     {
-        $this->folders = $folders;
+        if (!$this->folders->contains($folder)) {
+            $this->folders->add($folder);
+        }
 
         return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return boolean
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            return $this->folders->removeElement($folder);
+        }
+
+        return false;
     }
 
     /**
