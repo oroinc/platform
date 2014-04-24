@@ -5,3 +5,4 @@ oro_dashboard_config:
             route:       oro_user_dashboard_recent_emails
             acl:         oro_email_view
             description: oro.dashboard.recent_emails.description
+            icon:   bundles/orouser/img/recent_emails.png

@@ -34,6 +34,13 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getLabel());
     }
 
+    public function testIsDefault()
+    {
+        $this->assertFalse($this->dashboard->isDefault());
+        $this->dashboard->setIsDefault(true);
+        $this->assertTrue($this->dashboard->isDefault());
+    }
+
     public function testName()
     {
         $this->assertNull($this->dashboard->getName());
@@ -50,20 +57,30 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getOwner());
     }
 
-    public function testAddWidgets()
+    public function testStartDashboard()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\DashboardWidget');
+        $this->assertNull($this->dashboard->getOwner());
+        $value = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard');
+        $this->assertEquals($this->dashboard, $this->dashboard->setStartDashboard($value));
+        $this->assertEquals($value, $this->dashboard->getStartDashboard());
+    }
+
+    public function testAddAndResetWidgets()
+    {
+        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $widget->expects($this->once())->method('setDashboard')
             ->with($this->dashboard);
         $this->assertFalse($this->dashboard->getWidgets()->contains($widget));
         $this->assertEquals($this->dashboard, $this->dashboard->addWidget($widget));
         $this->assertEquals(1, $this->dashboard->getWidgets()->count());
         $this->assertTrue($this->dashboard->getWidgets()->contains($widget));
+        $this->dashboard->resetWidgets();
+        $this->assertEquals(0, $this->dashboard->getWidgets()->count());
     }
 
     public function testHasWidget()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\DashboardWidget');
+        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $this->assertFalse($this->dashboard->hasWidget($widget));
         $this->dashboard->addWidget($widget);
         $this->assertTrue($this->dashboard->hasWidget($widget));
@@ -71,11 +88,41 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveWidget()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\DashboardWidget');
+        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $this->assertFalse($this->dashboard->removeWidget($widget));
         $this->dashboard->addWidget($widget);
         $this->assertTrue($this->dashboard->hasWidget($widget));
         $this->assertTrue($this->dashboard->removeWidget($widget));
         $this->assertFalse($this->dashboard->hasWidget($widget));
+    }
+
+    public function testCreatedAt()
+    {
+        $this->assertNull($this->dashboard->getCreatedAt());
+        $date = new \DateTime();
+        $this->assertEquals($this->dashboard, $this->dashboard->setCreatedAt($date));
+        $this->assertEquals($date, $this->dashboard->getCreatedAt());
+    }
+
+    public function testUpdatedAt()
+    {
+        $this->assertNull($this->dashboard->getUpdatedAt());
+        $date = new \DateTime();
+        $this->assertEquals($this->dashboard, $this->dashboard->setUpdatedAt($date));
+        $this->assertEquals($date, $this->dashboard->getUpdatedAt());
+    }
+
+    public function testPrePersist()
+    {
+        $this->assertNull($this->dashboard->getCreatedAt());
+        $this->dashboard->prePersist();
+        $this->assertInstanceOf('\DateTime', $this->dashboard->getCreatedAt());
+    }
+
+    public function testPreUpdate()
+    {
+        $this->assertNull($this->dashboard->getUpdatedAt());
+        $this->dashboard->preUpdate();
+        $this->assertInstanceOf('\DateTime', $this->dashboard->getUpdatedAt());
     }
 }
