@@ -114,6 +114,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $folder->setName('Exist');
         $folder->setFullName('Exist');
         $folder->setOrigin($origin);
+
         $this->batch->addFolder($folder);
         $newFolder = new EmailFolder();
         $newFolder->setName('New');

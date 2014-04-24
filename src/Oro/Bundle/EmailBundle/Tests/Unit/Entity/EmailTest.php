@@ -143,7 +143,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
 
         $entity = new Email();
-        $entity->setFolders(new ArrayCollection([$folder]));
+        $entity->addFolder($folder);
 
         $this->assertTrue($folder === $entity->getFolders()->first());
     }
