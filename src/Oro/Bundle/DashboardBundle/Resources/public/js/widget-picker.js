@@ -9,14 +9,14 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
     var WidgetPickerDialog = modal.extend({
         open: function() {
             Backbone.BootstrapModal.prototype.open.apply(this, arguments);
-            var controls = $('.add-widget-button');
-            $('.dashboard-widget-container').bind('click', {}, function(event) {
-                event.stopImmediatePropagation();
-                if (!$(event.target).hasClass('add-widget-button')) {
-                    $(this).find('.add-widget-button').click();
-                }
-            });
-            controls.bind('click', {controls: controls}, this.options.clickAddToDashboardCallback);
+            var addWidgetControls = $('.add-widget-button');
+            var collapseControls = $('.dashboard-picker-collapse');
+
+            collapseControls.unbind('click', this.options.collapseCallback);
+            collapseControls.bind('click', {}, this.options.collapseCallback);
+
+            addWidgetControls.unbind('click', this.options.clickAddToDashboardCallback);
+            addWidgetControls.bind('click', {controls: addWidgetControls}, this.options.clickAddToDashboardCallback);
         }
     });
 
@@ -50,10 +50,21 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                 content: $('#available-dashboard-widgets').html(),
                 className: 'modal dashboard-widgets-wrapper',
                 title: __('oro.dashboard.add_dashboard_widgets.title'),
-                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this)
+                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this),
+                collapseCallback: this._collapseDelegate
             });
 
             $('.dashboard-widgets-add').bind('click', _.bind(this._onClickAddWidget, this));
+        },
+
+        /**
+         * @private
+         */
+        _collapseDelegate: function(){
+            var $this = $(this);
+            var container = $this.parents('.dashboard-widget-container');
+            $this.toggleClass('collapsed-state');
+            container.find('.dashboard-widgets-description').fadeToggle();
         },
 
         /**
@@ -91,7 +102,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _startLoading: function(controls, widgetContainer){
             controls.addClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.append($('<div class="loading-content"></div>'));
+            widgetButtonWrapper.addClass('loading-content');
             widgetButtonWrapper.find('.add-widget-button').hide();
         },
 
@@ -103,8 +114,9 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _endLoading: function(controls, widgetContainer){
             controls.removeClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.find('.loading-content').remove();
-            widgetButtonWrapper.find('.add-widget-button').show();
+            widgetButtonWrapper.removeClass('loading-content');
+            //fix case if modal window closed after press and before loading complete
+            widgetButtonWrapper.find('.add-widget-button').css('display', 'inline-block');
             var previous = widgetContainer.css('background-color');
             var animateFinish = function () {
                 animateFinish = function() {
@@ -121,6 +133,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @private
          */
         _onClickAddWidget: function(event) {
+            event.preventDefault();
             var columnIndex = $(event.target).closest('.dashboard-column').index();
             this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
             this.dialog.open();

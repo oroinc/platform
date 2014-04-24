@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class SecurityFacade
 {
@@ -155,21 +156,32 @@ class SecurityFacade
     }
 
     /**
+     * Gets logged user object or null
+     *
+     * @return mixed
+     */
+    public function getLoggedUser()
+    {
+        if (null === $token = $this->securityContext->getToken()) {
+            return null;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
      * Gets id of currently logged in user.
      *
      * @return int 0 if there is not currently logged in user; otherwise, a number greater than zero
      */
     public function getLoggedUserId()
     {
-        if (null === $token = $this->securityContext->getToken()) {
-            return 0;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            return 0;
-        }
-
-        return $user->getId();
+        $user = $this->getLoggedUser();
+        return $user ? $user->getId() : 0;
     }
 
     /**
@@ -179,6 +191,6 @@ class SecurityFacade
      */
     public function hasLoggedUser()
     {
-        return ($this->getLoggedUserId() !== 0);
+        return ($this->getLoggedUser() !== null);
     }
 }

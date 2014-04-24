@@ -66,18 +66,29 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+
+    .actions-container.collapse-expand-action-container {
+      position: relative;
+      top: 1px;
+      padding: 10px 5px;
+      border-bottom: 1px solid #ddd;
+    }
     
     .actions-container {
       position: relative;
       top: -32px;
+      height: 0px;
+    }
+
+    .actions-container.pull-left {
+      top: 10px;
+    }
+
+    .actions-container.pull-right {
+      top: -32px;
     }
 
     .default-actions-container {
-      display: none;
-    }
-
-    /** temporary hide collapse/expand */
-    .collapse-expand-action-container {
       display: none;
     }
 
@@ -105,9 +116,12 @@
     }
 
     .title {
-      padding-left: 18;
+      padding-left: 28px;
       padding-right: 0;
-      border-bottom: 1px solid #ddd;
+    }
+
+    .row-fluid {
+      border-top: 1px solid #ddd;
     }
 
     .dashboard-widget-content {
@@ -120,6 +134,7 @@
     visibility: hidden;
     padding: 0!important;
     margin: 0!important;
+    overflow: hidden!important;
   }
 
   .widget-placeholder {
@@ -134,8 +149,8 @@
     text-align: center;
   }
   .dashboard-widget.collapsed {
-    .title {
-      border-bottom: none;
+    .row-fluid {
+      border-top: none;
     }
     height: 43px;
     overflow: hidden;
@@ -338,69 +353,94 @@
 }
 .dashboard-widgets-wrapper{
   width: 600px;
-  .dashboard-widget-title {
-    display: block;
-    padding: 0 0 10px;
-  }
-  .dashboard-widget-container:hover {
-    background-color: #F2F2F2;
-  }
   .dashboard-widget-container {
+    border-bottom: 2px solid #f5f5f5;
+    padding: 5px 0;
     width: 100%;
-    height: 158px;
-    padding: 15px;
-    border-bottom: 2px solid #808080;
-    position: relative;
-    .dashboard-widget-thumbnail{
-      float: left;
-      margin: 0 10px 0 0;
-      width: 25%;
-      position: relative;
+    table{
+      width: 100%;
     }
-    .dashboard-widget-thumbnail img{
-      height: 125px;
+    .dashboard-widget-small-column{
+      width: 36px;
     }
-    p{
-      float: left;
-      height: 100%;
-      margin-top: -3px;
-      overflow: hidden;
-      width: 50%;
+    .dashboard-picker-collapse{
+      text-align: center;
+      color: #000000;
+      display: block;
+      background: transparent url('../../img/expanded.png') no-repeat center center;
+      height: 35px;
+    }
+    .dashboard-picker-collapse.collapsed-state{
+      background: transparent url('../../img/collapsed.png') no-repeat center center;
+    }
+
+    .dashboard-widget-title {
+      height: 35px;
+    }
+    .dashboard-widget-large-column{
+      width: 445px;
+      padding: 5px 24px 5px 5px;
+    }
+    .dashboard-widget-icon{
+      width: 28px;
+      height: 28px;
     }
   }
   .modal-body{
     padding: 0;
   }
   .modal-header {
-    padding: 7px 15px 3px;
+    padding: 5px 15px 1px;
+    background-color: #404952;
+    background-image: linear-gradient(to bottom, #47505A, #363E47);
+    background-repeat: repeat-x;
+    border-bottom: 1px solid #000000;
+    border-radius: 4px 4px 0 0;
+    color: #ffffff;
+    a.close{
+      color: #ffffff;
+      margin-top: 4px;
+      font-size: 25px;
+      text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
+      opacity: 0.9;
+      &:hover,
+      &:focus {
+        color: #ffffff;
+        opacity: 0.6;
+      }
+    }
+    h3 {
+      font-size: 16px;
+    }
   }
   .modal-footer {
-    height: 40px;
-    padding-top: 0;
-    a.ok, a.cancel{
+    height: 55px;
+    border-radius: 0 0 4px 4px;
+    a.ok{
       display: none;
     }
   }
-  .dashboard-widgets-pick-wrapper {
-    text-align: center;
-    width: 130px;
-    height: 130px;
-    display: table-cell;
-    vertical-align: middle;
-    .loading-content {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      background-color: transparent;
-    }
+  div.dashboard-widgets-pick-wrapper {
+    width: 32px;
+    height: 52px;
   }
 
   .loading-content{
-    background: transparent url('../../img/loader.gif') no-repeat center left;
+    background: transparent url('../../img/loader.gif') no-repeat 10px center;
   }
 }
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
+  }
+}
+
+.mobile-version .dashboard-widget {
+  .title {
+    height: 70px;
+  }
+
+  .action-wrapper.sortable {
+    display: none;
   }
 }

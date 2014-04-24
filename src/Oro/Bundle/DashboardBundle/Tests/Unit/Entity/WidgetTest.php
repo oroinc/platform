@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 
-class DashboardWidgetTest extends \PHPUnit_Framework_TestCase
+class WidgetTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DashboardWidget
+     * @var Widget
      */
     protected $widget;
 
     protected function setUp()
     {
-        $this->widget = new DashboardWidget();
+        $this->widget = new Widget();
     }
 
     public function testId()
@@ -35,13 +35,6 @@ class DashboardWidgetTest extends \PHPUnit_Framework_TestCase
         $value = array(1, 100);
         $this->assertEquals($this->widget, $this->widget->setLayoutPosition($value));
         $this->assertEquals($value, $this->widget->getLayoutPosition());
-    }
-
-    public function testExpanded()
-    {
-        $this->assertTrue($this->widget->isExpanded());
-        $this->assertEquals($this->widget, $this->widget->setExpanded(false));
-        $this->assertFalse($this->widget->isExpanded());
     }
 
     public function testDashboard()
