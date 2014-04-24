@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -38,6 +39,22 @@ class ReportController extends Controller
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
             }
+
+            /** @todo Get chart options from report entity */
+            // $chartOptions = $entity->getChartOptions();
+            $chartOptions = array(
+                'name' => 'line_chart',
+                'settings' => array(
+                    'foo' => 'bar'
+                )
+            );
+
+            /** @var ChartViewBuilder $chartViewBuilder */
+            $chartViewBuilder = $this->get('oro_chart.view_builder');
+            $parameters['chartView'] = $chartViewBuilder->setDataGridName($gridName)
+                ->setOptions($chartOptions)
+                ->setDataMapping(array('value' => 'c1', 'label' => 'c2'))
+                ->getView();
         }
 
         return $this->render(

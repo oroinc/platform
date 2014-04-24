@@ -1,3 +1,23 @@
+{# Chart variables format:
+
+    "options":
+        "name": "chart_name",
+        "data_schema" => array(
+            "label" => array("fieldName" => "name", "label" => "oro.xxx.firstName"),
+            "value" => array("fieldName" => "salary", "label" => "oro.xxx.salary"),
+        ),
+        "settings" => array(
+            "foo" => "bar"
+        ),
+    "config": { /** Chart config from in format of oro/chart.yml */ }
+    "data": [
+        {"label": "In progress", "value": 1000},
+        {"label": "Lost", "value": 500},
+        {"label": "Won", "value": 10000},
+    ]
+
+#}
+
 {% set widgetId = random() %}
 <div class="chart-container">
     <div class="clearfix">
