@@ -2,19 +2,14 @@
 
 namespace Oro\Bundle\ChartBundle\Model;
 
-class ChartView implements ChartViewInterface
+use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
+
+class ChartView
 {
     /**
      * @var \Twig_Environment
      */
     protected $twig;
-
-    /**
-     * Chart view variables
-     *
-     * @var array
-     */
-    protected $vars;
 
     /**
      * Chart template
@@ -24,25 +19,36 @@ class ChartView implements ChartViewInterface
     protected $template;
 
     /**
-     * @param \Twig_Environment $twig
-     * @param array $vars Chart view vars
-     * @param string $template
+     * Chart view variables
+     *
+     * @var array
      */
-    public function __construct(\Twig_Environment $twig, array $vars, $template)
+    protected $vars;
+
+    /**
+     * @param \Twig_Environment $twig
+     * @param DataInterface $data
+     * @param string $template
+     * @param array $vars Chart view vars
+     */
+    public function __construct(\Twig_Environment $twig, $template, DataInterface $data, array $vars)
     {
         $this->twig = $twig;
-        $this->vars = $vars;
         $this->template = $template;
+        $this->data = $data;
+        $this->vars = $vars;
     }
 
     /**
-     * {@inheritdoc}
+     * Render chart
+     *
+     * @return string
      */
     public function render()
     {
-        $this->twig->render(
-            $this->template,
-            $this->vars
-        );
+        $context = $this->vars;
+        $context['data'] = $this->data->toArray();
+
+        return $this->twig->render($this->template, $context);
     }
 }
