@@ -23,7 +23,7 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 class DashboardController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * @param integer Dashboard $id
+     * @param Dashboard $id
      *
      * @ApiDoc(
      *      description="Delete dashboard",

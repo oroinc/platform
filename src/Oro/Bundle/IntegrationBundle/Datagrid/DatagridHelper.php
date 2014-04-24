@@ -15,9 +15,9 @@ class DatagridHelper
     {
         return function (ResultRecordInterface $record) {
             if ($record->getValue('syncCount') > 0) {
-                return ['delete' => false, 'deleteDifferent'=>true];
+                return ['delete' => false, 'deleteSyncChannel'=>true];
             } else {
-                return ['delete' => true, 'deleteDifferent'=>false];
+                return ['delete' => true, 'deleteSyncChannel'=>false];
             }
         };
     }
