@@ -58,12 +58,12 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
 
         /** @property {Object} */
         defaultMessages: {
-            confirm_title: __('Execution Confirmation'),
-            confirm_content: __('Are you sure you want to do this?'),
-            confirm_ok: __('Yes, do it'),
-            success: __('Action performed.'),
-            error: __('Action is not performed.'),
-            empty_selection: __('Please, select item to perform action.')
+            confirm_title: 'Execution Confirmation',
+            confirm_content: 'Are you sure you want to do this?',
+            confirm_ok: 'Yes, do it',
+            success: 'Action performed.',
+            error: 'Action is not performed.',
+            empty_selection: 'Please, select item to perform action.'
         },
 
         /**
@@ -209,7 +209,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
 
         _showAjaxSuccessMessage: function (data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                message = data.message || defaultMessage;
+                message = __(data.message || defaultMessage);
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);
             }
@@ -260,9 +260,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
         getConfirmDialog: function (callback) {
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
-                    title: this.messages.confirm_title,
-                    content: this.messages.confirm_content,
-                    okText: this.messages.confirm_ok
+                    title: __(this.messages.confirm_title),
+                    content: __(this.messages.confirm_content),
+                    okText: __(this.messages.confirm_ok)
                 }));
                 this.confirmModal.on('ok', callback);
             }
