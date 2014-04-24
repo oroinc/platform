@@ -1,30 +1,10 @@
-#main.sidebar-left-minimized {
-    margin-left: 33px;
-}
-#main.sidebar-right-minimized {
-    margin-right: 33px;
-}
-#main.sidebar-left-maximized {
-    margin-left: 200px;
-}
-#main.sidebar-right-maximized {
-    margin-right: 200px;
-}
-#main.navbar-right-minimized .sidebar,
-#main.navbar-right-maximized .sidebar,
-#main.navbar-left-minimized .sidebar,
-#main.navbar-left-maximized .sidebar{
-    top: 25px;
-}
-
 .sidebar {
     background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
-    top: 66px;
-    bottom: 0;
-    width: 33px;
-    position: fixed;
+    float: left;
+    height: 100%;
+    position: relative;
     z-index: 750;
-    overflow-y: auto;
+    overflow: visible;
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -32,12 +12,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
-.sidebar{
-    margin-bottom: 33px;
-}
-.dev-mode .sidebar{
-    margin-bottom: 72px;
 }
 
 .sidebar-maximized .sidebar-widget-close{
@@ -360,8 +334,7 @@
     word-wrap: break-word;
 }
 .sidebar-widget-popup{
-    bottom: 75px;
-    position: fixed;
+    position: absolute;
     width: 0;
     overflow: visible;
 }
@@ -370,9 +343,6 @@
 }
 .sidebar-left .sidebar-widget-popup .sidebar-widget{
     left: 0;
-}
-.sidebar-right .sidebar-widget-popup {
-    right: 33px;
 }
 .sidebar-right .sidebar-widget-popup .sidebar-widget{
     right: 0;

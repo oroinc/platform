@@ -221,11 +221,11 @@ table.table {
     opacity: 0.5;
 }
 
-.desktop-version #oroplatform-header .logo {
+.desktop-version header.navbar .logo {
     font-size: 0;
 }
 
-.desktop-version #oroplatform-header .logo a {
+.desktop-version header.navbar .logo a {
     display: inline-block;
     font-size: 17px;
 }

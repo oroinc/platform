@@ -24,7 +24,6 @@ oro_system_configuration:
                 choices:
                     top: Top
                     left: Left
-                    right: Right
     tree:
         system_configuration:
             platform:

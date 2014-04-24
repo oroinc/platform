@@ -1,17 +1,6 @@
 {% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == placement %}
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-<div class="navbar-inner navbar-{{ placement }}">
-    <ul class="nav pull-right user-menu">
-        {{ block('user_menu') }}
-    </ul>
-    {{ block('navbar') }}
-    <div id="main-menu">
-        {{ block('application_menu') }}
-    </div>
+<div id="main-menu" class="main-menu-sided">
+    {{ block('application_menu') }}
 </div>
-<script type="text/javascript">
-    require(['jquery'], function () {
-        $('#main').addClass('navbar-{{ placement }}-minimized');
-    });
-</script>
 {% endif %}

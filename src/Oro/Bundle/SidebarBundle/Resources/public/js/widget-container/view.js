@@ -73,7 +73,6 @@ define(['jquery', 'underscore', 'backbone', '../constants',
         setOffset: function (cord) {
             var view = this;
             view.$el.offset(cord);
-            view.$el.find('.sidebar-widget-content').css('max-height', view.$el.height());
         },
 
         onClickToggle: function (e) {

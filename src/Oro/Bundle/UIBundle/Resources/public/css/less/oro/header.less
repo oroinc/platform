@@ -53,7 +53,7 @@
   }
 }
 
-#oroplatform-header {
+header.navbar {
   .unclickable {
     cursor: default;
   }
@@ -369,77 +369,6 @@
           }
         }
       }
-    }
-  }
-  .oroplatform-menu {
-    > li.dropdown {
-      margin:0 3px;
-      z-index: 900;
-      > a {
-        margin:6px 1px 7px;
-        padding:4px 10px;
-        font-size: @baseFontSize;
-        color:#fff;
-        text-shadow:none;
-      }
-      &.active {
-        > a {
-          margin:5px 0 6px;
-          padding:4px 10px;
-          border:1px solid darken(#354150,7%);
-          border-bottom-color:darken(#354150,20%);
-          .border-radius(4px);
-          background:#5e6772;
-          #gradient > .vertical(#4c5663, #474f58);
-        }
-      }
-      &:hover,
-      &:focus {
-        > a {
-          margin:5px 0 0;
-          border:1px solid #fff;
-          padding-bottom:10px;
-          background:#fff;
-          .border-radius(4px 4px 0 0);
-          color:#444;
-          &:hover {
-            background:#fff;
-            color:#444;
-          }
-        }
-      }
-      .dropdown-menu { /* All 2+ level */
-        border:none;
-        .border-radius(0 3px 3px 3px);
-        width:auto;
-        padding:0;
-        font-size: @baseFontSize;
-        .box-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-        &:after,
-        &:before { border:none; }
-        li {
-          line-height:1.3em;
-          a {
-            padding:5px 10px;
-            color:@bodyColor;
-          }
-          &.active a { background:none; }
-          a:hover,
-          &.active a:hover { background:#f3f3f3 }
-          &:first-child a { .border-radius(0 3px 0 0)}
-          &:last-child a { .border-radius(0 0 3px 3px)}
-        }
-      }
-    }
-    li.dropdown:hover .dropdown-menu { /* Opens on hover for all 2+ levels */
-      display:block;
-    }
-    li.dropdown .dropdown-menu {
-      left:140px;
-    }
-    > li.dropdown > .dropdown-menu {
-      left:auto;
-      top:39px;
     }
   }
 }

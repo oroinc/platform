@@ -1,0 +1,208 @@
+@menuBackGroundColor: #313a45;
+
+// common decoration
+.main-menu {
+  .dropdown:hover > .dropdown-menu { /* Opens on hover for all 2+ levels */
+    display: block;
+  }
+  > li.dropdown {
+    z-index: 900;
+    .dropdown-menu { /* All 2+ level */
+      border: 1px solid #e8e8e8;
+      width: auto;
+      padding: 0;
+      font-size: @baseFontSize;
+      .border-radius(0 3px 3px 0);
+      margin-top: 0;
+      top: 0;
+      left: 100%;
+      .box-shadow(1px 2px 4px rgba(0, 0, 0, 0.3));
+      li {
+        a {
+          padding: 5px 15px;
+          color: @bodyColor;
+        }
+        &.active a { background:none; }
+        a:hover,
+        &.active a:hover { background:#f3f3f3 }
+        &.active a.unclickable:hover { background: none }
+      }
+    }
+  }
+  .menu_level_1 {
+    li.dropdown{
+      &:after {
+        display: none;
+      }
+      // right side corner inside menu-item
+      > a > span:after {
+        content: "\f054";
+        font-family: 'FontAwesome';
+        display: block;
+        font-size: 8px;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+      }
+      &:hover {
+        // right side corner outside menu-item
+        > a:before {
+          content: '';
+          display: inline-block;
+          border-top: 9px solid transparent;
+          border-bottom: 9px solid transparent;
+          border-left: 9px solid #ccc;
+          border-left-color: #e8e8e8;
+          position: absolute;
+          top: 6px;
+          left: 100%;
+          z-index: 901;
+        }
+        > a:after {
+          content: '';
+          display: inline-block;
+          border-top: 11px solid transparent;
+          border-bottom: 11px solid transparent;
+          border-left: 11px solid #fff;
+          position: absolute;
+          margin-left: -3px;
+          top: 4px;
+          left: 100%;
+          z-index: 901;
+        }
+        > a:hover:after {
+          border-left-color: #f3f3f3;
+        }
+        .dropdown-menu {
+          margin-left: 1px;
+        }
+      }
+    }
+  }
+}
+
+// menu top decoration
+.main-menu-top .main-menu {
+  > li.dropdown {
+    margin: 0 3px;
+    .menu_level_1{// Second level
+      border-top: 0;
+      left: 0;
+      top: 100%;
+    }
+    .dropdown-menu {/* All 2+ level */
+      &:after,
+      &:before { border:none; }
+    }
+    > a {
+      position: relative;
+      z-index: 901;
+      margin:6px 1px 7px;
+      padding:4px 10px;
+      font-size: @baseFontSize;
+      color:#fff;
+      text-shadow:none;
+      i[class^=icon-] {
+        display: none !important;
+      }
+    }
+    &.active {
+      > a {
+        margin:5px 0 6px;
+        padding:4px 10px;
+        border:1px solid darken(#354150,7%);
+        border-bottom-color:darken(#354150,20%);
+        .border-radius(4px);
+        background:#5e6772;
+        #gradient > .vertical(#4c5663, #474f58);
+      }
+    }
+    &:hover,
+    &:focus {
+      > a {
+        margin:5px 0 0;
+        border:1px solid #fff;
+        padding-bottom:10px;
+        background:#fff;
+        .border-radius(4px 4px 0 0);
+        color:#444;
+        &:hover {
+          background:#fff;
+          color:#444;
+        }
+      }
+    }
+  }
+}
+
+// sided menu decoration
+.main-menu-sided {
+  width: 36px;
+  height: 100%;
+  background-color: #313a45;
+  float: left;
+  &.maximized {
+    width: 200px;
+  }
+  .main-menu {
+    .menu_level_1 {
+      list-style: none;
+      margin-left: 0;
+      > li > a {
+        display: block;
+        clear: both;
+        font-weight: normal;
+        line-height: 20px;
+        white-space: nowrap;
+      }
+    }
+    // first level
+    > li.dropdown {
+      border-width: 1px 0;
+      border-style: solid;
+      border-top-color: lighten(@menuBackGroundColor, 3%);
+      border-bottom-color: darken(@menuBackGroundColor, 2%);
+      height: 36px;
+      > .item-icon-holder {
+        text-align: center;
+        font-size: 15px;
+        line-height: 34px;
+        color: #b8c8d1;
+      }
+      &:hover {
+        border-width: 0;
+        > .item-icon-holder {
+          color: #313a45;
+          font-size: 18px;
+          line-height: 36px;
+          width: 100%;
+          background-color: #fff;
+          position: absolute;
+          z-index: 901;
+        }
+      }
+      > .dropdown-menu {
+        > a {
+          color: inherit;
+          font-weight: bold;
+          font-size: 14px;
+          padding: 7px 15px;
+          display: block;
+          clear: both;
+          line-height: 20px;
+          white-space: nowrap;
+          margin-bottom: 4px;
+          border-bottom: 1px solid #eee;
+          cursor: default;
+          &:hover {
+            color: inherit;
+            background: inherit;
+          }
+          i[class^=icon-] {
+            display: none !important;
+          }
+        }
+      }
+    }
+  }
+}

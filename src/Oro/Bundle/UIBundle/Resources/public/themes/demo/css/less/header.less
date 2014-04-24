@@ -40,7 +40,7 @@
   background-repeat: repeat-y;
 }
 
-#oroplatform-header {
+header.navbar {
   .navbar-inner .logo a,
   header .logo a{
     background-color: @baseGradientColorStart;
@@ -60,26 +60,7 @@
   .nav.pull-right li.dropdown .dropdown-menu li a{
     color: @linkColor;
   }
-  .oroplatform-menu {
-    & > li.dropdown.active:hover > a{
-      color: #fff;
-      &:hover{
-        color: #444;
-      }
-    }
-    & > li.dropdown.active {
-      & > a{
-        #gradient > .vertical(@baseGradientColorStart ,darken(@baseGradientColorStart,5%));
-        border-color: #2a5ab1;
-      }
-      &:hover > a{
-        border-color: transparent !important;
-        background-color: #fff !important;
-        color: #444 !important;
-        #gradient > .vertical(#ffffff ,#ffffff);
-      }
-    }
-  }
+
   .nav.top-search { // Includes Shortcuts and Search
     .dropdown {
       > .dropdown-toggle {

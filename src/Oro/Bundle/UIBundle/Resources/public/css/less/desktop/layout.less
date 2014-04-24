@@ -1,8 +1,18 @@
 @import "mixins";
+body, #page, #top-page {
+  height: 100%;
+}
 .responsive-block{
   min-width: 350px;
 }
 .responsive-cell {
   .forScreenWithSideBar(@smallScreen, float, left);
   .forScreenWithSideBar(@smallScreen, width, 100%);
+}
+#left-panel,
+#right-panel {
+  overflow: visible;
+}
+#left-panel, #right-panel, #main {
+  float: left;
 }

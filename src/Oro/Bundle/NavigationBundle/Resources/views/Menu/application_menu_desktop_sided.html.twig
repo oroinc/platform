@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block item %}
+    {% if item.hasChildren and item.displayChildren %}
+        {%- set classes = classes|merge(['dropdown']) %}
+        {%- if item.level != 1 %}
+        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
+        {% endif -%}
+    {% endif %}
     {{ block('item_renderer') }}
 {% endblock %}
 
@@ -27,10 +33,14 @@
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
 {% endblock %}
 
-{% block label %}
-    {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
-        {{- item.label|trans|raw -}}
-    {% else %}
-        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
-    {% endif %}
+{% block item_content %}
+   {% if item.level == 1 %}
+       {% set iconClass = item.getExtra('icon') ? item.getExtra('icon') : 'icon-th' %}
+       <div class="item-icon-holder"><i class="{{ iconClass }}"></i></div>
+       <div class="dropdown-menu ">
+           {{ parent() }}
+       </div>
+   {% else %}
+       {{ parent() }}
+   {% endif %}
 {% endblock %}

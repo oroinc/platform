@@ -1,5 +1,9 @@
 {% if isDesktopVersion() %}
-    {% include 'OroNavigationBundle:Menu:application_menu_desktop.html.twig' %}
+    {% if oro_config_value('oro_ui.navbar_position') == 'top' %}
+        {% include 'OroNavigationBundle:Menu:application_menu_desktop_top.html.twig' %}
+    {% else %}
+        {% include 'OroNavigationBundle:Menu:application_menu_desktop_sided.html.twig' %}
+    {% endif %}
 {% else %}
     {% include 'OroNavigationBundle:Menu:application_menu_mobile.html.twig' %}
 {% endif %}
