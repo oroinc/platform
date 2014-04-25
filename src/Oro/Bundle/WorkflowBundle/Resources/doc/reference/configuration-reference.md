@@ -29,7 +29,7 @@ Table of Contents
 Overview
 ========
 
-Configuration of Workfow declares all aspects related to specific workflow:
+Configuration of Workflow declares all aspects related to specific workflow:
 
 * basic properties of workflow like name and label
 * steps and transitions
@@ -121,7 +121,7 @@ not mapped by any attribute or mismatched with attribute type is restricted.
 
 Single attribute can be described with next configuration:
 
-* **unique name***
+* **unique name**
     Workflow attributes should have unique name in scope of Workflow that they belong to.
     Step configuration references attributes by this value.
 * **type**
@@ -145,7 +145,7 @@ Single attribute can be described with next configuration:
 * **label**
     *string*
     Label can be shown in the UI
-* **property_path
+* **property_path**
     *string*
     Used to work with attribute value by reference and specifies path to data storage
 * **options**
@@ -270,13 +270,13 @@ it's allowed and to perform Post Actions.
 
 Transition configuration has next options:
 
-* **unique name***
+* **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
-* **step_to***
+* **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.
-* **transition_definition***
+* **transition_definition**
     A references to Transition Definition configuration
 * **is_start**
     *boolean*
@@ -489,7 +489,7 @@ In this example configuration of Workflow there are two entities:
 
 When Workflow Item is created it's connected to Phone Call. On the first step "Start Call" user can go to
 "Call Phone Conversation Step" if a callee answered or to "End Phone Call" step if callee didn't answer.
-On the step "Call Phone Conversation" User enter Worfklow Data and go to "End Phone Call" step via "End conversation"
+On the step "Call Phone Conversation" User enter Workflow Data and go to "End Phone Call" step via "End conversation"
 transition. On this transition a new Entity of Phone Conversation is created and assigned to Phone Call entity.
 
 Configuration

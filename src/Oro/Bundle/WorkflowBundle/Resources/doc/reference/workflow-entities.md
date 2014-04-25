@@ -20,6 +20,7 @@ Table of Contents
    - [Attribute Assembler](#attribute-assembler)
    - [Condition Assembler](#condition-assembler)
    - [Action Assembler](#action-assembler)
+   - [Form Options Assembler](#form-option-assembler)
  - [Database Entities](#database-entities)
    - [Workflow Definition](#workflow-definition)
    - [Workflow Definition Repository](#workflow-definition-repository)
@@ -51,36 +52,45 @@ Workflow
 Oro\Bundle\WorkflowBundle\Model\Workflow
 
 **Description:**
-Encapsulates all logic of workflow, contains lists of steps, attributes and transitions. Create instance of
-Workflow Item, performs transition if it's allowed, gets allowed transitions and start transitions.
-Delegates operations with aggregated domain models to corresponding managers, such as Step Manager, Transition Manager
-and Attribute Manager
+Encapsulates all logic of workflow, contains lists of steps, attributes and transitions. Uses Entity Connector for the
+connects related entities with workflow entities. Create instance of Workflow Item, performs transition if it's allowed,
+gets allowed transitions and start transitions. Delegates operations with aggregated domain models to corresponding
+managers, such as Step Manager, Transition Manager and Attribute Manager.
 
 **Methods:**
-* **transit(WorkflowItem, Transition)** - performs transit with name transitionName for specified WorkflowItem;
-* **isTransitionAllowed(WorkflowItem, Transition)** - calculates whether transition is allowed
-for specified WorkflowItem;
-* **isTransitionAvailable(WorkflowItem, transition, errors)** - check whether transitions available for showing
-for specified WorkflowItem;
-* **start(data, Transition)** - returns new instance of Workflow Item and processes it's start transition;
-* **getTransitionsByWorkflowItem(WorkflowItem)** - returns a list of allowed transitions;
-* **createWorkflowItem(array data)** - create WorkflowItem instance and initialize it with passed data.
 * **getStepManager()** - get instance of embedded Step Manager;
 * **getAttributeManager()** - get instance of embedded Attribute Manager;
 * **getTransitionManager()** - get instance of embedded Transition Manager;
-* **bindEntities(workflowItem)** - bind all managed entities of specified worklfow item.
+* **start(Entity, data, startTransitionName)** - returns new instance of Workflow Item and processes it's start transition;
+* **isTransitionAllowed(WorkflowItem, Transition, errors, fireException)** - calculates whether transition is allowed
+for specified WorkflowItem and optionally returns list of errors or/and fire exception;
+* **transit(WorkflowItem, Transition)** - performs transit for specified WorkflowItem by name of transition or
+transition instance;
+* **createWorkflowItem(Entity, array data)** - create WorkflowItem instance for the specific entity and initialize it
+with passed data;
+* **getAttributesMapping()** - Get attribute names mapped to property paths if any have;
+* **isStartTransitionAvailable(Transition, Entity, array data, errors)** - check that start transition is available
+for showing for specified Entity and optionally returns list of errors;
+* **isTransitionAvailable(WorkflowItem, Transition, errors)** - check that transitions available for showing
+for specified WorkflowItem and optionally returns list of errors;
+* **getTransitionsByWorkflowItem(WorkflowItem)** - returns a list of allowed transitions for passed WorkflowItem;
+* **getPassedStepsByWorkflowItem(WorkflowItem)** - returns a list of passed latest steps in ascending order from step
+with minimum order to step with maximum order;
 
 Workflow Registry
 -----------------
 **Class:**
 Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
 
-**Description:** Assembles Workflow object using WorkflowAssembler, and return Workflow objects by their names
-or managed entities.
+**Description:** Assembles Workflow object using WorkflowAssembler and ConfigProviderInterface then returns Workflow
+objects by their names or managed entities.
 
 **Methods:**
-* **getWorkflow(workflowName)** - extracts Workflow object by its name.
-* **getWorkflowsByEntityClass(entityClass)** - gets list of Workflow objects where given entity class is managed entity.
+* **getWorkflow(workflowName)** - extracts Workflow object by it's name;
+* **getActiveWorkflowByEntityClass(entityClass)** - returns active Workflow that is applicable to passed entity class;
+* **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class;
+* **getWorkflowsByEntityClass(entityClass, workflowName)** - returns list of Workflow objects which is applicable
+to passed entity class. Has possibility to get single Workflow object if specify workflowName as second parameter;
 
 Step
 ----
@@ -89,12 +99,17 @@ Oro\Bundle\WorkflowBundle\Model\Step
 
 **Description:**
 Encapsulated step parameters, contains lists of attributes and allowed transition names, has step template,
-isFinal flag, form type and form options.
+isFinal flag, form type and form options. Also has possibility manage ACL permission for the entity actions.
 
 **Methods:**
 * **isAllowedTransition(transitionName)** - calculates whether transition with name transitionName allowed for current step;
 * **allowTransition(transitionName)** - allow transition with name transitionName;
-* **disallowTransition(transitionName)** - disallow transition with name transitionName.
+* **hasAllowedTransitions()** - check is current step has allowed transitions;
+* **disallowTransition(transitionName)** - disallow transition with name transitionName;
+* **setEntityAcls(array entityAcls)** - sets ACL permission for the entity actions;
+* **isEntityAclDefined(attributeName)** - check is current step has defined ACL permission rules;
+* **isEntityUpdateAllowed(attributeName)** - check is current step has ACL permission for update entity;
+* **isEntityDeleteAllowed(attributeName)** - check is current step has ACL permission for delete entity;
 
 Transition
 ----------
@@ -102,16 +117,20 @@ Transition
 Oro\Bundle\WorkflowBundle\Model\Transition
 
 **Description:**
-Encapsulates transition parameters, contains init action, condition and post action, has next step property.
+Encapsulates transition parameters, contains init action, condition, pre condition and post action, has next step property.
 
 **Methods:**
-* **isPreConditionAllowed(WorkflowItem, errors)** - check whether preconditions allowed
-and optionally returns list of errors;
+* **isConditionAllowed(WorkflowItem, errors)** - check whether conditions allowed and optionally returns list of errors;
+* **isPreConditionAllowed(WorkflowItem, errors)** - check whether preconditions allowed and optionally returns list of errors;
 * **isAllowed(WorkflowItem, errors)** - calculates whether this transition allowed for WorkflowItem
 and optionally returns list of errors;
-* **isAvailable(WorkflowItem, errors)** - check whether this transition should be shown;
+* **isAvailable(WorkflowItem, errors)** - check whether this transition should be shown and optionally returns list of errors;
 * **transit(WorkflowItem)** - performs transition for WorkflowItem;
-* **hasForm()** - if transition has form or not.
+* **setStart()** - mark transition as start transition;
+* **isStart()** - check is current transition start;
+* **hasForm()** - if transition has form or not;
+* **isHidden()** - check is current transition can be displayed;
+* **isUnavailableHidden()** - check is current transition can be hidden;
 
 Attribute
 ---------
@@ -119,7 +138,12 @@ Attribute
 Oro\Bundle\WorkflowBundle\Model\Attribute
 
 **Description:**
-Encapsulates attribute parameters, has label, type and options.
+Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission for the entity actions.
+
+**Methods:**
+* **setEntityAcls(array entityAcls)** - sets ACL permission for the entity;
+* **isEntityUpdateAllowed(attributeName)** - check is attribute has ACL permission for update entity;
+* **isEntityDeleteAllowed(attributeName)** - check is attribute has ACL permission for delete entity;
 
 Condition
 ---------
@@ -145,7 +169,7 @@ Creates instances of Transition Conditions based on type (alias) and options.
 * **create(type, options)** - creates specific instance of Transition Condition.
 
 Action
------------
+------
 **Interface:**
 Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface
 
@@ -157,7 +181,7 @@ Basic interface for Transition Actions. Detailed description
 * **execute(context)** - execute specific action for current context (usually context is WorkflowItem instance).
 
 Action Factory
--------------------
+--------------
 **Class:**
 Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory
 
@@ -176,7 +200,7 @@ Workflow Assembler
 Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler
 
 **Description:**
-Creates instances of Wokflow onjects based on Workflow Definitions. Requires configuration object to parse
+Creates instances of Workflow objects based on Workflow Definitions. Requires configuration object to parse
 configuration and attribute, step and transition assemblers to assemble appropriate parts of configuration.
 
 **Methods:**
@@ -214,7 +238,7 @@ Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
 Assemble Attribute instances based on source configuration.
 
 **Methods:**
-* **assemble(configuration)** - assemble and returns list of Atributes.
+* **assemble(configuration)** - assemble and returns list of Attributes.
 
 Condition Assembler
 -------------------
@@ -228,7 +252,7 @@ Recursively walks through Condition configuration and creates instance of approp
 assemble(configuration) - assemble configuration and returns root Condition instance.
 
 Action Assembler
----------------------
+----------------
 **Class:**
 Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
 
@@ -237,6 +261,18 @@ Walks through Action configuration and creates instance of appropriate Actions u
 
 **Methods:**
 * **assemble(configuration)** - assemble configuration and returns instance of list Action.
+
+Form Options Assembler
+----------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\FormOptionAssembler
+
+**Description:**
+Assembles form options that can be passed to transition and step
+
+**Methods:**
+* **assemble(options, attributes, owner, ownerName)** - validate form options and assemble with configuration then
+returns list of form options
 
 Database Entities
 =================
@@ -461,7 +497,7 @@ Oro\Bundle\WorkflowBundle\Model\Pass\PassInterface
 Oro\Bundle\WorkflowBundle\Model\Pass\ParameterPass
 
 **Description:**
-Passes through configuration and replaces access properties (f.e. $property) with appropriate PropertyPath intstances.
+Passes through configuration and replaces access properties (f.e. $property) with appropriate PropertyPath instances.
 
 **Methods:**
 * **pass(data)** - replaces access properties with Property Path instances.
