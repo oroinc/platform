@@ -21,7 +21,7 @@
     {% set indexPath = null %}
 {% endif %}
 
-{% oro_title_set({params : {"%workflow_title%": title ~ ' - ' ~ indexLabel} }) %}
+{% oro_title_set({params : {"%workflow_title%": title|trans ~ ' - ' ~ indexLabel|trans} }) %}
 
 {% block navButtons %}
     {% if indexPath %}
