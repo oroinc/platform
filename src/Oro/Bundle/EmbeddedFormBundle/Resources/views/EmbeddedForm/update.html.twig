@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
-{% oro_title_set({ params : {"%form.title%": form.vars.value ? form.vars.value.title : null} }) %}
+{% oro_title_set({ params : {"%form.title%": form.vars.value.title, "%entityName%": 'oro.embeddedform.entity_label'|trans} }) %}
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_embedded_form_delete') %}
@@ -27,14 +27,15 @@
 {% block pageHeader %}
     {% if form.vars.value.id %}
         {% set breadcrumbs = {
-        'entity':      form.vars.value,
-        'indexPath':   path('oro_embedded_form_list'),
-        'indexLabel': 'oro.embeddedform.entity_plural_label'|trans,
-        'entityTitle': form.vars.value.title
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_embedded_form_list'),
+            'indexLabel': 'oro.embeddedform.entity_plural_label'|trans,
+            'entityTitle': form.vars.value.title
         } %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.embeddedform.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with {title: title} %}
     {% endif %}
 {% endblock pageHeader %}
 

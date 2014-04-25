@@ -61,7 +61,9 @@ class WidgetExtension extends \Twig_Extension
             unset($options['widgetType']);
         }
 
-        $options['wid'] = $this->getUniqueIdentifier();
+        if (!isset($options['wid'])) {
+            $options['wid'] = $this->getUniqueIdentifier();
+        }
         $elementId = 'widget-container-' . $options['wid'];
         if (!array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;

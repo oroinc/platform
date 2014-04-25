@@ -1,4 +1,4 @@
-<div id="{{ elementId }}">
+<div id="{{ elementId }}" style="visibility: hidden;">
     {% if options.elementFirst %}
         {% render options.url %}
     {% endif %}
@@ -9,6 +9,7 @@
     function($, Widget){
         $(function(){
             var widget = new Widget({{ options|json_encode|raw }});
+            $("#{{ elementId }}").css('visibility', 'visible');
             {% if options.elementFirst %}
             widget.render();
             {% endif %}

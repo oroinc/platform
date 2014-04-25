@@ -20,6 +20,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
             title: '',
             alias: null,
             wid: null,
+            actionSectionTemplate: _.template('<div data-section="<%= section %>" class="widget-actions-section"/>'),
+            actionWrapperTemplate: _.template('<span class="action-wrapper"/>'),
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
@@ -295,7 +297,22 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
          * @private
          */
         _createWidgetActionsSection: function(section) {
-            return $('<div id="' + section + '" class="widget-actions-section"/>');
+            return $(
+                this.options.actionSectionTemplate({
+                    section: section
+                })
+            );
+        },
+
+        /**
+         * Append action element to sections
+         *
+         * @param {HTMLElement} sectionContainer
+         * @param {HTMLElement} actionElement
+         * @private
+         */
+        _appendActionElement: function(sectionContainer, actionElement) {
+            sectionContainer.append($(this.options.actionWrapperTemplate()).append(actionElement));
         },
 
         /**
@@ -314,12 +331,12 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                     this.actions[section] = {};
                 }
                 this.actions[section][key] = actionElement;
-                var sectionContainer = this.getActionsElement().find('#' + section);
+                var sectionContainer = this.getActionsElement().find('[data-section="' + section + '"]');
                 if (!sectionContainer.length) {
                     sectionContainer = this._createWidgetActionsSection(section);
                     sectionContainer.appendTo(this.getActionsElement());
                 }
-                sectionContainer.append(actionElement);
+                this._appendActionElement(sectionContainer, actionElement);
                 this.trigger('widget:add:action:' + section + ':' + key, $(actionElement));
             }
         },
@@ -430,7 +447,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                     var sectionContainer = self._createWidgetActionsSection(section);
                     _.each(actions, function(action, key) {
                         self._initActionEvents(action);
-                        sectionContainer.append(action);
+                        self._appendActionElement(sectionContainer, action);
                         self.trigger('widget:add:action:' + section + ':' + key, $(action));
                     });
                     container.append(sectionContainer);
@@ -565,6 +582,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                 this.setElement($(content).filter('.widget-content:first'));
                 this._show();
                 mediator.trigger('layout.init', this.widget);
+                mediator.trigger('widget:contentLoad', this.widget);
             } catch (error) {
                 console.warn(error);
                 // Remove state with unrestorable content
