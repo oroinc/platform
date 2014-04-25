@@ -30,14 +30,7 @@ define(['underscore'
                 var lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function (item, index) {
                     data = this._getChildren(this._getField(prevFieldName, data));
-                    var pair = item.split('::');
-                    if (_.size(pair) == 3) {
-                        pair = [
-                            pair[0],
-                            pair[1] + '::' + pair[2]
-                        ];
-                    }
-
+                    var pair = this._getPair(item);
                     var label = index < lastItemIndex
                         ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
@@ -76,12 +69,7 @@ define(['underscore'
                 data = this._getChildren(result);
                 var lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function (item, index) {
-                    var parts = item.split('::');
-                    var fieldName = _.last(parts);
-                    if (_.size(parts) == 3) {
-                        fieldName = parts[1] + '::' + parts[2];
-                    }
-
+                    var fieldName = this._getFieldName(item);
                     result = index < lastItemIndex
                         ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
@@ -113,12 +101,20 @@ define(['underscore'
             return field ? field.text : null;
         },
 
-        _getClassName: function () {
-            //TODO
+        _getPair: function (item) {
+            var pair = item.split('::');
+            if (_.size(pair) == 3) {
+                pair = [
+                    pair[0],
+                    pair[1] + '::' + pair[2]
+                ];
+            }
+
+            return pair;
         },
 
-        _getFieldName: function () {
-            //TODO
+        _getFieldName: function (item) {
+            return _.last(this._getPair(item));
         },
 
         _getField: function (fieldName, data) {
