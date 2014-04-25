@@ -22,4 +22,6 @@ oro_chart:
         template: FirstTestBundle:Chart:lineChart.html.twig
     advanced_chart:
         label: Advanced Chart
+        default_settings:
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87']
         template: FirstTestBundle:Chart:advancedChart.html.twig

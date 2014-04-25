@@ -21,7 +21,7 @@ class OroChartExtension extends Extension
         $loader->load('services.yml');
 
         $chartConfigs = array();
-
+        $mergedConfig = array();
 
         $configLoader = new CumulativeConfigLoader(
             'oro_chart',
@@ -30,12 +30,14 @@ class OroChartExtension extends Extension
 
         $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $chartConfigs[] = $resource->data['oro_chart'];
+            $mergedConfig = array_replace_recursive($mergedConfig, $resource->data['oro_chart']);
         }
 
         foreach ($configs as $config) {
-            $chartConfigs[] = $config;
+            $mergedConfig = array_replace_recursive($mergedConfig, $config);
         }
+
+        $chartConfigs[] = $mergedConfig;
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $chartConfigs);
