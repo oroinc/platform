@@ -50,8 +50,8 @@ class MappedData implements DataInterface
     }
 
     /**
-     * @param $sourceItem
-     * @param $fieldName
+     * @param array|object $sourceItem
+     * @param string $fieldName
      * @return mixed
      */
     protected function getValue($sourceItem, $fieldName)

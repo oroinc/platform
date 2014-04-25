@@ -150,7 +150,7 @@ class ChartViewBuilder
     /**
      * Get chart view vars
      *
-     * @return DataInterface
+     * @return array
      * @throws BadMethodCallException
      * @throws InvalidArgumentException
      */
@@ -159,11 +159,11 @@ class ChartViewBuilder
         $options = $this->options;
 
         if (null === $options) {
-            throw new BadMethodCallException("Can't build result when setOptions() was not called.");
+            throw new BadMethodCallException('Can\'t build result when setOptions() was not called.');
         }
 
         if (!isset($options['name'])) {
-            throw new InvalidArgumentException("Options must have \"name\" key.");
+            throw new InvalidArgumentException('Options must have "name" key.');
         }
 
         if (!isset($options['settings']) || !is_array($options['settings'])) {
