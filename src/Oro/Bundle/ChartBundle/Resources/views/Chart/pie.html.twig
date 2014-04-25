@@ -17,7 +17,7 @@
     ]
 
 #}
-
+{% if data|length>0  %}
 {% set widgetId = random() %}
 
 <div class="chart-container">
@@ -143,3 +143,8 @@
                 });
             });
 </script>
+{% else %}
+    <div class="clearfix no-data">
+        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    </div>
+{% endif %}
