@@ -35,7 +35,7 @@ oro_chart:
             chartHighlightColor: '#FF5E5E'
         template: OroChartBundle:Chart:pie.html.twig
     flow_chart:
-        label: Line Chart
+        label: Flow Chart
         data_schema:
           - name: label
             label: Step label
@@ -43,9 +43,12 @@ oro_chart:
           - name: value
             label: Value
             required: true
+          - name: isNozzle
+            label: Is nozzle step
+            required: false
         default_settings:
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
-        template: OroChartBundle:Chart:pie.html.twig
+        template: OroChartBundle:Chart:flow.html.twig

@@ -1,4 +1,5 @@
 {% if data|length>0  %}
+    {% set widgetId = random() %}
     <div class="chart-container">
         <div class="clearfix">
             <div id="{{ widgetId }}-chart" class="bar-chart chart pull-left"></div>
@@ -12,8 +13,8 @@
                     function($, _, layout, Flotr, numberFormatter){
                         var formatter = numberFormatter;
                         $(function () {
-                            var $widgetContent = $('#{{ widgetContentId }}');
                             var $chart = $('#{{ widgetId }}-chart');
+                            var $widgetContent = $chart.parents('.chart-container').parent();
                             var setChartSize = function () {
                                 var chartWidth = Math.round($widgetContent.width() * 0.9);
                                 if (chartWidth != $chart.width()) {
@@ -31,7 +32,9 @@
                                     return;
                                 }
                                 var data = {{ data|json_encode|raw }};
+                                console.log(data);
                                 var chartData = [];
+                                var nozzleSteps = [];
                                 _.each(data, function(value, key) {
                                     if (value.value <= 0) {
                                         data[key].value = 0.0001;
@@ -39,6 +42,9 @@
                                     var chartDataItem = {};
                                     chartDataItem[value.label] = value.value;
                                     chartData.push(chartDataItem);
+                                    if (value.isNozzle) {
+                                        nozzleSteps.push(chartDataItem);
+                                    }
                                 });
                                 console.log(chartData);
                                 Flotr.draw(
@@ -48,14 +54,14 @@
                                             funnel : {
                                                 show : true,
                                                 formatter: formatter.formatCurrency,
-                                                nozzleSteps: {{ config.default_settings.nozzleSteps|json_encode|raw }},
+                                                nozzleSteps: nozzleSteps,
                                                 colors: {{ config.default_settings.chartColors|json_encode|raw }},
                                                 tickFormatter: function (label, value) {
                                                     return label + ': ' + formatter.formatCurrency(value);
                                                 },
                                                 nozzleFormatter: function (label, value) {
                                                     return label
-                                                            + ' ({{ 'from'|trans }} {{ config.default_settings.quarterDate|oro_format_date }}): '
+                                                            + ' ({{ 'from'|trans }} {{ options.settings.quarterDate|oro_format_date }}): '
                                                             + formatter.formatCurrency(value);
                                                 }
                                             },
@@ -95,7 +101,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            <h5>{{ 'from'|trans }} {{ quarterDate|oro_format_date }}</h5>
+            <h5>{{ 'from'|trans }} {{ options.settings.quarterDate|oro_format_date }}</h5>
             <ul>
                 {% for item in data %}
                     {% if item.isNozzle %}

@@ -40,7 +40,6 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->booleanNode('required')
                                     ->info('Is chart data field required')
-                                    ->cannotBeEmpty()
                                     ->isRequired()
                                 ->end()
                             ->end()
