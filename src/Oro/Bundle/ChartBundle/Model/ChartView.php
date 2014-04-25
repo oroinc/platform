@@ -19,6 +19,13 @@ class ChartView
     protected $template;
 
     /**
+     * Chart view data
+     *
+     * @var DataInterface
+     */
+    protected $data;
+
+    /**
      * Chart view variables
      *
      * @var array
