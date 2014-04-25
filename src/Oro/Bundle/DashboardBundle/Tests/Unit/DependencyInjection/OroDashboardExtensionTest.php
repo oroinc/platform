@@ -58,7 +58,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'bundles' => array($firstBundle, $secondBundle),
-                'configs' => array(array('default_dashboard' => 'main1')),
+                'configs' => array(array()),
                 'expectedConfiguration' => array(
                     'widgets' => array(
                         'quick_launchpad' => array(
@@ -102,8 +102,7 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                         'empty_board' => array(
                             'twig' => 'OroDashboardBundle:Index:default.html.twig'
                         )
-                    ),
-                    'default_dashboard' => 'main1'
+                    )
                 ),
             ),
         );
