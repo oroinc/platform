@@ -52,7 +52,6 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
-                            {% placeholder pin_tabs_list %}
                             {% placeholder dots_menu %}
                             {# {% block navbar %}
                                 <div class="nav pull-left top-search shortcuts">
@@ -62,6 +61,7 @@
                             <ul class="nav pull-right user-menu">
                                 {{ block('user_menu') }}
                             </ul>
+                            {% placeholder pin_tabs_list %}
                         </div>
                     </div>
                     {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
