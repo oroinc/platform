@@ -44,9 +44,6 @@ class ChannelController extends FOSRestController
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-        if (!$this->get('oro_security.security_facade')->isGranted('DELETE', $entity)) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
-        }
         if (!$this->get('oro_integration.channel_delete_manager')->deleteChannel($entity)) {
             return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
         }

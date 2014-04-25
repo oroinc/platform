@@ -7,6 +7,7 @@ oro:
         change_type: Change Type
 
         delete_sync_channel_window:
-            content: Attention. This action will erase all channel-related data. Are you sure that you want to delete this channel?
+            content: "Warning: Removing the channel will delete all related data"
             button_ok: Yes, Delete
             title: Delete Confirmation
+            success: Channel and all related data were deleted

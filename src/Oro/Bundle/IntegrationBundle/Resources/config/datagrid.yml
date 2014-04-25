@@ -69,6 +69,7 @@ datagrid:
                     confirm_content: oro.integration.delete_sync_channel_window.content
                     confirm_ok:      oro.integration.delete_sync_channel_window.button_ok
                     confirm_title:   oro.integration.delete_sync_channel_window.title
+                    success:         oro.integration.delete_sync_channel_window.success
         action_configuration: @oro_integration.channels.datagrid_helper->getActionConfigurationClosure
         options:
             entityHint: channel
