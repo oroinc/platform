@@ -43,5 +43,7 @@ services:
 
     oro_report.form.type.chart_choice:
         class: %oro_report.form.type.chart_choice.class%
+        arguments:
+            - @oro_chart.config_provider
         tags:
             - { name: form.type, alias: oro_report_chart_choice }
