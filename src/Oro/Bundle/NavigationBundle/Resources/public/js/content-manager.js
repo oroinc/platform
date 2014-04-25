@@ -278,6 +278,15 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          */
         getPage: function (url) {
             return pagesCache[clearUrl(url)] || false;
+        },
+
+        /**
+         * Prevents storing current page in cache
+         */
+        cacheIgnore: function () {
+            mediator.once('hash_navigation_request:before', function (navigation) {
+                contentManager.clearCache(navigation.url);
+            });
         }
     };
 
