@@ -108,6 +108,7 @@ oro_icon_select:
     level down:             icon-level-down
     level up:               icon-level-up
     lightbulb:              icon-lightbulb
+    list alt:               icon-list-alt
     location arrow:         icon-location-arrow
     lock:                   icon-lock
     magic:                  icon-magic
@@ -199,7 +200,7 @@ oro_icon_select:
     tablet:                 icon-tablet
     tag:                    icon-tag
     tags:                   icon-tags
-    tasks:                  icon-list-alt
+    tasks:                  icon-tasks
     terminal:               icon-terminal
     thumbs down:            icon-thumbs-down
     thumbs down alt:        icon-thumbs-down-alt
