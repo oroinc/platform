@@ -253,7 +253,7 @@ datagrid:
                 join:
                     inner:
                         folder:
-                            join: e.folder
+                            join: e.folders
                             alias: f
                         origin:
                             join: f.origin

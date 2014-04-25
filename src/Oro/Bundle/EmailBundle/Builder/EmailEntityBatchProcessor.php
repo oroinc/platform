@@ -67,6 +67,14 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
+     * @return Email[]
+     */
+    public function getEmails()
+    {
+        return $this->emails;
+    }
+
+    /**
      * Register EmailAddress object
      *
      * @param EmailAddress $obj
