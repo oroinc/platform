@@ -5,3 +5,4 @@ oro_dashboard_config:
             route:       oro_calendar_dashboard_my_calendar
             acl:         oro_calendar_view
             description: oro.calendar.my_calendar_widget_descriptions
+            icon:   bundles/orocalendar/img/my_calendar.png

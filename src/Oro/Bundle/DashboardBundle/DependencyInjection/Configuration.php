@@ -29,8 +29,8 @@ class Configuration implements ConfigurationInterface
                                 ->info('The label name for widget title')
                                 ->cannotBeEmpty()
                             ->end()
-                            ->scalarNode('thumbnail')
-                                ->info('Path to thumbnail')
+                            ->scalarNode('icon')
+                                ->info('Path to icon')
                             ->end()
                             ->scalarNode('description')
                                 ->info('translatable description')
@@ -96,11 +96,6 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('label')
-                                ->info('The label name')
-                                ->isRequired()
-                                ->cannotBeEmpty()
-                            ->end()
                             ->scalarNode('twig')
                                 ->info(
                                     'The name of TWIG template.'
@@ -110,10 +105,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
-                ->end()
-                ->scalarNode('default_dashboard')
-                    ->info('The name of a dashboard which is displayed by default')
-                    ->defaultValue('main')
                 ->end()
             ->end();
 

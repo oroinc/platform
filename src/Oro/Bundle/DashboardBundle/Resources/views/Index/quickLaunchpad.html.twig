@@ -1,7 +1,7 @@
 {% extends bap.layout %}
 
 {% block content %}
-    <div class="layout-content dashboard-contailer">
+    <div class="layout-content dashboard-container-wrapper">
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">
                 <div class="row">
@@ -23,7 +23,7 @@
                                         <select id="dashboard_selector">
                                             <option>{{ 'oro.dashboard.title.chose_dashboard'|trans }}</option>
                                             {% for dashboardModel in dashboards %}
-                                                <option value="{{ dashboardModel.dashboard.id }}">
+                                                <option value="{{ dashboardModel.id }}">
                                                     {{ dashboardModel.getLabel()|trans }}
                                                 </option>
                                             {% endfor %}
@@ -35,7 +35,7 @@
                                                 function($, routing, Navigation){
                                                     $(function () {
                                                         $('#dashboard_selector').on('change', function (e) {
-                                                            var url = routing.generate('oro_dashboard_index', {id: $(e.currentTarget).val(), change_dashboard: true}),
+                                                            var url = routing.generate('oro_dashboard_open', {id: $(e.currentTarget).val(), change_dashboard: true}),
                                                                     navigation = Navigation.getInstance();
                                                             if (navigation) {
                                                                 navigation.processRedirect({

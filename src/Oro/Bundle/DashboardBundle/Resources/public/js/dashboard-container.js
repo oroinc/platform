@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          */
         options: {
             widgetIds: [],
-            handle: ".dashboard-widget > .title",
+            handle: ".dashboard-widget .sortable",
             columnsSelector: '.dashboard-column',
             emptyTextSelector: '> .empty-text',
             allowEdit: false,
@@ -50,6 +50,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             mediator.off('dashboard:widget:add', this.addToDashboard, this);
             mediator.on('dashboard:widget:add', this.addToDashboard, this);
 
+            this.widgets = {};//reset widgets state before add
             _.each(this.options.widgetIds, function (wid) {
                 widgetManager.getWidgetInstance(
                     wid,
@@ -81,22 +82,22 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
         },
 
         /**
-         * @param {object} widgetModel
+         * @param {object} data
          */
-        addToDashboard: function(widgetModel){
-            var wid = 'dashboard-widget-' + widgetModel.widget.id;
+        addToDashboard: function(data){
+            var wid = 'dashboard-widget-' + data.id;
             var containerId = 'widget-container-'+wid;
-            var column = widgetModel.widget.layout_position[0] ? widgetModel.widget.layout_position[0] : 0;
+            var column = data.layout_position[0] ? data.layout_position[0] : 0;
             $('#dashboard-column-'+column).prepend($('<div id="' + containerId + '"></div>'));
             var state = {
-                'id': widgetModel.widget.id,
-                'expanded': widgetModel.widget.expanded,
-                'layoutPosition': widgetModel.widget.layout_position
+                'id': data.id,
+                'expanded': data.expanded,
+                'layoutPosition': data.layout_position
             };
             var widgetParams = {
                 'widgetType': 'dashboard-item',
                 'wid': wid,
-                'url': routing.generate(widgetModel.config.route, widgetModel.config.route_parameters),
+                'url': routing.generate(data.config.route, data.config.route_parameters),
                 'state': state,
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
@@ -189,13 +190,20 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _lockLayoutHeight: function() {
-            var maxHeight = 0;
-            $(this.options.columnsSelector).css({minHeight: '0px'});
-            $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
+            this._releaseLayoutHeight();
+            var columns = $(this.options.columnsSelector);
+            var scrollableContainer = columns.parents('.scrollable-container').first();
+            var container = scrollableContainer.find('.dashboard-container');
+            var padding = parseInt(container.css('paddingBottom')) + parseInt(container.css('paddingTop'));
+            var maxHeight = scrollableContainer.height() - padding;
+
+            columns.each(function(columnIndex, columnElement) {
                 var currentHeight = $(columnElement).height();
                 maxHeight = maxHeight > currentHeight ? maxHeight : currentHeight;
             });
-            $(this.options.columnsSelector).css({minHeight: (maxHeight + 200) + 'px'});
+
+            columns.css({minHeight: maxHeight + 'px'});
+            columns.sortable('refresh');
         },
 
         /**
@@ -209,7 +217,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
          * @private
          */
         _hideEmptyText: function() {
-            $(this.options.emptyTextSelector, this.options.columnsSelector).css('visibility', 'hidden');
+            $(this.options.emptyTextSelector, this.options.columnsSelector).addClass('hidden-empty-text');
         },
 
 
@@ -221,9 +229,9 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
 
             $(this.options.columnsSelector).each(function(columnIndex, columnElement) {
                 if (self._isEmptyColumn(columnIndex)) {
-                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'visible');
+                    $(self.options.emptyTextSelector, columnElement).removeClass('hidden-empty-text');
                 } else {
-                    $(self.options.emptyTextSelector, columnElement).css('visibility', 'hidden');
+                    $(self.options.emptyTextSelector, columnElement).addClass('hidden-empty-text');
                 }
             });
         },

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\EventListener;
 
+use Doctrine\DBAL\DBALException;
+
 use Gedmo\Translatable\TranslatableListener;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -95,13 +97,17 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         if ($this->isInstalled) {
-            $this->setPhpDefaultLocale(
-                $this->localeSettings->getLocale()
-            );
+            try {
+                $this->setPhpDefaultLocale(
+                    $this->localeSettings->getLocale()
+                );
 
-            $this->translatableListener->setTranslatableLocale(
-                $this->localeSettings->getLanguage()
-            );
+                $this->translatableListener->setTranslatableLocale(
+                    $this->localeSettings->getLanguage()
+                );
+            } catch (DBALException $exception) {
+                throw new \RuntimeException('Oro Application already installed. Use --force option to reinstall.');
+            }
         }
     }
 

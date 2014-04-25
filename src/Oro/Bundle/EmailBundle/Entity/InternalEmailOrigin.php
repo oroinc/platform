@@ -22,7 +22,7 @@ class InternalEmailOrigin extends EmailOrigin
      * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
-    protected $name;
+    protected $internalName;
 
     /**
      * Get an internal email origin name.
@@ -31,7 +31,7 @@ class InternalEmailOrigin extends EmailOrigin
      */
     public function getName()
     {
-        return $this->name;
+        return $this->internalName;
     }
 
     /**
@@ -42,7 +42,7 @@ class InternalEmailOrigin extends EmailOrigin
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->internalName = $name;
 
         return $this;
     }
@@ -54,6 +54,6 @@ class InternalEmailOrigin extends EmailOrigin
      */
     public function __toString()
     {
-        return sprintf('InternalEmailOrigin(%s)', $this->name);
+        return sprintf('InternalEmailOrigin(%s)', $this->internalName);
     }
 }

@@ -5,8 +5,9 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
-use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
@@ -29,7 +30,7 @@ class WidgetControllerTest extends WebTestCase
     protected $em;
 
     /**
-     * @var DashboardWidget
+     * @var Widget
      */
     protected $widget;
 
@@ -38,11 +39,17 @@ class WidgetControllerTest extends WebTestCase
      */
     protected $configProvider;
 
+    /**
+     * @var Manager
+     */
+    protected $dashboardManager;
+
     protected function setUp()
     {
-        $this->client = static::createClient([], ToolsAPI::generateWsseHeader());
-        $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-        $this->configProvider = $this->client->getContainer()->get('oro_dashboard.config_provider');
+        $this->client           = static::createClient([], ToolsAPI::generateWsseHeader());
+        $this->em               = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider   = $this->client->getContainer()->get('oro_dashboard.config_provider');
+        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
         $this->em->persist($this->widget);
@@ -65,17 +72,17 @@ class WidgetControllerTest extends WebTestCase
                     'widgetId'    => $this->widget->getId(),
                 ]
             ),
-            $data,
-            [],
-            ToolsAPI::generateWsseHeader()
+            $data
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
 
         $this->em->refresh($this->widget);
 
-        $this->assertEquals($data['isExpanded'], $this->widget->isExpanded());
+        $model = $this->dashboardManager->findWidgetModel($this->widget->getId());
+        $this->assertEquals($data['isExpanded'], $model->isExpanded());
         $this->assertEquals($data['layoutPosition'], $this->widget->getLayoutPosition());
+        $this->assertEquals($data['layoutPosition'], $model->getLayoutPosition());
     }
 
     public function testAddWidget()
@@ -85,24 +92,20 @@ class WidgetControllerTest extends WebTestCase
         $widgetNames = array_keys($widgets);
 
         $widgetName = $widgetNames[0];
-        $id = $this->widget->getDashboard()->getId();
+        $id         = $this->widget->getDashboard()->getId();
         $this->client->request(
             'POST',
             $this->client->generate(
                 'oro_api_post_dashboard_widget_add_widget'
             ),
-            array('dashboardId' => $id, 'widgetName' => $widgetName),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            array('dashboardId' => $id, 'widgetName' => $widgetName)
         );
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
-        $content = json_decode($result->getContent(), true);
+        $content = ToolsAPI::jsonToArray($result->getContent());
         $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
-        $this->assertEquals($widgetName, $content['widget']['name']);
-        $this->assertEquals($id, $content['widget']['dashboard']['id']);
-
+        $this->assertEquals($widgetName, $content['name']);
     }
 
     /**
@@ -118,10 +121,7 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $this->widget->getDashboard()->getId(),
                     'widgetId'    => $this->widget->getId(),
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
@@ -134,10 +134,7 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $this->widget->getDashboard()->getId(),
                     'widgetId'    => $this->widget->getId(),
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404);
@@ -159,7 +156,7 @@ class WidgetControllerTest extends WebTestCase
         $dashboard = null;
         $data      = ['layoutPositions' => []];
         foreach ($widgets as $widget) {
-            /* @var DashboardWidget $widget */
+            /* @var Widget $widget */
             $data['layoutPositions'][$widget->getId()] = array_map(
                 function ($item) {
                     return $item * 10;
@@ -178,15 +175,11 @@ class WidgetControllerTest extends WebTestCase
                     'dashboardId' => $dashboard->getId(),
                 ]
             ),
-            $data,
-            [],
-            ToolsAPI::generateWsseHeader()
+            $data
         );
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-
-
         foreach ($widgets as $key => $widget) {
             $this->em->refresh($widget);
             $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());
@@ -201,8 +194,8 @@ class WidgetControllerTest extends WebTestCase
         return [
             'multiple' => [
                 'widgets'           => [
-                    $this->createWidget('widget1', false),
-                    $this->createWidget('widget2', true, [2, 2]),
+                    $this->createWidget(),
+                    $this->createWidget('quick_launchpad', [2, 2]),
                 ],
                 'expectedPositions' => [
                     [10, 10],
@@ -211,7 +204,7 @@ class WidgetControllerTest extends WebTestCase
             ],
             'single'   => [
                 'widgets'           => [
-                    $this->createWidget('widget1', false)
+                    $this->createWidget()
                 ],
                 'expectedPositions' => [
                     [10, 10]
@@ -222,19 +215,17 @@ class WidgetControllerTest extends WebTestCase
 
     /**
      * @param string $name
-     * @param bool   $isExpanded
      * @param array  $layoutPositions
-     * @return DashboardWidget
+     * @return Widget
      */
-    protected function createWidget($name = 'widget', $isExpanded = true, array $layoutPositions = [1, 1])
+    protected function createWidget($name = 'quick_launchpad', array $layoutPositions = [1, 1])
     {
         $dashboard = new Dashboard();
-        $dashboard->setName('dashboard');
+        $dashboard->setName('main');
 
-        $widget = new DashboardWidget();
+        $widget = new Widget();
         $widget
             ->setName($name)
-            ->setExpanded($isExpanded)
             ->setLayoutPosition($layoutPositions)
             ->setDashboard($dashboard);
 

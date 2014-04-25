@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
+use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class WidgetAttributes
