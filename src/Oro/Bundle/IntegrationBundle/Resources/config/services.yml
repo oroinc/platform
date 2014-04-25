@@ -18,7 +18,6 @@ parameters:
     oro_integration.channels.datagrid_helper.class:                       Oro\Bundle\IntegrationBundle\Datagrid\DatagridHelper
 
     oro_integration.channel_delete_manager.class:                         Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteManager
-    oro_integration.manager.simple_channel_delete_provider.class:         Oro\Bundle\IntegrationBundle\Manager\SimpleChannelDeleteProvider
 
 services:
     oro_integration.channel.manager.api:
@@ -106,9 +105,4 @@ services:
 
     oro_integration.channel_delete_manager:
         class: %oro_integration.channel_delete_manager.class%
-
-    oro_integration.manager.simple_channel_delete_provider:
-        class: %oro_integration.manager.simple_channel_delete_provider.class%
         arguments: [ @doctrine.orm.entity_manager ]
-        tags:
-            - { name: oro_integration.channel_delete_provider }

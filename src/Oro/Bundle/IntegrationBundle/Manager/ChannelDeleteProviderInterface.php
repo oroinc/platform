@@ -7,16 +7,17 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 interface ChannelDeleteProviderInterface
 {
     /**
-     * Get suppoted Channel type
-     * @return string
-     */
-    public function getSupportedChannelType();
-
-    /**
-     * Process delete channel
+     * Is this provider supports given channel type
+     * @param string $channelType
      *
-     * @param Channel $channel
      * @return bool
      */
-    public function processDelete(Channel $channel);
+    public function isSupport($channelType);
+
+    /**
+     * Process delete channel related data
+     *
+     * @param Channel $channel
+     */
+    public function deleteRelatedData(Channel $channel);
 }
