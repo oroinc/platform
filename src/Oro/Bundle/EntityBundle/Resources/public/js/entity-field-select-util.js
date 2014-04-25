@@ -101,8 +101,18 @@ define(['underscore'
             return field ? field.text : null;
         },
 
-        // Returns className & fieldName
-        // in case of 3 items after split fieldName will be combination of 2nd and 3rd items
+        /**
+         * Returns a pair contains class name and field name
+         * Examples:
+         *  item = "Acme\Entity::id" (class name = "Acme\Entity", field name = "id")
+         *      result = ["Acme\Entity", "id"]
+         *  item = "Acme\Entity1::Acme\Entit2::id" (class name = "Acme\Entity1", field name = "Acme\Entit2::id")
+         *      result = ["Acme\Entity1", "Acme\Entit2::id"]
+         *
+         * @param item
+         * @returns {Array}
+         * @private
+         */
         _getPair: function (item) {
             var pair = item.split('::');
             if (_.size(pair) == 3) {
