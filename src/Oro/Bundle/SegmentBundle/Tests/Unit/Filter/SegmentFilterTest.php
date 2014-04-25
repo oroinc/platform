@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -28,6 +29,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class SegmentFilterTest extends OrmTestCase
 {
@@ -43,16 +45,16 @@ class SegmentFilterTest extends OrmTestCase
     /** @var StaticSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $staticSegmentQueryBuilder;
 
-    /** @var EntityNameProvider|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var EntityNameProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityNameProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
     /** @var SegmentFilter */
@@ -60,18 +62,59 @@ class SegmentFilterTest extends OrmTestCase
 
     public function setUp()
     {
-        $this->formFactory                = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
+
+        $registry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry', [], '', false);
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($this->em));
+
+        $this->formFactory = Forms::createFormFactoryBuilder()
+            ->addExtensions(
+                [
+                    new PreloadedExtension(
+                        [
+                            'oro_type_filter'        => new FilterType($translator),
+                            'oro_type_choice_filter' => new ChoiceFilterType($translator),
+                            'entity'                 => new EntityType($registry),
+                            'oro_type_entity_filter' => new EntityFilterType($translator),
+                        ],
+                        []
+                    ),
+                    new CsrfExtension(
+                        $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                    )
+                ]
+            )
+            ->getFormFactory();
+
+        $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetaData->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('OroSegment:Segment'));
+        $classMetaData->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue(['id']));
+
+        $this->em->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($classMetaData));
 
         $this->dynamicSegmentQueryBuilder = $this
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->staticSegmentQueryBuilder  = $this
+        $this->staticSegmentQueryBuilder = $this
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->entityNameProvider = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
-
+        $this->entityNameProvider   = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
         $this->entityConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
@@ -80,9 +123,6 @@ class SegmentFilterTest extends OrmTestCase
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -93,16 +133,22 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getEntityManager')
             ->will($this->returnValue($this->em));
 
+        $staticQBServiceID  = uniqid('static');
+        $dynamicQBServiceID = uniqid('dynamic');
+        $container          = new Container();
+        $container->set($staticQBServiceID, $this->staticSegmentQueryBuilder);
+        $container->set($dynamicQBServiceID, $this->dynamicSegmentQueryBuilder);
 
         $this->filter = new SegmentFilter(
             $this->formFactory,
             new FilterUtility(),
-            $this->dynamicSegmentQueryBuilder,
-            $this->staticSegmentQueryBuilder,
+            new ServiceLink($container, $dynamicQBServiceID),
+            new ServiceLink($container, $staticQBServiceID),
             $this->entityNameProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider
         );
+        $this->filter->init('segment', ['entity' => '']);
     }
 
     public function tearDown()
@@ -115,7 +161,7 @@ class SegmentFilterTest extends OrmTestCase
         $activeClassName  = 'Oro\Bundle\SegmentBundle\Entity\Segment';
         $newClassName     = 'Test\NewEntity';
         $deletedClassName = 'Test\DeletedEntity';
-        $entityConfigIds = [
+        $entityConfigIds  = [
             new EntityConfigId('entity', $activeClassName),
             new EntityConfigId('entity', $newClassName),
             new EntityConfigId('entity', $deletedClassName),
@@ -148,16 +194,8 @@ class SegmentFilterTest extends OrmTestCase
                 )
             );
 
-        $repo = $this->getRepoForMetadata();
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with($this->equalTo('OroSegmentBundle:Segment'))
-            ->will($this->returnValue($repo));
-
-        $filter = $this->createFilter();
-
-        $metadata = $filter->getMetadata();
+        $this->prepareRepo();
+        $metadata = $this->filter->getMetadata();
 
         $this->assertTrue(isset($metadata['entity_ids']));
         $this->assertEquals(
@@ -169,6 +207,7 @@ class SegmentFilterTest extends OrmTestCase
     /**
      * @param string $className
      * @param string $state
+     *
      * @return Config
      */
     protected function createExtendConfig($className, $state)
@@ -180,67 +219,7 @@ class SegmentFilterTest extends OrmTestCase
         return $config;
     }
 
-    protected function createFilter()
-    {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
-
-        $registry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry', [], '', false);
-        $registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
-
-        $factory = Forms::createFormFactoryBuilder()
-            ->addExtensions(
-                [
-                    new PreloadedExtension(
-                        [
-                            'oro_type_filter'                => new FilterType($translator),
-                            'oro_type_choice_filter'         => new ChoiceFilterType($translator),
-                            'entity'                         => new EntityType($registry),
-                            'oro_type_entity_filter'         => new EntityFilterType($translator),
-                        ],
-                        []
-                    ),
-                    new CsrfExtension(
-                        $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
-                    )
-                ]
-            )
-            ->getFormFactory();
-
-        $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetaData->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('OroSegment:Segment'));
-        $classMetaData->expects($this->once())
-            ->method('getIdentifier')
-            ->will($this->returnValue(['id']));
-
-        $this->em->expects($this->exactly(2))
-            ->method('getClassMetadata')
-            ->will($this->returnValue($classMetaData));
-
-        $filter = new SegmentFilter(
-            $factory,
-            new FilterUtility(),
-            $this->dynamicSegmentQueryBuilder,
-            $this->staticSegmentQueryBuilder,
-            $this->entityNameProvider,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider
-        );
-        $filter->init('segment', ['entity' => '']);
-
-        return $filter;
-    }
-
-    /**
-     * @return EntityRepository|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getRepoForMetadata()
+    protected function prepareRepo()
     {
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -271,35 +250,17 @@ class SegmentFilterTest extends OrmTestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($qb));
 
-        return $repo;
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with($this->equalTo('OroSegmentBundle:Segment'))
+            ->will($this->returnValue($repo));
     }
 
     public function testGetForm()
     {
-        $formMock = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->formFactory->expects($this->once())->method('create')
-            ->with(
-                EntityFilterType::NAME,
-                [],
-                [
-                    'csrf_protection' => false,
-                    'field_options'   => [
-                        'class'    => 'OroSegmentBundle:Segment',
-                        'property' => 'name',
-                        'required' => true,
-                        'query_builder' => function () {
-
-                        },
-                    ]
-                ]
-            )
-            ->will($this->returnValue($formMock));
-
+        $this->prepareRepo();
         $form = $this->filter->getForm();
-
-        // second call should not provoke expectation error, form should be created once
-        $this->filter->getForm();
-        $this->assertSame($formMock, $form);
+        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
     }
 
     public function testApplyInvalidData()

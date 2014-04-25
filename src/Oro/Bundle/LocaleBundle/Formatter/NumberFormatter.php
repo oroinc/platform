@@ -496,10 +496,14 @@ class NumberFormatter
      * @param string|null $locale
      * @return bool|null Null means that there are no currency symbol in string
      */
-    public function isCurrencySymbolPrepend($currency, $locale = null)
+    public function isCurrencySymbolPrepend($currency = null, $locale = null)
     {
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
+        }
+
+        if (!$currency) {
+            $currency = $this->localeSettings->getCurrency();
         }
 
         if (empty($this->currencySymbolPrepend[$locale])

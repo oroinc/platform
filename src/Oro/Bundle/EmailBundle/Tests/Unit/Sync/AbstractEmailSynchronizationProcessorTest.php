@@ -23,6 +23,9 @@ class AbstractEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestC
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $emailAddressManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $knownEmailAddressChecker;
+
     protected function setUp()
     {
         $this->log = $this->getMock('Psr\Log\LoggerInterface');
@@ -35,12 +38,16 @@ class AbstractEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestC
         $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->knownEmailAddressChecker = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = new TestEmailSynchronizationProcessor(
             $this->log,
             $this->em,
             $this->emailEntityBuilder,
-            $this->emailAddressManager
+            $this->emailAddressManager,
+            $this->knownEmailAddressChecker
         );
     }
 
