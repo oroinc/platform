@@ -35,7 +35,7 @@ define(['underscore'
                         ? this._getFieldGroupLabel(_.last(pair), data)
                         : this._getFieldLabel(_.last(pair), data);
                     result.push({
-                        entity: this.findEntity(pair[_.size(pair) - 2]),
+                        entity: this.findEntity(_.first(pair)),
                         label: label
                     });
                     prevFieldName = _.last(pair);
@@ -101,6 +101,8 @@ define(['underscore'
             return field ? field.text : null;
         },
 
+        // Returns className & fieldName
+        // in case of 3 items after split fieldName will be combination of 2nd and 3rd items
         _getPair: function (item) {
             var pair = item.split('::');
             if (_.size(pair) == 3) {
