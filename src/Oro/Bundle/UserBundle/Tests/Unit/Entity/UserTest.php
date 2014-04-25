@@ -509,4 +509,18 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $entity->getEmailOrigins());
         $this->assertSame($origin2, $entity->getEmailOrigins()->first());
     }
+
+    public function testGetApiKey()
+    {
+        $entity = new User();
+
+        $this->assertNotEmpty($entity->getApiKey(), 'Should return some key, even if is not present');
+        $this->assertNotSame($entity->getApiKey(), $entity->getApiKey(), 'Should return unique random string');
+
+        $apiKey = new UserApi();
+        $apiKey->setApiKey($apiKey->generateKey());
+        $entity->setApi($apiKey);
+
+        $this->assertSame($apiKey->getApiKey(), $entity->getApiKey(), 'Should delegate call to userApi entity');
+    }
 }

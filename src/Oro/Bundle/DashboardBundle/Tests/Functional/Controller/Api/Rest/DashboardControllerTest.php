@@ -5,8 +5,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\DashboardWidget;
-use Oro\Bundle\DashboardBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
@@ -57,10 +55,7 @@ class DashboardControllerTest extends WebTestCase
                 [
                     'id' => $id
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
@@ -72,10 +67,7 @@ class DashboardControllerTest extends WebTestCase
                 [
                     'id' => $id
                 ]
-            ),
-            [],
-            [],
-            ToolsAPI::generateWsseHeader()
+            )
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404);
