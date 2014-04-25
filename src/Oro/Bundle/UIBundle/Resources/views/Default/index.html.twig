@@ -49,6 +49,21 @@
             {% block header %}
                 <header class="navbar" id="oroplatform-header">
                     {% placeholder before_navigation %}
+                    <div class="navbar-inner">
+                        <div class="container">
+                            {% placeholder header_logo %}
+                            {% placeholder pin_tabs_list %}
+                            {% placeholder dots_menu %}
+                            {# {% block navbar %}
+                                <div class="nav pull-left top-search shortcuts">
+                                    {% placeholder navbar %}
+                                </div>
+                            {% endblock navbar %} #}
+                            <ul class="nav pull-right user-menu">
+                                {{ block('user_menu') }}
+                            </ul>
+                        </div>
+                    </div>
                     {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
                     {% placeholder after_navigation %}
                 </header>

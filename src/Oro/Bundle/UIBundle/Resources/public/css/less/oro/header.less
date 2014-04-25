@@ -61,12 +61,16 @@
     display: block;
     width: 100%;
     clear: both;
-    background: #323b45;
     position: relative;
     z-index: 900;
+    margin:0;
+    padding:0;
+    border:none;
+    border-bottom: 1px solid @baseGradientColorBorder;
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
     .divider-vertical {
       border:none;
-      margin:9px 6px;
+      margin:5px 6px;
       height:22px;
     }
     .btn-group {
@@ -83,16 +87,10 @@
       margin:0;
       >li {
         > a {
-          color: #fff;
-          font-weight: bold;
+          color: @headerTextColor;
+          font-weight: normal;
           text-shadow: none;
         }
-      }
-      a.help {
-        margin: 0 10px 0 0;
-        padding: 9px 4px;
-        color:#fff;
-        font-size:16px;
       }
     }
     .notifications {
@@ -109,10 +107,6 @@
       padding:15px 15px 7px;
     }
     .border-radius(0);
-    border:none;
-    margin:0;
-    padding:0;
-    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
   }
   .nav.top-search { // Includes Shortcuts and Search
     .dropdown {
@@ -350,8 +344,7 @@
   .nav.pull-right {
     li.dropdown {
       > a {
-        padding:10px;
-        color:#fff;
+        padding: 6px;
         text-shadow:none;
         [class^='icon-'] {
           vertical-align:top;

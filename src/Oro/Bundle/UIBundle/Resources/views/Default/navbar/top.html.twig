@@ -1,16 +1,6 @@
 {% if isMobileVersion() or oro_config_value('oro_ui.navbar_position') == 'top' %}
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-<div class="navbar-inner">
-    <div class="container">
-        {% placeholder header_logo %}
-        {{ block('navbar') }}
-        <div class="divider-vertical small-divider"></div>
-        <div id="main-menu" class="main-menu-top">
-            {{ block('application_menu') }}
-        </div>
-        <ul class="nav pull-right user-menu">
-            {{ block('user_menu') }}
-        </ul>
-    </div>
+<div id="main-menu" class="main-menu-top">
+    {{ block('application_menu') }}
 </div>
 {% endif %}
