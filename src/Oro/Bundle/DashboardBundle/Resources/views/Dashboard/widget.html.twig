@@ -13,8 +13,8 @@
 <div id="{{ widgetContentId }}" class="widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
     {% block content %}
     {% endblock %}
-    <div class="widget-actions">
-        {% block actions %}
+    {% block actions %}
+        <div class="widget-actions">
             {% if actions is defined %}
                 {% for action in actions -%}
                     {% if action.type is not defined or action.type == "button" %}
@@ -32,8 +32,8 @@
                     >{% if action.icon is defined %}<i class="icon-{{ action.icon }}"></i> {% endif %}{{ action.label }}</a>
                 {%- endfor %}
             {% endif %}
-        {% endblock %}
-    </div>
+        </div>
+    {% endblock %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'oroui/js/widget-manager', 'oronavigation/js/navigation'],
         function($, _, widgetManager, Navigation){

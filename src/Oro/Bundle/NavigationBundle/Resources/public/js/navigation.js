@@ -312,6 +312,13 @@ define(function (require) {
             }, this);
 
             /**
+             * Add processing links of loaded widget content
+             */
+            mediator.bind("widget:contentLoad", function (widgetEl) {
+                this.processClicks(widgetEl.find(this.selectors.links));
+            }, this);
+
+            /**
              * Processing links in 3 dots menu after item is added (e.g. favourites)
              */
             mediator.bind("navigaion_item:added", function (item) {

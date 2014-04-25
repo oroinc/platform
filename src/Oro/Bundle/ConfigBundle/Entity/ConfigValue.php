@@ -138,7 +138,7 @@ class ConfigValue
         $this->clearValue();
         switch (true) {
             case is_object($value):
-                $this->objectValue = $value;
+                $this->objectValue = clone $value;
                 $this->type        = self::FIELD_OBJECT_TYPE;
                 break;
             case is_array($value):

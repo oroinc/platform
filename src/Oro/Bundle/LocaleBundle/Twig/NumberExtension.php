@@ -39,6 +39,11 @@ class NumberExtension extends \Twig_Extension
                 'oro_locale_number_symbol',
                 array($this, 'getSymbol'),
                 array('is_safe' => array('html'))
+            ),
+            new \Twig_SimpleFunction(
+                'oro_currency_symbol_prepend',
+                array($this->formatter, 'isCurrencySymbolPrepend'),
+                array('is_safe' => array('html'))
             )
         );
     }

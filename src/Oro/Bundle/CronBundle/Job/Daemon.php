@@ -38,12 +38,12 @@ class Daemon
     /**
      *
      * @param string $rootDir
-     * @param int    $maxJobs [optional] Maximum number of concurent jobs. Default value is 5.
+     * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
      * @param string $env     [optional] Environment. Default value is "prod".
      */
     public function __construct($rootDir, $maxJobs = 5, $env = 'prod')
     {
-        $this->rootDir = $rootDir;
+        $this->rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR);
         $this->maxJobs = (int) $maxJobs;
         $this->env     = $env;
     }
@@ -104,32 +104,34 @@ class Daemon
      */
     public function getPid()
     {
-        // workaround for Windows
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $output = shell_exec('WMIC path win32_process get Processid,Commandline');
-
-            return preg_match('#console jms-job-queue:run.+(\d+)\s*$#Usm', $output, $matches)
-                ? (int) $matches[1]
-                : null;
-        }
-
-        $process = $this->getPidProcess();
-
-        $process->run();
-
-        return preg_match('#^.+console jms-job-queue:run#Usm', $process->getOutput(), $matches)
-            ? (int) $matches[0]
-            : null;
+        return $this->findProcessPid(
+            sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
+        );
     }
 
-    /**
-     * Instantiate "ps" *nix command to catch running job queue
-     *
-     * @return Process
-     */
-    protected function getPidProcess()
+    protected function findProcessPid($searchTerm)
     {
-        return new Process('ps ax | grep "[j]ms-job-queue:run"');
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
+            $searchRegExp = '/\s+(\d+)\s*$/Usm';
+        } else {
+            $cmd = 'ps ax | grep %s | grep -v grep';
+            $searchRegExp = '/^\s*(\d+)\s+/Usm';
+        }
+        $cmd = sprintf($cmd, escapeshellarg($searchTerm));
+
+        $process = new Process($cmd);
+        $process->run();
+        $output = $process->getOutput();
+
+        if (!empty($output)) {
+            preg_match($searchRegExp, $output, $matches);
+            if (count($matches) > 1 && !empty($matches[1])) {
+                return (int) $matches[1];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -150,7 +152,7 @@ class Daemon
      */
     protected function getQueueStopProcess($pid)
     {
-        $cmd = defined('PHP_WINDOWS_VERSION_BUILD') ? 'taskkill /F /PID %u' : 'kill -9 %u';
+        $cmd = defined('PHP_WINDOWS_VERSION_BUILD') ? 'taskkill /F /PID %u' : 'kill %u';
 
         return new Process(sprintf($cmd, $pid));
     }
