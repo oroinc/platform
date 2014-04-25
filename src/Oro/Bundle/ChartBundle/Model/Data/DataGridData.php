@@ -32,9 +32,7 @@ class DataGridData implements DataInterface
     }
 
     /**
-     * Reads data from data grid
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function toArray()
     {

@@ -7,7 +7,7 @@ interface DataInterface
     /**
      * Converts chart data to array
      *
-     * @return mixed
+     * @return array
      */
     public function toArray();
 }

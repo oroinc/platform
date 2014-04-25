@@ -18,9 +18,7 @@ class ArrayData implements DataInterface
     }
 
     /**
-     * Converts chart data to array
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function toArray()
     {
