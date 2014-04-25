@@ -106,10 +106,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('default_dashboard')
-                    ->info('The name of a dashboard which is displayed by default')
-                    ->defaultValue('main')
-                ->end()
             ->end();
 
         return $treeBuilder;

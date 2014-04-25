@@ -20,7 +20,8 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
+        $this->configProvider = $this
+            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -30,66 +31,119 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "chart_name" is  missing.
+     * @param array  $options
+     * @param string $exception
+     * @param string $message
+     *
+     * @dataProvider invalidOptionsProvider
      */
-    public function testRequireOptionsMissing()
+    public function testRequireOptionsIncorrectType(array $options, $exception, $message)
     {
-        $this->factory->create($this->type, null, array());
+        $this->setExpectedException(
+            $exception,
+            $message
+        );
+
+        $this->factory->create($this->type, null, $options);
+    }
+
+    public function invalidOptionsProvider()
+    {
+        return [
+            'name'          => [
+                'options'   => [ChartSettingsType::NAME => 11],
+                'exception' => '\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'message'   => 'The option "name" with value "11" is expected to be of type "string"'
+            ],
+            'chart_options' => [
+                'options'   => [ChartSettingsType::CHART_OPTIONS => 11],
+                'exception' => '\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'message'   => 'The option "chart_options" with value "11" is expected to be of type "array"'
+            ],
+            'empty'         => [
+                'options'   => [],
+                'exception' => '\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException',
+                'message'   => 'Missing options for'
+            ]
+        ];
     }
 
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "chart_name" with value "11" is expected to be of type "string"
+     * @param array   $fieldsData
+     * @param string  $chartName
+     * @param boolean $useParentOptions
+     *
+     * @dataProvider fieldDataProvider
      */
-    public function testRequireOptionsIncorrectType()
+    public function testFieldAdded(array $fieldsData, $chartName, $useParentOptions)
     {
-        $this->factory->create($this->type, null, array(ChartSettingsType::NODE_NAME => 11));
+        $configProvider = $this
+            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $chartOptions = array_merge(
+            [ChartSettingsType::NAME => $chartName],
+            [ChartSettingsType::SETTINGS_SCHEMA => $fieldsData]
+        );
+
+        $formOptions = [ChartSettingsType::NAME => $chartName];
+        if ($useParentOptions) {
+            $formOptions[ChartSettingsType::CHART_OPTIONS] = $chartOptions;
+        }
+
+        $configProvider
+            ->expects($this->any())
+            ->method('getChartConfig')
+            ->with($chartName)
+            ->will($this->returnValue($chartOptions));
+
+        $type = new ChartSettingsType($configProvider);
+        $form = $this->factory->create($type, null, $formOptions);
+
+        foreach ($fieldsData as $fieldName => $fieldData) {
+            $this->assertTrue($form->has($fieldName . 'Name'));
+            $actual = $form->get($fieldName . 'Name');
+            $this->assertEquals($actual->getConfig()->getOption('label'), $fieldName . 'Label');
+        }
     }
 
-    public function testFieldAdded()
+    public function fieldDataProvider()
     {
-        $expectedName     = 'expectedName';
-        $fieldName        = 'firstFieldName';
-        $fieldLabel       = 'firstFieldLabel';
-        $fieldType        = 'text';
-        $fieldNameSecond  = 'firstFieldNameSecond';
-        $fieldLabelSecond = 'firstFieldLabelSecond';
-        $fieldTypeSecond  = 'integer';
-        $settings         = array(
-            array(
-                'name'    => $fieldName,
-                'label'   => $fieldLabel,
-                'type'    => $fieldType,
-                'options' => array('label' => 'unexpected label', 'required' => true)
-            ),
-            array(
-                'name'    => $fieldNameSecond,
-                'label'   => $fieldLabelSecond,
-                'type'    => $fieldTypeSecond,
-                'options' => array('label' => 'unexpected label', 'required' => false)
-            )
-        );
-        $configs          = array(ChartSettingsType::NODE_SETTINGS => $settings);
+        return [
+            'name'    => [
+                'fieldsData'       => [
+                    'first'  => $this->getFieldData('first'),
+                    'second' => $this->getFieldData('second')
+                ],
+                'chartName'        => 'chart_name',
+                'useParentOptions' => false
+            ],
+            'options' => [
+                'fieldsData'       => [
+                    'first'  => $this->getFieldData('first'),
+                    'second' => $this->getFieldData('second')
+                ],
+                'chartName'        => 'chart_name',
+                'useParentOptions' => true
+            ]
+        ];
+    }
 
-        $this->configProvider->expects($this->once())
-            ->method('getChartConfig')
-            ->with($expectedName)
-            ->will($this->returnValue($configs));
-
-        $form = $this->factory->create($this->type, null, array(ChartSettingsType::NODE_NAME => $expectedName));
-
-        $this->assertTrue($form->has($fieldName));
-        $this->assertTrue($form->has($fieldNameSecond));
-
-        $actual = $form->get($fieldName);
-        $this->assertEquals($actual->getConfig()->getOption('label'), $fieldLabel);
-        $this->assertTrue($actual->getConfig()->getOption('required'));
-        $this->assertEquals($actual->getConfig()->getType()->getName(), $fieldType);
-
-        $actual = $form->get($fieldNameSecond);
-        $this->assertEquals($actual->getConfig()->getOption('label'), $fieldLabelSecond);
-        $this->assertFalse($actual->getConfig()->getOption('required'));
-        $this->assertEquals($actual->getConfig()->getType()->getName(), $fieldTypeSecond);
+    /**
+     * @param string $fieldName
+     * @return array
+     */
+    protected function getFieldData($fieldName)
+    {
+        return [
+            'name'    => $fieldName . 'Name',
+            'label'   => $fieldName . 'Label',
+            'type'    => 'text',
+            'options' => [
+                'label'    => $fieldName . 'NewLabel',
+                'required' => false
+            ]
+        ];
     }
 }
