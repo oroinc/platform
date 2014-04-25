@@ -16,7 +16,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
     protected $platform;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -29,7 +29,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
             )
         );
 
-        $this->createEmailToFolderRelationTable($schema);
+        self::oroEmailToFolderRelationTable($schema);
 
         // make message_id not null & add index
         $table = $schema->getTable('oro_email');
@@ -47,7 +47,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
      *
      * @param Schema $schema
      */
-    protected function createEmailToFolderRelationTable(Schema $schema)
+    public static function oroEmailToFolderRelationTable(Schema $schema)
     {
         $table = $schema->createTable('orocrm_email_to_folder');
         $table->addColumn('email_id', 'integer', []);
