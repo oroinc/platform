@@ -69,7 +69,7 @@ define(['underscore'
                 data = this._getChildren(result);
                 var lastItemIndex = _.size(chain) - 2;
                 _.each(_.rest(chain), _.bind(function (item, index) {
-                    var fieldName = this._getFieldName(item);
+                    var fieldName = _.last(this._getPair(item));
                     result = index < lastItemIndex
                         ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
@@ -109,7 +109,7 @@ define(['underscore'
          *  item = "Acme\Entity1::Acme\Entit2::id" (class name = "Acme\Entity1", field name = "Acme\Entit2::id")
          *      result = ["Acme\Entity1", "Acme\Entit2::id"]
          *
-         * @param item
+         * @param {string} item
          * @returns {Array}
          * @private
          */
@@ -123,10 +123,6 @@ define(['underscore'
             }
 
             return pair;
-        },
-
-        _getFieldName: function (item) {
-            return _.last(this._getPair(item));
         },
 
         _getField: function (fieldName, data) {
