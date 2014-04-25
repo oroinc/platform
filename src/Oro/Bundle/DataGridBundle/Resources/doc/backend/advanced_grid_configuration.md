@@ -23,7 +23,6 @@ This param will be passed to request and could be applied to datasource in build
         class: %oro_datagrid.event_listener.base_orm_relation.class%
         arguments:
           - groupId # param name
-          - @oro_datagrid.datagrid.request_params
           - false   # edit mode disabled
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.GRID_NAME, method: onBuildAfter }

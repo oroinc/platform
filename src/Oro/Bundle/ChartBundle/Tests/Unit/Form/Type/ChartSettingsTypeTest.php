@@ -52,17 +52,17 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         return [
             'name'          => [
                 'options'   => [ChartSettingsType::NAME => 11],
-                'exception' => '\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
                 'message'   => 'The option "name" with value "11" is expected to be of type "string"'
             ],
             'chart_options' => [
                 'options'   => [ChartSettingsType::CHART_OPTIONS => 11],
-                'exception' => '\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
                 'message'   => 'The option "chart_options" with value "11" is expected to be of type "array"'
             ],
             'empty'         => [
                 'options'   => [],
-                'exception' => '\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException',
+                'exception' => 'Oro\Bundle\ChartBundle\Exception\InvalidArgumentException',
                 'message'   => 'Missing options for'
             ]
         ];

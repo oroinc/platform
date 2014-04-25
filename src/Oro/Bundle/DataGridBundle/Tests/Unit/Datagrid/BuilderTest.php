@@ -78,7 +78,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuild($config, $resultFQCN, $raisedEvents, $extensionsCount, $extensionsMocks = [])
     {
         $builder = $this->getBuilderMock(['buildDataSource']);
-        $parameters = array('key' => 'value');
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
 
         foreach ($extensionsMocks as $extension) {
             $builder->registerExtension($extension);
@@ -87,12 +87,13 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         foreach ($raisedEvents as $at => $eventDetails) {
             list($name, $eventType) = $eventDetails;
             $this->eventDispatcher->expects($this->at($at))->method('dispatch')
-                ->with($this->equalTo($name), $this->isInstanceOf($eventType))
-                ->will(
-                    $this->returnCallback(
-                        function ($eventName, $event) use ($parameters) {
-                            /** @var $event BuildBefore|BuildAfter */
-                            \PHPUnit_Framework_TestCase::assertEquals($parameters, $event->getParameters());
+                ->with(
+                    $this->equalTo($name),
+                    $this->callback(
+                        function ($event) use ($eventType, $resultFQCN) {
+                            $this->isInstanceOf($eventType, $event);
+                            $this->isInstanceOf($resultFQCN, $event->getDatagrid());
+                            return true;
                         }
                     )
                 );
@@ -112,7 +113,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildProvider()
     {
-        $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\DatagridClass';
+        $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid';
         $baseEventList     = [
             ['oro_datagrid.datagrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
             [

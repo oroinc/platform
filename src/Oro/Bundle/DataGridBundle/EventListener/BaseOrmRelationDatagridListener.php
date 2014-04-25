@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
@@ -31,13 +31,11 @@ class BaseOrmRelationDatagridListener
 
     /**
      * @param string            $paramName  Parameter name that should be taken from request and binded to query
-     * @param RequestParameters $requestParams
      * @param bool              $isEditMode whether or not to add data_in, data_not_in params to query
      */
-    public function __construct($paramName, RequestParameters $requestParams, $isEditMode = true)
+    public function __construct($paramName, $isEditMode = true)
     {
         $this->paramName     = $paramName;
-        $this->requestParams = $requestParams;
         $this->isEditMode    = $isEditMode;
     }
 
@@ -57,12 +55,14 @@ class BaseOrmRelationDatagridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
+        $parameters = $datagrid->getParameters();
         if ($datasource instanceof OrmDatasource) {
             /** @var QueryBuilder $query */
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $additionalParams = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
+            $additionalParams = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS);
             if (isset($additionalParams[self::GRID_PARAM_DATA_IN])) {
                 $dataIn = $additionalParams[self::GRID_PARAM_DATA_IN];
             } else {
@@ -76,7 +76,7 @@ class BaseOrmRelationDatagridListener
             }
 
             $queryParameters = array(
-                $this->paramName => $this->requestParams->get($this->paramName, null),
+                $this->paramName => $parameters->get($this->paramName, null),
                 'data_in'        => $dataIn,
                 'data_not_in'    => $dataOut,
             );

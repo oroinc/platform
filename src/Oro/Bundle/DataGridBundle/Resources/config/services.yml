@@ -1,25 +1,26 @@
 parameters:
-    oro_datagrid.datagrid.base.class:                Oro\Bundle\DataGridBundle\Datagrid\Datagrid
-    oro_datagrid.extension.acceptor.class:           Oro\Bundle\DataGridBundle\Extension\Acceptor
+    oro_datagrid.datagrid.base.class:                       Oro\Bundle\DataGridBundle\Datagrid\Datagrid
+    oro_datagrid.extension.acceptor.class:                  Oro\Bundle\DataGridBundle\Extension\Acceptor
 
-    oro_datagrid.datagrid.manager.class:             Oro\Bundle\DataGridBundle\Datagrid\Manager
-    oro_datagrid.datagrid.builder.class:             Oro\Bundle\DataGridBundle\Datagrid\Builder
-    oro_datagrid.datagrid.request_params.class:      Oro\Bundle\DataGridBundle\Datagrid\RequestParameters
+    oro_datagrid.datagrid.manager.class:                    Oro\Bundle\DataGridBundle\Datagrid\Manager
+    oro_datagrid.datagrid.builder.class:                    Oro\Bundle\DataGridBundle\Datagrid\Builder
+    oro_datagrid.datagrid.parameters.class:                 Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
+    oro_datagrid.datagrid.request_parameters_factory.class: Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory
 
-    oro_datagrid.provider.resolver.class:            Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
+    oro_datagrid.provider.resolver.class:                   Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
 
-    oro_datagrid.twig.datagrid.class:                Oro\Bundle\DataGridBundle\Twig\DataGridExtension
-    oro_datagrid.event_listener.base_orm_relation.class: Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
-    oro_datagrid.configuration.provider.class:       Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
-    oro_datagrid.configuration.provider.chain.class: Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
-    oro_datagrid.event_listener.ormdatasource_acl.class: Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
+    oro_datagrid.twig.datagrid.class:                       Oro\Bundle\DataGridBundle\Twig\DataGridExtension
+    oro_datagrid.event_listener.base_orm_relation.class:    Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
+    oro_datagrid.configuration.provider.class:              Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
+    oro_datagrid.configuration.provider.chain.class:        Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
+    oro_datagrid.event_listener.ormdatasource_acl.class:    Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
         arguments:
             - @oro_datagrid.configuration.provider.chain
             - @oro_datagrid.datagrid.builder
-            - @oro_datagrid.datagrid.request_params
+            - @oro_datagrid.datagrid.request_parameters_factory
 
     oro_datagrid.datagrid.manager.link:
         tags:
@@ -34,9 +35,10 @@ services:
             - @oro_security.security_facade
         lazy: true
 
-    oro_datagrid.datagrid.request_params:
-        class: %oro_datagrid.datagrid.request_params.class%
-        score: request
+    oro_datagrid.datagrid.request_parameters_factory:
+        class: %oro_datagrid.datagrid.request_parameters_factory.class%
+        arguments:
+            - %oro_datagrid.datagrid.parameters.class%
         calls:
             - [setRequest, [@?request=]]
 

@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -34,10 +33,12 @@ class OrmPagerExtension extends AbstractExtension
     /** @var Pager */
     protected $pager;
 
-    public function __construct(Pager $pager, RequestParameters $requestParams)
+    /**
+     * @param Pager $pager
+     */
+    public function __construct(Pager $pager)
     {
         $this->pager = $pager;
-        parent::__construct($requestParams);
     }
 
     /**
@@ -108,13 +109,13 @@ class OrmPagerExtension extends AbstractExtension
      * Get param or return specified default value
      *
      * @param string $paramName
-     * @param null   $default
+     * @param mixed  $default
      *
      * @return mixed
      */
     protected function getOr($paramName, $default = null)
     {
-        $pagerParameters = $this->requestParams->get(self::PAGER_ROOT_PARAM);
+        $pagerParameters = $this->getParameters()->get(self::PAGER_ROOT_PARAM);
 
         return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
     }

@@ -111,4 +111,14 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
         $result = $this->grid->getMetadata();
         $this->assertInstanceOf($resultFQCN, $result);
     }
+
+    public function testSetParameters()
+    {
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+
+        $this->assertNull($this->grid->getParameters());
+        $this->grid->setParameters($parameters);
+
+        $this->assertSame($parameters, $this->grid->getParameters());
+    }
 }

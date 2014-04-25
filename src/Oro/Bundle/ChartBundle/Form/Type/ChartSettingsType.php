@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
 class ChartSettingsType extends AbstractType

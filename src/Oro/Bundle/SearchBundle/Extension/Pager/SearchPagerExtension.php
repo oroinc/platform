@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Extension\Pager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
@@ -15,9 +14,11 @@ class SearchPagerExtension extends OrmPagerExtension
     /** @var IndexerPager */
     protected $pager;
 
-    public function __construct(IndexerPager $pager, RequestParameters $requestParams)
+    /**
+     * @param IndexerPager $pager
+     */
+    public function __construct(IndexerPager $pager)
     {
-        $this->requestParams = $requestParams;
         $this->pager = $pager;
     }
 

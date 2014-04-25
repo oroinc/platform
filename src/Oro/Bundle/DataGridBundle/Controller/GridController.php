@@ -52,14 +52,12 @@ class GridController extends Controller
      * )
      *
      * @param string $gridName
-     *
-     * @throws \Exception
      * @return Response
+     * @throws \Exception
      */
     public function getAction($gridName)
     {
-        $parameters = (array)$this->getRequest()->query->get($gridName, array());
-        $grid       = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName, $parameters);
+        $grid = $this->get('oro_datagrid.datagrid.manager')->getDatagridByRequestParams($gridName);
 
         try {
             $result = $grid->getData();

@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
@@ -40,7 +40,7 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $params      = $this->getRequestParams()->get(RequestParameters::ADDITIONAL_PARAMETERS);
+        $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS);
         $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 

@@ -73,4 +73,20 @@ interface DatagridInterface
      * @return MetadataObject
      */
     public function getMetadata();
+
+    /**
+     * Set parameters
+     *
+     * @param ParameterBag $parameters
+     *
+     * @return $this
+     */
+    public function setParameters(ParameterBag $parameters);
+
+    /**
+     * Returns parameters
+     *
+     * @return ParameterBag
+     */
+    public function getParameters();
 }
