@@ -76,7 +76,7 @@ class ParameterBag
      */
     public function get($key, $default = null)
     {
-        return isset($this->parameters[$key]) ? $this->parameters[$key] : $default;
+        return $this->has($key) ? $this->parameters[$key] : $default;
     }
 
     /**

@@ -20,15 +20,6 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
  */
 class OrmPagerExtension extends AbstractExtension
 {
-    /**
-     * Query params
-     */
-    const PAGER_ROOT_PARAM = '_pager';
-    const PAGE_PARAM       = '_page';
-    const PER_PAGE_PARAM   = '_per_page';
-    const DISABLED_PARAM   = '_disabled';
-
-    const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /** @var Pager */
     protected $pager;
@@ -54,9 +45,8 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        /** @TODO disabled when hidden on toolbar */
         // enabled by default for ORM datasource
-        return !(bool)$this->getOr(self::DISABLED_PARAM, false)
+        return !(bool)$this->getOr(PagerInterface::DISABLED_PARAM, false)
             && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
     }
 
@@ -68,8 +58,8 @@ class OrmPagerExtension extends AbstractExtension
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
         $this->pager->setQueryBuilder($datasource->getQueryBuilder());
-        $this->pager->setPage($this->getOr(self::PAGE_PARAM, 1));
-        $this->pager->setMaxPerPage($this->getOr(self::PER_PAGE_PARAM, $defaultPerPage));
+        $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
+        $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         $this->pager->init();
     }
 
@@ -78,7 +68,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetSetByPath(self::TOTAL_PATH_PARAM, $this->pager->getNbResults());
+        $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $this->pager->getNbResults());
     }
 
     /**
@@ -89,8 +79,8 @@ class OrmPagerExtension extends AbstractExtension
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
         $state = [
-            'currentPage' => $this->getOr(self::PAGE_PARAM, 1),
-            'pageSize'    => $this->getOr(self::PER_PAGE_PARAM, $defaultPerPage)
+            'currentPage' => $this->getOr(PagerInterface::PAGE_PARAM, 1),
+            'pageSize'    => $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage)
         ];
 
         $data->offsetAddToArray('state', $state);
@@ -115,7 +105,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     protected function getOr($paramName, $default = null)
     {
-        $pagerParameters = $this->getParameters()->get(self::PAGER_ROOT_PARAM);
+        $pagerParameters = $this->getParameters()->get(PagerInterface::PAGER_ROOT_PARAM, []);
 
         return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
     }

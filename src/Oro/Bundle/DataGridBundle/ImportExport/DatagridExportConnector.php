@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -86,9 +86,9 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
                 $this->page++;
                 $this->grid->getParameters()->set(
-                    OrmPagerExtension::PAGER_ROOT_PARAM,
+                    PagerInterface::PAGER_ROOT_PARAM,
                     [
-                        OrmPagerExtension::PAGE_PARAM => $this->page
+                        PagerInterface::PAGE_PARAM => $this->page
                     ]
                 );
                 $gridData         = $this->grid->getData();
@@ -148,14 +148,14 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
 
             $this->page = 1;
             $this->grid->getParameters()->set(
-                OrmPagerExtension::PAGER_ROOT_PARAM,
+                PagerInterface::PAGER_ROOT_PARAM,
                 [
-                    OrmPagerExtension::PAGE_PARAM     => $this->page,
-                    OrmPagerExtension::PER_PAGE_PARAM => $this->pageSize
+                    PagerInterface::PAGE_PARAM     => $this->page,
+                    PagerInterface::PER_PAGE_PARAM => $this->pageSize
                 ]
             );
             $gridData         = $this->grid->getData();
-            $this->totalCount = $gridData->offsetGetByPath(OrmPagerExtension::TOTAL_PATH_PARAM);
+            $this->totalCount = $gridData->offsetGetByPath(PagerInterface::TOTAL_PATH_PARAM);
             $this->sourceData = $gridData->offsetGet('data');
             $this->offset     = 0;
         }

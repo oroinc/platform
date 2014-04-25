@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Extension\Pager;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SearchBundle\Extension\SearchDatasource;
@@ -40,8 +41,8 @@ class SearchPagerExtension extends OrmPagerExtension
 
         $this->pager->setQuery($datasource->getQuery());
 
-        $this->pager->setPage($this->getOr(self::PAGE_PARAM, 1));
-        $this->pager->setMaxPerPage($this->getOr(self::PER_PAGE_PARAM, $defaultPerPage));
+        $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
+        $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         $this->pager->init();
     }
 }
