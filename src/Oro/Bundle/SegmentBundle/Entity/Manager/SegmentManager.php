@@ -3,9 +3,12 @@
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentManager
 {
+    const PER_PAGE = 20;
+
     /** @var EntityManager */
     protected $em;
 
@@ -39,36 +42,50 @@ class SegmentManager
     /**
      * @param string $entityName
      * @param string $term
+     * @param integer $page optional
      *
      * @return array
      */
-    public function getSegmentByEntityName($entityName, $term)
+    public function getSegmentByEntityName($entityName, $term, $page = 1)
     {
-        $result = [];
-        $query  = $this->em->getRepository("OroSegmentBundle:Segment")
-            ->createQueryBuilder('s')
-            ->where('s.entity = :entity')
+        $offset = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
+        $result = array(
+            'items' => array(),
+            'total' => 0,
+        );
+
+        $queryBuilder = $this->em->getRepository("OroSegmentBundle:Segment")
+            ->createQueryBuilder('segment')
+            ->where('segment.entity = :entity')
             ->setParameter('entity', $entityName);
 
         if (!empty($term)) {
-            $query
-                ->andWhere('s.name LIKE :segmentName')
+            $queryBuilder
+                ->andWhere('segment.name LIKE :segmentName')
                 ->setParameter('segmentName', sprintf('%%%s%%', $term));
         }
 
-        $segments = $query
-            ->setMaxResults(20)
+        $countQueryBuilder = clone $queryBuilder;
+        $result['total'] = $countQueryBuilder->select('COUNT(segment)')->getQuery()->getSingleScalarResult();
+
+        if (empty($result['total'])) {
+            return $result;
+        }
+
+        $segments = $queryBuilder
+            ->setFirstResult($offset)
+            ->setMaxResults(self::PER_PAGE)
             ->getQuery()
             ->getResult();
 
+        /** @var Segment $segment */
         foreach ($segments as $segment) {
-            $result[] = [
+            $result['items'][] = array(
                 'id'   => 'segment_' . $segment->getId(),
                 'text' => $segment->getName(),
                 'type' => 'segment',
-            ];
+            );
         }
-
 
         return $result;
     }

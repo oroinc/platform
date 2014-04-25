@@ -76,19 +76,23 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 this.options.select2.ajax,
                 {
                     url: url,
-                    data: function (term, page) {
+                    data: _.bind(function (term, page) {
                         return {
-                            term: term
+                            page:      page,
+                            pageLimit: this.options.pageLimit,
+                            term:      term
                         };
-                    },
+                    }, this),
                     results: _.bind(function (data, page) {
-                        var currentId = this.options.currentSegment;
-                        var data = _.filter(data, function (item) {
+                        var currentId = this.options.currentSegment,
+                            more      = (page * this.options.pageLimit) < data.total;
+
+                        data = _.filter(data['items'], function (item) {
                             if (item.id != 'segment_'+currentId) {
                                 return true;
                             }
                         });
-                        return {results: data};
+                        return {results: data, more: more};
                     }, this)
                 }
             );
