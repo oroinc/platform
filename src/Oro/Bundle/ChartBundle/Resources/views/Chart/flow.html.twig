@@ -32,21 +32,19 @@
                                     return;
                                 }
                                 var data = {{ data|json_encode|raw }};
-                                console.log(data);
-                                var chartData = [];
+                                var chartData = {};
                                 var nozzleSteps = [];
                                 _.each(data, function(value, key) {
                                     if (value.value <= 0) {
                                         data[key].value = 0.0001;
                                     }
-                                    var chartDataItem = {};
-                                    chartDataItem[value.label] = value.value;
-                                    chartData.push(chartDataItem);
+                                    chartData[value.label] = value.value;
                                     if (value.isNozzle) {
-                                        nozzleSteps.push(chartDataItem);
+                                        nozzleSteps.push(value.label);
                                     }
                                 });
                                 console.log(chartData);
+                                console.log(nozzleSteps);
                                 Flotr.draw(
                                         $chart.get(0),
                                         new Array(chartData),
