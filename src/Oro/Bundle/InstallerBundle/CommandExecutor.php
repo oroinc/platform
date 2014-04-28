@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
-use Oro\Bundle\SecurityBundle\Cache\OroDataCacheManager;
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 
 class CommandExecutor
 {
@@ -80,6 +80,9 @@ class CommandExecutor
             ],
             $params
         );
+        if (!$params['--no-debug']) {
+            unset($params['--no-debug']);
+        }
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
         }

@@ -180,9 +180,10 @@ abstract class AbstractPageGrid extends AbstractPage
      * Verify entity exist on the current page
      *
      * @param array $entityData
+     * @param null|int $column
      * @return \PHPUnit_Extensions_Selenium2TestCase_Element
      */
-    public function getEntity($entityData)
+    public function getEntity($entityData, $column = null)
     {
         $xpath = '';
         foreach ($entityData as $entityField) {
@@ -191,7 +192,12 @@ abstract class AbstractPageGrid extends AbstractPage
             }
             $xpath .=  "td[contains(.,'{$entityField}')]";
         }
-        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]";
+        $postFix = "";
+        if (!is_null($column)) {
+            $postFix = "/td[{$column}]";
+        }
+
+        $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]{$postFix}";
         return $this->test->byXPath($xpath);
     }
 
@@ -205,8 +211,13 @@ abstract class AbstractPageGrid extends AbstractPage
     public function deleteEntity($entityData = array(), $actionName = 'Delete', $confirmation = true)
     {
         $entity = $this->getEntity($entityData);
-        $entity->element($this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]"))
-            ->click();
+        $element = $entity->element(
+            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]")
+        );
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $element->click();
+        $element->click();
+
         $entity->element(
             $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$actionName}')]")
         )->click();

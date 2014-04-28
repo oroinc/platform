@@ -59,7 +59,7 @@ services:
         arguments:
             - %kernel.root_dir%/console
             - %kernel.environment%
-            - @oro.oro_data_cache_manager
+            - @oro_cache.oro_data_cache_manager
 
     oro_entity_config.config_loader:
         class: %oro_entity_config.config_loader.class%
@@ -95,6 +95,7 @@ services:
         class: %oro_entity_config.event_listener.entityconfig_grid_listener.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_datagrid.provider.resolver
         tags:
             - { name: kernel.event_subscriber }
 
@@ -102,6 +103,7 @@ services:
         class: %oro_entity_config.event_listener.entityfields_grid_listener.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_datagrid.provider.resolver
             - @oro_datagrid.datagrid.request_params
         tags:
             - { name: kernel.event_subscriber }

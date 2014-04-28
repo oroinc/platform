@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Validator;
 
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,6 +24,11 @@ class VariablesValidator extends ConstraintValidator
     /** @var EntityManager */
     protected $entityManager;
 
+    /**
+     * @param \Twig_Environment        $twig
+     * @param SecurityContextInterface $securityContext
+     * @param EntityManager            $entityManager
+     */
     public function __construct(
         \Twig_Environment $twig,
         SecurityContextInterface $securityContext,
@@ -53,39 +58,43 @@ class VariablesValidator extends ConstraintValidator
             }
         }
 
-        $relatedEntity = false;
         if (class_exists($emailTemplate->getEntityName())) {
-            $className     = $emailTemplate->getEntityName();
-            $relatedEntity = new $className;
+            $className = $emailTemplate->getEntityName();
 
-            $metadata = $this->entityManager->getClassMetadata($className);
+            /** @var ClassMetadataInfo $metadata */
+            $classMetadata = $this->entityManager->getClassMetadata($className);
+            if ($classMetadata->getReflectionClass()->isAbstract()) {
+                $this->context->addViolation(
+                    sprintf('Its not possible to create template for "%s"', $className)
+                );
+            }
 
-            foreach ($metadata->getAssociationMappings() as $mapping) {
-                $targetEntity = new $mapping['targetEntity'];
-                $fieldName    = $mapping['fieldName'];
-                if (!in_array($mapping['type'], [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::MANY_TO_MANY])) {
-                    $relatedEntity->{'set' . ucfirst($fieldName)}($targetEntity);
+            $entity = $classMetadata->newInstance();
+
+            /** @var \Twig_Extension_Sandbox $sandbox */
+            $sandbox = $this->twig->getExtension('sandbox');
+            $sandbox->enableSandbox();
+
+            $hasErrors = false;
+            foreach ($fieldsToValidate as $template) {
+                try {
+                    $this->twig->render(
+                        $template,
+                        array(
+                            'entity' => $entity,
+                            'user'   => $this->getUser()
+                        )
+                    );
+                } catch (\Twig_Error $e) {
+                    $hasErrors = true;
                 }
             }
-        }
 
-        $errors = array();
-        foreach ($fieldsToValidate as $field => $value) {
-            try {
-                $this->twig->render(
-                    $value,
-                    array(
-                        'entity' => $relatedEntity,
-                        'user'   => $this->getUser()
-                    )
-                );
-            } catch (\Exception $e) {
-                $errors[$field] = true;
+            $sandbox->disableSandbox();
+
+            if ($hasErrors) {
+                $this->context->addViolation($constraint->message);
             }
-        }
-
-        if (!empty($errors)) {
-            $this->context->addViolation($constraint->message);
         }
     }
 

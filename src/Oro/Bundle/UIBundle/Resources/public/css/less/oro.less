@@ -69,9 +69,9 @@ form {
     top: 9px;
   }
   & > li > a{
-      & > i[class^="icon-"]{
-     	 min-width: 17px;
-	  }
+    & > i[class^="icon-"] {
+      min-width: 17px;
+    }
   }
 }
 .dark {
@@ -2229,7 +2229,7 @@ textarea {
     display: inline-block;
     left: 9px;
     position: absolute;
-    bottom: -8px;
+    bottom: -10px;
   }
   &:after {
     border-bottom: 10px solid #FFFFFF;
@@ -2239,8 +2239,8 @@ textarea {
     display: inline-block;
     left: 10px;
     position: absolute;
-    bottom: -8px;
-    z-index: 701;
+    bottom: -10px;
+    z-index: 10001;
   }
 }
 .filter-box .filter-select-oro {
@@ -2870,6 +2870,10 @@ label.validation-error {
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
   color: #555;
+  &.validate-group {
+    margin-left: -6px;
+    padding-left: 5px;
+  }
 }
 .validation-error div.selector {
   display: inline-block;
@@ -3213,7 +3217,7 @@ span.validation-failed {
   line-height: @baseLineHeight;
   padding-left: 10px;
 }
-.dashboard-contailer .page-title{
+.dashboard-container-wrapper .page-title{
   border-bottom: 1px solid #F2F2F2;
 }
 .tab-container{
@@ -3445,6 +3449,9 @@ i.pin-status {
 #container .popover {
   // prevent menu and loading wrapper overlapping
   z-index: 800;
+}
+
+.popover {
   .popover-content {
     padding-right: 25px;
   }

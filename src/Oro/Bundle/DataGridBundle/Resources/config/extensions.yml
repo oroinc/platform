@@ -17,6 +17,7 @@ services:
             - @translator
         tags:
             - { name: oro_datagrid.extension }
+        lazy: true
 
     oro_datagrid.extension.orm_pager:
         class: %oro_datagrid.extension.orm_pager.class%
@@ -84,5 +85,6 @@ services:
             - @translator
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
+            - @oro_security.acl_helper
         tags:
             - { name: oro_datagrid.extension }

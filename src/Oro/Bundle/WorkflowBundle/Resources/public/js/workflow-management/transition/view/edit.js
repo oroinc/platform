@@ -261,7 +261,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
             data.stepFrom = this.options.step_from;
-            data.allowedButtonStyles = this.options.allowed_button_styles;
+            data.allowedButtonStyles = _.sortBy(this.options.allowed_button_styles, 'label');
             data.buttonIcon = this._getFrontendOption('icon');
             data.buttonStyle = this._getFrontendOption('class');
             data.allowedStepsFrom = steps;

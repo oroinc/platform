@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
  * @ORM\Entity
@@ -50,10 +51,11 @@ class EntityConfigModel extends AbstractConfigModel
      */
     public function __construct($className = null)
     {
-        $this->className     = $className;
         $this->mode          = ConfigModelManager::MODE_DEFAULT;
         $this->fields        = new ArrayCollection();
         $this->indexedValues = new ArrayCollection();
+
+        $this->setClassName($className);
     }
 
     /**
@@ -71,6 +73,10 @@ class EntityConfigModel extends AbstractConfigModel
     public function setClassName($className)
     {
         $this->className = $className;
+
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+        $this->addToIndex('entity_config', 'module_name', $moduleName);
+        $this->addToIndex('entity_config', 'entity_name', $entityName);
 
         return $this;
     }

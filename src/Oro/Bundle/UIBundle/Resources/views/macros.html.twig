@@ -24,6 +24,33 @@
     </div>
 {% endmacro %}
 
+{% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
+    {% set details_anchor = details_anchor|default(null) %}
+    {% set details_link = details_link|default(null) %}
+    {% set details_enabled = details_enabled|default(false) %}
+    {% set tooltip_parameters = tooltip_parameters|default({}) %}
+    {% set tooltip_placement = tooltip_placement|default(null) %}
+    {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+
+    {# Help link logic #}
+    {% if details_enabled or details_anchor or details_link %}
+        {% set helpLink = details_link|default(get_help_link()) %}
+        {% if details_anchor %}
+            {% set helpLink = helpLink ~ '#' ~ details_anchor %}
+        {% endif %}
+        {% set tooltip = tooltip
+            ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">'
+            ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
+        %}
+    {% endif %}
+    {# End help link logic #}
+
+    <i class="icon-info-sign tooltip-icon"
+       {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
+       data-content="{{ tooltip }}"
+       data-toggle="popover"></i>
+{% endmacro %}
+
 {#
     Render flexible attribute row
     Parameters:
@@ -118,8 +145,16 @@
     {% endif %}
     {% spaceless %}
     <a href="{{ parameters.path }}"
+        {% if (parameters.id is defined) %}
+            id="{{ parameters.id }}"
+        {% endif %}
+        {% if parameters.data is defined %}
+            {% for dataItemName,dataItemValue in parameters.data %}
+                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+            {% endfor %}
+        {% endif %}
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-           title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+       title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -153,6 +188,9 @@
 {% macro dropdownButton(parameters) %}
     <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            {% if parameters.iCss is defined %}
+                <i class="{{ parameters.iCss }}"></i>
+            {% endif %}
             {{ parameters.label|trans }}
             <span class="caret"></span>
         </a>
@@ -325,11 +363,26 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
+    {% set aCss = 'btn icons-holder-text' %}
+
+    {% if parameters.disabled is defined and parameters.disabled %}
+        {% set aCss = aCss ~ ' disabled' %}
+    {% endif %}
+
+    {% if parameters.aCss is defined %}
+        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+    {% endif %}
+
+    {% set parameters = parameters|merge({'aCss': aCss}) %}
+
+    <div class="pull-left btn-group icons-holder">
+        {{ _self.deleteLink(parameters) }}
+    </div>
+{% endmacro %}
+
+{% macro deleteLink(parameters) %}
     {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'oro.ui.item'|trans %}
-    {% set label = parameters.label is defined
-        ? parameters.label
-        : 'oro.ui.delete'|trans
-    %}
+    {% set label = parameters.label is defined ? parameters.label : 'oro.ui.delete'|trans %}
     {% if parameters.title is defined %}
         {% set title = parameters.title %}
     {% else %}
@@ -338,35 +391,35 @@
             : 'oro.ui.delete'|trans
         %}
     {% endif %}
-    <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}{{ parameters.disabled is defined and parameters.disabled ? ' disabled' : ''}}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {% if (parameters.dataId is defined) %}
-                data-id="{{ parameters.dataId }}"
-            {% endif %}
-            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) }}"
-            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) }}"
-            {% if (parameters.dataUrl is defined) %}
-                data-url="{{ parameters.dataUrl }}"
-            {% endif %}
-            {% if parameters.dataRedirect is defined %}
-                data-redirect="{{ parameters.dataRedirect  }}"
-            {% endif %}
-            {% if parameters.data is defined %}
-                {% for dataItemName,dataItemValue in parameters.data %}
-                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
-                {% endfor %}
-            {% endif %}
-            title="{{ title }}"
-        >
-            <i class="icon-trash hide-text"></i>
-            {{ label }}
-        </a>
-    </div>
-{% endmacro %}
 
+    {% set message = parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
+    {% set linkParams = {
+        'data': {
+            'message': message,
+            'success-message': successMessage,
+            'url':url
+        },
+        'iCss': 'icon-trash',
+        'aCss': parameters.aCss,
+        'title': title,
+        'label': label,
+        'path': 'javascript:void(0);'
+    } %}
+
+
+    {% if (parameters.dataId is defined) %}
+        {% set data = linkParams.data|merge({'id': parameters.dataId}) %}
+        {% set linkParams = linkParams|merge({ 'data': data }) %}
+    {% endif %}
+    {% if parameters.dataRedirect is defined %}
+        {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
+        {% set linkParams = linkParams|merge({ 'data': data }) %}
+    {% endif %}
+
+    {{ _self.link(linkParams) }}
+{% endmacro %}
 
 {#
     A button with javascript handler

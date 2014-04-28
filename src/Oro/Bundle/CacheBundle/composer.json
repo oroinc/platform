@@ -1,0 +1,21 @@
+{
+    "name": "oro/cache-bundle",
+    "type": "symfony-bundle",
+    "description": "Oro Cache Bundle",
+    "keywords": ["Oro", "Cache"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.3.*"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\CacheBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/CacheBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

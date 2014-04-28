@@ -76,16 +76,7 @@ class EntityProcessor
     {
         set_time_limit(0);
 
-        // put system in maintenance mode
-        $this->maintenance->on();
-
-        register_shutdown_function(
-            function ($maintenance) {
-                /** @var MaintenanceMode $maintenance */
-                $maintenance->off();
-            },
-            $this->maintenance
-        );
+        $this->maintenance->activate();
 
         $exitCode = 0;
         foreach ($this->commands as $command => $options) {

@@ -5,7 +5,7 @@ test_controller:
   group_name: Test Group
   label: Test controller
   bindings:
-    - { class: Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Classes\ConfigController, method: testAction }
+    - { class: Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\Controller\Classes\ConfigController, method: testAction }
 
 test_wo_bindings:
   label: Test without bindings

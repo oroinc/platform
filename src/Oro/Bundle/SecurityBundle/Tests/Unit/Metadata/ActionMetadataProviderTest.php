@@ -100,25 +100,35 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCache()
     {
-        $this->annotationProvider->expects($this->exactly(2))
+        // Called when: warmUpCache, isKnownAction, warmUpCache
+        $this->annotationProvider->expects($this->exactly(3))
             ->method('getAnnotations')
             ->with($this->equalTo('action'))
             ->will($this->returnValue(array()));
+        // First warmUpCache
         $this->cache->expects($this->at(0))
-            ->method('fetch')
-            ->with(ActionMetadataProvider::CACHE_KEY);
-        $this->cache->expects($this->at(1))
             ->method('save')
             ->with(ActionMetadataProvider::CACHE_KEY);
-        $this->cache->expects($this->at(2))
+        // clearCache
+        $this->cache->expects($this->at(1))
             ->method('delete')
             ->with(ActionMetadataProvider::CACHE_KEY);
-        $this->cache->expects($this->at(3))
+        // First isKnownAction
+        $this->cache->expects($this->at(2))
             ->method('fetch')
+            ->with(ActionMetadataProvider::CACHE_KEY);
+        $this->cache->expects($this->at(3))
+            ->method('save')
+            ->with(ActionMetadataProvider::CACHE_KEY);
+        // Second warmUpCache
+        $this->cache->expects($this->at(4))
+            ->method('save')
             ->with(ActionMetadataProvider::CACHE_KEY);
 
         $this->provider->warmUpCache();
         $this->provider->clearCache();
+        $this->assertFalse($this->provider->isKnownAction('unknown'));
+        $this->provider->warmUpCache();
         $this->assertFalse($this->provider->isKnownAction('unknown'));
     }
 }

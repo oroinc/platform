@@ -12,6 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 
 class ConfigModelTest extends \PHPUnit_Framework_TestCase
 {
+    const TEST_CLASS = 'Oro\Bundle\TestBundle\Entity\TestEntity';
+    const TEST_MODULE = 'OroTestBundle';
+    const TEST_ENTITY = 'TestEntity';
+
     /**
      * @dataProvider modelProvider
      */
@@ -137,12 +141,28 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values, $model->toArray('datagrid'));
 
         $indexedValues = $model->getIndexedValues();
-        $this->assertCount(1, $indexedValues);
+        $expectedCount = $model instanceof EntityConfigModel ? 3 : 1;
+        $this->assertCount($expectedCount, $indexedValues);
+        $indexedValues = $indexedValues->toArray();
+
+        if ($model instanceof EntityConfigModel) {
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('module_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_MODULE, $indexedValue->getValue());
+
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('entity_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_ENTITY, $indexedValue->getValue());
+        }
+
         /** @var ConfigModelIndexValue $indexedValue */
-        $indexedValue = $indexedValues->first();
+        $indexedValue = array_shift($indexedValues);
         $this->assertEquals('datagrid', $indexedValue->getScope());
         $this->assertEquals('is_sortable', $indexedValue->getCode());
         $this->assertEquals(0, $indexedValue->getValue());
+
         if ($model instanceof FieldConfigModel) {
             $this->assertNull($indexedValue->getEntity());
             $this->assertSame($model, $indexedValue->getField());
@@ -172,17 +192,32 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values, $model->toArray('test_scope'));
 
         $indexedValues = $model->getIndexedValues();
-        $this->assertCount(2, $indexedValues);
-        /** @var ConfigModelIndexValue $indexedValue1 */
-        $indexedValue1 = $indexedValues->first();
-        $this->assertEquals('test_scope', $indexedValue1->getScope());
-        $this->assertEquals('indexed1', $indexedValue1->getCode());
-        $this->assertEquals(3, $indexedValue1->getValue());
-        /** @var ConfigModelIndexValue $indexedValue2 */
-        $indexedValue2 = $indexedValues->last();
-        $this->assertEquals('test_scope', $indexedValue2->getScope());
-        $this->assertEquals('indexed2', $indexedValue2->getCode());
-        $this->assertEquals(4, $indexedValue2->getValue());
+        $expectedCount = $model instanceof EntityConfigModel ? 4 : 2;
+        $this->assertCount($expectedCount, $indexedValues);
+        $indexedValues = $indexedValues->toArray();
+
+        /** @var ConfigModelIndexValue $indexedValue */
+        if ($model instanceof EntityConfigModel) {
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('module_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_MODULE, $indexedValue->getValue());
+
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('entity_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_ENTITY, $indexedValue->getValue());
+        }
+
+        $indexedValue = array_shift($indexedValues);
+        $this->assertEquals('test_scope', $indexedValue->getScope());
+        $this->assertEquals('indexed1', $indexedValue->getCode());
+        $this->assertEquals(3, $indexedValue->getValue());
+
+        $indexedValue = array_shift($indexedValues);
+        $this->assertEquals('test_scope', $indexedValue->getScope());
+        $this->assertEquals('indexed2', $indexedValue->getCode());
+        $this->assertEquals(4, $indexedValue->getValue());
 
         $values = [
             'value2'   => 1,
@@ -192,12 +227,26 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values, $model->toArray('test_scope'));
 
         $indexedValues = $model->getIndexedValues();
-        $this->assertCount(1, $indexedValues);
-        /** @var ConfigModelIndexValue $indexedValue1 */
-        $indexedValue1 = $indexedValues->first();
-        $this->assertEquals('test_scope', $indexedValue1->getScope());
-        $this->assertEquals('indexed2', $indexedValue1->getCode());
-        $this->assertEquals(2, $indexedValue1->getValue());
+        $expectedCount = $model instanceof EntityConfigModel ? 3 : 1;
+        $this->assertCount($expectedCount, $indexedValues);
+        $indexedValues = $indexedValues->toArray();
+
+        if ($model instanceof EntityConfigModel) {
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('module_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_MODULE, $indexedValue->getValue());
+
+            $indexedValue = array_shift($indexedValues);
+            $this->assertEquals('entity_config', $indexedValue->getScope());
+            $this->assertEquals('entity_name', $indexedValue->getCode());
+            $this->assertEquals(self::TEST_ENTITY, $indexedValue->getValue());
+        }
+
+        $indexedValue = array_shift($indexedValues);
+        $this->assertEquals('test_scope', $indexedValue->getScope());
+        $this->assertEquals('indexed2', $indexedValue->getCode());
+        $this->assertEquals(2, $indexedValue->getValue());
 
         $values = [];
         $model->fromArray('test_scope', $values, $indexed);
@@ -207,7 +256,7 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
     public function modelProvider()
     {
         return [
-            [new EntityConfigModel()],
+            [new EntityConfigModel(self::TEST_CLASS)],
             [new FieldConfigModel()]
         ];
     }

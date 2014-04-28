@@ -103,7 +103,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return array(
             $this->getName() => array_intersect_key(
                 $this->definition,
-                array_flip(array('title', 'priority', 'description'))
+                array_flip(array('title', 'priority', 'description', 'configurator'))
             )
         );
     }

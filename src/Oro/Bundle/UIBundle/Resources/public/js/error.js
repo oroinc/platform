@@ -24,10 +24,9 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
 
                 if (xhr.status === 401) {
                     this._processRedirect();
-                } else if (xhr.readyState === 4 && (app.debug || (typeof xhr.error !== 'function' || force))) {
+                } else if (xhr.readyState === 4 && app.debug && (typeof xhr.error !== 'function' || force)) {
                     // show error in modal window in following cases:
                     // when custom error handling is not added
-                    // when in debug mode
                     this.modalHandler(xhr);
                 }
             },

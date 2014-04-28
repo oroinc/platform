@@ -139,7 +139,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
-        $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
+        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
@@ -147,6 +147,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             if (e.keyCode === 27) {
                 $(e.currentTarget).parent().removeClass('open');
             }
+        });
+
+        // fixes submit by enter key press on select element
+        $(document).on('keydown', 'form select', function(e) {
+            if (e.keyCode === 13) {
+                $(e.target.form).submit();
+            }
+        });
+
+        $(document).on('focus', '.select2-focusser, .select2-input', function (e) {
+            $('.hasDatepicker').datepicker('hide')
         });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
@@ -246,22 +257,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             });
         };
 
-        var tries = 0;
-        var waitForDebugBar = function () {
-            var debugBar = $('.sf-toolbar');
-            if (debugBar.children().length) {
-                window.setTimeout(adjustHeight, 500);
-            } else if (tries < 100) {
-                tries += 1;
-                window.setTimeout(waitForDebugBar, 500);
-            }
-        };
-
-        var adjustReloaded = function () {
-            content = false;
-            adjustHeight();
-        };
-
         if (!anchor.length) {
             anchor = $('<div id="bottom-anchor"/>')
                 .css({
@@ -274,14 +269,32 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 .appendTo($(document.body));
         }
 
-        layout.onPageRendered(function () {
-            var debugBar = $('.sf-toolbar');
-            if (debugBar.length) {
-                waitForDebugBar();
-            } else {
-                adjustHeight();
-            }
-        });
+        if ($('.sf-toolbar').length) {
+            adjustHeight = (function () {
+                var orig = adjustHeight;
+                var waitForDebugBar = function (attempt) {
+                    if ($('.sf-toolbar').children().length) {
+                        $('body').addClass('dev-mode');
+                        _.delay(orig, 10);
+                    } else if (attempt < 100) {
+                        _.delay(waitForDebugBar, 500, attempt + 1);
+                    }
+                };
+
+                return _.wrap(adjustHeight, function (orig) {
+                    $('body').removeClass('dev-mode');
+                    orig();
+                    waitForDebugBar(0);
+                });
+            }());
+        }
+
+        var adjustReloaded = function () {
+            content = false;
+            adjustHeight();
+        };
+
+        layout.onPageRendered(adjustHeight);
 
         $(window).on('resize', adjustHeight);
 

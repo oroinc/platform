@@ -1,5 +1,8 @@
 oro:
     segment:
+        menu:
+            reports_tab.label: Reports & Segments
+            manage_segments.label: Manage Segments
         entity_label:        Segment
         entity_plural_label: Segments
         id:
