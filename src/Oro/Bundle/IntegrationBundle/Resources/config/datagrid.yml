@@ -8,11 +8,6 @@ datagrid:
                     - c.id
                     - c.name
                     - c.type
-                    - |
-                      (SELECT COUNT(s.id)
-                      FROM OroIntegrationBundle:Status s
-                      WHERE s.channel = c AND s.code = Oro\Bundle\IntegrationBundle\Entity\Status::STATUS_COMPLETED
-                      ) as syncCount
                 from:
                     - { table: %oro_integration.channel.entity.class%, alias: c }
         columns:
@@ -53,12 +48,6 @@ datagrid:
                 icon:         edit
                 label:        oro.integration.datagrid.action.update
                 rowAction:    true
-            delete:
-                type:         delete
-                link:         delete_link
-                acl_resource: oro_integration_channel_delete
-                icon:         trash
-                label:        oro.integration.datagrid.action.delete
             deleteSyncChannel:
                 type:         delete
                 link:         delete_link
@@ -69,6 +58,6 @@ datagrid:
                     confirm_content: oro.integration.delete_sync_channel_window.content
                     confirm_ok:      oro.integration.delete_sync_channel_window.button_ok
                     confirm_title:   oro.integration.delete_sync_channel_window.title
-        action_configuration: @oro_integration.channels.datagrid_helper->getActionConfigurationClosure
+                    success:         oro.integration.delete_sync_channel_window.success
         options:
             entityHint: channel

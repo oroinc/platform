@@ -10,16 +10,15 @@ class TestChannelDeleteProvider implements ChannelDeleteProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSupportedChannelType()
+    public function isSupport($channelType)
     {
-        return 'test';
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function processDelete(Channel $channel)
+    public function deleteRelatedData(Channel $channel)
     {
-        return true;
     }
 }

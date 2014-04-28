@@ -2,15 +2,29 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelDeleteManager
 {
     /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
      * @var ChannelDeleteProviderInterface[]
      */
     protected $deleteProviders;
+
+    /**
+     * @param EntityManager   $em
+     */
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
 
     /**
      * Add delete channel provider
@@ -19,7 +33,7 @@ class ChannelDeleteManager
      */
     public function addProvider(ChannelDeleteProviderInterface $deleteProvider)
     {
-        $this->deleteProviders[$deleteProvider->getSupportedChannelType()] = $deleteProvider;
+        $this->deleteProviders[] = $deleteProvider;
     }
 
     /**
@@ -30,11 +44,22 @@ class ChannelDeleteManager
      */
     public function deleteChannel(Channel $channel)
     {
-        $channelType = $channel->getType();
-        if (isset($this->deleteProviders[$channelType])) {
-            return $this->deleteProviders[$channelType]->processDelete($channel);
+        try {
+            $this->em->getConnection()->beginTransaction();
+            $channelType = $channel->getType();
+            foreach ($this->deleteProviders as $deleteProvider) {
+                if ($deleteProvider->isSupport($channelType)) {
+                    $deleteProvider->deleteRelatedData($channel);
+                }
+            }
+            $this->em->remove($channel);
+            $this->em->flush();
+            $this->em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $this->em->getConnection()->rollback();
+            return false;
         }
 
-        return false;
+        return true;
     }
 }
