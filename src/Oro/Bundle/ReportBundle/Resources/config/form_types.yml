@@ -1,10 +1,12 @@
 parameters:
-    oro_report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
-    oro_report.form.type.report.class:                 Oro\Bundle\ReportBundle\Form\Type\ReportType
-    oro_report.form.type.entity_choice.class:          Oro\Bundle\ReportBundle\Form\Type\ReportEntityChoiceType
-    oro_report.form.type.chart_choice.class:           Oro\Bundle\ReportBundle\Form\Type\ReportChartChoiceType
-    oro_report.form.handler.report.class:              Oro\Bundle\ReportBundle\Form\Handler\ReportHandler
-    oro_report.report.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_report.report.entity.class:                     Oro\Bundle\ReportBundle\Entity\Report
+    oro_report.form.type.report.class:                  Oro\Bundle\ReportBundle\Form\Type\ReportType
+    oro_report.form.type.entity_choice.class:           Oro\Bundle\ReportBundle\Form\Type\ReportEntityChoiceType
+    oro_report.form.type.chart.class:                   Oro\Bundle\ReportBundle\Form\Type\ReportChartType
+    oro_report.form.type.chart.schema.class:            Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType
+    oro_report.form.type.chart.schema.collection.class: Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType
+    oro_report.form.handler.report.class:               Oro\Bundle\ReportBundle\Form\Handler\ReportHandler
+    oro_report.report.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
 services:
     oro_report.form.type.report:
@@ -41,9 +43,24 @@ services:
         tags:
             - { name: form.type, alias: oro_report_entity_choice }
 
-    oro_report.form.type.chart_choice:
-        class: %oro_report.form.type.chart_choice.class%
+    oro_report.form.type.chart:
+        class: %oro_report.form.type.chart.class%
         arguments:
             - @oro_chart.config_provider
         tags:
-            - { name: form.type, alias: oro_report_chart_choice }
+            - { name: form.type, alias: oro_report_chart }
+
+
+    oro_report.form.type.chart.schema:
+        class: %oro_report.form.type.chart.schema.class%
+        arguments:
+            - @oro_chart.config_provider
+        tags:
+            - { name: form.type, alias: oro_report_chart_schema }
+
+    oro_report.form.type.chart.schema.collection:
+        class: %oro_report.form.type.chart.schema.collection.class%
+        arguments:
+            - @oro_chart.config_provider
+        tags:
+            - { name: form.type, alias: oro_report_chart_schema_collection }

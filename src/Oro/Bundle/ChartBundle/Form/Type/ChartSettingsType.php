@@ -2,28 +2,13 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
-class ChartSettingsType extends AbstractType
+class ChartSettingsType extends ConfigProviderAwareType
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @param ConfigProvider $configProvider
-     */
-    public function __construct(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -33,7 +18,7 @@ class ChartSettingsType extends AbstractType
 
         foreach ($chartConfig['settings_schema'] as $field) {
             $fieldOptions = !empty($field['options']) ? $field['options'] : array();
-            
+
             $fieldOptions['label'] = $field['label'];
 
             $builder->add($field['name'], $field['type'], $fieldOptions);
@@ -71,7 +56,7 @@ class ChartSettingsType extends AbstractType
      */
     protected function getChartConfig(array $options)
     {
-        $chartName   = $options['chart_name'];
+        $chartName = $options['chart_name'];
 
         if (isset($options['chart_config'])) {
             $chartConfig = $options['chart_config'];

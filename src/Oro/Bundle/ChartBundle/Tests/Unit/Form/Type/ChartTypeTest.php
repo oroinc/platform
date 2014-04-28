@@ -7,6 +7,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 
 class ChartTypeTest extends FormIntegrationTestCase
 {
@@ -52,9 +53,10 @@ class ChartTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($this->type, null, []);
 
         $this->assertTrue($form->has('type'));
+        $this->assertTrue($form->has('settings'));
 
-        foreach ($chartConfigs as $chartName => $chartConfig) {
-            $this->assertTrue($form->has($chartName));
+        foreach (array_keys($chartConfigs) as $chartName) {
+            $this->assertTrue($form->get('settings')->has($chartName));
         }
     }
 
@@ -73,21 +75,23 @@ class ChartTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($this->type, null, []);
 
         $this->assertTrue($form->has('type'));
+        $this->assertTrue($form->has('settings'));
 
-        foreach ($chartConfigs as $chartName => $chartConfig) {
-            $this->assertTrue($form->has($chartName));
+        foreach (array_keys($chartConfigs) as $chartName) {
+            $this->assertTrue($form->get('settings')->has($chartName));
         }
 
-        $form->submit(
-            array_merge(
-                ['type' => 'second'],
-                ['second' => $chartConfigs['second']]
-            )
+        $submittedData = array_merge(
+            ['type' => 'second'],
+            $chartConfigs
         );
 
-        $this->assertArrayHasKey('second', $form->getData());
-        $this->assertArrayNotHasKey('first', $form->getData());
-        $this->assertArrayNotHasKey('type', $form->getData());
+        $form->submit($submittedData);
+
+        $formData = $form->getData();
+
+        $this->assertArrayHasKey('name2', $formData['settings']);
+        $this->assertArrayHasKey('type', $formData);
     }
 
     /**
@@ -99,25 +103,29 @@ class ChartTypeTest extends FormIntegrationTestCase
             'name' => [
                 'chartConfigs' => [
                     'first'  => [
-                        'label' => 'First',
+                        'label'            => 'First',
                         'default_settings' => ['option' => 'value'],
-                        'settings_schema' => [
+                        'settings_schema'  => [
                             'field' => [
-                                'name' => 'name',
+                                'name'  => 'name',
                                 'label' => 'Name',
-                                'type' => 'text'
+                                'type'  => 'text',
                             ]
-                        ]
+                        ],
+                        'data_schema' => []
                     ],
                     'second' => [
-                        'label' => 'Second',
+                        'label'            => 'Second',
                         'default_settings' => ['option' => 'value2'],
-                        'settings_schema' => [
+                        'settings_schema'  => [
                             'field' => [
-                                'name' => 'name2',
+                                'name'  => 'name2',
                                 'label' => 'Name2',
-                                'type' => 'text'
+                                'type'  => 'text',
                             ]
+                        ],
+                        'data_schema' => [
+                            'option' => 'value'
                         ]
                     ]
                 ],
@@ -125,14 +133,19 @@ class ChartTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
-        $childType = new ChartSettingsType($this->configProvider);
+        $childType      = new ChartSettingsType($this->configProvider);
+        $collectionType = new ChartSettingsCollectionType();
 
         return [
             new PreloadedExtension(
                 [
-                    $childType->getName() => $childType,
+                    $childType->getName()      => $childType,
+                    $collectionType->getName() => $collectionType,
                 ],
                 []
             )

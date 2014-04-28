@@ -1,10 +1,13 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% form_theme form with [
+    'OroFormBundle:Form:fields.html.twig',
+    'OroReportBundle:Form:fields.html.twig'
+] %}
 {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
 
 {% oro_title_set({params : {"%report.name%": entity.name} }) %}
-{% set formAction = form.vars.value.id ? path('oro_report_update', { 'id': form.vars.value.id }) : path('oro_report_create')  %}
+{% set formAction = form.vars.value.id ? path('oro_report_update', {'id': form.vars.value.id}) : path('oro_report_create') %}
 
 {% block head_script %}
     {{ parent() }}
@@ -142,6 +145,20 @@
                     })
                 ]
             },
+        ]
+    }] ) %}
+
+    {% set dataBlocks = dataBlocks|merge( [{
+        'title': 'oro.report.form.chart_designer'|trans,
+        'subblocks': [
+            {
+                'title': 'oro.report.reporttype.chart.label'|trans,
+                'data': [
+                    form_widget(form.chart, {
+                        'label': 'oro.report.reporttype.chart.label'|trans,
+                    })
+                ]
+            }
         ]
     }] ) %}
 

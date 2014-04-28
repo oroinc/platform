@@ -2,29 +2,14 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
-class ChartType extends AbstractType
+class ChartType extends ConfigProviderAwareType
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @param ConfigProvider $configProvider
-     */
-    public function __construct(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,18 +29,8 @@ class ChartType extends AbstractType
                         $chartConfigs
                     )
                 ]
-            );
-
-        foreach ($chartConfigs as $chartName => $chartConfig) {
-            $builder->add(
-                $chartName,
-                'oro_chart_setting',
-                [
-                    'chart_name'   => $chartName,
-                    'chart_config' => $chartConfig
-                ]
-            );
-        }
+            )
+            ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'submit']);
     }
@@ -74,10 +49,12 @@ class ChartType extends AbstractType
 
         $type = $formData['type'];
 
-        foreach ($formData as $key => $chartData) {
-            if ($key !== $type) {
-                unset($formData[$key]);
-            }
+        if (isset($formData['settings'][$type])) {
+            $formData['settings'] = $formData['settings'][$type];
+        }
+
+        if (isset($formData['data_schema'][$type])) {
+            $formData['data_schema'] = $formData['data_schema'][$type];
         }
 
         $event->setData($formData);
