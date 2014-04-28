@@ -53,7 +53,7 @@
                         var xLabels = [];
                         var xNumber = 0;
                         for(var i in data){
-                            chartData.push([xNumber++, data[i]['value']]);
+                            chartData.push([xNumber++, parseInt(data[i]['value'])]);
                             xLabels.push(data[i]['label']);
                         }
                         var chart = {
