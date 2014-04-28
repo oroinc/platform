@@ -26,6 +26,6 @@ class OroReportBundleInstaller implements Installation
         $schemaMigration = new OroReportBundle();
         $schemaMigration->up($schema, $queries);
         $table = $schema->getTable(OroReportBundle::TABLE_NAME);
-        $table->addColumn('chart_options', 'array');
+        $table->addColumn('chart_options', 'json_array');
     }
 }

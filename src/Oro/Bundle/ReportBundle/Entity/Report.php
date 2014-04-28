@@ -82,7 +82,7 @@ class Report extends AbstractQueryDesigner
     /**
      * @var array
      *
-     * @ORM\Column(name="chart_options", type="array", nullable=true)
+     * @ORM\Column(name="chart_options", type="json_array")
      */
     protected $chartOptions;
 
