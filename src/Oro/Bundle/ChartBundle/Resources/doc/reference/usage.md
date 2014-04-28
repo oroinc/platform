@@ -24,7 +24,7 @@
 		return $this->render('ExampleBundle:Example:example.html.twig', array('chartView' => $view));
 	}
     
-Configurations list you can see ([here](./reference/chart-configuration.md))
+Configurations list you can see ([here](./chart-configuration.md))
 
 ##View Example##
 

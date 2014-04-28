@@ -33,4 +33,4 @@ Chart bundle consists of several related entities.
 ## How it works ##
 
 Developer use ChartViewBuilder for build view, then call from view render method in twig template.
-[See more](./reference/usage.md)
+[See more](./usage.md)
