@@ -45,8 +45,8 @@ class ChartViewBuilder
      * array(
      *     "name" => "chart_name",
      *     "data_schema" => array(
-     *         "label" => array("fieldName" => "name", "label" => "oro.xxx.firstName"),
-     *         "value" => array("fieldName" => "salary", "label" => "oro.xxx.salary"),
+     *         "label" => array("field_name" => "name", "label" => "oro.xxx.firstName"),
+     *         "value" => array("field_name" => "salary", "label" => "oro.xxx.salary"),
      *     ),
      *     "settings" => array(
      *         "foo" => "bar"
@@ -130,6 +130,14 @@ class ChartViewBuilder
     public function setOptions(array $options)
     {
         $this->options = $options;
+
+        if (isset($this->options['data_schema']) && is_array($this->options['data_schema'])) {
+            $dataMapping = array();
+            foreach ($this->options['data_schema'] as $key => $data) {
+                $dataMapping[$key] = isset($data['field_name']) ? $data['field_name'] : $key;
+            }
+            $this->setDataMapping($dataMapping);
+        }
 
         return $this;
     }

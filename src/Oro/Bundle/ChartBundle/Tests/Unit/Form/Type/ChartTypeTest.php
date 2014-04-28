@@ -53,7 +53,7 @@ class ChartTypeTest extends FormIntegrationTestCase
 
         $this->assertTrue($form->has('type'));
 
-        foreach (array_keys($chartConfigs) as $chartName) {
+        foreach ($chartConfigs as $chartName => $chartConfig) {
             $this->assertTrue($form->has($chartName));
         }
     }
@@ -74,7 +74,7 @@ class ChartTypeTest extends FormIntegrationTestCase
 
         $this->assertTrue($form->has('type'));
 
-        foreach (array_keys($chartConfigs) as $chartName) {
+        foreach ($chartConfigs as $chartName => $chartConfig) {
             $this->assertTrue($form->has($chartName));
         }
 
@@ -99,21 +99,23 @@ class ChartTypeTest extends FormIntegrationTestCase
             'name' => [
                 'chartConfigs' => [
                     'first'  => [
-                        'label' => 'first label',
-                        ChartSettingsType::CHART_OPTIONS   => ['option' => 'value'],
-                        ChartSettingsType::SETTINGS_SCHEMA => [
+                        'label' => 'First',
+                        'default_settings' => ['option' => 'value'],
+                        'settings_schema' => [
                             'field' => [
                                 'name' => 'name',
+                                'label' => 'Name',
                                 'type' => 'text'
                             ]
                         ]
                     ],
                     'second' => [
-                        'label' => 'second label',
-                        ChartSettingsType::CHART_OPTIONS   => ['option' => 'value2'],
-                        ChartSettingsType::SETTINGS_SCHEMA => [
+                        'label' => 'Second',
+                        'default_settings' => ['option' => 'value2'],
+                        'settings_schema' => [
                             'field' => [
                                 'name' => 'name2',
+                                'label' => 'Name2',
                                 'type' => 'text'
                             ]
                         ]

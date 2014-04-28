@@ -87,6 +87,28 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($options, 'options', $this->builder);
     }
 
+    public function testSetOptionsWithDataMapping()
+    {
+        $options = array(
+            'foo' => 'bar',
+            'data_schema' => array(
+                'label' => array('field_name' => 'foo', 'label' => 'Foo Label'),
+                'value' => array('label' => 'Bar Label')
+            )
+        );
+
+        $this->assertEquals($this->builder, $this->builder->setOptions($options));
+        $this->assertAttributeEquals($options, 'options', $this->builder);
+        $this->assertAttributeEquals(
+            array(
+                'label' => 'foo',
+                'value' => 'value',
+            ),
+            'dataMapping',
+            $this->builder
+        );
+    }
+
     public function testGetView()
     {
         $chartName = 'chart_name';
