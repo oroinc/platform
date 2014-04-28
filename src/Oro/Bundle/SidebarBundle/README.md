@@ -34,7 +34,7 @@ widgets: [
 ```
 
 ## Widget configuration in YAML
-Default data for you widget should be defined in `widget.yml` file in
+Default data for your widget should be defined in `widget.yml` file in
 `/Resources/public/sidebar_widget/widget_name/widget.yml`. This file can contains following item settings:
 
 * **title** - title text of your widget;
