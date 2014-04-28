@@ -43,6 +43,10 @@ datagrid:
             name: ~
             workflowDefinition: ~
             entityClass: ~
+            view_link:
+                type:       url
+                route:      oro_workflow_definition_view
+                params:     [ name ]
             update_link:
                 type:       url
                 route:      oro_workflow_definition_update
@@ -74,12 +78,18 @@ datagrid:
             default:
                 label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         actions:
+            view:
+                type:          navigate
+                acl_resource:  oro_workflow_definition_view
+                label:         oro.workflow.workflowdefinition.datagrid.view
+                icon:          user
+                link:          view_link
+                rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_update
                 label:         oro.workflow.workflowdefinition.datagrid.update
                 icon:          edit
-                rowAction:     true
                 link:          update_link
             clone:
                 type:          navigate

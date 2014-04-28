@@ -124,6 +124,7 @@ oro:
             clone_label_prefix:           'Copy of '
 
             datagrid:
+                view: View
                 update: Update
                 clone:  Clone
                 delete: Delete
