@@ -226,9 +226,7 @@ class WorkflowController extends FOSRestController
      */
     public function deleteAction(WorkflowItem $workflowItem)
     {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($workflowItem);
-        $em->flush();
+        $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 
@@ -251,7 +249,10 @@ class WorkflowController extends FOSRestController
      */
     public function activateAction(WorkflowDefinition $workflowDefinition)
     {
-        $this->get('oro_workflow.manager')->activateWorkflow($workflowDefinition);
+        $workflowManager = $this->get('oro_workflow.manager');
+
+        $workflowManager->resetWorkflowData($workflowDefinition);
+        $workflowManager->activateWorkflow($workflowDefinition);
 
         return $this->handleView(
             $this->view(

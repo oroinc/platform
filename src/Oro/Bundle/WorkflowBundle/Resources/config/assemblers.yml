@@ -52,6 +52,7 @@ services:
             - @oro_workflow.attribute_assembler
             - @oro_workflow.step_assembler
             - @oro_workflow.transition_assembler
+            - @translator
 
     oro_workflow.form_options_assembler:
         class: %oro_workflow.form_options_assembler.class%

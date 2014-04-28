@@ -5,6 +5,8 @@ parameters:
     oro_filter.expression.date.lexer.class:     Oro\Bundle\FilterBundle\Expression\Date\Lexer
     oro_filter.expression.date.parser.class:    Oro\Bundle\FilterBundle\Expression\Date\Parser
 
+    oro_filter.event_listener.disabled_filters.class: Oro\Bundle\FilterBundle\EventListener\DisabledFiltersListener
+
 services:
     oro_filter.extension.orm_filter:
         class: %oro_filter.extension.orm_filter.class%

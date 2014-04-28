@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
@@ -13,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class WorkflowAssembler extends AbstractAssembler
 {
     /**
-     * @var
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -38,21 +39,29 @@ class WorkflowAssembler extends AbstractAssembler
     protected $transitionAssembler;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param ContainerInterface $container
      * @param AttributeAssembler $attributeAssembler
      * @param StepAssembler $stepAssembler
      * @param TransitionAssembler $transitionAssembler
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ContainerInterface $container,
         AttributeAssembler $attributeAssembler,
         StepAssembler $stepAssembler,
-        TransitionAssembler $transitionAssembler
+        TransitionAssembler $transitionAssembler,
+        TranslatorInterface $translator
     ) {
         $this->container = $container;
         $this->attributeAssembler = $attributeAssembler;
         $this->stepAssembler = $stepAssembler;
         $this->transitionAssembler = $transitionAssembler;
+        $this->translator = $translator;
     }
 
     /**
@@ -137,11 +146,11 @@ class WorkflowAssembler extends AbstractAssembler
     {
         if ($workflowDefinition->getStartStep()
             && !array_key_exists(
-                Workflow::DEFAULT_START_TRANSITION_NAME,
+                TransitionManager::DEFAULT_START_TRANSITION_NAME,
                 $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
             )
         ) {
-            $startTransitionDefinitionName = Workflow::DEFAULT_START_TRANSITION_NAME . '_definition';
+            $startTransitionDefinitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME . '_definition';
             if (!array_key_exists(
                 $startTransitionDefinitionName,
                 $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS]
@@ -150,13 +159,18 @@ class WorkflowAssembler extends AbstractAssembler
                     array();
             }
 
-            $configuration[WorkflowConfiguration::NODE_TRANSITIONS][Workflow::DEFAULT_START_TRANSITION_NAME] =
+            $label = $this->translator->trans(
+                'oro.workflow.transition.start',
+                array('%workflow%' => $workflowDefinition->getLabel())
+            );
+
+            $configuration[WorkflowConfiguration::NODE_TRANSITIONS][TransitionManager::DEFAULT_START_TRANSITION_NAME] =
                 array(
-                    'label' => $workflowDefinition->getLabel(),
+                    'label' => $label,
                     'step_to' => $workflowDefinition->getStartStep()->getName(),
                     'is_start' => true,
                     'is_hidden' => true,
-                    'transition_definition' => $startTransitionDefinitionName
+                    'transition_definition' => $startTransitionDefinitionName,
                 );
         }
 

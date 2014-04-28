@@ -297,7 +297,7 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
-     * @return WorkflowStep[]
+     * @return WorkflowStep[]|Collection
      */
     public function getSteps()
     {

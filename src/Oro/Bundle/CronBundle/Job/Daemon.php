@@ -112,7 +112,7 @@ class Daemon
     protected function findProcessPid($searchTerm)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
+            $cmd = 'WMIC path win32_process get Processid,Commandline | findstr %s | findstr /V findstr';
             $searchRegExp = '/\s+(\d+)\s*$/Usm';
         } else {
             $cmd = 'ps ax | grep %s | grep -v grep';
