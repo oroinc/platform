@@ -17,7 +17,9 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-channel',
             'dataId': entity.id,
-            'entity_label': 'oro.integration.channel.entity_label'|trans
+            'entity_label': 'oro.integration.channel.entity_label'|trans,
+            'dataMessage': 'oro.integration.delete_sync_channel.content',
+            'successMessage': 'oro.integration.delete_sync_channel.success'
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
