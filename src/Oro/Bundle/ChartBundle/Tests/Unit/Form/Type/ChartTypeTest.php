@@ -99,8 +99,9 @@ class ChartTypeTest extends FormIntegrationTestCase
             'name' => [
                 'chartConfigs' => [
                     'first'  => [
-                        ChartSettingsType::CHART_OPTIONS   => ['option' => 'value'],
-                        ChartSettingsType::SETTINGS_SCHEMA => [
+                        'label' => 'First',
+                        'default_settings' => ['option' => 'value'],
+                        'settings_schema' => [
                             'field' => [
                                 'name' => 'name',
                                 'type' => 'text'
@@ -108,8 +109,9 @@ class ChartTypeTest extends FormIntegrationTestCase
                         ]
                     ],
                     'second' => [
-                        ChartSettingsType::CHART_OPTIONS   => ['option' => 'value2'],
-                        ChartSettingsType::SETTINGS_SCHEMA => [
+                        'label' => 'Second',
+                        'default_settings' => ['option' => 'value2'],
+                        'settings_schema' => [
                             'field' => [
                                 'name' => 'name2',
                                 'type' => 'text'

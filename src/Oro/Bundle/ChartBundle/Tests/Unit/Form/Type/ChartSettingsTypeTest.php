@@ -51,19 +51,19 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
     {
         return [
             'name'          => [
-                'options'   => [ChartSettingsType::NAME => 11],
+                'options'   => ['chart_name' => 11],
                 'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
-                'message'   => 'The option "name" with value "11" is expected to be of type "string"'
+                'message'   => 'The option "chart_name" with value "11" is expected to be of type "string"'
             ],
-            'chart_options' => [
-                'options'   => [ChartSettingsType::CHART_OPTIONS => 11],
+            'chart_config'  => [
+                'options'   => ['chart_name' => 'test', 'chart_config' => 11],
                 'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
-                'message'   => 'The option "chart_options" with value "11" is expected to be of type "array"'
+                'message'   => 'The option "chart_config" with value "11" is expected to be of type "array"'
             ],
             'empty'         => [
                 'options'   => [],
-                'exception' => 'Oro\Bundle\ChartBundle\Exception\InvalidArgumentException',
-                'message'   => 'Missing options for'
+                'exception' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
+                'message'   => 'The required option "chart_name" is  missing.'
             ]
         ];
     }
@@ -83,13 +83,13 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $chartOptions = array_merge(
-            [ChartSettingsType::NAME => $chartName],
-            [ChartSettingsType::SETTINGS_SCHEMA => $fieldsData]
+            ['chart_name' => $chartName],
+            ['settings_schema' => $fieldsData]
         );
 
-        $formOptions = [ChartSettingsType::NAME => $chartName];
+        $formOptions = ['chart_name' => $chartName];
         if ($useParentOptions) {
-            $formOptions[ChartSettingsType::CHART_OPTIONS] = $chartOptions;
+            $formOptions['chart_config'] = $chartOptions;
         }
 
         $configProvider

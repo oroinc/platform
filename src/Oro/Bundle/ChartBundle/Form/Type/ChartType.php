@@ -51,8 +51,8 @@ class ChartType extends AbstractType
                 $chartName,
                 'oro_chart_setting',
                 [
-                    ChartSettingsType::NAME          => $chartName,
-                    ChartSettingsType::CHART_OPTIONS => $chartConfig
+                    'chart_name'   => $chartName,
+                    'chart_config' => $chartConfig
                 ]
             );
         }
