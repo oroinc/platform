@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Manager;
+namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteProviderInterface;
 
 class ChannelRelatedDataDeleteProvider implements ChannelDeleteProviderInterface
 {

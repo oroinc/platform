@@ -15,10 +15,8 @@ parameters:
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
-    oro_integration.channels.datagrid_helper.class:                       Oro\Bundle\IntegrationBundle\Datagrid\DatagridHelper
 
     oro_integration.channel_delete_manager.class:                         Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteManager
-    oro_integration.channel_related_data_delete_provider.class:           Oro\Bundle\IntegrationBundle\Manager\ChannelRelatedDataDeleteProvider
 
 services:
     oro_integration.channel.manager.api:
@@ -101,16 +99,6 @@ services:
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
 
-    oro_integration.channels.datagrid_helper:
-        class: %oro_integration.channels.datagrid_helper.class%
-
     oro_integration.channel_delete_manager:
         class: %oro_integration.channel_delete_manager.class%
         arguments: [ @doctrine.orm.entity_manager ]
-
-    oro_integration.channel_related_data_delete_provider:
-        class: %oro_integration.channel_related_data_delete_provider.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: oro_integration.channel_delete_provider }

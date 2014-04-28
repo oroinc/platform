@@ -1,17 +1,16 @@
 <?php
 
-namespace OroCRM\Bundle\IntegrationBundle\Tests\Functional\Manager;
+namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
-class ChannelDeleteManagerTest extends WebTestCase
+abstract class AbstractChannelDataDeleteTest extends WebTestCase
 {
     /**
      * @var EntityManager
@@ -27,6 +26,11 @@ class ChannelDeleteManagerTest extends WebTestCase
      * @var Channel
      */
     protected $channel;
+
+    /**
+     * @var string
+     */
+    protected $entityClassName;
 
     public function setUp()
     {
@@ -45,7 +49,7 @@ class ChannelDeleteManagerTest extends WebTestCase
         $this->container->get('oro_integration.channel_delete_manager')->deleteChannel($this->channel);
 
         $resultChannel = $this->em->getRepository('OroIntegrationBundle:Channel')->find($channelId);
-        $resultForm = $this->em->getRepository('OroEmbeddedFormBundle:EmbeddedForm')
+        $resultForm = $this->em->getRepository($this->entityClassName)
             ->findOneBy(['channel' => $channelId]);
 
         $this->assertNull($resultChannel);
@@ -53,21 +57,22 @@ class ChannelDeleteManagerTest extends WebTestCase
     }
 
     /**
-     * Generate test channel with assigned embedded form
+     * Create related entity
+     *
+     * @param Channel $channel
+     */
+    abstract protected function createRelatedEntity(Channel $channel);
+
+    /**
+     * Generate test channel with related entity
      */
     protected function generateTestData()
     {
         $this->channel = new Channel();
         $this->channel->setType('simple')
             ->setName('test');
-        $embeddedForm = new EmbeddedForm();
-        $embeddedForm->setTitle('test');
-        $embeddedForm->setCss('');
-        $embeddedForm->setFormType('test');
-        $embeddedForm->setSuccessMessage('test');
-        $embeddedForm->setChannel($this->channel);
         $this->em->persist($this->channel);
-        $this->em->persist($embeddedForm);
+        $this->createRelatedEntity($this->channel);
         $this->em->flush();
     }
 }
