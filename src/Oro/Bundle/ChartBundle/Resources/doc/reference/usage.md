@@ -1,6 +1,12 @@
 # Basic usage
 
 ### Table of Contents
+
+- [Getting Started](./getting-started.md)
+- [Configuration](./chart-configuration.md)
+- [Configuration merging](./configuration-merge.md)
+- Basic usage
+
 ##Controller example##
 	public function exampleAction(){
 		// items - array in format: array(array('id'=>1, 'firsName'=>'Alex', 'fee'=>42), ...)

@@ -1,6 +1,11 @@
-#Configuration merge#
+#Configuration merging#
 
 ### Table of Contents ###
+
+- [Getting Started](./getting-started.md)
+- [Configuration](./chart-configuration.md)
+- Configuration merging
+- [Basic usage](./usage.md)
 
 ##Description##
 
@@ -24,10 +29,7 @@ First bundle configuration:
 	            type: checkbox
 	            options: { required: false }
 	        default_settings:
-	            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
-	            chartFontSize: 9
-	            chartFontColor: '#454545'
-	            chartHighlightColor: '#FF5E5E'
+	            chartColors: ['#ACD39C']
 	        template: default:Chart:line.html.twig
 
 
@@ -36,7 +38,8 @@ Second bundle configuration
 	oro_chart:
 	    line_chart:
 	        default_settings:
-	            chartColors: '7fab90,fdbc7c,73a4e1,bedb99,5a8980,ceeaf2,d6a970,fee090'
+	            chartColors: 		 '7fab90,fdbc7c,73a4e1,bedb99,5a8980,ceeaf2,d6a970,fee090'
+				chartHighlightColor: '#FF5E5E'
 	        template: additional:Chart:line.html.twig
 
 
@@ -58,9 +61,7 @@ Result chart configuration
 	            type: checkbox
 	            options: { required: false }
 	        default_settings:
-	            chartColors: '7fab90,fdbc7c,73a4e1,bedb99,5a8980,ceeaf2,d6a970,fee090'
-	            chartFontSize: 9
-	            chartFontColor: '#454545'
+	            chartColors: 		 '7fab90,fdbc7c,73a4e1,bedb99,5a8980,ceeaf2,d6a970,fee090'
 	            chartHighlightColor: '#FF5E5E'
 	        template: additional:Chart:line.html.twig
 

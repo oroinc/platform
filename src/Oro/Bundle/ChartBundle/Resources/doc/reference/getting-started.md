@@ -1,6 +1,12 @@
 # Getting Started
 
 ### Table of Contents
+
+- Getting Started
+- [Configuration](./chart-configuration.md)
+- [Configuration merging](./configuration-merge.md)
+- [Basic usage](./usage.md)
+
 ## What is Entity Merge ##
 Chart bundle provide functionality for display different types of chart.
 It is solution that allows user to view data in useful chart format.

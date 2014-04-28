@@ -1,6 +1,12 @@
 #Configuration#
 
 ### Table of Contents ###
+
+- [Getting Started](./getting-started.md)
+- Configuration
+- [Configuration merging](./configuration-merge.md)
+- [Basic usage](./usage.md)
+
 ##Configuration tree##
 
 		->info('Configuration of charts')
