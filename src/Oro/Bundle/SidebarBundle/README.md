@@ -33,9 +33,9 @@ widgets: [
 ]
 ```
 
-## Widget configurate in YAML
-You can setup default data for you widget in the `widget.yml` file, which placed in the folder by this direction
-`SomeBundle/Resources/public/sidebar_widget/widget_name/widget.yml`. This file can contains next item-settings:
+## Widget configuration in YAML
+Default data for you widget should be defined in `widget.yml` file in
+`/Resources/public/sidebar_widget/widget_name/widget.yml`. This file can contains following item settings:
 
 * **title** - title text of your widget;
 * **iconClass** - css icon class from `Font Awesome` icons. When this property is set, then **icon** setting will be ignored;
