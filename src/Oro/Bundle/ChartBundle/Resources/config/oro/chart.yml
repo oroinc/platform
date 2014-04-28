@@ -29,10 +29,13 @@ oro_chart:
             label: oro.chart.pie_chart.params.value
             required: true
         default_settings:
+            fraction_input_data_field: value
+            fraction_output_data_field: fraction
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
             chartFontSize: 9
             chartFontColor: '#454545'
             chartHighlightColor: '#FF5E5E'
+        data_transformer: oro_chart.data_transformer.pie_chart
         template: OroChartBundle:Chart:pie.html.twig
     flow_chart:
         label: oro.chart.flow_chart.label

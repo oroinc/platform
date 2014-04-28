@@ -18,6 +18,11 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $transformerFactory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $twig;
 
     /**
@@ -32,16 +37,21 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ChartBundle\Model\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->twig = $this->getMock('Twig_Environment');
+        $this->transformerFactory = $this
+            ->getMockBuilder('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->dataGridManager = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface');
+        $this->twig = $this->getMock('Twig_Environment');
 
         $this->builder = new ChartViewBuilder(
             $this->configProvider,
-            $this->twig,
-            $this->dataGridManager
+            $this->transformerFactory,
+            $this->dataGridManager,
+            $this->twig
         );
     }
 
@@ -150,6 +160,48 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($data, 'data', $chartView);
     }
 
+    public function testGetViewWithDataTransformer()
+    {
+        $chartName = 'chart_name';
+        $chartTemplate = 'template.html.twig';
+
+        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $dataTransformer = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface');
+        $transformedData = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $dataTransformerServiceId = 'data_transformer';
+
+        $chartConfig = array(
+            'data_transformer' => $dataTransformerServiceId,
+            'template' => $chartTemplate
+        );
+
+        $options = array(
+            'name' => $chartName,
+            'settings' => array('foo' => 'bar'),
+        );
+
+        $this->configProvider->expects($this->once())
+            ->method('getChartConfig')
+            ->with($chartName)
+            ->will($this->returnValue($chartConfig));
+
+        $this->transformerFactory->expects($this->once())
+            ->method('createTransformer')
+            ->will($this->returnValue($dataTransformer));
+
+        $dataTransformer->expects($this->once())
+            ->method('transform')
+            ->with($data, $options)
+            ->will($this->returnValue($transformedData));
+
+        $chartView = $this->builder->setOptions($options)
+            ->setData($data)
+            ->getView();
+
+        $this->assertInstanceOf('Oro\Bundle\ChartBundle\Model\ChartView', $chartView);
+        $this->assertAttributeEquals($transformedData, 'data', $chartView);
+    }
+
     /**
      * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Options must have "name" key.
@@ -191,20 +243,32 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setOptions() was not called.
+     * @expectedExceptionMessage Can't build result when setData() was not called.
      */
     public function testGetViewFailsWhenOptionsNotSet()
     {
-        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $chartName = 'foo';
+
+        $options = array('name' => $chartName);
+
+        $chartConfig = array(
+            'template' => 'foo.html.twig',
+            'default_settings' => array('bar' => 'baz'),
+        );
+
+        $this->configProvider->expects($this->once())
+            ->method('getChartConfig')
+            ->with($chartName)
+            ->will($this->returnValue($chartConfig));
 
         $this->builder
-            ->setData($data)
+            ->setOptions($options)
             ->getView();
     }
 
     /**
      * @expectedException \Oro\Bundle\ChartBundle\Exception\BadMethodCallException
-     * @expectedExceptionMessage Can't build result when setData() was not called.
+     * @expectedExceptionMessage Can't build result when setOptions() was not called.
      */
     public function testGetViewFailsWhenDataNotSet()
     {

@@ -43,13 +43,13 @@ class ReportController extends Controller
             /** @todo Get chart options from report entity */
             // $chartOptions = $entity->getChartOptions();
             $chartOptions = array(
-                'name' => 'line_chart',
+                'name' => 'pie_chart',
                 'settings' => array(
                     'foo' => 'bar'
                 ),
                 'data_schema' => array(
-                    'value' => array('field_name' => 'c1'),
-                    'label' => array('field_name' => 'c2'),
+                    'value' => array('field_name' => 'c2'),
+                    'label' => array('field_name' => 'c1'),
                 )
             );
 
