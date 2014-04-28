@@ -17,7 +17,6 @@ define(function (require) {
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
-        collectionOptions = {},
 
         helpers = {
             cellType: function (type) {
@@ -84,17 +83,17 @@ define(function (require) {
              * Build grid
              */
             buildGrid: function () {
-                var options, collection, grid, obj;
+                var options, collectionOptions, collection, grid, payload;
 
                 // collection can be stored in the page cache
-                mediator.trigger('datagrid_collection_set_before', obj = {});
-                if (obj.collection) {
-                    collection = obj.collection;
+                payload = {name: this.metadata.options.gridName};
+                mediator.trigger('datagrid_collection_set_before', payload);
+                if (payload.collection) {
+                    collection = payload.collection;
                 } else {
                     // otherwise, create collection from metadata
-                    options = methods.combineCollectionOptions.call(this);
-                    collection = new PageableCollection(this.$el.data('data'), options);
-                    collectionOptions = _.extend({}, options);
+                    collectionOptions = methods.combineCollectionOptions.call(this);
+                    collection = new PageableCollection(this.$el.data('data'), collectionOptions);
                 }
 
                 // create grid

@@ -1,10 +1,20 @@
 oro_dashboard:
     resource:     "@OroDashboardBundle/Controller"
     type:         annotation
-    prefix:       /dashboard
+    prefix:       /
+
+oro_dashboard_widget_api:
+    resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController
+    type: rest
+    prefix: api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format: json
+    defaults:
+        version: latest
 
 oro_dashboard_api:
-    resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController
+    resource: Oro\Bundle\DashboardBundle\Controller\Api\Rest\DashboardController
     type: rest
     prefix: api/rest/{version}/
     requirements:

@@ -6,6 +6,7 @@ parameters:
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
 
 services:
     oro_workflow.context_accessor:
@@ -64,3 +65,9 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+
+    oro_workflow.datagrid.action.workflow_activate:
+        class: %oro_workflow.datagrid.action.workflow_activate.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: workflow-activate }

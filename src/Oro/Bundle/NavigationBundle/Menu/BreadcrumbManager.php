@@ -105,8 +105,8 @@ class BreadcrumbManager
     /**
      * Find menu item by route
      *
-     * @param $menu
-     * @param $route
+     * @param ItemInterface $menu
+     * @param string $route
      * @return ItemInterface
      */
     public function getMenuItemByRoute($menu, $route)
@@ -120,6 +120,10 @@ class BreadcrumbManager
             }
 
             if ($item->getChildren() && $currentChild = $this->getMenuItemByRoute($item, $route)) {
+                if ($currentChild->getExtra('skipBreadcrumbs', false)) {
+                    return $item;
+                }
+
                 return $currentChild;
             }
         }
@@ -153,8 +157,8 @@ class BreadcrumbManager
     /**
      * Get menu item breadcrumbs list
      *
-     * @param $menu
-     * @param $route
+     * @param ItemInterface $menu
+     * @param string $route
      * @return array
      */
     public function getBreadcrumbLabels($menu, $route)

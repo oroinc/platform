@@ -102,7 +102,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $this->translator->expects($this->exactly(3))
+        $this->translator->expects($this->once())
             ->method('trans');
 
         $result = $this->titleService->render(array(), null, 'Prefix', 'Suffix');
@@ -142,7 +142,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
     public function testRenderShort()
     {
         $shortTitle = 'short title';
-        $this->translator->expects($this->exactly(1))
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with($this->equalTo($shortTitle))
             ->will($this->returnValue($shortTitle));
