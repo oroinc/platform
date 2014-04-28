@@ -66,6 +66,7 @@ Create Workflow: Create Workflow
 Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
+Reset workflow data: Reset workflow data
 
 oro:
     workflow:
@@ -130,6 +131,9 @@ oro:
                 deactivate: Deactivate
         action:
             general: "Workflow manipulations"
+
+        transition:
+            start: "Start %workflow%"
 
         entity_config:
             active_workflow.label:        'Active workflow'
