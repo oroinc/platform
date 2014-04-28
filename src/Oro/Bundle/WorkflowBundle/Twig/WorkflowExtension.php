@@ -27,6 +27,7 @@ class WorkflowExtension extends \Twig_Extension
             new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
             new \Twig_SimpleFunction('has_workflow_start_step', array($this, 'hasWorkflowStartStep')),
             new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
+            new \Twig_SimpleFunction('is_workflow_reset_allowed', array($this, 'isResetAllowed')),
         );
     }
 
@@ -78,5 +79,16 @@ class WorkflowExtension extends \Twig_Extension
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * Check that entity workflow item is equal to the active workflow item.
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function isResetAllowed($entity)
+    {
+        return $this->workflowManager->isResetAllowed($entity);
     }
 }

@@ -16,8 +16,6 @@ class DeletionIterableResult extends IterableResult
      */
     protected function prepareQueryToExecute(Query $query)
     {
-        parent::prepareQueryToExecute($query);
-
         // always iterate from the first record
         $query->setFirstResult(0);
     }
