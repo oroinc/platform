@@ -541,13 +541,8 @@ define(function (require) {
                     _.bind(function(data) {
                         var dtContainer = $('<div class="sf-toolbar" id="sfwdt' + debugBarToken + '" style="display: block;" data-sfurl="' + url + '"/>');
                         dtContainer.html(data);
-                        var scrollable = $('.scrollable-container:last');
-                        var container = scrollable.length ? scrollable : this.getCached$('container');
-                        if (!container.closest('body').length) {
-                            container = $(document.body);
-                        }
                         $('.sf-toolbar').remove();
-                        container.append(dtContainer);
+                        $(document.body).append(dtContainer);
                         mediator.trigger('layout:adjustHeight');
                     }, this)
                 );

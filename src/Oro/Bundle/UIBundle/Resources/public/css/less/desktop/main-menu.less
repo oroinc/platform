@@ -75,6 +75,9 @@
           margin-left: 1px;
         }
       }
+      &.active a:after {
+        border-left-color: #f3f3f3;
+      }
     }
   }
 }
@@ -150,6 +153,9 @@
     width: 200px;
   }
   .main-menu {
+    .item-icon-holder {
+      cursor: pointer;
+    }
     .menu_level_1 {
       list-style: none;
       margin-left: 0;
@@ -203,7 +209,6 @@
           white-space: nowrap;
           margin-bottom: 4px;
           border-bottom: 1px solid #eee;
-          cursor: default;
           &:hover {
             color: inherit;
             background: inherit;
