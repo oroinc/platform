@@ -6,8 +6,8 @@ oro_system_configuration:
         application_name_settings:
             title:  'Name'
         navbar_settings:
-            title:       'Navigation bar'
-            description: 'Reload the page for settings to take effect'
+            title:       oro.ui.system_configuration.groups.navbar_settings.title
+            description: oro.ui.system_configuration.groups.navbar_settings.description
     fields:
         oro_ui.application_name:
             type: text

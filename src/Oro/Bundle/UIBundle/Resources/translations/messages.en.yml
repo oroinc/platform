@@ -17,3 +17,8 @@ oro:
         item: item
         delete_confirm: Are you sure you want to delete this %entity_label%?
         delete_message: %entity_label% deleted
+        system_configuration:
+            groups:
+                navbar_settings:
+                    title: 'Navigation bar'
+                    description: 'Reload the page for settings to take effect'
