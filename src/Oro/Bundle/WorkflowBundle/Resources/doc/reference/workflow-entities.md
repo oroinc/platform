@@ -66,6 +66,7 @@ managers, such as Step Manager, Transition Manager and Attribute Manager.
 for specified WorkflowItem and optionally returns list of errors or/and fire exception;
 * **transit(WorkflowItem, Transition)** - performs transit for specified WorkflowItem by name of transition or
 transition instance;
+* **resetWorkflowData()** - perform reset workflow item data for the specific entity;
 * **createWorkflowItem(Entity, array data)** - create WorkflowItem instance for the specific entity and initialize it
 with passed data;
 * **getAttributesMapping()** - Get attribute names mapped to property paths if any have;
@@ -154,8 +155,10 @@ Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface
 Basic interface for Transition Conditions.
 
 **Methods:**
+* **setMessage(message)** - set condition error message;
+* **isAllowed(context, errors)** - calculates whether specific condition is allowed for current context
+(usually context is WorkflowItem) and optionally returns list of errors;
 * **initialize(options)** - initialize specific condition based on input options;
-* **isAllowed(context)** - calculates whether specific condition is allowed for current context (usually context is WorkflowItem).
 
 Condition Factory
 -----------------
@@ -166,7 +169,7 @@ Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory
 Creates instances of Transition Conditions based on type (alias) and options.
 
 **Methods:**
-* **create(type, options)** - creates specific instance of Transition Condition.
+* **create(type, array options, message)** - creates specific instance of Transition Condition;
 
 Action
 ------
@@ -174,11 +177,12 @@ Action
 Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface
 
 **Description:**
-Basic interface for Transition Actions. Detailed description
+Basic interface for Transition Actions.
 
 **Methods:**
+* **execute(context)** - execute specific action for current context (usually context is WorkflowItem instance);
 * **initialize(options)** - initialize specific action based on input options;
-* **execute(context)** - execute specific action for current context (usually context is WorkflowItem instance).
+* **setCondition(condition)** - set optional condition for action;
 
 Action Factory
 --------------
@@ -189,7 +193,8 @@ Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory
 Creates instances of Transition Actions based on type (alias) and options.
 
 **Methods:**
-* **create(type, options)** - creates specific instance of Transition Action.
+* **create(type, options, condition)** - creates specific instance of Transition Action. Also has possibility to set
+optional condition;
 
 Entity Assemblers
 =================
@@ -204,7 +209,8 @@ Creates instances of Workflow objects based on Workflow Definitions. Requires co
 configuration and attribute, step and transition assemblers to assemble appropriate parts of configuration.
 
 **Methods:**
-* **assemble(WorkflowDefinition)** - assemble and returns instance of Workflow based on input WorkflowDefinition.
+* **assemble(WorkflowDefinition, needValidation)** - assemble and returns instance of Workflow based on input
+WorkflowDefinition and optionally can escape Workflow validation;
 
 Step Assembler
 --------------
@@ -215,7 +221,7 @@ Oro\Bundle\WorkflowBundle\Model\StepAssembler
 Creates instances of Steps based on input configuration and Attributes.
 
 **Methods:**
-* **assemble(configuration, attributes)** - assemble and returns list of Step instances.
+* **assemble(configuration, attributes)** - assemble and returns list of Step instances;
 
 Transition Assembler
 --------------------
@@ -223,11 +229,11 @@ Transition Assembler
 Oro\Bundle\WorkflowBundle\Model\TransitionAssembler
 
 **Description:**
-Creates instances of Transitions based on transition configuration, transition definition configuration and list of
-Step entities. Uses Condition Factory and Action Factory to create configurable conditions and actions.
+Creates instances of Transitions based on transition configuration, transition definition configuration, form options
+and list of Step entities. Uses Condition Factory and Action Factory to create configurable conditions and actions.
 
 **Methods:**
-* **assemble(configuration, definitionsConfiguration, steps)** - assemble and returns list of Transitions.
+* **assemble(array configuration, array definitionsConfiguration, steps, attributes)** - assemble and returns list of Transitions;
 
 Attribute Assembler
 -------------------
@@ -235,10 +241,10 @@ Attribute Assembler
 Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
 
 **Description:**
-Assemble Attribute instances based on source configuration.
+Assemble Attribute instances based on WorkflowDefinition and source configuration.
 
 **Methods:**
-* **assemble(configuration)** - assemble and returns list of Attributes.
+* **assemble(definition, array $configuration)** - assemble and returns list of Attributes;
 
 Condition Assembler
 -------------------
@@ -249,7 +255,7 @@ Oro\Bundle\WorkflowBundle\Model\Condition\ConditionAssembler
 Recursively walks through Condition configuration and creates instance of appropriate Conditions using Condition Factory.
 
 **Methods:**
-assemble(configuration) - assemble configuration and returns root Condition instance.
+assemble(configuration) - assemble configuration and returns root Condition instance;
 
 Action Assembler
 ----------------
@@ -257,10 +263,10 @@ Action Assembler
 Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
 
 **Description:**
-Walks through Action configuration and creates instance of appropriate Actions using Action Factory.
+Walks through Action configuration and creates instance of appropriate Actions using Action Factory and Condition Factory.
 
 **Methods:**
-* **assemble(configuration)** - assemble configuration and returns instance of list Action.
+* **assemble(array configuration)** - assemble configuration and returns instance of treeExecutor Actions;
 
 Form Options Assembler
 ----------------------
@@ -268,11 +274,12 @@ Form Options Assembler
 Oro\Bundle\WorkflowBundle\Model\FormOptionAssembler
 
 **Description:**
-Assembles form options that can be passed to transition and step
+Assembles form options that can be passed to transition and step. Also creating initialization action, if that action exist,
+using Action Factory.
 
 **Methods:**
-* **assemble(options, attributes, owner, ownerName)** - validate form options and assemble with configuration then
-returns list of form options
+* **assemble(options, attributes, owner, ownerName)** - validate form options, set attributes and assemble with
+configuration then returns list of form options;
 
 Database Entities
 =================
@@ -284,7 +291,20 @@ Workflow Definition
 Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
 
 **Description:**
-Encapsulates Workflow parameters and serialized array with configuration.
+Encapsulates Workflow parameters and serialized array with configuration. Has references on related entity and
+steps (all steps for current definition and start step in particular). Also has reference on list of entity ACL permissions.
+
+**Methods:**
+* **addStep(WorkflowStep)** - add step to steps array;
+* **removeStep(WorkflowStep)** - remove step from steps array;
+* **hasStepByName(stepName)** - check is there step with given name for workflow definition;
+* **getStepByName(stepName)** - returns step by name if it exist, otherwise returns null;
+* **addEntityAcl(WorkflowEntityAcl)** - add ACL rule to rules array;
+* **removeEntityAcl(WorkflowEntityAcl)** - remove ACL rule from rules array;
+* **hasEntityAclByAttributeStep(attributeStep)** - check is there attribute step has ACL rules for related entity;
+* **getEntityAclByAttributeStep(attributeStep)** - returns ACL rules for related entity by attribute step if any;
+* **import(WorkflowDefinition)** - import data from passed workflow definition into the current;
+* **getObjectIdentifier()** - returns a unique identifier for this domain object;
 
 Workflow Definition Repository
 ------------------------------
@@ -293,7 +313,9 @@ Workflow Definition Repository
 Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository
 
 **Methods:**
-* **findByEntityClass(entity)** - returns list of appropriate Workflow Definitions for input entity.
+* **findByEntityClass(entityClass, workflowName)** - returns available workflow definitions for entity class. Also has
+possibility to get single workflow definition if specify workflowName as second parameter;
+* **findAllWithStartStep()** - returns list of workflow definition, where start step has been defined;
 
 Workflow Item
 -------------
@@ -303,8 +325,16 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
 **Description:**
 Specific instance of Workflow, contains state of workflow - data as instance of WorkflowData,
 temporary storage of result of last applied transition actions as instance of WorkflowResult, current step name,
-list of related entities as list of WorkflowBindEntity entities, log of all applied transitions as list of
-WorkflowTransitionRecord entities.
+name of WorkflowDefinition, has reference to related Workflow Definition, Transition Records and Entity,
+list of ACL identities for related entities, log of all applied transitions as list of WorkflowTransitionRecord entities,
+contains serialized data of WorkflowItem, available instance of WorkflowAwareSerializer and serialize format parameter.
+
+**Methods:**
+* **addTransitionRecord(WorkflowTransitionRecord)** - add transition to transitions array;
+* **addEntityAcl(WorkflowEntityAclIdentity)** - add ACL identity to array of workflow entity ACL identities;
+* **removeEntityAcl(WorkflowEntityAclIdentity)** - remove ACL identity from array of workflow entity ACL identities;
+* **hasAclIdentityByAttribute(attributeStep)** - check is there attribute step has ACL rules identities for related entity;
+* **getAclIdentityByAttributeStep(attributeStep)** - returns ACL identities for related entity by attribute step if any;
 
 Workflow Item Repository
 ------------------------
@@ -312,17 +342,14 @@ Workflow Item Repository
 Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
 
 **Methods:**
-* **findByEntityMetadata(entityClass, entityIdentifier, workflowName, workflowType)** - returns list of all Workflow
-Items related to input parameters.
-
-Workflow Bind Entity
---------------------
-**Class:**
-Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity
-
-**Description:**
-Encapsulates relation of Workflow Item with specific entity, contains entity ID, entity class name and step name
-of Workflow.
+* **findByEntityMetadata(entityClass, entityIdentifier)** - returns list of all Workflow Items related to input parameters;
+* **getByDefinitionQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder based on input workflow
+definition parameters;
+* **getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition)** - returns instance of QueryBuilder for related Entity
+and herewith updated workflow step by input WorkflowDefinition start step;
+* **resetWorkflowData(entityClass, excludedWorkflowNames, batchSize)** - perform reset workflow items data for all Entities,
+which related with current workflow. Optional you can control the size of batch, which will be reseted in the single query.
+Also you can excluded some groups of entities from list on resetting, specifying the names of workflows, which would be excluded;
 
 Support Entities
 ================
@@ -334,26 +361,43 @@ Oro\Bundle\WorkflowBundle\Model\WorkflowManager
 
 **Description:**
 Main entry point for client to work with workflows. Provides lots of useful methods that should be used in controllers
-and specific implementations.
+and specific implementations. Injected ManagerRegistry, WorkflowRegistry, DoctrineHelper and ConfigManager.
 
 **Methods:**
 * **getStartTransitions(workflow)** - returns list of start transition of specified workflow;
-* **isStartTransitionAvailable(workflow, transition, entity, errors)** - check whether specified start transition
-is allowed for current workflow, optionally returns list of errors;
-* **getTransitionsByWorkflowItem(WorkflowItem)** - get list of all possible (allowed and not allowed) transitions
-for specified WorkflowItem;
+* **getTransitionsByWorkflowItem(WorkflowItem)** - returns list of start transition of specified WorkflowItem object;
 * **isTransitionAvailable(WorkflowItem, transition, errors)** - check if current transition is allowed for
 specified workflow item, optionally returns list of errors;
+* **isStartTransitionAvailable(workflow, transition, entity, data, errors)** - check whether specified start transition
+is allowed for current workflow, optionally returns list of errors;
+* **resetWorkflowItem(WorkflowItem)** - Perform reset of workflow item data - set $workflowItem and $workflowStep
+references into null and remove workflow item. If active workflow definition has a start step,
+then active workflow will be started automatically;
 * **startWorkflow(workflow, entity, transition, data)** - start workflow for input entity using start transition
 and workflow data as array;
 * **transit(WorkflowItem, transition)** - perform transition for specified workflow item;
-* **getApplicableWorkflows(entity, workflowItems, workflowName)** - returns list of workflows that can be started
-for specified entity;
+* **getApplicableWorkflow(entity)** - returns active workflow by related entity object;
+* **getApplicableWorkflowByEntityClass(entityClass)** - returns active workflow by related entity class;
+* **hasApplicableWorkflowByEntityClass(entityClass)** - check there entity class has active workflow;
+* **getWorkflowItemByEntity(entity)** - returns Workflow Definition by related entity object;
+* **getWorkflow(workflowIdentifier)** - get workflow instance by workflow name, workflow instance of workflow item or by
+workflow itself;
+* **activateWorkflow(workflowIdentifier)** - perform activation workflow by workflow name, Workflow instance,
+WorkflowItem instance or WorkflowDefinition instance;
+* **deactivateWorkflow(entityClass)** - perform deactivation workflow by entity class;
+* **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for all Entities, which related with
+input workflow definition;
+* **isResetAllowed(entity)** - check that entity workflow item is equal to the active workflow item;
+
+
+* **getTransitionsByWorkflowItem(WorkflowItem)** - get list of all possible (allowed and not allowed) transitions
+for specified WorkflowItem;
+
+
 * **getWorkflowItemsByEntity(entity, workflowName, workflowType)** - get list of all workflow items by input entity;
 are not specified;
 * **getWorkflowData(Workflow, entity, data)** - get array filled with calculated workflow data based on
 input entity and data;
-* **getWorkflow(workflowIdentifier)** - get workflow instance by workflow name, workflow instance of workflow item.
 
 Workflow Data
 -------------
