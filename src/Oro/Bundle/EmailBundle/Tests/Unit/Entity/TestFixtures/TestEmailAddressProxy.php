@@ -12,6 +12,11 @@ class TestEmailAddressProxy extends OriginalEmailAddress
      */
     private $owner;
 
+    public function __construct(EmailOwnerInterface $owner = null)
+    {
+        $this->owner = $owner;
+    }
+
     public function getOwner()
     {
         return $this->owner;

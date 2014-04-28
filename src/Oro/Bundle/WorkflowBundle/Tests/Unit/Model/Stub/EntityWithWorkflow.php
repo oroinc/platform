@@ -37,7 +37,7 @@ class EntityWithWorkflow
     }
 
     /**
-     * @param WorkflowItem $workflowStep
+     * @param WorkflowStep $workflowStep
      * @return EntityWithWorkflow
      */
     public function setWorkflowStep($workflowStep)

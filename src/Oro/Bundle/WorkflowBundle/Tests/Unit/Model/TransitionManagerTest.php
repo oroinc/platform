@@ -159,4 +159,19 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($transition, $transitionsManager->extractTransition($transitionName));
     }
+
+    public function testGetDefaultStartTransition()
+    {
+        $transitionsManager = new TransitionManager();
+        $this->assertNull($transitionsManager->getDefaultStartTransition());
+
+        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $transition->expects($this->any())->method('getName')
+            ->will($this->returnValue(TransitionManager::DEFAULT_START_TRANSITION_NAME));
+
+        $transitionsManager->setTransitions(new ArrayCollection(array($transition)));
+        $this->assertEquals($transition, $transitionsManager->getDefaultStartTransition());
+    }
 }

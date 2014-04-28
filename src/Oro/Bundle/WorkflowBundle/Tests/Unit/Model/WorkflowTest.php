@@ -427,7 +427,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function testStart($data, $transitionName)
     {
         if (!$transitionName) {
-            $expectedTransitionName = Workflow::DEFAULT_START_TRANSITION_NAME;
+            $expectedTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         } else {
             $expectedTransitionName = $transitionName;
         }
