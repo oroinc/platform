@@ -46,14 +46,15 @@ class ReportController extends Controller
                 'name' => 'line_chart',
                 'settings' => array(
                     'foo' => 'bar'
+                ),
+                'data_schema' => array(
+                    'value' => array('field_name' => 'c1'),
+                    'label' => array('field_name' => 'c2'),
                 )
             );
 
-            /** @var ChartViewBuilder $chartViewBuilder */
-            $chartViewBuilder = $this->get('oro_chart.view_builder');
-            $parameters['chartView'] = $chartViewBuilder->setDataGridName($gridName)
+            $parameters['chartView'] = $this->get('oro_chart.view_builder')->setDataGridName($gridName)
                 ->setOptions($chartOptions)
-                ->setDataMapping(array('value' => 'c1', 'label' => 'c2'))
                 ->getView();
         }
 
