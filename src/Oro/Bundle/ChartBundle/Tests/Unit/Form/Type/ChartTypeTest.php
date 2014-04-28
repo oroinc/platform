@@ -104,6 +104,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                         'settings_schema' => [
                             'field' => [
                                 'name' => 'name',
+                                'label' => 'Name',
                                 'type' => 'text'
                             ]
                         ]
@@ -114,6 +115,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                         'settings_schema' => [
                             'field' => [
                                 'name' => 'name2',
+                                'label' => 'Name2',
                                 'type' => 'text'
                             ]
                         ]

@@ -32,11 +32,11 @@ class ChartSettingsType extends AbstractType
         $chartConfig = $this->getChartConfig($options);
 
         foreach ($chartConfig['settings_schema'] as $field) {
-            $options = !empty($field['options']) ? $field['options'] : array();
+            $fieldOptions = !empty($field['options']) ? $field['options'] : array();
+            
+            $fieldOptions['label'] = $field['label'];
 
-            $options['label'] = $field['label'];
-
-            $builder->add($field['name'], $field['type'], $options);
+            $builder->add($field['name'], $field['type'], $fieldOptions);
         }
     }
 
