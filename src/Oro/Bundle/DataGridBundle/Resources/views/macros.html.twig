@@ -19,7 +19,7 @@
         function ($, datagridBuilder) {
             var builders = _.toArray(arguments).slice(2);
             $(function () {
-                datagridBuilder(builders);
+                datagridBuilder(builders, '#grid-{{ name }}');
             });
         });
     </script>

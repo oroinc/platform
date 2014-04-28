@@ -207,9 +207,14 @@ define(function (require) {
      *
      * @export orodatagrid/js/datagrid-builder
      * @name   orodatagrid.datagridBuilder
+     *
+     * @param {array} builders
+     * @param {string} selector
      */
-    return function (builders) {
-        $(gridSelector).each(function (i, el) {
+    return function (builders, selector) {
+        var $el = $(selector).filter(gridSelector);
+
+        $el.each(function (i, el) {
             var $el = $(el);
             var gridName = (($el.data('metadata') || {}).options || {}).gridName;
             if (!gridName) {
