@@ -51,7 +51,7 @@
                                                 show : true,
                                                 formatter: formatter.formatCurrency,
                                                 nozzleSteps: nozzleSteps,
-                                                colors: {{ config.default_settings.chartColors|json_encode|raw }},
+                                                colors: {{ options.settings.chartColors|json_encode|raw }},
                                                 tickFormatter: function (label, value) {
                                                     return label + ': ' + formatter.formatCurrency(value);
                                                 },

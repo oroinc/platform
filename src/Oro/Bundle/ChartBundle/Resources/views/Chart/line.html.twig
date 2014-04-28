@@ -71,9 +71,9 @@
                                 $chart.get(0),
                                 [chart],
                                 {
-                                    colors: {{ config.default_settings.chartColors|json_encode|raw }},
-                                    fontColor: {{ config.default_settings.chartFontColor|json_encode|raw }},
-                                    fontSize: {{ config.default_settings.chartFontSize|json_encode|raw }},
+                                    colors: {{ options.settings.chartColors|json_encode|raw }},
+                                    fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
+                                    fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
                                     bars : {
                                         show : true,
                                         horizontal : false,

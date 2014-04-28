@@ -86,9 +86,9 @@
                                 $chart.get(0),
                                 data,
                                 {
-                                    colors: {{ config.default_settings.chartColors|json_encode|raw }},
-                                    fontColor: {{ config.default_settings.chartFontColor|json_encode|raw }},
-                                    fontSize: {{ config.default_settings.chartFontSize|json_encode|raw }},
+                                    colors: {{ options.settings.chartColors|json_encode|raw }},
+                                    fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
+                                    fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
                                     shadowSize: 0,
                                     HtmlText: true,
                                     xaxis : {
@@ -98,7 +98,7 @@
                                         showLabels : false
                                     },
                                     grid : {
-                                        color: {{ config.default_settings.chartFontColor|json_encode|raw }},
+                                        color: {{ options.settings.chartFontColor|json_encode|raw }},
                                         verticalLines : false,
                                         horizontalLines : false,
                                         outlineWidth: 0
@@ -112,7 +112,7 @@
                                     mouse : {
                                         track : true,
                                         relative: true,
-                                        lineColor: {{ config.default_settings.chartHighlightColor|json_encode|raw }},
+                                        lineColor: {{ options.settings.chartHighlightColor|json_encode|raw }},
                                         trackFormatter: function (obj) {
                                             return obj.series.label + '&nbsp;&nbsp;&nbsp;' + parseFloat(obj.fraction * 100).toFixed(2) + ' %';
                                         }
