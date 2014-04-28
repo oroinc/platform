@@ -80,6 +80,13 @@ class Report extends AbstractQueryDesigner
     protected $definition;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="chart_options", type="array", nullable=true)
+     */
+    protected $chartOptions;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
@@ -237,6 +244,26 @@ class Report extends AbstractQueryDesigner
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChartOptions()
+    {
+        return $this->chartOptions;
+    }
+
+    /**
+     * @param array $chartOptions
+     *
+     * @return Report
+     */
+    public function setChartOptions(array $chartOptions)
+    {
+        $this->chartOptions = $chartOptions;
 
         return $this;
     }
