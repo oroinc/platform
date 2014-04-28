@@ -358,6 +358,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             ->setParameter('folderId', $folder->getId())
             ->setParameter('uids', $uids)
             ->getQuery();
+
         $existingUids = array_map(
             function ($el) {
                 return $el['uid'];
@@ -382,7 +383,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     $src->getCcRecipients(),
                     $src->getBccRecipients()
                 );
-                $email->setFolder($folder);
+                $email->addFolder($folder);
+
                 $imapEmail = new ImapEmail();
                 $imapEmail
                     ->setUid($src->getId()->getUid())
