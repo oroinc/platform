@@ -101,7 +101,6 @@ class OrmDatasource implements DatasourceInterface
 
         $event = new OrmResultBefore($this->datagrid, $query);
         $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
-        $this->eventDispatcher->dispatch(OrmResultBefore::NAME . '.' . $this->datagrid->getName(), $event);
 
         $results = $event->getQuery()->execute();
         $rows    = [];
@@ -111,7 +110,6 @@ class OrmDatasource implements DatasourceInterface
 
         $event = new OrmResultAfter($this->datagrid, $rows);
         $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
-        $this->eventDispatcher->dispatch(OrmResultAfter::NAME . '.' . $this->datagrid->getName(), $event);
 
         return $event->getRecords();
     }

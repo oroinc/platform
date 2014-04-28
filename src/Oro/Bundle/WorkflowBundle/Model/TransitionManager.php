@@ -9,6 +9,8 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 
 class TransitionManager
 {
+    const DEFAULT_START_TRANSITION_NAME = '__start__';
+
     /**
      * @var Collection
      */
@@ -103,10 +105,18 @@ class TransitionManager
      */
     public function getStartTransitions()
     {
-        return $this->getTransitions()->filter(
+        return $this->transitions->filter(
             function (Transition $transition) {
                 return $transition->isStart();
             }
         );
+    }
+
+    /**
+     * @return null|Transition
+     */
+    public function getDefaultStartTransition()
+    {
+        return $this->getTransition(self::DEFAULT_START_TRANSITION_NAME);
     }
 }

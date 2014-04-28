@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Toolbar;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -15,10 +16,11 @@ class ToolbarExtension extends AbstractExtension
      */
     const METADATA_KEY = 'options';
 
-    const OPTIONS_PATH                       = '[options]';
-    const TOOLBAR_OPTION_PATH                = '[options][toolbarOptions]';
-    const PAGER_ITEMS_OPTION_PATH            = '[options][toolbarOptions][pageSize][items]';
-    const PAGER_DEFAULT_PER_PAGE_OPTION_PATH = '[options][toolbarOptions][pageSize][default_per_page]';
+    const OPTIONS_PATH                         = '[options]';
+    const TOOLBAR_OPTION_PATH                  = '[options][toolbarOptions]';
+    const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
+    const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
+    const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
 
     /** @var ConfigManager */
     private $cm;
@@ -50,6 +52,18 @@ class ToolbarExtension extends AbstractExtension
         // validate configuration and pass default values back to config
         $configuration = $this->validateConfiguration(new Configuration($this->cm), ['toolbarOptions' => $options]);
         $config->offsetSetByPath(sprintf('%s[%s]', self::OPTIONS_PATH, 'toolbarOptions'), $configuration);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    {
+        $result->offsetSetByPath('[options][hideToolbar]', false);
+        $minToolbarRecords = (int)$config->offsetGetByPath(self::TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH);
+        if ($minToolbarRecords > 0 && count($result['data']) < $minToolbarRecords) {
+            $result->offsetSetByPath('[options][hideToolbar]', true);
+        }
     }
 
     /**

@@ -110,6 +110,43 @@ class WorkflowManager
     }
 
     /**
+     * Perform reset of workflow item data - set $workflowItem and $workflowStep references into null
+     * and remove workflow item. If active workflow definition has a start step,
+     * then active workflow will be started automatically.
+     *
+     * @param WorkflowItem $workflowItem
+     * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
+     * @throws \Exception
+     */
+    public function resetWorkflowItem(WorkflowItem $workflowItem)
+    {
+        $activeWorkflowItem = null;
+        $entity = $workflowItem->getEntity();
+
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass('OroWorkflowBundle:WorkflowItem');
+        $em->beginTransaction();
+
+        try {
+            $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
+            $em->remove($workflowItem);
+            $em->flush();
+
+            $activeWorkflow = $this->getApplicableWorkflow($entity);
+            if ($activeWorkflow->getDefinition()->getStartStep()) {
+                $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
+            }
+
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+
+        return $activeWorkflowItem;
+    }
+
+    /**
      * @param string $workflow
      * @param object $entity
      * @param string|Transition|null $transition
@@ -199,10 +236,7 @@ class WorkflowManager
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
 
-        /** @var WorkflowItemRepository $workflowItemsRepository */
-        $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
-
-        return $workflowItemsRepository->findByEntityMetadata($entityClass, $entityIdentifier);
+        return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**
@@ -255,6 +289,17 @@ class WorkflowManager
     }
 
     /**
+     * @param WorkflowDefinition $workflowDefinition
+     */
+    public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
+    {
+        $this->getWorkflowItemRepository()->resetWorkflowData(
+            $workflowDefinition->getRelatedEntity(),
+            array($workflowDefinition->getName())
+        );
+    }
+
+    /**
      * @param string $entityClass
      * @param string|null $workflowName
      */
@@ -281,11 +326,34 @@ class WorkflowManager
     }
 
     /**
+     * Check that entity workflow item is equal to the active workflow item.
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function isResetAllowed($entity)
+    {
+        $currentWorkflowItem = $this->getWorkflowItemByEntity($entity);
+        $activeWorkflow      = $this->getApplicableWorkflow($entity);
+
+        return $activeWorkflow && $currentWorkflowItem &&
+               $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
+    }
+
+    /**
      * @param ConfigInterface $entityConfig
      */
     protected function persistEntityConfig(ConfigInterface $entityConfig)
     {
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
+    }
+
+    /**
+     * @return WorkflowItemRepository
+     */
+    protected function getWorkflowItemRepository()
+    {
+        return $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
     }
 }

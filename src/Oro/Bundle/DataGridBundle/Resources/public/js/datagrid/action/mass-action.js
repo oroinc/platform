@@ -13,12 +13,12 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
     return AbstractAction.extend({
         /** @property {Object} */
         defaultMessages: {
-            confirm_title: __('Mass Action Confirmation'),
-            confirm_content: __('Are you sure you want to do this?'),
-            confirm_ok: __('Yes, do it'),
-            success: __('Mass action performed.'),
-            error: __('Mass action is not performed.'),
-            empty_selection: __('Please, select items to perform mass action.')
+            confirm_title: 'Mass Action Confirmation',
+            confirm_content: 'Are you sure you want to do this?',
+            confirm_ok: 'Yes, do it',
+            success: 'Mass action performed.',
+            error: 'Mass action is not performed.',
+            empty_selection: 'Please, select items to perform mass action.'
         },
 
         initialize: function (options) {
@@ -32,7 +32,7 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
         execute: function () {
             var selectionState = this.datagrid.getSelectionState();
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
-                messenger.notificationFlashMessage('warning', this.messages.empty_selection);
+                messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
             } else {
                 AbstractAction.prototype.execute.call(this);
             }

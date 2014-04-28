@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolver implements ContainerAwareInterface
 {
+    const KEY_EXTENDS       = 'extends';
+    const KEY_EXTENDED_FROM = 'extended_from';
+
     /**
      * @var ContainerInterface
      */
@@ -24,21 +27,22 @@ class SystemAwareResolver implements ContainerAwareInterface
 
     /**
      * @param string $datagridName
-     * @param array $datagridDefinition
-     * @param bool $recursion
+     * @param array  $datagridDefinition
+     * @param bool   $recursion
+     *
      * @return array
      */
     public function resolve($datagridName, $datagridDefinition, $recursion = false)
     {
         foreach ($datagridDefinition as $key => $val) {
             if (is_array($val)) {
-                $this->parentNode = $val;
+                $this->parentNode         = $val;
                 $datagridDefinition[$key] = $this->resolve($datagridName, $val, true);
                 continue;
             }
 
             $val = $this->resolveSystemCall($datagridName, $key, $val);
-            if (!$recursion && 'extends' === $key) {
+            if (!$recursion && self::KEY_EXTENDS === $key) {
                 // get parent grid definition, resolved
                 $definition = $this->container
                     ->get('oro_datagrid.datagrid.manager')
@@ -50,6 +54,10 @@ class SystemAwareResolver implements ContainerAwareInterface
                     $datagridDefinition
                 );
                 unset($datagridDefinition['extends']);
+
+                $datagridDefinition[self::KEY_EXTENDED_FROM]   = isset($datagridDefinition[self::KEY_EXTENDED_FROM]) ?
+                    $datagridDefinition[self::KEY_EXTENDED_FROM] : [];
+                $datagridDefinition[self::KEY_EXTENDED_FROM][] = $val;
 
                 // run resolve again on merged grid definition
                 $datagridDefinition = $this->resolve($val, $datagridDefinition);
@@ -87,7 +95,7 @@ class SystemAwareResolver implements ContainerAwareInterface
         switch (true) {
             case preg_match('#^%([\w\._]+)%$#', $val, $match):
                 $val = $this->container->getParameter($match[1]);
-            // static call class:method or class::const
+                // static call class:method or class::const
             case preg_match('#%([\w\._]+)%::([\w\._]+)#', $val, $match):
                 // with class as param
                 $class = $this->container->getParameter($match[1]);
@@ -133,7 +141,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             // service pass @service
             case preg_match('#@([\w\._]+)#', $val, $match):
                 $service = $match[1];
-                $val = $this->container->get($service);
+                $val     = $this->container->get($service);
                 break;
             default:
                 break;
