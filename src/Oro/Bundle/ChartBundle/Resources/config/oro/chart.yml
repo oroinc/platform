@@ -1,16 +1,16 @@
 oro_chart:
     line_chart:
-        label: Line Chart
+        label: oro.chart.line_chart.label
         data_schema:
           - name: label
-            label: Category (X axis)
+            label: oro.chart.line_chart.params.label
             required: true
           - name: value
-            label: Value (Y axis)
+            label: oro.chart.line_chart.params.value
             required: true
         settings_schema:
           - name: connect_dots_with_line
-            label: Connect line with dots
+            label: oro.chart.line_chart.settings.connect_dots_with_line
             type: checkbox
             options: { required: false }
         default_settings:
@@ -20,13 +20,13 @@ oro_chart:
             chartHighlightColor: '#FF5E5E'
         template: OroChartBundle:Chart:line.html.twig
     pie_chart:
-        label: Pie Chart
+        label: oro.chart.pie_chart.label
         data_schema:
           - name: label
-            label: Fraction Label
+            label: oro.chart.pie_chart.params.label
             required: true
           - name: value
-            label: Value
+            label: oro.chart.pie_chart.params.value
             required: true
         default_settings:
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
@@ -35,16 +35,16 @@ oro_chart:
             chartHighlightColor: '#FF5E5E'
         template: OroChartBundle:Chart:pie.html.twig
     flow_chart:
-        label: Flow Chart
+        label: oro.chart.flow_chart.label
         data_schema:
           - name: label
-            label: Step label
+            label: oro.chart.flow_chart.params.label
             required: true
           - name: value
-            label: Value
+            label: oro.chart.flow_chart.params.value
             required: true
           - name: isNozzle
-            label: Is nozzle step
+            label: oro.chart.flow_chart.params.is_nozzle
             required: false
         default_settings:
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
