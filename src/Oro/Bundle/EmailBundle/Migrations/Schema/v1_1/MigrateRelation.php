@@ -29,4 +29,4 @@ class MigrateRelation implements Migration, OrderedMigrationInterface
     {
         return 2;
     }
-} 
+}

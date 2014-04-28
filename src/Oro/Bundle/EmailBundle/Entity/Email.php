@@ -159,7 +159,7 @@ class Email
      * @var ArrayCollection|EmailFolder[] $folders
      *
      * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
-     * @ORM\JoinTable(name="orocrm_email_to_folder")
+     * @ORM\JoinTable(name="oro_email_to_folder")
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
@@ -292,7 +292,7 @@ class Email
     }
 
     /**
-     * Add folder
+     * Add recipient
      *
      * @param  EmailRecipient $recipient
      * @return $this

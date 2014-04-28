@@ -38,7 +38,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
 
         // migrate existing email-folder relations
         $queries->addPostQuery(
-            "INSERT INTO orocrm_email_to_folder (email_id, emailfolder_id) SELECT id, folder_id FROM oro_email"
+            "INSERT INTO oro_email_to_folder (email_id, emailfolder_id) SELECT id, folder_id FROM oro_email"
         );
     }
 
@@ -49,11 +49,11 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
      */
     public static function oroEmailToFolderRelationTable(Schema $schema)
     {
-        $table = $schema->createTable('orocrm_email_to_folder');
+        $table = $schema->createTable('oro_email_to_folder');
         $table->addColumn('email_id', 'integer', []);
         $table->addColumn('emailfolder_id', 'integer', []);
-        $table->addIndex(['email_id'], 'orocrm_folder_email_idx', []);
-        $table->addIndex(['emailfolder_id'], 'orocrm_email_folder_idx', []);
+        $table->addIndex(['email_id'], 'oro_folder_email_idx', []);
+        $table->addIndex(['emailfolder_id'], 'oro_email_folder_idx', []);
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
