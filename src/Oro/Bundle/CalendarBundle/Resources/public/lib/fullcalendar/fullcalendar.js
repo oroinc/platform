@@ -10,8 +10,8 @@
  * For event resizing, requires jQuery UI resizable.
  */
 
-/*global require*/
-require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'], function ($, dateTimeFormatter) {
+/*global define*/
+define(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'], function ($, dateTimeFormatter) {
 
 
 ;;

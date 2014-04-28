@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -21,15 +21,13 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tag;
-
+use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\UserBundle\Model\ExtendUser;
@@ -74,7 +72,8 @@ class User extends ExtendUser implements
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
-    NotificationEmailInterface
+    NotificationEmailInterface,
+    AdvancedApiUserInterface
 {
     const ROLE_DEFAULT       = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -445,13 +444,13 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Get name of field contains the primary email address
+     * Get names of fields contain email addresses
      *
-     * @return string
+     * @return string[]|null
      */
-    public function getPrimaryEmailField()
+    public function getEmailFields()
     {
-        return 'email';
+        return ['email'];
     }
 
     /**
@@ -650,6 +649,14 @@ class User extends ExtendUser implements
     public function getApi()
     {
         return $this->api;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getApiKey()
+    {
+        return $this->api ? $this->getApi()->getApiKey() : uniqid('undefined');
     }
 
     /**

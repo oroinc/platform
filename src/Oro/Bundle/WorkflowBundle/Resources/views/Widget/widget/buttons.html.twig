@@ -65,7 +65,20 @@
                 transitionData
             ) }}
         {% endfor %}
+
     </div>
 
     {{ workflowMacros.renderTransitionsJs(transitionsData, blockId) }}
+
+    {% if showResetButton and workflowItem %}
+        <div class="btn-group">
+            {% set data = {
+                'url':              path('oro_workflow_api_rest_workflow_delete', {workflowItemId: workflowItem.id}),
+                'title':            'Reset workflow data',
+                'workflow_item_id': workflowItem.id,
+            } %}
+
+            {{ workflowMacros.renderResetButton(data, blockId) }}
+        </div>
+    {% endif %}
 </div>

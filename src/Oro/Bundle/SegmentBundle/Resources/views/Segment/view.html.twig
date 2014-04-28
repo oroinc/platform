@@ -2,7 +2,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
-{% oro_title_set({params : {"%segment.name%": entity.name, "%segment.group%": segmentGroup} }) %}
+{% oro_title_set({params : {"%segment.name%": entity.name, "%segment.group%": segmentGroup|trans} }) %}
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}
