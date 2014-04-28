@@ -16,7 +16,7 @@ class EntityConnector
      * @param object $entity
      * @param WorkflowItem $workflowItem
      */
-    public function setWorkflowItem($entity, WorkflowItem $workflowItem)
+    public function setWorkflowItem($entity, WorkflowItem $workflowItem = null)
     {
         $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_ITEM, $workflowItem);
     }
@@ -25,7 +25,7 @@ class EntityConnector
      * @param object $entity
      * @param WorkflowStep $workflowStep
      */
-    public function setWorkflowStep($entity, WorkflowStep $workflowStep)
+    public function setWorkflowStep($entity, WorkflowStep $workflowStep = null)
     {
         $this->setProperty($entity, FieldGenerator::PROPERTY_WORKFLOW_STEP, $workflowStep);
     }
@@ -54,7 +54,7 @@ class EntityConnector
      * @param mixed $value
      * @throws WorkflowException
      */
-    protected function setProperty($entity, $property, $value)
+    protected function setProperty($entity, $property, $value = null)
     {
         $setter = $this->getSetter($entity, $property);
         if (!$setter) {
@@ -112,5 +112,14 @@ class EntityConnector
             && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_ITEM)
             && $this->getGetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP)
             && $this->getSetter($entityOrClass, FieldGenerator::PROPERTY_WORKFLOW_STEP);
+    }
+
+    /**
+     * @param object $entity
+     */
+    public function resetWorkflowData($entity)
+    {
+        $this->setWorkflowItem($entity, null);
+        $this->setWorkflowStep($entity, null);
     }
 }

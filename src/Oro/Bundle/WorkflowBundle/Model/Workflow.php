@@ -16,8 +16,6 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class Workflow
 {
-    const DEFAULT_START_TRANSITION_NAME = '__start__';
-
     /**
      * @var string
      */
@@ -163,7 +161,7 @@ class Workflow
     public function start($entity, array $data = array(), $startTransitionName = null)
     {
         if (null === $startTransitionName) {
-            $startTransitionName = self::DEFAULT_START_TRANSITION_NAME;
+            $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
         $workflowItem = $this->createWorkflowItem($entity, $data);
@@ -274,6 +272,16 @@ class Workflow
         $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
 
         $this->aclManager->updateAclIdentities($workflowItem);
+    }
+
+    /**
+     * Reset workflow item data.
+     *
+     * @param $entity
+     */
+    public function resetWorkflowData($entity)
+    {
+        $this->entityConnector->resetWorkflowData($entity);
     }
 
     /**
