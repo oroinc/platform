@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -26,7 +26,7 @@ class Builder
     /** @var string */
     protected $acceptorClass;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DatasourceInterface[] */
@@ -41,7 +41,7 @@ class Builder
     public function __construct(
         $baseDatagridClass,
         $acceptorClass,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade
     ) {
         $this->baseDatagridClass = $baseDatagridClass;
@@ -54,7 +54,7 @@ class Builder
      * Create, configure and build datagrid
      *
      * @param DatagridConfiguration $config
-     * @param array $parameters
+     * @param array                 $parameters
      *
      * @return DatagridInterface
      */
@@ -70,8 +70,6 @@ class Builder
 
         $event = new BuildBefore($datagrid, $config, $parameters);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
-        // duplicate event dispatch with grid name
-        $this->eventDispatcher->dispatch(BuildBefore::NAME . '.' . $name, $event);
 
         $this->buildDataSource($datagrid, $config);
 
@@ -85,8 +83,6 @@ class Builder
 
         $event = new BuildAfter($datagrid, $parameters);
         $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);
-        // duplicate event dispatch with grid name
-        $this->eventDispatcher->dispatch(BuildAfter::NAME . '.' . $name, $event);
 
         return $datagrid;
     }

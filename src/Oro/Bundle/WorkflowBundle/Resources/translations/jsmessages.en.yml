@@ -36,3 +36,8 @@
 "Step saved.": "Step saved."
 "Copy of": "Copy of"
 "Clone step": "Clone step"
+"Workflow reset": "Workflow reset"
+"Cannot reset workflow item data.": "Cannot reset workflow item data."
+"Yes, Reset": "Yes, Reset"
+"Attention: This action will reset workflow data for this record.": "Attention: This action will reset workflow data for this record."
+"Attention: This action will reset all workflow data for this entity.": "Attention: This action will reset all workflow data for this entity."

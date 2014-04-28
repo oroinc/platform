@@ -63,7 +63,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
             if (_.has(options, 'enable') && !options.enable) {
                 this.disable();
             }
-            if (options.hide) {
+            if (options.hide || this.collection.state.hideToolbar) {
                 this.hide();
             }
 

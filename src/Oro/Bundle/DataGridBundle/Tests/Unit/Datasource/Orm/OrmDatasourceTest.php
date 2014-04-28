@@ -26,8 +26,7 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        $this->datasource = new OrmDatasource($this->em, $this->eventDispatcher);
+        $this->datasource      = new OrmDatasource($this->em, $this->eventDispatcher);
     }
 
     /**
@@ -35,7 +34,7 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testHints($hints, $expected)
     {
-        $entityClass = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass';
+        $entityClass      = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass';
         $configs['query'] = [
             'select' => ['t'],
             'from'   => [
@@ -90,7 +89,7 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         $persister = $this->getMockBuilder('Doctrine\ORM\Persisters\BasicEntityPersister')
             ->disableOriginalConstructor()
             ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+        $uow       = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
         $uow->expects($this->once())
