@@ -80,14 +80,13 @@ class ChartSettingsType extends AbstractType
     protected function getChartConfig(array $options)
     {
         $chartConfig = [];
-        $chartName   = $options[self::NAME];
-
-        if (isset($options[self::NAME])) {
-            $chartConfig = $this->configProvider->getChartConfig($chartName);
+        $chartName = isset($options[self::NAME]) ? $options[self::NAME] : '';
+        if (!empty($chartName)) {
+            $chartConfig = $this->configProvider->getChartConfig($options[self::NAME]);
         }
 
         if (isset($options[self::CHART_OPTIONS])) {
-            $chartConfig = $options[self::CHART_OPTIONS];
+            $chartConfig = array_replace_recursive($chartConfig, $options[self::CHART_OPTIONS]);
         }
 
         if (!$chartConfig) {

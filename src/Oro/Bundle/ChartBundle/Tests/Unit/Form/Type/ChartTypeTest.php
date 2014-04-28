@@ -53,7 +53,7 @@ class ChartTypeTest extends FormIntegrationTestCase
 
         $this->assertTrue($form->has('type'));
 
-        foreach ($chartConfigs as $chartName => $chartConfig) {
+        foreach (array_keys($chartConfigs) as $chartName) {
             $this->assertTrue($form->has($chartName));
         }
     }
@@ -74,7 +74,7 @@ class ChartTypeTest extends FormIntegrationTestCase
 
         $this->assertTrue($form->has('type'));
 
-        foreach ($chartConfigs as $chartName => $chartConfig) {
+        foreach (array_keys($chartConfigs) as $chartName) {
             $this->assertTrue($form->has($chartName));
         }
 
@@ -99,6 +99,7 @@ class ChartTypeTest extends FormIntegrationTestCase
             'name' => [
                 'chartConfigs' => [
                     'first'  => [
+                        'label' => 'first label',
                         ChartSettingsType::CHART_OPTIONS   => ['option' => 'value'],
                         ChartSettingsType::SETTINGS_SCHEMA => [
                             'field' => [
@@ -108,6 +109,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                         ]
                     ],
                     'second' => [
+                        'label' => 'second label',
                         ChartSettingsType::CHART_OPTIONS   => ['option' => 'value2'],
                         ChartSettingsType::SETTINGS_SCHEMA => [
                             'field' => [

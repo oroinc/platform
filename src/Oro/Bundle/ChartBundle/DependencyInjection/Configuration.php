@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('label')
                         ->info('The label of chart')
                         ->cannotBeEmpty()
+                        ->isRequired()
                     ->end()
                     ->arrayNode('data_schema')
                         ->info('Schema of chart data fields')
