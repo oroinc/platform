@@ -16,12 +16,15 @@ Bundle support such chart types as:
 
 Chart bundle consists of several related entities.
 
-- **ArrayData**    - realization of data interface for array.
-- **DataGridData** - realization of data interface for array.
-- **MappedData** - realization of data interface for array.
-- **ChartView** - realization of data interface for array.
-- **ChartViewBuilder** - realization of data interface for array.
-- **ConfigProvider** - realization of data interface for array.
+- **ArrayData**    		- realization of data interface for array.
+- **DataGridData** 		- realization of data interface for data grid.
+- **MappedData** 		- realization of data interface for mapping data to chart schema.
+- **ChartView** 		- chart view representation.
+- **ChartViewBuilder** 	- class responsible for chart view creation.
+- **ConfigProvider** 	- provide access to oro_chart config node.
 
 
 ## How it works ##
+
+Developer use ChartViewBuilder for build view, then call from view render method in twig template.
+[See more](./reference/usage.md)
