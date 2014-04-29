@@ -28,7 +28,7 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
  */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
-    const EMAIL_ADDRESS_BATCH_SIZE = 1000;
+    const EMAIL_ADDRESS_BATCH_SIZE = 100;
 
     /**
      * @var ImapEmailManager
