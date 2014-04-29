@@ -35,10 +35,11 @@ Table of Contents
    - [Transition Manager](#transition-manager)
    - [Attribute Manager](#attribute-manager)
    - [Context Accessor](#context-accessor)
-   - [Entity Binder](#entity-binder)
+   - [Entity Connector](#entity-connector)
    - [Workflow Configuration](#workflow-configuration)
    - [Workflow List Configuration](#workflow-list-configuration)
-   - [Configuration Provider](#configuration-provider)
+   - [Workflow Configuration Provider](#configuration-provider)
+   - [Workflow Definition Configuration Builder](#workflow-definition-configuration-builder)
    - [Workflow Data Serializer](#workflow-data-serializer)
    - [Workflow Data Normalizer](#workflow-data-normalizer)
    - [Attribute Normalizer](#attribute-normalizer)
@@ -491,7 +492,8 @@ and list of additional functions applicable to transitions.
 
 **Methods:**
 * **extractTransition(transition)** - converts transition name to transition instance;
-* **getStartTransitions()** - get list of start transitions.
+* **getStartTransitions()** - get list of start transitions;
+* **getDefaultStartTransition()** - get default start transition that leads to the start step.
 
 Attribute Manager
 ----------------
@@ -502,6 +504,11 @@ Oro\Bundle\WorkflowBundle\Model\AttributeManager
 AttributeManager is a container for attributes, is provides getters, setters
 and list of additional functions applicable to attributes.
 
+**Methods:**
+* **getEntityAttribute()** - attribute used as root entity;
+* **getAttributesByType(type)** - get all attributes that have specified type;
+* **getEntityAttributes()** - get all attributes that have type "entity".
+
 Context Accessor
 ----------------
 **Class:**
@@ -511,6 +518,16 @@ Oro\Bundle\WorkflowBundle\Model\ContextAccessor
 Context is used in action and conditions and thereby it's usually an instance of Workflow Item.
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
+
+Entity Connector
+----------------
+
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\EntityConnector
+
+**Description:**
+Provides methods to get and set Workflow Item and Workflow Step to the specific entity. Also can define
+whether entity or class has properties to store Workflow Item and Workflow Step.
 
 Workflow Configuration
 ----------------------
@@ -524,7 +541,7 @@ Contains tree builder for single Workflow configuration with steps, conditions, 
 * **getConfigTreeBuilder()** - configuration tree builder for single Workflow configuration.
 
 Workflow List Configuration
-------------------
+---------------------------
 **Class:**
 Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
 
@@ -535,10 +552,10 @@ Contains tree builder for list of Workflows, processConfiguration raw configurat
 * **getConfigTreeBuilder()** - configuration tree builder for list of Workflows.
 * **processConfiguration(configs)** - processes raw configuration according to configuration tree builder
 
-Configuration Provider
----------------------
+Workflow Configuration Provider
+-------------------------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Configuration\ConfigurationProvider
+Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
 
 **Description:**
 Parses files workflow.yml in all bundles and processes merged configuration using Workflow List Configuration.
@@ -546,8 +563,20 @@ Parses files workflow.yml in all bundles and processes merged configuration usin
 **Methods:**
 * **getWorkflowDefinitionConfiguration()** - get list of configurations for Workflow Definitions.
 
+Workflow Definition Configuration Builder
+-----------------------------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
+
+**Description:**
+Builds WorkflowDefinition entities based on input configuration (usually parsed from *.yml files).
+
+**Methods:**
+* **buildFromConfiguration(configurationData)** - build several entities based on configuration;
+* **buildOneFromConfiguration(name, configuration)** - builds one entity based on definition name and configuration.
+
 Workflow Data Serializer
------------------------
+------------------------
 **Interface:**
 Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer
 
