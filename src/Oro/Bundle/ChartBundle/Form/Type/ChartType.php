@@ -41,7 +41,7 @@ class ChartType extends ConfigProviderAwareType
 
         $builder
             ->add(
-                'type',
+                'name',
                 'choice',
                 [
                     'choices' => array_map(
@@ -49,7 +49,8 @@ class ChartType extends ConfigProviderAwareType
                             return $chartConfig['label'];
                         },
                         $chartConfigs
-                    )
+                    ),
+                    'empty_value' => 'oro.chart.form.chart_empty_value'
                 ]
             )
             ->add(

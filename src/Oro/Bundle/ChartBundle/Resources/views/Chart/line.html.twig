@@ -47,7 +47,8 @@
                         if (!$chart.get(0).clientWidth) {
                             return;
                         }
-                        var data = {{ data|json_encode|raw }};
+                        var data = {{ data|json_encode|raw }}
+                        var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
                         var chartData = [];
                         var xLabels = [];
@@ -65,6 +66,9 @@
                                 labelFormatter: function (data) {
                                     return numberFormatter.formatCurrency(data.y);
                                 }
+                            },
+                            points: {
+                                show: !connectDots
                             }
                         };
                         Flotr.draw(
@@ -74,11 +78,8 @@
                                     colors: {{ options.settings.chartColors|json_encode|raw }},
                                     fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
                                     fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                                    bars : {
-                                        show : true,
-                                        horizontal : false,
-                                        shadowSize : 0,
-                                        barWidth : 0.5
+                                    lines : {
+                                        show : connectDots
                                     },
                                     mouse : {
                                         track : true,
@@ -88,7 +89,6 @@
                                         }
                                     },
                                     yaxis: {
-                                        min: 0,
                                         tickFormatter: function (y) {
                                             return numberFormatter.formatCurrency(y);
                                         }
