@@ -68,7 +68,7 @@ class Channel
     /**
      * @var boolean
      *
-     * @ORM\Column(name="is_two_way_sync", type="boolean", nullable=true)
+     * @ORM\Column(name="is_two_way_sync_enable", type="boolean", nullable=true)
      * @Oro\Versioned()
      */
     protected $isTwoWaySyncEnable;

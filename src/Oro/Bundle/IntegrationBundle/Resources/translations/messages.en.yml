@@ -34,8 +34,10 @@ oro:
             statuses.label:   Statuses
             name.label:       Name
             connectors.label: Connectors
-            two_way_sync.label: Enable two way sync
+            two_way_sync_enable.label: Enable two way sync
             sync_priority.label: Sync priority
+            remote_wins.label: Remote wins
+            local_wins.label: Local wins
 
         delete_sync_channel:
             content: "Warning: Removing the channel will delete all related data"
