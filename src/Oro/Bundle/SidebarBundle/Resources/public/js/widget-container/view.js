@@ -30,9 +30,9 @@ define(['jquery', 'underscore', 'backbone', '../constants',
         },
 
         render: function () {
-            var view = this;
-            var model = view.model;
-            var template = null;
+            var view     = this,
+                model    = view.model,
+                template = null;
 
             if (model.get('state') === constants.WIDGET_MINIMIZED) {
                 template = view.templateMin;
@@ -42,7 +42,6 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
-
 
             if (view.model.get('cssClass')) {
                 view.$el.attr('class', view.model.get('cssClass'));
