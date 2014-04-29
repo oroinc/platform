@@ -90,7 +90,6 @@ class ChannelType extends AbstractType
                 ],
             ]
         );
-        
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
     }
 
