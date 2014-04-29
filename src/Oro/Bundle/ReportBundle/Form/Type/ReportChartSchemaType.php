@@ -40,11 +40,12 @@ class ReportChartSchemaType extends AbstractType
             }
 
             $fieldOptions = [
-                'label'       => $schemaOptions['label'],
-                'required'    => $schemaOptions['required'],
-                'constraints' => new NotBlank(),
-                'attr'        => [
-                    'data-filter' => json_encode($excludedProperties)
+                'label'    => $schemaOptions['label'],
+                'required' => $schemaOptions['required'],
+                'attr'     => [
+                    'data-filter'                    => json_encode($excludedProperties),
+                    'data-validation-optional-group' => true,
+                    'data-validation'                => json_encode(['NotBlank' => []])
                 ]
             ];
 
