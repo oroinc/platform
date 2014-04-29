@@ -47,9 +47,7 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
         }
 
         if ($this->isNotEmpty($data->getType())) {
-            $connectorsTypes = $this->registry->getRegisteredConnectorsTypes($data->getType());
-
-            if (true === $this->hasTwoWaySync($connectorsTypes)) {
+            if (false === $this->hasTwoWaySync($data->getType())) {
                 $form
                     ->remove('syncPriority')
                     ->remove('isTwoWaySyncEnable')
@@ -69,12 +67,24 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ArrayCollection $connectorsTypes
+     * @param string $type
+     *
+     * @return ArrayCollection
+     */
+    private function getRegisteredConnectorsTypes($type)
+    {
+        return $this->registry->getRegisteredConnectorsTypes($type);
+    }
+
+    /**
+     * @param string $type
      *
      * @return bool
      */
-    private function hasTwoWaySync(ArrayCollection $connectorsTypes)
+    private function hasTwoWaySync($type)
     {
+        $connectorsTypes = $this->getRegisteredConnectorsTypes($type);
+
         foreach ($connectorsTypes as $type) {
             if ($type instanceof TwoWaySyncConnectorInterface) {
                 return true;
