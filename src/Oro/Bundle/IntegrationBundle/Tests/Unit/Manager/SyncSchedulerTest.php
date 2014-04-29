@@ -3,6 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\EntityManager;
+
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -63,19 +66,36 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->scheduler->schedule($channel, $testConnectorType);
     }
 
-    /**
-     */
     public function testSchedule()
     {
         $testChannelType   = 'testChannelType';
         $testConnectorType = 'testConnectorType';
+        $testId            = 22;
 
         $channel = new Channel();
         $channel->setType($testChannelType);
+        $ref = new \ReflectionProperty(get_class($channel), 'id');
+        $ref->setAccessible(true);
+        $ref->setValue($channel, $testId);
         $this->typesRegistry->addChannelType($testChannelType, new TestChannelType());
         $this->typesRegistry->addConnectorType($testConnectorType, $testChannelType, new TestTwoWayConnector());
+
+        $that = $this;
         $this->em->expects($this->once())->method('persist')
-            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'));
+            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
+            ->will(
+                $this->returnCallback(
+                    function (Job $job) use ($that, $testId, $testConnectorType) {
+                        $expectedArgs = [
+                            '--channel=' . $testId,
+                            sprintf('--connector=\'testConnectorType\'', $testConnectorType),
+                            '--params=\'a:0:{}\'',
+                        ];
+
+                        $that->assertEquals($expectedArgs, $job->getArgs());
+                    }
+                )
+            );
         $this->em->expects($this->once())->method('flush')
             ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'));
 
