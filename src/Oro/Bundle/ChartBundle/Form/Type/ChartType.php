@@ -81,19 +81,19 @@ class ChartType extends ConfigProviderAwareType
     {
         $formData = $event->getData();
 
-        if (!isset($formData['type'])) {
+        if (!isset($formData['name'])) {
             $event->setData(array());
             return;
         }
 
-        $type = $formData['type'];
+        $name = $formData['name'];
 
-        if (isset($formData['settings'][$type])) {
-            $formData['settings'] = $formData['settings'][$type];
+        if (isset($formData['settings'][$name])) {
+            $formData['settings'] = $formData['settings'][$name];
         }
 
-        if (isset($formData['data_schema'][$type])) {
-            $formData['data_schema'] = $formData['data_schema'][$type];
+        if (isset($formData['data_schema'][$name])) {
+            $formData['data_schema'] = $formData['data_schema'][$name];
         }
 
         $event->setData($formData);

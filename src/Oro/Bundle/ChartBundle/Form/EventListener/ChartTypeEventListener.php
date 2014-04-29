@@ -34,15 +34,15 @@ class ChartTypeEventListener implements EventSubscriberInterface
     {
         $formData = $event->getData();
 
-        if (!$formData || !isset($formData['type'])) {
+        if (!$formData || !isset($formData['name'])) {
             return;
         }
 
-        $type = $formData['type'];
+        $name = $formData['name'];
 
         foreach ($this->optionsGroups as $optionsGroup) {
-            if (isset($formData[$optionsGroup][$type])) {
-                $formData[$optionsGroup] = $formData[$optionsGroup][$type];
+            if (isset($formData[$optionsGroup][$name])) {
+                $formData[$optionsGroup] = $formData[$optionsGroup][$name];
             }
         }
 
@@ -61,11 +61,11 @@ class ChartTypeEventListener implements EventSubscriberInterface
             return;
         }
 
-        if (!isset($formData['type'])) {
-            throw new InvalidArgumentException('Type is missing');
+        if (!isset($formData['name'])) {
+            throw new InvalidArgumentException('Chart name is missing');
         }
 
-        $type = $formData['type'];
+        $name = $formData['name'];
 
         foreach ($this->optionsGroups as $optionsGroup) {
             if (isset($formData[$optionsGroup])) {
@@ -75,7 +75,7 @@ class ChartTypeEventListener implements EventSubscriberInterface
                     unset($formData[$optionsGroup][$key]);
                 }
 
-                $formData[$optionsGroup][$type] = $data;
+                $formData[$optionsGroup][$name] = $data;
             }
         }
 
