@@ -49,13 +49,15 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                     'foo' => array(
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
+                        'iconClass' => null,
                         'module' => 'widget/foo',
                         'placement' => 'left',
                         'settings' => array('test' => 'Hello')
                     ),
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'bar.ico',
+                        'icon' => null,
+                        'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
                         'settings' => null
@@ -68,7 +70,9 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'sidebar_widgets' => array(
                             'foo' => array(
                                 'title' => 'Foo Extended',
-                                'settings' => array('test2' => 'Rewritten')
+                                'settings' => array('test2' => 'Rewritten'),
+                                'icon' => null,
+                                'iconClass' => 'test2'
                             )
                         )
                     )
@@ -76,7 +80,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedThemeSettings' => array(
                     'foo' => array(
                         'title' => 'Foo Extended',
-                        'icon' => 'foo.ico',
+                        'icon' => null,
+                        'iconClass' => 'test2',
                         'module' => 'widget/foo',
                         'placement' => 'left',
                         'settings' => array('test2' => 'Rewritten')
@@ -84,7 +89,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'bar.ico',
+                        'icon' => null,
+                        'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
                         'settings' => null
