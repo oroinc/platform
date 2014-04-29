@@ -34,12 +34,8 @@ class ChartTypeEventListener implements EventSubscriberInterface
     {
         $formData = $event->getData();
 
-        if (!$formData) {
+        if (!$formData || !isset($formData['type'])) {
             return;
-        }
-
-        if (!isset($formData['type'])) {
-            throw new InvalidArgumentException('Type is missing');
         }
 
         $type = $formData['type'];

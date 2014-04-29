@@ -49,7 +49,8 @@ class ChartType extends ConfigProviderAwareType
                             return $chartConfig['label'];
                         },
                         $chartConfigs
-                    )
+                    ),
+                    'empty_value' => 'oro.chart.form.select_chart'
                 ]
             )
             ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);
@@ -81,7 +82,8 @@ class ChartType extends ConfigProviderAwareType
         $formData = $event->getData();
 
         if (!isset($formData['type'])) {
-            throw new InvalidArgumentException('Type data is missing');
+            $event->setData(array());
+            return;
         }
 
         $type = $formData['type'];

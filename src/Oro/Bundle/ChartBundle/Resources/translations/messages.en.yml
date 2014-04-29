@@ -1,5 +1,7 @@
 oro:
   chart:
+      form:
+          select_chart: Select chart type
       line_chart:
           label: Line Chart
           params:
