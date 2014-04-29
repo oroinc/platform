@@ -18,8 +18,8 @@
                 'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
             }) }}
             <script type="text/javascript">
-                require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator'],
-                function($, Messenger, Navigation, mediator) {
+                require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
+                function($, Messenger, Navigation, mediator, Error) {
                     var navigation = Navigation.getInstance();
                     $('#{{ entity.name }}-workflow-deactivate-btn').on('click', function(e) {
                         e.preventDefault();
