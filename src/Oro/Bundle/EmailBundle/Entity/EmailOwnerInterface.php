@@ -20,11 +20,11 @@ interface EmailOwnerInterface extends FirstNameInterface, LastNameInterface
     public function getClass();
 
     /**
-     * Get name of field contains the primary email address
+     * Get names of fields contain email addresses
      *
-     * @return string
+     * @return string[]|null
      */
-    public function getPrimaryEmailField();
+    public function getEmailFields();
 
     /**
      * Get entity unique id

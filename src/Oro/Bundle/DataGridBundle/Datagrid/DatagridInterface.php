@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -75,18 +76,16 @@ interface DatagridInterface
     public function getMetadata();
 
     /**
-     * Set parameters
-     *
-     * @param ParameterBag $parameters
-     *
-     * @return $this
-     */
-    public function setParameters(ParameterBag $parameters);
-
-    /**
      * Returns parameters
      *
      * @return ParameterBag
      */
     public function getParameters();
+
+    /**
+     * Get config object
+     *
+     * @return DatagridConfiguration
+     */
+    public function getConfig();
 }
