@@ -71,7 +71,7 @@ class Channel
      * @ORM\Column(name="is_two_way_sync", type="boolean", nullable=true)
      * @Oro\Versioned()
      */
-    protected $isTwoWaySync;
+    protected $isTwoWaySyncEnable;
 
     /**
      * @var string
@@ -95,7 +95,7 @@ class Channel
     public function __construct()
     {
         $this->statuses = new ArrayCollection();
-        $this->isTwoWaySync = false;
+        $this->isTwoWaySyncEnable = false;
     }
 
     /**
@@ -257,18 +257,21 @@ class Channel
     }
 
     /**
-     * @param boolean $isTwoWaySync
+     * @param $isTwoWaySyncEnable
+     *
+     * @return $this
      */
-    public function setIsTwoWaySync($isTwoWaySync)
+    public function setIsTwoWaySyncEnable($isTwoWaySyncEnable)
     {
-        $this->isTwoWaySync = $isTwoWaySync;
+        $this->isTwoWaySyncEnable = $isTwoWaySyncEnable;
+        return $this;
     }
 
     /**
      * @return boolean
      */
-    public function getIsTwoWaySync()
+    public function getIsTwoWaySyncEnable()
     {
-        return $this->isTwoWaySync;
+        return $this->isTwoWaySyncEnable;
     }
 }

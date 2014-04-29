@@ -67,7 +67,7 @@ class ChannelType extends AbstractType
         );
 
         $builder->add(
-            'isTwoWaySync',
+            'isTwoWaySyncEnable',
             'checkbox',
             [
                 'label'    => 'oro.integration.channel.two_way_sync.label',

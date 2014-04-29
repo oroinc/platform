@@ -34,7 +34,7 @@ oro:
             statuses.label:   Statuses
             name.label:       Name
             connectors.label: Connectors
-            two_way_sync.label: Is two way sync
+            two_way_sync.label: Enable two way sync
             sync_priority.label: Sync priority
 
         delete_sync_channel:
