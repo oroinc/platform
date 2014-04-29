@@ -19,7 +19,8 @@
             },
             util: {},
             fieldsLoaderSelector: '#' ~ params.entity_choice_id,
-            currentSegment: params.currentSegmentId|default(null)
+            currentSegment: params.currentSegmentId|default(null),
+            pageLimit: params.page_limit|default(10)
         }
     } %}
     <div class="condition-builder left-panel-container">
