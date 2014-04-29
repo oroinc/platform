@@ -1,0 +1,19 @@
+{% extends 'OroChartBundle:Form:fields.html.twig' %}
+
+{% block oro_report_chart_widget %}
+    {{ block('oro_chart_widget') }}
+
+    <script type="text/javascript">
+        require(['oro/chart/chart_form'], function (ChartForm) {
+            ChartForm.initialize('#oro_report_form_chart');
+        });
+    </script>
+{% endblock %}
+
+{% block oro_report_chart_schema_collection_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block oro_report_chart_schema_row %}
+    {{ form_widget(form) }}
+{% endblock %}

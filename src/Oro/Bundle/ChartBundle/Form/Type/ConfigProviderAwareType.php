@@ -1,13 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Form\Type;
+namespace Oro\Bundle\ChartBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
-class ReportChartChoiceType extends AbstractType
+abstract class ConfigProviderAwareType extends AbstractType
 {
     /**
      * @var ConfigProvider
@@ -25,24 +28,8 @@ class ReportChartChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        //todo: add fields here use config provider to get data schema
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'oro_chart';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
-        return 'oro_report_chart_choice';
+        return 'oro_chart_aware';
     }
 }

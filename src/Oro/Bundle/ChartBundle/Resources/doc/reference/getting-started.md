@@ -1,6 +1,12 @@
 # Getting Started
 
 ### Table of Contents
+
+- Getting Started
+- [Configuration](./chart-configuration.md)
+- [Configuration merging](./configuration-merge.md)
+- [Basic usage](./usage.md)
+
 ## What is Entity Merge ##
 Chart bundle provide functionality for display different types of chart.
 It is solution that allows user to view data in useful chart format.
@@ -27,4 +33,4 @@ Chart bundle consists of several related entities.
 ## How it works ##
 
 Developer use ChartViewBuilder for build view, then call from view render method in twig template.
-[See more](./reference/usage.md)
+[See more](./usage.md)

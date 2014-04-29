@@ -1,6 +1,12 @@
 # Basic usage
 
 ### Table of Contents
+
+- [Getting Started](./getting-started.md)
+- [Configuration](./chart-configuration.md)
+- [Configuration merging](./configuration-merge.md)
+- Basic usage
+
 ##Controller example##
 	public function exampleAction(){
 		// items - array in format: array(array('id'=>1, 'firsName'=>'Alex', 'fee'=>42), ...)
@@ -18,7 +24,7 @@
 		return $this->render('ExampleBundle:Example:example.html.twig', array('chartView' => $view));
 	}
     
-Configurations list you can see ([here](./reference/chart-configuration.md))
+Configurations list you can see ([here](./chart-configuration.md))
 
 ##View Example##
 

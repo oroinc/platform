@@ -1,10 +1,11 @@
 parameters:
-    oro_chart.config_provider.class:            Oro\Bundle\ChartBundle\Model\ConfigProvider
-    oro_chart.view_builder.class:               Oro\Bundle\ChartBundle\Model\ChartViewBuilder
-    oro_chart.data_transformer.factory.class:   Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
-    oro_chart.data_transformer.pie_chart.class: Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
-    oro_chart.form.type.settings.class:         Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
-    oro_chart.form.type.class:                  Oro\Bundle\ChartBundle\Form\Type\ChartType
+    oro_chart.config_provider.class:               Oro\Bundle\ChartBundle\Model\ConfigProvider
+    oro_chart.view_builder.class:                  Oro\Bundle\ChartBundle\Model\ChartViewBuilder
+    oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
+    oro_chart.data_transformer.pie_chart.class:    Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
+    oro_chart.form.type.settings.class:            Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
+    oro_chart.form.type.class:                     Oro\Bundle\ChartBundle\Form\Type\ChartType
+    oro_chart.form.type.settings.collection.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType
 
 services:
     oro_chart.config_provider:
@@ -27,6 +28,11 @@ services:
             - @oro_chart.config_provider
         tags:
             - { name: form.type, alias: oro_chart_setting }
+
+    oro_chart.form.type.settings.collection:
+        class: %oro_chart.form.type.settings.collection.class%
+        tags:
+            - { name: form.type, alias: oro_chart_settings_collection }
 
     oro_chart.form.type:
         class: %oro_chart.form.type.class%

@@ -4,8 +4,8 @@ define(['underscore', 'jquery'],
         'use strict';
 
         /**
-         * @export  orodashboard/js/chart_form
-         * @class   orodashboard.ChartForm
+         * @export  orochart/js/chart_form
+         * @class   orochart.ChartForm
          */
         return {
 
@@ -13,9 +13,16 @@ define(['underscore', 'jquery'],
              * @property {Object}
              */
             options: {
-                typeSelector: '#oro_chart #oro_chart_type',
-                parentSelector: '#oro_chart > .control-group',
-                selectorPrefix: '#oro_chart_'
+                blocks: ['settings', 'data_schema'],
+                parent: null,
+                selectors: {
+                    type: null
+                },
+                templates: {
+                    type: '<%= parent %>_type',
+                    parent: '<%= parent %>_<%= block %> > div',
+                    target: '<%= parent %>_<%= block %>_<%= chart %>'
+                }
             },
 
             /**
@@ -23,30 +30,46 @@ define(['underscore', 'jquery'],
              * @param {Object} options
              */
             initialize: function (selector, options) {
-                this.options = _.extend({}, this.options, options);
+                var self = this;
+                self.options = _.extend({}, self.options, {parent: selector}, options);
 
-                this.updateChartFormVisibility();
+                self.options.selectors.type = _.template(
+                    self.options.templates.type,
+                    {parent: self.options.parent}
+                );
 
-                this.addHandler(selector)
+                self.updateChartFormVisibility();
+                self.addHandler();
             },
 
-            /**
-             * @param {Object} selector
-             */
-            addHandler: function (selector) {
+            addHandler: function () {
                 var self = this;
-                $(selector).on('change', _.bind(function () {
+
+                $(self.options.selectors.type).on('change', _.bind(function () {
                     self.updateChartFormVisibility();
-                }, this));
+                }, self));
             },
 
             updateChartFormVisibility: function () {
-                $(this.options.parentSelector).not(':first').hide();
+                var self = this;
 
-                var name = $(this.options.typeSelector).val();
-                $(this.options.parentSelector)
-                    .has(this.options.selectorPrefix + name)
-                    .show();
+                var name = $(self.options.selectors.type).val();
+
+                _.each(self.options.blocks, function (block) {
+                    var parentSelector = _.template(
+                        self.options.templates.parent,
+                        {parent: self.options.parent, block: block}
+                    );
+
+                    $(parentSelector).hide();
+
+                    var targetSelector = _.template(
+                        self.options.templates.target,
+                        {parent: self.options.parent, block: block, chart: name}
+                    );
+
+                    $(targetSelector).show();
+                });
             }
         };
     });
