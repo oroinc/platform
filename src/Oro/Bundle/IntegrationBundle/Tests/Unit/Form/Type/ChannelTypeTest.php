@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormBuilder;
+
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
@@ -13,6 +15,9 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     /** @var TypesRegistry */
     protected $registry;
 
+    /** @var  FormBuilder */
+    protected $builder;
+
     public function setUp()
     {
         $this->registry = $this
@@ -21,11 +26,15 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
                             ->getMock();
 
         $this->type = new ChannelType($this->registry);
+
+        $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+                                ->disableOriginalConstructor()
+                                ->getMock();
     }
 
     public function tearDown()
     {
-        unset($this->type, $this->registry);
+        unset($this->type, $this->registry, $this->builder);
     }
 
 
@@ -38,15 +47,11 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $builder->expects($this->at(0))
+        $this->builder->expects($this->at(0))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Symfony\Component\EventDispatcher\EventSubscriberInterface'));
 
-        $this->type->buildForm($builder, array());
+        $this->type->buildForm($this->builder, array());
     }
 
     public function testGetName()
@@ -67,5 +72,4 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'));
         $this->type->setDefaultOptions($resolver);
     }
-
 }
