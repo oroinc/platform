@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -101,5 +102,13 @@ class Datagrid implements DatagridInterface
         $this->acceptor = $acceptor;
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfig()
+    {
+        return $this->getAcceptor()->getConfig();
     }
 }

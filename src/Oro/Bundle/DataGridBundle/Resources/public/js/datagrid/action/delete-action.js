@@ -16,9 +16,10 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
         confirmModalConstructor: DeleteConfirmation,
 
         defaultMessages: {
-            confirm_title: __('Delete Confirmation'),
-            confirm_content: __('Are you sure you want to delete this item?'),
-            confirm_ok: __('Yes, Delete')
+            confirm_title: 'Delete Confirmation',
+            confirm_content: 'Are you sure you want to delete this item?',
+            confirm_ok: 'Yes, Delete',
+            success: 'Item deleted'
         },
 
         /**
@@ -32,6 +33,7 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
          * Confirm delete item
          */
         doDelete: function () {
+            var that = this;
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
@@ -40,7 +42,7 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
                     messenger.notificationFlashMessage('error', messageText);
                 },
                 success: function () {
-                    var messageText = __('Item deleted');
+                    var messageText = __(that.messages.success);
                     messenger.notificationFlashMessage('success', messageText);
                 }
             });
