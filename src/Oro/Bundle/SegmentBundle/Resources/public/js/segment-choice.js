@@ -78,20 +78,15 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                     url: url,
                     data: _.bind(function (term, page) {
                         return {
-                            page:      page,
+                            page: page,
                             pageLimit: this.options.pageLimit,
-                            term:      term
+                            term: term,
+                            currentSegment: this.options.currentSegment
                         };
                     }, this),
-                    results: _.bind(function (data) {
-                        var currentId = this.options.currentSegment,
-                            more      = data['items'].length == this.options.pageLimit;
-
-                        data = _.filter(data['items'], function (item) {
-                            return item.id != 'segment_' + currentId;
-                        });
-                        return {results: data, more: more};
-                    }, this)
+                    results: function (data) {
+                        return data;
+                    }
                 }
             );
 

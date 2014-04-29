@@ -7,7 +7,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentManager
 {
-    const PER_PAGE = 20;
+    const PER_PAGE = 2;
 
     /** @var EntityManager */
     protected $em;
@@ -43,16 +43,12 @@ class SegmentManager
      * @param string $entityName
      * @param string $term
      * @param integer $page optional
+     * @param null $skippedSegment
      *
      * @return array
      */
-    public function getSegmentByEntityName($entityName, $term, $page = 1)
+    public function getSegmentByEntityName($entityName, $term, $page = 1, $skippedSegment = null)
     {
-        $offset = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
-        $result = array(
-            'items' => array(),
-        );
-
         $queryBuilder = $this->em->getRepository("OroSegmentBundle:Segment")
             ->createQueryBuilder('segment')
             ->where('segment.entity = :entity')
@@ -63,16 +59,26 @@ class SegmentManager
                 ->andWhere('segment.name LIKE :segmentName')
                 ->setParameter('segmentName', sprintf('%%%s%%', $term));
         }
+        if ($skippedSegment) {
+            $queryBuilder
+                ->andWhere('segment.id <> :skippedSegment')
+                ->setParameter('skippedSegment', $skippedSegment);
+        }
 
         $segments = $queryBuilder
-            ->setFirstResult($offset)
-            ->setMaxResults(self::PER_PAGE)
+            ->setFirstResult($this->getOffset($page))
+            ->setMaxResults(self::PER_PAGE + 1)
             ->getQuery()
             ->getResult();
 
+        $result = array(
+            'results' => array(),
+            'more' => count($segments) > self::PER_PAGE
+        );
+        array_splice($segments, self::PER_PAGE);
         /** @var Segment $segment */
         foreach ($segments as $segment) {
-            $result['items'][] = array(
+            $result['results'][] = array(
                 'id'   => 'segment_' . $segment->getId(),
                 'text' => $segment->getName(),
                 'type' => 'segment',
@@ -80,5 +86,20 @@ class SegmentManager
         }
 
         return $result;
+    }
+
+    /**
+     * Get offset by page.
+     *
+     * @param int $page
+     * @return int
+     */
+    protected function getOffset($page)
+    {
+        if ($page > 1) {
+            return ($page - 1) * SegmentManager::PER_PAGE;
+        }
+
+        return 0;
     }
 }
