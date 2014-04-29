@@ -258,8 +258,8 @@ function(_, Backbone, messenger, __,
 
                     navigation.hideLoading();
                     if (this.saveAndClose) {
-                        navigation.setLocation(this.options.backUrl);
                         mediator.once('hash_navigation_request:complete', renderSuccessMessage);
+                        navigation.setLocation(this.options.backUrl);
                     } else {
                         renderSuccessMessage();
                     }
