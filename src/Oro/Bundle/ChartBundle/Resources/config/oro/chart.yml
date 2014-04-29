@@ -5,6 +5,7 @@ oro_chart:
           - name: label
             label: oro.chart.line_chart.params.label
             required: true
+            filter: string # filter for fields, see query_designer.yml filter section
           - name: value
             label: oro.chart.line_chart.params.value
             required: true

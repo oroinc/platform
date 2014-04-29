@@ -37,8 +37,9 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
                         'line_chart' => [
                             'data_schema' => [
                                 [
-                                    'label' => 'label',
-                                    'name'  => 'name'
+                                    'label'    => 'label',
+                                    'name'     => 'name',
+                                    'required' => false
                                 ]
                             ]
                         ]
@@ -61,7 +62,12 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $schemaCollectionType = new ReportChartSchemaType();
+        $manager = $this
+            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $schemaCollectionType = new ReportChartSchemaType($manager);
         $fieldChoiceType      = new FieldChoiceType();
 
         return [

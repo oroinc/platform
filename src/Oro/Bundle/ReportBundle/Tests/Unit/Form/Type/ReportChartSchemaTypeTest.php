@@ -17,7 +17,12 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        $this->type = new ReportChartSchemaType();
+        $manager = $this
+            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->type = new ReportChartSchemaType($manager);
 
         parent::setUp();
     }
@@ -41,8 +46,9 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
             'full' => [
                 'dataSchema' => [
                     'fieldName' => [
-                        'label' => 'label',
-                        'name'  => 'name'
+                        'label'    => 'label',
+                        'name'     => 'name',
+                        'required' => true
                     ]
                 ]
             ]
