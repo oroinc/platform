@@ -144,7 +144,80 @@
     {% endset %}
 
     {% set workflowStepsAndTransitions %}
-        <span>Workflow steps and transitions...</span>
+        <style type="text/css">
+            .transitions-list-short {
+                margin-left: 0;
+            }
+
+            .transitions-list-short li {
+                list-style: none;
+            }
+        </style>
+        <div class="workflow-definition-steps-list-container">
+            <div class="grid-container steps-list">
+                <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                    <thead>
+                        <th class="label-column"><span>{{ "Step"|trans }}</span></th>
+                        <th><span>{{ "Transitions"|trans }}</span></th>
+                        <th>
+                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                {{ "Position"|trans }}
+                            </span>
+                        </th>
+                    </thead>
+                    <tbody class="item-container">
+                        {% set startStep = [{
+                            'label': '(' ~ 'Start'|trans ~ ')',
+                            'order': -1,
+                            'is_final': false,
+                            'allowed_transitions': startTransitionNames
+                        }] %}
+
+                        {% if entity.configuration.steps is defined %}
+                            {% set steps = startStep|merge(entity.configuration.steps) %}
+                        {% else %}
+                            {% set steps = [startStep] %}
+                        {% endif %}
+
+                        {% for stepData in steps %}
+                            <tr>
+                                <td class="step-name">
+                                    {{ stepData.label }}
+                                    {% if stepData.is_final %}
+                                        &nbsp;
+                                        <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
+                                            ({{ "Final"|trans }})
+                                        </strong>
+                                    {% endif %}
+                                </td>
+                                <td class="step-transitions">
+                                    {% if stepData.allowed_transitions is not empty %}
+                                        <ul class="transitions-list-short">
+                                            {% for key, transitionName in stepData.allowed_transitions %}
+                                                {% set currentTransition = entity.configuration.transitions[transitionName] %}
+                                                {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
+                                                <li>
+                                                    <span>{{ currentTransition.label }}</span>
+                                                    <i class="icon-long-arrow-right"></i>
+                                                    <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">
+                                                        {{ toStep.label }}
+                                                    </span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                        {{ stepData.order }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% endset %}
 
     {% set dataBlocks = [
@@ -158,7 +231,10 @@
         {
             'title': 'Configuration'|trans,
             'subblocks': [
-                {'data' : [workflowStepsAndTransitions] },
+                {
+                    'title': 'Workflow steps and transitions'|trans,
+                    'data':  [workflowStepsAndTransitions]
+                },
             ]
         },
     ] %}
