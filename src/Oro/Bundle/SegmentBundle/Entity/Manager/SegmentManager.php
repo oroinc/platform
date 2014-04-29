@@ -7,7 +7,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentManager
 {
-    const PER_PAGE = 2;
+    const PER_PAGE = 20;
 
     /** @var EntityManager */
     protected $em;
@@ -59,7 +59,7 @@ class SegmentManager
                 ->andWhere('segment.name LIKE :segmentName')
                 ->setParameter('segmentName', sprintf('%%%s%%', $term));
         }
-        if ($skippedSegment) {
+        if (!empty($skippedSegment)) {
             $queryBuilder
                 ->andWhere('segment.id <> :skippedSegment')
                 ->setParameter('skippedSegment', $skippedSegment);

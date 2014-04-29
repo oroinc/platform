@@ -65,13 +65,14 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
      * @param $segmentsCount integer
      * @param $term string|null
      * @param $page integer
+     * @param $skippedParameter integer
      */
-    public function testGetSegmentByEntityNameWithEmptyTerm($segmentsCount, $term, $page)
+    public function testGetSegmentByEntityName($segmentsCount, $term, $page, $skippedParameter = null)
     {
         $entityName     = 'Acme\Entity\Demo';
         $offset         = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
         $segments       = $this->generateSegments($segmentsCount);
-        $expectedResult = $this->imitateResult($segments, $offset, $term);
+        $expectedResult = $this->imitateResult($segments, $offset, $term, $skippedParameter);
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -80,7 +81,7 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
 
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($expectedResult['items']));
+            ->will($this->returnValue($expectedResult['results']));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -89,20 +90,25 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->will($this->returnSelf());
 
-        if (empty($term)) {
-            $qb->expects($this->never())
-                ->method('andWhere');
-            $qb->expects($this->once())
-                ->method('setParameter')
-                ->will($this->returnSelf());
-        } else {
-            $qb->expects($this->once())
-                ->method('andWhere')
-                ->will($this->returnSelf());
-            $qb->expects($this->exactly(2))
-                ->method('setParameter')
-                ->will($this->returnSelf());
+        $callAndWhereCounts = 0;
+        $callSetParametersCounts = 1;
+
+        if (!empty($term)) {
+            $callAndWhereCounts++;
+            $callSetParametersCounts++;
         }
+
+        if (!empty($skippedParameter)) {
+            $callAndWhereCounts++;
+            $callSetParametersCounts++;
+        }
+
+        $qb->expects(empty($callAndWhereCounts) ? $this->never() : $this->exactly($callAndWhereCounts))
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects(empty($callSetParametersCounts) ? $this->never() : $this->exactly($callSetParametersCounts))
+            ->method('setParameter')
+            ->will($this->returnSelf());
 
         $qb->expects($this->once())
             ->method('setFirstResult')
@@ -110,7 +116,7 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('setMaxResults')
-            ->with(SegmentManager::PER_PAGE)
+            ->with(SegmentManager::PER_PAGE + 1)
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('getQuery')
@@ -128,11 +134,11 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('OroSegmentBundle:Segment'))
             ->will($this->returnValue($repo));
 
-        $realResult = $this->manager->getSegmentByEntityName($entityName, $term, $page);
+        $realResult = $this->manager->getSegmentByEntityName($entityName, $term, $page, $skippedParameter);
 
-        foreach ($realResult['items'] as $key => $item) {
+        foreach ($realResult['results'] as $key => $item) {
             /** @var Segment $expectedItem */
-            $expectedItem = $expectedResult['items'][$key];
+            $expectedItem = $expectedResult['results'][$key];
             $this->assertEquals($expectedItem->getName(), $item['text']);
             $this->assertEquals('segment', $item['type']);
         }
@@ -173,21 +179,35 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
                 'segmentsCount' => SegmentManager::PER_PAGE * 2,
                 'term'          => null,
                 'page'          => 2,
+            ),
+            'with skipped parameter' => array(
+                'segmentsCount'    => SegmentManager::PER_PAGE * 2,
+                'term'             => null,
+                'page'             => 1,
+                'skippedParameter' => SegmentManager::PER_PAGE -1
+            ),
+            'with skipped parameter on second page' => array(
+                'segmentsCount'    => SegmentManager::PER_PAGE * 2,
+                'term'             => null,
+                'page'             => 2,
+                'skippedParameter' => SegmentManager::PER_PAGE -1
             )
         );
     }
 
-    protected function imitateResult($segments, $offset, $term)
+    protected function imitateResult($segments, $offset, $term, $skippedParameter)
     {
         /** @var Segment $segment */
         foreach ($segments as $key => $segment) {
-            if (!empty($term) && false === strpos($segment->getName(), $term)) {
+            if (!empty($term) && false === strpos($segment->getName(), $term) ||
+                !empty($skippedParameter) && $skippedParameter == $key + $offset
+            ) {
                 unset($segments[$key]);
             }
         }
 
         return array(
-            'items' => empty($segments) ? array() : array_slice($segments, $offset, SegmentManager::PER_PAGE),
+            'results' => empty($segments) ? array() : array_slice($segments, $offset, SegmentManager::PER_PAGE + 1),
         );
     }
 
