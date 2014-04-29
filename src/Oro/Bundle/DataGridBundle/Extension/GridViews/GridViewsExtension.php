@@ -40,7 +40,7 @@ class GridViewsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS);
+        $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 

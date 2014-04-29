@@ -22,10 +22,16 @@ class Datagrid implements DatagridInterface
     /** @var ParameterBag */
     protected $parameters;
 
-    public function __construct($name, Acceptor $acceptor)
+    /**
+     * @param string $name
+     * @param Acceptor $acceptor
+     * @param ParameterBag $parameters
+     */
+    public function __construct($name, Acceptor $acceptor, ParameterBag $parameters)
     {
         $this->name = $name;
         $this->setAcceptor($acceptor);
+        $this->setParameters($parameters);
     }
 
     /**
