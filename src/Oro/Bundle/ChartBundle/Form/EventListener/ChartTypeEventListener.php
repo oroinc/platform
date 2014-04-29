@@ -35,7 +35,7 @@ class ChartTypeEventListener implements EventSubscriberInterface
         $formData = $event->getData();
 
         if (!$formData || !isset($formData['name'])) {
-            $event->setData(null);
+            $event->setData([]);
 
             return;
         }
@@ -60,7 +60,7 @@ class ChartTypeEventListener implements EventSubscriberInterface
         $formData = $event->getData();
 
         if (!$formData || !isset($formData['name'])) {
-            $event->setData(null);
+            $event->setData([]);
 
             return;
         }
