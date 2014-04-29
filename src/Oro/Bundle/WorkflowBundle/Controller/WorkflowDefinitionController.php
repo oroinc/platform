@@ -131,4 +131,22 @@ class WorkflowDefinitionController extends Controller
             'entity' => $workflowDefinition
         );
     }
+
+    /**
+     * @Route(
+     *      "/info/{name}",
+     *      name="oro_workflow_definition_info"
+     * )
+     * @AclAncestor("oro_workflow_definition_view")
+     * @Template
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    public function infoAction(WorkflowDefinition $workflowDefinition)
+    {
+        return array(
+            'entity' => $workflowDefinition
+        );
+    }
 }
