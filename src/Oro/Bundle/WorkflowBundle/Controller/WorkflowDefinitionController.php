@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -12,6 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 
 /**
  * @Route("/workflowdefinition")
@@ -127,8 +129,19 @@ class WorkflowDefinitionController extends Controller
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
+        $startTransitions = $this->get('oro_workflow.manager')->getStartTransitions($workflowDefinition->getName());
+        $startTransitionNames = array();
+
+        /** @var Transition $transition */
+        foreach ($startTransitions as $transition) {
+            if (TransitionManager::DEFAULT_START_TRANSITION_NAME != $transition->getName()) {
+                $startTransitionNames[] = $transition->getName();
+            }
+        }
+
         return array(
-            'entity' => $workflowDefinition
+            'entity' => $workflowDefinition,
+            'startTransitionNames' => $startTransitionNames
         );
     }
 }

@@ -12,7 +12,7 @@ define([
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
-function(_, Backbone, messanger, __,
+function(_, Backbone, messenger, __,
      StepsListView,
      StepModel,
      TransitionModel,
@@ -255,7 +255,7 @@ function(_, Backbone, messanger, __,
                         navigation.setLocation(this.options.backUrl);
                     }
 
-                    messanger.notificationFlashMessage('success', __('Workflow saved.'));
+                    messenger.notificationFlashMessage('success', __('Workflow saved.'));
                 }, this),
                 'error': function(model, response) {
                     navigation.hideLoading();
@@ -264,7 +264,7 @@ function(_, Backbone, messanger, __,
                     if (app.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
                     }
-                    messanger.notificationFlashMessage('error', __('Could not save workflow.'));
+                    messenger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
             });
         },
@@ -272,19 +272,19 @@ function(_, Backbone, messanger, __,
         validateConfiguration: function() {
             // workflow label should be defined
             if (!this.model.get('label')) {
-                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
+                messenger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
                 return false;
             }
 
             // related entity should be defined
             if (!this.model.get('entity')) {
-                messanger.notificationFlashMessage('error', __('Could not save workflow. Please set related entity.'));
+                messenger.notificationFlashMessage('error', __('Could not save workflow. Please set related entity.'));
                 return false;
             }
 
             // at least one step and one transition must exist
             if (this.model.get('steps').length <= 1 || this.model.get('transitions').length == 0) {
-                messanger.notificationFlashMessage(
+                messenger.notificationFlashMessage(
                     'error',
                     __('Could not save workflow. Please add at least one step and one transition.')
                 );
@@ -293,7 +293,7 @@ function(_, Backbone, messanger, __,
 
             // should be defined either start step or at least one start transition
             if (!this.model.get('start_step') && _.isEmpty(this._getStartingPoint().get('allowed_transitions'))) {
-                messanger.notificationFlashMessage(
+                messenger.notificationFlashMessage(
                     'error',
                     __('Could not save workflow. Please either set default step or add transitions to starting point.')
                 );
