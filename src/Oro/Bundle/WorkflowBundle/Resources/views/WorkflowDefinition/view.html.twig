@@ -4,6 +4,74 @@
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
 {% block navButtons %}
+    {% if resource_granted('oro_workflow') %}
+        {% set entityWorkflowConfig = oro_entity_config(entity.relatedEntity, 'workflow') %}
+        {% if entityWorkflowConfig.active_workflow is defined and entityWorkflowConfig.active_workflow == entity.name  %}
+            {{ UI.button({
+                'iCss': 'icon-remove',
+                'aCss': 'no-hash btn-danger',
+                'id': 'workflow-deactivate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation'],
+                function($, Messenger, Navigation) {
+                    var navigation = Navigation.getInstance();
+                    $('#workflow-deactivate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        $.ajax({
+                            url: el.prop('href'),
+                            type: 'GET',
+                            success: function(response) {
+                                if (response.message) {
+                                    Messenger.notificationFlashMessage('success', response.message);
+                                }
+                                if (navigation) {
+                                    navigation.loadPage(true);
+                                } else {
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(xhr, textStatus, error) {
+                                Error.handle({}, xhr, {enforce: true});
+                            }
+                        })
+                    });
+                });
+            </script>
+        {% else %}
+            {{ UI.button({
+                'iCss': 'icon-ok',
+                'aCss': 'no-hash btn-success',
+                'id': 'workflow-activate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'path': path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroworkflow/js/activation-handler', 'oronavigation/js/navigation'],
+                function($, activationHandler, Navigation) {
+                    var navigation = Navigation.getInstance();
+                    $('#workflow-activate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        el.on('activation_success', function() {
+                            if (navigation) {
+                                navigation.loadPage(true);
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+                        activationHandler.call(el, el.prop('href'));
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+
     {% if resource_granted('EDIT', entity) and not entity.system %}
         {{ UI.editButton({
             'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
