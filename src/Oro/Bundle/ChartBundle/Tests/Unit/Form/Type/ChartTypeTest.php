@@ -64,7 +64,7 @@ class ChartTypeTest extends FormIntegrationTestCase
 
         $form = $this->factory->create($this->type, null, []);
 
-        $this->assertTrue($form->has('type'));
+        $this->assertTrue($form->has('name'));
         $this->assertTrue($form->has('settings'));
 
         foreach (array_keys($chartConfigs) as $chartName) {

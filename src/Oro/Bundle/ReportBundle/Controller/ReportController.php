@@ -36,26 +36,19 @@ class ReportController extends Controller
 
         if ($reportType === 'table') {
             $gridName = sprintf('oro_report_table_%d', $entity->getId());
+
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
             }
 
-            /** @todo Get chart options from report entity */
-            // $chartOptions = $entity->getChartOptions();
-            $chartOptions = array(
-                'name' => 'pie_chart',
-                'settings' => array(
-                    'foo' => 'bar'
-                ),
-                'data_schema' => array(
-                    'value' => array('field_name' => 'c2'),
-                    'label' => array('field_name' => 'c1'),
-                )
-            );
+            $chartOptions = $entity->getChartOptions();
 
-            $parameters['chartView'] = $this->get('oro_chart.view_builder')->setDataGridName($gridName)
-                ->setOptions($chartOptions)
-                ->getView();
+            if ($chartOptions) {
+                $parameters['chartView'] = $this->get('oro_chart.view_builder')
+                    ->setDataGridName($gridName)
+                    ->setOptions($chartOptions)
+                    ->getView();
+            }
         }
 
         return $this->render(
