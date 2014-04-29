@@ -7,7 +7,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentManager
 {
-    const PER_PAGE = 2;
+    const PER_PAGE = 20;
 
     /** @var EntityManager */
     protected $em;
