@@ -74,11 +74,8 @@
                                     colors: {{ options.settings.chartColors|json_encode|raw }},
                                     fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
                                     fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                                    bars : {
-                                        show : true,
-                                        horizontal : false,
-                                        shadowSize : 0,
-                                        barWidth : 0.5
+                                    lines : {
+                                        show : true
                                     },
                                     mouse : {
                                         track : true,
@@ -88,7 +85,6 @@
                                         }
                                     },
                                     yaxis: {
-                                        min: 0,
                                         tickFormatter: function (y) {
                                             return numberFormatter.formatCurrency(y);
                                         }
