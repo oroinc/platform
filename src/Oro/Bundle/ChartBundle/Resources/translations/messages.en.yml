@@ -9,6 +9,11 @@ oro:
               value: Value (Y axis)
           settings:
               connect_dots_with_line: Connect line with dots
+      bar_chart:
+          label: Bar Chart
+          params:
+              label: Category (X axis)
+              value: Value (Y axis)
       pie_chart:
           label: Pie Chart
           params:
