@@ -70,6 +70,7 @@ Root element of configuration is "workflows". Under this element workflows can b
 Single workflow configuration has next properties:
 
 * **name**
+    *string*
     Workflow should have a unique name in scope of all application. As workflow configuration doesn't support merging
     two workflows with the same name will lead to exception during configuration loading.
 * **label**
@@ -77,13 +78,22 @@ Single workflow configuration has next properties:
     This value will be shown in the UI
 * **entity**
     *string*
-    Class name of workflow related entity. **Important:** Entity must have fields to contain workflow item and step.
+    Class name of workflow related entity. **Important:** Entity either must be extended or custom
+    or it must have fields to contain workflow item and step.
 * **entity_attribute**
     *string*
     Name of the attribute used to store related entity
+* **is_system**
+    *boolean*
+    Flag that define whether this definition is system. System definition can't be edited or removed.
+    All definitions loaded from *.yml files automatically marked as system.
 * **start_step**
     *string*
-    The name of start step. It's optional if Workflow has start transition, otherwise start_step is required.
+    The name of start step. If Workflow has start transition then start_step is optional, otherwise it's required.
+* **steps_display_ordered**
+    *boolean*
+    If this flag is true, then workflow step widget will show all steps according to their order (including not passed)
+    on entity view page, otherwise widget will show only passed steps.
 * **attributes**
     Contains configuration for Attributes
 * **steps**
@@ -96,19 +106,22 @@ Single workflow configuration has next properties:
 Example
 -------
 ```
-workflows:                        # Root elements
-    phone_call:                   # A unique name of workflow
-        label: Demo Call Workflow # This will be shown in UI
-        entity: My\Custom\Entity  # Workflow will be used for this entity
-        start_step: start_call    # name of start step
-        attributes:               # configuration for Attributes
-            # ...
-        steps:                    # configuration for Steps
-            # ...
-        transitions:              # configuration for Transitions
-            # ...
-        transition_definitions:   # configuration for Transition Definitions here
-            # ...
+workflows:                                                    # Root elements
+    b2b_flow_sales:                                           # A unique name of workflow
+        label: B2B Sales Flow                                 # This will be shown in UI
+        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity_attribute: opportunity                         # Attribute name used to store root entity
+        is_system: true                                       # Workflow is system, i.e. not editable and not deletable
+        start_step: qualify                                   # Name of start step
+        steps_display_ordered: true                           # Show all steps in step widget
+        attributes:                                           # configuration for Attributes
+                                                              # ...
+        steps:                                                # configuration for Steps
+                                                              # ...
+        transitions:                                          # configuration for Transitions
+                                                              # ...
+        transition_definitions:                               # configuration for Transition Definitions
+                                                              # ...
 ```
 
 Attributes Configuration
