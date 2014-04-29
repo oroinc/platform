@@ -112,7 +112,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'data_schema' => array(),
                         'settings_schema' => array(),
                         'default_settings' => array(),
-                        'data_transformer' => Configuration::DEFAULT_DATA_TRANSFORMER_SERVICE,
                         'template' => 'BarTemplate.html.twig',
                     ),
                 )

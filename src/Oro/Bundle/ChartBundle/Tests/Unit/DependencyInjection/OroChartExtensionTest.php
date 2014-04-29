@@ -107,7 +107,6 @@ class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
                         'data_schema' => array(),
                         'settings_schema' => array(),
                         'default_settings' => array('foo' => 'bar', 'chartColors' => 'testColor'),
-                        'data_transformer' => 'oro_dashboard.data_transformer.default'
                     )
                 )
             )

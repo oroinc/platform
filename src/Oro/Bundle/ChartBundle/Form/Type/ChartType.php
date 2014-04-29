@@ -5,6 +5,7 @@ namespace Oro\Bundle\ChartBundle\Form\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 
@@ -15,7 +16,7 @@ class ChartType extends ConfigProviderAwareType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $chartConfigs = $this->configProvider->getChartConfigs();
+        $chartConfigs = $this->getChartConfigs($options);
 
         $builder
             ->add(
@@ -33,6 +34,21 @@ class ChartType extends ConfigProviderAwareType
             ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'submit']);
+    }
+
+    /**
+     * @param array $options
+     * @return array
+     */
+    protected function getChartConfigs(array $options)
+    {
+        $result = $this->configProvider->getChartConfigs();
+
+        if (isset($options['chart_filter'])) {
+            $result = array_filter($result, $options['chart_filter']);
+        }
+
+        return $result;
     }
 
     /**
@@ -58,6 +74,15 @@ class ChartType extends ConfigProviderAwareType
         }
 
         $event->setData($formData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['chart_filter']);
+        $resolver->setAllowedTypes(['chart_filter' => 'callable']);
     }
 
     /**

@@ -7,8 +7,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const DEFAULT_DATA_TRANSFORMER_SERVICE = 'oro_dashboard.data_transformer.default';
-
     /**
      * {@inheritdoc}
      */
