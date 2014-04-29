@@ -16,10 +16,10 @@ define(['underscore', 'jquery'],
                 blocks: ['settings', 'data_schema'],
                 parent: null,
                 selectors: {
-                    type: null
+                    name: null
                 },
                 templates: {
-                    type: '<%= parent %>_type',
+                    name: '<%= parent %>_name',
                     parent: '<%= parent %>_<%= block %> > div',
                     target: '<%= parent %>_<%= block %>_<%= chart %>'
                 }
@@ -33,8 +33,8 @@ define(['underscore', 'jquery'],
                 var self = this;
                 self.options = _.extend({}, self.options, {parent: selector}, options);
 
-                self.options.selectors.type = _.template(
-                    self.options.templates.type,
+                self.options.selectors.name = _.template(
+                    self.options.templates.name,
                     {parent: self.options.parent}
                 );
 
@@ -45,7 +45,7 @@ define(['underscore', 'jquery'],
             addHandler: function () {
                 var self = this;
 
-                $(self.options.selectors.type).on('change', _.bind(function () {
+                $(self.options.selectors.name).on('change', _.bind(function () {
                     self.updateChartFormVisibility();
                 }, self));
             },
@@ -53,7 +53,7 @@ define(['underscore', 'jquery'],
             updateChartFormVisibility: function () {
                 var self = this;
 
-                var name = $(self.options.selectors.type).val();
+                var name = $(self.options.selectors.name).val();
 
                 _.each(self.options.blocks, function (block) {
                     var parentSelector = _.template(
