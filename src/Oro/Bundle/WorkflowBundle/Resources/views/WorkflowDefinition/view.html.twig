@@ -166,6 +166,12 @@
                         </th>
                     </thead>
                     <tbody class="item-container">
+                        {% set startTransitionNames = [] %}
+                        {% for transitionName, transitionConfig in entity.configuration.transitions %}
+                            {% if transitionConfig.is_start %}
+                                {% set startTransitionNames = startTransitionNames|merge([transitionName]) %}
+                            {% endif %}
+                        {% endfor %}
                         {% set startStep = [{
                             'label': '(' ~ 'Start'|trans ~ ')',
                             'order': -1,
@@ -193,7 +199,7 @@
                                 <td class="step-transitions">
                                     {% if stepData.allowed_transitions is not empty %}
                                         <ul class="transitions-list-short">
-                                            {% for key, transitionName in stepData.allowed_transitions %}
+                                            {% for transitionName in stepData.allowed_transitions %}
                                                 {% set currentTransition = entity.configuration.transitions[transitionName] %}
                                                 {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
                                                 <li>
