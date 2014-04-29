@@ -3,9 +3,12 @@
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentManager
 {
+    const PER_PAGE = 20;
+
     /** @var EntityManager */
     protected $em;
 
@@ -39,32 +42,64 @@ class SegmentManager
     /**
      * @param string $entityName
      * @param string $term
+     * @param integer $page optional
+     * @param null $skippedSegment
      *
      * @return array
      */
-    public function getSegmentByEntityName($entityName, $term)
+    public function getSegmentByEntityName($entityName, $term, $page = 1, $skippedSegment = null)
     {
-        $result = [];
+        $queryBuilder = $this->em->getRepository("OroSegmentBundle:Segment")
+            ->createQueryBuilder('segment')
+            ->where('segment.entity = :entity')
+            ->setParameter('entity', $entityName);
 
         if (!empty($term)) {
-            $segments = $this->em->getRepository("OroSegmentBundle:Segment")->createQueryBuilder('s')
-                ->where('s.entity = :entity')
-                ->andWhere('s.name LIKE :segmentName')
-                ->setParameter('entity', $entityName)
-                ->setParameter('segmentName', sprintf('%%%s%%', $term))
-                ->setMaxResults(20)
-                ->getQuery()
-                ->getResult();
+            $queryBuilder
+                ->andWhere('segment.name LIKE :segmentName')
+                ->setParameter('segmentName', sprintf('%%%s%%', $term));
+        }
+        if (!empty($skippedSegment)) {
+            $queryBuilder
+                ->andWhere('segment.id <> :skippedSegment')
+                ->setParameter('skippedSegment', $skippedSegment);
+        }
 
-            foreach ($segments as $segment) {
-                $result[] = [
-                    'id'   => 'segment_' . $segment->getId(),
-                    'text' => $segment->getName(),
-                    'type' => 'segment',
-                ];
-            }
+        $segments = $queryBuilder
+            ->setFirstResult($this->getOffset($page))
+            ->setMaxResults(self::PER_PAGE + 1)
+            ->getQuery()
+            ->getResult();
+
+        $result = array(
+            'results' => array(),
+            'more' => count($segments) > self::PER_PAGE
+        );
+        array_splice($segments, self::PER_PAGE);
+        /** @var Segment $segment */
+        foreach ($segments as $segment) {
+            $result['results'][] = array(
+                'id'   => 'segment_' . $segment->getId(),
+                'text' => $segment->getName(),
+                'type' => 'segment',
+            );
         }
 
         return $result;
+    }
+
+    /**
+     * Get offset by page.
+     *
+     * @param int $page
+     * @return int
+     */
+    protected function getOffset($page)
+    {
+        if ($page > 1) {
+            return ($page - 1) * SegmentManager::PER_PAGE;
+        }
+
+        return 0;
     }
 }

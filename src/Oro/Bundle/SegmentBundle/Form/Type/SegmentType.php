@@ -40,8 +40,8 @@ class SegmentType extends AbstractQueryDesignerType
     public function getDefaultOptions()
     {
         return [
-            'column_column_choice_type'   => 'hidden',
-            'filter_column_choice_type'   => 'oro_entity_field_select'
+            'column_column_choice_type' => 'hidden',
+            'filter_column_choice_type' => 'oro_entity_field_select'
         ];
     }
 
@@ -53,9 +53,9 @@ class SegmentType extends AbstractQueryDesignerType
         $options = array_merge(
             $this->getDefaultOptions(),
             [
-                'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
-                'intention'                   => 'segment',
-                'cascade_validation'          => true
+                'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
+                'intention'          => 'segment',
+                'cascade_validation' => true
             ]
         );
 
