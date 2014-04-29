@@ -47,14 +47,16 @@ class SegmentController extends RestController implements ClassResourceInterface
     public function getItemsAction($entityName)
     {
         $entityName = str_replace('_', '\\', $entityName);
-        $term       = $this->getRequest()->query->get('term');
+        $page = $this->getRequest()->query->get('page', 1);
+        $term = $this->getRequest()->query->get('term');
+        $currentSegment = $this->getRequest()->query->get('currentSegment', null);
         $statusCode = Codes::HTTP_OK;
 
         /** @var SegmentManager $provider */
         $manager = $this->get('oro_segment.segment_manager');
 
         try {
-            $result = $manager->getSegmentByEntityName($entityName, $term);
+            $result = $manager->getSegmentByEntityName($entityName, $term, (int)$page, $currentSegment);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = ['message' => $ex->getMessage()];
