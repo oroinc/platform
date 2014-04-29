@@ -34,6 +34,8 @@ oro:
             statuses.label:   Statuses
             name.label:       Name
             connectors.label: Connectors
+            two_way_sync.label: Is two way sync
+
 
         delete_sync_channel:
             content: "Warning: Removing the channel will delete all related data"

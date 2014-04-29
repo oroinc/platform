@@ -65,6 +65,26 @@ class ChannelType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'isTwoWaySync',
+            'checkbox',
+            [
+                'label'    => 'oro.integration.channel.two_way_sync.label',
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'syncPriority',
+            'choice',
+            [
+                'label'    => 'oro.integration.channel.sync_priority.label',
+                'required' => false,
+                'choices'  => [],
+            ]
+        );
+
     }
 
     /**
