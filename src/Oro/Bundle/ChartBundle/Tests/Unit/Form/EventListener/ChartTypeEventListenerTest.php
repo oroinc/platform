@@ -125,8 +125,9 @@ class ChartTypeEventListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $event
-            ->expects($this->never())
-            ->method('setData');
+            ->expects($this->atLeastOnce())
+            ->method('setData')
+            ->with($this->equalTo(null));
 
         $this->listener->preSetData($event);
         $this->listener->onSubmit($event);
