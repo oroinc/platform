@@ -34,7 +34,7 @@ class ChartTypeEventListener implements EventSubscriberInterface
     {
         $formData = $event->getData();
 
-        if (!$formData || !isset($formData['name'])) {
+        if (!$formData || !isset($formData['name']) || !$formData['name']) {
             return;
         }
 
@@ -57,12 +57,8 @@ class ChartTypeEventListener implements EventSubscriberInterface
     {
         $formData = $event->getData();
 
-        if (!$formData) {
+        if (!$formData || !isset($formData['name']) || !$formData['name']) {
             return;
-        }
-
-        if (!isset($formData['name'])) {
-            throw new InvalidArgumentException('Chart name is missing');
         }
 
         $name = $formData['name'];
