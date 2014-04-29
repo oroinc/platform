@@ -47,9 +47,10 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->validate()
                             ->ifTrue(function ($value) {
-                                return empty($value['icon']) && empty($value['iconClass']);
+                                return !empty($value['icon']) && empty($value['iconClass']) ||
+                                        empty($value['icon']) && !empty($value['iconClass']);
                             })
-                            ->thenInvalid('Should contain not empty icon or iconClass property')
+                            ->thenInvalid('Either icon or iconClass option is required for sidebar widget')
                             ->end()
                         ->end()
                     ->end()
