@@ -1,9 +1,5 @@
-{% if isDesktopVersion() %}
-    {% if oro_config_value('oro_ui.navbar_position') == 'top' %}
-        {% include 'OroNavigationBundle:Menu:application_menu_desktop_top.html.twig' %}
-    {% else %}
-        {% include 'OroNavigationBundle:Menu:application_menu_desktop_sided.html.twig' %}
-    {% endif %}
+{% if isMobileVersion() or oro_config_value('oro_ui.navbar_position') == 'top' %}
+    {% include 'OroNavigationBundle:Menu:application_menu_desktop_top.html.twig' %}
 {% else %}
-    {% include 'OroNavigationBundle:Menu:application_menu_mobile.html.twig' %}
+    {% include 'OroNavigationBundle:Menu:application_menu_desktop_sided.html.twig' %}
 {% endif %}

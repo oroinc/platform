@@ -53,14 +53,14 @@
                         <div class="container">
                             {% placeholder header_logo %}
                             {% placeholder dots_menu %}
-                            {# {% block navbar %}
-                                <div class="nav pull-left top-search shortcuts">
-                                    {% placeholder navbar %}
-                                </div>
-                            {% endblock navbar %} #}
                             <ul class="nav pull-right user-menu">
                                 {{ block('user_menu') }}
                             </ul>
+                            {% block navbar %}
+                            <div class="nav pull-left top-search shortcuts">
+                                {% placeholder navbar %}
+                            </div>
+                            {% endblock navbar %}
                             {% placeholder pin_tabs_list %}
                         </div>
                     </div>

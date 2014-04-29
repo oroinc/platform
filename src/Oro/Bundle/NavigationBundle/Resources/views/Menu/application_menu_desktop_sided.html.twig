@@ -35,12 +35,21 @@
 
 {% block item_content %}
    {% if item.level == 1 %}
-       {% set iconClass = item.getExtra('icon') ? item.getExtra('icon') : 'icon-th' %}
-       <div class="item-icon-holder"><i class="{{ iconClass }}"></i></div>
-       <div class="dropdown-menu ">
+       {% set linkAttributes = item.linkAttributes %}
+       {{ block('linkElement') }}
+       <div class="dropdown-menu">
            {{ parent() }}
        </div>
    {% else %}
        {{ parent() }}
    {% endif %}
 {% endblock %}
+
+{% block label %}
+    {%- if item.level == 1 and not item.getExtra('icon') %}
+        <i class="icon-th"></i>{{ parent() }}
+    {% else %}
+        {{ parent() }}
+    {% endif -%}
+{% endblock %}
+

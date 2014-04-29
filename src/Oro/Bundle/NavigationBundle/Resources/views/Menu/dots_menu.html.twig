@@ -1,7 +1,7 @@
 {% extends 'OroNavigationBundle:Menu:dots_tabs.html.twig' %}
 
 {% block root %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% if isDesktopVersion() and item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
     <div class="pin-bar">
         <div class="pin-menus dropdown dropdown-close-prevent">
             <i class="icon-ellipsis-horizontal oro-dropdown-toggle"></i>
