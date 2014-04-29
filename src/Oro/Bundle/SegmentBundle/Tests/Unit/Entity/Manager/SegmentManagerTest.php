@@ -71,27 +71,20 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
         $entityName     = 'Acme\Entity\Demo';
         $offset         = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
         $segments       = $this->generateSegments($segmentsCount);
-        $expectedResult = $this->imitateResult($segments, $page, $term);
+        $expectedResult = $this->imitateResult($segments, $offset, $term);
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult', 'getSingleScalarResult'))
+            ->setMethods(array('getResult'))
             ->getMockForAbstractClass();
 
         $query->expects($this->once())
             ->method('getResult')
             ->will($this->returnValue($expectedResult['items']));
 
-        $query->expects($this->once())
-            ->method('getSingleScalarResult')
-            ->will($this->returnValue($expectedResult['total']));
-
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $qb->expects($this->once())
-            ->method('select')
-            ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('where')
             ->will($this->returnSelf());
@@ -119,7 +112,7 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxResults')
             ->with(SegmentManager::PER_PAGE)
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))
+        $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
 
@@ -137,7 +130,6 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
 
         $realResult = $this->manager->getSegmentByEntityName($entityName, $term, $page);
 
-        $this->assertEquals($expectedResult['total'], $realResult['total']);
         foreach ($realResult['items'] as $key => $item) {
             /** @var Segment $expectedItem */
             $expectedItem = $expectedResult['items'][$key];
@@ -185,9 +177,8 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function imitateResult($segments, $page, $term)
+    protected function imitateResult($segments, $offset, $term)
     {
-        $offset = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
         /** @var Segment $segment */
         foreach ($segments as $key => $segment) {
             if (!empty($term) && false === strpos($segment->getName(), $term)) {
@@ -197,7 +188,6 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
 
         return array(
             'items' => empty($segments) ? array() : array_slice($segments, $offset, SegmentManager::PER_PAGE),
-            'total' => count($segments)
         );
     }
 

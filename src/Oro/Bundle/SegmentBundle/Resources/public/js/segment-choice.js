@@ -83,14 +83,12 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                             term:      term
                         };
                     }, this),
-                    results: _.bind(function (data, page) {
+                    results: _.bind(function (data) {
                         var currentId = this.options.currentSegment,
-                            more      = (page * this.options.pageLimit) < data.total;
+                            more      = data['items'].length == this.options.pageLimit;
 
                         data = _.filter(data['items'], function (item) {
-                            if (item.id != 'segment_'+currentId) {
-                                return true;
-                            }
+                            return item.id != 'segment_' + currentId;
                         });
                         return {results: data, more: more};
                     }, this)

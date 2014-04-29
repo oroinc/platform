@@ -51,7 +51,6 @@ class SegmentManager
         $offset = is_numeric($page) && $page > 1 ? ($page - 1) * SegmentManager::PER_PAGE : 0;
         $result = array(
             'items' => array(),
-            'total' => 0,
         );
 
         $queryBuilder = $this->em->getRepository("OroSegmentBundle:Segment")
@@ -63,13 +62,6 @@ class SegmentManager
             $queryBuilder
                 ->andWhere('segment.name LIKE :segmentName')
                 ->setParameter('segmentName', sprintf('%%%s%%', $term));
-        }
-
-        $countQueryBuilder = clone $queryBuilder;
-        $result['total'] = $countQueryBuilder->select('COUNT(segment)')->getQuery()->getSingleScalarResult();
-
-        if (empty($result['total'])) {
-            return $result;
         }
 
         $segments = $queryBuilder
