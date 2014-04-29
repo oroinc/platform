@@ -33,7 +33,19 @@ class ChartTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $eventListener = $this
+            ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+
+        $class = get_class($eventListener);
+
+        $class::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue([]));
+
         $this->type = new ChartType($this->configProvider);
+        $this->type->setEventListener($eventListener);
 
         parent::setUp();
     }
@@ -61,40 +73,6 @@ class ChartTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $chartConfigs
-     *
-     * @dataProvider chartConfigsProvider
-     */
-    public function testSubmit($chartConfigs)
-    {
-        $this->configProvider
-            ->expects($this->once())
-            ->method('getChartConfigs')
-            ->will($this->returnValue($chartConfigs));
-
-        $form = $this->factory->create($this->type, null, []);
-
-        $this->assertTrue($form->has('type'));
-        $this->assertTrue($form->has('settings'));
-
-        foreach (array_keys($chartConfigs) as $chartName) {
-            $this->assertTrue($form->get('settings')->has($chartName));
-        }
-
-        $submittedData = array_merge(
-            ['type' => 'second'],
-            $chartConfigs
-        );
-
-        $form->submit($submittedData);
-
-        $formData = $form->getData();
-
-        $this->assertArrayHasKey('name2', $formData['settings']);
-        $this->assertArrayHasKey('type', $formData);
-    }
-
-    /**
      * @return array
      */
     public function chartConfigsProvider()
@@ -112,7 +90,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                                 'type'  => 'text',
                             ]
                         ],
-                        'data_schema' => []
+                        'data_schema'      => []
                     ],
                     'second' => [
                         'label'            => 'Second',
@@ -124,7 +102,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                                 'type'  => 'text',
                             ]
                         ],
-                        'data_schema' => [
+                        'data_schema'      => [
                             'option' => 'value'
                         ]
                     ]

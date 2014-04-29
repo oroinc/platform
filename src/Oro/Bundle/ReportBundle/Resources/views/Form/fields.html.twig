@@ -5,15 +5,31 @@
 
     <script type="text/javascript">
         require(['oro/chart/chart_form'], function (ChartForm) {
-            ChartForm.initialize('#oro_report_form_chart');
+            ChartForm.initialize('#{{ id }}');
         });
     </script>
 {% endblock %}
 
-{% block oro_report_chart_schema_collection_row %}
+{% block oro_report_chart_data_schema_collection_row %}
     {{ form_widget(form) }}
 {% endblock %}
 
-{% block oro_report_chart_schema_row %}
+{% block oro_report_chart_data_schema_row %}
     {{ form_widget(form) }}
+
+    {% set fieldConditionOptions = {
+        select2: {
+            placeholder: 'oro.entity.form.choose_entity_field'|trans
+        },
+        util: {},
+        fieldsLoaderSelector: '#oro_report_form_entity',
+        exclude: ['children']
+    } %}
+    <script type="text/javascript">
+        require(['oroentity/js/field-choice'], function ($) {
+            $('#{{ id }}')
+                .find('[id^="{{ id }}_"]')
+                .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
+        });
+    </script>
 {% endblock %}

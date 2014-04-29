@@ -16,7 +16,7 @@ class ReportChartSchemaType extends AbstractType
         foreach ($options['data_schema'] as $schemaOptions) {
             $builder->add(
                 $schemaOptions['name'],
-                'oro_field_choice',
+                'text',
                 [
                     'label'    => $schemaOptions['label'],
                     'required' => true
@@ -32,14 +32,6 @@ class ReportChartSchemaType extends AbstractType
     {
         $resolver->setRequired(['data_schema']);
         $resolver->setAllowedTypes(['data_schema' => 'array']);
-        $resolver->setDefaults(
-            array(
-                'entity'             => null,
-                'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
-                'intention'          => 'query_designer_column',
-                'column_choice_type' => 'oro_entity_field_select'
-            )
-        );
     }
 
     /**
@@ -47,6 +39,6 @@ class ReportChartSchemaType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_report_chart_schema';
+        return 'oro_report_chart_data_schema';
     }
 }

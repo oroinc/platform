@@ -13,7 +13,7 @@ class ReportChartType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('data_schema', 'oro_report_chart_schema_collection');
+        $builder->add('data_schema', 'oro_report_chart_data_schema_collection');
     }
 
     /**

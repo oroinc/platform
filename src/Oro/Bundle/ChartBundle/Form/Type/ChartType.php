@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -12,10 +13,30 @@ use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 class ChartType extends ConfigProviderAwareType
 {
     /**
+     * @var array
+     */
+    protected $optionsGroups = ['settings', 'data_schema'];
+
+    /**
+     * @var EventSubscriberInterface
+     */
+    protected $eventListener;
+
+    /**
+     * @param EventSubscriberInterface $eventListener
+     */
+    public function setEventListener(EventSubscriberInterface $eventListener)
+    {
+        $this->eventListener = $eventListener;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber($this->eventListener);
+
         $chartConfigs = $this->getChartConfigs($options);
 
         $builder
