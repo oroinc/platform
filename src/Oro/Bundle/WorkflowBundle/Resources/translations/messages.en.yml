@@ -125,7 +125,7 @@ oro:
 
             datagrid:
                 view: View
-                update: Update
+                update: Edit
                 clone:  Clone
                 delete: Delete
                 activate: Activate
