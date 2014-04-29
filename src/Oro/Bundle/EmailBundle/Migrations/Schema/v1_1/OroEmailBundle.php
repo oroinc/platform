@@ -55,6 +55,8 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
         $table->addIndex(['email_id'], 'oro_folder_email_idx', []);
         $table->addIndex(['emailfolder_id'], 'oro_email_folder_idx', []);
 
+        $table->setPrimaryKey(['email_id', 'emailfolder_id']);
+
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
             ['email_id'],
