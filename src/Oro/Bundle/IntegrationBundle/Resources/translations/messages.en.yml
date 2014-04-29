@@ -34,3 +34,7 @@ oro:
             statuses.label:   Statuses
             name.label:       Name
             connectors.label: Connectors
+
+        delete_sync_channel:
+            content: "Warning: Removing the channel will delete all related data"
+            success: Channel and all related data were deleted
