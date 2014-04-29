@@ -6,8 +6,8 @@
             {{ ui.renderProperty("oro.workflow.workflowdefinition.name.label"|trans, entity.label) }}
 
             {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
-            {% set label = entityConfig.label|default('')|trans %}
-            {{ ui.renderProperty("oro.workflow.workflowdefinition.related_entity.label"|trans, label) }}
+            {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
+            {{ ui.renderProperty("oro.workflow.workflowdefinition.related_entity.label"|trans, relatedEntityLabel) }}
             {{ ui.renderProperty("Default step"|trans, entity.startStep ? entity.startStep.label : '') }}
             {{ ui.renderProperty("oro.workflow.workflowdefinition.steps_display_ordered.label"|trans, entity.stepsDisplayOrdered ? 'Yes' : 'No') }}
         </div>

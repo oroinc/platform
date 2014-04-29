@@ -9,6 +9,7 @@ define([
     'oroworkflow/js/workflow-management/helper',
     'oronavigation/js/navigation',
     'oroui/js/app',
+    'oroui/js/mediator',
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
@@ -21,6 +22,7 @@ function(_, Backbone, messenger, __,
      Helper,
      Navigation,
      app,
+     mediator,
      Confirmation
 ) {
     'use strict';
@@ -250,12 +252,17 @@ function(_, Backbone, messenger, __,
             navigation.showLoading();
             this.model.save(null, {
                 'success': _.bind(function() {
+                    var renderSuccessMessage = function() {
+                        messenger.notificationFlashMessage('success', __('Workflow saved.'));
+                    };
+
                     navigation.hideLoading();
                     if (this.saveAndClose) {
                         navigation.setLocation(this.options.backUrl);
+                        mediator.once('hash_navigation_request:complete', renderSuccessMessage);
+                    } else {
+                        renderSuccessMessage();
                     }
-
-                    messenger.notificationFlashMessage('success', __('Workflow saved.'));
                 }, this),
                 'error': function(model, response) {
                     navigation.hideLoading();

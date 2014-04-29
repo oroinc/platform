@@ -3,22 +3,108 @@
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
+{% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
+{% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
+
 {% block navButtons %}
-    {% if resource_granted('EDIT', entity) and not entity.system %}
-        {{ UI.editButton({
-            'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
-            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
-        }) }}
+    {% if resource_granted('oro_workflow') %}
+        {% if isActive %}
+            {{ UI.button({
+                'iCss': 'icon-remove',
+                'aCss': 'no-hash btn-danger',
+                'id': entity.name ~ '-workflow-deactivate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
+                function($, Messenger, Navigation, mediator, Error) {
+                    var navigation = Navigation.getInstance();
+                    $('#{{ entity.name }}-workflow-deactivate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        $.ajax({
+                            url: el.prop('href'),
+                            type: 'GET',
+                            success: function(response) {
+                                if (navigation) {
+                                    if (response.message) {
+                                        mediator.once('hash_navigation_request:complete', function() {
+                                            Messenger.notificationFlashMessage('success', response.message);
+                                        });
+                                    }
+                                    navigation.loadPage(true);
+
+                                } else {
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(xhr, textStatus, error) {
+                                Error.handle({}, xhr, {enforce: true});
+                            }
+                        })
+                    });
+                });
+            </script>
+        {% else %}
+            {{ UI.button({
+                'iCss': 'icon-ok',
+                'aCss': 'no-hash btn-success',
+                'id': entity.name ~ '-workflow-activate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'path': path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroworkflow/js/activation-handler', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/messenger'],
+                function($, activationHandler, Navigation, mediator, Messenger) {
+                    var navigation = Navigation.getInstance();
+                    $('#{{ entity.name }}-workflow-activate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        el.on('activation_success', function(e, response) {
+                            if (navigation) {
+                                if (response.message) {
+                                    mediator.once('hash_navigation_request:complete', function() {
+                                        Messenger.notificationFlashMessage('success', response.message);
+                                    });
+                                }
+                                navigation.loadPage(true);
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+                        activationHandler.call(el, el.prop('href'), true);
+                    });
+                });
+            </script>
+        {% endif %}
     {% endif %}
-    {% if resource_granted('DELETE', entity) %}
-        {{ UI.deleteButton({
-            'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
-            'dataRedirect': path('oro_workflow_definition_index'),
-            'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-workflow-definition',
-            'dataId': entity.name,
-            'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
-        }) }}
+
+    {{ UI.button({
+        'iCss': 'icon-copy',
+        'label': 'oro.workflow.workflowdefinition.datagrid.clone',
+        'title': 'oro.workflow.workflowdefinition.datagrid.clone',
+        'path': path('oro_workflow_definition_clone', {'name': entity.name}),
+    }) }}
+    {% if not entity.system %}
+        {% if resource_granted('EDIT', entity) %}
+            {{ UI.editButton({
+                'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
+                'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+            }) }}
+        {% endif %}
+        {% if resource_granted('DELETE', entity) %}
+            {{ UI.deleteButton({
+                'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
+                'dataRedirect': path('oro_workflow_definition_index'),
+                'aCss': 'no-hash remove-button',
+                'id': 'btn-remove-workflow-definition',
+                'dataId': entity.name,
+                'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+            }) }}
+        {% endif %}
     {% endif %}
 {% endblock navButtons %}
 
@@ -40,9 +126,6 @@
 {% block breadcrumbs %}
     {{ parent() }}
 
-    {% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
-    {% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
-
     <div class="status-enabled pull-left">
         {% if isActive %}
             <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
@@ -56,7 +139,7 @@
     {% set workflowDefinitionInfo %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_workflow_definition_view', {name: entity.name}),
+            'url': path('oro_workflow_definition_info', {name: entity.name}),
         }) }}
     {% endset %}
 
