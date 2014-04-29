@@ -61,7 +61,8 @@ managers, such as Step Manager, Transition Manager and Attribute Manager.
 * **getStepManager()** - get instance of embedded Step Manager;
 * **getAttributeManager()** - get instance of embedded Attribute Manager;
 * **getTransitionManager()** - get instance of embedded Transition Manager;
-* **start(Entity, data, startTransitionName)** - returns new instance of Workflow Item and processes it's start transition;
+* **start(Entity, data, startTransitionName)** - returns new instance of Workflow Item and processes it's start
+transition;
 * **isTransitionAllowed(WorkflowItem, Transition, errors, fireException)** - calculates whether transition is allowed
 for specified WorkflowItem and optionally returns list of errors or/and fire exception;
 * **transit(WorkflowItem, Transition)** - performs transit for specified WorkflowItem by name of transition or
@@ -90,8 +91,8 @@ objects by their names or managed entities.
 * **getWorkflow(workflowName)** - extracts Workflow object by it's name;
 * **getActiveWorkflowByEntityClass(entityClass)** - returns active Workflow that is applicable to passed entity class;
 * **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class;
-* **getWorkflowsByEntityClass(entityClass, workflowName)** - returns list of Workflow objects which is applicable
-to passed entity class. Has possibility to get single Workflow object if specify workflowName as second parameter;
+* **getWorkflowsByEntityClass(entityClass, workflowName)** - returns list of Workflow objects applicable
+to specified entity class. It may return only one Workflow object if specify workflowName as second parameter;
 
 Step
 ----
@@ -103,7 +104,8 @@ Encapsulated step parameters, contains lists of attributes and allowed transitio
 isFinal flag, form type and form options. Also has possibility manage ACL permission for the entity actions.
 
 **Methods:**
-* **isAllowedTransition(transitionName)** - calculates whether transition with name transitionName allowed for current step;
+* **isAllowedTransition(transitionName)** - calculates whether transition with name transitionName allowed for current
+step;
 * **allowTransition(transitionName)** - allow transition with name transitionName;
 * **hasAllowedTransitions()** - check is current step has allowed transitions;
 * **disallowTransition(transitionName)** - disallow transition with name transitionName;
@@ -118,14 +120,17 @@ Transition
 Oro\Bundle\WorkflowBundle\Model\Transition
 
 **Description:**
-Encapsulates transition parameters, contains init action, condition, pre condition and post action, has next step property.
+Encapsulates transition parameters, contains init action, condition, pre condition and post action, has next step
+property.
 
 **Methods:**
 * **isConditionAllowed(WorkflowItem, errors)** - check whether conditions allowed and optionally returns list of errors;
-* **isPreConditionAllowed(WorkflowItem, errors)** - check whether preconditions allowed and optionally returns list of errors;
+* **isPreConditionAllowed(WorkflowItem, errors)** - check whether preconditions allowed and optionally returns
+list of errors;
 * **isAllowed(WorkflowItem, errors)** - calculates whether this transition allowed for WorkflowItem
 and optionally returns list of errors;
-* **isAvailable(WorkflowItem, errors)** - check whether this transition should be shown and optionally returns list of errors;
+* **isAvailable(WorkflowItem, errors)** - check whether this transition should be shown and optionally returns
+list of errors;
 * **transit(WorkflowItem)** - performs transition for WorkflowItem;
 * **setStart()** - mark transition as start transition;
 * **isStart()** - check is current transition start;
@@ -139,7 +144,8 @@ Attribute
 Oro\Bundle\WorkflowBundle\Model\Attribute
 
 **Description:**
-Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission for the entity actions.
+Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission
+for the entity actions.
 
 **Methods:**
 * **setEntityAcls(array entityAcls)** - sets ACL permission for the entity;
@@ -281,6 +287,7 @@ using Action Factory.
 * **assemble(options, attributes, owner, ownerName)** - validate form options, set attributes and assemble with
 configuration then returns list of form options;
 
+
 Database Entities
 =================
 
@@ -350,6 +357,61 @@ and herewith updated workflow step by input WorkflowDefinition start step;
 * **resetWorkflowData(entityClass, excludedWorkflowNames, batchSize)** - perform reset workflow items data for all Entities,
 which related with current workflow. Optional you can control the size of batch, which will be reseted in the single query.
 Also you can excluded some groups of entities from list on resetting, specifying the names of workflows, which would be excluded;
+
+Workflow Step
+-------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Entity\WorkflowStep
+
+**Description:**
+This class is the representation of Step entity, it stores only data that be used in DB requests: name, label,
+step order and final flag. Also Workflow Step knows about Workflow Definition that it attached to.
+
+**Methods:**
+* **import(WorklfowStep)** - copies data from source Workflow Step to current one;
+
+Workflow Transition Record
+--------------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord
+
+**Description:**
+Stores data about transitions: step form, step to, transition name and timestamp. Transition record is attached to
+one specific Workflow Item.
+
+Workflow Entity Acl
+-------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl
+
+**Description:**
+Class represents entity ACL for specific attribute on specific step. It stores attribute name, Workflow Step entity,
+entity class name and updatable/deletable flags. Also it has relation to Workflow Definition that uses this ACL.
+
+**Methods:**
+* **getAttributeStepKey()** - builds unique key based on attribute and step names to merge Workflow Entity Acl entites;
+* **import(WorkflowEntityAcl)** - copies data from source Workflow Entity Acl to current one;
+
+Workflow Entity Acl Identity
+----------------------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity
+
+**Description:**
+Stores relation between Workflow Entity Acl, specific entity (class and identifier) and Workflow Item.
+
+**Methods:**
+* **getAttributeStepKey()** - builds unique key based on attribute and step names to merge Workflow Entity Acl entities;
+* **import(WorkflowEntityAclIdentity)** - copies data from source Workflow Entity Acl Identity to current one;
+
+Workflow Entity Acl Identity Repository
+---------------------------------------
+
+**Class:**
+Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository
+
+**Methods:**
+* **findByClassAndIdentifier(class, identifier)** - returns list of all Acl Identities related to the specified entity;
 
 Support Entities
 ================
