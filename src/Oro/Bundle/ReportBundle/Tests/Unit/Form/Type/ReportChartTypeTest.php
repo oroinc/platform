@@ -52,7 +52,20 @@ class ReportChartTypeTest extends FormIntegrationTestCase
             ->method('getChartConfigs')
             ->will($this->returnValue([]));
 
-        $childType            = new ChartType($configProvider);
+        $eventListener = $this
+            ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+
+        $class = get_class($eventListener);
+
+        $class::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue([]));
+
+        $childType = new ChartType($configProvider);
+        $childType->setEventListener($eventListener);
+
         $collectionType       = new ChartSettingsCollectionType();
         $schemaCollectionType = new ReportChartSchemaCollectionType($configProvider);
 

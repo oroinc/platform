@@ -39,11 +39,8 @@ class ReportType extends AbstractQueryDesignerType
                 )
             )
             ->add(
-                'chart',
-                'oro_report_chart',
-                array(
-                    'mapped' => false
-                )
+                'chartOptions',
+                'oro_report_chart'
             )
             ->add('description', 'textarea', array('required' => false));
 

@@ -2,19 +2,36 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 
 class ChartType extends ConfigProviderAwareType
 {
+    /**
+     * @var array
+     */
+    protected $optionsGroups = ['settings', 'data_schema'];
+
+    /**
+     * @var EventSubscriberInterface
+     */
+    protected $eventListener;
+
+    /**
+     * @param EventSubscriberInterface $eventListener
+     */
+    public function setEventListener(EventSubscriberInterface $eventListener)
+    {
+        $this->eventListener = $eventListener;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber($this->eventListener);
+
         $chartConfigs = $this->configProvider->getChartConfigs();
 
         $builder
@@ -31,33 +48,6 @@ class ChartType extends ConfigProviderAwareType
                 ]
             )
             ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);
-
-        $builder->addEventListener(FormEvents::SUBMIT, [$this, 'submit']);
-    }
-
-    /**
-     * @param FormEvent $event
-     * @throws InvalidArgumentException
-     */
-    public function submit(FormEvent $event)
-    {
-        $formData = $event->getData();
-
-        if (!isset($formData['type'])) {
-            throw new InvalidArgumentException('Type data is missing');
-        }
-
-        $type = $formData['type'];
-
-        if (isset($formData['settings'][$type])) {
-            $formData['settings'] = $formData['settings'][$type];
-        }
-
-        if (isset($formData['data_schema'][$type])) {
-            $formData['data_schema'] = $formData['data_schema'][$type];
-        }
-
-        $event->setData($formData);
     }
 
     /**

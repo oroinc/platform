@@ -19,7 +19,7 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
             if (isset($chartConfig['data_schema'])) {
                 $builder->add(
                     $chartName,
-                    'oro_report_chart_schema',
+                    'oro_report_chart_data_schema',
                     [
                         'data_schema' => $chartConfig['data_schema']
                     ]
@@ -34,6 +34,6 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
      */
     public function getName()
     {
-        return 'oro_report_chart_schema_collection';
+        return 'oro_report_chart_data_schema_collection';
     }
 }

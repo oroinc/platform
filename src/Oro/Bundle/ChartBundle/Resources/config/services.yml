@@ -6,6 +6,7 @@ parameters:
     oro_chart.form.type.settings.class:            Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
     oro_chart.form.type.class:                     Oro\Bundle\ChartBundle\Form\Type\ChartType
     oro_chart.form.type.settings.collection.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType
+    oro_chart.form.event_listener.chart.class:     Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener
 
 services:
     oro_chart.config_provider:
@@ -40,6 +41,11 @@ services:
             - @oro_chart.config_provider
         tags:
             - { name: form.type, alias: oro_chart }
+        calls:
+             - [setEventListener, [@oro_chart.form.event_listener.chart]]
+
+    oro_chart.form.event_listener.chart:
+        class: %oro_chart.form.event_listener.chart.class%
 
     oro_chart.data_transformer.factory:
         class: %oro_chart.data_transformer.factory.class%

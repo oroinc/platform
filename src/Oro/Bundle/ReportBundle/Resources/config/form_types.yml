@@ -45,22 +45,18 @@ services:
 
     oro_report.form.type.chart:
         class: %oro_report.form.type.chart.class%
-        arguments:
-            - @oro_chart.config_provider
         tags:
             - { name: form.type, alias: oro_report_chart }
 
 
     oro_report.form.type.chart.schema:
         class: %oro_report.form.type.chart.schema.class%
-        arguments:
-            - @oro_chart.config_provider
         tags:
-            - { name: form.type, alias: oro_report_chart_schema }
+            - { name: form.type, alias: oro_report_chart_data_schema }
 
     oro_report.form.type.chart.schema.collection:
         class: %oro_report.form.type.chart.schema.collection.class%
         arguments:
             - @oro_chart.config_provider
         tags:
-            - { name: form.type, alias: oro_report_chart_schema_collection }
+            - { name: form.type, alias: oro_report_chart_data_schema_collection }
