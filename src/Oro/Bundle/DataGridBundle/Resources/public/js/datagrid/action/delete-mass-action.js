@@ -16,12 +16,12 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/delete-confirmat
 
         /** @property {Object} */
         defaultMessages: {
-            confirm_title: __('Delete Confirmation'),
-            confirm_content: __('Are you sure you want to do remove selected items?'),
-            confirm_ok: __('Yes, Delete'),
-            success: __('Selected items were removed.'),
-            error: __('Selected items were not removed.'),
-            empty_selection: __('Please, select items to remove.')
+            confirm_title: 'Delete Confirmation',
+            confirm_content: 'Are you sure you want to do remove selected items?',
+            confirm_ok: 'Yes, Delete',
+            success: 'Selected items were removed.',
+            error: 'Selected items were not removed.',
+            empty_selection: 'Please, select items to remove.'
         }
     });
 });
