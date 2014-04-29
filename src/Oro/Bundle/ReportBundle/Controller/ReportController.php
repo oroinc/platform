@@ -43,7 +43,7 @@ class ReportController extends Controller
 
             $chartOptions = $entity->getChartOptions();
 
-            if (!empty($chartOptions['name'])) {
+            if (!empty($chartOptions)) {
                 $parameters['chartView'] = $this->get('oro_chart.view_builder')
                     ->setDataGridName($gridName)
                     ->setOptions($chartOptions)
