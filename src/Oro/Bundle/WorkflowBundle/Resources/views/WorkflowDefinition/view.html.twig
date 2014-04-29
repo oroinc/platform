@@ -3,14 +3,16 @@
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
+{% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
+{% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
+
 {% block navButtons %}
     {% if resource_granted('oro_workflow') %}
-        {% set entityWorkflowConfig = oro_entity_config(entity.relatedEntity, 'workflow') %}
-        {% if entityWorkflowConfig.active_workflow is defined and entityWorkflowConfig.active_workflow == entity.name  %}
+        {% if isActive %}
             {{ UI.button({
                 'iCss': 'icon-remove',
                 'aCss': 'no-hash btn-danger',
-                'id': 'workflow-deactivate-btn',
+                'id': entity.name ~ '-workflow-deactivate-btn',
                 'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
                 'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
                 'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
@@ -19,7 +21,7 @@
                 require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator'],
                 function($, Messenger, Navigation, mediator) {
                     var navigation = Navigation.getInstance();
-                    $('#workflow-deactivate-btn').on('click', function(e) {
+                    $('#{{ entity.name }}-workflow-deactivate-btn').on('click', function(e) {
                         e.preventDefault();
                         var el = $(this);
                         $.ajax({
@@ -49,7 +51,7 @@
             {{ UI.button({
                 'iCss': 'icon-ok',
                 'aCss': 'no-hash btn-success',
-                'id': 'workflow-activate-btn',
+                'id': entity.name ~ '-workflow-activate-btn',
                 'label': 'oro.workflow.workflowdefinition.datagrid.activate',
                 'title': 'oro.workflow.workflowdefinition.datagrid.activate',
                 'path': path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
@@ -58,7 +60,7 @@
                 require(['jquery', 'oroworkflow/js/activation-handler', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/messenger'],
                 function($, activationHandler, Navigation, mediator, Messenger) {
                     var navigation = Navigation.getInstance();
-                    $('#workflow-activate-btn').on('click', function(e) {
+                    $('#{{ entity.name }}-workflow-activate-btn').on('click', function(e) {
                         e.preventDefault();
                         var el = $(this);
                         el.on('activation_success', function(e, response) {
@@ -115,9 +117,6 @@
 
 {% block breadcrumbs %}
     {{ parent() }}
-
-    {% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
-    {% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
 
     <div class="status-enabled pull-left">
         {% if isActive %}
