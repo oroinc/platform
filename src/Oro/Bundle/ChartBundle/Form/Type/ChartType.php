@@ -50,7 +50,7 @@ class ChartType extends ConfigProviderAwareType
                         },
                         $chartConfigs
                     ),
-                    'empty_value' => 'oro.chart.form.select_chart'
+                    'empty_value' => 'oro.chart.form.chart_empty_value'
                 ]
             )
             ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);

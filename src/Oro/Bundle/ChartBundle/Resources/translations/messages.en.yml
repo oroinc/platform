@@ -1,7 +1,7 @@
 oro:
   chart:
       form:
-          select_chart: Select chart type
+          chart_empty_value: None
       line_chart:
           label: Line Chart
           params:

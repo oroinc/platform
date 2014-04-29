@@ -47,6 +47,8 @@ class ReportController extends Controller
                 $parameters['chartView'] = $this->get('oro_chart.view_builder')
                     ->setDataGridName($gridName)
                     ->setOptions($chartOptions)
+                    // @todo remove when data_schema will be valid
+                    ->setDataMapping(array('label' => 'c1', 'value' => 'c2'))
                     ->getView();
             }
         }

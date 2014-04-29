@@ -8,12 +8,8 @@ oro_chart:
           - name: value
             label: oro.chart.line_chart.params.value
             required: true
-        settings_schema:
-          - name: connect_dots_with_line
-            label: oro.chart.line_chart.settings.connect_dots_with_line
-            type: checkbox
-            options: { required: false }
         default_settings:
+            connect_dots_with_line: true
             available_in_reports: true
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
             chartFontSize: 9
@@ -46,7 +42,6 @@ oro_chart:
             label: oro.chart.pie_chart.params.value
             required: true
         default_settings:
-            available_in_reports: true
             fraction_input_data_field: value
             fraction_output_data_field: fraction
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
