@@ -365,7 +365,8 @@ and specific implementations. Injected ManagerRegistry, WorkflowRegistry, Doctri
 
 **Methods:**
 * **getStartTransitions(workflow)** - returns list of start transition of specified workflow;
-* **getTransitionsByWorkflowItem(WorkflowItem)** - returns list of start transition of specified WorkflowItem object;
+* **getTransitionsByWorkflowItem(WorkflowItem)** - get list of all possible (allowed and not allowed) transitions
+for specified WorkflowItem;
 * **isTransitionAvailable(WorkflowItem, transition, errors)** - check if current transition is allowed for
 specified workflow item, optionally returns list of errors;
 * **isStartTransitionAvailable(workflow, transition, entity, data, errors)** - check whether specified start transition
@@ -388,16 +389,6 @@ WorkflowItem instance or WorkflowDefinition instance;
 * **resetWorkflowData(WorkflowDefinition)** - perform reset workflow items data for all Entities, which related with
 input workflow definition;
 * **isResetAllowed(entity)** - check that entity workflow item is equal to the active workflow item;
-
-
-* **getTransitionsByWorkflowItem(WorkflowItem)** - get list of all possible (allowed and not allowed) transitions
-for specified WorkflowItem;
-
-
-* **getWorkflowItemsByEntity(entity, workflowName, workflowType)** - get list of all workflow items by input entity;
-are not specified;
-* **getWorkflowData(Workflow, entity, data)** - get array filled with calculated workflow data based on
-input entity and data;
 
 Workflow Data
 -------------
