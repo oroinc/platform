@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportChartSchemaType extends AbstractType
 {
@@ -39,9 +40,10 @@ class ReportChartSchemaType extends AbstractType
             }
 
             $fieldOptions = [
-                'label'    => $schemaOptions['label'],
-                'required' => $schemaOptions['required'],
-                'attr'     => [
+                'label'       => $schemaOptions['label'],
+                'required'    => $schemaOptions['required'],
+                'constraints' => new NotBlank(),
+                'attr'        => [
                     'data-filter' => json_encode($excludedProperties)
                 ]
             ];
