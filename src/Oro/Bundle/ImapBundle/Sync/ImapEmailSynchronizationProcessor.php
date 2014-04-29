@@ -365,14 +365,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             function ($el) {
                 return $el['uid'];
             },
-            $query->getResult()
+            $result
         );
 
         $existingEmailIds = array_map(
             function ($el) {
                 return $el['id'];
             },
-            $query->getResult()
+            $result
         );
 
         $srcStack = [];
@@ -414,9 +414,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $this->emailEntityBuilder->getBatch()->persist($this->em);
 
+        /** @var Email[] $oEmails */
         $oEmails = $this->emailEntityBuilder->getBatch()->getEmails();
-
-        /** @var Email $email */
         foreach ($oEmails as $email) {
             if ($email->getId() || in_array($email->getId(), $existingEmailIds)) {
                 continue;
