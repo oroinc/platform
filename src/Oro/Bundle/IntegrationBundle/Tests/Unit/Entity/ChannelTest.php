@@ -47,12 +47,12 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
     public function getSetDataProvider()
     {
         return [
-            'id'                 => ['id'],
-            'name'               => ['name', self::TEST_STRING, self::TEST_STRING],
-            'type'               => ['type', self::TEST_STRING, self::TEST_STRING],
-            'connectors'         => ['connectors', self::$testConnectors, self::$testConnectors],
-            'syncPriority'       => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
-            'isTwoWaySyncEnable' => ['isTwoWaySyncEnable', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
+            'id'                  => ['id'],
+            'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
+            'type'                => ['type', self::TEST_STRING, self::TEST_STRING],
+            'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
+            'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
+            'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
         ];
     }
 

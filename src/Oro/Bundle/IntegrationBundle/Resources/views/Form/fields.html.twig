@@ -13,9 +13,9 @@
         {{ form_widget(form.transport) }}
     {% endif %}
 
-    {% if (form.isTwoWaySyncEnable is defined) %}
+    {% if (form.isTwoWaySyncEnabled is defined) %}
         <div {% if form.syncPriority.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
-            {{ form_row(form.isTwoWaySyncEnable) }}
+            {{ form_row(form.isTwoWaySyncEnabled) }}
         </div>
     {% endif %}
 

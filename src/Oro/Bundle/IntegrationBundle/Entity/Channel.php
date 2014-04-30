@@ -95,7 +95,7 @@ class Channel
     public function __construct()
     {
         $this->statuses = new ArrayCollection();
-        $this->isTwoWaySyncEnable = false;
+        $this->isTwoWaySyncEnabled = false;
     }
 
     /**
