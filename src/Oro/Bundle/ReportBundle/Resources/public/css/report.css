@@ -4,3 +4,10 @@
 .form-horizontal .report-descr textarea {
     height: 54px;
 }
+
+.chart-wrapper {
+    padding: 25px;
+    text-align: center;
+    width: 70%;
+    margin: 0 auto;
+}

@@ -35,9 +35,10 @@
 
 {% block content_data %}
     {% if gridName is defined %}
-
         {% if chartView is defined %}
-            {{ chartView.render()|raw }}
+            <div class="chart-wrapper">
+                {{ chartView.render()|raw }}
+            </div>
         {% endif %}
 
         {{ dataGrid.renderGrid(gridName) }}
