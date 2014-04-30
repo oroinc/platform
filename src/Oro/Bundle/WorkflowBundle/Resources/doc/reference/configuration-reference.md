@@ -153,35 +153,28 @@ Single attribute can be described with next configuration:
     * **object**
         object should support serialize/deserialize, option "class" is required for this type
     * **entity**
-        Doctrine entity, option "class" is required and must be a class of Doctrine entity, also options
-        "managed_entity", "bind" and "multiple" can be used
+        Doctrine entity, option "class" is required and it must be a Doctrine manageable class
 * **label**
     *string*
     Label can be shown in the UI
+* **entity_acl**
+    Defines an ACL for the specific entity stored in this attribute.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
 * **property_path**
     *string*
-    Used to work with attribute value by reference and specifies path to data storage
+    Used to work with attribute value by reference and specifies path to data storage. If property path is specified
+    then all other attribute properties except name are optional - they can be automatically guessed
+    based on last element (field) of property path.
 * **options**
-    Options of this attribute. Currently next options are supported
+    Options of an attribute. Currently next options are supported
     * **class**
         *string*
         Fully qualified class name. Allowed only when type either entity or object.
-    * **managed_entity**
-        *boolean*
-        Allowed only when type is entity.
-        If *true* than Workflow can be found by entity. It's useful when you need to give to user possibility to start
-        Workflow that is applicable for specific entity.
-    * **bind**
-        *boolean*
-        By default is *true* when *managed_entity* is *true*. Allowed only when type is entity. If true than instances of
-        Workflow will be bound to entity that is saved in data as value of this attribute. It's useful when you need to
-        find all Workflow Items that are connected with entity instance.
-    * **multiple**
-        *boolean (false - default)*
-        By default is same as managed_entity value.
-        If *true* than it will be possible to multiple instances of Workflow for this entity. If *false* than the
-        restriction of one instance of Workflow for entity will be applied. Also false value is possible only if bind
-        is true because of check relation between instances of Workflow and entity is possible only when bind is true.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,
@@ -193,34 +186,22 @@ Example
 
 ```
 workflows:
-    phone_call:
+    b2b_flow_sales:
         # ...
-        attributes:
-            phone_call:
-                label: Phone Call
-                type: entity
-                options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-            call_timeout:
-                type: integer
-                label: 'Call Timeout'
-                property_path: phone_call.timeout
-            call_successfull:
-                type: boolean
-                label: 'Call Successful'
-                property_path: phone_call.successful
-            conversation_successful:
-                type: boolean
-                label: 'Conversation Successful'
-                property_path: phone_call.conversation.successful
-            conversation_comment:
-                type: string
-                label: 'Conversation Comment'
-                property_path: phone_call.conversation.comment
-            conversation_result:
-                type: string
-                label: 'Conversation Result'
-                property_path: phone_call.conversation.result
+        new_account:
+            label: 'Account'
+            type: entity
+            entity_acl:
+                delete: false
+            options:
+                class: OroCRM\Bundle\AccountBundle\Entity\Account
+        new_company_name:
+            label: 'Company name'
+            type: string
+        opportunity:
+            property_path: sales_funnel.opportunity
+        opportunity_name:
+            property_path: sales_funnel.opportunity.name
 ```
 
 Steps configuration
