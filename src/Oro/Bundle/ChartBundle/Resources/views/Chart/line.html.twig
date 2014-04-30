@@ -24,6 +24,7 @@
         <div id="{{ widgetId }}-chart" class="bar-chart chart pull-left"></div>
     </div>
 </div>
+
 <script type="text/javascript">
     require(['jquery', 'oroui/js/layout', 'flotr2', 'oro/chart/data_formatter'],
             function($, layout, Flotr, dataFormatter){
@@ -43,9 +44,8 @@
                         $chart.closest('.clearfix').width($chart.width());
                     };
                     var drawChart = function () {
-
-                        var yFormat = 'date';//todo: use data_schema value format
-                        var xFormat = 'money';//todo: use data_schema label format
+                        var xFormat = {{ options.data_schema.label.frontend_type|json_encode|raw }};
+                        var yFormat = {{ options.data_schema.value.frontend_type|json_encode|raw }};
 
                         if (!$chart.get(0).clientWidth) {
                             return;

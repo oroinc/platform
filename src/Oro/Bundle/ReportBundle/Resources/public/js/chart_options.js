@@ -62,7 +62,7 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
 
                 var items = $(selector).find(childSelector);
                 _.each(items, function (item) {
-                    var itemFilters = $(item).data('filter');
+                    var itemFilters = $(item).data('type-filter');
                     var extraFilters = [];
 
                     _.each(fieldsList, function(field){

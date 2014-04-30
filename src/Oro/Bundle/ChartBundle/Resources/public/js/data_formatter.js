@@ -32,7 +32,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         var date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.formatDateTime(date);
-                    case 'money':
+                    case 'money': case 'currency':
                         return numberFormatter.formatCurrency(data);
                     case 'percent':
                         return numberFormatter.formatPercent(data);
@@ -55,6 +55,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                    case 'decimal':
                    case 'float':
                    case 'money':
+                   case 'currency':
                    case 'percent':
                        return parseFloat(data);
                    case 'date':

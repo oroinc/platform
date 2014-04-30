@@ -32,10 +32,10 @@ class ReportChartSchemaType extends AbstractType
         foreach ($options['data_schema'] as $schemaOptions) {
             $excludedProperties = ['children'];
 
-            if (isset($schemaOptions['filter']) && $schemaOptions['filter']) {
+            if (isset($schemaOptions['type_filter']) && $schemaOptions['type_filter']) {
                 $excludedProperties = array_merge(
                     $excludedProperties,
-                    $this->manager->getExcludedProperties($schemaOptions['filter'])
+                    $this->manager->getExcludedProperties($schemaOptions['type_filter'])
                 );
             }
 
@@ -43,7 +43,7 @@ class ReportChartSchemaType extends AbstractType
                 'label'    => $schemaOptions['label'],
                 'required' => $schemaOptions['required'],
                 'attr'     => [
-                    'data-filter'                    => json_encode($excludedProperties),
+                    'data-type-filter'               => json_encode($excludedProperties),
                     'data-validation-optional-group' => true,
                     'data-validation'                => json_encode(['NotBlank' => []])
                 ]

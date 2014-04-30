@@ -73,13 +73,13 @@ class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
                                 'label' => 'Category (X axis)',
                                 'name' => 'label',
                                 'required' => true,
-                                'filter' => []
+                                'type_filter' => []
                             ),
                             array(
                                 'label' => 'Value (Y axis)',
                                 'name' => 'value',
                                 'required' => true,
-                                'filter' => []
+                                'type_filter' => []
                             )
                         ),
                         'settings_schema' => array(

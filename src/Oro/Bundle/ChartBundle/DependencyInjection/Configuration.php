@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                                     ->info('Is chart data field required')
                                     ->isRequired()
                                 ->end()
-                                ->arrayNode('filter')
+                                ->arrayNode('type_filter')
                                     ->info('Filter type for fields')
                                     ->prototype('variable')
                                     ->end()

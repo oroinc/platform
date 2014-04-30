@@ -1,8 +1,8 @@
 {% if data|length>0  %}
-    {% set widgetId = random() %}
+    {% set containerId = "chart-container-" ~ random() %}
     <div class="chart-container">
         <div class="clearfix">
-            <div id="{{ widgetId }}-chart" class="bar-chart chart pull-left"></div>
+            <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
         </div>
     </div>
     {% if isDesktopVersion() %}
@@ -13,7 +13,7 @@
                     function($, _, layout, Flotr, numberFormatter){
                         var formatter = numberFormatter;
                         $(function () {
-                            var $chart = $('#{{ widgetId }}-chart');
+                            var $chart = $('#{{ containerId }}-chart');
                             var $widgetContent = $chart.parents('.chart-container').parent();
                             var setChartSize = function () {
                                 var chartWidth = Math.round($widgetContent.width() * 0.9);
