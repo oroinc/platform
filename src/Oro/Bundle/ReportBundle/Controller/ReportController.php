@@ -7,7 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -41,14 +41,18 @@ class ReportController extends Controller
                 $parameters['gridName'] = $gridName;
             }
 
+            $datagrid = $this->get('oro_datagrid.datagrid.manager')
+                ->getDatagrid(
+                    $gridName,
+                    array(PagerInterface::PAGER_ROOT_PARAM => array(PagerInterface::DISABLED_PARAM => true))
+                );
+
             $chartOptions = $entity->getChartOptions();
 
             if (!empty($chartOptions)) {
                 $parameters['chartView'] = $this->get('oro_chart.view_builder')
-                    ->setDataGridName($gridName)
+                    ->setDataGrid($datagrid)
                     ->setOptions($chartOptions)
-                    // @todo remove when data_schema will be valid
-                    ->setDataMapping(array('label' => 'c1', 'value' => 'c2'))
                     ->getView();
             }
         }

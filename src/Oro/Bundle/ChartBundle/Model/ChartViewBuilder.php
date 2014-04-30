@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Model;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DataGridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 use Oro\Bundle\ChartBundle\Exception\BadMethodCallException;
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
@@ -26,9 +26,9 @@ class ChartViewBuilder
     protected $twig;
 
     /**
-     * @var DataGridManager
+     * @var array
      */
-    protected $dataGridManager;
+    protected $datagridColumnsDefinition;
 
     /**
      * @var DataInterface
@@ -62,17 +62,14 @@ class ChartViewBuilder
      * @param ConfigProvider $configProvider
      * @param TransformerFactory $transformerFactory
      * @param \Twig_Environment $twig
-     * @param DataGridManager $manager
      */
     public function __construct(
         ConfigProvider $configProvider,
         TransformerFactory $transformerFactory,
-        DataGridManager $manager,
         \Twig_Environment $twig
     ) {
         $this->configProvider = $configProvider;
         $this->transformerFactory = $transformerFactory;
-        $this->dataGridManager = $manager;
         $this->twig = $twig;
     }
 
@@ -103,14 +100,17 @@ class ChartViewBuilder
     }
 
     /**
-     * Set chart data as grid name, grid data will used
+     * Set chart data as grid instance
      *
-     * @param array $name
+     * @param DatagridInterface $datagrid
      * @return ChartViewBuilder
      */
-    public function setDataGridName($name)
+    public function setDataGrid(DatagridInterface $datagrid)
     {
-        $this->setData(new DataGridData($this->dataGridManager, $name));
+        $this->setData(new DataGridData($datagrid));
+
+        $config = $datagrid->getConfig();
+        $this->datagridColumnsDefinition = $config['columns'];
 
         return $this;
     }
@@ -123,7 +123,11 @@ class ChartViewBuilder
      */
     public function setDataMapping(array $dataMapping)
     {
-        $this->dataMapping = $dataMapping;
+        if (array_values($dataMapping) === array_keys($dataMapping)) {
+            $this->dataMapping = null;
+        } else {
+            $this->dataMapping = $dataMapping;
+        }
 
         return $this;
     }
@@ -133,20 +137,74 @@ class ChartViewBuilder
      *
      * @param array $options
      * @return ChartViewBuilder
+     * @throws InvalidArgumentException
      */
     public function setOptions(array $options)
     {
+        if (!isset($options['name'])) {
+            throw new InvalidArgumentException('Options must have "name" key.');
+        }
+
+        if (!isset($options['settings']) || !is_array($options['settings'])) {
+            $options['settings'] = array();
+        }
+
+        $this->parseOptionsDataSchema($options);
+
         $this->options = $options;
 
-        if (isset($this->options['data_schema']) && is_array($this->options['data_schema'])) {
+        $this->setupDataMapping($options);
+
+        return $this;
+    }
+
+    /**
+     * Parse "data_schema" key of options, fix structure and update fields using datagrid
+     *
+     * @param array $options
+     * @throws InvalidArgumentException
+     */
+    protected function parseOptionsDataSchema(array &$options)
+    {
+        if (isset($options['data_schema'])) {
+            if (!is_array($options['data_schema'])) {
+                throw new InvalidArgumentException('Options must have "data_schema" key with array.');
+            }
+            foreach ($options['data_schema'] as $key => &$data) {
+                if (!is_array($data)) {
+                    $data = array('field_name' => $data);
+                }
+
+                if (!isset($data['field_name'])) {
+                    $data['field_name'] = $key;
+                }
+
+                $fieldName = $data['field_name'];
+                foreach (array('label', 'frontend_type') as $property) {
+                    if (!isset($data[$property]) && isset($this->datagridColumnsDefinition[$fieldName][$property])) {
+                        $data[$property] = $this->datagridColumnsDefinition[$fieldName][$property];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Setup data mapping when options was set
+     */
+    protected function setupDataMapping()
+    {
+        if (isset($this->options['data_mapping'])) {
+            $this->setDataMapping($this->options['data_mapping']);
+        }
+
+        if (null === $this->dataMapping && isset($this->options['data_schema'])) {
             $dataMapping = array();
             foreach ($this->options['data_schema'] as $key => $data) {
-                $dataMapping[$key] = isset($data['field_name']) ? $data['field_name'] : $key;
+                $dataMapping[$key] = $data['field_name'];
             }
             $this->setDataMapping($dataMapping);
         }
-
-        return $this;
     }
 
     /**
@@ -175,14 +233,6 @@ class ChartViewBuilder
 
         if (null === $options) {
             throw new BadMethodCallException('Can\'t build result when setOptions() was not called.');
-        }
-
-        if (!isset($options['name'])) {
-            throw new InvalidArgumentException('Options must have "name" key.');
-        }
-
-        if (!isset($options['settings']) || !is_array($options['settings'])) {
-            $options['settings'] = array();
         }
 
         $config = $this->configProvider->getChartConfig($options['name']);

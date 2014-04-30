@@ -9,7 +9,8 @@
         "symfony/symfony": "2.3.*",
         "oro/ui-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
-        "oro/requirejs-bundle": "dev-master"
+        "oro/requirejs-bundle": "dev-master",
+        "oro/datagrid-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\ChartBundle": "" }

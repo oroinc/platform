@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface as DataGridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
 class DataGridData implements DataInterface
 {
@@ -13,23 +12,11 @@ class DataGridData implements DataInterface
     protected $data;
 
     /**
-     * @var DataGridManager
+     * @param DatagridInterface $datagrid
      */
-    protected $dataGridManager;
-
-    /**
-     * @var string
-     */
-    protected $dataGridName;
-
-    /**
-     * @param DataGridManager $manager
-     * @param string $dataGridName
-     */
-    public function __construct(DataGridManager $manager, $dataGridName)
+    public function __construct(DatagridInterface $datagrid)
     {
-        $this->dataGridManager = $manager;
-        $this->dataGridName = $dataGridName;
+        $this->datagrid = $datagrid;
     }
 
     /**
@@ -38,14 +25,7 @@ class DataGridData implements DataInterface
     public function toArray()
     {
         if (null === $this->data) {
-            $resultData = $this->dataGridManager
-                ->getDatagrid(
-                    $this->dataGridName,
-                    array(
-                        PagerInterface::PAGER_ROOT_PARAM => array(PagerInterface::DISABLED_PARAM => true)
-                    )
-                )
-                ->getData();
+            $resultData = $this->datagrid->getData();
             $this->data = $resultData['data'];
         }
 

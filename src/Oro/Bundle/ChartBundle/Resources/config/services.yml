@@ -20,7 +20,6 @@ services:
         arguments:
             - @oro_chart.config_provider
             - @oro_chart.data_transformer.factory
-            - @oro_datagrid.datagrid.manager
             - @twig
 
     oro_chart.form.type.settings:
