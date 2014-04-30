@@ -32,7 +32,6 @@ oro_chart:
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
             default_type: decimal
         default_settings:
-            available_in_reports: true
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
             chartFontSize: 9
             chartFontColor: '#454545'
