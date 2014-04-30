@@ -13,6 +13,18 @@
         {{ form_widget(form.transport) }}
     {% endif %}
 
+    {% if (form.isTwoWaySyncEnabled is defined) %}
+        <div {% if form.syncPriority.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+            {{ form_row(form.isTwoWaySyncEnabled) }}
+        </div>
+    {% endif %}
+
+    {% if (form.syncPriority is defined) %}
+        <div {% if form.syncPriority.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+            {{ form_row(form.syncPriority) }}
+        </div>
+    {% endif %}
+
     {% if (form.connectors is defined) %}
         <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
             {{ form_row(form.connectors) }}
