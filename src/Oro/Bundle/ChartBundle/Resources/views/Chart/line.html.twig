@@ -44,7 +44,7 @@
                     };
                     var drawChart = function () {
 
-                        var yFormat = 'integer';//todo: use data_schema value format
+                        var yFormat = 'date';//todo: use data_schema value format
                         var xFormat = 'money';//todo: use data_schema label format
 
                         if (!$chart.get(0).clientWidth) {
@@ -55,7 +55,9 @@
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
                         var chartData = [];
                         var yMax = null;
+                        var yMin = null;
                         var xMax = null;
+                        var xMin = null;
                         for(var i in rawData){
                             var yValue = dataFormatter.clearValue(rawData[i]['value'], yFormat);
                             yValue = yValue === null ? parseInt(i) : yValue;
@@ -63,31 +65,32 @@
                             xValue = xValue === null ? parseInt(i) : xValue;
                             if(xMax === null){
                                 xMax = xValue;
-                            }
-                            if(yMax === null){
                                 yMax = yValue;
+                                yMin = yValue;
+                                xMin = xValue;
                             }
-                            if(xMax < xValue){
-                                xMax = xValue;
-                            }
-                            if(yMax < yValue){
-                                yMax = yValue;
-                            }
-                            chartData.push([xValue, yValue]);
-                        }
-                        xMax += dataFormatter.clearValue(xMax/10, xFormat);
-                        yMax += dataFormatter.clearValue(yMax/10, yFormat);
+                            xMax = xMax < xValue ? xValue : xMax;
+                            xMin = xMin > xValue ? xValue : xMin;
+                            yMax = yMax < yValue ? yValue : yMax;
+                            yMin = yMin > yValue ? yValue : yMin;
 
+                            var item = [xValue, yValue];
+                            chartData.push(item);
+                        }
+                        xMax += (xMax - xMin)/10;
+                        yMax += (yMax - yMin)/10;
                         var chart = {
                             data: chartData,
                             color: colors[0],
                             markers: {
                                 show: true,
                                 position: 'ct',
-                                labelFormatter: function (data) {
-                                    var label = dataFormatter.formatLabel(data.y, yFormat);
+                                labelFormatter: function (pointData) {
+                                    console.log(pointData);
+
+                                    var label = dataFormatter.formatLabel(pointData.y, yFormat);
                                     if (label === null) {
-                                        label = rawData[data.y]['value'];
+                                        label = rawData[pointData.y]['value'];
                                     }
                                     return label;
                                 }
@@ -109,9 +112,9 @@
                                     mouse : {
                                         track : true,
                                         relative : true,
-                                        trackFormatter: function (data) {
-                                            return  dataFormatter.formatLabel(data.x, xFormat)+
-                                                    ': ' + dataFormatter.formatLabel(data.y, yFormat);
+                                        trackFormatter: function (pointData) {
+                                            return  dataFormatter.formatLabel(pointData.x, xFormat)+
+                                                    ': ' + dataFormatter.formatLabel(pointData.y, yFormat);
                                         }
                                     },
                                     yaxis: {

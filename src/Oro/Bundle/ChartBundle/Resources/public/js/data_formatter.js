@@ -8,6 +8,11 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
          * @name   dataFormatter
          */
         return {
+            /**
+             * @param {string} data
+             * @param {string} format
+             * @return {*}
+             */
            formatLabel: function(data, format) {
                 switch (format){
                     case 'integer':
@@ -20,9 +25,13 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     case 'boolean':
                         return numberFormatter.formatInteger(data);
                     case 'date':
-                        return dateTimeFormatter.formatDate(data);
+                        var date = new Date();
+                        date.setTime(data);
+                        return dateTimeFormatter.formatDate(date);
                     case 'datetime':
-                        return dateTimeFormatter.formatDateTime(data);
+                        var date = new Date();
+                        date.setTime(data);
+                        return dateTimeFormatter.formatDateTime(date);
                     case 'money':
                         return numberFormatter.formatCurrency(data);
                     case 'percent':
@@ -31,6 +40,11 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                         return null;
                 }
            },
+            /**
+             * @param {string} data
+             * @param {string} format
+             * @return {*}
+             */
            clearValue: function(data, format){
                switch (format){
                    case 'integer':
@@ -44,10 +58,10 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                    case 'percent':
                        return parseFloat(data);
                    case 'date':
-                       var date  = new Date(data);
-                       return date.getTime(); //add convert to date
+                       return Date.parse(data); //add convert to date
                    case 'datetime':
-                       return data; //add convert to date time
+                       var date = dateTimeFormatter.unformatBackendDateTime(data);
+                       return date.getTime();
                    default:
                        return null;
                }
