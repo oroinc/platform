@@ -36,6 +36,8 @@ Table of Contents
    - [Attribute Manager](#attribute-manager)
    - [Context Accessor](#context-accessor)
    - [Entity Connector](#entity-connector)
+   - [ACL Manager](#acl-manager)
+   - [Workflow Entity Voter](#workflow-entity-voter)
    - [Workflow Configuration](#workflow-configuration)
    - [Workflow List Configuration](#workflow-list-configuration)
    - [Workflow Configuration Provider](#configuration-provider)
@@ -528,6 +530,27 @@ Oro\Bundle\WorkflowBundle\Model\EntityConnector
 **Description:**
 Provides methods to get and set Workflow Item and Workflow Step to the specific entity. Also can define
 whether entity or class has properties to store Workflow Item and Workflow Step.
+
+ACL Manager
+-----------
+
+**Class:**
+Oro\Bundle\WorkflowBundle\Acl\AclManager
+
+**Description:**
+Additional service that process ACL for workflow definitions and calculate Acl Identity entities for specified
+Workflow Item.
+k
+Workflow Entity Voter
+---------------------
+
+**Class:**
+Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
+
+**Description:**
+Symfony ACL Voter that processes ACL for attributes and steps. Voter checks whether source entity has Workflow ACL
+Identity and returns ACCESS_GRANTED or ACCESS_DENIED. If entity is not supported or it doesn't have identity -
+returns ACCESS_ABSTAIN.
 
 Workflow Configuration
 ----------------------

@@ -70,6 +70,7 @@ Root element of configuration is "workflows". Under this element workflows can b
 Single workflow configuration has next properties:
 
 * **name**
+    *string*
     Workflow should have a unique name in scope of all application. As workflow configuration doesn't support merging
     two workflows with the same name will lead to exception during configuration loading.
 * **label**
@@ -77,13 +78,22 @@ Single workflow configuration has next properties:
     This value will be shown in the UI
 * **entity**
     *string*
-    Class name of workflow related entity. **Important:** Entity must have fields to contain workflow item and step.
+    Class name of workflow related entity. **Important:** Entity either must be extended or custom
+    or it must have fields to contain workflow item and step.
 * **entity_attribute**
     *string*
     Name of the attribute used to store related entity
+* **is_system**
+    *boolean*
+    Flag that define whether this definition is system. System definition can't be edited or removed.
+    All definitions loaded from *.yml files automatically marked as system.
 * **start_step**
     *string*
-    The name of start step. It's optional if Workflow has start transition, otherwise start_step is required.
+    The name of start step. If Workflow has start transition then start_step is optional, otherwise it's required.
+* **steps_display_ordered**
+    *boolean*
+    If this flag is true, then workflow step widget will show all steps according to their order (including not passed)
+    on entity view page, otherwise widget will show only passed steps.
 * **attributes**
     Contains configuration for Attributes
 * **steps**
@@ -96,19 +106,22 @@ Single workflow configuration has next properties:
 Example
 -------
 ```
-workflows:                        # Root elements
-    phone_call:                   # A unique name of workflow
-        label: Demo Call Workflow # This will be shown in UI
-        entity: My\Custom\Entity  # Workflow will be used for this entity
-        start_step: start_call    # name of start step
-        attributes:               # configuration for Attributes
-            # ...
-        steps:                    # configuration for Steps
-            # ...
-        transitions:              # configuration for Transitions
-            # ...
-        transition_definitions:   # configuration for Transition Definitions here
-            # ...
+workflows:                                                    # Root elements
+    b2b_flow_sales:                                           # A unique name of workflow
+        label: B2B Sales Flow                                 # This will be shown in UI
+        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity_attribute: opportunity                         # Attribute name used to store root entity
+        is_system: true                                       # Workflow is system, i.e. not editable and not deletable
+        start_step: qualify                                   # Name of start step
+        steps_display_ordered: true                           # Show all steps in step widget
+        attributes:                                           # configuration for Attributes
+                                                              # ...
+        steps:                                                # configuration for Steps
+                                                              # ...
+        transitions:                                          # configuration for Transitions
+                                                              # ...
+        transition_definitions:                               # configuration for Transition Definitions
+                                                              # ...
 ```
 
 Attributes Configuration
@@ -140,35 +153,28 @@ Single attribute can be described with next configuration:
     * **object**
         object should support serialize/deserialize, option "class" is required for this type
     * **entity**
-        Doctrine entity, option "class" is required and must be a class of Doctrine entity, also options
-        "managed_entity", "bind" and "multiple" can be used
+        Doctrine entity, option "class" is required and it must be a Doctrine manageable class
 * **label**
     *string*
     Label can be shown in the UI
+* **entity_acl**
+    Defines an ACL for the specific entity stored in this attribute.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
 * **property_path**
     *string*
-    Used to work with attribute value by reference and specifies path to data storage
+    Used to work with attribute value by reference and specifies path to data storage. If property path is specified
+    then all other attribute properties except name are optional - they can be automatically guessed
+    based on last element (field) of property path.
 * **options**
-    Options of this attribute. Currently next options are supported
+    Options of an attribute. Currently next options are supported
     * **class**
         *string*
         Fully qualified class name. Allowed only when type either entity or object.
-    * **managed_entity**
-        *boolean*
-        Allowed only when type is entity.
-        If *true* than Workflow can be found by entity. It's useful when you need to give to user possibility to start
-        Workflow that is applicable for specific entity.
-    * **bind**
-        *boolean*
-        By default is *true* when *managed_entity* is *true*. Allowed only when type is entity. If true than instances of
-        Workflow will be bound to entity that is saved in data as value of this attribute. It's useful when you need to
-        find all Workflow Items that are connected with entity instance.
-    * **multiple**
-        *boolean (false - default)*
-        By default is same as managed_entity value.
-        If *true* than it will be possible to multiple instances of Workflow for this entity. If *false* than the
-        restriction of one instance of Workflow for entity will be applied. Also false value is possible only if bind
-        is true because of check relation between instances of Workflow and entity is possible only when bind is true.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,
@@ -180,34 +186,22 @@ Example
 
 ```
 workflows:
-    phone_call:
+    b2b_flow_sales:
         # ...
-        attributes:
-            phone_call:
-                label: Phone Call
-                type: entity
-                options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-            call_timeout:
-                type: integer
-                label: 'Call Timeout'
-                property_path: phone_call.timeout
-            call_successfull:
-                type: boolean
-                label: 'Call Successful'
-                property_path: phone_call.successful
-            conversation_successful:
-                type: boolean
-                label: 'Conversation Successful'
-                property_path: phone_call.conversation.successful
-            conversation_comment:
-                type: string
-                label: 'Conversation Comment'
-                property_path: phone_call.conversation.comment
-            conversation_result:
-                type: string
-                label: 'Conversation Result'
-                property_path: phone_call.conversation.result
+        new_account:
+            label: 'Account'
+            type: entity
+            entity_acl:
+                delete: false
+            options:
+                class: OroCRM\Bundle\AccountBundle\Entity\Account
+        new_company_name:
+            label: 'Company name'
+            type: string
+        opportunity:
+            property_path: sales_funnel.opportunity
+        opportunity_name:
+            property_path: sales_funnel.opportunity.name
 ```
 
 Steps configuration
