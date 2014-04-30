@@ -46,20 +46,23 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @return {*}
              */
            clearValue: function(data, format){
-               if(data === null){
-                   data = '';
-               }
-               switch (format){
+                switch (format){
                    case 'integer':
                    case 'smallint':
                    case 'bigint':
                    case 'boolean':
+                       if(data === null){
+                           data = 0;
+                       }
                        return parseInt(data);
                    case 'decimal':
                    case 'float':
                    case 'money':
                    case 'currency':
                    case 'percent':
+                       if(data === null){
+                           data = 0;
+                       }
                        return parseFloat(data);
                    case 'date':
                        return Date.parse(data); //add convert to date
