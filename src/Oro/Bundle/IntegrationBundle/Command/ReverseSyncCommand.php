@@ -53,15 +53,15 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channelId  = $input->getOption(self::CHANNEL_ARG_NAME);
-        $connector  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params     = $input->getOption(self::PARAMETERS_ARG_NAME);
-        $logger     = new OutputLogger($output);
-        $processor  = $this->getService(self::SYNC_PROCESSOR);
-        $repository = $this->getService('doctrine.orm.entity_manager')
+        $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
+        $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
+        $params         = $input->getOption(self::PARAMETERS_ARG_NAME);
+        $logger         = new OutputLogger($output);
+        $processor      = $this->getService(self::SYNC_PROCESSOR);
+        $repository     = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
 
-        if (empty($channelId) || empty($connector) || empty($params)) {
+        if (empty($channelId) || empty($connectorType) || empty($params)) {
             throw new \InvalidArgumentException('Channel id, Connector type and Parameters require.');
         }
 
@@ -73,7 +73,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             ->getConfiguration()
             ->setSQLLogger(null);
 
-        if ($this->isJobRunning($channelId, $connector, $params)) {
+        if ($this->isJobRunning($channelId, $connectorType, $params)) {
             $logger->warning('Job already running. Terminating....');
             return 0;
         }
@@ -85,9 +85,15 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
         }
 
         try {
-            $logger->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
-
-            $processor->process($channel, $connector, $params);
+            $logger->notice(
+                sprintf(
+                    'Run sync for "%s" channel and "%s" connector.',
+                    $channel->getName(),
+                    $connectorType
+                )
+            );
+            
+            $processor->process($channel, $connectorType, $params);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
         }
@@ -111,15 +117,14 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
 
     /**
      * @param int $channelId
-     * @param string $connectorType
+     * @param string $connectorTypeType
      * @param string $params
      *
      * @return bool
      */
-    protected function isJobRunning($channelId, $connectorType, $params)
+    protected function isJobRunning($channelId, $connectorTypeType, $params)
     {
         /** @var QueryBuilder $qb */
-
         $qb = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('JMSJobQueueBundle:Job')
             ->createQueryBuilder('j');
@@ -130,15 +135,14 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             ->setParameter('commandName', $this->getName())
             ->setParameter('stateName', Job::STATE_RUNNING)
             ->andWhere(
-                $qb->expr()->andX(
-                    $qb->expr()->like('j.args', ':channelId'),
-                    $qb->expr()->like('j.args', ':connectorType'),
-                    $qb->expr()->like('j.args', ':params')
-                )
+                $qb->expr()->eq('j.args', ':args')
             )
-            ->setParameter('channelId', '%--channel=' . $channelId . '%')
-            ->setParameter('connectorType', '%--connector=' . $connectorType . '%')
-            ->setParameter('params', "%--params='" . $params . "'%");
+            ->setParameter(
+                'args',
+                '["--channel=' . $channelId . '",' .
+                ' "--connector=' . $connectorTypeType . '",' .
+                ' "--params=\'' . $params . '\'"]'
+            );
 
         $running = $query->getQuery()->getSingleScalarResult();
 
