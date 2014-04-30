@@ -19,7 +19,6 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
  */
 abstract class AbstractQueryConverter
 {
-    const COLUMN_ALIAS_TEMPLATE = 'c%d';
     const TABLE_ALIAS_TEMPLATE  = 't%d';
 
     /**
@@ -231,40 +230,33 @@ abstract class AbstractQueryConverter
      */
     protected function prepareColumnAliases()
     {
-        $counter = 0;
-
         foreach ($this->definition['columns'] as $column) {
             $alias = null;
 
             // Pattern to match strings like:
             // "relationName+Foo\BarBundle\Entity\TestEntity::fieldName" or simple "fieldName"
-            $namePattern = '[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]+';
-            $pattern = "/^($namePattern)(?:.*\\:\\:($namePattern))?$/";
+            $aliasParts = array();
 
-            if (preg_match($pattern, $column['name'], $matches)) {
-                if (3 == count($matches)) {
-                    // relationName+Foo\BarBundle\Entity\TestEntity::fieldName
-                    // $alias = relationName_fieldName
-                    $alias = $matches[1] . '_' . $matches[2];
-                } else {
-                    // fieldName
-                    // $alias = fieldName
-                    $alias = $matches[1];
-                }
-
-                if ($alias != $column['name']) {
-                    $uniqueCounter = 0;
-                    do {
-                        $alias = $alias . '_' . $uniqueCounter;
-                        $uniqueCounter++;
-                    } while (isset($this->columnAliases[$alias]));
+            foreach (explode('+', $column['name']) as $aliasPart) {
+                if (preg_match('/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]+)$/', $aliasPart, $matches)) {
+                    $aliasParts[] = $matches[1];
                 }
             }
 
+            $alias = implode('_', $aliasParts);
+
             // If for some reason $column['name'] didn't match pattern, or alias is already used
             // generate it automatically
-            while (!$alias || isset($this->columnAliases[$alias])) {
-                $alias = sprintf(static::COLUMN_ALIAS_TEMPLATE, ++$counter);
+            if (!$alias) {
+                $alias = 'c';
+            }
+
+            if (isset($this->columnAliases[$alias])) {
+                $counter = 1;
+                while (isset($this->columnAliases[$alias . $counter])) {
+                    $counter++;
+                }
+                $alias = $alias . $counter;
             }
 
             $this->columnAliases[$this->buildColumnAliasKey($column)] = $alias;
