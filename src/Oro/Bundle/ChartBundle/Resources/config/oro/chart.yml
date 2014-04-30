@@ -5,10 +5,12 @@ oro_chart:
           - name: label
             label: oro.chart.line_chart.params.label
             required: true
+            default_type: string
           - name: value
             label: oro.chart.line_chart.params.value
             required: true
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            default_type: decimal
         default_settings:
             connect_dots_with_line: true
             available_in_reports: true
@@ -23,10 +25,12 @@ oro_chart:
           - name: label
             label: oro.chart.bar_chart.params.label
             required: true
+            default_type: string
           - name: value
             label: oro.chart.bar_chart.params.value
             required: true
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            default_type: decimal
         default_settings:
             available_in_reports: true
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
@@ -40,10 +44,12 @@ oro_chart:
           - name: label
             label: oro.chart.pie_chart.params.label
             required: true
+            default_type: string
           - name: value
             label: oro.chart.pie_chart.params.value
             required: true
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            default_type: decimal
         default_settings:
             fraction_input_data_field: value
             fraction_output_data_field: fraction
@@ -59,13 +65,16 @@ oro_chart:
           - name: label
             label: oro.chart.flow_chart.params.label
             required: true
+            default_type: string
           - name: value
             label: oro.chart.flow_chart.params.value
             required: true
             type_filter: [percent, number] # filter for fields, see query_designer.yml filter section
+            default_type: decimal
           - name: isNozzle
             label: oro.chart.flow_chart.params.is_nozzle
             required: false
+            default_type: boolean
             type_filter: [boolean] # filter for fields, see query_designer.yml filter section
         default_settings:
             chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']

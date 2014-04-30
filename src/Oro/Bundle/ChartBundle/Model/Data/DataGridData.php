@@ -12,6 +12,11 @@ class DataGridData implements DataInterface
     protected $data;
 
     /**
+     * @var DatagridInterface
+     */
+    protected $datagrid;
+
+    /**
      * @param DatagridInterface $datagrid
      */
     public function __construct(DatagridInterface $datagrid)

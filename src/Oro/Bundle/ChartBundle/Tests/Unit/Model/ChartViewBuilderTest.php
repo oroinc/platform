@@ -96,7 +96,10 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptions()
     {
-        $options = array('name' => 'foo', 'data_schema' => array('foo' => array('field_name' => 'foo')));
+        $options = array(
+            'name' => 'foo',
+            'data_schema' => array('foo' => array('field_name' => 'foo', 'type' => 'integer'))
+        );
         $expectedOptions = $options;
         $expectedOptions['settings'] = array();
 
@@ -114,9 +117,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->will($this->returnValue($config));
 
-        $options = array(
-            'name' => 'foo', 'data_schema' => array('foo' => 'bar'), 'settings' => array()
-        );
+        $options = array('name' => 'foo', 'data_schema' => array('foo' => 'bar'), 'settings' => array());
         $expectedOptions = $options;
         $expectedOptions['data_schema'] = array(
             'foo' => array(
@@ -159,8 +160,8 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $options = array(
             'name' => 'foo',
             'data_schema' => array(
-                'label' => array('field_name' => 'foo', 'label' => 'Foo Label'),
-                'value' => array('label' => 'Bar Label')
+                'label' => array('field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'),
+                'value' => array('label' => 'Bar Label', 'type' => 'string')
             ),
             'data_mapping' => array('foo' => 'bar'),
         );
@@ -178,8 +179,8 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $options = array(
             'name' => 'foo',
             'data_schema' => array(
-                'label' => array('field_name' => 'foo', 'label' => 'Foo Label'),
-                'value' => array('label' => 'Bar Label')
+                'label' => array('field_name' => 'foo', 'label' => 'Foo Label', 'type' => 'integer'),
+                'value' => array('label' => 'Bar Label', 'type' => 'integer')
             )
         );
 
@@ -219,10 +220,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
             'config' => $chartConfig
         );
 
-        $this->configProvider->expects($this->once())
-            ->method('getChartConfig')
-            ->with($chartName)
-            ->will($this->returnValue($chartConfig));
+        $this->setExpectedChartConfig($chartName, $chartConfig);
 
         $chartView = $this->builder->setOptions($options)
             ->setData($data)
@@ -247,15 +245,13 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
         $chartConfig = array(
             'data_transformer' => $dataTransformerServiceId,
-            'template' => $chartTemplate
+            'template' => $chartTemplate,
+            'default_settings' => array(),
         );
 
         $options = array('name' => $chartName, 'settings' => array('foo' => 'bar'));
 
-        $this->configProvider->expects($this->once())
-            ->method('getChartConfig')
-            ->with($chartName)
-            ->will($this->returnValue($chartConfig));
+        $this->setExpectedChartConfig($chartName, $chartConfig);
 
         $this->transformerFactory->expects($this->once())
             ->method('createTransformer')
@@ -288,10 +284,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
         $options = array('name' => $chartName);
 
-        $this->configProvider->expects($this->once())
-            ->method('getChartConfig')
-            ->with($chartName)
-            ->will($this->returnValue($chartConfig));
+        $this->setExpectedChartConfig($chartName, $chartConfig);
 
         $this->builder->setOptions($options)
             ->setData($data)
@@ -322,11 +315,15 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
             'default_settings' => array('bar' => 'baz'),
         );
 
+        $this->setExpectedChartConfig($chartName, $chartConfig);
+        $this->builder->setOptions($options)->getView();
+    }
+
+    protected function setExpectedChartConfig($chartName, array $chartConfig)
+    {
         $this->configProvider->expects($this->once())
             ->method('getChartConfig')
             ->with($chartName)
             ->will($this->returnValue($chartConfig));
-
-        $this->builder->setOptions($options)->getView();
     }
 }
