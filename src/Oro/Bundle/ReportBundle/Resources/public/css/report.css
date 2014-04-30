@@ -5,9 +5,12 @@
     height: 54px;
 }
 
-.chart-wrapper {
+.desktop-version .chart-wrapper {
     padding: 25px;
-    text-align: center;
     width: 70%;
     margin: 0 auto;
+}
+
+.mobile-version .chart-wrapper {
+    margin-top: 20px;
 }
