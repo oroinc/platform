@@ -46,7 +46,6 @@
                     var drawChart = function () {
                         var xFormat = {{ options.data_schema.label.type|json_encode|raw }};
                         var yFormat = {{ options.data_schema.value.type|json_encode|raw }};
-
                         if (!$chart.get(0).clientWidth) {
                             return;
                         }
@@ -90,6 +89,7 @@
                                     if (label === null) {
                                         label = rawData[pointData.y]['value'];
                                     }
+
                                     return label;
                                 }
                             },
@@ -111,8 +111,15 @@
                                         track : true,
                                         relative : true,
                                         trackFormatter: function (pointData) {
-                                            return  dataFormatter.formatLabel(pointData.x, xFormat)+
-                                                    ': ' + dataFormatter.formatLabel(pointData.y, yFormat);
+                                            var xLabel  = dataFormatter.formatLabel(pointData.x, xFormat);
+                                            if (xLabel === null) {
+                                                xLabel = rawData[parseInt(pointData.x)]['label'];
+                                            }
+                                            var yLabel  = dataFormatter.formatLabel(pointData.y, yFormat);
+                                            if (yLabel === null) {
+                                                yLabel = rawData[parseInt(pointData.y)]['value'];
+                                            }
+                                            return   xLabel + ': ' + yLabel;
                                         }
                                     },
                                     yaxis: {
