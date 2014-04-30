@@ -61,8 +61,16 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
         $repository     = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
 
-        if (empty($channelId) || empty($connectorType) || empty($params)) {
-            throw new \InvalidArgumentException('Channel id, Connector type and Parameters require.');
+        if (empty($channelId)) {
+            throw new \InvalidArgumentException('Channel id require.');
+        }
+
+        if (empty($connectorType)) {
+            throw new \InvalidArgumentException('Connector type require.');
+        }
+
+        if (empty($params)) {
+            throw new \InvalidArgumentException('Parameters require.');
         }
 
         $processor->getLoggerStrategy()->setLogger($logger);
@@ -92,7 +100,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                     $connectorType
                 )
             );
-            
+
             $processor->process($channel, $connectorType, $params);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
