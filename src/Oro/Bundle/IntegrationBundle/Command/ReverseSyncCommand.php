@@ -62,15 +62,15 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             ->getRepository('OroIntegrationBundle:Channel');
 
         if (empty($channelId)) {
-            throw new \InvalidArgumentException('Channel id require.');
+            throw new \InvalidArgumentException('Channel id option is required.');
         }
 
         if (empty($connectorType)) {
-            throw new \InvalidArgumentException('Connector type require.');
+            throw new \InvalidArgumentException('Connector type option is required.');
         }
 
         if (empty($params)) {
-            throw new \InvalidArgumentException('Parameters require.');
+            throw new \InvalidArgumentException('Parameters option is required.');
         }
 
         $processor->getLoggerStrategy()->setLogger($logger);
