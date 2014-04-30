@@ -238,7 +238,7 @@ class Channel
     }
 
     /**
-     * @param $syncPriority
+     * @param string $syncPriority
      *
      * @return $this
      */
@@ -257,7 +257,7 @@ class Channel
     }
 
     /**
-     * @param $isTwoWaySyncEnable
+     * @param boolean $isTwoWaySyncEnable
      *
      * @return $this
      */
