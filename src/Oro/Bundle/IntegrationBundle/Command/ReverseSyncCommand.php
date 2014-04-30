@@ -22,7 +22,7 @@ use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
  */
 class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
-    const SYNC_PROCESSOR = 'oro_integration.sync.processor';
+    const SYNC_PROCESSOR = 'oro_integration.reverse_sync.processor';
     const COMMAND_NAME = 'oro:integration:reverse:sync';
     const CHANNEL_ARG_NAME = 'channel';
     const CONNECTOR_ARG_NAME = 'connector';
@@ -55,7 +55,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     {
         $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
         $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params         = $input->getOption(self::PARAMETERS_ARG_NAME);
+        $params         = ['id'=>50];#$input->getOption(self::PARAMETERS_ARG_NAME);
         $logger         = new OutputLogger($output);
         $processor      = $this->getService(self::SYNC_PROCESSOR);
         $repository     = $this->getService('doctrine.orm.entity_manager')
