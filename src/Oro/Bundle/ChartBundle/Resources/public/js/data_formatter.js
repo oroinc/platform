@@ -46,6 +46,9 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @return {*}
              */
            clearValue: function(data, format){
+               if(data === null){
+                   data = '';
+               }
                switch (format){
                    case 'integer':
                    case 'smallint':

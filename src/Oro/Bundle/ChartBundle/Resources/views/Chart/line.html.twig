@@ -50,7 +50,7 @@
                         if (!$chart.get(0).clientWidth) {
                             return;
                         }
-                        var rawData = {{ data|json_encode|raw }}
+                        var rawData = {{ data|json_encode|raw }};
                         var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
                         var chartData = [];
@@ -86,8 +86,6 @@
                                 show: true,
                                 position: 'ct',
                                 labelFormatter: function (pointData) {
-                                    console.log(pointData);
-
                                     var label = dataFormatter.formatLabel(pointData.y, yFormat);
                                     if (label === null) {
                                         label = rawData[pointData.y]['value'];
@@ -132,7 +130,12 @@
                                         tickFormatter: function (x) {
                                             var label = dataFormatter.formatLabel(x, xFormat);
                                             if (label === null) {
-                                                label = rawData[parseInt(x)]['value'];
+                                                var number = parseInt(x);
+                                                if (rawData.length > number) {
+                                                    label = rawData[number]['label'];
+                                                } else {
+                                                    label = '';
+                                                }
                                             }
                                             return label;
                                         }
