@@ -10,7 +10,6 @@ use Symfony\Component\DomCrawler\Form;
 /**
  * @outputBuffering enabled
  * @db_isolation
- * @db_reindex
  */
 class ControllersTest extends WebTestCase
 {
