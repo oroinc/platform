@@ -21,6 +21,11 @@ class ChartViewBuilder
     protected $configProvider;
 
     /**
+     * @var TransformerFactory
+     */
+    protected $transformerFactory;
+
+    /**
      * @var \Twig_Environment
      */
     protected $twig;
