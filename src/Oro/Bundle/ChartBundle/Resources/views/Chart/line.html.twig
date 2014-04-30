@@ -3,8 +3,8 @@
     "options":
         "name": "chart_name",
         "data_schema" => array(
-            "label" => array("field_name" => "name", "label" => "First Name", "frontend_type" => "string"),
-            "value" => array("field_name" => "salary", "label" => "Salary", "frontend_type" => "money"),
+            "label" => array("field_name" => "name", "label" => "First Name", "type" => "string"),
+            "value" => array("field_name" => "salary", "label" => "Salary", "type" => "money"),
         ),
         "settings" => array(
             "foo" => "bar"
@@ -44,8 +44,8 @@
                         $chart.closest('.clearfix').width($chart.width());
                     };
                     var drawChart = function () {
-                        var xFormat = {{ options.data_schema.label.frontend_type|json_encode|raw }};
-                        var yFormat = {{ options.data_schema.value.frontend_type|json_encode|raw }};
+                        var xFormat = {{ options.data_schema.label.type|json_encode|raw }};
+                        var yFormat = {{ options.data_schema.value.type|json_encode|raw }};
 
                         if (!$chart.get(0).clientWidth) {
                             return;

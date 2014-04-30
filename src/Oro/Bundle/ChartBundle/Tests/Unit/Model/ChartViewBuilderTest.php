@@ -122,7 +122,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
             'foo' => array(
                 'field_name' => 'bar',
                 'label' => 'Foo label',
-                'frontend_type' => 'int',
+                'type' => 'int',
             )
         );
 

@@ -39,18 +39,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                     'name' => 'label',
                                     'label' => 'Category (X axis)',
                                     'required' => true,
+                                    'default_type' => 'decimal'
                                 ),
                                 array(
                                     'name' => 'value',
                                     'label' => 'Value (Y axis)',
                                     'required' => true,
+                                    'default_type' => 'string'
                                 ),
                             ),
                             'settings_schema' => array(
                                 array(
                                     'name' => 'connect_dots_with_line',
                                     'label' => 'Connect line with dots',
-                                    'type' => 'boolean',
+                                    'type' => 'boolean'
                                 ),
                                 array(
                                     'name' => 'advanced_option',
@@ -80,13 +82,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'label' => 'Category (X axis)',
                                 'name' => 'label',
                                 'required' => true,
-                                'type_filter' => []
+                                'type_filter' => [],
+                                'default_type' => 'decimal'
                             ),
                             array(
                                 'label' => 'Value (Y axis)',
                                 'name' => 'value',
                                 'required' => true,
-                                'type_filter' => []
+                                'type_filter' => [],
+                                'default_type' => 'string'
                             ),
                         ),
                         'settings_schema' => array(

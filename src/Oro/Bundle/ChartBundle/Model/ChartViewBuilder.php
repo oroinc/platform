@@ -46,8 +46,8 @@ class ChartViewBuilder
      * array(
      *     "name" => "chart_name",
      *     "data_schema" => array(
-     *         "label" => array("field_name" => "name", "label" => "First Name", "frontend_type" => "string"),
-     *         "value" => array("field_name" => "salary", "label" => "Salary", "frontend_type" => "money"),
+     *         "label" => array("field_name" => "name", "label" => "First Name", "type" => "string"),
+     *         "value" => array("field_name" => "salary", "label" => "Salary", "type" => "money"),
      *     ),
      *     "settings" => array(
      *         "foo" => "bar"
@@ -180,10 +180,13 @@ class ChartViewBuilder
                 }
 
                 $fieldName = $data['field_name'];
-                foreach (array('label', 'frontend_type') as $property) {
-                    if (!isset($data[$property]) && isset($this->datagridColumnsDefinition[$fieldName][$property])) {
-                        $data[$property] = $this->datagridColumnsDefinition[$fieldName][$property];
-                    }
+
+                if (!isset($data['label']) && isset($this->datagridColumnsDefinition[$fieldName]['label'])) {
+                    $data['label'] = $this->datagridColumnsDefinition[$fieldName]['label'];
+                }
+
+                if (!isset($data['type']) && isset($this->datagridColumnsDefinition[$fieldName]['frontend_type'])) {
+                    $data['type'] = $this->datagridColumnsDefinition[$fieldName]['frontend_type'];
                 }
             }
         }
