@@ -8,7 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class MigrateRelation implements Migration, OrderedMigrationInterface
+class RemoveOldRelation implements Migration, OrderedMigrationInterface
 {
     /**
      * @inheritdoc
