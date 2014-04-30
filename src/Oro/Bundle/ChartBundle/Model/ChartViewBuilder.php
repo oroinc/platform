@@ -41,6 +41,11 @@ class ChartViewBuilder
     protected $dataMapping;
 
     /**
+     * @var array
+     */
+    protected $chartConfig;
+
+    /**
      * Array of chart options.
      *
      * array(
@@ -141,19 +146,19 @@ class ChartViewBuilder
      */
     public function setOptions(array $options)
     {
-        if (!isset($options['name'])) {
+        $this->options = $options;
+        $this->chartConfig = null;
+
+        if (!isset($this->options['name'])) {
             throw new InvalidArgumentException('Options must have "name" key.');
         }
 
-        if (!isset($options['settings']) || !is_array($options['settings'])) {
-            $options['settings'] = array();
+        if (!isset($this->options['settings']) || !is_array($this->options['settings'])) {
+            $this->options['settings'] = array();
         }
 
-        $this->parseOptionsDataSchema($options);
-
-        $this->options = $options;
-
-        $this->setupDataMapping($options);
+        $this->parseOptionsDataSchema();
+        $this->setupDataMapping();
 
         return $this;
     }
@@ -161,35 +166,52 @@ class ChartViewBuilder
     /**
      * Parse "data_schema" key of options, fix structure and update fields using datagrid
      *
-     * @param array $options
      * @throws InvalidArgumentException
      */
-    protected function parseOptionsDataSchema(array &$options)
+    protected function parseOptionsDataSchema()
     {
-        if (isset($options['data_schema'])) {
-            if (!is_array($options['data_schema'])) {
+        if (isset($this->options['data_schema'])) {
+            if (!is_array($this->options['data_schema'])) {
                 throw new InvalidArgumentException('Options must have "data_schema" key with array.');
             }
-            foreach ($options['data_schema'] as $key => &$data) {
-                if (!is_array($data)) {
-                    $data = array('field_name' => $data);
-                }
 
-                if (!isset($data['field_name'])) {
-                    $data['field_name'] = $key;
-                }
-
-                $fieldName = $data['field_name'];
-
-                if (!isset($data['label']) && isset($this->datagridColumnsDefinition[$fieldName]['label'])) {
-                    $data['label'] = $this->datagridColumnsDefinition[$fieldName]['label'];
-                }
-
-                if (!isset($data['type']) && isset($this->datagridColumnsDefinition[$fieldName]['frontend_type'])) {
-                    $data['type'] = $this->datagridColumnsDefinition[$fieldName]['frontend_type'];
-                }
+            foreach ($this->options['data_schema'] as $key => &$data) {
+                $data = $this->parseOptionsDataSchemaField($key, $data);
             }
         }
+    }
+
+    /**
+     * @param string $key
+     * @param string|array $data
+     * @return array
+     */
+    protected function parseOptionsDataSchemaField($key, $data)
+    {
+        if (!is_array($data)) {
+            $data = array('field_name' => $data);
+        }
+
+        if (!isset($data['field_name'])) {
+            $data['field_name'] = $key;
+        }
+
+        $fieldName = $data['field_name'];
+
+        if (!isset($data['label']) && isset($this->datagridColumnsDefinition[$fieldName]['label'])) {
+            $data['label'] = $this->datagridColumnsDefinition[$fieldName]['label'];
+        }
+
+        if (!isset($data['type']) && isset($this->datagridColumnsDefinition[$fieldName]['frontend_type'])) {
+            $data['type'] = $this->datagridColumnsDefinition[$fieldName]['frontend_type'];
+        }
+
+        if (!isset($data['type'])) {
+            $configFieldData = $this->getChartConfigDataSchemaField($key);
+            $data['type'] = $configFieldData['default_type'];
+        }
+
+        return $data;
     }
 
     /**
@@ -238,22 +260,51 @@ class ChartViewBuilder
             throw new BadMethodCallException('Can\'t build result when setOptions() was not called.');
         }
 
-        $config = $this->configProvider->getChartConfig($options['name']);
+        $config = $this->getChartConfig();
 
         if (!isset($config['template'])) {
             throw new InvalidArgumentException(
-                sprintf('Config of chart "%s" must have "template" key.', $options['name'])
+                sprintf('Config of chart "%s" must have "template" key.', $this->options['name'])
             );
         }
 
-        if (isset($config['default_settings']) && is_array($config['default_settings'])) {
-            $options['settings'] = array_replace_recursive($config['default_settings'], $options['settings']);
-        }
+        $options['settings'] = array_replace_recursive($config['default_settings'], $options['settings']);
 
         return array(
             'options' => $options,
             'config' => $config
         );
+    }
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    protected function getChartConfig()
+    {
+        if (null === $this->chartConfig) {
+            $chartConfig = $this->configProvider->getChartConfig($this->options['name']);
+            $this->chartConfig = $chartConfig;
+        }
+        return $this->chartConfig;
+    }
+
+    /**
+     * @param string $name
+     * @return array
+     */
+    protected function getChartConfigDataSchemaField($name)
+    {
+        $chartConfig = $this->getChartConfig();
+        if (isset($chartConfig['data_schema'])) {
+            foreach ($chartConfig['data_schema'] as $data) {
+                if ($data['name'] == $name) {
+                    return $data;
+                }
+            }
+        }
+
+        return array();
     }
 
     /**
