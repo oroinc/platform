@@ -48,10 +48,8 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 
         if ($this->isNotEmpty($data->getType())) {
             if (false === $this->hasTwoWaySync($data->getType())) {
-                $form
-                    ->remove('syncPriority')
-                    ->remove('isTwoWaySyncEnabled')
-                ;
+                $form->remove('syncPriority')
+                    ->remove('isTwoWaySyncEnabled');
             }
         }
     }

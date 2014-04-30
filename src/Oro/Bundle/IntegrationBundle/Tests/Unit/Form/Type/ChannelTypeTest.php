@@ -20,29 +20,20 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->registry = $this
-                            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-                            ->disableOriginalConstructor()
-                            ->getMock();
+        $this->registry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->type = new ChannelType($this->registry);
 
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function tearDown()
     {
         unset($this->type, $this->registry, $this->builder);
-    }
-
-
-    public function testInterface()
-    {
-        $typeName = $this->type->getName();
-        $this->assertInternalType('string', $typeName);
-        $this->assertNotEmpty($typeName);
     }
 
     public function testBuildForm()
