@@ -1,5 +1,6 @@
 oro:
   chart:
+      no_data: No data
       form:
           chart_empty_value: None
       line_chart:
