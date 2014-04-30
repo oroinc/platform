@@ -57,6 +57,31 @@
                         var yMin = null;
                         var xMax = null;
                         var xMin = null;
+                        var getXLabel = function(data) {
+                            var label = dataFormatter.formatLabel(data, xFormat);
+                            if (label === null) {
+                                var number = parseInt(data);
+                                if (rawData.length > number) {
+                                    label = rawData[number]['label'];
+                                } else {
+                                    label = '';
+                                }
+                            }
+                            return label;
+                        };
+                        var getYLabel = function(data) {
+                            var label = dataFormatter.formatLabel(data, yFormat);
+                            if (label === null) {
+                                var number = parseInt(data);
+                                if (rawData.length > number) {
+                                    label = rawData[data]['value'];
+                                } else {
+                                    label = '';
+                                }
+                            }
+
+                            return label;
+                        };
                         for(var i in rawData){
                             var yValue = dataFormatter.clearValue(rawData[i]['value'], yFormat);
                             yValue = yValue === null ? parseInt(i) : yValue;
@@ -85,12 +110,7 @@
                                 show: true,
                                 position: 'ct',
                                 labelFormatter: function (pointData) {
-                                    var label = dataFormatter.formatLabel(pointData.y, yFormat);
-                                    if (label === null) {
-                                        label = rawData[pointData.y]['value'];
-                                    }
-
-                                    return label;
+                                     return getYLabel(pointData.y);
                                 }
                             },
                             points: {
@@ -111,40 +131,19 @@
                                         track : true,
                                         relative : true,
                                         trackFormatter: function (pointData) {
-                                            var xLabel  = dataFormatter.formatLabel(pointData.x, xFormat);
-                                            if (xLabel === null) {
-                                                xLabel = rawData[parseInt(pointData.x)]['label'];
-                                            }
-                                            var yLabel  = dataFormatter.formatLabel(pointData.y, yFormat);
-                                            if (yLabel === null) {
-                                                yLabel = rawData[parseInt(pointData.y)]['value'];
-                                            }
-                                            return   xLabel + ': ' + yLabel;
+                                            return   getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
                                         }
                                     },
                                     yaxis: {
                                         max: yMax,
                                         tickFormatter: function (y) {
-                                            var label = dataFormatter.formatLabel(y, yFormat);
-                                            if (label === null) {
-                                                label = rawData[parseInt(y)]['value'];
-                                            }
-                                            return label;
+                                            return getYLabel(y);
                                         }
                                     },
                                     xaxis: {
                                         max: xMax,
                                         tickFormatter: function (x) {
-                                            var label = dataFormatter.formatLabel(x, xFormat);
-                                            if (label === null) {
-                                                var number = parseInt(x);
-                                                if (rawData.length > number) {
-                                                    label = rawData[number]['label'];
-                                                } else {
-                                                    label = '';
-                                                }
-                                            }
-                                            return label;
+                                            return getXLabel(x);
                                         }
                                     },
                                     grid: {
