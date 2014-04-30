@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator'],
-    function (_, $, mediator) {
+define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotranslation/js/translator'],
+    function (_, $, mediator, __) {
         'use strict';
 
         /**
@@ -15,7 +15,9 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator'],
             options: {
                 childTemplate: '[id^=<%= id %>_]',
                 fieldChoiceOptions: {
-                    select2: {},
+                    select2: {
+                        placeholder: __('oro.entity.form.choose_entity_field')
+                    },
                     util: {},
                     fieldsLoaderSelector: '#oro_report_form_entity',
                     exclude: {}

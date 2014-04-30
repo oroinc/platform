@@ -32,7 +32,7 @@ class ReportChartSchemaType extends AbstractType
         foreach ($options['data_schema'] as $schemaOptions) {
             $excludedProperties = ['children'];
 
-            if (isset($schemaOptions['filter'])) {
+            if (isset($schemaOptions['filter']) && $schemaOptions['filter']) {
                 $excludedProperties = array_merge(
                     $excludedProperties,
                     $this->manager->getExcludedProperties($schemaOptions['filter'])

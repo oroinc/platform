@@ -77,14 +77,16 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'label' => 'Foo',
                         'data_schema' => array(
                             array(
-                                'name' => 'label',
                                 'label' => 'Category (X axis)',
+                                'name' => 'label',
                                 'required' => true,
+                                'filter' => []
                             ),
                             array(
-                                'name' => 'value',
                                 'label' => 'Value (Y axis)',
+                                'name' => 'value',
                                 'required' => true,
+                                'filter' => []
                             ),
                         ),
                         'settings_schema' => array(
@@ -103,9 +105,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 ),
                             ),
                         ),
-                        'default_settings' => array(),
                         'data_transformer' => 'foo_data_transformer_service',
-                        'template' => 'FooTemplate.html.twig'
+                        'template' => 'FooTemplate.html.twig',
+                        'default_settings' => array(),
                     ),
                     'bar_chart' => array(
                         'label' => 'Bar',

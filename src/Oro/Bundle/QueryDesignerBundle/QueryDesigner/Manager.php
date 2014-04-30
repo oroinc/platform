@@ -120,15 +120,17 @@ class Manager implements FunctionProviderInterface
     /**
      * Returns filters types
      *
-     * @param string $filterName
+     * @param array $filterNames
      *
      * @return array
      */
-    public function getExcludedProperties($filterName)
+    public function getExcludedProperties(array $filterNames)
     {
         $types   = [];
         $filters = $this->config->offsetGet('filters');
-        unset($filters[$filterName]);
+        foreach ($filterNames as $filterName) {
+            unset($filters[$filterName]);
+        }
 
         foreach ($filters as $filter) {
             if (isset($filter['applicable'])) {
