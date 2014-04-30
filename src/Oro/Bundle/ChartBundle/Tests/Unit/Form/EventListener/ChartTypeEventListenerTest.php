@@ -122,61 +122,14 @@ class ChartTypeEventListenerTest extends \PHPUnit_Framework_TestCase
         $event
             ->expects($this->exactly(2))
             ->method('getData')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue(['test']));
 
         $event
-            ->expects($this->never())
-            ->method('setData');
+            ->expects($this->atLeastOnce())
+            ->method('setData')
+            ->with($this->equalTo([]));
 
         $this->listener->preSetData($event);
-        $this->listener->onSubmit($event);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Chart name is missing
-     */
-    public function testPreSetDataMissingType()
-    {
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue(['value' => false]));
-
-        $event
-            ->expects($this->never())
-            ->method('setData');
-
-        $this->listener->preSetData($event);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ChartBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Chart name is missing
-     */
-    public function testPreSubmitMissingType()
-    {
-        $this->markTestSkipped();
-
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue(['value' => false]));
-
-        $event
-            ->expects($this->never())
-            ->method('setData');
-
         $this->listener->onSubmit($event);
     }
 }

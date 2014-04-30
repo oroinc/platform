@@ -53,9 +53,13 @@ class ChartType extends ConfigProviderAwareType
                     'empty_value' => 'oro.chart.form.chart_empty_value'
                 ]
             )
-            ->add('settings', 'oro_chart_settings_collection', ['chart_configs' => $chartConfigs]);
-
-        $builder->addEventListener(FormEvents::SUBMIT, [$this, 'submit']);
+            ->add(
+                'settings',
+                'oro_chart_settings_collection',
+                [
+                    'chart_configs' => $chartConfigs
+                ]
+            );
     }
 
     /**
@@ -71,32 +75,6 @@ class ChartType extends ConfigProviderAwareType
         }
 
         return $result;
-    }
-
-    /**
-     * @param FormEvent $event
-     * @throws InvalidArgumentException
-     */
-    public function submit(FormEvent $event)
-    {
-        $formData = $event->getData();
-
-        if (!isset($formData['name'])) {
-            $event->setData(array());
-            return;
-        }
-
-        $name = $formData['name'];
-
-        if (isset($formData['settings'][$name])) {
-            $formData['settings'] = $formData['settings'][$name];
-        }
-
-        if (isset($formData['data_schema'][$name])) {
-            $formData['data_schema'] = $formData['data_schema'][$name];
-        }
-
-        $event->setData($formData);
     }
 
     /**

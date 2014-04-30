@@ -17,19 +17,25 @@
 {% block oro_report_chart_data_schema_row %}
     {{ form_widget(form) }}
 
-    {% set fieldConditionOptions = {
-        select2: {
-            placeholder: 'oro.entity.form.choose_entity_field'|trans
-        },
-        util: {},
-        fieldsLoaderSelector: '#oro_report_form_entity',
-        exclude: ['children']
-    } %}
     <script type="text/javascript">
-        require(['oroentity/js/field-choice'], function ($) {
-            $('#{{ id }}')
-                .find('[id^="{{ id }}_"]')
-                .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
+        require(['underscore', 'oroentity/js/field-choice'], function (_, $) {
+            var items = $('#{{ id }}').find('[id^="{{ id }}_"]'),
+                    json = {
+                        select2: {
+                            placeholder: '{{ 'oro.entity.form.choose_entity_field'|trans}}'
+                        },
+                        util: {},
+                        fieldsLoaderSelector: '#oro_report_form_entity'
+                    },
+                    filters;
+            _.each(items, function (item) {
+                var options = json;
+                if (filters = $(item).data('filter')) {
+                    options = _.extend(json, {exclude: filters})
+                }
+
+                $(item).fieldChoice(options);
+            });
         });
     </script>
 {% endblock %}
