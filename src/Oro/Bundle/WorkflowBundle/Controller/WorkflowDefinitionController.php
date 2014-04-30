@@ -84,7 +84,8 @@ class WorkflowDefinitionController extends Controller
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'delete_allowed' => true,
         );
     }
 
@@ -111,7 +112,10 @@ class WorkflowDefinitionController extends Controller
             ->setLabel($clonePrefix . $workflowDefinition->getLabel())
             ->setSystem(false);
 
-        return $this->updateAction($clonedDefinition);
+        $response = $this->updateAction($clonedDefinition);
+        $response['delete_allowed'] = false;
+
+        return $response;
     }
 
     /**

@@ -1,6 +1,6 @@
 /* global define */
 define([
-    'underscore', 'backbone', 'oroui/js/messenger', 'orotranslation/js/translator',
+    'underscore', 'backbone', 'routing', 'oroui/js/messenger', 'orotranslation/js/translator',
     'oroworkflow/js/workflow-management/step/view/list',
     'oroworkflow/js/workflow-management/step/model',
     'oroworkflow/js/workflow-management/transition/model',
@@ -13,7 +13,7 @@ define([
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
-function(_, Backbone, messenger, __,
+function(_, Backbone, routing, messenger, __,
      StepsListView,
      StepModel,
      TransitionModel,
@@ -43,8 +43,7 @@ function(_, Backbone, messenger, __,
         options: {
             stepsEl: null,
             model: null,
-            entities: [],
-            backUrl: null
+            entities: []
         },
 
         initialize: function() {
@@ -252,17 +251,20 @@ function(_, Backbone, messenger, __,
             navigation.showLoading();
             this.model.save(null, {
                 'success': _.bind(function() {
-                    var renderSuccessMessage = function() {
-                        messenger.notificationFlashMessage('success', __('Workflow saved.'));
-                    };
-
                     navigation.hideLoading();
+
+                    var redirectUrl = '',
+                        modelName = this.model.get('name');
                     if (this.saveAndClose) {
-                        mediator.once('hash_navigation_request:complete', renderSuccessMessage);
-                        navigation.setLocation(this.options.backUrl);
+                        redirectUrl = routing.generate('oro_workflow_definition_view', { name: modelName });
                     } else {
-                        renderSuccessMessage();
+                        redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
                     }
+
+                    mediator.once('hash_navigation_request:complete', function() {
+                        messenger.notificationFlashMessage('success', __('Workflow saved.'));
+                    });
+                    navigation.setLocation(redirectUrl);
                 }, this),
                 'error': function(model, response) {
                     navigation.hideLoading();
