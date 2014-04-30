@@ -1,0 +1,187 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
+
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\TestFrameworkBundle\Test\FunctionalTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
+
+/**
+ * @db_isolation
+ * @db_reindex
+ */
+class WorkflowItemRepositoryTest extends FunctionalTestCase
+{
+    /**
+     * @var WorkflowItemRepository
+     */
+    protected $repository;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroWorkflowBundle:WorkflowItem');
+    }
+
+    public function testResetWorkflowData()
+    {
+        // load two workflow definitions and create 20 entities with workflow items for each
+        $this->loadFixtures(
+            array(
+                'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
+                'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities',
+            )
+        );
+
+        // assert input state
+        // - no entities without workflow items
+        // - 20 entities with NO_START_STEP workflow item
+        // - 20 entities with WITH_START_STEP workflow item
+        $inputEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $inputEntityIds,
+            0,
+            LoadWorkflowAwareEntities::COUNT,
+            LoadWorkflowAwareEntities::COUNT
+        );
+        $noStartStepEntityIds = $inputEntityIds[LoadWorkflowDefinitions::NO_START_STEP];
+        $withStartStepEntityIds = $inputEntityIds[LoadWorkflowDefinitions::WITH_START_STEP];
+
+        // reset only WITH_START_STEP workflow data with more than one batch
+        $this->repository->resetWorkflowData(
+            'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            array(LoadWorkflowDefinitions::NO_START_STEP),
+            LoadWorkflowAwareEntities::COUNT - 1
+        );
+
+        // assert state: NO_START_STEP workflow entities weren't changed, WITH_START_STEP workflow entities were reset
+        // - 20 entities without workflow items
+        // - 20 entities with NO_START_STEP workflow item
+        // - no entities with WITH_START_STEP workflow item
+        $updatedEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $updatedEntityIds,
+            LoadWorkflowAwareEntities::COUNT,
+            LoadWorkflowAwareEntities::COUNT,
+            0,
+            $withStartStepEntityIds,
+            $noStartStepEntityIds,
+            array()
+        );
+        $this->assertEntitiesHaveNoWorkflowData($updatedEntityIds['none']);
+
+        // reset all workflow data
+        $this->repository->resetWorkflowData('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
+
+        // assert state: both NO_START_STEP and WITH_START_STEP workflow entities were reset
+        // - 40 entities without workflow items
+        // - no entities with NO_START_STEP workflow item
+        // - no entities with WITH_START_STEP workflow item
+        $emptyEntityIds = $this->getEntityIdsByWorkflow();
+        $this->assertEntityIdsByWorkflow(
+            $emptyEntityIds,
+            LoadWorkflowAwareEntities::COUNT * 2,
+            0,
+            0,
+            array_merge($noStartStepEntityIds, $withStartStepEntityIds),
+            array(),
+            array()
+        );
+        $this->assertEntitiesHaveNoWorkflowData($emptyEntityIds['none']);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getEntityIdsByWorkflow()
+    {
+        $registry = $this->getContainer()->get('doctrine');
+        $registry->getManager()->clear();
+
+        /** @var WorkflowAwareEntity[] $entities */
+        $entities = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')->findAll();
+
+        $ids = array('none' => array());
+        foreach ($entities as $entity) {
+            $workflowName = $entity->getWorkflowItem() ? $entity->getWorkflowItem()->getWorkflowName() : 'none';
+            $ids[$workflowName][] = $entity->getId();
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param array $entityIds
+     */
+    protected function assertEntitiesHaveNoWorkflowData(array $entityIds)
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('doctrine')
+            ->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
+
+        $queryBuilder = $repository->createQueryBuilder('entity');
+        $queryBuilder->andWhere($queryBuilder->expr()->in('entity.id', $entityIds));
+
+        /** @var WorkflowAwareEntity[] $entities */
+        $entities = $queryBuilder->getQuery()->execute();
+        foreach ($entities as $entity) {
+            $this->assertNull($entity->getWorkflowItem());
+            $this->assertNull($entity->getWorkflowStep());
+        }
+    }
+
+    /**
+     * @param array $allEntityIds
+     * @param int $noneEntitiesCount
+     * @param int $noStartStepEntitiesCount
+     * @param int $withStartStepEntitiesCount
+     * @param array $noneEntityIds
+     * @param array $noStartStepEntityIds
+     * @param array $withStartStepEntityIds
+     */
+    protected function assertEntityIdsByWorkflow(
+        array $allEntityIds,
+        $noneEntitiesCount,
+        $noStartStepEntitiesCount,
+        $withStartStepEntitiesCount,
+        array $noneEntityIds = null,
+        array $noStartStepEntityIds = null,
+        array $withStartStepEntityIds = null
+    ) {
+        if ($noneEntitiesCount > 0) {
+            $actualAllEntities = $allEntityIds['none'];
+            $this->assertCount($noneEntitiesCount, $actualAllEntities);
+            if ($noneEntityIds !== null) {
+                $this->assertEquals($noneEntityIds, $actualAllEntities);
+            }
+        } else {
+            $this->assertEmpty($allEntityIds['none']);
+        }
+
+        if ($noStartStepEntitiesCount > 0) {
+            $this->assertArrayHasKey(LoadWorkflowDefinitions::NO_START_STEP, $allEntityIds);
+            $actualNoStartStepEntityIds = $allEntityIds[LoadWorkflowDefinitions::NO_START_STEP];
+            $this->assertCount($noStartStepEntitiesCount, $actualNoStartStepEntityIds);
+            if ($noStartStepEntityIds !== null) {
+                $this->assertEquals($noStartStepEntityIds, $actualNoStartStepEntityIds);
+            }
+        } else {
+            $this->assertArrayNotHasKey(LoadWorkflowDefinitions::NO_START_STEP, $allEntityIds);
+        }
+
+        if ($withStartStepEntitiesCount > 0) {
+            $this->assertArrayHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $allEntityIds);
+            $actualWithStartStepEntityIds = $allEntityIds[LoadWorkflowDefinitions::WITH_START_STEP];
+            $this->assertCount($withStartStepEntitiesCount, $actualWithStartStepEntityIds);
+            if ($withStartStepEntityIds !== null) {
+                $this->assertEquals($withStartStepEntityIds, $actualWithStartStepEntityIds);
+            }
+        } else {
+            $this->assertArrayNotHasKey(LoadWorkflowDefinitions::WITH_START_STEP, $allEntityIds);
+        }
+    }
+}
