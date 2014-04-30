@@ -41,13 +41,13 @@ class ChartViewBuilder
     protected $dataMapping;
 
     /**
-     * Array of chart options
+     * Array of chart options.
      *
      * array(
      *     "name" => "chart_name",
      *     "data_schema" => array(
-     *         "label" => array("field_name" => "name", "label" => "oro.xxx.firstName"),
-     *         "value" => array("field_name" => "salary", "label" => "oro.xxx.salary"),
+     *         "label" => array("field_name" => "name", "label" => "First Name", "frontend_type" => "string"),
+     *         "value" => array("field_name" => "salary", "label" => "Salary", "frontend_type" => "money"),
      *     ),
      *     "settings" => array(
      *         "foo" => "bar"
