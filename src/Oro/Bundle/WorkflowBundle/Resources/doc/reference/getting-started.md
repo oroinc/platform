@@ -96,21 +96,6 @@ allowed.
 Workflow Item stores all collected data and current step, so, user can stop his progress on Workflow at any moment and
 then return to it, and Workflow will have exactly the same state.
 
-Managed Entities
-================
-
-Workflow can have attributes with managed entities. Values of such attributes are required. When user visits page of
-some entity, this knowledge can be used to show all applicable Workflows that can be started.
-
-When Workflow has managed entity attribute it means that the data of Workflow Item contains a reference to that entity.
-If for some reason managed entity will be deleted Workflow Item won't be applicable.
-
-Bind Entities
-=============
-
-When Workflow has attributes with bind entities this information can be used to show all bound Workflows Items on page
-of the entity. Managed entities attributes are bound by default.
-
 Configuration
 =============
 
@@ -119,54 +104,83 @@ new user.
 
 ```
 workflows:
-    create_user:                             # name of the workflow
-        label: 'Create User Workflow'        # workflow label
-        entity: Acme\Bundle\DemoBundle\Entity\UserManager    # workflow related entity
-        start_step: create_user_form         # step that will be shown first
-        steps:                               # list of all existing steps in workflow
-            user_form:                       # step where user should fill form with personal information
-                label: 'Enter User Data'                               # step label
-                allowed_transitions:         # list of allowed transition from this step
-                    - create_user            # user can be created from this step
-            user_summary:                    # step where user can review entered data
-                label: 'User Summary'        # step label
-                is_final: true               # this step is final
-        attributes:                          # list of all existing attributes in workflow
-            username:                        # username attribute
-                label: 'Username'            # attribute label
-                type: string                 # attribute type, possible values are bool (boolean), int (integer), float, string, array, object, entity
-            age:                             # age attribute
-                label: 'Age'
-                type: integer
-            email:                           # email attribute
-                type: string
+    example_user_flow:                            # name of the workflow
+        label: 'User Workflow Example'            # workflow label
+        entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
+        entity_attribute: user                    # attribute name of current entity that can be used in configuration
+        start_step: started                       # step that will be shown first
+        steps_display_ordered: true               # all workflow steps will be shown on the related entity view page
+                                                  # otherwise, only the current step and the past steps will be shown
+        steps:                                    # list of all existing steps in workflow
+            started:                              # step where user should fill form with firstname and lastname
+                label: 'Started'                  # step label
+                order: 10                         # steps will be shown in ascending
+                allowed_transitions:              # list of allowed transition from this step
+                    - set_name                    # firstname and lastname will be filled on this transition
+            processed:                            # step where user can review entered data
+                label: 'Processed'
+                order: 20
+                allowed_transitions:
+                   - add_email
+        attributes:                               # list of all existing attributes in workflow
+            middlename:                           # middlename of user
+                property_path: user.middleName    # path to entity property (automatically defined attribute metadata)
+            email_string:                         # email string attribute
+                label: 'Email'                    # attribute label
+                type: string                      # attribute type, possible values are:
+                                                  # bool (boolean), int (integer), float, string, array, object, entity
+            email:                                # email entity
                 label: 'Email'
-            user:                            # user entity
                 type: entity
-                label: 'User'
-                options:                     # attribute options
-                    class: Acme\Bundle\DemoBundle\Entity\User    # entity class name
-        transitions:                         # list of all existing transitions in workflow
-            create_user:                     # transition from step "user_form" to "user_summary"
-                label: 'Create User'                             # transition label
-                step_to: user_summary                            # next step after transition performing
-                transition_definition: create_user_definition    # link to definition of conditions and post actions
-        transition_definitions:              # list of all existing transition definitions
-            create_user_definition:          # definitions for transition "create_user"
-                conditions:                  # required conditions: username is not empty and age >= 18
-                    @and:                                        # AND for all children conditions
-                        - @not_empty: [$username]                # username attribute value is not empty
-                        - @greater_or_equal: [$age, 18]          # age attribute value is greater or equal to 18
-                post_actions:                # required post actions: create User entity
-                    - @create_entity:        # create entity post action
-                        parameters:          # parameters of post action
-                            class: Acme\Bundle\DemoBundle\Entity\User    # entity class name
-                            attribute: $user                             # save entity in attribute "user"
-                            data:                                # user entity data
-                                username: $username              # get username value from attribute "username"
-                                age: $age                        # get age value from attribute "age"
-                                email: $email                    # get email value from attribute "email"
-                                registered: true                 # set registered flag as true
+                options:                          # attribute options
+                    class: Oro\Bundle\UserBundle\Entity\Email # entity class name
+        transitions:                                       # list of all existing transitions in workflow
+            set_name:                                      # transition from step "started" to "processed"
+                label: 'Set middlename'                    # transition label
+                step_to: processed                         # next step after transition performing
+                transition_definition: set_name_definition # link to definition of conditions and post actions
+                form_options:                              # options which will be passed to form type of transition
+                    attribute_fields:                      # list of attribute fields which will be shown
+                        middlename:                        # form field name
+                            options:                       # list of form field options
+                                required: true             # define this field as required
+                                constraints:               # list of constraints
+                                    - NotBlank: ~          # this field must be filled
+            add_email:
+                label: 'Add email'
+                step_to: processed
+                transition_definition: add_email_definition
+                form_options:
+                    attribute_fields:
+                        email_string:
+                            options:
+                                required: true
+                                constraints:
+                                    - NotBlank: ~
+        transition_definitions:                             # list of all existing transition definitions
+            set_name_definition:                            # definitions for transition "set_name"
+                conditions:                                 # required conditions: user is not empty
+                    @not_empty: $user                       # user attribute value is not empty
+                post_actions:                               # list of action which will be performed after transition
+                    - @assign_value:                        # list of fields that will be updated
+                        - [$user.middlename, $middlename]   # update users middlename
+            add_email_definition:
+                conditions:
+                    @not_empty: $user
+                post_actions:                               # list of action which will be performed after transition
+                    - @create_entity:                         # create email entity
+                        class: Oro\Bundle\UserBundle\Entity\Email # entity class
+                        attribute: $email                   # entity attribute in configuration
+                        data:                               # data for creating entity
+                            email: $email_string
+                            user: $user
+                    - @call_method:                         # call specific method from entity class
+                        object: $user                       # object that should call method
+                        method: addEmail                    # method that should be called
+                        method_parameters:                  # parameters that will be passed to the called method
+                            [$email]
+                    - @unset_value:                         # unset temporary properties
+                            [$email_string, $email]
 ```
 
 This configuration describes Workflow that includes two steps - "user_form" and "user_summary".
