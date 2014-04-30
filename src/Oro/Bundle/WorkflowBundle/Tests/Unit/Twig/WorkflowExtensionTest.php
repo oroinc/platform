@@ -30,12 +30,13 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(3, $functions);
+        $this->assertCount(4, $functions);
 
         $expectedFunctions = array(
             'has_workflow',
             'has_workflow_start_step',
             'has_workflow_item',
+            'is_workflow_reset_allowed',
         );
 
         /** @var \Twig_SimpleFunction $function */
@@ -154,5 +155,21 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             array($workflowItem, true),
             array(null, false),
         );
+    }
+
+    /**
+     * @dataProvider workflowDataProvider
+     * @param bool $expected
+     */
+    public function testIsWorkflowActive($expected)
+    {
+        $entity = new \stdClass();
+
+        $this->workflowManager->expects($this->once())
+            ->method('isResetAllowed')
+            ->with($entity)
+            ->will($this->returnValue($expected));
+
+        $this->assertEquals($expected, $this->extension->isResetAllowed($entity));
     }
 }

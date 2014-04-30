@@ -1,0 +1,5 @@
+oro_system_configuration:
+    groups:
+        integrations:
+            title: 'Integrations'
+

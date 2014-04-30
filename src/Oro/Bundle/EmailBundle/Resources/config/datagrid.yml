@@ -1,5 +1,5 @@
 datagrid:
-    email-grid:
+    base-email-grid:
         source:
             acl_resource: oro_email_view
             type: orm
@@ -41,13 +41,23 @@ datagrid:
                 subject: { data_name: e.subject }
                 sentAt:  { data_name: e.sentAt }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+        options:
+            entityHint: email
 
+    simplified-email-grid:
+        extends: base-email-grid
+        options:
+            toolbarOptions:
+                turnOffToolbarRecordsNumber: 5
+                addResetAction: false
+
+    email-grid:
+        extends: base-email-grid
         filters:
             columns:
                 fromEmailAddress: { type: string,   data_name: a.email }
                 subject:          { type: string,   data_name: e.subject }
                 sentAt:           { type: datetime, data_name: e.sentAt }
-        options: { entityHint: email }
 
     email-templates:
         source:

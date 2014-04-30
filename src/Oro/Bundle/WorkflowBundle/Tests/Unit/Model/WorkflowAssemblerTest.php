@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
@@ -147,6 +148,32 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return $stepAssembler;
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createTranslatorMock()
+    {
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())->method('trans')
+            ->with($this->isType('string'), $this->isType('array'))
+            ->will(
+                $this->returnCallback(
+                    function ($id, array $parameters = array()) {
+                        $this->assertEquals('oro.workflow.transition.start', $id);
+                        $this->assertArrayHasKey('%workflow%', $parameters);
+                        return $this->getStartTransitionLabel($parameters['%workflow%']);
+                    }
+                )
+            );
+
+        return $translator;
+    }
+
+    protected function getStartTransitionLabel($workflowLabel)
+    {
+        return 'Start ' . $workflowLabel;
+    }
+
     protected function getStepMock($name)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
@@ -261,13 +288,15 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $expectedTransitions,
             $expectedDefinitions
         );
+        $translator = $this->createTranslatorMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
             $attributeAssembler,
             $stepAssembler,
-            $transitionAssembler
+            $transitionAssembler,
+            $translator
         );
         $actualWorkflow = $workflowAssembler->assemble($workflowDefinition);
 
@@ -309,7 +338,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
         );
         $customStartTransition = array(
-            Workflow::DEFAULT_START_TRANSITION_NAME => array(
+            TransitionManager::DEFAULT_START_TRANSITION_NAME => array(
                 'label' => 'My Label',
                 'step_to' => 'custom_step',
                 'is_start' => true,
@@ -321,10 +350,10 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $fullConfigWithCustomStart[WorkflowConfiguration::NODE_TRANSITIONS] += $customStartTransition;
         $fullConfigWithCustomStart[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS] += $customStartDefinition;
 
-        $label = $this->workflowParameters['label'];
+        $label = $this->getStartTransitionLabel($this->workflowParameters['label']);
         $getDefaultTransition = function ($stepName) use ($label) {
             return array(
-                Workflow::DEFAULT_START_TRANSITION_NAME => array(
+                TransitionManager::DEFAULT_START_TRANSITION_NAME => array(
                     'label' => $label,
                     'step_to' => $stepName,
                     'is_start' => true,
@@ -402,13 +431,15 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
+        $translator = $this->createTranslatorMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
             $attributeAssembler,
             $stepAssembler,
-            $transitionAssembler
+            $transitionAssembler,
+            $translator
         );
         $workflowAssembler->assemble($workflowDefinition);
     }
@@ -436,13 +467,15 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
+        $translator = $this->createTranslatorMock();
 
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
             $attributeAssembler,
             $stepAssembler,
-            $transitionAssembler
+            $transitionAssembler,
+            $translator
         );
         $workflow = $workflowAssembler->assemble($workflowDefinition, false);
 
@@ -467,12 +500,14 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes, false);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps, false);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions, false);
+        $translator = $this->createTranslatorMock();
 
         $workflowAssembler = new WorkflowAssembler(
             $container,
             $attributeAssembler,
             $stepAssembler,
-            $transitionAssembler
+            $transitionAssembler,
+            $translator
         );
         $workflowAssembler->assemble($workflowDefinition);
     }

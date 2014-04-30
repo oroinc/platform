@@ -178,7 +178,7 @@ class Client extends BaseClient
     {
         $loader = new \Doctrine\Common\DataFixtures\Loader;
         $loader->loadFromDirectory($folder);
-        $fixtures = $loader->getFixtures();
+        $fixtures = array_values($loader->getFixtures());
 
         //filter fixtures by className
         if (!is_null($filter)) {

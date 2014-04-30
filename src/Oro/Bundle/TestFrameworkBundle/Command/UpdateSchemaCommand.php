@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
+
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
     const TEST_ENTITY_NAMESPACE = 'Oro\Bundle\TestFrameworkBundle\Entity';
@@ -74,5 +76,27 @@ class UpdateSchemaCommand extends ContainerAwareCommand
                 );
             }
         }
+
+        $this->loadEntityConfigData($em);
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    protected function loadEntityConfigData(EntityManager $em)
+    {
+        $filter = function ($doctrineAllMetadata) {
+            return array_filter(
+                $doctrineAllMetadata,
+                function ($item) {
+                    /** @var ClassMetadataInfo $item */
+                    return strpos($item->getReflectionClass()->getName(), self::TEST_ENTITY_NAMESPACE) === 0;
+                }
+            );
+        };
+
+        /** @var ConfigLoader $loader */
+        $loader = $this->getContainer()->get('oro_entity_config.config_loader');
+        $loader->load(true, $filter);
     }
 }

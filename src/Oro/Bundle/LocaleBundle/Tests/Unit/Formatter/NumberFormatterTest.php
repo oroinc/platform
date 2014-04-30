@@ -488,6 +488,21 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->formatter->isCurrencySymbolPrepend($currency, $locale));
     }
 
+    public function testIsCurrencySymbolPrependWithoutLocale()
+    {
+        $this->localeSettings
+            ->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue('en'));
+
+        $this->localeSettings
+            ->expects($this->once())
+            ->method('getCurrency')
+            ->will($this->returnValue('RUR'));
+
+        $this->assertEquals(true, $this->formatter->isCurrencySymbolPrepend());
+    }
+
     /**
      * @return array
      */

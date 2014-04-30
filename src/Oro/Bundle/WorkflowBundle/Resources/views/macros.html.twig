@@ -79,7 +79,7 @@
                             $(this).data('executor').call();
                         });
                         {% endif %}
-                        transitionBtn.trigger('transitionHandlerInitialized');
+                        //transitionBtn.trigger('transitionHandlerInitialized');
                     } else {
                         transitionBtn.on('click', function(e) {
                             e.preventDefault();
@@ -99,5 +99,35 @@
                 {% endfor %}
             });
         });
+    </script>
+{% endmacro %}
+
+{% macro renderResetButton(data, blockId) %}
+    {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
+    <a href="javascript:void(0);"
+       data-url="{{ data.url }}"
+       title="{{ data.title|trans }}"
+       class="btn icons-holder-text btn-primary"
+       id="{{ resetButtonId }}">
+            <i class="icon-repeat"></i>
+            {{ data.title|trans }}
+    </a>
+
+    <script type="text/javascript">
+        require(['jquery', 'oroworkflow/js/reset-handler'],
+            function($, workflowResetHandler) {
+                'use strict';
+
+                $(function() {
+                    var resetBtn = $('#{{ blockId }}').find('#{{ resetButtonId }}');
+                    resetBtn.data('executor', function() {
+                        workflowResetHandler.call(resetBtn);
+                    });
+                    resetBtn.on('click', function(e) {
+                        e.preventDefault();
+                        $(this).data('executor').call();
+                    });
+                });
+            });
     </script>
 {% endmacro %}

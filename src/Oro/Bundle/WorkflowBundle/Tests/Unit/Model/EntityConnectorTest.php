@@ -24,6 +24,25 @@ class EntityConnectorTest extends \PHPUnit_Framework_TestCase
         unset($this->entityConnector);
     }
 
+    public function testResetWorkflowData()
+    {
+        $entity = new EntityWithWorkflow();
+        $this->assertEmpty($entity->getWorkflowItem());
+
+        $workflowItem = new WorkflowItem();
+        $this->entityConnector->setWorkflowItem($entity, $workflowItem);
+
+        $workflowStep = new WorkflowStep();
+        $this->entityConnector->setWorkflowStep($entity, $workflowStep);
+
+        $this->assertEquals($workflowItem, $entity->getWorkflowItem());
+        $this->assertEquals($workflowStep, $entity->getWorkflowStep());
+
+        $this->entityConnector->resetWorkflowData($entity);
+        $this->assertNull($entity->getWorkflowItem());
+        $this->assertNull($entity->getWorkflowStep());
+    }
+
     public function testSetWorkflowItem()
     {
         $entity = new EntityWithWorkflow();

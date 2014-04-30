@@ -11,6 +11,7 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
+use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
 abstract class OroKernel extends Kernel
 {
@@ -197,5 +198,16 @@ abstract class OroKernel extends Kernel
         if (!$this->debug) {
             $cache->write(php_strip_whitespace($cache), $container->getResources());
         }
+    }
+
+    /**
+     * Add custom error handler
+     */
+    protected function initializeContainer()
+    {
+        $handler = new ErrorHandler();
+        $handler->registerHandlers();
+
+        parent::initializeContainer();
     }
 }
