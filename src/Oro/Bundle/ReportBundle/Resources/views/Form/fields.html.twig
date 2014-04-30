@@ -18,24 +18,8 @@
     {{ form_widget(form) }}
 
     <script type="text/javascript">
-        require(['underscore', 'oroentity/js/field-choice'], function (_, $) {
-            var items = $('#{{ id }}').find('[id^="{{ id }}_"]'),
-                    json = {
-                        select2: {
-                            placeholder: '{{ 'oro.entity.form.choose_entity_field'|trans}}'
-                        },
-                        util: {},
-                        fieldsLoaderSelector: '#oro_report_form_entity'
-                    },
-                    filters;
-            _.each(items, function (item) {
-                var options = json;
-                if (filters = $(item).data('filter')) {
-                    options = _.extend(json, {exclude: filters})
-                }
-
-                $(item).fieldChoice(options);
-            });
+        require(['oro/report/chart_options'], function (ChartOptions) {
+            ChartOptions.initialize('{{ id }}', {});
         });
     </script>
 {% endblock %}

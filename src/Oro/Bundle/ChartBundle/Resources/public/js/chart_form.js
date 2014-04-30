@@ -4,8 +4,8 @@ define(['underscore', 'jquery'],
         'use strict';
 
         /**
-         * @export  orochart/js/chart_form
-         * @class   orochart.ChartForm
+         * @export orochart/js/chart_form
+         * @class  orochart.ChartForm
          */
         return {
 
@@ -26,8 +26,8 @@ define(['underscore', 'jquery'],
             },
 
             /**
-             * @param {Object} selector
-             * @param {Object} options
+             * @param {String} selector
+             * @param {Array} options
              */
             initialize: function (selector, options) {
                 var self = this;
@@ -42,6 +42,9 @@ define(['underscore', 'jquery'],
                 self.addHandler();
             },
 
+            /**
+             * @returns void
+             */
             addHandler: function () {
                 var self = this;
 
@@ -50,6 +53,9 @@ define(['underscore', 'jquery'],
                 }, self));
             },
 
+            /**
+             * @returns void
+             */
             updateChartFormVisibility: function () {
                 var self = this;
 
