@@ -36,10 +36,11 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildAfter()
     {
-        $config   = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
-        $acceptor = new Acceptor();
+        $config     = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
+        $acceptor   = new Acceptor();
         $acceptor->setConfig($config);
-        $grid     = new DataGrid(self::TEST_GRID_NAME, $acceptor);
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $grid       = new DataGrid(self::TEST_GRID_NAME, $acceptor, $parameters);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
         $qb->expects($this->once())->method('getDQLPart')->with($this->equalTo('from'))
