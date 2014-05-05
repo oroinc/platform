@@ -14,6 +14,7 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
              */
             options: {
                 childTemplate: '[id^=<%= id %>_]',
+                optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
                 fieldChoiceOptions: {
                     select2: {
                         placeholder: __('oro.entity.form.choose_entity_field')
@@ -72,7 +73,8 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                 self.options.fieldChoiceOptions.fields = [];
                 _.each(collection.models, function (model) {
                     var name = model.get('name');
-                    self._addFieldByPath(fieldsList, self.options.fieldChoiceOptions.fields, name);
+                    var options = model.get('func');
+                    self._addFieldByPath(fieldsList, self.options.fieldChoiceOptions.fields, name, options);
                 });
             },
 
@@ -80,11 +82,14 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
              * @param {Array} fields
              * @param {Array} root
              * @param {String} name
+             * @param {Array} options
              */
-            _addFieldByPath: function (fields, root, name) {
+            _addFieldByPath: function (fields, root, name, options) {
                 var self = this;
                 var chain = name.split('+');
                 var fieldName = _.last(_.first(chain).split('::'));
+                var lastFieldName = _.last(_.last(chain).split('::'));
+                var hasOptions = fieldName == lastFieldName;
 
                 var field = _.findWhere(fields, {name: fieldName});
                 if (field) {
@@ -92,6 +97,20 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                     if (!rootField) {
                         rootField = _.clone(field);
                         rootField.related_entity_fields = [];
+
+                        if (options && hasOptions) {
+                            var optionedName = _.template(
+                                self.options.optionsTemplate,
+                                {
+                                    field: rootField.name,
+                                    group: options.name,
+                                    name: options.group_name,
+                                    type: options.group_type
+                                }
+                            );
+
+                            rootField.name = optionedName;
+                        }
 
                         root.push(rootField);
                     }
@@ -101,7 +120,8 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                         self._addFieldByPath(
                             field.related_entity_fields,
                             rootField.related_entity_fields,
-                            childName
+                            childName,
+                            options
                         );
                     }
                 }
