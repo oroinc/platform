@@ -17,19 +17,17 @@ Bundle support such chart types as:
 
 ## Main classes ##
 
-Chart bundle consists of several related entities.
-
 **Oro\Bundle\ChartBundle\Model\Data\DataInterface**
-Interface that can be passed to chart builder as source data.
+- Interface that can be passed to chart builder as source data.
 
 **Oro\Bundle\ChartBundle\Model\ChartView**
-View representation that can be used to render chart.
+- View representation that can be used to render chart.
 
 **Oro\Bundle\ChartBundle\Model\ChartViewBuilder**
-Builder can be used to create view instance.
+- Builder can be used to create view instance.
 
 **Oro\Bundle\ChartBundle\Model\ConfigProvider**
-Provide access to oro_chart configuration.
+- Provide access to oro_chart configuration.
 
 ## How it works ##
 
