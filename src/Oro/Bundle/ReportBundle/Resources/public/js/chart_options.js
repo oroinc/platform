@@ -61,6 +61,9 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                 });
             },
 
+            /**
+             * @param {Array} collection
+             */
             updateFields: function (collection) {
                 var self = this;
                 var fieldsList = $(self.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
@@ -72,6 +75,11 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                 });
             },
 
+            /**
+             * @param {Array} fields
+             * @param {Array} root
+             * @param {String} name
+             */
             _addFieldByPath: function (fields, root, name) {
                 var self = this;
                 var chain = name.split('+');
