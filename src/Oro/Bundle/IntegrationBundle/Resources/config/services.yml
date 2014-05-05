@@ -107,3 +107,7 @@ services:
     oro_integration.sync_scheduler:
         class: %oro_integration.sync_scheduler.class%
         arguments: [ @doctrine.orm.entity_manager, @oro_integration.manager.types_registry ]
+
+    oro_integration.sync_scheduler.link:
+        tags:
+            - { name: oro_service_link,  service: oro_integration.sync_scheduler }
