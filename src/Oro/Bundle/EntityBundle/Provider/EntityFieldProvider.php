@@ -54,6 +54,11 @@ class EntityFieldProvider
     protected $virtualFields;
 
     /**
+     * @var array
+     */
+    protected $hiddenFields;
+
+    /**
      * Constructor
      *
      * @param ConfigProvider      $entityConfigProvider
@@ -62,6 +67,7 @@ class EntityFieldProvider
      * @param ManagerRegistry     $doctrine
      * @param Translator          $translator
      * @param array               $virtualFields
+     * @param array               $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -69,7 +75,8 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        $virtualFields
+        $virtualFields,
+        $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
@@ -77,6 +84,7 @@ class EntityFieldProvider
         $this->doctrine             = $doctrine;
         $this->translator           = $translator;
         $this->virtualFields        = $virtualFields;
+        $this->hiddenFields         = $hiddenFields;
     }
 
     /**
@@ -210,6 +218,11 @@ class EntityFieldProvider
      */
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
+        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
+        if (isset($this->hiddenFields[$metadata->name][$fieldName])) {
+            return true;
+        }
+
         return false;
     }
 
