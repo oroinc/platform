@@ -17,8 +17,6 @@ class ParameterBag
      * Constructor.
      *
      * @param array $parameters An array of parameters
-     *
-     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -59,8 +57,6 @@ class ParameterBag
      * Adds parameters.
      *
      * @param array $parameters An array of parameters
-     *
-     * @api
      */
     public function add(array $parameters = array())
     {
@@ -84,8 +80,6 @@ class ParameterBag
      *
      * @param string $key   The key
      * @param mixed  $value The value
-     *
-     * @api
      */
     public function set($key, $value)
     {
@@ -97,8 +91,6 @@ class ParameterBag
      *
      * @param string $key
      * @param mixed  $value
-     *
-     * @return void
      */
     public function mergeKey($key, $value)
     {
@@ -115,10 +107,7 @@ class ParameterBag
      * Returns true if the parameter is defined.
      *
      * @param string $key The key
-     *
      * @return Boolean true if the parameter exists, false otherwise
-     *
-     * @api
      */
     public function has($key)
     {
@@ -129,8 +118,6 @@ class ParameterBag
      * Removes a parameter.
      *
      * @param string $key The key
-     *
-     * @api
      */
     public function remove($key)
     {

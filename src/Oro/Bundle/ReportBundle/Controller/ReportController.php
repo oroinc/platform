@@ -47,7 +47,7 @@ class ReportController extends Controller
                     array(PagerInterface::PAGER_ROOT_PARAM => array(PagerInterface::DISABLED_PARAM => true))
                 );
 
-            $chartOptions = $entity->getChartOptions();
+            $chartOptions = $entity->getChartOptions($datagrid->getConfig());
 
             if (!empty($chartOptions)) {
                 $parameters['chartView'] = $this->get('oro_chart.view_builder')

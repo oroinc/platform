@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestParameterBagFactory
 {
-    const DEFAULT_ROOT_PARAM    = 'grid';
+    const DEFAULT_ROOT_PARAM = 'grid';
 
     /**
      * @var Request
