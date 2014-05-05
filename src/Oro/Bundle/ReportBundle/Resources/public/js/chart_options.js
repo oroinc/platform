@@ -26,7 +26,8 @@ define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotran
                 events: [
                     'items-manager:table:add',
                     'items-manager:table:change',
-                    'items-manager:table:remove'
+                    'items-manager:table:remove',
+                    'items-manager:table:reset'
                 ]
             },
 
