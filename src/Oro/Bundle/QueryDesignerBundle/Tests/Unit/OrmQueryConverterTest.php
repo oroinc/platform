@@ -4,6 +4,50 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
 class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
+    protected function getVirtualFieldProvider(array $config = [])
+    {
+        $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface');
+        $provider->expects($this->any())
+            ->method('getMainEntityAlias')
+            ->will($this->returnValue('entity'));
+        $provider->expects($this->any())
+            ->method('isVirtualField')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use (&$config) {
+                        $result = false;
+                        foreach ($config as $item) {
+                            if ($item[0] === $className && $item[1] === $fieldName) {
+                                $result = true;
+                                break;
+                            }
+                        }
+
+                        return $result;
+                    }
+                )
+            );
+        $provider->expects($this->any())
+            ->method('getVirtualFieldQuery')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use (&$config) {
+                        $result = [];
+                        foreach ($config as $item) {
+                            if ($item[0] === $className && $item[1] === $fieldName) {
+                                $result = $item[2];
+                                break;
+                            }
+                        }
+
+                        return $result;
+                    }
+                )
+            );
+
+        return $provider;
+    }
+
     protected function getFunctionProvider(array $config = [])
     {
         $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface');

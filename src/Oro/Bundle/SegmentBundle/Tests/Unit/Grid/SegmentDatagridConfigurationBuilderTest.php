@@ -29,6 +29,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             self::TEST_GRID_NAME,
             $segment,
             $this->getFunctionProvider(),
+            $this->getVirtualFieldProvider(),
             $doctrine,
             $configManager
         );
@@ -54,6 +55,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             self::TEST_GRID_NAME,
             $segment,
             $this->getFunctionProvider(),
+            $this->getVirtualFieldProvider(),
             $doctrine,
             $configManager
         );

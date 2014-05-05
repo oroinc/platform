@@ -6,7 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager implements FunctionProviderInterface
+class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -115,6 +115,51 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtualField($className, $fieldName)
+    {
+        // @todo: not implemented yet
+        return ($className === 'Oro\Bundle\UserBundle\Entity\User' && $fieldName === 'primaryEmail');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMainEntityAlias($className, $fieldName)
+    {
+        // @todo: not implemented yet
+        return 'entity';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualFieldQuery($className, $fieldName)
+    {
+        // @todo: not implemented yet
+        if ($className === 'Oro\Bundle\UserBundle\Entity\User' && $fieldName === 'primaryEmail') {
+            return [
+                'select' => [
+                    'expr' => 'emails.email', 'return_type' => 'string'
+                ],
+                'join' => [
+                    'left' => [
+                        [
+                            'join' => 'entity.emails',
+                            'alias' => 'emails',
+                            'conditionType' => 'WITH',
+                            'condition' => 'emails.primary = true'
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        return null;
     }
 
     /**
