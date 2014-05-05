@@ -10,7 +10,7 @@ oro:
               label: Category (X axis)
               value: Value (Y axis)
           settings:
-              connect_dots_with_line: Connect line with dots
+              connect_dots_with_line: Connect dots with line
       bar_chart:
           label: Bar Chart
           params:
