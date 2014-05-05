@@ -657,10 +657,7 @@ abstract class AbstractQueryConverter
 
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnTypes[$key])) {
-            $type                           = isset($query['select']['return_type'])
-                ? $query['select']['return_type']
-                : $this->guessVirtualColumnType($columnExpr);
-            $this->virtualColumnTypes[$key] = $type;
+            $this->virtualColumnTypes[$key] = $query['select']['return_type'];
         }
     }
 
@@ -900,19 +897,6 @@ abstract class AbstractQueryConverter
         }
 
         return false;
-    }
-
-    /**
-     * Tries to guess the virtual column type by its expression
-     *
-     * @todo: not implemented yet
-     *
-     * @param string $columnExpr
-     * @return string|null The data type or NULL if it cannot be calculated
-     */
-    protected function guessVirtualColumnType($columnExpr)
-    {
-        return null;
     }
 
     /**
