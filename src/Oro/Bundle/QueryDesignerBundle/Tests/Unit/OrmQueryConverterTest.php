@@ -8,9 +8,6 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface');
         $provider->expects($this->any())
-            ->method('getMainEntityAlias')
-            ->will($this->returnValue('entity'));
-        $provider->expects($this->any())
             ->method('isVirtualField')
             ->will(
                 $this->returnCallback(

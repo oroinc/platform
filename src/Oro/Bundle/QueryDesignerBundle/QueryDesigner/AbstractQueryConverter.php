@@ -637,7 +637,7 @@ abstract class AbstractQueryConverter
          *      value = alias
          */
         $aliases = [
-            $this->virtualFieldProvider->getMainEntityAlias($className, $fieldName) => $mainEntityJoinAlias
+            isset($query['root_alias']) ? $query['root_alias'] : 'entity' => $mainEntityJoinAlias
         ];
 
         if (isset($query['join'])) {

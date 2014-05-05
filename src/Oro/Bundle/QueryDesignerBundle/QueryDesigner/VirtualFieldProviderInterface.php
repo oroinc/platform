@@ -14,15 +14,6 @@ interface VirtualFieldProviderInterface
     public function isVirtualField($className, $fieldName);
 
     /**
-     * Gets an alias of the main entity for the given virtual field
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @return string
-     */
-    public function getMainEntityAlias($className, $fieldName);
-
-    /**
      * Gets a query associated with the given virtual field
      *
      * @param string $className

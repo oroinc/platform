@@ -20,20 +20,28 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     protected $translator;
 
     /**
+     * @var array
+     */
+    protected $virtualFields;
+
+    /**
      * Constructor
      *
      * @param array                 $config
      * @param ConfigurationResolver $resolver
      * @param Translator            $translator
+     * @param array                 $virtualFields
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        Translator $translator
+        Translator $translator,
+        $virtualFields
     ) {
         $resolver->resolve($config);
-        $this->config     = ConfigurationObject::create($config);
-        $this->translator = $translator;
+        $this->config        = ConfigurationObject::create($config);
+        $this->translator    = $translator;
+        $this->virtualFields = $virtualFields;
     }
 
     /**
@@ -122,17 +130,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     public function isVirtualField($className, $fieldName)
     {
-        // @todo: not implemented yet
-        return ($className === 'Oro\Bundle\UserBundle\Entity\User' && $fieldName === 'primaryEmail');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMainEntityAlias($className, $fieldName)
-    {
-        // @todo: not implemented yet
-        return 'entity';
+        return isset($this->virtualFields[$className][$fieldName]);
     }
 
     /**
@@ -140,26 +138,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        // @todo: not implemented yet
-        if ($className === 'Oro\Bundle\UserBundle\Entity\User' && $fieldName === 'primaryEmail') {
-            return [
-                'select' => [
-                    'expr' => 'emails.email', 'return_type' => 'string'
-                ],
-                'join' => [
-                    'left' => [
-                        [
-                            'join' => 'entity.emails',
-                            'alias' => 'emails',
-                            'conditionType' => 'WITH',
-                            'condition' => 'emails.primary = true'
-                        ]
-                    ]
-                ]
-            ];
-        }
-
-        return null;
+        return $this->virtualFields[$className][$fieldName]['query'];
     }
 
     /**
