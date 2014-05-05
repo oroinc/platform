@@ -13,8 +13,8 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @param {string} format
              * @return {*}
              */
-           formatLabel: function(data, format) {
-                switch (format){
+           formatValue: function(data, format) {
+                switch (format) {
                     case 'integer':
                     case 'smallint':
                     case 'bigint':
@@ -45,13 +45,13 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @param {string} format
              * @return {*}
              */
-           clearValue: function(data, format){
-                switch (format){
+           parseValue: function(data, format) {
+                switch (format) {
                    case 'integer':
                    case 'smallint':
                    case 'bigint':
                    case 'boolean':
-                       if(data === null){
+                       if (data === null) {
                            data = 0;
                        }
                        return parseInt(data);
@@ -60,7 +60,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                    case 'money':
                    case 'currency':
                    case 'percent':
-                       if(data === null){
+                       if (data === null) {
                            data = 0;
                        }
                        return parseFloat(data);

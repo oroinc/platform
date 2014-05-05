@@ -4,10 +4,9 @@
 
 - Getting Started
 - [Configuration](./chart-configuration.md)
-- [Configuration merging](./configuration-merge.md)
 - [Basic usage](./usage.md)
 
-## What is Entity Merge ##
+## What is chart bundle ##
 Chart bundle provide functionality for display different types of chart.
 It is solution that allows user to view data in useful chart format.
 Bundle support such chart types as:
@@ -16,21 +15,21 @@ Bundle support such chart types as:
 - pie chart
 - flow chart
 
+## Main classes ##
 
+**Oro\Bundle\ChartBundle\Model\Data\DataInterface**
+- Interface that can be passed to chart builder as source data.
 
-## Main Entities ##
+**Oro\Bundle\ChartBundle\Model\ChartView**
+- View representation that can be used to render chart.
 
-Chart bundle consists of several related entities.
+**Oro\Bundle\ChartBundle\Model\ChartViewBuilder**
+- Builder can be used to create view instance.
 
-- **ArrayData**    		- realization of data interface for array.
-- **DataGridData** 		- realization of data interface for data grid.
-- **MappedData** 		- realization of data interface for mapping data to chart schema.
-- **ChartView** 		- chart view representation.
-- **ChartViewBuilder** 	- class responsible for chart view creation.
-- **ConfigProvider** 	- provide access to oro_chart config node.
-
+**Oro\Bundle\ChartBundle\Model\ConfigProvider**
+- Provide access to oro_chart configuration.
 
 ## How it works ##
 
-Developer use ChartViewBuilder for build view, then call from view render method in twig template.
+Developer use chart view builder to create instance of chart view that can be used to render chart in template.
 [See more](./usage.md)

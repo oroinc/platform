@@ -44,6 +44,7 @@ class ChartType extends ConfigProviderAwareType
                 'name',
                 'choice',
                 [
+                    'label' => 'oro.chart.form.name.label',
                     'choices' => array_map(
                         function (array $chartConfig) {
                             return $chartConfig['label'];

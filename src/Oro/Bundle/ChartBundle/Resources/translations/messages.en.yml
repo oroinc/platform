@@ -2,6 +2,7 @@ oro:
   chart:
       no_data: No data
       form:
+          name.label: Chart Type
           chart_empty_value: None
       line_chart:
           label: Line Chart
@@ -9,7 +10,7 @@ oro:
               label: Category (X axis)
               value: Value (Y axis)
           settings:
-              connect_dots_with_line: Connect line with dots
+              connect_dots_with_line: Connect dots with line
       bar_chart:
           label: Bar Chart
           params:
