@@ -10,46 +10,46 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
 
-class EntityReaderWithFilters extends BaseReader
+class EntityReaderById extends BaseReader
 {
+    const ID_FILTER = 'id';
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(ContextRegistry $contextRegistry, ManagerRegistry $registry)
     {
         parent::__construct($contextRegistry, $registry);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function initializeFromContext(ContextInterface $context)
     {
         if ($context->hasOption('entityName')) {
-
-            $filter = [];
-
-            if ($context->hasOption('id')) {
-                $filter = ['id'=>$context->getOption('id')];
-            }
-
-            $this->setSourceEntityName($context->getOption('entityName'), $filter);
-
-        } elseif ($context->hasOption('queryBuilder')) {
-            $this->setSourceQueryBuilder($context->getOption('queryBuilder'));
-        } elseif ($context->hasOption('query')) {
-            $this->setSourceQuery($context->getOption('query'));
+            $this->setSourceEntityName($context);
         } elseif (!$this->getSourceIterator()) {
             throw new InvalidConfigurationException(
                 'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
             );
         }
+        return $this;
     }
 
-    public function setSourceEntityName($entityName, $filter = [])
+    /**
+     * {@inheritdoc}
+     */
+    public function setSourceEntityName($context)
     {
-        $qb = $this->getQueryBuilder($entityName);
-
-        $metadata = $qb->getEntityManager()->getClassMetadata($entityName);
+        $entityName = $context->getOption('entityName');
+        $qb         = $this->getQueryBuilder($entityName);
+        $metadata   = $qb->getEntityManager()->getClassMetadata($entityName);
 
         foreach ($metadata->getAssociationMappings() as $assocMapping) {
             $alias = '_' . $assocMapping['fieldName'];
@@ -57,15 +57,19 @@ class EntityReaderWithFilters extends BaseReader
             $qb->leftJoin('o.' . $assocMapping['fieldName'], $alias);
         }
 
-        if (!empty($filter)) {
+        if ($context->hasOption(self::ID_FILTER)) {
+            $optionValue = $context->getOption(self::ID_FILTER);
 
-            foreach ($filter as $key => $row) {
-                if (is_array($row)) {
-                    $qb->add('where', $qb->expr()->in('o.'.$key, ':'.$key))->setParameter($key, $row);
-                } else {
-                    $qb->add('where', 'o.'.$key.' = :'.$key)->setParameter($key, $row);
-                }
-
+            if (is_array($optionValue)) {
+                $qb->add(
+                    'where',
+                    $qb->expr()->in('o.'.self::ID_FILTER, ':'.self::ID_FILTER)
+                )
+                ->setParameter(self::ID_FILTER, $optionValue);
+            } else {
+                $qb
+                    ->add('where', 'o.'.self::ID_FILTER.' = :'.self::ID_FILTER)
+                    ->setParameter(self::ID_FILTER, $optionValue);
             }
         }
 
@@ -74,6 +78,8 @@ class EntityReaderWithFilters extends BaseReader
         }
 
         $this->setSourceQueryBuilder($qb);
+
+        return $this;
     }
 
     /**

@@ -18,15 +18,10 @@ class ReverseProcessor implements ProcessorInterface, ContextAwareInterface
     protected $context;
 
     /**
-     * @var SerializerInterface
+     * @param mixed $object
+     *
+     * @return mixed
      */
-    protected $serializer;
-
-    /**
-     * @var DataConverterInterface
-     */
-    protected $dataConverter;
-
     public function process($object)
     {
         return $object;
@@ -39,21 +34,5 @@ class ReverseProcessor implements ProcessorInterface, ContextAwareInterface
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;
-    }
-
-    /**
-     * @param SerializerInterface $serializer
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        $this->serializer = $serializer;
-    }
-
-    /**
-     * @param DataConverterInterface $dataConverter
-     */
-    public function setDataConverter(DataConverterInterface $dataConverter)
-    {
-        $this->dataConverter = $dataConverter;
     }
 }

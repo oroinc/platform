@@ -135,9 +135,7 @@ class ReverseSyncProcessor
      */
     protected function processExport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
     {
-        $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
-        $jobResult;
-
+        $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
     }
 
     /**

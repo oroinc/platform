@@ -11,6 +11,18 @@ class ReverseWriter implements ItemWriterInterface
      */
     public function write(array $items)
     {
-        $items;
+        foreach ($items as $item) {
+            $transport = $this->getTransport($item);
+        }
+    }
+
+    /**
+     * @param Object $item
+     *
+     * @return Object
+     */
+    protected function getTransport($item)
+    {
+        return $item->getChannel()->getTransport();
     }
 }

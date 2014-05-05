@@ -25,10 +25,10 @@ parameters:
     oro_integration.reverse.processor.class:                              Oro\Bundle\IntegrationBundle\Processor\ReverseProcessor
 
     #Writer
-    oro_importexport.writer.reverse.class:                               Oro\Bundle\IntegrationBundle\Writer\ReverseWriter
+    oro_importexport.writer.reverse.class:                                Oro\Bundle\IntegrationBundle\Writer\ReverseWriter
 
     #Reader
-    oro_importexport.reader.entity.with_filters.class:                   Oro\Bundle\IntegrationBundle\Reader\EntityReaderWithFilters
+    oro_importexport.reader.entity.with_filters.class:                    Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
 
 services:
     oro_integration.channel.manager.api:
