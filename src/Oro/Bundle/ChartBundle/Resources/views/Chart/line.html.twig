@@ -58,7 +58,7 @@
                         var xMax = null;
                         var xMin = null;
                         var getXLabel = function(data) {
-                            var label = dataFormatter.formatLabel(data, xFormat);
+                            var label = dataFormatter.formatValue(data, xFormat);
                             if (label === null) {
                                 var number = parseInt(data);
                                 if (rawData.length > number) {
@@ -70,7 +70,7 @@
                             return label;
                         };
                         var getYLabel = function(data) {
-                            var label = dataFormatter.formatLabel(data, yFormat);
+                            var label = dataFormatter.formatValue(data, yFormat);
                             if (label === null) {
                                 var number = parseInt(data);
                                 if (rawData.length > number) {
@@ -82,12 +82,12 @@
 
                             return label;
                         };
-                        for(var i in rawData){
-                            var yValue = dataFormatter.clearValue(rawData[i]['value'], yFormat);
+                        for (var i in rawData) {
+                            var yValue = dataFormatter.parseValue(rawData[i]['value'], yFormat);
                             yValue = yValue === null ? parseInt(i) : yValue;
-                            var xValue = dataFormatter.clearValue(rawData[i]['label'], xFormat);
+                            var xValue = dataFormatter.parseValue(rawData[i]['label'], xFormat);
                             xValue = xValue === null ? parseInt(i) : xValue;
-                            if(xMax === null){
+                            if (xMax === null) {
                                 xMax = xValue;
                                 yMax = yValue;
                                 yMin = yValue;
@@ -101,8 +101,8 @@
                             var item = [xValue, yValue];
                             chartData.push(item);
                         }
-                        xMax += (xMax - xMin)/10;
-                        yMax += (yMax - yMin)/10;
+                        xMax += (xMax - xMin) / 10;
+                        yMax += (yMax - yMin) / 10;
                         var chart = {
                             data: chartData,
                             color: colors[0],
