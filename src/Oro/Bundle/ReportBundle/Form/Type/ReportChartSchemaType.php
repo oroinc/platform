@@ -30,7 +30,7 @@ class ReportChartSchemaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['data_schema'] as $schemaOptions) {
-            $excludedProperties = ['children'];
+            $excludedProperties = [];
 
             if (isset($schemaOptions['type_filter']) && $schemaOptions['type_filter']) {
                 $excludedProperties = array_merge(

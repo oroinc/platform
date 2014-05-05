@@ -127,8 +127,6 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
         _onResetCollection: function () {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
-
-            mediator.trigger('items-manager:table:reset', this.options.collection);
         },
 
         _renderModel: function (model) {
