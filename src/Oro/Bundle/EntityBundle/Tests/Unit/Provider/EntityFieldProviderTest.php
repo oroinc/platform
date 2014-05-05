@@ -70,6 +70,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityClassResolver,
             $this->doctrine,
             $translator,
+            [],
             []
         );
         $this->provider->setEntityProvider($entityProvider);
