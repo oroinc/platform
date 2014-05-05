@@ -81,7 +81,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name   A filter name
+     * @param string $name A filter name
      * @param array  $params An additional parameters of a new filter
      * @throws \RuntimeException if a filter with the given name does not exist
      * @return FilterInterface
@@ -139,6 +139,31 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     public function getVirtualFieldQuery($className, $fieldName)
     {
         return $this->virtualFields[$className][$fieldName]['query'];
+    }
+
+    /**
+     * Returns filters types
+     *
+     * @param array $filterNames
+     * @return array
+     */
+    public function getExcludedProperties(array $filterNames)
+    {
+        $types   = [];
+        $filters = $this->config->offsetGet('filters');
+        foreach ($filterNames as $filterName) {
+            unset($filters[$filterName]);
+        }
+
+        foreach ($filters as $filter) {
+            if (isset($filter['applicable'])) {
+                foreach ($filter['applicable'] as $type) {
+                    $types[] = $type;
+                }
+            }
+        }
+
+        return $types;
     }
 
     /**
@@ -226,7 +251,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /**
      * Checks if an item can be used for the given query type
      *
-     * @param array  $item      An item to check
+     * @param array  $item An item to check
      * @param string $queryType The query type
      * @return bool true if the item can be used for the given query type; otherwise, false.
      */
