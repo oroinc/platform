@@ -17,6 +17,7 @@ oro_menu_config:
 
 oro_titles:
     oro_workflow_definition_index: ~
+    oro_workflow_definition_view: '%%workflow_definition.label%%'
     oro_workflow_definition_create: 'Create Workflow'
     oro_workflow_definition_update: '%%workflow_definition.label%% - Edit'
     oro_workflow_definition_clone: '%%workflow_definition.label%% - Clone'

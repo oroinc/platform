@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use JMS\Serializer\Annotation as JMS;
 
 /**

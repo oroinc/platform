@@ -48,6 +48,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         return array(
             'system definition' => array(
                 'expected' => array(
+                    'view' => true,
                     'update' => false,
                     'clone'  => true,
                     'delete' => false,
@@ -58,6 +59,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ),
             'regular definition' => array(
                 'expected' => array(
+                    'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
@@ -124,6 +126,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
         return array(
             'no config' => array(
                 'expected' => array(
+                    'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
@@ -136,6 +139,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ),
             'active definition' => array(
                 'expected' => array(
+                    'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,
@@ -148,6 +152,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ),
             'inactive definition' => array(
                 'expected' => array(
+                    'view' => true,
                     'update' => true,
                     'clone'  => true,
                     'delete' => true,

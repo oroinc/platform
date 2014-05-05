@@ -103,10 +103,10 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
             $callSetParametersCounts++;
         }
 
-        $qb->expects(empty($callAndWhereCounts) ? $this->never() : $this->exactly($callAndWhereCounts))
+        $qb->expects($this->exactly($callAndWhereCounts))
             ->method('andWhere')
             ->will($this->returnSelf());
-        $qb->expects(empty($callSetParametersCounts) ? $this->never() : $this->exactly($callSetParametersCounts))
+        $qb->expects($this->exactly($callSetParametersCounts))
             ->method('setParameter')
             ->will($this->returnSelf());
 

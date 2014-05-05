@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -20,9 +22,11 @@ interface EmailBodyLoaderInterface
     /**
      * Loads email body for the given email
      *
-     * @param Email $email
+     * @param EmailFolder   $folder
+     * @param Email         $email
      * @param EntityManager $em
+     *
      * @return EmailBody
      */
-    public function loadEmailBody(Email $email, EntityManager $em);
+    public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em);
 }
