@@ -82,7 +82,7 @@ datagrid:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_view
                 label:         oro.workflow.workflowdefinition.datagrid.view
-                icon:          user
+                icon:          eye-open
                 link:          view_link
                 rowAction:     true
             activate:

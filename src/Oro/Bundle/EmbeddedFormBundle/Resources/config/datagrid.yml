@@ -71,7 +71,7 @@ datagrid:
                 acl_resource: oro_embedded_form_view
                 type: navigate
                 label: View
-                icon: user
+                icon: eye-open
                 link: view_link
                 rowAction: true
             update:
