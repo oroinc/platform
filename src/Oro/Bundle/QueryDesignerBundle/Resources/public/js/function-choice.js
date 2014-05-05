@@ -107,6 +107,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             this.element.val('').trigger('change');
         },
 
+        /**
+         * TODO
+         */
         _matchApplicable: function (applicable, criteria) {
             return _.find(applicable, function (item) {
                 return _.every(item, function (value, key) {

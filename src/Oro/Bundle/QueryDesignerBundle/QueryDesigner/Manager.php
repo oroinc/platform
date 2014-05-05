@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
@@ -15,25 +14,29 @@ class Manager implements FunctionProviderInterface
     /** @var FilterInterface[] */
     protected $filters = [];
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
+
+    /** @var  EntityHierarchyBuilder */
+    protected $entityHierarchyBuilder;
 
     /**
      * Constructor
      *
-     * @param array                 $config
-     * @param ConfigurationResolver $resolver
-     * @param Translator            $translator
+     * @param array                  $config
+     * @param ConfigurationResolver  $resolver
+     * @param EntityHierarchyBuilder $entityHierarchyBuilder
+     * @param Translator             $translator
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
+        EntityHierarchyBuilder $entityHierarchyBuilder,
         Translator $translator
     ) {
         $resolver->resolve($config);
         $this->config     = ConfigurationObject::create($config);
+        $this->entityHierarchyBuilder = $entityHierarchyBuilder;
         $this->translator = $translator;
     }
 
@@ -56,7 +59,7 @@ class Manager implements FunctionProviderInterface
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
             'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
-            'hierarchy'  => $this->getMetadataHierarchy()
+            'hierarchy'  => $this->entityHierarchyBuilder->getHierarchy()
         ];
     }
 
@@ -75,7 +78,7 @@ class Manager implements FunctionProviderInterface
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name   A filter name
+     * @param string $name A filter name
      * @param array  $params An additional parameters of a new filter
      * @throws \RuntimeException if a filter with the given name does not exist
      * @return FilterInterface
@@ -117,14 +120,6 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
-    }
-
-    protected function getMetadataHierarchy()
-    {
-        //$this->
-
-
-        return [];
     }
 
     /**
@@ -212,7 +207,7 @@ class Manager implements FunctionProviderInterface
     /**
      * Checks if an item can be used for the given query type
      *
-     * @param array  $item      An item to check
+     * @param array  $item An item to check
      * @param string $queryType The query type
      * @return bool true if the item can be used for the given query type; otherwise, false.
      */

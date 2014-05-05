@@ -98,6 +98,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
+        /**
+         * TODO
+         */
         _matchApplicable: function (applicable, criteria) {
             return _.find(applicable, function (item) {
                 return _.every(item, function (value, key) {
