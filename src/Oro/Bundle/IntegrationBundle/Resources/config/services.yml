@@ -19,8 +19,16 @@ parameters:
     oro_integration.channel_delete_manager.class:                         Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
 
-    # processors
+    #Processors
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
+
+    oro_integration.reverse.processor.class:                              Oro\Bundle\IntegrationBundle\Processor\ReverseProcessor
+
+    #Writer
+    oro_importexport.writer.reverse.class:                               Oro\Bundle\IntegrationBundle\Writer\ReverseWriter
+
+    #Reader
+    oro_importexport.reader.entity.with_filters.class:                   Oro\Bundle\IntegrationBundle\Reader\EntityReaderWithFilters
 
 services:
     oro_integration.channel.manager.api:
@@ -120,3 +128,19 @@ services:
             - @oro_integration.manager.types_registry
             - @oro_integration.logger.strategy
         lazy: true
+
+    oro_integration.processor.reverse:
+        class: %oro_integration.reverse.processor.class%
+        arguments:
+            - @oro_importexport.processor.registry
+            - "export"
+            - @oro_importexport.context_registry
+
+    oro_integration.writer.reverse:
+        class: %oro_importexport.writer.reverse.class%
+
+    oro_integration.reader.entity.with_filters:
+        class: %oro_importexport.reader.entity.with_filters.class%
+        arguments:
+            - @oro_importexport.context_registry
+            - @doctrine

@@ -55,7 +55,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     {
         $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
         $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params         = ['id'=>50];#$input->getOption(self::PARAMETERS_ARG_NAME);
+        $params         = 'a:1:{s:2:"id";i:50;}';#$input->getOption(self::PARAMETERS_ARG_NAME);
         $logger         = new OutputLogger($output);
         $processor      = $this->getService(self::SYNC_PROCESSOR);
         $repository     = $this->getService('doctrine.orm.entity_manager')
@@ -69,7 +69,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             throw new \InvalidArgumentException('Connector type option is required.');
         }
 
-        if (empty($params)) {
+        if (empty($params) || !is_array(unserialize($params))) {
             throw new \InvalidArgumentException('Parameters option is required.');
         }
 
@@ -101,7 +101,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 )
             );
 
-            $processor->process($channel, $connectorType, $params);
+            $processor->process($channel, $connectorType, unserialize($params));
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
         }
@@ -152,8 +152,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 ' "--params=\'' . $params . '\'"]'
             );
 
-        $running = $query->getQuery()->getSingleScalarResult();
-
+        $running = (int)$query->getQuery()->getSingleScalarResult();
         return $running > 0;
     }
 }
