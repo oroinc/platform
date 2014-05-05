@@ -713,8 +713,8 @@ abstract class AbstractQueryConverter
                 $item['join'],
                 $parentJoinId,
                 $item['type'],
-                $item['conditionType'],
-                $item['condition']
+                isset($item['conditionType']) ? $item['conditionType'] : null,
+                isset($item['condition']) ? $item['condition'] : null
             );
             $this->joins[$tableAlias]    = $joinId;
             $this->tableAliases[$joinId] = $tableAlias;
