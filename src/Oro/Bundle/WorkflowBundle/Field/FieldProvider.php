@@ -63,7 +63,7 @@ class FieldProvider extends EntityFieldProvider
     {
         // skip workflow and collection relations
         if ($this->isWorkflowField($associationName)
-            || $metadata->isSingleValuedAssociation($associationName)
+            || !$metadata->isSingleValuedAssociation($associationName)
         ) {
             return true;
         }
