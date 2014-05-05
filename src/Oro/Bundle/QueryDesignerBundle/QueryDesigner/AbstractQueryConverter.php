@@ -683,6 +683,8 @@ abstract class AbstractQueryConverter
      * @param array  $joins
      * @param array  $item
      * @param string $mainEntityJoinId
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function registerVirtualColumnTableAlias(&$joins, $item, $mainEntityJoinId)
     {
