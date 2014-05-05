@@ -110,7 +110,7 @@ datagrid:
                 type:          navigate
                 label:         View
                 link:          view_link
-                icon:          user
+                icon:          eye-open
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
@@ -253,7 +253,7 @@ datagrid:
                 join:
                     inner:
                         folder:
-                            join: e.folder
+                            join: e.folders
                             alias: f
                         origin:
                             join: f.origin
@@ -433,7 +433,7 @@ datagrid:
                 join:
                     inner:
                         folder:
-                            join: e.folder
+                            join: e.folders
                             alias: f
                         origin:
                             join: f.origin

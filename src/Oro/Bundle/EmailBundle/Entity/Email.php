@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use JMS\Serializer\Annotation as JMS;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -12,7 +14,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * Email
  *
- * @ORM\Table(name="oro_email")
+ * @ORM\Table(
+ *      name="oro_email",
+ *      indexes={@ORM\Index(name="IDX_email_message_id", columns={"message_id"})}
+ * )
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  *
@@ -29,9 +34,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Email
 {
-    const LOW_IMPORTANCE = -1;
+    const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
-    const HIGH_IMPORTANCE = 1;
+    const HIGH_IMPORTANCE   = 1;
 
     /**
      * @var integer
@@ -126,8 +131,8 @@ class Email
     /**
      * @var string
      *
-     * @ORM\Column(name="message_id", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
+     * @ORM\Column(name="message_id", type="string", length=255)
+     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $messageId;
@@ -151,14 +156,14 @@ class Email
     protected $xThreadId;
 
     /**
-     * @var EmailFolder
+     * @var ArrayCollection|EmailFolder[] $folders
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id")
+     * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
+     * @ORM\JoinTable(name="oro_email_to_folder")
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
      * @JMS\Exclude
      */
-    protected $folder;
+    protected $folders;
 
     /**
      * @var ArrayCollection
@@ -172,7 +177,8 @@ class Email
     {
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailBody = new ArrayCollection();
+        $this->emailBody  = new ArrayCollection();
+        $this->folders    = new ArrayCollection();
     }
 
     /**
@@ -286,7 +292,7 @@ class Email
     }
 
     /**
-     * Add folder
+     * Add recipient
      *
      * @param  EmailRecipient $recipient
      * @return $this
@@ -462,26 +468,41 @@ class Email
     }
 
     /**
-     * Get email folder
+     * Get email folders
      *
-     * @return EmailFolder
+     * @return ArrayCollection|EmailFolder[]
      */
-    public function getFolder()
+    public function getFolders()
     {
-        return $this->folder;
+        return $this->folders;
     }
 
     /**
-     * Set email folder
+     * @param EmailFolder $folder
      *
-     * @param  EmailFolder $folder
      * @return $this
      */
-    public function setFolder(EmailFolder $folder)
+    public function addFolder(EmailFolder $folder)
     {
-        $this->folder = $folder;
+        if (!$this->folders->contains($folder)) {
+            $this->folders->add($folder);
+        }
 
         return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return boolean
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            return $this->folders->removeElement($folder);
+        }
+
+        return false;
     }
 
     /**
