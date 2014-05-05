@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
@@ -54,7 +55,8 @@ class Manager implements FunctionProviderInterface
             'filters'    => $filtersMetadata,
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
-            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType)
+            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
+            'hierarchy'  => $this->getMetadataHierarchy()
         ];
     }
 
@@ -115,6 +117,14 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
+    }
+
+    protected function getMetadataHierarchy()
+    {
+        //$this->
+
+
+        return [];
     }
 
     /**
