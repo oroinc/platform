@@ -75,7 +75,7 @@ datagrid:
                 type:          navigate
                 acl_resource:  oro_dashboard_view
                 label:         View
-                icon:          user
+                icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:

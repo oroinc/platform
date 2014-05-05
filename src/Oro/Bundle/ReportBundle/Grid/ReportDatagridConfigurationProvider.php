@@ -3,9 +3,11 @@
 namespace Oro\Bundle\ReportBundle\Grid;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface
@@ -16,6 +18,11 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
      * @var FunctionProviderInterface
      */
     protected $functionProvider;
+
+    /**
+     * @var VirtualFieldProviderInterface
+     */
+    protected $virtualFieldProvider;
 
     /**
      * @var ManagerRegistry
@@ -30,13 +37,18 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider ,
+     * @param ManagerRegistry               $doctrine
      */
-    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
-    {
-        $this->functionProvider = $functionProvider;
-        $this->doctrine         = $doctrine;
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        ManagerRegistry $doctrine
+    ) {
+        $this->functionProvider     = $functionProvider;
+        $this->virtualFieldProvider = $virtualFieldProvider;
+        $this->doctrine             = $doctrine;
     }
 
     /**
@@ -60,6 +72,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
                 $gridName,
                 $report,
                 $this->functionProvider,
+                $this->virtualFieldProvider,
                 $this->doctrine
             );
 

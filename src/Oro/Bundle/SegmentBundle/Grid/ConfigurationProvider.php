@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigurationProvider implements ConfigurationProviderInterface
@@ -16,6 +17,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /** @var FunctionProviderInterface */
     protected $functionProvider;
+
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
 
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -29,18 +33,21 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
-     * @param ConfigManager             $configManager
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param ConfigManager                 $configManager
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
         ConfigManager $configManager
     ) {
-        $this->functionProvider = $functionProvider;
-        $this->doctrine         = $doctrine;
-        $this->configManager    = $configManager;
+        $this->functionProvider     = $functionProvider;
+        $this->virtualFieldProvider = $virtualFieldProvider;
+        $this->doctrine             = $doctrine;
+        $this->configManager        = $configManager;
     }
 
     /**
@@ -64,6 +71,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
                 $gridName,
                 $segment,
                 $this->functionProvider,
+                $this->virtualFieldProvider,
                 $this->doctrine,
                 $this->configManager
             );
