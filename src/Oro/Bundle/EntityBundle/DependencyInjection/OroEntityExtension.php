@@ -18,6 +18,7 @@ class OroEntityExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $this->loadVirtualFieldConfigs($container);
+        $this->loadHiddenFieldConfigs($container);
 
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
@@ -50,5 +51,31 @@ class OroEntityExtension extends Extension
         }
 
         $container->setParameter('oro_entity.virtual_fields', $virtualFieldConfigs);
+    }
+
+    /**
+     * Loads configuration of entity hidden fields
+     *
+     * @todo: declaration of hidden fields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function loadHiddenFieldConfigs(ContainerBuilder $container)
+    {
+        $hiddenFieldConfigs = [];
+
+        $configLoader = new CumulativeConfigLoader(
+            'oro_entity_hidden_fields',
+            new YamlCumulativeFileLoader('Resources/config/oro/entity_hidden_fields.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $hiddenFieldConfigs = array_merge(
+                $hiddenFieldConfigs,
+                $resource->data['oro_entity_hidden_fields']
+            );
+        }
+
+        $container->setParameter('oro_entity.hidden_fields', $hiddenFieldConfigs);
     }
 }

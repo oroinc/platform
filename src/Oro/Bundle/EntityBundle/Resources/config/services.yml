@@ -88,6 +88,7 @@ services:
             - @doctrine
             - @translator
             - %oro_entity.virtual_fields%
+            - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
 
