@@ -9,7 +9,7 @@ function($, __, Modal, Messenger, Error) {
      * @export  oroworkflow/js/activation-handler
      * @class   oroworkflow.WorkflowActivationHandler
      */
-    return function(url) {
+    return function(url, hideNotifications) {
         var element = this;
 
         var confirmActivation = new Modal({
@@ -24,7 +24,7 @@ function($, __, Modal, Messenger, Error) {
                 url: url,
                 type: 'GET',
                 success: function(response) {
-                    if (response.message) {
+                    if (response.message && !hideNotifications) {
                         Messenger.notificationFlashMessage('success', response.message);
                     }
                     element.trigger('activation_success', [response]);

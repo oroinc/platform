@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Tests\Functional;
+namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
@@ -10,7 +10,6 @@ use Symfony\Component\DomCrawler\Form;
 /**
  * @outputBuffering enabled
  * @db_isolation
- * @db_reindex
  */
 class ControllersTest extends WebTestCase
 {
@@ -29,10 +28,10 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_index'));
+        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_index'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertEquals('Manage Custom Reports - Reports &amp; Segments', $crawler->filter('#page-title')->html());
+        $this->assertEquals('Manage Segments - Reports &amp; Segments', $crawler->filter('#page-title')->html());
     }
 
     /**
@@ -41,7 +40,7 @@ class ControllersTest extends WebTestCase
      */
     public function testCreate($report)
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_create'));
+        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -52,7 +51,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains("Report saved", $crawler->html());
+        $this->assertContains("Segment saved", $crawler->html());
     }
 
     /**
@@ -63,9 +62,9 @@ class ControllersTest extends WebTestCase
     {
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            'reports-grid',
+            'oro_segments-grid',
             array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'],
+                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'],
             )
         );
 
@@ -74,13 +73,22 @@ class ControllersTest extends WebTestCase
         $result = ToolsAPI::jsonToArray($result->getContent());
         $result = reset($result['data']);
         $id = $result['id'];
-        $this->client->request('GET', $this->client->generate('oro_report_view', array('id' => $id)));
+        $this->client->request('GET', $this->client->generate('oro_segment_view', array('id' => $id)));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
 
+        if ($report['oro_segment_form[type]'] == 'static') {
+            $this->client->request(
+                'POST',
+                $this->client->generate('oro_api_post_segment_run', array('id' => $id))
+            );
+            $result = $this->client->getResponse();
+            ToolsAPI::assertJsonResponse($result, 204);
+        }
+
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            "oro_report_table_{$id}",
+            "oro_segment_grid_{$id}",
             array(
             )
         );
@@ -100,9 +108,9 @@ class ControllersTest extends WebTestCase
     {
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            'reports-grid',
+            'oro_segments-grid',
             array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'],
+                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'],
             )
         );
 
@@ -112,10 +120,10 @@ class ControllersTest extends WebTestCase
         $result = reset($result['data']);
         $id = $result['id'];
 
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_update', array('id' => $id)));
+        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_update', array('id' => $id)));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $report['oro_report_form[name]'] .= '_updated';
+        $report['oro_segment_form[name]'] .= '_updated';
         $form = $this->fillForm($form, $report);
 
         $this->client->followRedirects(true);
@@ -123,11 +131,20 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains("Report saved", $crawler->html());
+        $this->assertContains("Segment saved", $crawler->html());
+
+        if ($report['oro_segment_form[type]'] == 'static') {
+            $this->client->request(
+                'POST',
+                $this->client->generate('oro_api_post_segment_run', array('id' => $id))
+            );
+            $result = $this->client->getResponse();
+            ToolsAPI::assertJsonResponse($result, 204);
+        }
 
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            "oro_report_table_{$id}",
+            "oro_segment_grid_{$id}",
             array(
             )
         );
@@ -144,13 +161,13 @@ class ControllersTest extends WebTestCase
      * @depends testView
      * @dataProvider requestsApi()
      */
-    public function testExport($report, $reportResult)
+    public function testExport($report, $reportResult, $segmentExport)
     {
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            'reports-grid',
+            'oro_segments-grid',
             array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated',
+                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated',
             )
         );
 
@@ -166,7 +183,7 @@ class ControllersTest extends WebTestCase
             'GET',
             $this->client->generate(
                 'oro_datagrid_export_action',
-                array('gridName' =>"oro_report_table_{$id}", "format" => 'csv')
+                array('gridName' =>"oro_segment_grid_{$id}", "format" => 'csv')
             )
         );
         $content = ob_get_contents();
@@ -175,11 +192,6 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/csv; charset=UTF-8');
-        $this->assertEquals('binary', $result->headers->get('Content-Transfer-Encoding'));
-        $this->assertStringStartsWith(
-            'attachment; filename="datagrid_oro_report_table_' . $id,
-            $result->headers->get('Content-Disposition')
-        );
 
         //file to array
         $content = str_getcsv($content, "\n", '"', '"');
@@ -190,7 +202,7 @@ class ControllersTest extends WebTestCase
         foreach ($content as &$row) {
             $row = str_getcsv($row, ',', '"', '"');
         }
-        $this->verifyReport($reportResult, $content, count($content));
+        $this->verifyReport($segmentExport, $content, count($content));
     }
         /**
      * @param array $report
@@ -201,9 +213,9 @@ class ControllersTest extends WebTestCase
     {
         $result = ToolsAPI::getEntityGrid(
             $this->client,
-            'reports-grid',
+            'oro_segments-grid',
             array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated',
+                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated',
             )
         );
 
@@ -215,13 +227,13 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_report', array('id' => $id))
+            $this->client->generate('oro_api_delete_segment', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
 
-        $this->client->request('GET', $this->client->generate('oro_report_update', array('id' => $id)));
+        $this->client->request('GET', $this->client->generate('oro_segment_update', array('id' => $id)));
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404, 'text/html; charset=UTF-8');
