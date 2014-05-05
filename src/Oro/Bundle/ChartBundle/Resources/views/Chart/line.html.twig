@@ -49,6 +49,7 @@
                         if (!$chart.get(0).clientWidth) {
                             return;
                         }
+
                         var rawData = {{ data|json_encode|raw }};
                         var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
@@ -62,7 +63,7 @@
                             if (label === null) {
                                 var number = parseInt(data);
                                 if (rawData.length > number) {
-                                    label = rawData[number]['label'];
+                                    label = rawData[number]['label'] === null ? '{{ 'N/A'|trans }}'  : rawData[number]['label'];
                                 } else {
                                     label = '';
                                 }
@@ -74,12 +75,11 @@
                             if (label === null) {
                                 var number = parseInt(data);
                                 if (rawData.length > number) {
-                                    label = rawData[data]['value'];
+                                    label = rawData[data]['value'] === null ? '{{ 'N/A'|trans }}' : rawData[data]['value'];
                                 } else {
                                     label = '';
                                 }
                             }
-
                             return label;
                         };
                         for (var i in rawData) {
@@ -101,8 +101,11 @@
                             var item = [xValue, yValue];
                             chartData.push(item);
                         }
-                        xMax += (xMax - xMin) / 10;
-                        yMax += (yMax - yMin) / 10;
+                        var deltaX = xMax - xMin;
+                        var deltaY = yMax - yMin;
+                        xMax += (deltaX > 0 ? deltaX / 10 : 1);
+                        yMax += (deltaY > 0 ? deltaY / 10 : 1);
+
                         var chart = {
                             data: chartData,
                             color: colors[0],
