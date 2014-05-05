@@ -32,6 +32,9 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
+     *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
+     *      description="Indicates whether virtual fields should be returned as well.")
+     * @QueryParam(
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
@@ -53,6 +56,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
     {
         $entityName        = str_replace('_', '\\', $entityName);
         $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
+        $withVirtualFields = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
         $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
         $deepLevel         = $this->getRequest()->query->has('deep-level')
             ? (int)$this->getRequest()->query->get('deep-level')
@@ -66,6 +70,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
+                $withVirtualFields,
                 $withEntityDetails,
                 $deepLevel,
                 $lastDeepLevelRelations

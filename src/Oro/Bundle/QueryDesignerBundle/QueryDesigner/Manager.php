@@ -6,7 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager implements FunctionProviderInterface
+class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -20,20 +20,28 @@ class Manager implements FunctionProviderInterface
     protected $translator;
 
     /**
+     * @var array
+     */
+    protected $virtualFields;
+
+    /**
      * Constructor
      *
      * @param array                 $config
      * @param ConfigurationResolver $resolver
      * @param Translator            $translator
+     * @param array                 $virtualFields
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        Translator $translator
+        Translator $translator,
+        $virtualFields
     ) {
         $resolver->resolve($config);
-        $this->config     = ConfigurationObject::create($config);
-        $this->translator = $translator;
+        $this->config        = ConfigurationObject::create($config);
+        $this->translator    = $translator;
+        $this->virtualFields = $virtualFields;
     }
 
     /**
@@ -115,6 +123,22 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtualField($className, $fieldName)
+    {
+        return isset($this->virtualFields[$className][$fieldName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualFieldQuery($className, $fieldName)
+    {
+        return $this->virtualFields[$className][$fieldName]['query'];
     }
 
     /**
