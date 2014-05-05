@@ -2,6 +2,7 @@ oro:
   chart:
       no_data: No data
       form:
+          name.label: Chart Type
           chart_empty_value: None
       line_chart:
           label: Line Chart
