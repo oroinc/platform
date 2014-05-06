@@ -4,7 +4,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
         'use strict';
 
         /**
-         * @export oro/chart/data_formatter
+         * @export orochart/js/data_formatter
          * @name   dataFormatter
          */
         return {
