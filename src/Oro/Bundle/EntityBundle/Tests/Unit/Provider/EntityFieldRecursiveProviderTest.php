@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
+class EntityFieldRecursiveProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityConfigProvider;
@@ -22,7 +22,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
 
-    /** @var EntityFieldProvider */
+    /** @var EntityFieldRecursiveProvider */
     private $provider;
 
     protected function setUp()
@@ -64,7 +64,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new EntityFieldProvider(
+        $this->provider = new EntityFieldRecursiveProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
