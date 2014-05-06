@@ -1,4 +1,12 @@
 config:
+    shim:
+        'flotr2':
+            deps:
+                - 'jquery'
+
     paths:
-        'oro/chart/chart_form': 'bundles/orochart/js/chart_form.js'
-        'oro/chart/data_formatter': 'bundles/orochart/js/data_formatter.js'
+        'flotr2': 'bundles/orochart/lib/flotr2/flotr2.amd.js'
+        'bean': 'bundles/orochart/lib/flotr2/bean.js'
+        'orochart/js/chart_form': 'bundles/orochart/js/chart_form.js'
+        'orochart/js/data_formatter': 'bundles/orochart/js/data_formatter.js'
+        'orochart/js/flotr2/funnel': 'bundles/orochart/js/flotr2/funnel.js'
