@@ -312,4 +312,5 @@ Following diagram shows this logic in graphical representation.
 
 **Note:** If you want to test this flow in real application, you can put this configuration in file
 Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
-``app/console oro:workflow:definitions:load`` and activate in UI - after that you can go to User view page and test it.
+``app/console oro:workflow:definitions:load`` and activate in in UI -
+after that you can go to User view page and test it.
