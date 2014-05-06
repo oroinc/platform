@@ -6,10 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
@@ -48,12 +45,11 @@ class EntityReaderById extends BaseReader
                 $qb->add(
                     'where',
                     $qb->expr()->in('o.'.self::ID_FILTER, ':'.self::ID_FILTER)
-                )
-                ->setParameter(self::ID_FILTER, $optionValue);
+                );
+                $qb->setParameter(self::ID_FILTER, $optionValue);
             } else {
-                $qb
-                    ->add('where', 'o.'.self::ID_FILTER.' = :'.self::ID_FILTER)
-                    ->setParameter(self::ID_FILTER, $optionValue);
+                $qb->add('where', 'o.'.self::ID_FILTER.' = :'.self::ID_FILTER);
+                $qb->setParameter(self::ID_FILTER, $optionValue);
             }
         }
 

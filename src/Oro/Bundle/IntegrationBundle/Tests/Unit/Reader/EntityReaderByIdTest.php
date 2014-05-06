@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
 
-use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\EntityReaderByIdAdapter;
+use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 
 class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +33,7 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->reader = new EntityReader($this->contextRegistry, $this->managerRegistry);
+        $this->reader = new EntityReaderById($this->contextRegistry, $this->managerRegistry);
     }
 
     public function testSetStepExecutionWithEntityName()
@@ -90,15 +90,16 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of entity reader must contain either "entityName",
-     * "queryBuilder" or "query".
+     * @expectedExceptionMessage Configuration of entity reader must contain either "entityName".
      */
     public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
     {
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->exactly(3))->method('hasOption')->will($this->returnValue(false));
+        $context->expects($this->exactly(1))
+            ->method('hasOption')
+            ->will($this->returnValue(false));
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
@@ -106,6 +107,22 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
     public function testSetSourceEntityName()
     {
         $name = '\stdClass';
+        $id = 1;
+
+        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
+            ->getMock();
+
+        $context->expects($this->exactly(1))
+            ->method('hasOption')
+            ->will($this->returnValue($name));
+
+        $context->expects($this->at(0))
+            ->method('getOption')
+            ->will($this->returnValue($name));
+
+        $context->expects($this->at(1))
+            ->method('getOption')
+            ->will($this->returnValue($id));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -138,6 +155,14 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
             ->method('orderBy')
             ->with('o.id', 'ASC');
 
+        $queryBuilder->expects($this->once())
+            ->method('add')
+            ->with('where', 'o.id = :id');
+
+        $queryBuilder->expects($this->any())
+            ->method('setParameter')
+            ->with('id', null, null);
+
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -152,14 +177,16 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $entityManager->expects($this->once())->method('getClassMetadata')
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
             ->with($name)
             ->will($this->returnValue($classMetadata));
 
-        $queryBuilder->expects($this->once())->method('getEntityManager')
+        $queryBuilder->expects($this->once())
+            ->method('getEntityManager')
             ->will($this->returnValue($entityManager));
 
-        $this->reader->setSourceEntityName($name);
+        $this->reader->setSourceEntityName($context);
     }
 
     /**
@@ -180,4 +207,3 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
         return $stepExecution;
     }
 }
-
