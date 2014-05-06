@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-
 class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 {
-
     const REMOTE_WINS     = 'remote';
     const LOCAL_WINS      = 'local';
 
@@ -55,16 +52,15 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 
         if ($this->isNotEmpty($data->getType())) {
             if (true === $this->hasTwoWaySync($data->getType())) {
-
                 $mc = $this->getModifierClosure();
                 $mc($form);
-
-                /*$form->remove('syncPriority');
-                $form->remove('isTwoWaySyncEnabled');*/
             }
         }
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -80,9 +76,6 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                 $mc($form);
             }
         }
-
-
-
     }
 
     /**
@@ -122,6 +115,9 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
         return false;
     }
 
+    /**
+     * @return callable
+     */
     protected function getModifierClosure()
     {
         return function ($form) {
@@ -149,6 +145,4 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 
         };
     }
-
-
 }
