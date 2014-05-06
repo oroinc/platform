@@ -34,7 +34,7 @@ Configuration of Workflow declares all aspects related to specific workflow:
 * basic properties of workflow like name and label
 * steps and transitions
 * attributes involved in workflow
-* entities that are related to workflow
+* entity that is related to workflow
 
 Structure of configuration is declared in class Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration.
 
@@ -44,6 +44,32 @@ Configuration File
 Configuration must be placed in a file named Resources/config/workflow.yml. For example
 src/Acme/DemoWorkflowBundle/Resources/config/workflow.yml.
 
+Configuration file may be split by parts. All included parts must be placed under imports section. Imports may be used
+in any part of workflow configuration.
+
+**Example - workflow.yml**
+```
+imports:
+    - { resource: 'oro/workflow/b2b_flow_lead.yml' }
+    - { resource: 'oro/workflow/b2b_flow_sales.yml' }
+    - { resource: 'oro/workflow/b2b_flow_sales_funnel.yml' }
+```
+
+**Example - b2b_flow_lead.yml**
+```
+imports:
+    - { resource: 'b2b_flow_lead/steps.yml' }
+    - { resource: 'b2b_flow_lead/attributes.yml' }
+    - { resource: 'b2b_flow_lead/transitions.yml' }
+    - { resource: 'b2b_flow_lead/transition_definitions.yml' }
+
+workflows:
+    b2b_flow_lead:
+        label: 'Unqualified Sales Lead'
+        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity_attribute: lead
+        start_step: new
+```
 
 Configuration Loading
 =====================
@@ -227,10 +253,14 @@ Summarizing all above, step has next configuration:
 * **is_final**
     *boolean*
     If true than step will be counted as workflow final step.
-* **view_attributes**
-    List of attributes that will be shown when step is selected on Workflow wizard UI. Custom path could be specified
-    instead of name of attribute. Each view attribute could have "view_type" option which is used to find Twig block
-    than will render value.
+* **entity_acl**
+    Defines an ACL for the workflow related entity when workflow is in this step.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
 * **allowed_transitions**
     Optional list of allowed transitions. If no transitions are allowed it's same as is_final option set to true
 
@@ -276,6 +306,25 @@ Transition configuration has next options:
     *boolean*
     If true than this transition can be used to start new workflow. At least one start transition is required if
     workflow doesn't have start_step attribute.
+* **is_hidden**
+    *boolean*
+    Indicates that this transition must be hidden at frontend.
+* **is_unavailable_hidden**
+    *boolean*
+    Indicates that this transition must be hidden at frontend in case when transition is not allowed.
+* **acl_resource**
+    *string*
+    ACL resource name that will be checked while checking that transition execution is allowed
+* **acl_message**
+    *string*
+    Message, that will be sown in case when acl_resource is not granted.
+* **message**
+    *string*
+    Notification message, that will be shown at frontend before transition execution.
+* **display_type**
+    *string*
+    Frontend transition form display type. Possible options are: dialog, page.
+    Display type "page" require "form_options" to be set.
 * **form_type**
     *string (oro_workflow_attributes - default)*
     A form type that will be used to render form of transition.
@@ -285,6 +334,9 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
+* **transition_definition**
+    *string*
+    Name of associated transition definition.
 
 Example
 -------
@@ -493,8 +545,8 @@ Configuration
 workflows:
     phone_call:
         label: 'Demo Call Workflow'
-		entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-		enabled: true
+        entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
+        enabled: true
         start_step: start_call
         steps:
             start_call:
