@@ -1,6 +1,10 @@
+namespaces:
+    doctrine: Symfony\Bridge\Doctrine\Validator\Constraints\
+    oro_entity_extend: Oro\Bundle\EntityExtendBundle\Validator\Constraints\
+
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [fieldName, entity]
+        - doctrine:UniqueEntity: [fieldName, entity]
     properties:
         fieldName:
             - NotBlank: ~
@@ -11,19 +15,19 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
                 pattern: "/^id$/i"
                 match:   false
                 message: The '{{ value }}' cannot be used as field name
-            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword: ~
+            - oro_entity_extend:NotSqlKeyword: ~
         type:
             - NotBlank: ~
 
 Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
     group_sequence: [EntityConfigModel, Sql, Php]
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [className]
+        - doctrine:UniqueEntity: [className]
     properties:
         className:
             - NotBlank:  ~
             - Regex:
                 pattern: "/^[a-z]+[a-z0-9]*$/i"
                 message: This value should contains only lower/upper alphabetic symbols and numbers
-            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword: {groups: Sql}
-            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword: {groups: Php}
+            - oro_entity_extend:NotSqlKeyword: {groups: Sql}
+            - oro_entity_extend:NotPhpKeyword: {groups: Php}
