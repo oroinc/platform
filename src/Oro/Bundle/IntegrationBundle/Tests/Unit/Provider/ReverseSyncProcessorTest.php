@@ -63,27 +63,6 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Return mocked sync processor
-     *
-     * @param array $mockedMethods
-     * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
-     */
-    protected function getReverseSyncProcessor($mockedMethods = [])
-    {
-        return $this->getMock(
-            'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor',
-            $mockedMethods,
-            [
-                $this->em,
-                $this->processorRegistry,
-                $this->jobExecutor,
-                $this->registry,
-                $this->log
-            ]
-        );
-    }
-
-    /**
      * Test process method
      */
     public function testProcess()
@@ -99,7 +78,6 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = $this->getReverseSyncProcessor(['processExport']);
         $processor->process($this->channel, $connectors, $params);
     }
-
 
     public function testOneChannelConnectorProcess()
     {
@@ -149,5 +127,26 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         $processor->process($this->channel, $connector, ['testParameter' => 'testValue']);
+    }
+
+    /**
+     * Return mocked sync processor
+     *
+     * @param array $mockedMethods
+     * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
+     */
+    protected function getReverseSyncProcessor($mockedMethods = [])
+    {
+        return $this->getMock(
+            'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor',
+            $mockedMethods,
+            [
+                $this->em,
+                $this->processorRegistry,
+                $this->jobExecutor,
+                $this->registry,
+                $this->log
+            ]
+        );
     }
 }

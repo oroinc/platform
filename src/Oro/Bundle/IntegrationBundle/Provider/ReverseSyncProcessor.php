@@ -3,16 +3,13 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\Debug;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
-use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 class ReverseSyncProcessor
 {

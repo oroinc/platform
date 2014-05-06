@@ -4,8 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
-
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 
 class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
@@ -21,11 +19,11 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
     protected $contextRegistry;
 
     /**
-     * @var EntityReaderTestAdapter
+     * @var EntityReaderById
      */
     protected $reader;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
             ->disableOriginalConstructor()
