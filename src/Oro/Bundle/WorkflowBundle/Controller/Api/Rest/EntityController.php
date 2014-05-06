@@ -48,6 +48,7 @@ class EntityController extends FOSRestController
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
+                false,
                 $withEntityDetails,
                 false,
                 $deepLevel,

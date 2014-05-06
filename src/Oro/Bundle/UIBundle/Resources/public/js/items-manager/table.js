@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, _, mediator) {
     'use strict';
 
     /**
@@ -108,19 +108,27 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
+
+            mediator.trigger('items-manager:table:add', this.options.collection);
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
+
+            mediator.trigger('items-manager:table:change', this.options.collection);
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').remove();
+
+            mediator.trigger('items-manager:table:remove', this.options.collection);
         },
 
         _onResetCollection: function () {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
+
+            mediator.trigger('items-manager:table:reset', this.options.collection);
         },
 
         _renderModel: function (model) {

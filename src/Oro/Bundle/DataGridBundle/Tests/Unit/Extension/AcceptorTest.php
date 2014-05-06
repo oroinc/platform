@@ -18,7 +18,8 @@ class AcceptorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->config   = DatagridConfiguration::create([]);
-        $this->acceptor = new Acceptor($this->config);
+        $this->acceptor = new Acceptor();
+        $this->acceptor->setConfig($this->config);
     }
 
     public function tearDown()
@@ -48,10 +49,6 @@ class AcceptorTest extends \PHPUnit_Framework_TestCase
         // test sorting, LINUX like priority used here
         $this->assertEquals($extMock2, $results[0]);
         $this->assertEquals($extMock1, $results[1]);
-
-        // test cloning, for state dependent extensions (such as pager)
-        $this->assertNotSame($extMock2, $results[0]);
-        $this->assertNotSame($extMock1, $results[1]);
     }
 
     /**

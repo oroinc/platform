@@ -57,7 +57,8 @@ class EntityFieldChoiceType extends AbstractType
                 ? [] // return empty list if entity is not specified or skip_load_data = true
                 : $that->getChoices(
                     $options['entity'],
-                    $options['with_relations']
+                    $options['with_relations'],
+                    $options['with_virtual_fields']
                 );
         };
 
@@ -79,13 +80,14 @@ class EntityFieldChoiceType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'entity'             => null,
-                'with_relations'     => false,
-                'choices'            => $choices,
-                'empty_value'        => '',
-                'skip_load_entities' => false,
-                'skip_load_data'     => false,
-                'configs'            => $defaultConfigs
+                'entity'              => null,
+                'with_relations'      => false,
+                'with_virtual_fields' => false,
+                'choices'             => $choices,
+                'empty_value'         => '',
+                'skip_load_entities'  => false,
+                'skip_load_data'      => false,
+                'configs'             => $defaultConfigs
             )
         );
         $resolver->setNormalizers(
@@ -134,18 +136,20 @@ class EntityFieldChoiceType extends AbstractType
     /**
      * Returns a list of choices
      *
-     * @param string $entityName    Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations Indicates whether association fields should be returned as well.
+     * @param string $entityName        Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations     Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields Indicates whether virtual fields should be returned as well.
      * @return array of entity fields
-     *                              key = field name, value = ChoiceListItem
+     *                                  key = field name, value = ChoiceListItem
      */
-    protected function getChoices($entityName, $withRelations)
+    protected function getChoices($entityName, $withRelations, $withVirtualFields)
     {
         $choiceFields    = [];
         $choiceRelations = [];
         $fields          = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
+            $withVirtualFields,
             true
         );
         foreach ($fields as $field) {

@@ -3,3 +3,5 @@ oro:
         field_choice:
             fields:           Fields
             relations:        Relations
+        form:
+            choose_entity_field:    Choose a field...

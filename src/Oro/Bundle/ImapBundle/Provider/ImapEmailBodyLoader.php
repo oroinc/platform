@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -47,10 +48,10 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadEmailBody(Email $email, EntityManager $em)
+    public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em)
     {
         /** @var ImapEmailOrigin $origin */
-        $origin = $email->getFolder()->getOrigin();
+        $origin = $folder->getOrigin();
 
         $config = new ImapConfig(
             $origin->getHost(),
@@ -59,8 +60,9 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword())
         );
+
         $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
-        $manager->selectFolder($email->getFolder()->getFullName());
+        $manager->selectFolder($folder->getFullName());
 
         $repo = $em->getRepository('OroImapBundle:ImapEmail');
         $query = $repo->createQueryBuilder('e')

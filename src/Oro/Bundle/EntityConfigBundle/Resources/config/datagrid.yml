@@ -41,7 +41,7 @@ datagrid:
             view:
                 type: navigate
                 label: View
-                icon: book
+                icon: eye-open
                 link: view_link
                 rowAction: true
             update:

@@ -63,6 +63,10 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             this._trigger('update', null, [fields]);
         },
 
+        getFieldsData: function () {
+            return this.element.data('fields');
+        },
+
         _confirm: function (confirm, newVal, oldVal) {
             var $el = this.element,
                 load = $.proxy(this.loadFields, this),

@@ -1,0 +1,29 @@
+oro:
+  chart:
+      no_data: No data
+      form:
+          name.label: Chart Type
+          chart_empty_value: None
+      line_chart:
+          label: Line Chart
+          params:
+              label: Category (X axis)
+              value: Value (Y axis)
+          settings:
+              connect_dots_with_line: Connect dots with line
+      bar_chart:
+          label: Bar Chart
+          params:
+              label: Category (X axis)
+              value: Value (Y axis)
+      pie_chart:
+          label: Pie Chart
+          params:
+              label: Fraction Label
+              value: Fraction Value
+      flow_chart:
+          label: Flow Chart
+          params:
+              label:     Step label
+              value:     Step value
+              is_nozzle: Is step nozzle
