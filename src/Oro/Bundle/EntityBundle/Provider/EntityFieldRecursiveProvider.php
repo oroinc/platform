@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Translation\Translator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -18,40 +19,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
-class EntityFieldProvider
+class EntityFieldRecursiveProvider extends AbstractProvider
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $entityConfigProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
-     * @var EntityClassResolver
-     */
-    protected $entityClassResolver;
-
     /**
      * @var ManagerRegistry
      */
     protected $doctrine;
 
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $entityProvider;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
 
     /**
      * @var array
@@ -83,13 +59,22 @@ class EntityFieldProvider
         $virtualFields,
         $hiddenFields
     ) {
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->extendConfigProvider = $extendConfigProvider;
-        $this->entityClassResolver  = $entityClassResolver;
-        $this->doctrine             = $doctrine;
-        $this->translator           = $translator;
-        $this->virtualFields        = $virtualFields;
-        $this->hiddenFields         = $hiddenFields;
+        parent::__construct($entityConfigProvider, $extendConfigProvider, $entityClassResolver, $translator);
+
+        $this->doctrine      = $doctrine;
+        $this->virtualFields = $virtualFields;
+        $this->hiddenFields  = $hiddenFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplied(ParameterBag $parameters)
+    {
+        $entityName  = str_replace('_', '\\', $parameters->get('entityName'));
+        $isPlainList = ('1' === $parameters->get('plain-list'));
+
+        return !empty($entityName) && !$isPlainList;
     }
 
     /**
@@ -146,6 +131,7 @@ class EntityFieldProvider
         $result    = array();
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
+
         $this->addFields($result, $className, $em, $withVirtualFields, $translate);
         if ($withRelations) {
             $this->addRelations(
@@ -478,15 +464,12 @@ class EntityFieldProvider
         if ($translate) {
             $relation['label'] = $this->translator->trans($relation['label']);
         }
+
         $relatedEntityName = $relation['related_entity_name'];
         if ($withEntityDetails) {
-            $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
-            foreach ($entity as $key => $val) {
-                if (!in_array($key, ['name'])) {
-                    $relation['related_entity_' . $key] = $val;
-                }
-            }
+            $relation = $this->addEntityDetails($relatedEntityName, $relation, $translate);
         }
+
         if ($relationDeepLevel >= 0) {
             // set some exceptions
             // todo: we need to find more proper way to do this
@@ -507,6 +490,25 @@ class EntityFieldProvider
         }
 
         $result[] = $relation;
+    }
+
+    /**
+     * @param string $relatedEntityName
+     * @param array  $relation
+     * @param bool   $translate
+     *
+     * @return array
+     */
+    protected function addEntityDetails($relatedEntityName, array $relation, $translate)
+    {
+        $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
+        foreach ($entity as $key => $val) {
+            if (!in_array($key, ['name'])) {
+                $relation['related_entity_' . $key] = $val;
+            }
+        }
+
+        return $relation;
     }
 
     /**
