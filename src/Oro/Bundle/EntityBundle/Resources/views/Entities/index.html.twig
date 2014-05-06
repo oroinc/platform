@@ -6,7 +6,7 @@
 {% set params = {class_name: entity_class} %}
 {% set pageTitle = 'Entities' %}
 
-{% oro_title_set({params : {"%entityName%": label|default('N/A') }}) %}
+{% oro_title_set({params : {"%entityName%": label|default('N/A')|trans }}) %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {

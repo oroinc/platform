@@ -4,7 +4,7 @@
     {{ block('oro_chart_widget') }}
 
     <script type="text/javascript">
-        require(['oro/chart/chart_form'], function (ChartForm) {
+        require(['orochart/js/chart_form'], function (ChartForm) {
             ChartForm.initialize('#{{ id }}');
         });
     </script>
@@ -18,7 +18,7 @@
     {{ form_widget(form) }}
 
     <script type="text/javascript">
-        require(['oro/report/chart_options'], function (ChartOptions) {
+        require(['ororeport/js/chart_options'], function (ChartOptions) {
             ChartOptions.initialize('{{ id }}', {});
         });
     </script>
