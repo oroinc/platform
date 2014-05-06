@@ -6,6 +6,12 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class EntityFieldListProvider extends EntityFieldRecursiveProvider
 {
+    /** @var string|null */
+    protected $currentClassName = null;
+
+    /** @var string|null */
+    protected $rootClassName = null;
+
     /**
      * {@inheritdoc}
      */
@@ -20,10 +26,66 @@ class EntityFieldListProvider extends EntityFieldRecursiveProvider
     /**
      * {@inheritdoc}
      */
+    protected function addField(array &$result, $name, $type, $label, $isIdentifier, $translate)
+    {
+        $field = [
+            'name'  => $name,
+            'type'  => $type,
+            'label' => $translate ? $this->translator->trans($label) : $label
+        ];
+
+        if ($isIdentifier) {
+            $field['identifier'] = true;
+        }
+
+        if (empty($result[$this->currentClassName])) {
+            $result[$this->currentClassName] = array_merge(
+                $this->addEntityDetails($this->currentClassName, [], $translate),
+                ['fields' => []]
+            );
+        }
+
+        $result[$this->currentClassName]['fields'][] = $field;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFields(
+        $entityName,
+        $withRelations = false,
+        $withVirtualFields = false,
+        $withEntityDetails = false,
+        $withUnidirectional = false,
+        $deepLevel = 0,
+        $lastDeepLevelRelations = false,
+        $translate = true
+    ) {
+        $this->currentClassName = $this->entityClassResolver->getEntityClass($entityName);
+        if (is_null($this->rootClassName)) {
+            $this->rootClassName = $this->currentClassName;
+        }
+
+        return parent::getFields($entityName, $withRelations, $withVirtualFields, $withEntityDetails, $withUnidirectional, $deepLevel, $lastDeepLevelRelations, $translate);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function sortFields(array &$fields)
+    {
+        // nothing to sort here
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function addRelation(
         array &$result,
         array $relation,
+        $withVirtualFields,
         $withEntityDetails,
+        $withUnidirectional,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
@@ -34,7 +96,14 @@ class EntityFieldListProvider extends EntityFieldRecursiveProvider
         }
 
         $relatedEntityName = $relation['related_entity_name'];
-        $relation = $this->addEntityDetails($relatedEntityName, $relation, $translate);
+
+        // add related entity with fields to field list
+        if (empty($result[$relatedEntityName])) {
+            $result[$relatedEntityName] = array_merge(
+                $this->entityProvider->getEntity($relatedEntityName),
+                ['fields' => []]
+            );
+        }
 
         if ($relationDeepLevel >= 0) {
             // set some exceptions
@@ -47,49 +116,36 @@ class EntityFieldListProvider extends EntityFieldRecursiveProvider
                 $this->getFields(
                     $relatedEntityName,
                     $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
+                    $withVirtualFields,
                     $withEntityDetails,
+                    $withUnidirectional,
                     $relationDeepLevel,
                     $lastDeepLevelRelations,
                     $translate
                 );
-        } else {
-            $relatedEntityFields = [];
-        }
 
-        // add related entity with fields to field list
-        if (empty($result[$relatedEntityName])) {
-            $result[$relatedEntityName] = array_merge(
-                $this->entityProvider->getEntity($relatedEntityName),
-                ['fields' => $relatedEntityFields]
+            $result[$relatedEntityName]['fields'] = array_merge_recursive(
+                $result[$relatedEntityName]['fields'],
+                $relatedEntityFields[$relatedEntityName]['fields']
             );
         }
 
-        $sourceClassName = $relation['source_entity_name'];
-
         // add field relation to source entity
-        $result[$sourceClassName]['fields'] = array_merge(
-            $result[$sourceClassName]['fields'],
-            [
-                'name'          => $relation['name'],
-                'label'         => $relation['label'],
-                'relation_type' => $relation['relation_type'],
-                'related_entity_name' => $relatedEntityName,
-            ]
-        );
+        $result[$this->rootClassName]['fields'][] = [
+            'name'          => $relation['name'],
+            'label'         => $relation['label'],
+            'relation_type' => $relation['relation_type'],
+            'related_entity_name' => $relatedEntityName,
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addEntityDetails($relatedEntityName, array $relation, $translate)
+    protected function addEntityDetails($entityName, array $entityData, $translate)
     {
-        $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
-        foreach ($entity as $key => $val) {
-            if (!in_array($key, ['name'])) {
-                $relation[$key] = $val;
-            }
-        }
+        $entity = $this->entityProvider->getEntity($entityName, $translate);
 
-        return $relation;
+        return array_merge_recursive($entityData, $entity);
     }
-} 
+}
