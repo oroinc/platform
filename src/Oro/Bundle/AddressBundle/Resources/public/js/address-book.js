@@ -39,7 +39,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
 
             this.$adressesContainer = $('<div class="map-address-list"/>').appendTo(this.$el);
             this.$mapContainerFrame = $('<div class="map-visual-frame"/>').appendTo(this.$el);
-            var noDataMessage = '<div class="no-data"><span>'+this.noDataMessage+'</span></div>';
+            var noDataMessage = '<div class="no-data"><span>' + this.noDataMessage + '</span></div>';
             this.$noDataContainer = $(noDataMessage).appendTo(this.$el);
             this.mapView = new this.options.mapView({
                 'mapOptions': this.options.mapOptions,
