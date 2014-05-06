@@ -28,7 +28,7 @@ parameters:
     oro_importexport.writer.reverse.class:                                Oro\Bundle\IntegrationBundle\Writer\ReverseWriter
 
     #Reader
-    oro_importexport.reader.entity.with_filters.class:                    Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
+    oro_importexport.reader.entity.by_id.class:                    Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
 
 services:
     oro_integration.channel.manager.api:
@@ -139,8 +139,8 @@ services:
     oro_integration.writer.reverse:
         class: %oro_importexport.writer.reverse.class%
 
-    oro_integration.reader.entity.with_filters:
-        class: %oro_importexport.reader.entity.with_filters.class%
+    oro_integration.reader.entity.by_id:
+        class: %oro_importexport.reader.entity.by_id.class%
         arguments:
             - @oro_importexport.context_registry
             - @doctrine

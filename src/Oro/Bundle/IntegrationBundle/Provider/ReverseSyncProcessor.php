@@ -85,6 +85,8 @@ class ReverseSyncProcessor
      * @param string  $connector  Connector name
      * @param array   $parameters Connector additional parameters
      * @param boolean $saveStatus Do we need to save new status to bd
+     *
+     * @return $this
      */
     protected function processChannelConnector(Channel $channel, $connector, array $parameters, $saveStatus = true)
     {
@@ -107,35 +109,36 @@ class ReverseSyncProcessor
 
             $this->em->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($channel, $status);
-            return;
+            return $this;
         }
-
-        $jobName = $realConnector->getTwoWayJobName();
 
         $configuration = [
             ProcessorRegistry::TYPE_EXPORT =>
                 array_merge(
                     [
-                        'entityName'     => $realConnector->getImportEntityFQCN(),
-                        'channel'        => $channel->getId()
+                        'entityName' => $realConnector->getImportEntityFQCN(),
+                        'channel'    => $channel->getId()
                     ],
                     $parameters
                 ),
         ];
 
-        $this->processExport($connector, $jobName, $configuration, $channel, $saveStatus);
+        $this->processExport($realConnector->getTwoWayJobName(), $configuration);
+
+        return $this;
     }
 
     /**
-     * @param string  $connector
-     * @param string  $jobName
-     * @param array   $configuration
-     * @param Channel $channel
-     * @param boolean $saveStatus
+     * @param $jobName
+     * @param $configuration
+     *
+     * @return $this
      */
-    protected function processExport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
+    protected function processExport($jobName, $configuration)
     {
         $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
+
+        return $this;
     }
 
     /**

@@ -62,3 +62,27 @@ channel type it could be used.
         tags:
             - { name: oro_integration.connector, type: product, channel_type: presta_shop }
 ```
+
+##Export job definition
+This will export your data to your store based on channel definition.
+
+**oro_integration.reader.entity.by_id** - service reads from entity by ID.
+
+**oro_integration.processor.reverse** - service is processing each record.
+
+**oro_integration.writer.reverse** - service is writing collection of entities.
+
+####Example:
+    #batch_job.yml
+    example_export:
+        title: "Entity export"
+        type:  export
+        steps:
+            export:
+                title: export
+                class: Oro\Bundle\BatchBundle\Step\ItemStep
+                services:
+                    reader:    oro_integration.reader.entity.by_id
+                    processor: oro_integration.processor.reverse
+                    writer:    oro_integration.writer.reverse
+                parameters: ~

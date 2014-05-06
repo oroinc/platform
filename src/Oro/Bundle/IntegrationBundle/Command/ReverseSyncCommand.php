@@ -55,7 +55,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     {
         $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
         $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params         = 'a:1:{s:2:"id";i:50;}';#$input->getOption(self::PARAMETERS_ARG_NAME);
+        $params         = $input->getOption(self::PARAMETERS_ARG_NAME);
         $logger         = new OutputLogger($output);
         $processor      = $this->getService(self::SYNC_PROCESSOR);
         $repository     = $this->getService('doctrine.orm.entity_manager')
@@ -69,8 +69,12 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             throw new \InvalidArgumentException('Connector type option is required.');
         }
 
-        if (empty($params) || !is_array(unserialize($params))) {
+        if (empty($params)) {
             throw new \InvalidArgumentException('Parameters option is required.');
+        }
+
+        if (!is_array(unserialize($params))) {
+            throw new \InvalidArgumentException('Parameters option must be serialized string.');
         }
 
         $processor->getLoggerStrategy()->setLogger($logger);
