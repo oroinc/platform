@@ -5,195 +5,311 @@ Table of Contents
 -----------------
  - [What is Workflow?](#what-is-workflow)
  - [Main Entities](#main-entities)
- - [Entity and Wizard Workflows?](#entity-and-wizard-workflows)
  - [How it works?](#how-it-works)
- - [Managed Entities](#managed-entities)
- - [Bind Entities](#bind-entities)
+ - [Workflow Fields](#workflow-fields)
+ - [Activation State](#activation-state) TODO
  - [Configuration](#configuration)
 
 What is Workflow?
-=================
+-----------------
 
-Workflow is a complex solution that allows user to perform set of actions with predefined conditions - each next action
-depends on previous. Also Workflow can be described as some kind of wizard that helps user to perform complex actions.
-Usually Workflow is used to manage some specific entity and to create additional entities.
+Workflow is a complex solution that allows user to perform set of actions with predefined conditions
+for specific entity - each next action depends on previous. Also Workflow can be described as some kind of wizard
+that helps user to perform complex actions.
+Usually Workflow is used to manage some specific type of entity and to create additional entities.
 
 Main Entities
-=============
+-------------
 
 Workflow consists of several related entities.
 
 * **Step** - entity that shows current status of Workflow. Before rendering each transitions checked
-is it allowed for current Workflow Item. Contains name, label and list of allowed transitions.
+is it allowed for current Workflow Item. Contains name, label and list of allowed transitions. Entity involved
+in workflow has relation to current workflow step.
 
 * **Attribute** - entity that represent one value in Workflow Item, used to render field value on a step form.
 Attribute knows about its type (string, object, entity etc.) and additional options.
-Contains name and label as additional parameters.
+Attribute contains name and label as additional parameters.
 
 * **Transition** - action that change current step of Workflow Item (i.e. moves it from one step to another). Transition
 is allowed if it's Conditions are satisfied. Before Transition performed Init Actions are executed and after
 transition performed - Post Actions are executed. Transition can be used as a start transition - it means that this
 transition will start Workflow and create new instance of Workflow Item. Transition optionally could have a form. In
 this case this form will be showed to user when Transition button is clicked. Transition contains name, label and some
-additional options. Optionally can contain form with list of attributes.
+additional options. Optionally transition can contain form with list of attributes.
 
 * **Condition** - defines whether specific Transition is allowed with specified input data. Conditions can be nested.
 
-* **Actions** - actions are assigned to Transition and executed when Transition performed. There are two kind of actions:
-Init Action and Post Actions. The difference between them is that Init Actions are executed before Transition and
-Post Actions are executed after Transition. Actions can be used to manage entities (create, find), manipulate attributes
-(assign values) and to perform any other actions.
+* **Actions** - actions are assigned to Transition and executed when Transition is performed.
+There are two kind of actions: Init Action and Post Actions. The difference between them is that
+Init Actions are executed before Transition and Post Actions are executed after Transition.
+Actions can be used to manage entities (create, find), manipulate attributes (f.e. assign values)
+and to perform any other actions.
 
-* **Workflow** - aggregates steps, attributes and transitions. Workflow is a model that doesn't have own state but it
-can have instances as Workflow Items.
+* **Workflow** - aggregates steps, attributes and transitions. Workflow is a model that doesn't have it's own state
+but it can be referred by Workflow Items.
 
-* **Workflow Data** - aggregated by Workflow Item. Each value associated with Attribute.
+* **Workflow Data** - container aggregated by Workflow Item where each value associated with some Attribute.
 Those values can be entered by user directly or assigned via Actions.
 
 * **Workflow Item** - associated with Workflow and indirectly associated with Steps, Transitions and
-Attributes. Has it's own state in Workflow Data, current Step name, list of bound entities and other data.
-
-Entity and Wizard Workflows
-===========================
-
-There are two types of Workflows:
-* wizard;
-* entity (default).
-
-**Wizard Workflow**
-
-When user starts wizard Workflow then he will be redirected to special Workflow page. On this page he can see next
-UI blocks:
-* list of steps labels as links
-* optional area with form of step
-* optional area with view attributes of step
-* all other steps and their forms in read only mode
-* buttons with possible transitions
-* custom blocks configured by developer (for example information block with some entity data)
-
-![Example of Wizard Workflow UI](../images/wizard-workflow-ui-example.png)
-
-**Entity Workflow**
-
-Unlike wizard, entity Workflow doesn't have special page and it's directly managed on entity page. Another difference
-from wizard Workflow is that steps of entity Workflow cannot have forms and user performs transitions on managed entity
-page by clicking on Workflow buttons.
+Attributes. Has it's own state in Workflow Data, current Step and other data. Workflow Item stored in entity that has
+associated workflow.
 
 How it works?
-=============
+-------------
 
-When user clicks button with start transition (and submit transition form if it's exist) in the background
-a new instance of Workflow Item of specific Workflow is created.
+Entity can have assigned workflow - it means that on entity view page there will be list of passed steps and
+allowed transition buttons. When user clicks button with start transition (and submit transition form if it's exist)
+in the background a new instance of Workflow Item of specific Workflow is created.
 
 Each Step has a list of allowed Transitions, and each Transition has list of Conditions that define whether this
 Transition can be performed with specific Workflow Item state. If Transition is allowed then user can perform it.
 If Transition has Init Actions they are executed before Transition. If transition has Post Actions then
-these Post Actions will be performed right after Transition. So, user can move through Steps of Workflow until
+these Post Actions will be performed right after Transition. So, user can move entity through Steps of Workflow until
 he reach the final Step where Workflow will be finished.
 It's also possible that Workflow doesn't have a final step. In this case user can perform transitions until they are
 allowed.
 
 Workflow Item stores all collected data and current step, so, user can stop his progress on Workflow at any moment and
-then return to it, and Workflow will have exactly the same state.
+then return to it, and Workflow will have exactly the same state. Each Workflow Item represents workflow
+started for some specific entity - this entity stores links to Workflow Item and current Step.
+
+Workflow Fields
+---------------
+
+Each entity that has workflow must also have special fields to store Workflow Item and Workflow Step entities.
+These fields must be named as $workflowItem and $workflowStep. Here is example of their configuration:
+
+```php
+/**
+ * @var WorkflowItem
+ *
+ * @ORM\OneToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowItem")
+ * @ORM\JoinColumn(name="workflow_item_id", referencedColumnName="id", onDelete="SET NULL")
+ */
+protected $workflowItem;
+
+/**
+ * @var WorkflowStep
+ *
+ * @ORM\ManyToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowStep")
+ * @ORM\JoinColumn(name="workflow_step_id", referencedColumnName="id", onDelete="SET NULL")
+ */
+protected $workflowStep;
+
+/**
+ * @param WorkflowItem $workflowItem
+ * @return Opportunity
+ */
+public function setWorkflowItem($workflowItem)
+{
+    $this->workflowItem = $workflowItem;
+
+    return $this;
+}
+
+/**
+ * @return WorkflowItem
+ */
+public function getWorkflowItem()
+{
+    return $this->workflowItem;
+}
+
+/**
+ * @param WorkflowItem $workflowStep
+ * @return Opportunity
+ */
+public function setWorkflowStep($workflowStep)
+{
+    $this->workflowStep = $workflowStep;
+
+    return $this;
+}
+
+/**
+ * @return WorkflowStep
+ */
+public function getWorkflowStep()
+{
+    return $this->workflowStep;
+}
+
+```
+
+Also workflow can be assigned to any extended or custom entities - if this case these fields
+will be created automatically when first workflow for this entity will be created.
+
+Activation State
+----------------
+
+By default all new workflow created in inactive state - it means that there will be no steps and transition
+on entity view page. Only one workflow for each entity can be active in one time.
+
+Activation of workflow can be performed in several ways.
+
+### User Interface
+
+User can activate workflow through UI in Workflow datagrid - it available in menu under "System" > "Workflows".
+Here each workflow can be activated either using row actions "Activate" and "Deactivate", or from Workflow view page
+using appropriate buttons.
+
+### Annotation
+
+Developer can add workflow configuration to @Config entity annotation where active workflow will be specified.
+This approach can be used if there is a need to automatically activate workflow on application installation.
+Here is example of such configuration:
+
+```php
+/**
+ * ...
+ *
+ * @Config(
+ *  ...
+ *  defaultValues={
+ *      ...
+ *      "workflow"={
+ *          "active_workflow"="example_user_flow"
+ *      }
+ *  }
+ * )
+ */
+class User
+{
+    ...
+}
+```
+
+### REST API
+
+WorkflowBunlde provides REST API the allows to activate or deactivate workflow.
+
+Activation URL attributes:
+    * **route:** oro_workflow_api_rest_workflow_activate or oro_api_workflow_activate
+    * **parameter:** workflowDefinition - name of the appropriate workflow
+
+Deactivation URL attributes:
+    * **route:** oro_workflow_api_rest_workflow_deactivate or oro_api_workflow_deactivate
+    * **parameter:** entityClass - entity which workflow should be deactivated
+
+### Workflow Manager
+
+WorkflowBundle has WorkflowManager service (oro_workflow.manager) that provides methods to activate and deactivate
+workflows:
+    * **activateWorkflow(workflowIdentifier)** - activate workflow by workflow name, Workflow instance,
+    WorkflowItem instance or WorkflowDefinition instance;
+    * **deactivateWorkflow(entityClass)** - deactivate workflow by entity class.
 
 Configuration
-=============
+-------------
 
-All Workflow entities are described in configuration. Look at example of simple Workflow configuration that creates a
-new user.
+All Workflow entities are described in configuration. Look at example of simple Workflow configuration that performs
+some action with User entity.
 
 ```
 workflows:
     example_user_flow:                            # name of the workflow
-        label: 'User Workflow Example'            # workflow label
+        label: 'User Workflow Example'            # workflow label for UI representation
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
-        start_step: started                       # step that will be shown first
-        steps_display_ordered: true               # all workflow steps will be shown on the related entity view page
-                                                  # otherwise, only the current step and the past steps will be shown
+        start_step: started                       # step that will be assigned automatically to new entities
+        steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
+
         steps:                                    # list of all existing steps in workflow
-            started:                              # step where user should fill form with firstname and lastname
+            started:                              # step where user should enter firstname and lastname
                 label: 'Started'                  # step label
-                order: 10                         # steps will be shown in ascending
+                order: 10                         # order of step (ascending)
                 allowed_transitions:              # list of allowed transition from this step
-                    - set_name                    # firstname and lastname will be filled on this transition
+                    - set_name                    # first name and last name should be entered on this transition
             processed:                            # step where user can review entered data
-                label: 'Processed'
-                order: 20
-                allowed_transitions:
-                   - add_email
-        attributes:                               # list of all existing attributes in workflow
-            middlename:                           # middlename of user
-                property_path: user.middleName    # path to entity property (automatically defined attribute metadata)
-            email_string:                         # email string attribute
-                label: 'Email'                    # attribute label
-                type: string                      # attribute type, possible values are:
-                                                  # bool (boolean), int (integer), float, string, array, object, entity
-            email:                                # email entity
-                label: 'Email'
-                type: entity
-                options:                          # attribute options
+                label: 'Processed'                # step label
+                order: 20                         # steps will be shown in ascending
+                allowed_transitions:              # order of step
+                   - add_email                    # new email should be added on this transition
+
+        attributes:                                           # list of all existing attributes in workflow
+            first_name:                                       # first name of a user
+                property_path: user.firstName                 # path to entity property (automatically defined attribute metadata)
+            middle_name:                                      # middle name of a user
+                property_path: user.middleName                # path to entity property (automatically defined attribute metadata)
+            last_name:                                        # last name of a user
+                property_path: user.lastName                  # path to entity property (automatically defined attribute metadata)
+            email_string:                                     # email string temporary attribute
+                label: 'Email'                                # attribute label
+                type: string                                  # attribute type
+            email_entity:                                     # email entity temporary attribute
+                label: 'Email Entity'                         # attribute label
+                type: entity                                  # attribute type
+                options:                                      # attribute options
                     class: Oro\Bundle\UserBundle\Entity\Email # entity class name
-        transitions:                                       # list of all existing transitions in workflow
-            set_name:                                      # transition from step "started" to "processed"
-                label: 'Set middlename'                    # transition label
-                step_to: processed                         # next step after transition performing
-                transition_definition: set_name_definition # link to definition of conditions and post actions
-                form_options:                              # options which will be passed to form type of transition
-                    attribute_fields:                      # list of attribute fields which will be shown
-                        middlename:                        # form field name
-                            options:                       # list of form field options
-                                required: true             # define this field as required
-                                constraints:               # list of constraints
-                                    - NotBlank: ~          # this field must be filled
-            add_email:
-                label: 'Add email'
-                step_to: processed
-                transition_definition: add_email_definition
-                form_options:
-                    attribute_fields:
-                        email_string:
-                            options:
-                                required: true
-                                constraints:
-                                    - NotBlank: ~
-        transition_definitions:                             # list of all existing transition definitions
-            set_name_definition:                            # definitions for transition "set_name"
-                conditions:                                 # required conditions: user is not empty
-                    @not_empty: $user                       # user attribute value is not empty
-                post_actions:                               # list of action which will be performed after transition
-                    - @assign_value:                        # list of fields that will be updated
-                        - [$user.middlename, $middlename]   # update users middlename
-            add_email_definition:
-                conditions:
-                    @not_empty: $user
-                post_actions:                               # list of action which will be performed after transition
-                    - @create_entity:                         # create email entity
+
+        transitions:                                        # list of all existing transitions in workflow
+            set_name:                                       # transition from step "started" to "processed"
+                label: 'Set Name'                           # transition label
+                step_to: processed                          # next step after transition performing
+                transition_definition: set_name_definition  # link to definition of conditions and post actions
+                form_options:                               # options which will be passed to form type of transition
+                    attribute_fields:                       # list of attribute fields which will be shown
+                        first_name:                         # attribute name
+                            options:                        # list of form field options
+                                required: true              # define this field as required
+                                constraints:                # list of constraints
+                                    - NotBlank: ~           # this field must be filled
+                        middle_name: ~                      # attribute name
+                        last_name:                          # attribute name
+                            options:                        # list of form field options
+                                required: true              # define this field as required
+                                constraints:                # list of constraints
+                                    - NotBlank: ~           # this field must be filled
+            add_email:                                      # transition from step "add_email" to "add_email" (self-transition)
+                label: 'Add Email'                          # transition label
+                step_to: processed                          # next step after transition performing
+                transition_definition: add_email_definition # link to definition of conditions and post actions
+                form_options:                               # options which will be passed to form type of transition
+                    attribute_fields:                       # list of attribute fields which will be shown
+                        email_string:                       # attribute name
+                            options:                        # list of form field options
+                                required: true              # define this field as required
+                                constraints:                # list of constraints
+                                    - NotBlank: ~           # this field must be filled
+                                    - Email: ~              # field must contain valid email
+
+        transition_definitions:                                   # list of all existing transition definitions
+            set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
+            add_email_definition:                                 # definition for transition "add_email"
+                post_actions:                                     # list of action which will be performed after transition
+                    - @create_entity:                             # create email entity
                         class: Oro\Bundle\UserBundle\Entity\Email # entity class
-                        attribute: $email                   # entity attribute in configuration
-                        data:                               # data for creating entity
-                            email: $email_string
-                            user: $user
-                    - @call_method:                         # call specific method from entity class
-                        object: $user                       # object that should call method
-                        method: addEmail                    # method that should be called
-                        method_parameters:                  # parameters that will be passed to the called method
-                            [$email]
-                    - @unset_value:                         # unset temporary properties
-                            [$email_string, $email]
+                        attribute: $email_entity                  # entity attribute that should store this entity
+                        data:                                     # data for creating entity
+                            email: $email_string                  # entered email
+                            user: $user                           # current user
+                    - @call_method:                               # call specific method from entity class
+                        object: $user                             # object that should call method
+                        method: addEmail                          # method that should be called
+                        method_parameters:                        # parameters that will be passed to the called method
+                            [$email_entity]                       # add email from temporary attribute
+                    - @unset_value:                               # unset temporary properties
+                            [$email_string, $email_entity]        # clear email string and entity
+
 ```
 
-This configuration describes Workflow that includes two steps - "user_form" and "user_summary".
+This configuration describes Workflow that includes two steps - "set_name" and "add_email".
 
-At step "user_form" user should fill small form with personal information attributes - "username" as text (required),
-"age" as integer (required) and "email" as email (optional).
+On step "started" user can update full name (first, middle and last name) using transition "set_name".
+Then on step "processed" user can add additional emails using transition "add_email".
 
-To perform transition "create_user" several conditions must be satisfied (transition definition
-"create_user_definition", node "conditions"): user must enter username (condition @not_empty) and (condition @and) age
-must be greater of equals to 18 years (condition @greater_or_equal). If these conditions and satisfied following post
-actions will be performed (transition definition "create_user_definition", node "post_actions"): User entity will be
-created with entered data and it will be saved to attribute "user" (post action @create_entity).
+To perform transition "set_name" user should fill first and last name, and middle name is optional. After this
+transition entered data will be automatically set to user through attribute property paths.
+And to perform transition "add_email" user must enter valid email - it must be not empty and has valid format.
+This transition creates new Email entity with assigned email string and User entity, then adds it to User entity to
+create connection and clears temporary attributes in last action.
 
-Following diagram shows this schema in graphical representation.
+Following diagram shows this logic in graphical representation.
 
 ![Workflow Diagram](../images/getting-started_workflow-diagram.png)
+
+**Note:** If you want to test this flow in real application, you can put this configuration in file
+Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
+``app/console oro:workflow:definitions:load`` and activate in UI - after that you can go to User view page and test it.

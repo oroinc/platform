@@ -86,7 +86,7 @@ and "workflows" that define names of definitions required to load.
 
 Workflow configuration cannot be merged, it means that you cannot override workflow that is defined in other bundle.
 If you will declare a workflow and another bundle will declare it's own workflow with the same name the command will
-trigger exception and data won't saved.
+trigger exception and data won't be saved.
 
 Defining a Workflow
 ===================
