@@ -419,7 +419,7 @@ class Workflow
      * Get passed latest steps from step with minimum order to step with maximum order.
      *
      * @param WorkflowItem $workflowItem
-     * @return Collection
+     * @return Collection|Step[]
      */
     public function getPassedStepsByWorkflowItem(WorkflowItem $workflowItem)
     {
