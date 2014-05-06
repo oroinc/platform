@@ -141,7 +141,6 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                     ],
                 ]
             );
-
         };
     }
 }

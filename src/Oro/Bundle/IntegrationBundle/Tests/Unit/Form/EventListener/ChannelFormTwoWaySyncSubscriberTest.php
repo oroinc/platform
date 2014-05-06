@@ -62,7 +62,6 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
     public function testGetSubscribedEvents()
     {
         $result = $this->subscriber->getSubscribedEvents();
@@ -70,7 +69,6 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
     }
-
 
     public function testPreSetWithoutTwoWay()
     {
