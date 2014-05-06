@@ -53,12 +53,13 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
-        $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params         = $input->getOption(self::PARAMETERS_ARG_NAME);
-        $logger         = new OutputLogger($output);
-        $processor      = $this->getService(self::SYNC_PROCESSOR);
-        $repository     = $this->getService('doctrine.orm.entity_manager')
+        $channelId       = $input->getOption(self::CHANNEL_ARG_NAME);
+        $connectorType   = $input->getOption(self::CONNECTOR_ARG_NAME);
+        $params          = $input->getOption(self::PARAMETERS_ARG_NAME);
+        $convertedParams = unserialize($params);
+        $logger          = new OutputLogger($output);
+        $processor       = $this->getService(self::SYNC_PROCESSOR);
+        $repository      = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
 
         if (empty($channelId)) {
@@ -73,7 +74,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             throw new \InvalidArgumentException('Parameters option is required.');
         }
 
-        if (!is_array(unserialize($params))) {
+        if (!is_array($convertedParams)) {
             throw new \InvalidArgumentException('Parameters option must be serialized string.');
         }
 
@@ -105,7 +106,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 )
             );
 
-            $processor->process($channel, $connectorType, unserialize($params));
+            $processor->process($channel, $connectorType, $convertedParams);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
         }
@@ -156,7 +157,6 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 ' "--params=\'' . $params . '\'"]'
             );
 
-        $running = (int)$query->getQuery()->getSingleScalarResult();
-        return $running > 0;
+        return (int)$query->getQuery()->getSingleScalarResult() > 0;
     }
 }

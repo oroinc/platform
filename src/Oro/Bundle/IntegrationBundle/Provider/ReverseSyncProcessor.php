@@ -63,33 +63,6 @@ class ReverseSyncProcessor
      */
     public function process(Channel $channel, $connector, array $parameters)
     {
-        $this->processChannelConnector($channel, $connector, $parameters, false);
-
-        return $this;
-    }
-
-    /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
-     */
-    public function getLoggerStrategy()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * Process channel connector
-     *
-     * @param Channel $channel    Channel object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
-     * @param boolean $saveStatus Do we need to save new status to bd
-     *
-     * @return $this
-     */
-    protected function processChannelConnector(Channel $channel, $connector, array $parameters, $saveStatus = true)
-    {
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
 
@@ -100,16 +73,7 @@ class ReverseSyncProcessor
             }
 
         } catch (\Exception $e) {
-            // log and continue
-            $this->logger->error($e->getMessage());
-            $status = new Status();
-            $status->setCode(Status::STATUS_FAILED)
-                ->setMessage($e->getMessage())
-                ->setConnector($connector);
-
-            $this->em->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($channel, $status);
-            return $this;
+            return $this->logError($e, $channel, $connector);
         }
 
         $configuration = [
@@ -126,6 +90,16 @@ class ReverseSyncProcessor
         $this->processExport($realConnector->getTwoWayJobName(), $configuration);
 
         return $this;
+    }
+
+    /**
+     * Get logger strategy
+     *
+     * @return LoggerStrategy
+     */
+    public function getLoggerStrategy()
+    {
+        return $this->logger;
     }
 
     /**
@@ -152,5 +126,27 @@ class ReverseSyncProcessor
     protected function getRealConnector(Channel $channel, $connector)
     {
         return clone $this->registry->getConnectorType($channel->getType(), $connector);
+    }
+
+    /**
+     * log and continue
+     *
+     * @param \Exception $e
+     * @param Channel    $channel
+     * @param            $connector
+     *
+     * @return $this
+     */
+    protected function logError(\Exception $e, Channel $channel, $connector)
+    {
+        $this->logger->error($e->getMessage());
+        $status = new Status();
+        $status->setCode(Status::STATUS_FAILED)
+            ->setMessage($e->getMessage())
+            ->setConnector($connector);
+
+        $this->em->getRepository('OroIntegrationBundle:Channel')
+            ->addStatus($channel, false);
+        return $this;
     }
 }
