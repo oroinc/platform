@@ -70,7 +70,7 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Email", mappedBy="folder", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist", "remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emails;
@@ -208,8 +208,6 @@ class EmailFolder
     public function addEmail(Email $email)
     {
         $this->emails[] = $email;
-
-        $email->setFolder($this);
 
         return $this;
     }

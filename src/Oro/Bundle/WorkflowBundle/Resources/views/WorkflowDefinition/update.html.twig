@@ -31,7 +31,7 @@
 {% set gridUrl = path('oro_workflow_definition_index') %}
 
 {% block navButtons %}
-    {% if entity.name and resource_granted('DELETE', entity) %}
+    {% if entity.name and delete_allowed and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
             'dataRedirect': gridUrl,
@@ -569,8 +569,7 @@
             var workflowManagement = new WorkflowManagement({
                 el: '#{{ form.vars.id }}',
                 stepsEl: '.workflow-definition-steps-list-container',
-                model: workflowModel,
-                backUrl: {{ gridUrl|json_encode|raw }}
+                model: workflowModel
             });
 
             workflowManagement.render();

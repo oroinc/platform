@@ -28,7 +28,7 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
  */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
-    const EMAIL_ADDRESS_BATCH_SIZE = 10;
+    const EMAIL_ADDRESS_BATCH_SIZE = 100;
 
     /**
      * @var ImapEmailManager
@@ -351,20 +351,31 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $repo         = $this->em->getRepository('OroImapBundle:ImapEmail');
         $query        = $repo->createQueryBuilder('e')
-            ->select('e.uid')
+            ->select('e.uid, se.id')
             ->innerJoin('e.email', 'se')
-            ->innerJoin('se.folder', 'sf')
+            ->innerJoin('se.folders', 'sf')
             ->where('sf.id = :folderId AND e.uid IN (:uids)')
             ->setParameter('folderId', $folder->getId())
             ->setParameter('uids', $uids)
             ->getQuery();
+
+        $result = $query->getResult();
+
         $existingUids = array_map(
             function ($el) {
                 return $el['uid'];
             },
-            $query->getResult()
+            $result
         );
 
+        $existingEmailIds = array_map(
+            function ($el) {
+                return $el['id'];
+            },
+            $result
+        );
+
+        $srcStack = [];
         foreach ($emails as $src) {
             if (!in_array($src->getId()->getUid(), $existingUids)) {
                 $this->log->notice(
@@ -382,12 +393,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     $src->getCcRecipients(),
                     $src->getBccRecipients()
                 );
-                $email->setFolder($folder);
-                $imapEmail = new ImapEmail();
-                $imapEmail
-                    ->setUid($src->getId()->getUid())
-                    ->setEmail($email);
-                $this->em->persist($imapEmail);
+                $email->addFolder($folder);
+                $email->setMessageId($src->getMessageId());
+                $email->setXMessageId($src->getXMessageId());
+                $email->setXThreadId($src->getXThreadId());
+
+                $srcStack[$src->getMessageId()] = $src->getId()->getUid();
 
                 $this->log->notice(sprintf('The "%s" email was persisted.', $src->getSubject()));
             } else {
@@ -402,6 +413,24 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         $this->emailEntityBuilder->getBatch()->persist($this->em);
+
+        /** @var Email[] $oEmails */
+        $oEmails = $this->emailEntityBuilder->getBatch()->getEmails();
+        foreach ($oEmails as $email) {
+            if ($email->getId() || in_array($email->getId(), $existingEmailIds)) {
+                continue;
+            }
+
+            $uid = $srcStack[$email->getMessageId()];
+
+            $imapEmail = new ImapEmail();
+            $imapEmail
+                ->setUid($uid)
+                ->setEmail($email);
+
+            $this->em->persist($imapEmail);
+        }
+
         $this->em->flush();
     }
 }
