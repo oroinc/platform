@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Reader;
 
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
@@ -25,21 +24,6 @@ class EntityReaderById extends BaseReader
     public function __construct(ContextRegistry $contextRegistry, ManagerRegistry $registry)
     {
         parent::__construct($contextRegistry, $registry);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function initializeFromContext(ContextInterface $context)
-    {
-        if ($context->hasOption('entityName')) {
-            $this->setSourceEntityName($context);
-        } elseif (!$this->getSourceIterator()) {
-            throw new InvalidConfigurationException(
-                'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
-            );
-        }
-        return $this;
     }
 
     /**
@@ -78,8 +62,6 @@ class EntityReaderById extends BaseReader
         }
 
         $this->setSourceQueryBuilder($qb);
-
-        return $this;
     }
 
     /**
@@ -90,5 +72,19 @@ class EntityReaderById extends BaseReader
     protected function getQueryBuilder($entityName)
     {
         return $this->registry->getRepository($entityName)->createQueryBuilder('o');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeFromContext(ContextInterface $context)
+    {
+        if ($context->hasOption('entityName')) {
+            $this->setSourceEntityName($context);
+        } elseif (!$this->getSourceIterator()) {
+            throw new InvalidConfigurationException(
+                'Configuration of entity reader must contain either "entityName".'
+            );
+        }
     }
 }
