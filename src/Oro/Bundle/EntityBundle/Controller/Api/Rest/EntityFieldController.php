@@ -32,6 +32,9 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
+     *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
+     *      description="Indicates whether virtual fields should be returned as well.")
+     * @QueryParam(
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
@@ -58,6 +61,8 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
+        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
+
         $deepLevel         = $this->getRequest()->query->has('deep-level')
             ? (int)$this->getRequest()->query->get('deep-level')
             : 0;
@@ -70,6 +75,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
+                $withVirtualFields,
                 $withEntityDetails,
                 $withUnidirectional,
                 $deepLevel,

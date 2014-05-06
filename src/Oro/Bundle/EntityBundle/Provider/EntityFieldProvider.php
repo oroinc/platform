@@ -15,9 +15,12 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EntityFieldProvider
 {
     /**
@@ -51,6 +54,16 @@ class EntityFieldProvider
     protected $translator;
 
     /**
+     * @var array
+     */
+    protected $virtualFields;
+
+    /**
+     * @var array
+     */
+    protected $hiddenFields;
+
+    /**
      * Constructor
      *
      * @param ConfigProvider      $entityConfigProvider
@@ -58,19 +71,25 @@ class EntityFieldProvider
      * @param EntityClassResolver $entityClassResolver
      * @param ManagerRegistry     $doctrine
      * @param Translator          $translator
+     * @param array               $virtualFields
+     * @param array               $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
-        Translator $translator
+        Translator $translator,
+        $virtualFields,
+        $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->doctrine             = $doctrine;
         $this->translator           = $translator;
+        $this->virtualFields        = $virtualFields;
+        $this->hiddenFields         = $hiddenFields;
     }
 
     /**
@@ -88,6 +107,7 @@ class EntityFieldProvider
      *
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
      * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
      * @param int    $deepLevel              The maximum deep level of related entities.
@@ -116,6 +136,7 @@ class EntityFieldProvider
     public function getFields(
         $entityName,
         $withRelations = false,
+        $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
         $deepLevel = 0,
@@ -125,12 +146,13 @@ class EntityFieldProvider
         $result    = array();
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
-        $this->addFields($result, $className, $em, $translate);
+        $this->addFields($result, $className, $em, $withVirtualFields, $translate);
         if ($withRelations) {
             $this->addRelations(
                 $result,
                 $className,
                 $em,
+                $withVirtualFields,
                 $withEntityDetails,
                 $withUnidirectional,
                 $deepLevel - 1,
@@ -143,6 +165,7 @@ class EntityFieldProvider
                     $result,
                     $className,
                     $em,
+                    $withVirtualFields,
                     $withEntityDetails,
                     $deepLevel - 1,
                     $lastDeepLevelRelations,
@@ -161,15 +184,21 @@ class EntityFieldProvider
      * @param array         $result
      * @param string        $className
      * @param EntityManager $em
+     * @param bool          $withVirtualFields
      * @param bool          $translate
      */
-    protected function addFields(array &$result, $className, EntityManager $em, $translate)
+    protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
     {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
 
+            // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
+                if ($this->isIgnoredField($metadata, $fieldName)) {
+                    continue;
+                }
+
                 $fieldLabel = $this->getFieldLabel($className, $fieldName);
                 $this->addField(
                     $result,
@@ -180,7 +209,42 @@ class EntityFieldProvider
                     $translate
                 );
             }
+
+            // add virtual fields
+            if ($withVirtualFields && isset($this->virtualFields[$className])) {
+                foreach ($this->virtualFields[$className] as $fieldName => $config) {
+                    if ($this->isIgnoredField($metadata, $fieldName)) {
+                        continue;
+                    }
+
+                    $this->addField(
+                        $result,
+                        $fieldName,
+                        $config['query']['select']['return_type'],
+                        ConfigHelper::getTranslationKey('label', $className, $fieldName),
+                        false,
+                        $translate
+                    );
+                }
+            }
         }
+    }
+
+    /**
+     * Checks if the given field should be ignored
+     *
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
+     * @return bool
+     */
+    protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    {
+        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
+        if (isset($this->hiddenFields[$metadata->name][$fieldName])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -212,6 +276,7 @@ class EntityFieldProvider
      * @param array         $result
      * @param string        $className
      * @param EntityManager $em
+     * @param bool          $withVirtualFields
      * @param bool          $withEntityDetails
      * @param bool          $withUnidirectional
      * @param int           $relationDeepLevel
@@ -222,6 +287,7 @@ class EntityFieldProvider
         array &$result,
         $className,
         EntityManager $em,
+        $withVirtualFields,
         $withEntityDetails,
         $withUnidirectional,
         $relationDeepLevel,
@@ -238,12 +304,8 @@ class EntityFieldProvider
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                // skip 'default_' extend field
-                if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-                    $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-                    if ($this->isExtendField($className, $guessedFieldName)) {
+                if ($this->isIgnoredRelation($metadata, $associationName)) {
                         continue;
-                    }
                 }
 
                 $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
@@ -260,6 +322,7 @@ class EntityFieldProvider
                 $this->addRelation(
                     $result,
                     $relationData,
+                    $withVirtualFields,
                     $withEntityDetails,
                     $withUnidirectional,
                     $relationDeepLevel,
@@ -277,6 +340,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withVirtualFields
      * @param int           $relationDeepLevel
      * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
@@ -285,6 +349,7 @@ class EntityFieldProvider
         array &$result,
         $className,
         EntityManager $em,
+        $withVirtualFields,
         $withEntityDetails,
         $relationDeepLevel,
         $lastDeepLevelRelations,
@@ -324,6 +389,7 @@ class EntityFieldProvider
             $this->addRelation(
                 $result,
                 $relationData,
+                $withVirtualFields,
                 $withEntityDetails,
                 true,
                 $relationDeepLevel,
@@ -367,10 +433,31 @@ class EntityFieldProvider
     }
 
     /**
+     * Checks if the given relation should be ignored
+     *
+     * @param ClassMetadata $metadata
+     * @param string        $associationName
+     * @return bool
+     */
+    protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
+    {
+        // skip 'default_' extend field
+        if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+            $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+            if ($this->isExtendField($metadata->name, $guessedFieldName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Adds a relation to $result
      *
      * @param array $result
      * @param array $relation
+     * @param bool  $withVirtualFields
      * @param bool  $withEntityDetails
      * @param bool  $withUnidirectional
      * @param int   $relationDeepLevel
@@ -380,6 +467,7 @@ class EntityFieldProvider
     protected function addRelation(
         array &$result,
         array $relation,
+        $withVirtualFields,
         $withEntityDetails,
         $withUnidirectional,
         $relationDeepLevel,
@@ -409,6 +497,7 @@ class EntityFieldProvider
                 $this->getFields(
                     $relatedEntityName,
                     $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
+                    $withVirtualFields,
                     $withEntityDetails,
                     $withUnidirectional,
                     $relationDeepLevel,

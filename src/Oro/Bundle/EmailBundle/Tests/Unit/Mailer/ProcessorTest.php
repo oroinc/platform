@@ -102,10 +102,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
         $model = $this->createEmailModel(
             array(
-                'from' => 'test@test.com',
-                'to' => array('test2@test.com'),
+                'from'    => 'test@test.com',
+                'to'      => array('test2@test.com'),
                 'subject' => 'test',
-                'body' => 'test body'
+                'body'    => 'test body'
             )
         );
         $this->emailProcessor->process($model);
@@ -290,6 +290,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     protected function processWithOwner($user, $withOrigin = false)
     {
         $message = $this->getMockForAbstractClass('\Swift_Mime_Message');
+
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));

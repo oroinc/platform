@@ -31,6 +31,9 @@ This value should be {{ limit }} or less.: This value should be {{ limit }} or l
 This value should be a valid number.: This value should be a valid number.
 Name: Name
 Final: Final
+Start: Start
+Inactive: Inactive
+Configuration: Configuration
 Transitions: Transitions
 Add transition: Add transition
 Add transition to this step: Add transition to this step
@@ -124,7 +127,8 @@ oro:
             clone_label_prefix:           'Copy of '
 
             datagrid:
-                update: Update
+                view: View
+                update: Edit
                 clone:  Clone
                 delete: Delete
                 activate: Activate

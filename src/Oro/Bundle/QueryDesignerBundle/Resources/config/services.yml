@@ -11,6 +11,7 @@ services:
             - []
             - @oro_query_designer.config.resolver
             - @translator
+            - %oro_entity.virtual_fields%
 
     oro_query_designer.query_designer.restriction_builder:
         class: %oro_query_designer.query_designer.restriction_builder.class%

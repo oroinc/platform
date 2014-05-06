@@ -54,26 +54,34 @@ class Builder
      * Create, configure and build datagrid
      *
      * @param DatagridConfiguration $config
-     * @param array                 $parameters
+     * @param ParameterBag $parameters
      *
      * @return DatagridInterface
      */
-    public function build(DatagridConfiguration $config, array $parameters = [])
+    public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
         /** @var Acceptor $acceptor */
-        $acceptor = new $this->acceptorClass($config);
-        /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor);
+        $acceptor = new $this->acceptorClass();
+        $acceptor->setConfig($config);
 
-        $event = new BuildBefore($datagrid, $config, $parameters);
+        /** @var DatagridInterface $datagrid */
+        $datagrid = new $class($name, $acceptor, $parameters);
+
+        $event = new BuildBefore($datagrid, $config);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
 
         $this->buildDataSource($datagrid, $config);
 
         foreach ($this->extensions as $extension) {
+            /**
+             * ATTENTION: extension object should be cloned cause it can contain some state
+             */
+            $extension = clone $extension;
+            $extension->setParameters($parameters);
+
             if ($extension->isApplicable($config)) {
                 $acceptor->addExtension($extension);
             }
@@ -81,7 +89,7 @@ class Builder
 
         $acceptor->processConfiguration();
 
-        $event = new BuildAfter($datagrid, $parameters);
+        $event = new BuildAfter($datagrid);
         $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);
 
         return $datagrid;

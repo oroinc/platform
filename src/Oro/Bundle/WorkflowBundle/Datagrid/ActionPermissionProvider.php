@@ -36,6 +36,7 @@ class ActionPermissionProvider
         $isSystem = $record->getValue('system');
 
         return array(
+            'view' => true,
             'update' => !$isSystem,
             'clone'  => true,
             'delete' => !$isSystem,
