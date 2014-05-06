@@ -16,9 +16,6 @@ class ChannelType extends AbstractType
     const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
-    const REMOTE_WINS = 'remote';
-    const LOCAL_WINS  = 'local';
-
     /** @var TypesRegistry */
     protected $registry;
 
