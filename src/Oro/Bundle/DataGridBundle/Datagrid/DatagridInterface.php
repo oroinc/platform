@@ -76,6 +76,13 @@ interface DatagridInterface
     public function getMetadata();
 
     /**
+     * Returns parameters
+     *
+     * @return ParameterBag
+     */
+    public function getParameters();
+
+    /**
      * Get config object
      *
      * @return DatagridConfiguration

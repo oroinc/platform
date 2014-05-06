@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oro/report/chart_options': 'bundles/ororeport/js/chart_options.js'

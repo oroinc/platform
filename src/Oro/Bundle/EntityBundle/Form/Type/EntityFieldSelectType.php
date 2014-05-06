@@ -71,6 +71,7 @@ class EntityFieldSelectType extends AbstractType
             array(
                 'entity'                    => null,
                 'with_relations'            => false,
+                'with_virtual_fields'       => false,
                 'deep_level'                => 0,
                 'last_deep_level_relations' => false,
                 'empty_value'               => '',
@@ -98,7 +99,7 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function configsNormalizer(Options $options, &$configs, &$defaultConfigs)
     {
-        $configs = array_merge($defaultConfigs, $configs);
+        $configs             = array_merge($defaultConfigs, $configs);
         $configs['multiple'] = $options['multiple'];
         if ($options['multiple'] && $configs['placeholder'] === $defaultConfigs['placeholder']) {
             $configs['placeholder'] .= 's';
@@ -132,6 +133,7 @@ class EntityFieldSelectType extends AbstractType
             : $this->getData(
                 $options['entity'],
                 $options['with_relations'],
+                $options['with_virtual_fields'],
                 $options['deep_level'],
                 $options['last_deep_level_relations']
             );
@@ -145,16 +147,18 @@ class EntityFieldSelectType extends AbstractType
      *
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param int    $deepLevel              The maximum deep level of related entities.
      * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
      *                                       should be returned.
      * @return array
      */
-    protected function getData($entityName, $withRelations, $deepLevel, $lastDeepLevelRelations)
+    protected function getData($entityName, $withRelations, $withVirtualFields, $deepLevel, $lastDeepLevelRelations)
     {
         $fields = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
+            $withVirtualFields,
             true,
             $deepLevel,
             $lastDeepLevelRelations
@@ -172,7 +176,7 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function convertData(array &$fields, $entityName, $parentFieldId)
     {
-        $result    = [];
+        $result = [];
         foreach ($fields as $field) {
             $fieldId = null !== $parentFieldId
                 ? sprintf('%s+%s::%s', $parentFieldId, $entityName, $field['name'])
@@ -188,7 +192,7 @@ class EntityFieldSelectType extends AbstractType
 
             if (!isset($field['related_entity_name'])) {
                 $fieldData['id'] = $fieldId;
-                $result[]  = $fieldData;
+                $result[]        = $fieldData;
             } else {
                 if (isset($field['related_entity_fields'])) {
                     $fieldData['children'] = $this->convertData(

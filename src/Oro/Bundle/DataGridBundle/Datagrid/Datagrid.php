@@ -19,10 +19,19 @@ class Datagrid implements DatagridInterface
     /** @var Acceptor */
     protected $acceptor;
 
-    public function __construct($name, Acceptor $acceptor)
+    /** @var ParameterBag */
+    protected $parameters;
+
+    /**
+     * @param string $name
+     * @param Acceptor $acceptor
+     * @param ParameterBag $parameters
+     */
+    public function __construct($name, Acceptor $acceptor, ParameterBag $parameters)
     {
         $this->name = $name;
         $this->setAcceptor($acceptor);
+        $this->setParameters($parameters);
     }
 
     /**
@@ -102,6 +111,22 @@ class Datagrid implements DatagridInterface
         $this->acceptor = $acceptor;
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setParameters(ParameterBag $parameters)
+    {
+        $this->parameters = $parameters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**

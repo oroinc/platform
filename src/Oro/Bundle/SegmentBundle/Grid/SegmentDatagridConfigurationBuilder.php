@@ -9,6 +9,7 @@ use Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy;
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
@@ -25,16 +26,18 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
     /**
      * Constructor
      *
-     * @param string                    $gridName
-     * @param Segment                   $segment
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
-     * @param ConfigManager             $configManager
+     * @param string                        $gridName
+     * @param Segment                       $segment
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param ConfigManager                 $configManager
      */
     public function __construct(
         $gridName,
         Segment $segment,
         FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
         ConfigManager $configManager
     ) {
@@ -43,11 +46,12 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
             $gridName,
             new DatagridSourceSegmentProxy($segment, $em),
             $functionProvider,
+            $virtualFieldProvider,
             $doctrine
         );
 
-        $this->entityName     = $segment->getEntity();
-        $entityMetadata = $configManager->getEntityMetadata($this->entityName);
+        $this->entityName = $segment->getEntity();
+        $entityMetadata   = $configManager->getEntityMetadata($this->entityName);
         if ($entityMetadata && $entityMetadata->routeView) {
             $this->route = $entityMetadata->routeView;
         }
@@ -72,7 +76,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
                 'properties',
                 [
                     $this->identifierName => null,
-                    'view_link'  => [
+                    'view_link'           => [
                         'type'   => 'url',
                         'route'  => $this->route,
                         'params' => ['id']
@@ -85,7 +89,7 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
                 [
                     'view' => [
                         'type'         => 'navigate',
-                        'acl_resource' => 'VIEW;entity:'.$this->entityName,
+                        'acl_resource' => 'VIEW;entity:' . $this->entityName,
                         'label'        => 'View',
                         'icon'         => 'user',
                         'link'         => 'view_link',
@@ -94,12 +98,12 @@ class SegmentDatagridConfigurationBuilder extends DatagridConfigurationBuilder
                 ]
             );
 
-            $tableAlias = $config->offsetGetByPath('[source][query_config][table_aliases]');
-            $tableAlias = array_shift($tableAlias);
-
+            // add primary key of the root table to the result
+            $tableAliases   = $config->offsetGetByPath('[source][query_config][table_aliases]');
+            $rootTableAlias = $tableAliases[''];
             $config->offsetAddToArrayByPath(
                 '[source][query][select]',
-                [sprintf('%s.%s', $tableAlias, $this->identifierName)]
+                [sprintf('%s.%s', $rootTableAlias, $this->identifierName)]
             );
         }
 
