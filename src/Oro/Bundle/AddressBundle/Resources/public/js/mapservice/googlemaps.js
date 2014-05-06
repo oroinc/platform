@@ -68,7 +68,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
 
             if (this.options.showWeather) {
                 weatherLayer = new google.maps.weather.WeatherLayer({
-                    temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT
+                    temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT,
+                    windSpeedUnits: google.maps.weather.WindSpeedUnit.MILES_PER_HOUR
                 });
                 weatherLayer.setMap(this.map);
 
