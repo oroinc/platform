@@ -22,7 +22,7 @@ use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
  */
 class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
-    const SYNC_PROCESSOR = 'oro_integration.sync.processor';
+    const SYNC_PROCESSOR = 'oro_integration.reverse_sync.processor';
     const COMMAND_NAME = 'oro:integration:reverse:sync';
     const CHANNEL_ARG_NAME = 'channel';
     const CONNECTOR_ARG_NAME = 'connector';
@@ -53,12 +53,13 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channelId      = $input->getOption(self::CHANNEL_ARG_NAME);
-        $connectorType  = $input->getOption(self::CONNECTOR_ARG_NAME);
-        $params         = $input->getOption(self::PARAMETERS_ARG_NAME);
-        $logger         = new OutputLogger($output);
-        $processor      = $this->getService(self::SYNC_PROCESSOR);
-        $repository     = $this->getService('doctrine.orm.entity_manager')
+        $channelId       = $input->getOption(self::CHANNEL_ARG_NAME);
+        $connectorType   = $input->getOption(self::CONNECTOR_ARG_NAME);
+        $params          = $input->getOption(self::PARAMETERS_ARG_NAME);
+        $convertedParams = unserialize($params);
+        $logger          = new OutputLogger($output);
+        $processor       = $this->getService(self::SYNC_PROCESSOR);
+        $repository      = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
 
         if (empty($channelId)) {
@@ -71,6 +72,10 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
 
         if (empty($params)) {
             throw new \InvalidArgumentException('Parameters option is required.');
+        }
+
+        if (!is_array($convertedParams)) {
+            throw new \InvalidArgumentException('Parameters option must be serialized string.');
         }
 
         $processor->getLoggerStrategy()->setLogger($logger);
@@ -101,7 +106,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 )
             );
 
-            $processor->process($channel, $connectorType, $params);
+            $processor->process($channel, $connectorType, $convertedParams);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
         }
@@ -152,8 +157,6 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
                 ' "--params=\'' . $params . '\'"]'
             );
 
-        $running = $query->getQuery()->getSingleScalarResult();
-
-        return $running > 0;
+        return (int)$query->getQuery()->getSingleScalarResult() > 0;
     }
 }
