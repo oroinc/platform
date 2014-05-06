@@ -1,0 +1,29 @@
+Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [fieldName, entity]
+    properties:
+        fieldName:
+            - NotBlank: ~
+            - Regex:
+                pattern: "/^[a-z]+[a-z0-9_]*$/"
+                message: This value should contains only lower alphabetic symbols, underscore and numbers
+            - Regex:
+                pattern: "/^id$/i"
+                match:   false
+                message: The '{{ value }}' cannot be used as field name
+            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword: ~
+        type:
+            - NotBlank: ~
+
+Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
+    group_sequence: [EntityConfigModel, Sql, Php]
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [className]
+    properties:
+        className:
+            - NotBlank:  ~
+            - Regex:
+                pattern: "/^[a-z]+[a-z0-9]*$/i"
+                message: This value should contains only lower/upper alphabetic symbols and numbers
+            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword: {groups: Sql}
+            - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword: {groups: Php}
