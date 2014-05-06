@@ -11,8 +11,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+
 class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 {
+
+    const REMOTE_WINS     = 'remote';
+    const LOCAL_WINS      = 'local';
+
     /** @var TypesRegistry */
     protected $registry;
 
@@ -31,6 +37,7 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA  => 'preSet',
+            FormEvents::PRE_SUBMIT  => 'preSubmit',
         ];
     }
 
@@ -47,11 +54,35 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
         }
 
         if ($this->isNotEmpty($data->getType())) {
-            if (false === $this->hasTwoWaySync($data->getType())) {
-                $form->remove('syncPriority')
-                    ->remove('isTwoWaySyncEnabled');
+            if (true === $this->hasTwoWaySync($data->getType())) {
+
+                $mc = $this->getModifierClosure();
+                $mc($form);
+
+                /*$form->remove('syncPriority');
+                $form->remove('isTwoWaySyncEnabled');*/
             }
         }
+    }
+
+    public function preSubmit(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $data = $event->getData();
+
+        if (empty($data)) {
+            return;
+        }
+
+        if ($this->isNotEmpty($data['type'])) {
+            if (true === $this->hasTwoWaySync($data['type'])) {
+                $mc = $this->getModifierClosure();
+                $mc($form);
+            }
+        }
+
+
+
     }
 
     /**
@@ -90,4 +121,34 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
         }
         return false;
     }
+
+    protected function getModifierClosure()
+    {
+        return function ($form) {
+
+            $form->add(
+                'isTwoWaySyncEnabled',
+                'checkbox',
+                [
+                    'label'    => 'oro.integration.channel.two_way_sync_enabled.label',
+                    'required' => false,
+                ]
+            );
+            $form->add(
+                'syncPriority',
+                'choice',
+                [
+                    'label'    => 'oro.integration.channel.sync_priority.label',
+                    'required' => false,
+                    'choices'  => [
+                        self::REMOTE_WINS => 'oro.integration.channel.remote_wins.label',
+                        self::LOCAL_WINS => 'oro.integration.channel.local_wins.label'
+                    ],
+                ]
+            );
+
+        };
+    }
+
+
 }

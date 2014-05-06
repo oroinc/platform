@@ -68,7 +68,7 @@ class ChannelType extends AbstractType
                 'required' => false,
             ]
         );
-
+/*
         $builder->add(
             'isTwoWaySyncEnabled',
             'checkbox',
@@ -90,7 +90,7 @@ class ChannelType extends AbstractType
                 ],
             ]
         );
-
+*/
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
     }
 
