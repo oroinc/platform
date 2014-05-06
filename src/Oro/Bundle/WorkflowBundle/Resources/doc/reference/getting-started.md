@@ -7,7 +7,7 @@ Table of Contents
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
  - [Workflow Fields](#workflow-fields)
- - [Activation State](#activation-state) TODO
+ - [Activation State](#activation-state)
  - [Configuration](#configuration)
 
 What is Workflow?
@@ -312,5 +312,5 @@ Following diagram shows this logic in graphical representation.
 
 **Note:** If you want to test this flow in real application, you can put this configuration in file
 Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
-``app/console oro:workflow:definitions:load`` and activate in in UI -
+``app/console oro:workflow:definitions:load`` and activate it from UI -
 after that you can go to User view page and test it.
