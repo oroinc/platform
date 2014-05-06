@@ -29,7 +29,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
-            ->addOption('timeout', null, InputOption::VALUE_REQUIRED, 'Process timeout')
+            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Process timeout', 300)
             ->addOption(
                 'sample-data',
                 null,
@@ -62,7 +62,7 @@ class InstallCommand extends ContainerAwareCommand
                 array(
                     '--no-optional-warmers' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                    '--process-timeout' => $input->getOption("timeout"),
                     '--no-debug' => false
                 )
             );
@@ -152,7 +152,7 @@ class InstallCommand extends ContainerAwareCommand
                     '--force' => true,
                     '--full-database' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300)
+                    '--process-timeout' => $input->getOption("timeout")
                 )
             )
             ->runCommand('oro:entity-config:clear')
@@ -161,14 +161,14 @@ class InstallCommand extends ContainerAwareCommand
                 'oro:migration:load',
                 array(
                     '--process-isolation' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300)
+                    '--process-timeout' => $input->getOption("timeout")
                 )
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 array(
                     '--process-isolation' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300)
+                    '--process-timeout' => $input->getOption("timeout")
                 )
             )
             ->runCommand(
@@ -176,7 +176,7 @@ class InstallCommand extends ContainerAwareCommand
                 array(
                     '--process-isolation' => true,
                     '--no-interaction' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300)
+                    '--process-timeout' => $input->getOption("timeout")
                 )
             );
 
@@ -272,7 +272,7 @@ class InstallCommand extends ContainerAwareCommand
                 'oro:migration:data:load',
                 array(
                     '--process-isolation' => true,
-                    '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                    '--process-timeout' => $input->getOption("timeout"),
                     '--fixtures-type' => 'demo'
                 )
             );
@@ -298,27 +298,27 @@ class InstallCommand extends ContainerAwareCommand
         $commandExecutor
             ->runCommand('oro:navigation:init', array(
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
             ))
             ->runCommand('fos:js-routing:dump', array(
                 '--target' => 'web/js/routes.js',
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
             ))
             ->runCommand('oro:localization:dump')
             ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
             ->runCommand('assetic:dump', array(
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
             ))
             ->runCommand('oro:translation:dump', array(
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
             ))
             ->runCommand('oro:requirejs:build', array(
                 '--ignore-errors' => true,
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
             ));
 
         // run installer scripts
@@ -332,7 +332,7 @@ class InstallCommand extends ContainerAwareCommand
             'cache:clear',
             array(
                 '--process-isolation' => true,
-                '--process-timeout' => ($input->getOption("timeout")!==null?$input->getOption("timeout"):300),
+                '--process-timeout' => $input->getOption("timeout"),
                 '--no-debug' => false
             )
         );
