@@ -80,11 +80,6 @@ function(_, Backbone, Helper, __) {
                 select2: {
                     placeholder: __("Choose field..."),
                     formatSelectionTemplate: this.entity_field_template
-                },
-                util: {
-                    findEntity:  function (entityName) {
-                        return _.findWhere(workflow.getSystemEntities(), {name: entityName});
-                    }
                 }
             });
         },

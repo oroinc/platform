@@ -606,3 +606,35 @@ disabled look for disabled choices in the results dropdown
     #accordion > .group();
   }
 }
+
+.select2-breadcrumbs {
+  list-style: none;
+  margin: 4px 4px 0;
+  &:empty {
+    margin: 0;
+  }
+  .select2-breadcrumb-item{
+    display: inline-block;
+    font-size: @fontSizeSmall;
+    line-height: @baseLineHeight * 0.80;
+    color: @linkColor;
+    cursor: pointer;
+    &:hover {
+      color: @linkColorHover
+    }
+    &:after {
+      content: '/';
+      display: inline;
+      padding: 0 2px;
+      color: @bodyColor;
+      cursor: default;
+    }
+    &:last-child {
+      color: gray;
+      cursor: default;
+      &:after {
+        display: none;
+      }
+    }
+  }
+}

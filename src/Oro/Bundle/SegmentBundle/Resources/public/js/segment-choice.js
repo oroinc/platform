@@ -1,8 +1,7 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroentity/js/entity-field-view',
-    'jquery-ui', 'jquery.select2', 'routing'
-], function ($, _, EntityFieldUtil, EntityFieldView, ui, select2, routing) {
+define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
+    ], function ($, _, routing) {
     'use strict';
 
     $.widget('orosegment.segmentChoice', {
@@ -20,8 +19,6 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         },
 
         _create: function () {
-            this.entityFieldUtil = new EntityFieldUtil(this.element);
-
             this._on({
                 change: function (e) {
                     if (e.added) {
@@ -34,7 +31,6 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         },
 
         _init: function () {
-            $.extend(this.entityFieldUtil, this.options.util);
             this._processSelect2Options();
             this._updateData(this.options.entity, this.options.segmentData);
         },

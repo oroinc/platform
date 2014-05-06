@@ -4,7 +4,6 @@
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
-            util: {},
             fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
@@ -17,7 +16,6 @@
                     quietMillis: 100,
                 }
             },
-            util: {},
             fieldsLoaderSelector: '#' ~ params.entity_choice_id,
             currentSegment: params.currentSegmentId|default(null),
             pageLimit: params.page_limit|default(10)

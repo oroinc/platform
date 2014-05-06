@@ -1,5 +1,5 @@
-/*jshint browser:true*/
-/*jslint browser:true*/
+/*jshint browser:true, nomen:true*/
+/*jslint browser:true, nomen:true*/
 /*global define*/
 define(['jquery', 'jquery.select2'], function ($) {
     'use strict';
@@ -119,16 +119,71 @@ define(['jquery', 'jquery.select2'], function ($) {
         };
     }(window.Select2['class'].abstract.prototype));
 
+    (function (prototype) {
+        var init = prototype.init;
+
+        // abstract
+        prototype.init = function () {
+            init.apply(this, arguments);
+            this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
+            this.breadcrumbs.on('click', '.select2-breadcrumb-item', $.proxy(function (e) {
+                var data = $(e.currentTarget).data('select2-data');
+                this.context = data.context;
+                this.updateResults();
+                e.stopPropagation();
+            }, this));
+            this.dropdown.prepend(this.breadcrumbs);
+        };
+
+        prototype.updateBreadcrumbs = function () {
+            var breadcrumbs = this.breadcrumbs,
+                opts = this.opts;
+            breadcrumbs.empty();
+            if (this.context && $.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
+                var items = opts.breadcrumbs(this.context);
+                $.each(items, function (i, item) {
+                    var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
+                    $item = $("<li class='select2-breadcrumb-item'>" + $item + "</li>");
+                    $item.data('select2-data', {context: item.context});
+                    breadcrumbs.append($item);
+                });
+            }
+        };
+    }(window.Select2['class'].abstract.prototype));
 
     // Override methods of SingleSelect2 class
     (function (prototype) {
         var onSelect = prototype.onSelect;
+        var updateResults = prototype.updateResults;
+        var clear = prototype.clear;
+
         prototype.onSelect = function (data, options) {
+            if (data.id === undefined && data.context) {
+                this.context = data.context;
+                this.updateResults();
+                return;
+            }
+
             onSelect.apply(this, arguments);
+
             // @todo BAP-3928, remove this method override after upgrade select2 to v3.4.6, fix code is taken from there
             if ((!options || !options.noFocus) && this.opts.minimumResultsForSearch >= 0) {
                 this.focusser.focus();
             }
+        };
+
+        prototype.updateResults = function (initial) {
+            updateResults.apply(this, arguments);
+            if (initial && this.opts.element.val()) {
+                this.context = this.opts.element.val();
+            }
+            this.updateBreadcrumbs();
+            this.positionDropdown();
+        };
+
+        prototype.clear = function () {
+            this.context = '';
+            clear.apply(this, arguments);
         };
     }(window.Select2['class'].single.prototype));
 });

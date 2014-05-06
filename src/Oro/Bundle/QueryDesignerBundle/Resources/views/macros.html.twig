@@ -285,5 +285,5 @@
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}
-    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }) %></script>
+    <script type="text/html" id="{{ id }}"><% _.each(obj, function (item, index, list) { if (index > 0) { %>&#32;<%= item.field.entity.label %>&nbsp;<b><%= item.field.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }}) %></script>
 {% endmacro %}

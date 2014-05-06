@@ -1,0 +1,5 @@
+oro:
+    entity:
+        field_choice:
+            fields:           Fields
+            relations:        Relations
