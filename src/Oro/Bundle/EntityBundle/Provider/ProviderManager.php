@@ -32,8 +32,6 @@ class ProviderManager
     public function selectByParams($entityName, ParameterBag $parameters)
     {
         $parameters->set('entityName', $entityName);
-        // @TODO: remove this before merge
-        $parameters->set('plain-list', '1');
 
         /** @var AbstractProvider $provider */
         foreach ($this->providers as $provider) {
