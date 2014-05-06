@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -78,6 +80,13 @@ class Report extends AbstractQueryDesigner
      * @ORM\Column(name="definition", type="text")
      */
     protected $definition;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="chart_options", type="json_array", nullable=true)
+     */
+    protected $chartOptions;
 
     /**
      * @var \DateTime
@@ -237,6 +246,36 @@ class Report extends AbstractQueryDesigner
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+
+        return $this;
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return array
+     */
+    public function getChartOptions(DatagridConfiguration $config = null)
+    {
+        $result = $this->chartOptions;
+
+        if (isset($result['data_schema']) && isset($config['source']['query_config']['column_aliases'])) {
+            $columnAliases = $config['source']['query_config']['column_aliases'];
+            foreach ($result['data_schema'] as &$value) {
+                $value = isset($columnAliases[$value]) ? $columnAliases[$value] : $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $chartOptions
+     *
+     * @return Report
+     */
+    public function setChartOptions(array $chartOptions)
+    {
+        $this->chartOptions = $chartOptions;
 
         return $this;
     }

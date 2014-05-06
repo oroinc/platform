@@ -32,6 +32,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
         $this->provider = new ConfigurationProvider(
             $this->getFunctionProvider(),
+            $this->getVirtualFieldProvider(),
             $this->doctrine,
             $this->configManager
         );

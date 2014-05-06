@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
@@ -57,12 +58,15 @@ class Processor
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
 
+        /** @var \Swift_Message $message */
         $message = $this->mailer->createMessage();
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), 'text/plain');
+
+        $messageId = $message->generateId();
 
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
@@ -101,8 +105,9 @@ class Processor
             $messageDate
         );
 
-        $email->setFolder($origin->getFolder(EmailFolder::SENT));
+        $email->addFolder($origin->getFolder(EmailFolder::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
+        $email->setMessageId($messageId);
 
         $this->emailEntityBuilder->getBatch()->persist($this->em);
         $this->em->flush();

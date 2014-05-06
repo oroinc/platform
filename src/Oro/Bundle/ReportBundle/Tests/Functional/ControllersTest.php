@@ -175,6 +175,11 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/csv; charset=UTF-8');
+        $this->assertEquals('binary', $result->headers->get('Content-Transfer-Encoding'));
+        $this->assertStringStartsWith(
+            'attachment; filename="datagrid_oro_report_table_' . $id,
+            $result->headers->get('Content-Disposition')
+        );
 
         //file to array
         $content = str_getcsv($content, "\n", '"', '"');

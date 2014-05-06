@@ -7,7 +7,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -36,21 +35,17 @@ class SearchResultsExtension extends AbstractExtension
     protected $dispatcher;
 
     /**
-     * @param RequestParameters        $requestParams
      * @param ResultFormatter          $formatter
      * @param EntityManager            $em
      * @param ObjectMapper             $mapper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        RequestParameters $requestParams,
         ResultFormatter $formatter,
         EntityManager $em,
         ObjectMapper $mapper,
         EventDispatcherInterface $dispatcher
     ) {
-        parent::__construct($requestParams);
-
         $this->resultFormatter = $formatter;
         $this->em              = $em;
         $this->mapper          = $mapper;

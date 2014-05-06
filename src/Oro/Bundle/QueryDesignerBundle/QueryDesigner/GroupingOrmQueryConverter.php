@@ -22,12 +22,16 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
      */
-    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
-    {
-        parent::__construct($functionProvider, $doctrine);
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        ManagerRegistry $doctrine
+    ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -83,12 +87,13 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $entityClassName,
         $tableAlias,
         $fieldName,
+        $columnExpr,
         $columnAlias,
         $filterName,
         array $filterData
     ) {
         $filter = [
-            'column'     => sprintf('%s.%s', $tableAlias, $fieldName),
+            'column'     => $columnExpr,
             'filter'     => $filterName,
             'filterData' => $filterData
         ];

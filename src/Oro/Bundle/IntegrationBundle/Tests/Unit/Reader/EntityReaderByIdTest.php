@@ -4,6 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\EntityReaderByIdAdapter;
+
 class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -29,7 +31,7 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->reader = new EntityReaderByIdAdapterTest($this->contextRegistry, $this->managerRegistry);
+        $this->reader = new EntityReaderByIdAdapter($this->contextRegistry, $this->managerRegistry);
     }
 
     public function testSetStepExecutionWithEntityName()

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Cache;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
 
@@ -43,9 +44,12 @@ class EmailCacheManager
             return;
         }
 
+        $folder = $email->getFolders()->first();
+        $origin = $folder->getOrigin();
+
         $emailBody = $this->selector
-            ->select($email->getFolder()->getOrigin())
-            ->loadEmailBody($email, $this->em);
+            ->select($origin)
+            ->loadEmailBody($folder, $email, $this->em);
 
         $email->setEmailBody($emailBody);
 
