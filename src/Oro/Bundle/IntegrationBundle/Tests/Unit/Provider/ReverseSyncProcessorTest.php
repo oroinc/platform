@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
-use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWaySyncConnector as TestConnector;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector as TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 
 class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
@@ -129,7 +129,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('executeJob')
             ->with(
                 'export',
-                'test job',
+                'tstJobName',
                 [
                     'export' => [
                         'entityName'     => 'testEntity',
