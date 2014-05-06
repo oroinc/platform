@@ -23,7 +23,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             'addressUpdateUrl': null,
             'mapView': Googlemaps
         },
-
+        noDataMessage: __('Empty Address Book'),
         attributes: {
             'class': 'map-box'
         },
@@ -39,6 +39,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
 
             this.$adressesContainer = $('<div class="map-address-list"/>').appendTo(this.$el);
             this.$mapContainerFrame = $('<div class="map-visual-frame"/>').appendTo(this.$el);
+            var noDataMessage = '<div class="no-data"><span>' + this.noDataMessage + '</span></div>';
+            this.$noDataContainer = $(noDataMessage).appendTo(this.$el);
             this.mapView = new this.options.mapView({
                 'mapOptions': this.options.mapOptions,
                 'el': this.$mapContainerFrame
@@ -73,14 +75,31 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
 
         addAll: function (items) {
             this.$adressesContainer.empty();
-            items.each(function (item) {
-                this.addAddress(item);
-            }, this);
+            if(items.length > 0){
+                this._hideEmptyMessage();
+                items.each(function (item) {
+                    this.addAddress(item);
+                }, this);
+            } else {
+                this._showEmptyMessage();
+            }
             if (items.length === 1) {
                 this._activateFirstAddress();
             } else {
                 this._activatePreviousAddress();
             }
+        },
+
+        _hideEmptyMessage: function(){
+            this.$noDataContainer.hide();
+            this.$mapContainerFrame.show();
+            this.$adressesContainer.show();
+        },
+
+        _showEmptyMessage: function () {
+            this.$noDataContainer.show();
+            this.$mapContainerFrame.hide();
+            this.$adressesContainer.hide();
         },
 
         _activatePreviousAddress: function () {
