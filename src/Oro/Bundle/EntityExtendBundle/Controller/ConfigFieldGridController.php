@@ -141,7 +141,7 @@ class ConfigFieldGridController extends Controller
         $relationOptions = explode('||', $fieldType);
         $relationName    = $relationOptions[0];
 
-        if (isset($relationOptions[1])) {
+        if (isset($relationOptions[1]) && !empty($relationOptions[1])) {
             $fieldName = $relationOptions[1];
         }
 

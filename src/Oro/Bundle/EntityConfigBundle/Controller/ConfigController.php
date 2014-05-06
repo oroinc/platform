@@ -144,6 +144,18 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
         $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
 
+
+//        echo '<pre>';
+//        print_r ($extendConfigProvider->getConfig('Extend\Entity\testEntity1'));
+//        echo '</pre>';
+//        echo '===================================================================================';
+//
+//        echo '<pre>';
+//        print_r($extendConfigProvider->getConfig('Extend\Entity\testEntity2'));
+//        echo '</pre>';
+//
+//        die;
+
         /**
          * TODO
          * refactor and place into Helper class

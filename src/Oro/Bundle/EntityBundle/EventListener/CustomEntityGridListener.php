@@ -93,7 +93,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $this->parameters = null;
+        //$this->parameters = null;
+        // nothing to do here, just leave it empty !!!
     }
 
     /**
@@ -246,6 +247,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * @param               $label
      * @param FieldConfigId $fieldConfigId
      *
+     * @param bool          $isVisible
      * @return array
      */
     protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId, $isVisible = true)
@@ -338,7 +340,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - then from master request attributes
      *
      * @param string $name
-     * @param bool $default
+     * @param bool   $default
+     *
+     * @throws \BadMethodCallException
      * @return mixed
      */
     protected function getParam($name, $default = false)
