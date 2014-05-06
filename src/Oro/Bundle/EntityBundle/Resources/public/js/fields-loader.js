@@ -14,7 +14,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
                 'with-relations': 1,
                 'with-entity-details': 1,
                 'with-unidirectional': 1,
-                'deep-level': 1
+                'deep-level': 3,
+                'plain-list': 1
             },
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog
@@ -47,7 +48,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         },
 
         loadFields: function () {
-            var entityName = this.element.val();
+            var entityName = this.getEntityName();
             $.ajax({
                 url: this.generateURL(entityName),
                 success: $.proxy(this._onLoaded, this),
@@ -57,8 +58,12 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             });
         },
 
+        getEntityName: function () {
+            return this.element.val();
+        },
+
         setFieldsData: function (data) {
-            var fields = this._convertFields(data);
+            var fields = this._convertData(data);
             this.element.data('fields', fields);
             this._trigger('update', null, [fields]);
         },
@@ -109,12 +114,23 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
          * Converts data in proper array of fields hierarchy
          *
          * @param {Array} data
-         * @param {Object?} parent
          * @returns {Array}
          * @private
          */
-        _convertFields: function (data, parent) {
-            // @todo data converter from 'entity-field-*-util' should be implemented here
+        _convertData: function (data) {
+            $.each(data, function () {
+                var entity = this;
+                entity.fieldsIndex = {};
+                $.each(entity.fields, function () {
+                    var field = this;
+                    if (field.related_entity_name) {
+                        field.related_entity = data[field.related_entity_name];
+                        delete field.related_entity_name;
+                    }
+                    field.entity = entity;
+                    entity.fieldsIndex[field.name] = field;
+                });
+            });
             return data;
         }
     });
