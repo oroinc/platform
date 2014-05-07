@@ -50,7 +50,7 @@ class DataGridExtension extends \Twig_Extension
      */
     public function getGrid($name, array $params = [])
     {
-        return $this->manager->getDatagrid($name, $params);
+        return $this->manager->getDatagridByRequestParams($name, $params);
     }
 
     /**

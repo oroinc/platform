@@ -10,8 +10,13 @@
     {% set datagrid = oro_datagrid_build(name, params) %}
     {% set metaData = oro_datagrid_metadata(datagrid, params) %}
     {% set data     = oro_datagrid_data(datagrid) %}
+    {% set gridId   = 'grid-' ~ name  %}
+    {% set gridSelector = gridId ~ '-' ~ random() %}
 
-    <div id="grid-{{ name }}" data-type="datagrid" data-data="{{ data|json_encode|raw|escape }}"
+    <div id="{{ gridId }}"
+         data-grid-selector="{{ gridSelector }}"
+         data-type="datagrid"
+         data-data="{{ data|json_encode|raw|escape }}"
          {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
          data-metadata="{{ metaData|json_encode|raw|escape }}"></div>
     <script type="text/javascript">
@@ -19,7 +24,7 @@
         function ($, datagridBuilder) {
             var builders = _.toArray(arguments).slice(2);
             $(function () {
-                datagridBuilder(builders, '#grid-{{ name }}');
+                datagridBuilder(builders, '[data-grid-selector="{{ gridSelector }}"]');
             });
         });
     </script>

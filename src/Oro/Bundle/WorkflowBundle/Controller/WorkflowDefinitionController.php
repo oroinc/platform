@@ -27,6 +27,7 @@ class WorkflowDefinitionController extends Controller
      *      class="OroWorkflowBundle:WorkflowDefinition",
      *      permission="VIEW"
      * )
+     *
      * @return array
      */
     public function indexAction()
@@ -46,6 +47,7 @@ class WorkflowDefinitionController extends Controller
      *      class="OroWorkflowBundle:WorkflowDefinition",
      *      permission="CREATE"
      * )
+     *
      * @return array
      */
     public function createAction()
@@ -65,6 +67,7 @@ class WorkflowDefinitionController extends Controller
      *      class="OroWorkflowBundle:WorkflowDefinition",
      *      permission="EDIT"
      * )
+     *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      * @throws AccessDeniedHttpException
@@ -81,7 +84,8 @@ class WorkflowDefinitionController extends Controller
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
-            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
+            'delete_allowed' => true,
         );
     }
 
@@ -92,6 +96,7 @@ class WorkflowDefinitionController extends Controller
      * )
      * @AclAncestor("oro_workflow_definition_create")
      * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
+     *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
@@ -107,6 +112,45 @@ class WorkflowDefinitionController extends Controller
             ->setLabel($clonePrefix . $workflowDefinition->getLabel())
             ->setSystem(false);
 
-        return $this->updateAction($clonedDefinition);
+        $response = $this->updateAction($clonedDefinition);
+        $response['delete_allowed'] = false;
+
+        return $response;
+    }
+
+    /**
+     * @Route(
+     *      "/view/{name}",
+     *      name="oro_workflow_definition_view"
+     * )
+     * @AclAncestor("oro_workflow_definition_view")
+     * @Template("OroWorkflowBundle:WorkflowDefinition:view.html.twig")
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    public function viewAction(WorkflowDefinition $workflowDefinition)
+    {
+        return array(
+            'entity' => $workflowDefinition
+        );
+    }
+
+    /**
+     * @Route(
+     *      "/info/{name}",
+     *      name="oro_workflow_definition_info"
+     * )
+     * @AclAncestor("oro_workflow_definition_view")
+     * @Template
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    public function infoAction(WorkflowDefinition $workflowDefinition)
+    {
+        return array(
+            'entity' => $workflowDefinition
+        );
     }
 }

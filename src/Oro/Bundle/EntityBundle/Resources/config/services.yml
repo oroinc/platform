@@ -48,7 +48,6 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
             - @router
         calls:
             - [setRequest, [@?request=]]
@@ -60,7 +59,6 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
             - @router
         calls:
             - [setRequest, [@?request=]]
@@ -87,6 +85,8 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @translator
+            - %oro_entity.virtual_fields%
+            - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
 

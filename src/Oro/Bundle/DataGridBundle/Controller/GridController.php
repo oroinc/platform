@@ -52,14 +52,12 @@ class GridController extends Controller
      * )
      *
      * @param string $gridName
-     *
-     * @throws \Exception
      * @return Response
+     * @throws \Exception
      */
     public function getAction($gridName)
     {
-        $parameters = (array)$this->getRequest()->query->get($gridName, array());
-        $grid       = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName, $parameters);
+        $grid = $this->get('oro_datagrid.datagrid.manager')->getDatagridByRequestParams($gridName);
 
         try {
             $result = $grid->getData();
@@ -124,10 +122,11 @@ class GridController extends Controller
         // prepare response
         $response = new StreamedResponse($this->exportCallback($context, $executor));
         $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Transfer-Encoding', 'binary');
         $outputFileName = sprintf('datagrid_%s_%s.%s', str_replace('-', '_', $gridName), date('Y_m_d_H_i_s'), $format);
         $response->headers->set(
             'Content-Disposition',
-            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $outputFileName)
+            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $outputFileName)
         );
 
         return $response->send();
