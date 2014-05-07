@@ -16,11 +16,17 @@ class EntityType extends AbstractType
      */
     protected $nameGenerator;
 
+    /**
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     */
     public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -37,6 +43,9 @@ class EntityType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(

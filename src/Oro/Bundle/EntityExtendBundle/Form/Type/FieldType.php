@@ -47,6 +47,11 @@ class FieldType extends AbstractType
      */
     protected $nameGenerator;
 
+    /**
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     */
     public function __construct(
         ConfigManager $configManager,
         Translator $translator,
