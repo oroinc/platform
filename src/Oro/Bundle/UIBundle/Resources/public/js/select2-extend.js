@@ -139,7 +139,7 @@ define(['jquery', 'jquery.select2'], function ($) {
             var breadcrumbs = this.breadcrumbs,
                 opts = this.opts;
             breadcrumbs.empty();
-            if (this.context && $.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
+            if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
                 var items = opts.breadcrumbs(this.context);
                 $.each(items, function (i, item) {
                     var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});

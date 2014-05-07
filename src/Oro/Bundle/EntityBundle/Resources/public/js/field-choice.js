@@ -59,8 +59,62 @@ define(function (require) {
         },
 
         _init: function () {
+            var instance, select2Options,
+                self = this;
+
             this._processSelect2Options();
             this._updateData(this.options.entity, this.options.fields);
+
+            select2Options = $.extend({
+                initSelection: function (element, callback) {
+                    var id, chain, opts, match;
+                    opts = instance.opts;
+                    id = element.val();
+                    match = null;
+                    chain = self._pathToEntityChain(id, true);
+                    instance.context = self._entityChainToPath(chain);
+                    opts.query({
+                        matcher: function (term, text, el) {
+                            var is_match = id === opts.id(el);
+                            if (is_match) {
+                                match = el;
+                            }
+                            return is_match;
+                        },
+                        callback: !$.isFunction(callback) ? $.noop : function () {
+                            callback(match);
+                        }
+                    });
+                },
+                id: function (result) {
+                    return result.id !== undefined ? result.id : result.context;
+                },
+                data: function () {
+                    var context, results;
+                    context = (instance && instance.context) || '';
+                    results = self._select2Data(context);
+                    return {
+                        more: false,
+                        context: context,
+                        results: results
+                    };
+                },
+                formatBreadcrumbItem: function (item) {
+                    var label;
+                    label = item.field ? item.field.label : item.entity.label;
+                    return label;
+                },
+                breadcrumbs: function (context) {
+                    var chain = self._pathToEntityChain(context, true);
+                    $.each(chain, function (i, item) {
+                        item.context = item.path;
+                    });
+                    return chain;
+                }
+            }, this.options.select2);
+
+            this.element.select2(select2Options);
+            instance = this.element.data('select2');
         },
 
         _setOption: function (key, value) {
@@ -102,9 +156,6 @@ define(function (require) {
         },
 
         _updateData: function (entity, data) {
-            var instance, select2Options,
-                self = this;
-
             data = data || {};
             this.options.entity = entity;
             this.options.fields = data;
@@ -112,57 +163,6 @@ define(function (require) {
             this.element
                 .data('entity', entity)
                 .data('data', data);
-
-            select2Options = $.extend({
-                initSelection: function (element, callback) {
-                    var id, chain, opts, match;
-                    opts = instance.opts;
-                    id = element.val();
-                    match = null;
-                    chain = self._pathToEntityChain(id, true);
-                    instance.context = self._entityChainToPath(chain);
-                    opts.query({
-                        matcher: function (term, text, el) {
-                            var is_match = id === opts.id(el);
-                            if (is_match) {
-                                match = el;
-                            }
-                            return is_match;
-                        },
-                        callback: !$.isFunction(callback) ? $.noop : function () {
-                            callback(match);
-                        }
-                    });
-                },
-                id: function (result) {
-                    return result.id !== undefined ? result.id : result.context;
-                },
-                data: function () {
-                    var context, results;
-                    context = (instance && instance.context) || '';
-                    results = self._select2Data(context);
-                    return {
-                        more: false,
-                        context: context,
-                        results: results
-                    };
-                },
-                formatBreadcrumbItem: function (item, options) {
-                    var label;
-                    label = item.field ? item.field.label : item.entity.label;
-                    return label;
-                },
-                breadcrumbs: function (context) {
-                    var chain = self._pathToEntityChain(context, true);
-                    $.each(chain, function (i, item) {
-                        item.context = item.path;
-                    });
-                    return chain.length > 1 ? chain : [];
-                }
-            }, this.options.select2);
-
-            this.element.select2(select2Options);
-            instance = this.element.data('select2');
         },
 
         getApplicableConditions: function (fieldId) {
