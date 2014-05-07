@@ -14,8 +14,8 @@ use FOS\Rest\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\EntityBundle\Provider\EntityFieldListProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
-use Oro\Bundle\EntityBundle\Provider\ProviderManager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -62,12 +62,6 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        /** @var ProviderManager $providerManager */
-        $providerManager = $this->get('oro_entity.provider_manager');
-
-        /** @var EntityFieldRecursiveProvider $provider */
-        $provider = $providerManager->selectByParams($entityName, $this->getRequest()->query);
-
         $entityName         = str_replace('_', '\\', $entityName);
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
@@ -77,6 +71,15 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
             ? (int)$this->getRequest()->query->get('deep-level')
             : 0;
         $lastDeepLevelRelations = ('1' === $this->getRequest()->query->get('last-deep-level-relations'));
+        $isPlainList            = ('1' == $this->getRequest()->query->get('plain-list'));
+
+        if ($isPlainList) {
+            /** @var EntityFieldListProvider $provider */
+            $provider = $this->get('oro_entity.entity_field_list_provider');
+        } else {
+            /** @var EntityFieldRecursiveProvider $provider */
+            $provider = $this->get('oro_entity.entity_field_provider');
+        }
 
         try {
             $result = $provider->getFields(
