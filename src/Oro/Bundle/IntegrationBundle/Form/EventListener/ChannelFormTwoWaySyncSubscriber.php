@@ -134,7 +134,7 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                 'choice',
                 [
                     'label'    => 'oro.integration.channel.sync_priority.label',
-                    'required' => false,
+                    'required' => true,
                     'choices'  => [
                         self::REMOTE_WINS => 'oro.integration.channel.remote_wins.label',
                         self::LOCAL_WINS => 'oro.integration.channel.local_wins.label'
