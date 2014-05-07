@@ -17,7 +17,10 @@
         }) }}
         {% for button in button_config %}
             {{ UI.button({
-                'path'   : button.void is defined ? [ 'javascript:void(0);//', path(button.route, button.args|default({})) ]|join : path(button.route, button.args|default({})),
+                'path'   : button.void is defined ? 'javascript:void(0);' : path(button.route, button.args|default({})),
+                'data'   : {
+                    'url' : button.void is defined ? path(button.route, button.args|default({})) : null,
+                },
                 'iCss'   : button.iCss|default(''),
                 'aCss'   : button.aCss|default(''),
                 'title'  : button.title|default(button.name),
