@@ -65,6 +65,10 @@ services:
             - { name: monolog.logger, channel: security }
         lazy: true
 
+    oro_security.security_facade.link:
+        tags:
+            - { name: oro_service_link,  service: oro_security.security_facade }
+
     oro_security.acl.manager:
         class: %oro_security.acl.manager.class%
         arguments:
