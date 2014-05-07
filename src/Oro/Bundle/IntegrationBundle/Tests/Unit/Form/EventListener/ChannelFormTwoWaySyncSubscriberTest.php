@@ -6,14 +6,23 @@ use Symfony\Component\Form\FormEvents;
 
 class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-
     /** @var \Oro\Bundle\IntegrationBundle\Manager\TypesRegistry */
     protected $typesRegistry;
 
-    /**
-     * @var AddressCountryAndRegionSubscriber
-     */
+    /** @var AddressCountryAndRegionSubscriber */
     protected $subscriber;
+
+    /** @var \Symfony\Component\Form\FormEvent */
+    protected $eventMock;
+
+    /** @var \Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface */
+    protected $connector;
+
+    /** @var \Symfony\Component\Form\Test\FormInterface */
+    protected $formMock;
+
+    /** @var \Oro\Bundle\IntegrationBundle\Entity\Channel */
+    protected $data;
 
     /**
      * SetUp test environment
@@ -25,6 +34,32 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->subscriber = new ChannelFormTwoWaySyncSubscriber($this->typesRegistry);
+
+        $this->eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->connector = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->data = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+    }
+
+    public function tearDown()
+    {
+        unset(
+            $this->typesRegistry,
+            $this->subscriber,
+            $this->eventMock,
+            $this->connector,
+            $this->formMock,
+            $this->data
+        );
     }
 
     public function testGetSubscribedEvents()
@@ -35,76 +70,51 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
     }
 
-
     public function testPreSetWithoutTwoWay()
     {
-        $data = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $data->expects($this->at(0))
+        $this->data->expects($this->at(0))
             ->method('getType')
             ->will($this->returnValue('test'));
-
-        $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->typesRegistry->expects($this->once())
             ->method('getRegisteredConnectorsTypes')
             ->will($this->returnValue([]));
 
-        $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formMock->expects($this->never())
+        $this->formMock->expects($this->never())
             ->method('add')
-            ->will($this->returnValue($formMock));
+            ->will($this->returnValue($this->formMock));
 
-        $eventMock->expects($this->once())
+        $this->eventMock->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($formMock));
-
-        $eventMock->expects($this->once())
+            ->will($this->returnValue($this->formMock));
+        $this->eventMock->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->will($this->returnValue($this->data));
 
-        $this->assertNull($this->subscriber->preSet($eventMock));
+        $this->assertNull($this->subscriber->preSet($this->eventMock));
     }
 
     public function testPreSetWithTwoWay()
     {
-        $data = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $data->expects($this->at(0))
+        $this->data->expects($this->at(0))
             ->method('getType')
             ->will($this->returnValue('test'));
 
-        $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $connector = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->typesRegistry->expects($this->once())
             ->method('getRegisteredConnectorsTypes')
-            ->will($this->returnValue([$connector]));
+            ->will($this->returnValue([$this->connector]));
 
-        $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formMock->expects($this->exactly(2))
+        $this->formMock->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnValue($formMock));
+            ->will($this->returnValue($this->formMock));
 
-        $eventMock->expects($this->once())
+        $this->eventMock->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($formMock));
-
-        $eventMock->expects($this->once())
+            ->will($this->returnValue($this->formMock));
+        $this->eventMock->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->will($this->returnValue($this->data));
 
-        $this->assertNull($this->subscriber->preSet($eventMock));
+        $this->assertNull($this->subscriber->preSet($this->eventMock));
     }
 }

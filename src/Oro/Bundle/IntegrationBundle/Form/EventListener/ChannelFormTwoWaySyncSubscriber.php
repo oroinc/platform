@@ -52,8 +52,8 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 
         if ($this->isNotEmpty($data->getType())) {
             if (true === $this->hasTwoWaySync($data->getType())) {
-                $mc = $this->getModifierClosure();
-                $mc($form);
+                $modifier = $this->getModifierClosure();
+                $modifier($form);
             }
         }
     }
@@ -72,8 +72,8 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 
         if ($this->isNotEmpty($data['type'])) {
             if (true === $this->hasTwoWaySync($data['type'])) {
-                $mc = $this->getModifierClosure();
-                $mc($form);
+                $modifier = $this->getModifierClosure();
+                $modifier($form);
             }
         }
     }
@@ -141,7 +141,6 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                     ],
                 ]
             );
-
         };
     }
 }
