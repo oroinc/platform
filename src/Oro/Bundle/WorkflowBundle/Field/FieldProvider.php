@@ -5,9 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Field;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
 
-class FieldProvider extends EntityFieldProvider
+class FieldProvider extends EntityFieldRecursiveProvider
 {
     /**
      * @var array
