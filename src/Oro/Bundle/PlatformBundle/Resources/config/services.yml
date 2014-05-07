@@ -1,11 +1,11 @@
 parameters:
     oro_platform.composer.local_repo_manager.class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryManager
+    oro_platform.composer.installed_json:           composer/installed.json
+    oro_platform.composer.vendor_dir:               %kernel.root_dir%/../vendor/
+
     oro_platform.maintenance.class:                 Oro\Bundle\PlatformBundle\Maintenance\Mode
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
 
-    oro_platform.composer.config:
-        config:
-            vendor-dir: ../vendor # we are in web directory, so need to update this path
 services:
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
@@ -24,5 +24,5 @@ services:
         class: %oro_platform.composer.local_repo_manager.class%
         arguments:
             - @filesystem
-            - %kernel.root_dir%/../vendor/
-            - 'composer/installed.json'
+            - %oro_platform.composer.vendor_dir%
+            - %oro_platform.composer.installed_json%
