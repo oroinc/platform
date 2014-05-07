@@ -39,6 +39,11 @@ class CommandExecutor
     protected $lastCommandExitCode;
 
     /**
+     * @var int
+     */
+    protected $defaultTimeout = 300;
+
+    /**
      * Constructor
      *
      * @param string|null         $env
@@ -102,6 +107,8 @@ class CommandExecutor
             if (array_key_exists('--process-timeout', $params)) {
                 $pb->setTimeout($params['--process-timeout']);
                 unset($params['--process-timeout']);
+            } else {
+                $pb->setTimeout($this->defaultTimeout);
             }
 
             foreach ($params as $name => $val) {
@@ -225,5 +232,21 @@ class CommandExecutor
         }
 
         return $phpPath;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTimeout()
+    {
+        return $this->defaultTimeout;
+    }
+
+    /**
+     * @param int $defaultTimeout
+     */
+    public function setDefaultTimeout($defaultTimeout)
+    {
+        $this->defaultTimeout = $defaultTimeout;
     }
 }
