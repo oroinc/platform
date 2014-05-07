@@ -7,9 +7,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -69,7 +67,6 @@ class DoctrineSubscriber implements EventSubscriber
                                 $className,
                                 $columnName
                             );
-
                             $cmBuilder->addIndex([$columnName], $indexName);
                         }
                     }

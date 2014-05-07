@@ -209,11 +209,9 @@ class ConfigSubscriber implements EventSubscriberInterface
             $relations    = $targetConfig->get('relation');
             if (isset($relations[$fieldConfig->get('relation_key')])) {
                 $this->createTargetRelation($fieldConfig, $fieldConfig->get('relation_key'));
-
-                if ($relations[$fieldConfig->get('relation_key')]['assign']){
+                if ($relations[$fieldConfig->get('relation_key')]['assign']) {
                     return;
                 }
-
             }
         }
 
