@@ -44,10 +44,11 @@ class UserEmailGridListener
             }
 
             $originIds = []; // to make sure param bind passed
-            if ($id = $parameters->get('userId')) {
+            $userId = $parameters->get('userId');
+            if ($userId) {
                 $user = $this->em
                     ->getRepository('OroUserBundle:User')
-                    ->find($id);
+                    ->find($userId);
 
                 $emailOrigins = $user->getEmailOrigins();
                 foreach ($emailOrigins as $emailOrigin) {
@@ -55,7 +56,10 @@ class UserEmailGridListener
                 }
 
                 $additionalParameters = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS);
-                if (!empty($originIds) && array_key_exists('refresh', $additionalParameters)) {
+                if (!empty($originIds)
+                    && !empty($additionalParameters)
+                    && array_key_exists('refresh', $additionalParameters)
+                ) {
                     $this->emailSyncManager->syncOrigins($emailOrigins);
                 }
             }
