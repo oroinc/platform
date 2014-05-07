@@ -55,7 +55,7 @@ class CommandExecutor
      * Launches a command as a separate process.
      *
      * The '--process-timeout' parameter can be used to set the process timeout
-     * in seconds. Default timeout is 60 seconds.
+     * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
      *

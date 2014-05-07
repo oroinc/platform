@@ -67,7 +67,7 @@ class CommandExecutor
      * Launches a command.
      * If '--process-isolation' parameter is specified the command will be launched as a separate process.
      * In this case you can parameter '--process-timeout' to set the process timeout
-     * in seconds. Default timeout is 60 seconds.
+     * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
      *
