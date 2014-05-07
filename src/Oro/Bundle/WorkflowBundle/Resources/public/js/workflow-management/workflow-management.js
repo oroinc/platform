@@ -147,7 +147,7 @@ function(_, Backbone, routing, messenger, __,
 
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_workflow_api_rest_entity_get',
-                routingParams: {"with-relations": 1, "with-entity-details": 1, "plain-list": 1, "deep-level": 3},
+                routingParams: {"with-relations": 1, "with-entity-details": 1, "plain-list": 1, "deep-level": 2},
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
                      return this.model.get('steps').length > 1 &&

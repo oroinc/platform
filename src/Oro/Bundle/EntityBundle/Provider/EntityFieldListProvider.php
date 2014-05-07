@@ -53,25 +53,10 @@ class EntityFieldListProvider extends EntityFieldRecursiveProvider
                 $translate
             );
 
-            $result[$currentClassName] = $this->addEntityDetails($currentClassName, [], $translate);
+            $result[$currentClassName] = $entityData;
             $result[$currentClassName]['fields'] = $fields;
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function addEntityDetails($entityName, array $entityData, $translate)
-    {
-        $entity = $this->entityProvider->getEntity($entityName, $translate);
-        foreach ($entity as $key => $val) {
-            if (!in_array($key, ['name']) || !isset($entityData[$key])) {
-                $entityData[$key] = $val;
-            }
-        }
-
-        return $entityData;
     }
 }
