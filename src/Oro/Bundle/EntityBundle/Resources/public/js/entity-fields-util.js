@@ -11,7 +11,7 @@ define(function (require) {
 
     /**
      *
-     * @param {Object} fields
+     * @param {Array} fields
      * @param {Object} exclude
      * @returns {Object}
      * @static
