@@ -26,14 +26,15 @@ class PlatformControllerTest extends WebTestCase
         );
     }
 
-    public function testAbout()
+    public function testSystemInformation()
     {
-        $this->client->request('GET', $this->client->generate('oro_platform_about'));
+        $this->client->request('GET', $this->client->generate('oro_platform_system_info'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
 
-        $this->assertContains('Oro Packages', $result);
-        $this->assertContains('3rd Party Packages', $result);
-        $this->assertContains('symfony/symfony', $result);
+        $content = $result->getContent();
+        $this->assertContains('Oro Packages', $content);
+        $this->assertContains('3rd Party Packages', $content);
+        $this->assertContains('symfony/symfony', $content);
     }
 }

@@ -1,6 +1,6 @@
 oro:
     platform:
-        about: About
+        system_info: System Information
         packages: Packages
 
         no_packages: There are no installed packages

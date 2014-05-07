@@ -21,18 +21,18 @@ class PlatformController extends Controller
     const NAMESPACE_DELIMITER = '/';
 
     /**
-     * @Route("/about", name="oro_platform_about")
+     * @Route("/information", name="oro_platform_system_info")
      * @Template()
      *
      * @Acl(
-     *     id="oro_platform_about",
-     *     label="oro.platform.about",
+     *     id="oro_platform_system_info",
+     *     label="oro.platform.system_info",
      *     type="action"
      * )
      */
-    public function aboutAction()
+    public function systemInfoAction()
     {
-        $packages    = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
+        $packages    = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
         $oroPackages = $thirdPartyPackages = [];
 
         foreach ($packages as $package) {
@@ -40,7 +40,7 @@ class PlatformController extends Controller
             if (0 === strpos($package->getName(), self::ORO_NAMESPACE . self::NAMESPACE_DELIMITER)) {
                 $oroPackages[] = $package;
             } else {
-                $thirdPartyPackages [] = $package;
+                $thirdPartyPackages[] = $package;
             }
         }
 
