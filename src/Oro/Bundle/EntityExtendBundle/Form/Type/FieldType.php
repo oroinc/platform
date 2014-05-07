@@ -89,8 +89,15 @@ class FieldType extends AbstractType
                 /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
-                if ($relation['assign'] || !$targetFieldId) {
-                    continue;
+                if (!$relation['assign'] || !$targetFieldId) {
+                    // additional check for revers relation of manyToOne field type
+                    if ($relation['assign']
+                        && $fieldId
+                        && !$targetFieldId
+                        && $targetFieldId->getFieldType() != 'manyToOne'
+                    ) {
+                        continue;
+                    }
                 }
 
                 if ($fieldId
