@@ -36,7 +36,7 @@ class UpdateEntityConfigMigrationQuery implements MigrationQuery
     {
         $this->commandExecutor->runCommand(
             'oro:entity-config:update',
-            ['--process-timeout' => 300],
+            [],
             $logger
         );
     }
