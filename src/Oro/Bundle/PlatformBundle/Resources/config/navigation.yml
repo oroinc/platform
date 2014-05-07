@@ -1,0 +1,17 @@
+oro_menu_config:
+    items:
+        oro_platform_about:
+            label: 'oro.platform.about'
+            extras:
+                position:    110
+            route: 'oro_platform_about'
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        oro_platform_about: ~
+
+oro_titles:
+    oro_platform_about:  ~

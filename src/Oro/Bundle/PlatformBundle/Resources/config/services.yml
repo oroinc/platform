@@ -2,6 +2,9 @@ parameters:
     oro_platform.maintenance.class:                 Oro\Bundle\PlatformBundle\Maintenance\Mode
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
 
+    oro_platform.composer.config:
+        config:
+            vendor-dir: ../vendor # we are in web directory, so need to update this path
 services:
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
@@ -15,3 +18,9 @@ services:
             - "@event_dispatcher"
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+
+    oro_platform.composer:
+        class: %oro_distribution.composer.class%
+        factory_class: Composer\Factory
+        factory_method: create
+        arguments: [@oro_distribution.composer.io, %oro_platform.composer.config%]

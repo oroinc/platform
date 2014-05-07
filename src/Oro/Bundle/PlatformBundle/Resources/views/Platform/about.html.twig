@@ -1,0 +1,68 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% set entity = null %}
+
+{% block pageHeader %}
+    {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.platform.about'|trans } %}
+{% endblock %}
+
+{% block content_data %}
+    {% set packagesSection %}
+        <div class="row-fluid">
+            <div class="responsive-block package-list">
+                <h3>{{ 'oro.platform.caption.oro'|trans }}</h3>
+                {{ _self.packagesTable(oroPackages) }}
+            </div>
+            <div class="responsive-block package-list">
+                <h3>{{ 'oro.platform.caption.thirdParty'|trans }}</h3>
+                {{ _self.packagesTable(thirdPartyPackages) }}
+            </div>
+        </div>
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.platform.packages'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [packagesSection]}
+            ]
+        }
+    ] %}
+
+    {% set id = 'about' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}
+
+{% macro packagesTable(packages) %}
+    {% if packages|length %}
+    <table class="table table-bordered table-striped ">
+        <thead>
+        <tr>
+            <th>{{ 'oro.platform.package.name'|trans }}</th>
+            <th>{{ 'oro.platform.package.version'|trans }}</th>
+            <th>{{ 'oro.platform.package.license'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for package in packages %}
+            <tr>
+                <td>{{ package.prettyName }}</td>
+                <td>{{ package.prettyVersion }}</td>
+                <td>
+                    {% for license in package.license %}
+                        {{ license }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="well">
+            {{ 'oro.platform.no_packages'|trans }}
+        </div>
+    {% endif %}
+{% endmacro %}
