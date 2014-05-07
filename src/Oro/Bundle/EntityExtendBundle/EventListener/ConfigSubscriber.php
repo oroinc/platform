@@ -209,6 +209,11 @@ class ConfigSubscriber implements EventSubscriberInterface
             $relations    = $targetConfig->get('relation');
             if (isset($relations[$fieldConfig->get('relation_key')])) {
                 $this->createTargetRelation($fieldConfig, $fieldConfig->get('relation_key'));
+
+                if ($relations[$fieldConfig->get('relation_key')]['assign']){
+                    return;
+                }
+
             }
         }
 
@@ -298,13 +303,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         $selfRelations      = $selfConfig->get('relation');
         $selfRelationConfig = & $selfRelations[$relationKey];
 
-        $selfRelationConfig['field_id'] = $fieldConfig;
+        $selfRelationConfig['field_id'] = $fieldConfig->getId();
 
         $targetConfig         = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelations      = $targetConfig->get('relation');
         $targetRelationConfig = & $targetRelations[$relationKey];
 
-        $targetRelationConfig['target_field_id'] = $fieldConfig;
+        $targetRelationConfig['target_field_id'] = $fieldConfig->getId();
 
         $selfConfig->set('relation', $selfRelations);
         $targetConfig->set('relation', $targetRelations);

@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
-    protected $types = array(
+    protected $types = [
         'string'     => 'oro.entity_extend.form.data_type.string',
         'integer'    => 'oro.entity_extend.form.data_type.integer',
         'smallint'   => 'oro.entity_extend.form.data_type.smallint',
@@ -30,18 +31,18 @@ class FieldType extends AbstractType
         'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
         'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
-    );
+    ];
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
+    /**
+     * @param ConfigManager $configManager
+     * @param Translator    $translator
+     */
     public function __construct(ConfigManager $configManager, Translator $translator)
     {
         $this->configManager = $configManager;
@@ -56,10 +57,10 @@ class FieldType extends AbstractType
         $builder->add(
             'fieldName',
             'text',
-            array(
+            [
                 'label' => 'Field Name',
                 'block' => 'type',
-            )
+            ]
         );
 
         $entityProvider = $this->configManager->getProvider('entity');
@@ -67,12 +68,15 @@ class FieldType extends AbstractType
 
         $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
-            $types = array();
-            foreach ($entityConfig->get('relation') as $relationKey => $relation) {
+            $types = [];
+            $relations = $entityConfig->get('relation');
+            foreach ($relations as $relationKey => $relation) {
+                /** @var FieldConfigId $fieldId */
                 $fieldId       = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
-                if (!$relation['assign'] || !$targetFieldId) {
+                if ($relation['assign'] || !$targetFieldId) {
                     continue;
                 }
 
@@ -101,11 +105,11 @@ class FieldType extends AbstractType
         $builder->add(
             'type',
             'choice',
-            array(
+            [
                 'choices'     => $this->types,
                 'empty_value' => 'Select field type',
                 'block'       => 'type',
-            )
+            ]
         );
     }
 
@@ -115,17 +119,17 @@ class FieldType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(array('class_name'))
+            ->setRequired(['class_name'])
             ->setDefaults(
-                array(
-                    'require_js'   => array(),
-                    'block_config' => array(
-                        'type' => array(
+                [
+                    'require_js'   => [],
+                    'block_config' => [
+                        'type' => [
                             'title'    => 'General',
                             'priority' => 1,
-                        )
-                    )
-                )
+                        ]
+                    ]
+                ]
             );
     }
 

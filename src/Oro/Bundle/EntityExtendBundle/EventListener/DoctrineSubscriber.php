@@ -69,6 +69,7 @@ class DoctrineSubscriber implements EventSubscriber
                                 $className,
                                 $columnName
                             );
+
                             $cmBuilder->addIndex([$columnName], $indexName);
                         }
                     }
@@ -88,22 +89,18 @@ class DoctrineSubscriber implements EventSubscriber
     protected function prepareRelations(ConfigInterface $config, ClassMetadataBuilder $cmBuilder)
     {
         if ($config->is('relation')) {
-            foreach ($config->get('relation') as $relation) {
+            $relations = $config->get('relation');
+            foreach ($relations as $relation) {
                 /** @var FieldConfigId|Config $fieldId */
-                if ($relation['assign'] && $fieldId = $relation['field_id']) {
+                $fieldId = $relation['field_id'];
+                if ($relation['assign'] && $fieldId) {
                     /** @var FieldConfigId $targetFieldId */
                     $targetFieldId = $relation['target_field_id'];
 
-                    if ($targetFieldId instanceof Config) {
-                        $targetFieldId = $targetFieldId->getId();
-                    }
                     $targetFieldName = $targetFieldId
                         ? $targetFieldId->getFieldName()
                         : null;
 
-                    if ($fieldId instanceof Config) {
-                        $fieldId = $fieldId->getId();
-                    }
                     $fieldName = $fieldId->getFieldName();
                     $defaultName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName();
 
