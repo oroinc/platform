@@ -16,9 +16,6 @@ class ChannelType extends AbstractType
     const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
-    const REMOTE_WINS = 'remote';
-    const LOCAL_WINS  = 'local';
-
     /** @var TypesRegistry */
     protected $registry;
 
@@ -68,28 +65,6 @@ class ChannelType extends AbstractType
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
                 'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'isTwoWaySyncEnabled',
-            'checkbox',
-            [
-                'label'    => 'oro.integration.channel.two_way_sync_enabled.label',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'syncPriority',
-            'choice',
-            [
-                'label'    => 'oro.integration.channel.sync_priority.label',
-                'required' => true,
-                'choices'  => [
-                    self::REMOTE_WINS => 'oro.integration.channel.remote_wins.label',
-                    self::LOCAL_WINS  => 'oro.integration.channel.local_wins.label'
-                ],
             ]
         );
     }
