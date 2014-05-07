@@ -22,18 +22,21 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
                     (param.max !== null && value > Number(param.max)));
         },
         function (param, element) {
-            var message, placeholders = {},
-                value = numberFormatter.unformat(this.elementValue(element));
+            var message,
+                placeholders = {},
+                value = this.elementValue(element),
+                normalizedValue = numberFormatter.unformat(value);
             param = _.extend({}, defaultParam, param);
-            if (isNaN(value)) {
+            if (isNaN(normalizedValue)) {
                 message = param.invalidMessage;
-            } else if (param.min !== null && value < Number(param.min)) {
+            } else if (param.min !== null && normalizedValue < Number(param.min)) {
                 message = param.minMessage;
                 placeholders.limit = param.min;
-            } else if (param.max !== null && value > Number(param.max)) {
+            } else if (param.max !== null && normalizedValue > Number(param.max)) {
                 message = param.maxMessage;
                 placeholders.limit = param.max;
             }
+            placeholders.value = value;
             return __(message, placeholders);
         }
     ];

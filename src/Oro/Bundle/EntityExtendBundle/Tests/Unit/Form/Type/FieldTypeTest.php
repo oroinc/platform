@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\DefaultTranslator;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Validator;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
-
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldTypeTest extends \PHPUnit_Framework_TestCase
@@ -56,8 +61,15 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        $validator = new Validator(
+            new ClassMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory(),
+            new DefaultTranslator()
+        );
+
         $this->factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())
+            ->addTypeExtension(new FormTypeValidatorExtension($validator))
             ->getFormFactory();
 
         $this->configManagerMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -68,7 +80,11 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type           = new FieldType($this->configManagerMock, $this->translatorMock);
+        $this->type           = new FieldType(
+            $this->configManagerMock,
+            $this->translatorMock,
+            new ExtendDbIdentifierNameGenerator()
+        );
         $this->typeReflection = new \ReflectionClass($this->type);
     }
 
