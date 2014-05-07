@@ -13,8 +13,8 @@ use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
 {
-    const REMOTE_WINS     = 'remote';
-    const LOCAL_WINS      = 'local';
+    const REMOTE_WINS = 'remote';
+    const LOCAL_WINS  = 'local';
 
     /** @var TypesRegistry */
     protected $registry;
@@ -33,8 +33,8 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SET_DATA  => 'preSet',
-            FormEvents::PRE_SUBMIT  => 'preSubmit',
+            FormEvents::PRE_SET_DATA => 'preSet',
+            FormEvents::PRE_SUBMIT   => 'preSubmit',
         ];
     }
 
@@ -121,23 +121,25 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     protected function getModifierClosure()
     {
         return function ($form) {
-            $form->add(
+            // commented until two way sync will finished
+            /*$form->add(
                 'isTwoWaySyncEnabled',
                 'checkbox',
                 [
                     'label'    => 'oro.integration.channel.two_way_sync_enabled.label',
                     'required' => false,
                 ]
-            );
+            );*/
             $form->add(
                 'syncPriority',
                 'choice',
                 [
                     'label'    => 'oro.integration.channel.sync_priority.label',
+                    'tooltip'  => 'oro.integration.channel.sync_priority.tooltip',
                     'required' => true,
                     'choices'  => [
                         self::REMOTE_WINS => 'oro.integration.channel.remote_wins.label',
-                        self::LOCAL_WINS => 'oro.integration.channel.local_wins.label'
+                        self::LOCAL_WINS  => 'oro.integration.channel.local_wins.label'
                     ],
                 ]
             );
