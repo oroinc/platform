@@ -55,7 +55,8 @@ class EntitiesController extends Controller
         return [
             'entity_id'    => $id,
             'entity_class' => $extendEntityName,
-            'label'        => $entityConfig->get('label')
+            'label'        => $entityConfig->get('label'),
+            'plural_label' => $entityConfig->get('plural_label')
         ];
     }
 
