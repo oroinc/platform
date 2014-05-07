@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Controller;
 
-use Composer\Composer;
 use Composer\Package\PackageInterface;
 
+use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -32,7 +32,7 @@ class PlatformController extends Controller
      */
     public function systemInfoAction()
     {
-        $packages    = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
+        $packages    = $this->getLocalRepositoryManager()->getLocalRepository()->getCanonicalPackages();
         $oroPackages = $thirdPartyPackages = [];
 
         foreach ($packages as $package) {
@@ -51,10 +51,10 @@ class PlatformController extends Controller
     }
 
     /**
-     * @return Composer
+     * @return LocalRepositoryManager
      */
-    protected function getComposer()
+    protected function getLocalRepositoryManager()
     {
-        return $this->get('oro_platform.composer');
+        return $this->get('oro_platform.composer.local_repo_manager');
     }
 }
