@@ -6,38 +6,14 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var Util = require('./entity-fields-util');
     require('jquery-ui');
     require('jquery.select2');
-
-    function filterFields(fields, exclude) {
-        fields = _.filter(fields, function (item) {
-            var result;
-            // otherwise - we filter by object keys or not filtering at all
-            result = !_.some(exclude, function (rule) {
-                var result;
-                // exclude can be a property name
-                if (_.isString(rule)) {
-                    result = _.intersection(
-                        [rule],
-                        _.keys(item)
-                    ).length > 0;
-                } else {
-                    // or exclude can be an object with data to compare
-                    var cut = _.pick(item, _.keys(rule));
-                    result  = _.isEqual(cut, rule);
-                }
-
-                return result;
-            });
-            return result;
-        });
-        return fields;
-    }
 
     $.widget('oroentity.fieldChoice', {
         options: {
             entity: null,
-            fields: {},
+            data: {},
             select2: {
                 pageableResults: true,
                 dropdownAutoWidth: true
@@ -55,6 +31,7 @@ define(function (require) {
                 }
             });
 
+            this.util = new Util(this.options.entity, this.options.data);
             this._bindFieldsLoader();
         },
 
@@ -63,7 +40,7 @@ define(function (require) {
                 self = this;
 
             this._processSelect2Options();
-            this._updateData(this.options.entity, this.options.fields);
+            this._updateData(this.options.entity, this.options.data);
 
             select2Options = $.extend({
                 initSelection: function (element, callback) {
@@ -71,8 +48,8 @@ define(function (require) {
                     opts = instance.opts;
                     id = element.val();
                     match = null;
-                    chain = self._pathToEntityChain(id, true);
-                    instance.context = self._entityChainToPath(chain);
+                    chain = self.util.pathToEntityChain(id, true);
+                    instance.context = self.util.entityChainToPath(chain);
                     opts.query({
                         matcher: function (term, text, el) {
                             var is_match = id === opts.id(el);
@@ -105,7 +82,7 @@ define(function (require) {
                     return label;
                 },
                 breadcrumbs: function (context) {
-                    var chain = self._pathToEntityChain(context, true);
+                    var chain = self.util.pathToEntityChain(context, true);
                     $.each(chain, function (i, item) {
                         item.context = item.path;
                     });
@@ -148,9 +125,9 @@ define(function (require) {
                 return;
             }
             $fieldsLoader = $(this.options.fieldsLoaderSelector);
-            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
+            $fieldsLoader.on('fieldsloaderupdate', function (e, data) {
                 self.setValue('');
-                self._updateData($(e.target).val(), fields);
+                self._updateData($(e.target).val(), data);
             });
             this._updateData($fieldsLoader.val(), $fieldsLoader.data('fields'));
         },
@@ -158,30 +135,13 @@ define(function (require) {
         _updateData: function (entity, data) {
             data = data || {};
             this.options.entity = entity;
-            this.options.fields = data;
+            this.options.data = data;
 
             this.element
                 .data('entity', entity)
                 .data('data', data);
-        },
 
-        getApplicableConditions: function (fieldId) {
-            if (!fieldId) {
-                return {};
-            }
-
-            var chain = this._pathToEntityChain(fieldId);
-            var result = {
-                parent_entity: null,
-                entity: chain[chain.length - 1].field.entity.name,
-                field: fieldId
-            };
-            if (chain.length > 2) {
-                result.parent_entity = chain[chain.length - 2].field.entity.name;
-            }
-            _.extend(result, _.pick(chain[chain.length - 1].field, ['type', 'identifier']));
-
-            return result;
+            this.util.init(entity, data);
         },
 
         setValue: function (value) {
@@ -189,11 +149,15 @@ define(function (require) {
         },
 
         formatChoice: function (value, template) {
-            return value ? template(this._pathToEntityChain(value)) : '';
+            return value ? template(this.util.pathToEntityChain(value)) : '';
         },
 
         splitFieldId: function (fieldId) {
-            return this._pathToEntityChain(fieldId);
+            return this.util.pathToEntityChain(fieldId);
+        },
+
+        getApplicableConditions: function (fieldId) {
+            return this.util.getApplicableConditions(fieldId);
         },
 
         /**
@@ -205,19 +169,19 @@ define(function (require) {
         _select2Data: function (path) {
             var fields = [], relations = [], results = [],
                 chain, entityName, entityFields,
-                entityData = this.options.fields;
+                entityData = this.options.data;
             if ($.isEmptyObject(entityData)) {
                 return results;
             }
 
-            chain = this._pathToEntityChain(path, true);
-            path = this._entityChainToPath(chain);
+            chain = this.util.pathToEntityChain(path, true);
+            path = this.util.entityChainToPath(chain);
             entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
             entityFields = entityData.fields;
 
             if (!_.isEmpty(this.options.exclude)) {
-                entityFields = filterFields(entityFields, this.options.exclude);
+                entityFields = Util.filterFields(entityFields, this.options.exclude);
             }
 
             $.each(entityFields, function () {
@@ -251,73 +215,6 @@ define(function (require) {
             }
 
             return results;
-        },
-
-        /**
-         *
-         * @param {string} path
-         * @param {boolean?} trim
-         * @returns {Array.<Object>}
-         * @private
-         */
-        _pathToEntityChain: function (path, trim) {
-            var chain, data, self = this;
-            data = this.options.fields;
-            chain = [{
-                entity: data[this.options.entity],
-                path: ''
-            }];
-
-            $.each(path.split('::'), function (i, item) {
-                var filedName, entityName;
-                if (item) {
-                    item = item.split('+');
-                    filedName = item[0];
-                    entityName = item[1];
-                    if (!chain[i].entity) {
-                        debugger;
-                    }
-                    item = {
-                        field: chain[i].entity.fieldsIndex[filedName]
-                    };
-                    if (entityName) {
-                        item.entity = data[entityName];
-                    }
-                    chain.push(item);
-                    item.path = self._entityChainToPath(chain);
-                }
-            });
-
-            // if last item in the chain is a field -- cut it off
-            if (trim && chain[chain.length - 1].entity === undefined) {
-                chain = chain.slice(0, -1);
-            }
-
-            return chain;
-        },
-
-        /**
-         *
-         * @param {Array.<Object>} chain
-         * @param {number=} end
-         * @returns {string}
-         * @private
-         */
-        _entityChainToPath: function (chain, end) {
-            var path;
-            end = end || chain.length;
-
-            chain = $.map(chain.slice(1, end), function (item) {
-                var result = item.field.name;
-                if (item.entity) {
-                    result += '+' + item.entity.name;
-                }
-                return result;
-            });
-
-            path = chain.join('::');
-
-            return path;
         }
     });
 

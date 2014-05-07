@@ -7,9 +7,8 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
     $.widget('orosegment.segmentChoice', {
         options: {
             entity: null,
-            fields: [],
+            data: {},
             segmentData: {},
-            util: {},
             select2: {
                 collapsibleResults: true,
                 dropdownAutoWidth: true
