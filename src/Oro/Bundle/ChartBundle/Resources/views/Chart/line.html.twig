@@ -105,7 +105,6 @@
                         var deltaY = yMax - yMin;
                         xMax += (deltaX > 0 ? deltaX / 10 : 1);
                         yMax += (deltaY > 0 ? deltaY / 10 : 1);
-
                         var chart = {
                             data: chartData,
                             color: colors[0],
@@ -141,14 +140,17 @@
                                         max: yMax,
                                         tickFormatter: function (y) {
                                             return getYLabel(y);
-                                        }
+                                        },
+                                        title: {{ options.data_schema.value.label|json_encode|raw }}
                                     },
                                     xaxis: {
                                         max: xMax,
                                         tickFormatter: function (x) {
                                             return getXLabel(x);
-                                        }
+                                        },
+                                        title: {{ options.data_schema.label.label|json_encode|raw }}
                                     },
+                                    HtmlText : false,
                                     grid: {
                                         verticalLines : false
                                     }
