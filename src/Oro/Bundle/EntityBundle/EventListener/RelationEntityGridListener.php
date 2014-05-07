@@ -59,8 +59,6 @@ class RelationEntityGridListener extends CustomEntityGridListener
 
             $queryBuilder->setParameters($parameters);
         }
-
-        parent::onBuildAfter($event);
     }
 
     /**
@@ -69,13 +67,13 @@ class RelationEntityGridListener extends CustomEntityGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $this->parameters = $event->getDatagrid()->getParameters();
+        $datagrid = $event->getDatagrid();
 
         // get field config, extendEntity, $added, $removed
-        $extendEntityName = $this->getParam('class_name');
+        $extendEntityName = $this->getParam($datagrid, 'class_name');
         $extendEntityName = str_replace('_', '\\', $extendEntityName);
-        $fieldName        = $this->getParam('field_name');
-        $entityId         = $this->getParam('id');
+        $fieldName        = $this->getParam($datagrid, 'field_name');
+        $entityId         = $this->getParam($datagrid, 'id');
 
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');

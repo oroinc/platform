@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -40,6 +40,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /** @var Request */
     protected $request;
 
+    /** @var DatagridInterface[] */
+    protected $visitedDatagrids = array();
+
     protected $filterMap = array(
         'string'   => 'string',
         'integer'  => 'number',
@@ -69,11 +72,6 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     );
 
     /**
-     * @var ParameterBag
-     */
-    protected $parameters;
-
-    /**
      * @param ConfigManager       $configManager
      * @param SystemAwareResolver $datagridResolver
      * @param Router              $router
@@ -93,7 +91,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $this->parameters = null;
+        // nothing to do here, just leave it empty
     }
 
     /**
@@ -102,9 +100,12 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $this->parameters = $event->getDatagrid()->getParameters();
+        $datagrid = $event->getDatagrid();
 
-        $entityClass = $this->getParam('class_name');
+        $this->addVisitedDatagrid($datagrid);
+
+        $entityClass = $this->getParam($datagrid, 'class_name');
+
         if (empty($entityClass)) {
             $entityClass = $this->request->attributes->get('id');
         }
@@ -243,8 +244,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /**
      * @param string        $code
-     * @param               $label
+     * @param string        $label
      * @param FieldConfigId $fieldConfigId
+     * @param boolean       $isVisible
      *
      * @return array
      */
@@ -320,8 +322,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             $route = $node['route'];
         }
 
-        return function (ResultRecord $record) use ($router, $route) {
-            $className = $this->getParam('class_name');
+        return function (ResultRecord $record) use ($gridName, $router, $route) {
+            $datagrid = $this->getVisitedDatagrid($gridName);
+            $className = $this->getParam($datagrid, 'class_name');
             return $router->generate(
                 $route,
                 array(
@@ -337,24 +340,19 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - first from current request query
      * - then from master request attributes
      *
+     * @param DatagridInterface $datagrid
      * @param string $name
      * @param bool $default
      * @return mixed
      */
-    protected function getParam($name, $default = false)
+    protected function getParam(DatagridInterface $datagrid, $name, $default = false)
     {
-        if (!$this->parameters) {
-            throw new \BadMethodCallException('Method must be called only while datagrid is building.');
-        }
-
-        $paramValue = $this->parameters->get($name, $default);
+        $paramValue = $datagrid->getParameters()->get($name, $default);
         if ($paramValue === false) {
             $paramNameCamelCase = str_replace(
                 ' ',
                 '',
-                lcfirst(
-                    ucwords(str_replace('_', ' ', $name))
-                )
+                lcfirst(ucwords(str_replace('_', ' ', $name)))
             );
 
             $paramValue = $this->request->attributes->get($paramNameCamelCase, $default);
@@ -379,5 +377,28 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         if ($request instanceof Request) {
             $this->request = $request;
         }
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     */
+    protected function addVisitedDatagrid(DatagridInterface $datagrid)
+    {
+        $this->visitedDatagrids[$datagrid->getName()] = $datagrid;
+    }
+
+    /**
+     * @param string $datagridName
+     * @return DatagridInterface
+     * @throws \InvalidArgumentException
+     */
+    protected function getVisitedDatagrid($datagridName)
+    {
+        if (!isset($this->visitedDatagrids[$datagridName])) {
+            throw new \InvalidArgumentException(
+                sprintf('Can\'t get instance of grid "%s".', $datagridName)
+            );
+        }
+        return $this->visitedDatagrids[$datagridName];
     }
 }

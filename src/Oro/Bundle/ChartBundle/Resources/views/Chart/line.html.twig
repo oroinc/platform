@@ -51,6 +51,21 @@
                         }
 
                         var rawData = {{ data|json_encode|raw }};
+
+                        if (dataFormatter.isValueNumerical(xFormat)) {
+                            rawData.sort(function(first, second){
+                                if(first.label == null){
+                                    return -1;
+                                }
+                                if(second.label == null){
+                                    return 1;
+                                }
+                                var firstLabel = dataFormatter.parseValue(first.label, xFormat);
+                                var secondLabel = dataFormatter.parseValue(second.label, xFormat);
+                                return firstLabel - secondLabel;
+                            });
+                        }
+
                         var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
                         var chartData = [];
@@ -103,8 +118,13 @@
                         }
                         var deltaX = xMax - xMin;
                         var deltaY = yMax - yMin;
-                        xMax += (deltaX > 0 ? deltaX / 10 : 1);
-                        yMax += (deltaY > 0 ? deltaY / 10 : 1);
+                        var xStep = (deltaX > 0 ? deltaX / rawData.length : 1);
+                        var yStep = (deltaY > 0 ? deltaY / rawData.length : 1);
+                        xMax += xStep;
+                        yMax += yStep;
+                        xMin -= xStep;
+                        yMin -= yStep;
+
                         var chart = {
                             data: chartData,
                             color: colors[0],
@@ -138,6 +158,7 @@
                                     },
                                     yaxis: {
                                         max: yMax,
+                                        min: yMin,
                                         tickFormatter: function (y) {
                                             return getYLabel(y);
                                         },
@@ -145,6 +166,7 @@
                                     },
                                     xaxis: {
                                         max: xMax,
+                                        min: xMin,
                                         tickFormatter: function (x) {
                                             return getXLabel(x);
                                         },

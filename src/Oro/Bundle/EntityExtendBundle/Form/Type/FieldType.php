@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
-    protected $types = array(
+    protected $types = [
         'string'     => 'oro.entity_extend.form.data_type.string',
         'integer'    => 'oro.entity_extend.form.data_type.integer',
         'smallint'   => 'oro.entity_extend.form.data_type.smallint',
@@ -30,7 +30,7 @@ class FieldType extends AbstractType
         'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
         'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
-    );
+    ];
 
     /**
      * @var ConfigManager
@@ -42,10 +42,24 @@ class FieldType extends AbstractType
      */
     protected $translator;
 
-    public function __construct(ConfigManager $configManager, Translator $translator)
-    {
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     */
+    public function __construct(
+        ConfigManager $configManager,
+        Translator $translator,
+        ExtendDbIdentifierNameGenerator $nameGenerator
+    ) {
         $this->configManager = $configManager;
         $this->translator    = $translator;
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -56,10 +70,13 @@ class FieldType extends AbstractType
         $builder->add(
             'fieldName',
             'text',
-            array(
-                'label' => 'Field Name',
-                'block' => 'type',
-            )
+            [
+                'label'       => 'Field Name',
+                'block'       => 'type',
+                'constraints' => [
+                    new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])
+                ],
+            ]
         );
 
         $entityProvider = $this->configManager->getProvider('entity');
@@ -67,7 +84,7 @@ class FieldType extends AbstractType
 
         $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
-            $types = array();
+            $types = [];
             foreach ($entityConfig->get('relation') as $relationKey => $relation) {
                 $fieldId       = $relation['field_id'];
                 $targetFieldId = $relation['target_field_id'];
@@ -101,11 +118,11 @@ class FieldType extends AbstractType
         $builder->add(
             'type',
             'choice',
-            array(
+            [
                 'choices'     => $this->types,
                 'empty_value' => 'Select field type',
                 'block'       => 'type',
-            )
+            ]
         );
     }
 
@@ -115,17 +132,17 @@ class FieldType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(array('class_name'))
+            ->setRequired(['class_name'])
             ->setDefaults(
-                array(
-                    'require_js'   => array(),
-                    'block_config' => array(
-                        'type' => array(
+                [
+                    'require_js'   => [],
+                    'block_config' => [
+                        'type' => [
                             'title'    => 'General',
                             'priority' => 1,
-                        )
-                    )
-                )
+                        ]
+                    ]
+                ]
             );
     }
 
