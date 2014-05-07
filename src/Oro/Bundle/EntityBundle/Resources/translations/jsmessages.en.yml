@@ -2,6 +2,6 @@ oro:
     entity:
         field_choice:
             fields:           Fields
-            relations:        Relations
+            relations:        Relatated entities
         form:
             choose_entity_field:    Choose a field...
