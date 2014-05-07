@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -74,6 +76,22 @@ class EntityFieldRecursiveProviderTest extends \PHPUnit_Framework_TestCase
             []
         );
         $this->provider->setEntityProvider($entityProvider);
+    }
+
+    public function testIsApplied()
+    {
+        $params = new ParameterBag(
+            [
+                'entityName' => 'Acme_Test_Entity',
+            ]
+        );
+
+        $result = $this->provider->isApplied($params);
+        $this->assertTrue($result);
+
+        $params = new ParameterBag(['plain-list' => '1']);
+        $result = $this->provider->isApplied($params);
+        $this->assertFalse($result);
     }
 
     public function testGetFieldsNoEntityConfig()
