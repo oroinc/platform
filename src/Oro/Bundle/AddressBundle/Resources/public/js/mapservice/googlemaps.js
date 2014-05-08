@@ -98,13 +98,19 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
                         other_params: googleMapsSettings,
                         callback: _.bind(this.onGoogleMapsInit, this)
                     });
+
+                    this.mapsLoadExecuted = false;
                 }, this)
             });
         },
 
         updateMap: function (address, label) {
             // Load google maps js
-            if (!this.hasGoogleMaps() && !this.mapsLoadExecuted) {
+            if (!this.hasGoogleMaps()) {
+                if (this.mapsLoadExecuted) {
+                    return;
+                }
+
                 this.mapsLoadExecuted = true;
                 this.requestedLocation = {
                     'address': address,
