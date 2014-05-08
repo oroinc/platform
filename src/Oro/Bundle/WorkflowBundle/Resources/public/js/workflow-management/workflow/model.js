@@ -138,6 +138,7 @@ function(_, $, Backbone, Helper, __,
         setEntityFieldsData: function(fields) {
             this.entityFieldsInitialized = true;
             this.entityFieldUtil = new EntityFieldsUtil(this.get('entity'), fields);
+            this.trigger('entityFieldsInitialize');
         },
 
         getFieldIdByPropertyPath: function(propertyPath) {
