@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Translation\Translator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -19,8 +18,28 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class EntityFieldRecursiveProvider extends AbstractProvider
+class EntityFieldRecursiveProvider
 {
+    /**
+     * @var ConfigProvider
+     */
+    protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
+
+    /**
+     * @var EntityClassResolver
+     */
+    protected $entityClassResolver;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
     /**
      * @var ManagerRegistry
      */
@@ -59,22 +78,13 @@ class EntityFieldRecursiveProvider extends AbstractProvider
         $virtualFields,
         $hiddenFields
     ) {
-        parent::__construct($entityConfigProvider, $extendConfigProvider, $entityClassResolver, $translator);
-
-        $this->doctrine      = $doctrine;
-        $this->virtualFields = $virtualFields;
-        $this->hiddenFields  = $hiddenFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplied(ParameterBag $parameters)
-    {
-        $entityName  = str_replace('_', '\\', $parameters->get('entityName'));
-        $isPlainList = ('1' === $parameters->get('plain-list'));
-
-        return !empty($entityName) && !$isPlainList;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
+        $this->entityClassResolver  = $entityClassResolver;
+        $this->translator           = $translator;
+        $this->doctrine             = $doctrine;
+        $this->virtualFields        = $virtualFields;
+        $this->hiddenFields         = $hiddenFields;
     }
 
     /**

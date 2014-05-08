@@ -42,8 +42,8 @@ function(_, $, Backbone, Helper, __,
             attributes: null
         },
 
-        propertyPathToFieldIdMapping: {},
-        pathMappingInitialized: false,
+        entityFieldsData: null,
+        entityFieldsInitialized: false,
 
         initialize: function() {
             if (this.get('steps') === null) {
@@ -134,16 +134,39 @@ function(_, $, Backbone, Helper, __,
             return cloned;
         },
 
-        setPropertyPathToFieldIdMapping: function(mapping) {
-            this.propertyPathToFieldIdMapping = mapping;
-            this.pathMappingInitialized = true;
-            this.trigger('pathMappingInit', mapping);
+        setEntityFieldsData: function(fields) {
+            this.entityFieldsInitialized = true;
+            this.entityFieldsData = fields;
         },
 
         getFieldIdByPropertyPath: function(propertyPath) {
-            return this.pathMappingInitialized && this.propertyPathToFieldIdMapping.hasOwnProperty(propertyPath)
-                ? this.propertyPathToFieldIdMapping[propertyPath]
-                : '';
+            var pathData = propertyPath.split('.');
+            var entity = this.get('entity');
+
+            if (pathData.length > 1
+                && pathData[0] == this.get('entity_attribute')
+                && this.entityFieldsData.hasOwnProperty(entity)
+            ) {
+                var entityData = this.entityFieldsData[entity];
+
+                var fieldIdParts = $.map(pathData.slice(1, pathData.length - 1), function (fieldName) {
+                    var fieldPartId = fieldName;
+
+                    if (entityData.hasOwnProperty('fieldsIndex') && entityData.fieldsIndex.hasOwnProperty(fieldName)) {
+                        entityData = entityData.fieldsIndex[fieldName];
+                        if (entityData.hasOwnProperty('related_entity')) {
+                            fieldPartId += '+' + entityData.related_entity.name;
+                        }
+                    }
+
+                    return fieldPartId;
+                });
+
+                fieldIdParts.push(pathData[pathData.length - 1]);
+                return fieldIdParts.join('::');
+            } else {
+                return null;
+            }
         },
 
         getSystemEntities: function() {

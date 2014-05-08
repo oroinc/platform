@@ -2,23 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 class EntityFieldListProvider extends EntityFieldRecursiveProvider
 {
     /** @var string|null */
     protected $currentClassName = null;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplied(ParameterBag $parameters)
-    {
-        $entityName  = str_replace('_', '\\', $parameters->get('entityName'));
-        $isPlainList = ('1' === $parameters->get('plain-list'));
-
-        return !empty($entityName) && $isPlainList;
-    }
 
     /**
      * {@inheritdoc}

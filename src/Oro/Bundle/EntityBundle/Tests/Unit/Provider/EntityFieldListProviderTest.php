@@ -86,23 +86,6 @@ class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->setEntityProvider($this->entityProvider);
     }
 
-    public function testIsApplied()
-    {
-        $params = new ParameterBag(
-            [
-                'entityName' => 'Acme_Test_Entity',
-                'plain-list' => '1',
-            ]
-        );
-
-        $result = $this->provider->isApplied($params);
-        $this->assertTrue($result);
-
-        $params = new ParameterBag();
-        $result = $this->provider->isApplied($params);
-        $this->assertFalse($result);
-    }
-
     public function testGetFieldsWithRelations()
     {
         $this->prepareWithRelations();

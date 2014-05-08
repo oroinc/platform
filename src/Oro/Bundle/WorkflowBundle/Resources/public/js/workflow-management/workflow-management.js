@@ -147,7 +147,14 @@ function(_, Backbone, routing, messenger, __,
 
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_workflow_api_rest_entity_get',
-                routingParams: {"with-relations": 1, "with-entity-details": 1, "plain-list": 1, "deep-level": 2},
+                routingParams: {
+                    "with-relations": 1,
+                    "with-virtual-fields": 1,
+                    "with-unidirectional": 1,
+                    "with-entity-details": 1,
+                    "plain-list": 1,
+                    "deep-level": 2
+                },
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
                      return this.model.get('steps').length > 1 &&
@@ -156,6 +163,7 @@ function(_, Backbone, routing, messenger, __,
                             + this.model.get('attributes').length) > 0;
                 }, this)
             });
+
             this.$entitySelectEl.on('change', _.bind(function() {
                 if (!this.model.get('entity')) {
                     this.model.set('entity', this.$entitySelectEl.val());
@@ -163,8 +171,21 @@ function(_, Backbone, routing, messenger, __,
             }, this));
 
             this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
-                this.createPathMapping($(e.target).data('fields'));
+                this.initEntityFieldsData($(e.target).data('fields'));
             }, this));
+
+            this._preloadEntityFieldsData();
+        },
+
+        _preloadEntityFieldsData: function() {
+            if (this.$entitySelectEl.val()) {
+                var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
+                if (!fieldsData.length) {
+                    this.$entitySelectEl.fieldsLoader('loadFields');
+                } else {
+                    this.initEntityFieldsData(fieldsData);
+                }
+            }
         },
 
         addStartingPoint: function() {
@@ -190,40 +211,8 @@ function(_, Backbone, routing, messenger, __,
             this.addStartingPoint();
         },
 
-        createPathMapping: function(fields) {
-            var rootAttributeName = this.model.get('entity_attribute');
-            var mapping = {};
-
-            var addMapping = _.bind(function(field, parentPropertyPath, parentFieldId) {
-                var propertyPath = parentPropertyPath + '.' + field.name;
-                var fieldIdParts = [];
-
-                if (parentFieldId) {
-                    fieldIdParts.push(parentFieldId);
-                }
-
-                var fieldIdName = field.name;
-                if (field.hasOwnProperty('related_entity_name')) {
-                    fieldIdName += '+' + field.related_entity_name;
-                }
-                fieldIdParts.push(fieldIdName);
-
-                if (!field.hasOwnProperty('related_entity_name')) {
-                    mapping[propertyPath] = fieldIdParts.join('::');
-                }
-
-                if (field.hasOwnProperty('related_entity_fields')) {
-                    _.each(field.related_entity_fields, function(relatedField) {
-                        addMapping(relatedField, propertyPath, fieldIdParts.join('::'));
-                    });
-                }
-            });
-
-            _.each(fields, function(field) {
-                addMapping(field, rootAttributeName, "");
-            });
-
-            this.model.setPropertyPathToFieldIdMapping(mapping);
+        initEntityFieldsData: function(fields) {
+            this.model.setEntityFieldsData(fields);
         },
 
         saveConfiguration: function(e) {
