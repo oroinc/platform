@@ -79,6 +79,10 @@ table.grid tr .boolean-cell {
     text-align: left;
 }
 
+.datetime-cell {
+    white-space: nowrap;
+}
+
 table.grid tr .number-cell,
 table.grid tr .integer-cell {
     text-align: right;
