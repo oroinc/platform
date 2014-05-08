@@ -1,130 +1,138 @@
 /*global define*/
-define(['underscore', 'oroentity/js/field-choice', 'oroui/js/mediator', 'orotranslation/js/translator'],
-    function (_, $, mediator, __) {
-        'use strict';
+/*jslint nomen: true*/
+define(function (require) {
+    'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var Util = require('oroentity/js/entity-fields-util');
+    require('oroentity/js/fields-loader');
+    require('jquery.select2');
+
+
+    /**
+     * @export ororeport/js/chart_options
+     * @class  ororeport.ChartOptions
+     */
+    return {
 
         /**
-         * @export ororeport/js/chart_options
-         * @class  ororeport.ChartOptions
+         * @property {Object}
          */
-        return {
+        options: {
+            childTemplate: '[id^=<%= id %>_]',
+            optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
+            fieldsLoaderSelector: '#oro_report_form_entity',
+            events: [
+                'items-manager:table:add',
+                'items-manager:table:change',
+                'items-manager:table:remove',
+                'items-manager:table:reset'
+            ]
+        },
 
-            /**
-             * @property {Object}
-             */
-            options: {
-                childTemplate: '[id^=<%= id %>_]',
-                optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
-                fieldChoiceOptions: {
-                    select2: {
-                        placeholder: __('oro.entity.form.choose_entity_field')
+        /**
+         * @param {String} id
+         * @param {Array} options
+         */
+        initialize: function (id, options) {
+            var self = this;
+            var initializer = _.once(_.bind(this.initSelect2, this, id));
+
+            this.options = _.extend({}, this.options, options);
+            this.items = [];
+
+            _.each(this.options.events, function (event) {
+                mediator.on(event, function (collection) {
+                    var entity = $(self.options.fieldsLoaderSelector).fieldsLoader('getEntityName');
+                    var data = $(self.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
+                    self.util = new Util(entity, data);
+                    self.items = collection.toJSON();
+                    initializer();
+                });
+            });
+        },
+
+        initSelect2: function (id) {
+            var childSelector = _.template(this.options.childTemplate, {id: id});
+            var self = this;
+            $('#' + id).find(childSelector).each(function () {
+                var exclude = $(this).data('type-filter');
+                $(this).select2({
+                    collapsibleResults: true,
+                    placeholder: __('oro.entity.form.choose_entity_field'),
+                    data: function () {
+                        return self.data(exclude);
                     },
-                    util: {},
-                    exclude: [],
-                    fields: []
-                },
-                fieldsLoaderSelector: '#oro_report_form_entity',
-                events: [
-                    'items-manager:table:add',
-                    'items-manager:table:change',
-                    'items-manager:table:remove',
-                    'items-manager:table:reset'
-                ]
-            },
-
-            /**
-             * @param {String} id
-             * @param {Array} options
-             */
-            initialize: function (id, options) {
-                var self = this;
-                this.options = _.extend({}, this.options, options);
-
-                _.each(this.options.events, function (event) {
-                    mediator.on(event, function (collection) {
-                        self.updateFields(collection);
-
-                        self.updateFilters(id);
-                    });
-                });
-            },
-
-            /**
-             * @param {String} id
-             */
-            updateFilters: function (id) {
-                var self = this;
-                var childSelector = _.template(self.options.childTemplate, {id: id});
-                var items = $('#' + id).find(childSelector);
-
-                _.each(items, function (item) {
-                    self.options.fieldChoiceOptions.exclude = $(item).data('type-filter');
-                    $(item).fieldChoice(self.options.fieldChoiceOptions);
-                });
-            },
-
-            /**
-             * @param {Array} collection
-             */
-            updateFields: function (collection) {
-                var self = this;
-                var fieldsList = $(self.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
-
-                self.options.fieldChoiceOptions.fields = [];
-                _.each(collection.models, function (model) {
-                    var name = model.get('name');
-                    var options = model.get('func');
-                    self._addFieldByPath(fieldsList, self.options.fieldChoiceOptions.fields, name, options);
-                });
-            },
-
-            /**
-             * @param {Array} fields
-             * @param {Array} root
-             * @param {String} name
-             * @param {Array} options
-             */
-            _addFieldByPath: function (fields, root, name, options) {
-                var self = this;
-                var chain = name.split('+');
-                var fieldName = _.last(_.first(chain).split('::'));
-                var lastFieldName = _.last(_.last(chain).split('::'));
-                var hasOptions = fieldName == lastFieldName;
-
-                var field = _.findWhere(fields, {name: fieldName});
-                if (field) {
-                    var rootField = _.findWhere(root, {name: fieldName});
-                    if (!rootField) {
-                        rootField = _.clone(field);
-                        rootField.related_entity_fields = [];
-
-                        if (options && hasOptions) {
-                            var optionedName = _.template(
-                                self.options.optionsTemplate,
-                                {
-                                    field: rootField.name,
-                                    group: options.name,
-                                    name: options.group_name,
-                                    type: options.group_type
-                                }
-                            );
-
-                            rootField.name = optionedName;
-                        }
-
-                        root.push(rootField);
+                    initSelection: function (element, callback) {
+                        var value = element.val().split('(');
+                        var node = _.last(self.util.pathToEntityChain(value[0]));
+                        callback({
+                            id: value.join('('),
+                            text: node.field.label
+                        });
                     }
+                });
+            });
+        },
 
-                    if (chain.length > 1) {
-                        var childName = _.rest(chain).join('+');
-                        self._addFieldByPath(
-                            field.related_entity_fields,
-                            rootField.related_entity_fields,
-                            childName,
-                            options
-                        );
-                    }
-                }
+        data: function (exclude) {
+            var data, util, optionsTemplate;
+            util = this.util;
+            data = {
+                more: false,
+                results: []
+            };
+
+            if (!util) {
+                return data;
             }
-        };
-    });
+
+            optionsTemplate = _.template(this.options.optionsTemplate);
+
+            $.each(this.items, function () {
+                var options = this.func;
+                var chain = util.pathToEntityChain(this.name).slice(1);
+                var field = chain[chain.length - 1].field;
+                var items = data.results;
+                if (!Util.filterFields([field], exclude).length) {
+                    return;
+                }
+                $.each(chain, function () {
+                    var item, id;
+                    if (this.entity) {
+                        item = _.findWhere(items, {path: this.path});
+                        if (!item) {
+                            item = {
+                                text: this.field.label,
+                                path: this.path,
+                                children: []
+                            };
+                            items.push(item);
+                        }
+                        items = item.children;
+                    } else {
+                        if (options) {
+                            id = optionsTemplate({
+                                field: this.path,
+                                group: options.name,
+                                name: options.group_name,
+                                type: options.group_type
+                            });
+                        } else {
+                            id = this.path;
+                        }
+                        items.push({
+                            text: this.field.label,
+                            id: id
+                        });
+                    }
+                });
+            });
+
+            return data;
+        }
+    }
+});

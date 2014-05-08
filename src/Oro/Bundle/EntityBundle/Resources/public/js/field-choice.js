@@ -1,49 +1,21 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', './entity-field-select-util', './entity-field-view',
-    'jquery-ui', 'jquery.select2'
-    ], function ($, _, EntityFieldUtil, EntityFieldView) {
+define(function (require) {
     'use strict';
 
-    function filterFields(fields, exclude) {
-        fields = _.filter(fields, function (item) {
-            var result;
-
-            // filter children only if we filtering by data
-            if (item.children && !_.isString(exclude[0])) {
-                item.children = filterFields(item.children, exclude);
-                result = !_.isEmpty(item.children);
-            } else {
-                // otherwise - we filter by object keys or not filtering at all
-                result = !_.some(exclude, function (rule) {
-                    var result;
-                    // exclude can be a property name
-                    if (_.isString(rule)) {
-                        result = _.intersection(
-                            [rule],
-                            _.keys(item)
-                        ).length > 0;
-                    } else {
-                        // or exclude can be an object with data to compare
-                        var cut = _.pick(item, _.keys(rule));
-                        result  = _.isEqual(cut, rule);
-                    }
-
-                    return result;
-                });
-            }
-            return result;
-        });
-        return fields;
-    }
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Util = require('./entity-fields-util');
+    require('jquery-ui');
+    require('jquery.select2');
 
     $.widget('oroentity.fieldChoice', {
         options: {
             entity: null,
-            fields: [],
-            util: {},
+            data: {},
             select2: {
-                collapsibleResults: true,
+                pageableResults: true,
                 dropdownAutoWidth: true
             },
             exclude: [],
@@ -51,8 +23,6 @@ define(['jquery', 'underscore', './entity-field-select-util', './entity-field-vi
         },
 
         _create: function () {
-            this.entityFieldUtil = new EntityFieldUtil(this.element);
-
             this._on({
                 change: function (e) {
                     if (e.added) {
@@ -61,21 +31,67 @@ define(['jquery', 'underscore', './entity-field-select-util', './entity-field-vi
                 }
             });
 
+            this.util = new Util(this.options.entity, this.options.data);
             this._bindFieldsLoader();
         },
 
         _init: function () {
-            $.extend(this.entityFieldUtil, this.options.util);
+            var instance, select2Options,
+                self = this;
+
             this._processSelect2Options();
-            if (this.options.entity
-                && this.options.fields && !this.options.fields.length
-                && this.options.fieldsLoaderSelector
-            ) {
-                var $fieldsLoader = $(this.options.fieldsLoaderSelector);
-                $fieldsLoader.fieldsLoader('loadFields');
-            } else {
-                this._updateData(this.options.entity, this.options.fields);
-            }
+            this._updateData(this.options.entity, this.options.data);
+
+            select2Options = $.extend({
+                initSelection: function (element, callback) {
+                    var id, chain, opts, match;
+                    opts = instance.opts;
+                    id = element.val();
+                    match = null;
+                    chain = self.util.pathToEntityChain(id, true);
+                    instance.pagePath = chain[chain.length - 1].basePath;
+                    opts.query({
+                        matcher: function (term, text, el) {
+                            var is_match = id === opts.id(el);
+                            if (is_match) {
+                                match = el;
+                            }
+                            return is_match;
+                        },
+                        callback: !$.isFunction(callback) ? $.noop : function () {
+                            callback(match);
+                        }
+                    });
+                },
+                id: function (result) {
+                    return result.id !== undefined ? result.id : result.pagePath;
+                },
+                data: function () {
+                    var pagePath, results;
+                    pagePath = (instance && instance.pagePath) || '';
+                    results = self._select2Data(pagePath);
+                    return {
+                        more: false,
+                        pagePath: pagePath,
+                        results: results
+                    };
+                },
+                formatBreadcrumbItem: function (item) {
+                    var label;
+                    label = item.field ? item.field.label : item.entity.label;
+                    return label;
+                },
+                breadcrumbs: function (pagePath) {
+                    var chain = self.util.pathToEntityChain(pagePath, true);
+                    $.each(chain, function (i, item) {
+                        item.pagePath = item.basePath;
+                    });
+                    return chain;
+                }
+            }, this.options.select2);
+
+            this.element.select2(select2Options);
+            instance = this.element.data('select2');
         },
 
         _setOption: function (key, value) {
@@ -92,15 +108,14 @@ define(['jquery', 'underscore', './entity-field-select-util', './entity-field-vi
         },
 
         _processSelect2Options: function () {
-            var template, entityFieldUtil,
+            var template,
                 options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
-                entityFieldUtil = this.entityFieldUtil;
                 template = _.template(options.formatSelectionTemplate);
-                options.formatSelection = function (item) {
-                    return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
-                };
+                options.formatSelection = $.proxy(function (item) {
+                    return this.formatChoice(item.id, template);
+                }, this);
             }
         },
 
@@ -110,32 +125,98 @@ define(['jquery', 'underscore', './entity-field-select-util', './entity-field-vi
                 return;
             }
             $fieldsLoader = $(this.options.fieldsLoaderSelector);
-            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
+            $fieldsLoader.on('fieldsloaderupdate', function (e, data) {
                 self.setValue('');
-                self._updateData($(e.target).val(), fields);
+                self._updateData($(e.target).val(), data);
             });
             this._updateData($fieldsLoader.val(), $fieldsLoader.data('fields'));
         },
 
-        _updateData: function (entity, fields) {
+        _updateData: function (entity, data) {
+            data = data || {};
             this.options.entity = entity;
-            this.options.fields = fields;
-            fields = this.entityFieldUtil._convertData(fields, entity, null);
-            if (!_.isEmpty(this.options.exclude)) {
-                fields = filterFields(fields, this.options.exclude);
-            }
+            this.options.data = data;
+
             this.element
                 .data('entity', entity)
-                .data('data', fields);
-            this.element.select2($.extend({data: fields}, this.options.select2));
-        },
+                .data('data', data);
 
-        getApplicableConditions: function (fieldId) {
-            return EntityFieldView.prototype.getFieldApplicableConditions.call(this.entityFieldUtil, fieldId);
+            this.util.init(entity, data);
         },
 
         setValue: function (value) {
             this.element.select2('val', value, true);
+        },
+
+        formatChoice: function (value, template) {
+            return value ? template(this.util.pathToEntityChain(value)) : '';
+        },
+
+        splitFieldId: function (fieldId) {
+            return this.util.pathToEntityChain(fieldId);
+        },
+
+        getApplicableConditions: function (fieldId) {
+            return this.util.getApplicableConditions(fieldId);
+        },
+
+        /**
+         *
+         * @param {string} path
+         * @returns {Array}
+         * @private
+         */
+        _select2Data: function (path) {
+            var fields = [], relations = [], results = [],
+                chain, entityName, entityFields,
+                entityData = this.options.data,
+                util = this.util;
+            if ($.isEmptyObject(entityData)) {
+                return results;
+            }
+
+            chain = this.util.pathToEntityChain(path, true);
+            entityName = chain[chain.length - 1].entity.name;
+            entityData = entityData[entityName];
+            entityFields = entityData.fields;
+
+            if (!_.isEmpty(this.options.exclude)) {
+                entityFields = Util.filterFields(entityFields, this.options.exclude);
+            }
+
+            $.each(entityFields, function () {
+                var field = this, item, chainItem;
+                chainItem = {field: field};
+                item = {
+                    id: util.entityChainToPath(chain.concat(chainItem)),
+                    text: field.label
+                };
+                if (field.related_entity) {
+                    chainItem.entity = field.related_entity;
+                    item.pagePath = util.entityChainToPath(chain.concat(chainItem));
+                    item.related_entity = field.related_entity;
+                    delete item.id;
+                    relations.push(item);
+                } else {
+                    fields.push(item);
+                }
+            });
+
+            if (!_.isEmpty(fields)) {
+                results.push({
+                    text: __("oro.entity.field_choice.fields"),
+                    children: fields
+                });
+            }
+
+            if (!_.isEmpty(relations)) {
+                results.push({
+                    text: __("oro.entity.field_choice.relations"),
+                    children: relations
+                });
+            }
+
+            return results;
         }
     });
 

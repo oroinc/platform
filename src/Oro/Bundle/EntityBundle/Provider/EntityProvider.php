@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Translation\Translator;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
