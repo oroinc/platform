@@ -30,9 +30,9 @@ class PlatformExtension extends \Twig_Extension
     {
         return array(
             'oro_version' => new \Twig_Function_Method(
-                    $this,
-                    'getVersion'
-                )
+                $this,
+                'getVersion'
+            )
         );
     }
 
