@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -28,9 +28,6 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var null original entity class */
     protected $entityClass = null;
 
@@ -42,6 +39,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /** @var Request */
     protected $request;
+
+    /** @var DatagridInterface[] */
+    protected $visitedDatagrids = array();
 
     protected $filterMap = array(
         'string'   => 'string',
@@ -72,20 +72,17 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     );
 
     /**
-     * @param ConfigManager     $configManager
+     * @param ConfigManager       $configManager
      * @param SystemAwareResolver $datagridResolver
-     * @param RequestParameters $requestParameters
-     * @param Router            $router
+     * @param Router              $router
      */
     public function __construct(
         ConfigManager $configManager,
         SystemAwareResolver $datagridResolver,
-        RequestParameters $requestParameters,
         Router $router
     ) {
         parent::__construct($configManager, $datagridResolver);
 
-        $this->requestParams = $requestParameters;
         $this->router        = $router;
     }
 
@@ -103,7 +100,12 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $entityClass = $this->getRequestParam('class_name');
+        $datagrid = $event->getDatagrid();
+
+        $this->addVisitedDatagrid($datagrid);
+
+        $entityClass = $this->getParam($datagrid, 'class_name');
+
         if (empty($entityClass)) {
             $entityClass = $this->request->attributes->get('id');
         }
@@ -242,8 +244,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /**
      * @param string        $code
-     * @param               $label
+     * @param string        $label
      * @param FieldConfigId $fieldConfigId
+     * @param boolean       $isVisible
      *
      * @return array
      */
@@ -319,10 +322,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             $route = $node['route'];
         }
 
-        $requestParams = $this->requestParams;
-
-        return function (ResultRecord $record) use ($router, $requestParams, $route) {
-            $className = $requestParams->get('class_name');
+        return function (ResultRecord $record) use ($gridName, $router, $route) {
+            $datagrid = $this->getVisitedDatagrid($gridName);
+            $className = $this->getParam($datagrid, 'class_name');
             return $router->generate(
                 $route,
                 array(
@@ -338,20 +340,19 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - first from current request query
      * - then from master request attributes
      *
-     * @param      $paramName
+     * @param DatagridInterface $datagrid
+     * @param string $name
      * @param bool $default
      * @return mixed
      */
-    protected function getRequestParam($paramName, $default = false)
+    protected function getParam(DatagridInterface $datagrid, $name, $default = false)
     {
-        $paramValue = $this->requestParams->get($paramName, $default);
+        $paramValue = $datagrid->getParameters()->get($name, $default);
         if ($paramValue === false) {
             $paramNameCamelCase = str_replace(
                 ' ',
                 '',
-                lcfirst(
-                    ucwords(str_replace('_', ' ', $paramName))
-                )
+                lcfirst(ucwords(str_replace('_', ' ', $name)))
             );
 
             $paramValue = $this->request->attributes->get($paramNameCamelCase, $default);
@@ -376,5 +377,28 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         if ($request instanceof Request) {
             $this->request = $request;
         }
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     */
+    protected function addVisitedDatagrid(DatagridInterface $datagrid)
+    {
+        $this->visitedDatagrids[$datagrid->getName()] = $datagrid;
+    }
+
+    /**
+     * @param string $datagridName
+     * @return DatagridInterface
+     * @throws \InvalidArgumentException
+     */
+    protected function getVisitedDatagrid($datagridName)
+    {
+        if (!isset($this->visitedDatagrids[$datagridName])) {
+            throw new \InvalidArgumentException(
+                sprintf('Can\'t get instance of grid "%s".', $datagridName)
+            );
+        }
+        return $this->visitedDatagrids[$datagridName];
     }
 }

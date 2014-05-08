@@ -1,4 +1,7 @@
 parameters:
+    oro_platform.composer.local_repo_factory.class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
+    oro_platform.composer.installed_json:           %kernel.root_dir%/../vendor/composer/installed.json
+
     oro_platform.maintenance.class:                 Oro\Bundle\PlatformBundle\Maintenance\Mode
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
 
@@ -15,3 +18,9 @@ services:
             - "@event_dispatcher"
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+
+    oro_platform.composer.local_repo_factory:
+        class: %oro_platform.composer.local_repo_factory.class%
+        arguments:
+            - @filesystem
+            - %oro_platform.composer.installed_json%

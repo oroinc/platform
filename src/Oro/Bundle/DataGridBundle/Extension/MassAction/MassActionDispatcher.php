@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
@@ -29,14 +28,10 @@ class MassActionDispatcher
      */
     protected $manager;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
-    public function __construct(ContainerInterface $container, Manager $manager, RequestParameters $requestParams)
+    public function __construct(ContainerInterface $container, Manager $manager)
     {
         $this->container     = $container;
         $this->manager       = $manager;
-        $this->requestParams = $requestParams;
     }
 
     /**
@@ -89,10 +84,10 @@ class MassActionDispatcher
         }
 
         // create datagrid
-        $datagrid = $this->manager->getDatagrid($datagridName);
+        $datagrid = $this->manager->getDatagridByRequestParams($datagridName);
 
         // set filter data
-        $this->requestParams->set(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
+        $datagrid->getParameters()->mergeKey(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
 
         // create mediator
         $massAction     = $this->getMassActionByName($actionName, $datagrid);

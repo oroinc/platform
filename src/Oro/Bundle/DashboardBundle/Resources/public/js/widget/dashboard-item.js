@@ -19,11 +19,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
         widgetEvents: {
             'click .collapse-expand-action-container .collapse-action': function(event) {
                 event.preventDefault();
-                this.collapse();
-            },
-            'click .collapse-expand-action-container .expand-action': function(event) {
-                event.preventDefault();
-                this.expand();
+                if (this.state.expanded) {
+                    this.collapse();
+                }else{
+                    this.expand();
+                }
             },
             'click .default-actions-container .move-action': function(event) {
                 event.preventDefault();
@@ -59,11 +59,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                 '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
                     '<div class="pull-left actions-container">' +
                         '<div class="pull-left collapse-expand-action-container">' +
-                            '<a class="collapse-action" href="#" title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
-                                '<i class="icon-collapse-alt hide-text"></i>' +
-                            '</a>' +
-                            '<a class="expand-action" href="#" title="<%- _.__(\'oro.dashboard.widget.expand\') %>">' +
-                                '<i class="icon-expand-alt hide-text"></i>' +
+                            '<a class="collapse-action <%= collapsed ? \'collapsed\' : \'\' %>" href="#" ' +
+                                'data-collapsed-title="<%- _.__(\'oro.dashboard.widget.expand\') %>"' +
+                                ' data-expanded-title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
                             '</a>' +
                         '</div>' +
                     '</div>' +
@@ -97,6 +95,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         initialize: function(options) {
             this.options.templateParams.allowEdit = this.options.allowEdit;
+            this.options.templateParams.collapsed = options.state.expanded;
             BlockWidget.prototype.initialize.apply(this, arguments);
         },
 
@@ -163,8 +162,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
         _setCollapsed: function() {
             this.state.expanded = false;
             this.widget.addClass('collapsed');
-            $('.collapse-expand-action-container .collapse-action', this.widget).hide();
-            $('.collapse-expand-action-container .expand-action', this.widget).show();
+            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            collapseControl.attr('title', collapseControl.data('collapsed-title')).toggleClass('collapsed');
         },
 
         /**
@@ -182,8 +181,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
         _setExpanded: function() {
             this.state.expanded = true;
             this.widget.removeClass('collapsed');
-            $('.collapse-expand-action-container .collapse-action', this.widget).show();
-            $('.collapse-expand-action-container .expand-action', this.widget).hide();
+            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
         },
 
         /**

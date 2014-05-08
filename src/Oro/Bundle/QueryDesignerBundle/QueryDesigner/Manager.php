@@ -6,7 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager implements FunctionProviderInterface
+class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -21,23 +21,31 @@ class Manager implements FunctionProviderInterface
     protected $entityHierarchyBuilder;
 
     /**
+     * @var array
+     */
+    protected $virtualFields;
+
+    /**
      * Constructor
      *
      * @param array                  $config
      * @param ConfigurationResolver  $resolver
-     * @param EntityHierarchyBuilder $entityHierarchyBuilder
+     * @param EntityHierarchyBuilder $hierarchyBuilder
      * @param Translator             $translator
+     * @param array                  $virtualFields
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        EntityHierarchyBuilder $entityHierarchyBuilder,
-        Translator $translator
+        EntityHierarchyBuilder $hierarchyBuilder,
+        Translator $translator,
+        $virtualFields
     ) {
         $resolver->resolve($config);
         $this->config     = ConfigurationObject::create($config);
-        $this->entityHierarchyBuilder = $entityHierarchyBuilder;
+        $this->entityHierarchyBuilder = $hierarchyBuilder;
         $this->translator = $translator;
+        $this->virtualFields = $virtualFields;
     }
 
     /**
@@ -120,6 +128,47 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtualField($className, $fieldName)
+    {
+        return isset($this->virtualFields[$className][$fieldName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualFieldQuery($className, $fieldName)
+    {
+        return $this->virtualFields[$className][$fieldName]['query'];
+    }
+
+    /**
+     * Returns filters types
+     *
+     * @param array $filterNames
+     * @return array
+     */
+    public function getExcludedProperties(array $filterNames)
+    {
+        $types   = [];
+        $filters = $this->config->offsetGet('filters');
+        foreach ($filterNames as $filterName) {
+            unset($filters[$filterName]);
+        }
+
+        foreach ($filters as $filter) {
+            if (isset($filter['applicable'])) {
+                foreach ($filter['applicable'] as $type) {
+                    $types[] = $type;
+                }
+            }
+        }
+
+        return $types;
     }
 
     /**

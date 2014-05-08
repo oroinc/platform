@@ -59,17 +59,17 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->selectColumns     = [];
-        $this->groupingColumns   = [];
-        $this->from              = [];
-        $this->innerJoins        = [];
-        $this->leftJoins         = [];
+        $this->selectColumns   = [];
+        $this->groupingColumns = [];
+        $this->from            = [];
+        $this->innerJoins      = [];
+        $this->leftJoins       = [];
         parent::doConvert($source);
-        $this->selectColumns     = null;
-        $this->groupingColumns   = null;
-        $this->from              = null;
-        $this->innerJoins        = null;
-        $this->leftJoins         = null;
+        $this->selectColumns   = null;
+        $this->groupingColumns = null;
+        $this->from            = null;
+        $this->innerJoins      = null;
+        $this->leftJoins       = null;
 
         $this->config->offsetSetByPath('[source][type]', 'orm');
     }
@@ -106,24 +106,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $entityClassName,
         $tableAlias,
         $fieldName,
+        $columnExpr,
         $columnAlias,
         $columnLabel,
         $functionExpr,
         $functionReturnType
     ) {
-        $columnName = sprintf('%s.%s', $tableAlias, $fieldName);
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
                 $tableAlias,
                 $fieldName,
-                $columnName,
+                $columnExpr,
                 $columnAlias
             );
         }
         $this->selectColumns[] = sprintf(
             '%s as %s',
-            $functionExpr !== null ? $functionExpr : $columnName,
+            $functionExpr !== null ? $functionExpr : $columnExpr,
             $columnAlias
         );
 
@@ -202,16 +202,23 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
     {
-        $join = [
-            'join'  => sprintf('%s.%s', $joinTableAlias, $joinFieldName),
+        $joinDefinition = [
+            'join'  => $join,
             'alias' => $joinAlias
         ];
-        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
-            $this->innerJoins[] = $join;
+        if (!empty($joinConditionType)) {
+            $joinDefinition['conditionType'] = $joinConditionType;
+        }
+        if (!empty($joinCondition)) {
+            $joinDefinition['condition'] = $joinCondition;
+        }
+
+        if ('left' === $joinType) {
+            $this->leftJoins[] = $joinDefinition;
         } else {
-            $this->leftJoins[] = $join;
+            $this->innerJoins[] = $joinDefinition;
         }
     }
 

@@ -17,6 +17,9 @@ Table of Contents
  - [Less Than Or Equal Condition](#less-than-or-equal-condition)
  - [True Condition](#true-condition)
  - [False Condition](#false-condition)
+ - [Has Value Condition](#has-value)
+ - [Not Has Value Condition](#not-has-value)
+ - [ACL Granted Condition](#acl-granted)
  - [Configurable Condition](#configurable-condition)
 
 Add Custom Condition
@@ -306,6 +309,64 @@ False Condition
 **Configuration Example**
 ```
 @false
+```
+
+Has Value Condition
+-------------------
+
+**Alias:** has_value
+
+**Description:** Check that context has value.
+
+**Options:**
+ - Requires exactly 1 option
+ - Option is a property path to check
+
+**Configuration Example**
+```
+@has_value:
+    - $customer.created_at
+```
+
+Not Has Value Condition
+-------------------
+
+**Alias:** not_has_value
+
+**Description:**  Check that context does not has value.
+
+**Options:**
+ - Requires exactly 1 option
+ - Option is a property path to check
+
+**Configuration Example**
+```
+@not_has_value:
+    - $customer.created_at
+```
+
+ACL Granted Condition
+---------------------
+
+**Alias:** acl_granted
+
+**Description:**  Check that ACL is granted.
+
+**Options:**
+ - Requires 1 or 2 options
+ - first option is ACL attribute
+ - second option is ACL object
+
+**Configuration Example**
+```
+@acl_granted:
+    - 'orocrm_contact_create'
+
+OR
+
+@acl_granted:
+    - 'CREATE'
+    - $shopping_cart.customer.contact
 ```
 
 Configurable Condition

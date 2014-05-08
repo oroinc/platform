@@ -104,14 +104,12 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: kernel.event_subscriber }
 
     oro_entity_config.event_listener.audit_log_grid_listener:
         class: %oro_dataaudit.event_listener.dataaudit_history_grid_listener.class%
         arguments:
-            - @oro_datagrid.datagrid.request_params
             - [objectClass, fieldName]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.audit-log-grid, method: onBuildAfter }

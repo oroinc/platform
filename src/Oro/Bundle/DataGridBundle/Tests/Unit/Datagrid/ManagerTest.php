@@ -3,8 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
-use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,124 +15,168 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     protected $builder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resolver;
+    protected $configurationProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $requestParams;
-
-    /** @var array */
-    protected $testConfiguration = [
-        self::TEST_NAME => [
-            'someKey'        => [],
-            'someAnotherKey' => []
-        ]
-    ];
+    protected $parametersFactory;
 
     public function setUp()
     {
+        $this->configurationProvider =
+            $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface')
+                ->disableOriginalConstructor()->getMock();
+
         $this->builder = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Builder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->resolver = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver')
-            ->disableOriginalConstructor()->getMock();
+        $this->parametersFactory =
+            $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $this->requestParams = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\RequestParameters')
-            ->disableOriginalConstructor()->getMock();
-
-        $configProvider = new ConfigurationProvider($this->testConfiguration, $this->resolver);
-        $chainConfigProvider = new ChainConfigurationProvider();
-        $chainConfigProvider->addProvider($configProvider);
-        $this->manager = new Manager($chainConfigProvider, $this->builder, $this->requestParams);
+        $this->manager = new Manager($this->configurationProvider, $this->builder, $this->parametersFactory);
     }
 
-    public function tearDown()
+    public function testGetDatagridByRequestParams()
     {
-        unset($this->builder);
-        unset($this->resolver);
-        unset($this->requestParams);
-        unset($this->manager);
+        $datagridName = 'test_grid';
+        $additionalParameters = array('foo' => 'bar');
+
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters->expects($this->once())->method('add')->with($additionalParameters);
+
+        $this->parametersFactory->expects($this->once())
+            ->method('createParameters')
+            ->with($datagridName)
+            ->will($this->returnValue($parameters));
+
+        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->with($datagridName)
+            ->will($this->returnValue($configuration));
+
+        $this->builder->expects($this->once())->method('build')
+            ->with($configuration, $parameters)
+            ->will($this->returnValue($datagrid));
+
+        $this->assertEquals(
+            $datagrid,
+            $this->manager->getDatagridByRequestParams($datagridName, $additionalParameters)
+        );
+    }
+
+    public function testGetDatagrid()
+    {
+        $datagridName = 'test_grid';
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+
+        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->with($datagridName)
+            ->will($this->returnValue($configuration));
+
+        $this->builder->expects($this->once())->method('build')
+            ->with($configuration, $parameters)
+            ->will($this->returnValue($datagrid));
+
+        $this->assertEquals(
+            $datagrid,
+            $this->manager->getDatagrid($datagridName, $parameters)
+        );
+    }
+
+    public function testGetDatagridWithDefaultParameters()
+    {
+        $datagridName = 'test_grid';
+
+        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->with($datagridName)
+            ->will($this->returnValue($configuration));
+
+        $this->builder->expects($this->once())->method('build')
+            ->with(
+                $configuration,
+                $this->callback(
+                    function ($parameters) {
+                        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag', $parameters);
+                        $this->assertEquals(array(), $parameters->all());
+
+                        return true;
+                    }
+                )
+            )
+            ->will($this->returnValue($datagrid));
+
+        $this->assertEquals(
+            $datagrid,
+            $this->manager->getDatagrid($datagridName)
+        );
+    }
+
+    public function testGetDatagridWithArrayParameters()
+    {
+        $datagridName = 'test_grid';
+        $parameters = array('foo' => 'bar');
+
+        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->with($datagridName)
+            ->will($this->returnValue($configuration));
+
+        $this->builder->expects($this->once())->method('build')
+            ->with(
+                $configuration,
+                $this->callback(
+                    function ($value) use ($parameters) {
+                        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag', $value);
+                        $this->assertEquals($parameters, $value->all());
+
+                        return true;
+                    }
+                )
+            )
+            ->will($this->returnValue($datagrid));
+
+        $this->assertEquals(
+            $datagrid,
+            $this->manager->getDatagrid($datagridName, $parameters)
+        );
     }
 
     /**
-     * @dataProvider datagridProvider
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $parameters must be an array or instance of ParameterBag.
      */
-    public function testGetDataGrid($name, array $parameters = [], $expectedExceptionMessage = null)
+    public function testGetDatagridThrowsException()
     {
-        if ($expectedExceptionMessage) {
-            $this->setExpectedException('\RuntimeException', $expectedExceptionMessage);
-        } else {
-            $this->resolver->expects($this->once())->method('resolve')->will($this->returnArgument(1));
+        $datagridName = 'test_grid';
+        $parameters = new \stdClass();
 
-            $configurationClass = 'Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration';
-            $this->builder->expects($this->once())->method('build')
-                ->with($this->isInstanceOf($configurationClass), $this->equalTo($parameters));
-            $this->requestParams->expects($this->at(0))->method('setRootParameter')->with($this->equalTo($name));
-            $counter = 1;
-            foreach ($parameters as $key => $value) {
-                $this->requestParams->expects($this->at($counter))->method('set')->with($key, $value);
-                $counter++;
-            }
-        }
-        $this->manager->getDatagrid($name, $parameters);
-    }
-
-    /**
-     * @return array
-     */
-    public function datagridProvider()
-    {
-        return [
-            'test existing grid configuration'                   => [
-                self::TEST_NAME,
-                ['key' => 'value', 'key2' => 'value2']
-            ],
-            'test some not existing grid should throw exception' => [
-                'someName',
-                [],
-                'A configuration for "someName" datagrid was not found.'
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider datagridConfigurationProvider
-     */
-    public function testGetDatagridConfiguration($names, $expectedResolverCall, $expectedException)
-    {
-        if ($expectedException) {
-            $this->setExpectedException('\RuntimeException');
-        }
-        $this->resolver->expects($this->exactly($expectedResolverCall))->method('resolve')
-            ->will($this->returnArgument(1));
-
-        foreach ($names as $name) {
-            $result = $this->manager->getConfigurationForGrid($name);
-            $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration', $result);
-            $this->assertEquals($name, $result->getName());
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function datagridConfigurationProvider()
-    {
-        return [
-            'call once, should call resolver'             => [
-                [self::TEST_NAME],
-                1,
-                false
-            ],
-            'twice called grid, should be processed once' => [
-                [self::TEST_NAME, self::TEST_NAME],
-                1,
-                false
-            ],
-            'test some not existing grid should throw exception' => [
-                ['SomeNotExistingName'],
-                0,
-                true
-            ]
-        ];
+        $this->manager->getDatagrid($datagridName, $parameters);
     }
 }

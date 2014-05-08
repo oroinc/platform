@@ -1,0 +1,140 @@
+[
+    {
+        "name": "oro/platform",
+        "version": "1.1.0",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/orocrm/platform.git",
+            "reference": "f9b3884bf79f3ff964529e80bbd83b77d6cfc510"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/orocrm/platform/zipball/f9b3884bf79f3ff964529e80bbd83b77d6cfc510",
+            "reference": "f9b3884bf79f3ff964529e80bbd83b77d6cfc510",
+            "shasum": ""
+        },
+        "require": {
+            "a2lix/translation-form-bundle": "1.2",
+            "akeneo/batch-bundle": "0.1.2",
+            "ass/xmlsecurity": "1.0.0",
+            "besimple/soap": "0.2.2",
+            "composer/composer": "1.0.0-alpha8",
+            "doctrine/data-fixtures": "1.0.0",
+            "doctrine/doctrine-bundle": "1.2.0",
+            "doctrine/doctrine-fixtures-bundle": "2.2.0",
+            "doctrine/orm": "2.4.1",
+            "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
+            "ext-gd": "*",
+            "ext-intl": "*",
+            "ext-mbstring": "*",
+            "ext-mysql": "*",
+            "ext-xml": "*",
+            "friendsofsymfony/jsrouting-bundle": "1.5.0",
+            "friendsofsymfony/rest-bundle": "0.12.*",
+            "genemu/form-bundle": "2.2.1",
+            "incenteev/composer-parameter-handler": "2.1.0",
+            "jdare/clank-bundle": "0.1.*",
+            "jms/job-queue-bundle": "1.0.*",
+            "jms/serializer": "0.14.0",
+            "jms/serializer-bundle": "0.13.0",
+            "knplabs/knp-menu": "2.0.x-dev",
+            "knplabs/knp-menu-bundle": "2.0.x-dev",
+            "knplabs/knp-paginator-bundle": "2.3.3",
+            "kriswallsmith/assetic": "1.1.2",
+            "leafo/lessphp": "0.4.0",
+            "lexik/maintenance-bundle": "dev-master",
+            "liip/imagine-bundle": "0.17.*",
+            "luxifer/doctrine-functions": "1.2.1",
+            "monolog/monolog": "1.7.*",
+            "mtdowling/cron-expression": "1.0.*",
+            "nelmio/api-doc-bundle": "2.4.4",
+            "nesbot/carbon": "1.8.*",
+            "ocramius/proxy-manager": "0.4.*",
+            "php": ">=5.4.4",
+            "sensio/distribution-bundle": "2.3.4",
+            "sensio/framework-extra-bundle": "2.3.4",
+            "sensio/generator-bundle": "2.3.4",
+            "stof/doctrine-extensions-bundle": "1.1.0",
+            "sylius/flow-bundle": "0.6.*",
+            "symfony/assetic-bundle": "2.3.0",
+            "symfony/icu": "~1.1",
+            "symfony/monolog-bundle": "2.3.0",
+            "symfony/swiftmailer-bundle": "2.3.*",
+            "symfony/symfony": "v2.3.6",
+            "twig/extensions": "1.0.1",
+            "zendframework/zend-mail": "2.1.*"
+        },
+        "time": "2014-04-28 09:42:03",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Oro\\Component": "src/",
+                "Oro\\Bundle": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Oro, Inc",
+                "homepage": "http://www.orocrm.com"
+            }
+        ],
+        "description": "Business Application Platform (BAP)",
+        "homepage": "https://github.com/orocrm/platform.git"
+    },
+    {
+        "name": "oro/crm",
+        "version": "1.1.0",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/orocrm/crm.git",
+            "reference": "aaebecccb56ba97b6131438bc16065b522033ed5"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/orocrm/crm/zipball/aaebecccb56ba97b6131438bc16065b522033ed5",
+            "reference": "aaebecccb56ba97b6131438bc16065b522033ed5",
+            "shasum": ""
+        },
+        "require": {
+            "oro/platform": "1.1.0",
+            "php": ">=5.4.4"
+        },
+        "time": "2014-04-28 10:35:16",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "OroCRM\\Bundle": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "OSL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Oro, Inc",
+                "homepage": "http://www.orocrm.com"
+            }
+        ],
+        "description": "OroCRM",
+        "homepage": "https://github.com/orocrm/crm.git"
+    }
+]

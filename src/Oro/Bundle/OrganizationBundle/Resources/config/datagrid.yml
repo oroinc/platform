@@ -63,7 +63,7 @@ datagrid:
                 type:          navigate
                 label:         oro.business_unit.datagrid.action.view
                 link:          view_link
-                icon:          user
+                icon:          eye-open
                 acl_resource:  oro_business_unit_view
                 rowAction:     true
             update:

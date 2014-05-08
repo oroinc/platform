@@ -40,7 +40,12 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
      */
     public function build(Segment $segment)
     {
-        $converter = new SegmentQueryConverter($this->manager, $this->doctrine, $this->restrictionBuilder);
+        $converter = new SegmentQueryConverter(
+            $this->manager,
+            $this->manager,
+            $this->doctrine,
+            $this->restrictionBuilder
+        );
         $qb        = $converter->convert(
             new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))
         );
