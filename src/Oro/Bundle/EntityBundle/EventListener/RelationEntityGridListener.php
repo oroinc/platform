@@ -18,10 +18,10 @@ class RelationEntityGridListener extends CustomEntityGridListener
      */
     protected $relationConfig;
 
-    /** @var */
+    /** @var object */
     protected $relation;
 
-    /** @var */
+    /** @var string */
     protected $hasAssignedExpression;
 
     /**
@@ -67,11 +67,13 @@ class RelationEntityGridListener extends CustomEntityGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
+        $datagrid = $event->getDatagrid();
+
         // get field config, extendEntity, $added, $removed
-        $extendEntityName = $this->getRequestParam('class_name');
+        $extendEntityName = $this->getParam($datagrid, 'class_name');
         $extendEntityName = str_replace('_', '\\', $extendEntityName);
-        $fieldName        = $this->getRequestParam('field_name');
-        $entityId         = $this->getRequestParam('id');
+        $fieldName        = $this->getParam($datagrid, 'field_name');
+        $entityId         = $this->getParam($datagrid, 'id');
 
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
@@ -152,8 +154,8 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $entityConfig = $this->configManager->getProvider('extend')->getConfig(
             $this->relationConfig->getId()->getClassName()
         );
-        $relations    = $entityConfig->get('relation');
-        $relation     = $relations[$this->relationConfig->get('relation_key')];
+        $relations = $entityConfig->get('relation');
+        $relation  = $relations[$this->relationConfig->get('relation_key')];
 
         $fieldName = $relation['target_field_id']->getFieldName();
 

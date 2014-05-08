@@ -174,7 +174,7 @@ class ConfigEntityGridController extends Controller
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
-            new EntityType(),
+            'oro_entity_extend_entity_type',
             array(
                 'data' => $cloneEntityModel,
             )

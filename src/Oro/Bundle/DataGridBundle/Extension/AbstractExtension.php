@@ -7,20 +7,17 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 abstract class AbstractExtension implements ExtensionVisitorInterface
 {
-    /** @var RequestParameters */
-    protected $requestParams;
-
-    public function __construct(RequestParameters $requestParams = null)
-    {
-        $this->requestParams = $requestParams;
-    }
+    /**
+     * @var ParameterBag
+     */
+    protected $parameters;
 
     /**
      * {@inheritDoc}
@@ -77,12 +74,22 @@ abstract class AbstractExtension implements ExtensionVisitorInterface
     }
 
     /**
-     * Getter for request parameters object
+     * Getter for parameters
      *
-     * @return RequestParameters
+     * @return ParameterBag
      */
-    protected function getRequestParams()
+    public function getParameters()
     {
-        return $this->requestParams;
+        return $this->parameters;
+    }
+
+    /**
+     * Set instance of parameters used for current grid
+     *
+     * @param ParameterBag $parameters
+     */
+    public function setParameters(ParameterBag $parameters)
+    {
+        $this->parameters = $parameters;
     }
 }

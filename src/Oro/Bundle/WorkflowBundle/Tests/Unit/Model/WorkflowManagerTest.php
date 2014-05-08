@@ -225,7 +225,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity_attribute');
         $entityAttribute->setType('entity');
-        $entityAttribute->setOptions(array('class' => 'DateTime', 'managed_entity' => true));
+        $entityAttribute->setOptions(array('class' => 'DateTime'));
 
         $stringAttribute = new Attribute();
         $stringAttribute->setName('other_attribute');

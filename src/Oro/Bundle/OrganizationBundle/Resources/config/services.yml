@@ -153,7 +153,6 @@ services:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
         arguments:
           - business_unit_id
-          - @oro_datagrid.datagrid.request_params
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.bu-update-users-grid, method: onBuildAfter }
 
@@ -161,7 +160,6 @@ services:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
         arguments:
           - business_unit_id
-          - @oro_datagrid.datagrid.request_params
           - false
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.bu-view-users-grid, method: onBuildAfter }

@@ -8,6 +8,8 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroReportBundle implements Migration
 {
+    const TABLE_NAME = 'oro_report';
+
     /**
      * @inheritdoc
      */
@@ -16,7 +18,7 @@ class OroReportBundle implements Migration
         // @codingStandardsIgnoreStart
 
         /** Generate table oro_report **/
-        $table = $schema->createTable('oro_report');
+        $table = $schema->createTable(self::TABLE_NAME);
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('type', 'string', ['notnull' => false, 'length' => 32]);
@@ -40,7 +42,7 @@ class OroReportBundle implements Migration
         /** End of generate table oro_report_type **/
 
         /** Generate foreign keys for table oro_report **/
-        $table = $schema->getTable('oro_report');
+        $table = $schema->getTable(self::TABLE_NAME);
         $table->addForeignKeyConstraint($schema->getTable('oro_business_unit'), ['business_unit_owner_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]);
         $table->addForeignKeyConstraint($schema->getTable('oro_report_type'), ['type'], ['name'], ['onDelete' => null, 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_report **/

@@ -31,12 +31,12 @@ class EmailListener
         /** @var OrmDatasource $ormDataSource */
         $ormDataSource = $event->getDatagrid()->getDatasource();
         $queryBuilder = $ormDataSource->getQueryBuilder();
-        $parameters = $event->getParameters();
+        $parameters = $event->getDatagrid()->getParameters();
 
         $this->factory->prepareQuery($queryBuilder);
 
-        if (array_key_exists('emailIds', $parameters)) {
-            $emailIds = $parameters['emailIds'];
+        if ($parameters->has('emailIds')) {
+            $emailIds = $parameters->get('emailIds');
             if (!is_array($emailIds)) {
                 $emailIds = explode(',', $emailIds);
             }

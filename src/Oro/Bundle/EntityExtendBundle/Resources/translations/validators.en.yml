@@ -1,0 +1,5 @@
+"This value should contains only lower/upper alphabetic symbols and numbers": "This value should contains only lower/upper alphabetic symbols and numbers"
+"This value should contains only lower alphabetic symbols, underscore and numbers": "This value should contains only lower alphabetic symbols, underscore and numbers"
+"The '{{ value }}' cannot be used as field name": "The '{{ value }}' cannot be used as field name"
+"This value should not be the reserved SQL word.": "This value should not be the reserved SQL word."
+"This value should not be the reserved PHP word.": "This value should not be the reserved PHP word."

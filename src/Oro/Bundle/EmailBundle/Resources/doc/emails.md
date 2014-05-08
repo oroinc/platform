@@ -138,7 +138,7 @@ class AcmeEmailBodyLoader implements EmailBodyLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadEmailBody(Email $email, EntityManager $em)
+    public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em)
     {
     }
 }
