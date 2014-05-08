@@ -32,7 +32,7 @@ function(_, Backbone, AttributeFormOptionRowView) {
             );
 
             this.listenTo(this.options.workflow, 'pathMappingInit', this.render);
-            if (this.options.workflow.pathMappingInitialized) {
+            if (this.options.workflow.entityFieldsInitialized) {
                 this.render();
             }
         },
