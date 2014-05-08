@@ -16,7 +16,7 @@ class VersionHelper
     protected $factory;
 
     /**
-     * @var PackageInterface[]
+     * @var array
      */
     protected $packages = [];
 
