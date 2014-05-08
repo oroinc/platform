@@ -148,10 +148,7 @@ function(_, Backbone, routing, messenger, __,
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_workflow_api_rest_entity_get',
                 routingParams: {
-                    "with-relations": 1,
-                    "with-virtual-fields": 1,
-                    "with-unidirectional": 1,
-                    "with-entity-details": 1
+                    "with-relations": 1
                 },
                 confirm: confirm,
                 requireConfirm: _.bind(function () {

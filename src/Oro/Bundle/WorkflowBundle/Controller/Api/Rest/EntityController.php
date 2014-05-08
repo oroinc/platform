@@ -34,16 +34,14 @@ class EntityController extends FOSRestController
     public function getAction($entityName)
     {
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
-        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
 
         $statusCode = Codes::HTTP_OK;
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_workflow.field_list_provider');
         try {
             $result = $provider->getFields(
-                $withVirtualFields,
-                $withUnidirectional,
+                false,
+                false,
                 $withRelations
             );
         } catch (InvalidEntityException $ex) {
