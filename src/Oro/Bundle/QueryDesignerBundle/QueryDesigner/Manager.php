@@ -18,7 +18,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     protected $translator;
 
     /** @var  EntityHierarchyBuilder */
-    protected $entityHierarchyBuilder;
+    protected $hierarchyBuilder;
 
     /**
      * @var array
@@ -43,7 +43,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     ) {
         $resolver->resolve($config);
         $this->config     = ConfigurationObject::create($config);
-        $this->entityHierarchyBuilder = $hierarchyBuilder;
+        $this->hierarchyBuilder = $hierarchyBuilder;
         $this->translator = $translator;
         $this->virtualFields = $virtualFields;
     }
@@ -67,7 +67,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
             'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
-            'hierarchy'  => $this->entityHierarchyBuilder->getHierarchy()
+            'hierarchy'  => $this->hierarchyBuilder->getHierarchy()
         ];
     }
 
