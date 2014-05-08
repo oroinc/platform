@@ -1,6 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'orotranslation/js/translator',
-    'oroentity/js/field-choice', 'jquery.validate'],
+define([
+    'underscore',
+    'backbone',
+    'oroworkflow/js/workflow-management/helper',
+    'orotranslation/js/translator',
+    'oroentity/js/field-choice',
+    'jquery.validate'
+],
 function(_, Backbone, Helper, __) {
     'use strict';
 
@@ -45,32 +51,12 @@ function(_, Backbone, Helper, __) {
         onAdd: function() {
             var formData = Helper.getFormData(this.form);
 
-            formData.property_path = this.getPropertyPath(formData.property_path);
+            formData.property_path = this.options.workflow.getPropertyPathByFieldId(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
             formData.view_id = this.editViewId;
 
             this.resetForm();
             this.trigger('formOptionAdd', formData);
-        },
-
-        getPropertyPath: function(propertyPath) {
-            var path = [this.options.workflow.get('entity_attribute')];
-            $.each(propertyPath.split('+'), function (i, item) {
-                var part;
-                if (i === 0) {
-                    // first item is always just a field name
-                    path.push(item);
-                } else {
-                    // field name can contain '::'
-                    // thus cut off entity name with first entrance '::',
-                    // remaining part is a field name
-                    part = item.split('::').slice(1).join('::');
-                    if (part) {
-                        path.push(part);
-                    }
-                }
-            });
-            return path.join('.');
         },
 
         resetForm: function() {
@@ -82,14 +68,11 @@ function(_, Backbone, Helper, __) {
         },
 
         initFieldChoice: function(container) {
-            var workflow = this.options.workflow;
-
             this.entityFieldSelectEl = container.find('[name="property_path"]');
             this.entityFieldSelectEl.fieldChoice({
                 fieldsLoaderSelector: this.options.entity_select_el,
                 select2: {
-                    placeholder: __("Choose field..."),
-                    formatSelectionTemplate: this.entity_field_template
+                    placeholder: __("Choose field...")
                 }
             });
         },

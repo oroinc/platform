@@ -154,6 +154,61 @@ define(function (require) {
             _.extend(result, _.pick(chain[chain.length - 1].field, ['type', 'identifier']));
 
             return result;
+        },
+
+        getPropertyPathByPath: function(path)
+        {
+            var propertyPathParts = [];
+            $.each(path.split('+'), function (i, item) {
+                var part;
+                if (i === 0) {
+                    // first item is always just a field name
+                    propertyPathParts.push(item);
+                } else {
+                    // field name can contain '::'
+                    // thus cut off entity name with first entrance '::',
+                    // remaining part is a field name
+                    part = item.split('::').slice(1).join('::');
+                    if (part) {
+                        propertyPathParts.push(part);
+                    }
+                }
+            });
+
+            return propertyPathParts.join('.');
+        },
+
+        getPathByPropertyPath: function(pathData) {
+            if (!_.isArray(pathData)) {
+                pathData = pathData.split('.');
+            }
+
+            var entityData = this.data[this.entity];
+            var fieldIdParts = $.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
+                var fieldPartId = fieldName;
+
+                var fieldsData = null;
+                if (entityData.hasOwnProperty('fieldsIndex')) {
+                    fieldsData = entityData.fieldsIndex;
+                } else if (entityData.hasOwnProperty('related_entity')
+                    && entityData.related_entity.hasOwnProperty('fieldsIndex')
+                ) {
+                    fieldsData = entityData.related_entity.fieldsIndex;
+                }
+
+                if (fieldsData && fieldsData.hasOwnProperty(fieldName)) {
+                    entityData = fieldsData[fieldName];
+
+                    if (entityData.hasOwnProperty('related_entity')) {
+                        fieldPartId += '+' + entityData.related_entity.name;
+                    }
+                }
+
+                return fieldPartId;
+            });
+
+            fieldIdParts.push(pathData[pathData.length - 1]);
+            return fieldIdParts.join('::');
         }
     };
 
