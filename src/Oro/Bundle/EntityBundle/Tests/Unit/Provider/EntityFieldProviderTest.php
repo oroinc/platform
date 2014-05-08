@@ -390,7 +390,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'name' => 'Acme\Entity\Test22::uni_rel1',
                 'type' => 'ref-one',
-                'label' => 'Test22 Plural Label (UniRel1)',
+                'label' => 'UniRel1 (Test22 Plural Label)',
                 'relation_type'         => 'ref-one',
                 'related_entity_name'   => 'Acme\Entity\Test22',
             ]

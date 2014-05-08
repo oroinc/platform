@@ -329,17 +329,17 @@ class EntityFieldProvider
             if ($translate) {
                 $label =
                     $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
+                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
                     ) .
                     ' (' .
                     $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
                     ) .
                     ')';
             } else {
                 $label =
-                    $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) .
-                    ' (' . $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') . ')';
+                    $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') .
+                    ' (' . $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) . ')';
             }
 
             $this->addRelation(
