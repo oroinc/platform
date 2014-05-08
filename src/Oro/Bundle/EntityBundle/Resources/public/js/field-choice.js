@@ -49,7 +49,7 @@ define(function (require) {
                     id = element.val();
                     match = null;
                     chain = self.util.pathToEntityChain(id, true);
-                    instance.context = self.util.entityChainToPath(chain);
+                    instance.pagePath = chain[chain.length - 1].basePath;
                     opts.query({
                         matcher: function (term, text, el) {
                             var is_match = id === opts.id(el);
@@ -64,15 +64,15 @@ define(function (require) {
                     });
                 },
                 id: function (result) {
-                    return result.id !== undefined ? result.id : result.context;
+                    return result.id !== undefined ? result.id : result.pagePath;
                 },
                 data: function () {
-                    var context, results;
-                    context = (instance && instance.context) || '';
-                    results = self._select2Data(context);
+                    var pagePath, results;
+                    pagePath = (instance && instance.pagePath) || '';
+                    results = self._select2Data(pagePath);
                     return {
                         more: false,
-                        context: context,
+                        pagePath: pagePath,
                         results: results
                     };
                 },
@@ -81,10 +81,10 @@ define(function (require) {
                     label = item.field ? item.field.label : item.entity.label;
                     return label;
                 },
-                breadcrumbs: function (context) {
-                    var chain = self.util.pathToEntityChain(context, true);
+                breadcrumbs: function (pagePath) {
+                    var chain = self.util.pathToEntityChain(pagePath, true);
                     $.each(chain, function (i, item) {
-                        item.context = item.path;
+                        item.pagePath = item.basePath;
                     });
                     return chain;
                 }
@@ -169,13 +169,13 @@ define(function (require) {
         _select2Data: function (path) {
             var fields = [], relations = [], results = [],
                 chain, entityName, entityFields,
-                entityData = this.options.data;
+                entityData = this.options.data,
+                util = this.util;
             if ($.isEmptyObject(entityData)) {
                 return results;
             }
 
             chain = this.util.pathToEntityChain(path, true);
-            path = this.util.entityChainToPath(chain);
             entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
             entityFields = entityData.fields;
@@ -185,13 +185,15 @@ define(function (require) {
             }
 
             $.each(entityFields, function () {
-                var field = this, item;
+                var field = this, item, chainItem;
+                chainItem = {field: field};
                 item = {
-                    id: (path ? path + '::' : '') + field.name,
+                    id: util.entityChainToPath(chain.concat(chainItem)),
                     text: field.label
                 };
                 if (field.related_entity) {
-                    item.context = item.id + '+' + field.related_entity.name;
+                    chainItem.entity = field.related_entity;
+                    item.pagePath = util.entityChainToPath(chain.concat(chainItem));
                     item.related_entity = field.related_entity;
                     delete item.id;
                     relations.push(item);

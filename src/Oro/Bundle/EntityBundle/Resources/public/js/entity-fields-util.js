@@ -59,7 +59,8 @@ define(function (require) {
             data = this.data;
             chain = [{
                 entity: data[this.entity],
-                path: ''
+                path: '',
+                basePath: ''
             }];
 
             if (!path) {
@@ -94,6 +95,9 @@ define(function (require) {
                     };
                     chain.push(item);
                     item.path = self.entityChainToPath(chain);
+                    if (item.field.related_entity) {
+                        item.basePath = item.path + '+' + item.field.related_entity.name;
+                    }
                 }
             });
 

@@ -128,7 +128,8 @@ define(['jquery', 'jquery.select2'], function ($) {
             this.breadcrumbs = $('<ul class="select2-breadcrumbs"></ul>');
             this.breadcrumbs.on('click', '.select2-breadcrumb-item', $.proxy(function (e) {
                 var data = $(e.currentTarget).data('select2-data');
-                this.context = data.context;
+                this.pagePath = data.pagePath;
+                this.search.val('');
                 this.updateResults();
                 e.stopPropagation();
             }, this));
@@ -140,11 +141,11 @@ define(['jquery', 'jquery.select2'], function ($) {
                 opts = this.opts;
             breadcrumbs.empty();
             if ($.isFunction(opts.formatBreadcrumbItem) && $.isFunction(opts.breadcrumbs)) {
-                var items = opts.breadcrumbs(this.context);
+                var items = opts.breadcrumbs(this.pagePath);
                 $.each(items, function (i, item) {
                     var $item = opts.formatBreadcrumbItem(item, {index: i, length: items.length});
                     $item = $("<li class='select2-breadcrumb-item'>" + $item + "</li>");
-                    $item.data('select2-data', {context: item.context});
+                    $item.data('select2-data', {pagePath: item.pagePath});
                     breadcrumbs.append($item);
                 });
             }
@@ -158,8 +159,9 @@ define(['jquery', 'jquery.select2'], function ($) {
         var clear = prototype.clear;
 
         prototype.onSelect = function (data, options) {
-            if (data.id === undefined && data.context) {
-                this.context = data.context;
+            if (data.id === undefined && data.pagePath) {
+                this.pagePath = data.pagePath;
+                this.search.val('');
                 this.updateResults();
                 return;
             }
@@ -174,15 +176,15 @@ define(['jquery', 'jquery.select2'], function ($) {
 
         prototype.updateResults = function (initial) {
             updateResults.apply(this, arguments);
-            if (initial && this.opts.element.val()) {
-                this.context = this.opts.element.val();
+            if (initial === true && this.opts.element.val()) {
+                this.pagePath = this.opts.element.val();
             }
             this.updateBreadcrumbs();
             this.positionDropdown();
         };
 
         prototype.clear = function () {
-            this.context = '';
+            this.pagePath = '';
             clear.apply(this, arguments);
         };
     }(window.Select2['class'].single.prototype));
