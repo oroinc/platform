@@ -1,7 +1,7 @@
 /* jshint browser:true  */
 /*global define, google*/
-define(['underscore', 'backbone', 'orotranslation/js/translator'
-    ], function (_, Backbone, __) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/locale-settings'
+    ], function (_, Backbone, __, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
@@ -67,9 +67,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
             });
 
             if (this.options.showWeather) {
+                var temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
+                var windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
                 weatherLayer = new google.maps.weather.WeatherLayer({
-                    temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT,
-                    windSpeedUnits: google.maps.weather.WindSpeedUnit.MILES_PER_HOUR
+                    temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
+                    windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
                 });
                 weatherLayer.setMap(this.map);
 

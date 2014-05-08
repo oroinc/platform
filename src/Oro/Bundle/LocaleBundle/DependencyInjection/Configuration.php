@@ -112,6 +112,8 @@ class Configuration implements ConfigurationInterface
                 'qwerty'                            => ['value' => [], 'type' => 'array'],
                 'languages'                         => ['value' => ['en'], 'type' => 'array'],
                 'quarter_start'                     => ['value' => ['year' => '2009', 'month' => '1', 'day' => '1']],
+                'temperature_unit'                  => ['value' => 'fahrenheit'],
+                'wind_speed_unit'                   => ['value' => 'miles_per_hour']
             )
         );
 
