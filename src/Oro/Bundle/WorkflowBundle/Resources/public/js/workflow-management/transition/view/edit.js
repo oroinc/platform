@@ -280,7 +280,13 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             var form = $(this.template(data));
 
             this.renderAddAttributeForm(form);
-            this.renderAttributesList(form);
+            if (this.options.workflow.entityFieldsInitialized) {
+                this.renderAttributesList(form);
+            } else {
+                this.listenTo(this.options.workflow, 'entityFieldsInitialize', _.bind(function() {
+                    this.renderAttributesList(form);
+                }, this));
+            }
 
             this.$el.append(form);
 
