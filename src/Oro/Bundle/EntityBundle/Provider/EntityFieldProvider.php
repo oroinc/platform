@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class EntityFieldRecursiveProvider
+class EntityFieldProvider
 {
     /**
      * @var ConfigProvider
@@ -98,14 +98,6 @@ class EntityFieldRecursiveProvider
     }
 
     /**
-     * @return EntityProvider
-     */
-    public function getEntityProvider()
-    {
-        return $this->entityProvider;
-    }
-
-    /**
      * Returns fields for the given entity
      *
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
@@ -113,10 +105,8 @@ class EntityFieldRecursiveProvider
      * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
      * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
-     *                                       should be returned.
      * @param bool   $translate              Flag means that label, plural label should be translated
+     *
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -142,11 +132,9 @@ class EntityFieldRecursiveProvider
         $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
-        $deepLevel = 0,
-        $lastDeepLevelRelations = false,
         $translate = true
     ) {
-        $result    = array();
+        $result    = [];
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
 
@@ -156,11 +144,7 @@ class EntityFieldRecursiveProvider
                 $result,
                 $className,
                 $em,
-                $withVirtualFields,
                 $withEntityDetails,
-                $withUnidirectional,
-                $deepLevel - 1,
-                $lastDeepLevelRelations,
                 $translate
             );
 
@@ -169,10 +153,7 @@ class EntityFieldRecursiveProvider
                     $result,
                     $className,
                     $em,
-                    $withVirtualFields,
                     $withEntityDetails,
-                    $deepLevel - 1,
-                    $lastDeepLevelRelations,
                     $translate
                 );
             }
@@ -280,22 +261,14 @@ class EntityFieldRecursiveProvider
      * @param array         $result
      * @param string        $className
      * @param EntityManager $em
-     * @param bool          $withVirtualFields
      * @param bool          $withEntityDetails
-     * @param bool          $withUnidirectional
-     * @param int           $relationDeepLevel
-     * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
      */
     protected function addRelations(
         array &$result,
         $className,
         EntityManager $em,
-        $withVirtualFields,
         $withEntityDetails,
-        $withUnidirectional,
-        $relationDeepLevel,
-        $lastDeepLevelRelations,
         $translate
     ) {
         // only configurable entities are supported
@@ -315,22 +288,15 @@ class EntityFieldRecursiveProvider
                 $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                 $targetMetadata  = $em->getClassMetadata($targetClassName);
                 $fieldLabel      = $this->getFieldLabel($className, $associationName);
-                $relationData    = array(
-                    'name'                => $associationName,
-                    'type'                => $targetMetadata->getTypeOfField($targetFieldName),
-                    'label'               => $fieldLabel,
-                    'relation_type'       => $this->getRelationType($className, $associationName),
-                    'related_entity_name' => $targetClassName
-                );
 
                 $this->addRelation(
                     $result,
-                    $relationData,
-                    $withVirtualFields,
+                    $associationName,
+                    $targetMetadata->getTypeOfField($targetFieldName),
+                    $fieldLabel,
+                    $this->getRelationType($className, $associationName),
+                    $targetClassName,
                     $withEntityDetails,
-                    $withUnidirectional,
-                    $relationDeepLevel,
-                    $lastDeepLevelRelations,
                     $translate
                 );
             }
@@ -344,19 +310,13 @@ class EntityFieldRecursiveProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
-     * @param bool          $withVirtualFields
-     * @param int           $relationDeepLevel
-     * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
      */
     protected function addUnidirectionalRelations(
         array &$result,
         $className,
         EntityManager $em,
-        $withVirtualFields,
         $withEntityDetails,
-        $relationDeepLevel,
-        $lastDeepLevelRelations,
         $translate
     ) {
         $relations = $this->getUnidirectionalRelations($em, $className);
@@ -382,22 +342,14 @@ class EntityFieldRecursiveProvider
                     ' (' . $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') . ')';
             }
 
-            $relationData = [
-                'name'                => $name,
-                'type'                => $classMetadata->getTypeOfField($fieldName),
-                'label'               => $label,
-                'relation_type'       => $this->getRelationType($relatedClassName, $fieldName),
-                'related_entity_name' => $relatedClassName
-            ];
-
             $this->addRelation(
                 $result,
-                $relationData,
-                $withVirtualFields,
+                $name,
+                $classMetadata->getTypeOfField($fieldName),
+                $label,
+                $this->getRelationType($relatedClassName, $fieldName),
+                $relatedClassName,
                 $withEntityDetails,
-                true,
-                $relationDeepLevel,
-                $lastDeepLevelRelations,
                 $translate
             );
         }
@@ -459,52 +411,39 @@ class EntityFieldRecursiveProvider
     /**
      * Adds a relation to $result
      *
-     * @param array $result
-     * @param array $relation
-     * @param bool  $withVirtualFields
-     * @param bool  $withEntityDetails
-     * @param bool  $withUnidirectional
-     * @param int   $relationDeepLevel
-     * @param bool  $lastDeepLevelRelations
-     * @param bool  $translate
+     * @param array  $result
+     * @param string $name
+     * @param string $type
+     * @param string $label
+     * @param string $relationType
+     * @param string $relatedEntityName
+     * @param bool   $withEntityDetails
+     * @param bool   $translate
      */
     protected function addRelation(
         array &$result,
-        array $relation,
-        $withVirtualFields,
+        $name,
+        $type,
+        $label,
+        $relationType,
+        $relatedEntityName,
         $withEntityDetails,
-        $withUnidirectional,
-        $relationDeepLevel,
-        $lastDeepLevelRelations,
         $translate
     ) {
-        $name = $relation['name'];
         if ($translate) {
-            $relation['label'] = $this->translator->trans($relation['label']);
+            $label = $this->translator->trans($label);
         }
 
-        $relatedEntityName = $relation['related_entity_name'];
+        $relation = [
+            'name'                => $name,
+            'type'                => $type,
+            'label'               => $label,
+            'relation_type'       => $relationType,
+            'related_entity_name' => $relatedEntityName
+        ];
+
         if ($withEntityDetails) {
-            $relation = $this->addEntityDetails($relatedEntityName, $relation, $translate);
-        }
-
-        if ($relationDeepLevel >= 0) {
-            // set some exceptions
-            // todo: we need to find more proper way to do this
-            if ($relationDeepLevel > 0 && ($name === 'owner' || $name === 'createdBy' || $name === 'updatedBy')) {
-                $relationDeepLevel = 0;
-            }
-            $relation['related_entity_fields'] =
-                $this->getFields(
-                    $relatedEntityName,
-                    $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
-                    $withVirtualFields,
-                    $withEntityDetails,
-                    $withUnidirectional,
-                    $relationDeepLevel,
-                    $lastDeepLevelRelations,
-                    $translate
-                );
+            $this->addEntityDetails($relatedEntityName, $relation, $translate);
         }
 
         $result[] = $relation;
@@ -517,7 +456,7 @@ class EntityFieldRecursiveProvider
      *
      * @return array
      */
-    protected function addEntityDetails($relatedEntityName, array $relation, $translate)
+    protected function addEntityDetails($relatedEntityName, array &$relation, $translate)
     {
         $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
         foreach ($entity as $key => $val) {

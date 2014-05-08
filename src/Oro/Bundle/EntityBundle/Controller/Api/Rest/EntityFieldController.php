@@ -14,8 +14,7 @@ use FOS\Rest\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -41,17 +40,6 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @QueryParam(
      *      name="with-unidirectional", requirements="(1)|(0)",
      *      description="Indicates whether Unidirectional association fields should be returned.")
-     * @QueryParam(
-     *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
-     *      description="The maximum deep level of related entities.")
-     * @QueryParam(
-     *      name="last-deep-level-relations", requirements="(1)|(0)",
-     *      nullable=true, strict=true, default="0",
-     *      description="Indicates whether fields for the last deep level of related entities should be returned.")
-     * @QueryParam(
-     *      name="plain-list", requirements="(1)|(0)",
-     *      nullable=true, strict=true, default="0",
-     *      description="Indicates whether fields returned as a tree or plain list.")
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
      * @ApiDoc(
      *      description="Get entity fields",
@@ -67,31 +55,19 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $deepLevel          = $this->getRequest()->query->has('deep-level')
-            ? (int)$this->getRequest()->query->get('deep-level')
-            : 0;
-        $lastDeepLevelRelations = ('1' === $this->getRequest()->query->get('last-deep-level-relations'));
-        $isPlainList            = ('1' == $this->getRequest()->query->get('plain-list'));
 
-        if ($isPlainList) {
-            /** @var EntityWithFieldsProvider $provider */
-            $provider = $this->get('oro_entity.entity_field_list_provider');
-        } else {
-            /** @var EntityFieldRecursiveProvider $provider */
-            $provider = $this->get('oro_entity.entity_field_provider');
-        }
+        /** @var EntityFieldProvider $provider */
+        $provider = $this->get('oro_entity.entity_field_provider');
 
+        $statusCode = Codes::HTTP_OK;
         try {
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
                 $withVirtualFields,
                 $withEntityDetails,
-                $withUnidirectional,
-                $deepLevel,
-                $lastDeepLevelRelations
+                $withUnidirectional
             );
-            $statusCode = Codes::HTTP_OK;
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

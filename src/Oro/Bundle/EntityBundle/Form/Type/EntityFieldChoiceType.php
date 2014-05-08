@@ -7,7 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class EntityFieldChoiceType extends AbstractType
@@ -20,7 +20,7 @@ class EntityFieldChoiceType extends AbstractType
     protected $entityProvider;
 
     /**
-     * @var EntityFieldRecursiveProvider
+     * @var EntityFieldProvider
      */
     protected $entityFieldProvider;
 
@@ -32,13 +32,13 @@ class EntityFieldChoiceType extends AbstractType
     /**
      * Constructor
      *
-     * @param EntityProvider               $entityProvider
-     * @param EntityFieldRecursiveProvider $entityFieldProvider
-     * @param TranslatorInterface          $translator
+     * @param EntityProvider      $entityProvider
+     * @param EntityFieldProvider $entityFieldProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityProvider $entityProvider,
-        EntityFieldRecursiveProvider $entityFieldProvider,
+        EntityFieldProvider $entityFieldProvider,
         TranslatorInterface $translator
     ) {
         $this->entityProvider      = $entityProvider;
@@ -169,6 +169,7 @@ class EntityFieldChoiceType extends AbstractType
         if (empty($choiceRelations)) {
             return $choiceFields;
         }
+
         $choices = [];
         if (!empty($choiceFields)) {
             $choices[$this->translator->trans('oro.entity.form.entity_fields')] = $choiceFields;

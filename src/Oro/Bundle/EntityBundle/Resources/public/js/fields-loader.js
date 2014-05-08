@@ -9,13 +9,10 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
      */
     $.widget('oroentity.fieldsLoader', {
         options: {
-            router: 'oro_api_get_entity_fields',
+            router: 'oro_api_fields_entity',
             routingParams: {
-                'with-relations': 1,
                 'with-entity-details': 1,
-                'with-unidirectional': 1,
-                'deep-level': 3,
-                'plain-list': 1
+                'with-unidirectional': 1
             },
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog

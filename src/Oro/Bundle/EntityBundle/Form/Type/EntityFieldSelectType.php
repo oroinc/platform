@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class EntityFieldSelectType extends AbstractType
 {
@@ -20,7 +20,7 @@ class EntityFieldSelectType extends AbstractType
     protected $entityProvider;
 
     /**
-     * @var EntityFieldRecursiveProvider
+     * @var EntityFieldProvider
      */
     protected $entityFieldProvider;
 
@@ -32,13 +32,13 @@ class EntityFieldSelectType extends AbstractType
     /**
      * Constructor
      *
-     * @param EntityProvider               $entityProvider
-     * @param EntityFieldRecursiveProvider $entityFieldProvider
-     * @param TranslatorInterface          $translator
+     * @param EntityProvider      $entityProvider
+     * @param EntityFieldProvider $entityFieldProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityProvider $entityProvider,
-        EntityFieldRecursiveProvider $entityFieldProvider,
+        EntityFieldProvider $entityFieldProvider,
         TranslatorInterface $translator
     ) {
         $this->entityProvider      = $entityProvider;
@@ -74,8 +74,6 @@ class EntityFieldSelectType extends AbstractType
                 'with_relations'            => false,
                 'with_unidirectional'       => false,
                 'with_virtual_fields'       => false,
-                'deep_level'                => 0,
-                'last_deep_level_relations' => false,
                 'empty_value'               => '',
                 'skip_load_entities'        => false,
                 'skip_load_data'            => false,
@@ -136,9 +134,7 @@ class EntityFieldSelectType extends AbstractType
                 $options['entity'],
                 $options['with_relations'],
                 $options['with_virtual_fields'],
-                $options['with_unidirectional'],
-                $options['deep_level'],
-                $options['last_deep_level_relations']
+                $options['with_unidirectional']
             );
         $attr['data-data']   = json_encode($data);
 
@@ -152,21 +148,17 @@ class EntityFieldSelectType extends AbstractType
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
      * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
      *                                       should be returned.
      * @return array
      */
-    protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional, $deepLevel, $lastDeepLevelRelations)
+    protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional)
     {
         $fields = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
             $withVirtualFields,
             true,
-            $withUnidirectional,
-            $deepLevel,
-            $lastDeepLevelRelations
+            $withUnidirectional
         );
 
         return $this->convertData($fields, $entityName, null);

@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -31,7 +31,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
     /** @var EntityProvider */
     private $entityProvider;
 
-    /** @var EntityFieldRecursiveProvider */
+    /** @var EntityFieldProvider */
     private $fieldProvider;
 
     protected function setUp()
@@ -77,7 +77,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->fieldProvider = new EntityFieldRecursiveProvider(
+        $this->fieldProvider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
@@ -88,7 +88,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
         );
         $this->fieldProvider->setEntityProvider($this->entityProvider);
 
-        $this->provider = new EntityWithFieldsProvider($this->fieldProvider);
+        $this->provider = new EntityWithFieldsProvider($this->fieldProvider, $this->entityProvider);
     }
 
     public function testGetFieldsWithRelations()

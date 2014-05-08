@@ -5,12 +5,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class EntityFieldRecursiveProviderTest extends \PHPUnit_Framework_TestCase
+class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityConfigProvider;
@@ -24,7 +24,7 @@ class EntityFieldRecursiveProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
 
-    /** @var EntityFieldRecursiveProvider */
+    /** @var EntityFieldProvider */
     private $provider;
 
     protected function setUp()
@@ -66,7 +66,7 @@ class EntityFieldRecursiveProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new EntityFieldRecursiveProvider(
+        $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
