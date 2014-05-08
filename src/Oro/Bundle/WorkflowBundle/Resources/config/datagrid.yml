@@ -21,7 +21,7 @@ datagrid:
                     - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
         columns:
             label:
-                label: oro.workflow.workflowdefinition.name.label
+                label: oro.workflow.workflowdefinition.label.label
             relatedEntity:
                 label: oro.workflow.workflowdefinition.related_entity.label
                 data_name: relatedEntity

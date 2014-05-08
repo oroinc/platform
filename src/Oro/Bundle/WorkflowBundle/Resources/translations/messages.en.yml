@@ -100,8 +100,8 @@ oro:
             id.label:             ID
             definition.label:     Workflow definition
             final.label:          Is final
-            label.label:          Label
-            name.label:           Name
+            label.label:          Name # this translation has been chosen because it doesn't confuse users
+            name.label:           Code # this translation has been chosen because it doesn't confuse users
             step_order.label:     Step order
 
             related_entity.label:       Workflow Step
@@ -113,12 +113,12 @@ oro:
             entity_plural_label:          Workflows
             created_at.label:             Created
             updated_at.label:             Updated
-            label.label:                  Label
+            label.label:                  Name # this translation has been chosen because it doesn't confuse users
             system.label:                 System
             configuration.label:          Configuration
             entity_acls.label:            Entity ACLs
             entity_attribute_name.label:  Entity attribute name
-            name.label:                   Name
+            name.label:                   Code # this translation has been chosen because it doesn't confuse users
             related_entity.label:         Related entity
             start_step.label:             Start step
             steps.label:                  Steps
