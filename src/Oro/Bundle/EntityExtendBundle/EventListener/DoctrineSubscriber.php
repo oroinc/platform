@@ -98,7 +98,7 @@ class DoctrineSubscriber implements EventSubscriber
                         ? $targetFieldId->getFieldName()
                         : null;
 
-                    $fieldName = $fieldId->getFieldName();
+                    $fieldName   = $fieldId->getFieldName();
                     $defaultName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName();
 
                     switch ($fieldId->getFieldType()) {
