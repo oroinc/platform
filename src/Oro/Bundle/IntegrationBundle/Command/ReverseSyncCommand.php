@@ -162,7 +162,8 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
 
     /**
      * We need to cut first and last symbol from string, if string has one more quote like this:
-     * "'a:1:{s:2:\"id\";i:11;}'" we need to bring it to the "a:1:{s:2:\"id\";i:11;}"
+     * "'a:1:{s:2:\"id\";i:11;}'" -> "a:1:{s:2:\"id\";i:11;}",
+     * '"a:1:{s:2:\"id\";i:11;}"' -> 'a:1:{s:2:\"id\";i:11;}'
      *
      * @param string $str
      *
@@ -172,9 +173,6 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     {
         if ("'" === substr($str, 0, 1) || '"' === substr($str, 0, 1)) {
             $str = substr($str, 1);
-        }
-
-        if ("'" === substr($str, -1) || '"' === substr($str, -1)) {
             $str = substr_replace($str, '', -1);
         }
 
