@@ -55,10 +55,20 @@ function(_, Backbone, Helper, __) {
 
         getPropertyPath: function(propertyPath) {
             var path = [this.options.workflow.get('entity_attribute')];
-            var parts = propertyPath.split('::');
-            _.each(parts, function(part) {
-                var propertyData = part.split('+');
-                path.push(propertyData[0]);
+            $.each(propertyPath.split('+'), function (i, item) {
+                var part;
+                if (i === 0) {
+                    // first item is always just a field name
+                    path.push(item);
+                } else {
+                    // field name can contain '::'
+                    // thus cut off entity name with first entrance '::',
+                    // remaining part is a field name
+                    part = item.split('::').slice(1).join('::');
+                    if (part) {
+                        path.push(part);
+                    }
+                }
             });
             return path.join('.');
         },
