@@ -3,9 +3,8 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
+
 use Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RandomIdExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,23 +12,20 @@ class RandomIdExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var RandomIdExtension
      */
-    protected $randomExtension;
+    protected $extension;
 
     protected function setUp()
     {
-        $this->randomExtension = new RandomIdExtension(new OptionsResolver());
+        $this->extension = new RandomIdExtension();
     }
 
     public function testSetDefaultOptions()
     {
-        /** @var OptionsResolver $resolver */
-        $resolver = new OptionsResolver();
-        $this->randomExtension->setDefaultOptions($resolver);
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver->expects($this->once())->method('setDefaults')
+            ->with(array('random_id' => false));
 
-        $defaultOptions = $this->readAttribute($resolver, 'defaultOptions');
-        $options        = $this->readAttribute($defaultOptions, 'options');
-
-        $this->assertFalse($options['random_id']);
+        $this->extension->setDefaultOptions($resolver);
     }
 
     /**
@@ -40,13 +36,12 @@ class RandomIdExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFinishView(FormView $view, array $options, $equal)
     {
-        /** @var FormInterface $formMock */
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
 
         $isEmptyId = empty($view->vars['id']);
-        $this->randomExtension->finishView($view, $formMock, $options);
+        $this->extension->finishView($view, $formMock, $options);
 
         if ($isEmptyId) {
             $this->assertTrue(empty($view->vars['id']));
