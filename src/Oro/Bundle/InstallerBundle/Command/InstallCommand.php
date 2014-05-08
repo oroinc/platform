@@ -3,6 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -16,6 +17,9 @@ use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -29,6 +33,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
+            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Timeout for child command execution', 300)
             ->addOption(
                 'sample-data',
                 null,
@@ -37,6 +42,9 @@ class InstallCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $forceInstall = $input->getOption('force');
@@ -47,6 +55,7 @@ class InstallCommand extends ContainerAwareCommand
             $this->getApplication(),
             $this->getContainer()->get('oro_cache.oro_data_cache_manager')
         );
+        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
 
         // if there is application is not installed or no --force option
         if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
@@ -61,7 +70,6 @@ class InstallCommand extends ContainerAwareCommand
                 array(
                     '--no-optional-warmers' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 300,
                     '--no-debug' => false
                 )
             );
@@ -138,9 +146,8 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('<info>Setting up database.</info>');
 
         /** @var DialogHelper $dialog */
-        $dialog    = $this->getHelperSet()->get('dialog');
-        $container = $this->getContainer();
-        $options   = $input->getOptions();
+        $dialog  = $this->getHelperSet()->get('dialog');
+        $options = $input->getOptions();
 
         $input->setInteractive(false);
 
@@ -151,7 +158,6 @@ class InstallCommand extends ContainerAwareCommand
                     '--force' => true,
                     '--full-database' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 360
                 )
             )
             ->runCommand('oro:entity-config:clear')
@@ -160,16 +166,20 @@ class InstallCommand extends ContainerAwareCommand
                 'oro:migration:load',
                 array(
                     '--process-isolation' => true,
-                    '--process-timeout' => 300
                 )
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
-                array('--process-isolation' => true)
+                array(
+                    '--process-isolation' => true,
+                )
             )
             ->runCommand(
                 'oro:migration:data:load',
-                array('--process-isolation' => true, '--no-interaction' => true)
+                array(
+                    '--process-isolation' => true,
+                    '--no-interaction' => true,
+                )
             );
 
         $output->writeln('');
@@ -262,7 +272,10 @@ class InstallCommand extends ContainerAwareCommand
         if ($demo) {
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
-                array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
+                array(
+                    '--process-isolation' => true,
+                    '--fixtures-type' => 'demo'
+                )
             );
         }
 
@@ -284,13 +297,45 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js', '--process-isolation' => true))
+            ->runCommand(
+                'oro:navigation:init',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'fos:js-routing:dump',
+                array(
+                    '--target' => 'web/js/routes.js',
+                    '--process-isolation' => true,
+                )
+            )
             ->runCommand('oro:localization:dump')
-            ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
-            ->runCommand('assetic:dump', array('--process-isolation' => true))
-            ->runCommand('oro:translation:dump', array('--process-isolation' => true))
-            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
+            ->runCommand(
+                'oro:assets:install',
+                array(
+                    '--exclude' => array('OroInstallerBundle')
+                )
+            )
+            ->runCommand(
+                'assetic:dump',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'oro:translation:dump',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'oro:requirejs:build',
+                array(
+                    '--ignore-errors' => true,
+                    '--process-isolation' => true,
+                )
+            );
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -303,7 +348,6 @@ class InstallCommand extends ContainerAwareCommand
             'cache:clear',
             array(
                 '--process-isolation' => true,
-                '--process-timeout' => 300,
                 '--no-debug' => false
             )
         );
@@ -368,12 +412,14 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function renderTable(array $collection, $header, OutputInterface $output)
     {
+        /** @var TableHelper $table */
         $table = $this->getHelperSet()->get('table');
 
         $table
             ->setHeaders(array('Check  ', $header))
             ->setRows(array());
 
+        /** @var \Requirement $requirement */
         foreach ($collection as $requirement) {
             if ($requirement->isFulfilled()) {
                 $table->addRow(array('OK', $requirement->getTestMessage()));

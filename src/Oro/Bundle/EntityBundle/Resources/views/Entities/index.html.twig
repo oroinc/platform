@@ -4,7 +4,8 @@
 {% set gridName = 'custom-entity-grid' %}
 {# grid params #}
 {% set params = {class_name: entity_class} %}
-{% set pageTitle = 'Entities' %}
+
+{% set pageTitle = plural_label %}
 
 {% oro_title_set({params : {"%entityName%": label|default('N/A')|trans }}) %}
 
