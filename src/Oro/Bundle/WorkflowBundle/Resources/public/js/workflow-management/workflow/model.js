@@ -8,8 +8,8 @@ define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/
     'oroworkflow/js/workflow-management/step/model',
     'oroworkflow/js/workflow-management/transition/model',
     'oroworkflow/js/workflow-management/transition-definition/model',
-    'oroworkflow/js/workflow-management/attribute/model'
-
+    'oroworkflow/js/workflow-management/attribute/model',
+    'oroentity/js/entity-fields-util'
 ],
 function(_, $, Backbone, Helper, __,
      StepCollection,
@@ -19,7 +19,8 @@ function(_, $, Backbone, Helper, __,
      StepModel,
      TransitionModel,
      TransitionDefinitionModel,
-     AttributeModel
+     AttributeModel,
+     EntityFieldsUtil
 ) {
     'use strict';
 
@@ -42,7 +43,7 @@ function(_, $, Backbone, Helper, __,
             attributes: null
         },
 
-        entityFieldsData: null,
+        entityFieldUtil: null,
         entityFieldsInitialized: false,
 
         initialize: function() {
@@ -136,37 +137,22 @@ function(_, $, Backbone, Helper, __,
 
         setEntityFieldsData: function(fields) {
             this.entityFieldsInitialized = true;
-            this.entityFieldsData = fields;
+            this.entityFieldUtil = new EntityFieldsUtil(this.get('entity'), fields);
         },
 
         getFieldIdByPropertyPath: function(propertyPath) {
             var pathData = propertyPath.split('.');
-            var entity = this.get('entity');
 
-            if (pathData.length > 1
-                && pathData[0] == this.get('entity_attribute')
-                && this.entityFieldsData.hasOwnProperty(entity)
-            ) {
-                var entityData = this.entityFieldsData[entity];
-
-                var fieldIdParts = $.map(pathData.slice(1, pathData.length - 1), function (fieldName) {
-                    var fieldPartId = fieldName;
-
-                    if (entityData.hasOwnProperty('fieldsIndex') && entityData.fieldsIndex.hasOwnProperty(fieldName)) {
-                        entityData = entityData.fieldsIndex[fieldName];
-                        if (entityData.hasOwnProperty('related_entity')) {
-                            fieldPartId += '+' + entityData.related_entity.name;
-                        }
-                    }
-
-                    return fieldPartId;
-                });
-
-                fieldIdParts.push(pathData[pathData.length - 1]);
-                return fieldIdParts.join('::');
+            if (pathData.length > 1 && pathData[0] == this.get('entity_attribute')) {
+                pathData.splice(0, 1);
+                return this.entityFieldUtil.getPathByPropertyPath(pathData);
             } else {
                 return null;
             }
+        },
+
+        getPropertyPathByFieldId: function(fieldId) {
+            return this.get('entity_attribute') + '.' + this.entityFieldUtil.getPropertyPathByPath(fieldId);
         },
 
         getSystemEntities: function() {
