@@ -18,7 +18,6 @@ define(['underscore'], function (_) {
     Util.filterFields = function (fields, exclude) {
         fields = _.filter(fields, function (item) {
             var result;
-            // otherwise - we filter by object keys or not filtering at all
             result = !_.some(exclude, function (rule) {
                 var result;
                 // exclude can be a property name
