@@ -1,15 +1,14 @@
 /*global define*/
 /*jslint nomen: true*/
-define(function (require) {
+define(['underscore'], function (_) {
     'use strict';
-
-    var _ = require('underscore');
 
     function Util(entity, data) {
         this.init(entity, data);
     }
 
     /**
+     * Filters passed fields by exclude mask
      *
      * @param {Array} fields
      * @param {Object} exclude
@@ -49,9 +48,32 @@ define(function (require) {
         },
 
         /**
+         * Parses path-string and returns array of objects
+         *
+         * Field Path:
+         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         * Returns Chain:
+         *  [{
+         *      entity: {Object},
+         *      path: "",
+         *      basePath: ""
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account",
+         *      basePath: "account+OroCRM\[...]\Account"
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account+OroCRM\[...]\Account::contacts",
+         *      basePath: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]Contact"
+         *  }, {
+         *      field: {Object},
+         *      path: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName"
+         *  }]
          *
          * @param {string} path
-         * @param {boolean?} trim
+         * @param {boolean?} trim - flag, allows to omit last item if it's a field
          * @returns {Array.<Object>}
          */
         pathToEntityChain: function (path, trim) {
@@ -110,9 +132,33 @@ define(function (require) {
         },
 
         /**
+         * Combines path-string from array of objects
+         *
+         * Chain:
+         *  [{
+         *      entity: {Object},
+         *      path: "",
+         *      basePath: ""
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account",
+         *      basePath: "account+OroCRM\[...]\Account"
+         *  }, {
+         *      entity: {Object},
+         *      field: {Object},
+         *      path: "account+OroCRM\[...]\Account::contacts",
+         *      basePath: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]Contact"
+         *  }, {
+         *      field: {Object},
+         *      path: "account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName"
+         *  }]
+         *
+         *  Returns Field Path:
+         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          *
          * @param {Array.<Object>} chain
-         * @param {number=} end
+         * @param {number=} end - number of chain-items which need to be ignored
          * @returns {string}
          */
         entityChainToPath: function (chain, end) {
@@ -133,8 +179,10 @@ define(function (require) {
         },
 
         /**
+         * Prepares the object with field's info which can be matched for conditions
          *
-         * @param fieldId
+         * @param {string} fieldId - Field Path, such as
+         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          * @returns {Object}
          */
         getApplicableConditions: function (fieldId) {
@@ -156,6 +204,17 @@ define(function (require) {
             return result;
         },
 
+        /**
+         * Converts Field Path to Property Path
+         *
+         * Filed Path:
+         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         * Returns Property Path:
+         *      account.contacts.firstName
+         *
+         * @param {string} path
+         * @returns {string}
+         */
         getPropertyPathByPath: function(path)
         {
             var propertyPathParts = [];
@@ -178,6 +237,17 @@ define(function (require) {
             return propertyPathParts.join('.');
         },
 
+        /**
+         * Converts Property Path to Field Path
+         *
+         * Property Path:
+         *      account.contacts.firstName
+         * Returns Filed Path:
+         *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
+         *
+         * @param {string} pathData
+         * @returns {string}
+         */
         getPathByPropertyPath: function(pathData) {
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
