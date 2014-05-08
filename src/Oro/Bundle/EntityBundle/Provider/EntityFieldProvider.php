@@ -122,9 +122,6 @@ class EntityFieldProvider
      *                                       .       'related_entity_label'        - entity label
      *                                       .       'related_entity_plural_label' - entity plural label
      *                                       .       'related_entity_icon'         - an icon associated with an entity
-     *                                       If a field represents a relation and $deepLevel > 0
-     *                                       the related entity fields are added:
-     *                                       .       'related_entity_fields'       - array of fields
      */
     public function getFields(
         $entityName,
