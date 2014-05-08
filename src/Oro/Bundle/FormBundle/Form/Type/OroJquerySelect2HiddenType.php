@@ -60,7 +60,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                     'configs'            => $defaultConfig,
                     'converter'          => null,
                     'autocomplete_alias' => null,
-                    'excluded'           => null
+                    'excluded'           => null,
+                    'random_id'          => true,
                 )
             );
 
