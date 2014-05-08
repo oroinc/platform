@@ -20,12 +20,12 @@ class NavigationListener
 
     /**
      * @param SecurityContextInterface $securityContext
-     * @param null|string $entryPoint
+     * @param null|string              $entryPoint
      */
     public function __construct(SecurityContextInterface $securityContext, $entryPoint = null)
     {
         $this->securityContext = $securityContext;
-        $this->entryPoint = $entryPoint;
+        $this->entryPoint      = $entryPoint;
     }
 
     /**
@@ -46,11 +46,13 @@ class NavigationListener
             $systemTabMenuItem->addChild(
                 'package_manager',
                 [
-                    'label' => 'Package Manager',
-                    'uri' => $this->entryPoint,
-                    'linkAttributes' => ['class' => 'no-hash']
+                    'label'          => 'Package Manager',
+                    'uri'            => $this->entryPoint,
+                    'linkAttributes' => ['class' => 'no-hash'],
+                    'extras'         => ['position' => '110'],
                 ]
             );
+
         }
     }
 }
