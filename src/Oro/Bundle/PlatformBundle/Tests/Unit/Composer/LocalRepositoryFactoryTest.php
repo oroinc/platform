@@ -4,21 +4,20 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryManager;
+use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 
-class LocalRepositoryManagerTest extends \PHPUnit_Framework_TestCase
+class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var LocalRepositoryManager
+     * @var LocalRepositoryFactory
      */
     protected $manager;
 
     protected function setUp()
     {
-        $this->manager = new LocalRepositoryManager(
+        $this->manager = new LocalRepositoryFactory(
             $this->getFilesystem(true),
-            __DIR__ . DIRECTORY_SEPARATOR,
-            'fixtures' . DIRECTORY_SEPARATOR . 'installed.json'
+            __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'installed.json'
         );
     }
 
@@ -40,7 +39,7 @@ class LocalRepositoryManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRepositoryFail()
     {
-        new LocalRepositoryManager($this->getFilesystem(false), 'vendor/', 'file');
+        new LocalRepositoryFactory($this->getFilesystem(false), 'vendor/file');
     }
 
     /**
