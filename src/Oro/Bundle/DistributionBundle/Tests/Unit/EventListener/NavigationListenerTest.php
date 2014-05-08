@@ -145,7 +145,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 [
                     'label' => 'Package Manager',
                     'uri' => $entryPoint,
-                    'linkAttributes' => ['class' => 'no-hash']
+                    'linkAttributes' => ['class' => 'no-hash'],
+                    'extras' => ['position' => '110']
                 ]
             )
             ->will($this->returnValue($systemTab));
