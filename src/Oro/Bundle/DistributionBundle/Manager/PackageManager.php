@@ -57,7 +57,10 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages = array(OroPlatformBundle::PACKAGE_NAME, 'oro/platform-dist');
+    protected $constantPackages = [
+        OroPlatformBundle::PACKAGE_NAME,
+        OroPlatformBundle::PACKAGE_DIST_NAME
+    ];
 
     /**
      * @var Pool

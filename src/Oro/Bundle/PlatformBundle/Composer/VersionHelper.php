@@ -16,6 +16,11 @@ class VersionHelper
     protected $factory;
 
     /**
+     * @var PackageInterface[]
+     */
+    protected $packages = [];
+
+    /**
      * @param LocalRepositoryFactory $factory
      */
     public function __construct(LocalRepositoryFactory $factory)
@@ -29,11 +34,19 @@ class VersionHelper
      */
     public function getVersion($packageName = OroPlatformBundle::PACKAGE_NAME)
     {
+        if (isset($this->packages[$packageName])) {
+            return $this->packages[$packageName];
+        }
+
         $packages = $this->factory->getLocalRepository()->findPackages($packageName);
 
         if ($package = current($packages)) {
             /** @var PackageInterface $package */
-            return $package->getPrettyVersion();
+            $version = $package->getPrettyVersion();
+
+            $this->packages[$packageName] = $version;
+
+            return $version;
         }
 
         return self::UNDEFINED_VERSION;

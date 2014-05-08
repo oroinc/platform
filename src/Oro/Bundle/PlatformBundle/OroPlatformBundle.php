@@ -11,6 +11,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerP
 class OroPlatformBundle extends Bundle
 {
     const PACKAGE_NAME = 'oro/platform';
+    const PACKAGE_DIST_NAME = 'oro/platform-dist';
 
     /**
      * {@inheritdoc}

@@ -893,7 +893,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->stringContains('Package oro/platform-dist is not deletable'));
 
         $manager = $this->createPackageManager(null, null, null, null, null, $logger);
-        $manager->uninstall(['oro/platform-dist']);
+        $manager->uninstall([OroPlatformBundle::PACKAGE_DIST_NAME]);
     }
 
     /**
@@ -904,7 +904,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $manager = $this->createPackageManager();
 
         $this->assertFalse($manager->canBeDeleted(OroPlatformBundle::PACKAGE_NAME));
-        $this->assertFalse($manager->canBeDeleted('oro/platform-dist'));
+        $this->assertFalse($manager->canBeDeleted(OroPlatformBundle::PACKAGE_DIST_NAME));
     }
 
     /**
