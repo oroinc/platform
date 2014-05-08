@@ -5,38 +5,63 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class EntityType extends AbstractType
 {
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     */
+    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'className',
             'text',
-            array(
-                'label'    => 'Name',
-                'block'    => 'entity',
-                'subblock' => 'second'
-            )
+            [
+                'label'       => 'Name',
+                'block'       => 'entity',
+                'subblock'    => 'second',
+                'constraints' => [
+                    new Assert\Length(['min' => 5, 'max' => $this->nameGenerator->getMaxCustomEntityNameSize()])
+                ],
+            ]
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'   => 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
-                'block_config' => array(
-                    'entity' => array(
-                        'title' => 'General',
-                        'subblocks' => array(
-                            'second' => array(
+                'block_config' => [
+                    'entity' => [
+                        'title'     => 'General',
+                        'subblocks' => [
+                            'second' => [
                                 'priority' => 10
-                            )
-                        )
-                    )
-                )
-            )
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         );
     }
 

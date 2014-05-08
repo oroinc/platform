@@ -36,7 +36,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
             ->method('runCommand')
             ->with(
                 'oro:entity-config:update',
-                ['--process-timeout' => 300],
+                [],
                 $logger
             )
             ->will(
