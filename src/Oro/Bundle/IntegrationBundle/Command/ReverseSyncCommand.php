@@ -56,7 +56,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
         $channelId       = $input->getOption(self::CHANNEL_ARG_NAME);
         $connectorType   = $input->getOption(self::CONNECTOR_ARG_NAME);
         $params          = $input->getOption(self::PARAMETERS_ARG_NAME);
-        $convertedParams = unserialize(str_replace('\"', '"', $params));
+        $convertedParams = unserialize(stripslashes($params));
         $logger          = new OutputLogger($output);
         $processor       = $this->getService(self::SYNC_PROCESSOR);
         $repository      = $this->getService('doctrine.orm.entity_manager')
