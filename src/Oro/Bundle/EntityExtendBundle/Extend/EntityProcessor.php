@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
+
 use Symfony\Component\Process\PhpExecutableFinder;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -82,7 +82,7 @@ class EntityProcessor
         foreach ($this->commands as $command => $options) {
             $code = $this->commandExecutor->runCommand(
                 $command,
-                array_merge($options, ['--process-timeout' => 300]),
+                $options,
                 $this->logger
             );
 
