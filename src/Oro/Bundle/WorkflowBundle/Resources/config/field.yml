@@ -13,3 +13,8 @@ services:
     oro_workflow.field_provider:
         class: %oro_workflow.field_provider.class%
         parent: oro_entity.entity_field_provider.abstract
+
+    oro_workflow.field_list_provider:
+        class: %oro_entity.entity_field_list_provider.class%
+        arguments:
+            - @oro_workflow.field_provider

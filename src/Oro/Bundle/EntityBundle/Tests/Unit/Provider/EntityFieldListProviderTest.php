@@ -5,12 +5,13 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldListProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
+class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityConfigProvider;
@@ -24,11 +25,14 @@ class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
 
-    /** @var EntityFieldListProvider */
+    /** @var EntityWithFieldsProvider */
     private $provider;
 
     /** @var EntityProvider */
     private $entityProvider;
+
+    /** @var EntityFieldRecursiveProvider */
+    private $fieldProvider;
 
     protected function setUp()
     {
@@ -73,7 +77,7 @@ class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new EntityFieldListProvider(
+        $this->fieldProvider = new EntityFieldRecursiveProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
@@ -82,8 +86,9 @@ class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
             [],
             []
         );
+        $this->fieldProvider->setEntityProvider($this->entityProvider);
 
-        $this->provider->setEntityProvider($this->entityProvider);
+        $this->provider = new EntityWithFieldsProvider($this->fieldProvider);
     }
 
     public function testGetFieldsWithRelations()
@@ -123,6 +128,9 @@ class EntityFieldListProviderTest extends \PHPUnit_Framework_TestCase
                         'label'               => 'Rel1',
                         'relation_type'       => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
+                        'related_entity_label'        => 'Test1 Label',
+                        'related_entity_plural_label' => 'Test1 Plural Label',
+                        'related_entity_icon'         => 'icon-test1',
                     ]
                 ]
             ]

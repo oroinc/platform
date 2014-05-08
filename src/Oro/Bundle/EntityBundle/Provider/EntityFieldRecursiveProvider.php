@@ -98,6 +98,14 @@ class EntityFieldRecursiveProvider
     }
 
     /**
+     * @return EntityProvider
+     */
+    public function getEntityProvider()
+    {
+        return $this->entityProvider;
+    }
+
+    /**
      * Returns fields for the given entity
      *
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
