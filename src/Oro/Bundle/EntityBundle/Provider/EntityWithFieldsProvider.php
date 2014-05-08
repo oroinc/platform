@@ -17,7 +17,12 @@ class EntityWithFieldsProvider
     }
 
     /**
-     * {@inheritdoc}
+     * @param bool $withVirtualFields
+     * @param bool $withUnidirectional
+     * @param bool $withRelations
+     * @param bool $translate
+     *
+     * @return array
      */
     public function getFields(
         $withVirtualFields = false,

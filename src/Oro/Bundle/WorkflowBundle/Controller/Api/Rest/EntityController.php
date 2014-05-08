@@ -25,7 +25,7 @@ class EntityController extends FOSRestController
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
      * )
-     * @ApiDoc(description="Get list of fields by entity", resource=true)
+     * @ApiDoc(description="Get entity with fields", resource=true)
      * @AclAncestor("oro_workflow")
      *
      * @param string $entityName
