@@ -106,7 +106,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entities));
 
 
-        $result   = $this->provider->getFields('Acme:Test', true);
+        $result   = $this->provider->getFields();
         $expected = [
             'Acme\Entity\Test' => [
                 'name'   => 'Acme\Entity\Test',
@@ -128,9 +128,6 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
                         'label'               => 'Rel1',
                         'relation_type'       => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
-                        'related_entity_label'        => 'Test1 Label',
-                        'related_entity_plural_label' => 'Test1 Plural Label',
-                        'related_entity_icon'         => 'icon-test1',
                     ]
                 ]
             ]

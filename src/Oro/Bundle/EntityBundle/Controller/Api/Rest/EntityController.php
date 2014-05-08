@@ -52,8 +52,8 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether virtual fields should be returned as well.")
      * @QueryParam(
-     *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether details of related entity should be returned as well.")
+     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
+     *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
      *      name="with-unidirectional", requirements="(1)|(0)",
      *      description="Indicates whether Unidirectional association fields should be returned.")
@@ -67,7 +67,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      */
     public function fieldsAction()
     {
-        $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
 
@@ -78,8 +78,8 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         try {
             $result = $provider->getFields(
                 $withVirtualFields,
-                $withEntityDetails,
-                $withUnidirectional
+                $withUnidirectional,
+                $withRelations
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;

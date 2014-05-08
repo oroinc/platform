@@ -12,7 +12,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             router: 'oro_api_fields_entity',
             routingParams: {
                 'with-entity-details': 1,
-                'with-unidirectional': 1
+                'with-unidirectional': 1,
+                'with-relations':      1
             },
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog

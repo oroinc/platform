@@ -21,12 +21,11 @@ class EntityWithFieldsProvider
      */
     public function getFields(
         $withVirtualFields = false,
-        $withEntityDetails = false,
         $withUnidirectional = false,
+        $withRelations = true,
         $translate = true
     ) {
         $result        = [];
-        $withRelations = true;
 
         $entities = $this->entityProvider->getEntities();
 
@@ -37,7 +36,7 @@ class EntityWithFieldsProvider
                 $currentClassName,
                 $withRelations,
                 $withVirtualFields,
-                $withEntityDetails,
+                false,
                 $withUnidirectional,
                 $translate
             );
