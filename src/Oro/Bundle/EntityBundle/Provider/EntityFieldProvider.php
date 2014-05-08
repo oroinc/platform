@@ -377,8 +377,9 @@ class EntityFieldProvider
             }
 
             foreach ($targetMappings as $mapping) {
-                if ($mapping['targetEntity'] == $className
+                if ($mapping['isOwningSide']
                     && empty($mapping['inversedBy'])
+                    && $mapping['targetEntity'] === $className
                 ) {
                     $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = $mapping;
                 }
