@@ -246,9 +246,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * @param string        $code
      * @param string        $label
      * @param FieldConfigId $fieldConfigId
-     * @param boolean       $isVisible
-     *
      * @param bool          $isVisible
+     *
      * @return array
      */
     protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId, $isVisible = true)
