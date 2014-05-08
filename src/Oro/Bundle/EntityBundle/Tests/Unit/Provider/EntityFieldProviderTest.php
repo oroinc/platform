@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -369,7 +367,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getIds')
             ->will($this->returnValue([new EntityConfigId('entity', 'Acme\\Entity\\Test22')]));
 
-        $result   = $this->provider->getFields('Acme:Test1', true, false, false, true, 1, false, false);
+        $result   = $this->provider->getFields('Acme:Test1', true, false, false, true, false);
         $expected = [
             [
                 'name'  => 'Test1field2',
@@ -390,9 +388,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'related_entity_name' => 'Acme\Entity\Test11',
             ],
             [
-                'name' => 'Acme\Entity\Test22::Test22field1',
+                'name' => 'Acme\Entity\Test22::uni_rel1',
                 'type' => 'ref-one',
-                'label' => 'Test22 Label (A)',
+                'label' => 'Test22 Plural Label (UniRel1)',
                 'relation_type'         => 'ref-one',
                 'related_entity_name'   => 'Acme\Entity\Test22',
             ]
@@ -429,22 +427,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $entityMetadata->expects($this->any())
                 ->method('isIdentifier')
                 ->will($this->returnValueMap($fieldIdentifiers));
-            $entityMetadata->expects($this->any())
-                ->method('getAssociationMappings')
-                ->will(
-                    $this->returnValue(
-                        [
-                            [
-                                'targetEntity' => 'Acme\Entity\Test1',
-                                'inversedBy'   => null,
-                                'sourceEntity' => 'Acme\Entity\Test22',
-                                'fieldName'    => 'Test22field1',
-                                'type'         => 2
-                            ]
-                        ]
-                    )
-                );
-
 
             if (isset($entityData['relations'])) {
                 $relNames         = [];
@@ -463,6 +445,21 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 $entityMetadata->expects($this->any())
                     ->method('getAssociationMappedByTargetField')
                     ->will($this->returnValue('id'));
+            }
+            if (isset($entityData['unidirectional_relations'])) {
+                $mappings = [];
+                foreach ($entityData['unidirectional_relations'] as $relName => $relData) {
+                    $fieldTypes[]       = [$relName, $relData['type']];
+                    $relData['fieldName']    = $relName;
+                    $relData['isOwningSide'] = true;
+                    $relData['inversedBy']   = null;
+                    $relData['sourceEntity'] = $entityClassName;
+                    unset($relData['config']);
+                    $mappings[$relName] = $relData;
+                }
+                $entityMetadata->expects($this->any())
+                    ->method('getAssociationMappings')
+                    ->will($this->returnValue($mappings));
             }
             $entityMetadata->expects($this->any())
                 ->method('getTypeOfField')
@@ -500,6 +497,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                             if (isset($config[$className]['relations'][$fieldName]['config'])) {
                                 return true;
                             }
+                            if (isset($config[$className]['unidirectional_relations'][$fieldName]['config'])) {
+                                return true;
+                            }
                         }
 
                         return false;
@@ -529,6 +529,14 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                                     $fieldName,
                                     $config[$className]['relations'][$fieldName]['type'],
                                     $config[$className]['relations'][$fieldName]['config']
+                                );
+                            }
+                            if (isset($config[$className]['unidirectional_relations'][$fieldName]['config'])) {
+                                return $this->getEntityFieldConfig(
+                                    $className,
+                                    $fieldName,
+                                    $config[$className]['unidirectional_relations'][$fieldName]['type'],
+                                    $config[$className]['unidirectional_relations'][$fieldName]['config']
                                 );
                             }
                         }
@@ -683,10 +691,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                             'label' => 'B',
                         ]
                     ],
-                    'Test22field1' => [
-                        'type'   => 'ref-one',
-                        'config' => [
-                            'label' => 'A',
+                ],
+                'unidirectional_relations' => [
+                    'uni_rel1' => [
+                        'targetEntity' => 'Acme\Entity\Test1',
+                        'type'         => 'ref-one',
+                        'config'       => [
+                            'label' => 'UniRel1',
                         ]
                     ],
                 ]
