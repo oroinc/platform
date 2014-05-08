@@ -25,6 +25,7 @@ use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
+use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
 class PackageManager
 {
@@ -56,7 +57,7 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages = array('oro/platform', 'oro/platform-dist');
+    protected $constantPackages = array(OroPlatformBundle::PACKAGE_NAME, 'oro/platform-dist');
 
     /**
      * @var Pool
