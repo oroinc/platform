@@ -151,9 +151,7 @@ function(_, Backbone, routing, messenger, __,
                     "with-relations": 1,
                     "with-virtual-fields": 1,
                     "with-unidirectional": 1,
-                    "with-entity-details": 1,
-                    "plain-list": 1,
-                    "deep-level": 2
+                    "with-entity-details": 1
                 },
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
