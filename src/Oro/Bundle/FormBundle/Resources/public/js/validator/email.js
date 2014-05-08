@@ -16,9 +16,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
             // @TODO add support of MX check action
             return $.validator.methods.email.apply(this, arguments);
         },
-        function (param) {
+        function (param, element) {
+            var value = this.elementValue(element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

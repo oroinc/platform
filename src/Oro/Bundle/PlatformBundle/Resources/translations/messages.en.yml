@@ -1,0 +1,14 @@
+oro:
+    platform:
+        system_info: System Information
+        packages: Packages
+
+        no_packages: There are no installed packages
+        package:
+            name: Package Name
+            version: Version
+            license: License
+
+        caption:
+            oro: Oro Packages
+            thirdParty: 3rd Party Packages
