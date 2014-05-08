@@ -90,12 +90,19 @@ class FieldType extends AbstractType
                 $targetFieldId = $relation['target_field_id'];
 
                 if (!$relation['assign'] || !$targetFieldId) {
+                    if (!$targetFieldId) {
+                        continue;
+                    }
+
                     // additional check for revers relation of manyToOne field type
-                    if ($relation['assign']
-                        && $fieldId
-                        && !$targetFieldId
-                        && $targetFieldId->getFieldType() != 'manyToOne'
-                    ) {
+                    $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
+                    if (false === (!$relation['assign']
+                        && !$fieldId
+                        && $targetFieldId
+                        && $targetFieldId->getFieldType() == 'manyToOne'
+                        && $targetEntityConfig->get('relation')
+                        && $targetEntityConfig->get('relation')[$relationKey]['assign']
+                    )) {
                         continue;
                     }
                 }
