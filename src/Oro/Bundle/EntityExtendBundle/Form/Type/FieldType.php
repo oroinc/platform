@@ -103,7 +103,16 @@ class FieldType extends AbstractType
                 $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
 
-                $key         = $relationKey . '||' . ($fieldId ? $fieldId->getFieldName() : '');
+                $fieldName = $fieldId
+                    ? $fieldId->getFieldName()
+                    : '';
+
+                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+                if (strlen($fieldName) > $maxFieldNameLength) {
+                    $fieldName = 'relation_' . substr(sha1($fieldName), 0, 6);
+                }
+
+                $key         = $relationKey . '||' . $fieldName;
                 $types[$key] = sprintf(
                     '%s (%s) %s',
                     $this->translator->trans('Relation'),
