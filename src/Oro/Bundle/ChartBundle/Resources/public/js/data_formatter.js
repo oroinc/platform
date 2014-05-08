@@ -13,7 +13,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @param {string} format
              * @return {*}
              */
-           formatValue: function(data, format) {
+            formatValue: function(data, format) {
                 switch (format) {
                     case 'integer':
                     case 'smallint':
@@ -39,40 +39,62 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     default:
                         return null;
                 }
-           },
+            },
             /**
              * @param {string} data
              * @param {string} format
              * @return {*}
              */
-           parseValue: function(data, format) {
+            parseValue: function(data, format) {
                 switch (format) {
-                   case 'integer':
-                   case 'smallint':
-                   case 'bigint':
-                   case 'boolean':
-                       if (data === null) {
-                           data = 0;
-                       }
-                       return parseInt(data);
-                   case 'decimal':
-                   case 'float':
-                   case 'money':
-                   case 'currency':
-                   case 'percent':
-                       if (data === null) {
-                           data = 0;
-                       }
-                       return parseFloat(data);
-                   case 'date':
-                       return Date.parse(data); //add convert to date
-                   case 'datetime':
-                       var date = dateTimeFormatter.unformatBackendDateTime(data);
-                       return date.getTime();
-                   default:
-                       return null;
-               }
-           }
+                    case 'integer':
+                    case 'smallint':
+                    case 'bigint':
+                    case 'boolean':
+                        if (data === null) {
+                            data = 0;
+                        }
+                        return parseInt(data);
+                    case 'decimal':
+                    case 'float':
+                    case 'money':
+                    case 'currency':
+                    case 'percent':
+                        if (data === null) {
+                            data = 0;
+                        }
+                        return parseFloat(data);
+                    case 'date':
+                        return Date.parse(data); //add convert to date
+                    case 'datetime':
+                        var date = dateTimeFormatter.unformatBackendDateTime(data);
+                        return date.getTime();
+                    default:
+                        return null;
+                }
+            },
+            /**
+             * @param {string} format
+             * @return {boolean}
+             */
+            isValueNumerical: function(format){
+                switch (format) {
+                    case 'integer':
+                    case 'smallint':
+                    case 'bigint':
+                    case 'boolean':
+                    case 'decimal':
+                    case 'float':
+                    case 'money':
+                    case 'currency':
+                    case 'percent':
+                    case 'date':
+                    case 'datetime':
+                        return true;
+                    default:
+                        return false;
+                }
+            }
         };
     }
 );

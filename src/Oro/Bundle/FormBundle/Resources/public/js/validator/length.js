@@ -18,9 +18,11 @@ define(['underscore', './number'
             return this.optional(element) || numberValidator[1].call(this, value.length, element, param);
         },
         function (param, element) {
-            var value = this.elementValue(element);
+            var value = this.elementValue(element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return numberValidator[2].call(this, param, element, value.length);
+            placeholders.value = value;
+            return numberValidator[2].call(this, param, element, value.length, placeholders);
         }
     ];
 });
