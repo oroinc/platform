@@ -14,7 +14,7 @@ use FOS\Rest\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldListProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldRecursiveProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
@@ -74,7 +74,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         $isPlainList            = ('1' == $this->getRequest()->query->get('plain-list'));
 
         if ($isPlainList) {
-            /** @var EntityFieldListProvider $provider */
+            /** @var EntityWithFieldsProvider $provider */
             $provider = $this->get('oro_entity.entity_field_list_provider');
         } else {
             /** @var EntityFieldRecursiveProvider $provider */

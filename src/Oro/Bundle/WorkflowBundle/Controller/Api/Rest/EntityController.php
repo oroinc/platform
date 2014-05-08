@@ -11,8 +11,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\Rest\Util\Codes;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_")
@@ -33,25 +33,17 @@ class EntityController extends FOSRestController
      */
     public function getAction($entityName)
     {
-        $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
         $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
-        $deepLevel         = $this->getRequest()->query->has('deep-level')
-            ? (int)$this->getRequest()->query->get('deep-level')
-            : 0;
         $lastDeepLevelRelations = ('1' == $this->getRequest()->query->get('last-deep-level-relations'));
 
         $statusCode = Codes::HTTP_OK;
-        /** @var FieldProvider $provider */
-        $provider = $this->get('oro_workflow.field_provider');
+        /** @var EntityWithFieldsProvider $provider */
+        $provider = $this->get('oro_workflow.field_list_provider');
         try {
             $result = $provider->getFields(
-                $entityName,
-                $withRelations,
                 false,
                 $withEntityDetails,
                 false,
-                $deepLevel,
                 $lastDeepLevelRelations
             );
         } catch (InvalidEntityException $ex) {

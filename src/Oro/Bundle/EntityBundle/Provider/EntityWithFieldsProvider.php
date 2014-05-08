@@ -2,34 +2,38 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-class EntityFieldListProvider extends EntityFieldRecursiveProvider
+class EntityWithFieldsProvider
 {
-    /** @var string|null */
-    protected $currentClassName = null;
+    /** @var EntityFieldRecursiveProvider */
+    protected $fieldRecursiveProvider;
+
+    public function __construct(EntityFieldRecursiveProvider $fieldRecursiveProvider)
+    {
+        $this->fieldRecursiveProvider = $fieldRecursiveProvider;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getFields(
-        $entityName,
-        $withRelations = false,
         $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
-        $deepLevel = 0,
         $lastDeepLevelRelations = false,
         $translate = true
     ) {
-        $result = [];
-        // force some params
+        $result        = [];
         $withRelations = true;
-        $deepLevel = 0;
+        $deepLevel     = 0;
 
-        $entities = $this->entityProvider->getEntities();
+        $entities = $this->fieldRecursiveProvider
+            ->getEntityProvider()
+            ->getEntities();
+
         foreach ($entities as $entityData) {
             $currentClassName = $entityData['name'];
 
-            $fields = parent::getFields(
+            $fields = $this->fieldRecursiveProvider->getFields(
                 $currentClassName,
                 $withRelations,
                 $withVirtualFields,
