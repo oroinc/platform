@@ -53,11 +53,7 @@ class Config implements ConfigInterface
             throw new RuntimeException(sprintf('Value "%s" for %s', $code, $this->getId()->toString()));
         }
 
-        if ($default) {
-            return $default;
-        }
-
-        return null;
+        return $default;
     }
 
     /**
