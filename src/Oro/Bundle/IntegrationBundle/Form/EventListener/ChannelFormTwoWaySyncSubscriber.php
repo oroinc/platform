@@ -126,7 +126,7 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                 'isTwoWaySyncEnabled',
                 'checkbox',
                 [
-                    'label'    => 'oro.integration.channel.two_way_sync_enabled.label',
+                    'label'    => 'oro.integration.channel.is_two_way_sync_enabled.label',
                     'required' => false,
                 ]
             );*/
