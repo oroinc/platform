@@ -12,6 +12,9 @@ class MaintenanceListener
      */
     protected $publisher;
 
+    /**
+     * @var SecurityFacade
+     */
     protected $securityFacade;
 
     /**
