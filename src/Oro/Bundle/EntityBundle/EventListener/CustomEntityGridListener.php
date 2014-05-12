@@ -344,7 +344,6 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * @param string $name
      * @param bool   $default
      *
-     * @throws \BadMethodCallException
      * @return mixed
      */
     protected function getParam(DatagridInterface $datagrid, $name, $default = false)
