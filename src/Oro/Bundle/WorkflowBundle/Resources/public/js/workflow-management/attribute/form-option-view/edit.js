@@ -1,6 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'orotranslation/js/translator',
-    'oroentity/js/field-choice', 'jquery.validate'],
+define([
+    'underscore',
+    'backbone',
+    'oroworkflow/js/workflow-management/helper',
+    'orotranslation/js/translator',
+    'oroentity/js/field-choice',
+    'jquery.validate'
+],
 function(_, Backbone, Helper, __) {
     'use strict';
 
@@ -45,22 +51,12 @@ function(_, Backbone, Helper, __) {
         onAdd: function() {
             var formData = Helper.getFormData(this.form);
 
-            formData.property_path = this.getPropertyPath(formData.property_path);
+            formData.property_path = this.options.workflow.getPropertyPathByFieldId(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
             formData.view_id = this.editViewId;
 
             this.resetForm();
             this.trigger('formOptionAdd', formData);
-        },
-
-        getPropertyPath: function(propertyPath) {
-            var path = [this.options.workflow.get('entity_attribute')];
-            var parts = propertyPath.split('::');
-            _.each(parts, function(part) {
-                var propertyData = part.split('+');
-                path.push(propertyData[0]);
-            });
-            return path.join('.');
         },
 
         resetForm: function() {
@@ -72,19 +68,11 @@ function(_, Backbone, Helper, __) {
         },
 
         initFieldChoice: function(container) {
-            var workflow = this.options.workflow;
-
             this.entityFieldSelectEl = container.find('[name="property_path"]');
             this.entityFieldSelectEl.fieldChoice({
                 fieldsLoaderSelector: this.options.entity_select_el,
                 select2: {
-                    placeholder: __("Choose field..."),
-                    formatSelectionTemplate: this.entity_field_template
-                },
-                util: {
-                    findEntity:  function (entityName) {
-                        return _.findWhere(workflow.getSystemEntities(), {name: entityName});
-                    }
+                    placeholder: __("Choose field...")
                 }
             });
         },

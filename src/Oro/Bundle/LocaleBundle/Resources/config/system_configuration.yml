@@ -10,6 +10,8 @@ oro_system_configuration:
             title: 'Languages'
         locale_settings:
             title: 'Localization options'
+        map_settings:
+            title: 'Map options'
 
     fields:
         oro_locale.locale:
@@ -91,6 +93,33 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        oro_locale.temperature_unit:
+            type: choice
+            priority: 20
+            options:
+                label: 'Temperature Unit'
+                tooltip: oro.locale.form.tooltip.temperature_unit
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    fahrenheit: 'Fahrenheit'
+                    celsius: 'Celsius'
+
+        oro_locale.wind_speed_unit:
+            type: choice
+            priority: 10
+            options:
+                label: 'Wind Speed Unit'
+                tooltip: oro.locale.form.tooltip.wind_speed_unit
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    miles_per_hour: 'Miles per hour'
+                    kilometers_per_hour: 'Kilometers per hour'
+                    meters_per_second: 'Meters per second'
+
     tree:
         system_configuration:
             platform:
@@ -109,6 +138,11 @@ oro_system_configuration:
                                             - oro_locale.timezone
                                             - oro_locale.currency
                                             - oro_locale.quarter_start
+                                    map_settings:
+                                        priority: 50
+                                        children:
+                                            - oro_locale.temperature_unit
+                                            - oro_locale.wind_speed_unit
                             language_settings:
                                 priority: 230
                                 children:

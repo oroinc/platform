@@ -169,6 +169,7 @@ class EntityFieldChoiceType extends AbstractType
         if (empty($choiceRelations)) {
             return $choiceFields;
         }
+
         $choices = [];
         if (!empty($choiceFields)) {
             $choices[$this->translator->trans('oro.entity.form.entity_fields')] = $choiceFields;
