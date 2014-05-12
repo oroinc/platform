@@ -264,9 +264,11 @@ class ExtendConfigDumper
 
         foreach ($relations as &$relation) {
             if ($relation['target_field_id'] == $fieldId) {
-                $relation['assign'] = true;
-                $relationFieldId    = $relation['field_id'];
+                if ($relation['owner']) {
+                    $relation['assign'] = true;
+                }
 
+                $relationFieldId = $relation['field_id'];
                 if ($relationFieldId && count($schema)) {
                     $schema['relation'][$relationFieldId->getFieldName()] =
                         $relationFieldId->getFieldName();

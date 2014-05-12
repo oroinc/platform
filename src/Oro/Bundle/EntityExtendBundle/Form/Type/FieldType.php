@@ -8,8 +8,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
@@ -32,19 +35,13 @@ class FieldType extends AbstractType
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     ];
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     /**
@@ -85,12 +82,29 @@ class FieldType extends AbstractType
         $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
             $types = [];
-            foreach ($entityConfig->get('relation') as $relationKey => $relation) {
+            $relations = $entityConfig->get('relation');
+            foreach ($relations as $relationKey => $relation) {
+                /** @var FieldConfigId $fieldId */
                 $fieldId       = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
                 if (!$relation['assign'] || !$targetFieldId) {
-                    continue;
+                    if (!$targetFieldId) {
+                        continue;
+                    }
+
+                    // additional check for revers relation of manyToOne field type
+                    $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
+                    if (false === (!$relation['assign']
+                        && !$fieldId
+                        && $targetFieldId
+                        && $targetFieldId->getFieldType() == 'manyToOne'
+                        && $targetEntityConfig->get('relation')
+                        && $targetEntityConfig->get('relation')[$relationKey]['assign']
+                    )) {
+                        continue;
+                    }
                 }
 
                 if ($fieldId
