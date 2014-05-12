@@ -140,16 +140,11 @@ class ConfigFieldGridController extends Controller
         $relationValues  = [];
         $relationOptions = explode('||', $fieldType);
         $relationName    = $relationOptions[0];
-
-        if (isset($relationOptions[1]) && !empty($relationOptions[1])) {
-            $fieldName = $relationOptions[1];
-        }
-
         $relationOptions = explode('|', $relationOptions[0]);
 
         /**
-         * fieldType example: relation|manyToOne|testentity5_relation_7
-         * check if fieldType has 3rd option [fieldName]
+         * fieldType example: oneToMany|EntityFrom|EntityTo|test_one_to_many
+         * check if fieldType has 4th option [fieldName]
          */
         if (count($relationOptions) == 4) {
             $fieldType = ExtendHelper::getReversRelationType($relationOptions[0]);
