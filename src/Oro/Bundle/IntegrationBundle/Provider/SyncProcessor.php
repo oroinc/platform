@@ -165,7 +165,7 @@ class SyncProcessor
             );
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
-            if ($counts['warnings']) {
+            if ($context->getErrors()) {
                 $this->logger->warning('Some entities were skipped due to warnings:');
                 foreach ($context->getErrors() as $error) {
                     $this->logger->warning($error);
