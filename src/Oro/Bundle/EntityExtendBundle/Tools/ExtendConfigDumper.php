@@ -254,15 +254,8 @@ class ExtendConfigDumper
         $extendProvider = $this->em->getExtendConfigProvider();
         $targetConfig   = $extendProvider->getConfig($targetClass);
 
-        $relations = [];
-        if ($targetConfig->is('relation')) {
-            $relations = $targetConfig->get('relation');
-        }
-
-        $schema    = [];
-        if ($targetConfig->is('schema')) {
-            $schema    = $targetConfig->get('schema');
-        }
+        $relations = $targetConfig->get('relation', false, []);
+        $schema    = $targetConfig->get('schema', false, []);
 
         foreach ($relations as &$relation) {
             if ($relation['target_field_id'] == $fieldId) {
