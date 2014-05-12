@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
 class MaintenanceListener
@@ -11,21 +12,29 @@ class MaintenanceListener
      */
     protected $publisher;
 
+    protected $securityFacade;
+
     /**
      * @param TopicPublisher $publisher
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(TopicPublisher $publisher)
+    public function __construct(TopicPublisher $publisher, SecurityFacade $securityFacade)
     {
         $this->publisher = $publisher;
+        $this->securityFacade = $securityFacade;
     }
 
     public function onModeOn()
     {
-        $this->publisher->send('oro/maintenance', array('isOn' => true));
+        $userId = $this->securityFacade->getLoggedUserId();
+
+        $this->publisher->send('oro/maintenance', array('isOn' => true, 'userId' => $userId));
     }
 
     public function onModeOff()
     {
-        $this->publisher->send('oro/maintenance', array('isOn' => false));
+        $userId = $this->securityFacade->getLoggedUserId();
+
+        $this->publisher->send('oro/maintenance', array('isOn' => false, 'userId' => $userId));
     }
 }
