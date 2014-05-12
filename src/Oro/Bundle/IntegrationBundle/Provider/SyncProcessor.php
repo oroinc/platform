@@ -118,9 +118,9 @@ class SyncProcessor
             ProcessorRegistry::TYPE_IMPORT =>
                 array_merge(
                     [
-                    'processorAlias' => reset($processorAliases),
-                    'entityName'     => $realConnector->getImportEntityFQCN(),
-                    'channel'        => $channel->getId()
+                        'processorAlias' => reset($processorAliases),
+                        'entityName'     => $realConnector->getImportEntityFQCN(),
+                        'channel'        => $channel->getId()
                     ],
                     $parameters
                 ),
