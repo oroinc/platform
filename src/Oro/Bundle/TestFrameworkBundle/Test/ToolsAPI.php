@@ -127,19 +127,22 @@ class ToolsAPI
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string $contentType
+     * @param string|false $headerContentType
      */
-    public static function assertJsonResponse(Response $response, $statusCode = 201, $contentType = 'application/json')
-    {
+    public static function assertJsonResponse(
+        Response $response,
+        $statusCode = 201,
+        $headerContentType = 'application/json'
+    ) {
         \PHPUnit_Framework_TestCase::assertEquals(
             $statusCode,
             $response->getStatusCode(),
             $response->getContent()
         );
 
-        if ($contentType !== '') {
+        if ($headerContentType) {
             \PHPUnit_Framework_TestCase::assertTrue(
-                $response->headers->contains('Content-Type', $contentType),
+                $response->headers->contains('Content-Type', $headerContentType),
                 $response->headers
             );
         }

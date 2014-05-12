@@ -11,8 +11,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class ControllersTest extends WebTestCase
 {
@@ -131,7 +131,7 @@ class ControllersTest extends WebTestCase
             ->findOneBy(array('id' => $result['id']));
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, '');
+        ToolsAPI::assertJsonResponse($result, 200, false);
 
         //verify result
         $this->assertEquals($user->getApi()->getApiKey(), trim($result->getContent(), '"'));

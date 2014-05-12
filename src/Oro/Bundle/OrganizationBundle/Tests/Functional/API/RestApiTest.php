@@ -9,7 +9,7 @@ use Symfony\Component\BrowserKit\Response;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestApiTest extends WebTestCase
 {

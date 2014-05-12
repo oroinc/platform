@@ -13,8 +13,8 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class WorkflowControllerTest extends WebTestCase
 {

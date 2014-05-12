@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class SoapAdvancedSearchApiTest extends WebTestCase
 {

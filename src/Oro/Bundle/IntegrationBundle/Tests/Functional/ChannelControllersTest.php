@@ -9,7 +9,7 @@ use Symfony\Component\DomCrawler\Form;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ChannelControllersTest extends WebTestCase
 {

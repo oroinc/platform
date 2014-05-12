@@ -10,8 +10,8 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
 
 /**
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class WorkflowItemRepositoryTest extends FunctionalTestCase
 {

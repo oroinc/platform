@@ -26,10 +26,7 @@ class RestAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_addresstypes')
-        );
+        $this->client->request('GET', $this->client->generate('oro_api_get_addresstypes'));
 
         /** @var $result Response */
         $result = $this->client->getResponse();
@@ -47,10 +44,10 @@ class RestAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressType($expected)
     {
-        foreach ($expected as $addrType) {
+        foreach ($expected as $addressType) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_addresstype', array('name' => $addrType['name']))
+                $this->client->generate('oro_api_get_addresstype', array('name' => $addressType['name']))
             );
             /** @var $result Response */
             $result = $this->client->getResponse();
@@ -58,7 +55,7 @@ class RestAddressTypeApiTest extends WebTestCase
             ToolsAPI::assertJsonResponse($result, 200);
             $result = ToolsAPI::jsonToArray($result->getContent());
             $this->assertNotEmpty($result);
-            $this->assertEquals($addrType, $result);
+            $this->assertEquals($addressType, $result);
         }
     }
 }

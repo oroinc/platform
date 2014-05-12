@@ -16,11 +16,18 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
-    const DB_ISOLATION = '/@db_isolation(.*)(\r|\n)/U';
-    const DB_REINDEX = '/@db_reindex(.*)(\r|\n)/U';
+    const DB_ISOLATION_ANNOTATION = 'dbIsolation';
+    const DB_REINDEX_ANNOTATION = 'dbReindex';
 
-    static protected $db_isolation = false;
-    static protected $db_reindex = false;
+    /**
+     * @var bool[]
+     */
+    static private $dbIsolation;
+
+    /**
+     * @var bool[]
+     */
+    static private $dbReindex;
 
     /**
      * @var Client
@@ -43,7 +50,6 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param array $options An array of options to pass to the createKernel class
      * @param array $server  An array of server parameters
-     *
      * @return Client A Client instance
      */
     protected static function createClient(array $options = array(), array $server = array())
@@ -51,12 +57,12 @@ abstract class WebTestCase extends BaseWebTestCase
         if (!self::$internalClient) {
             self::$internalClient = parent::createClient($options, $server);
 
-            if (self::$db_isolation) {
+            if (self::getDbIsolationSetting()) {
                 /** @var Client $client */
                 $client = self::$internalClient;
 
                 //workaround MyISAM search tables are not on transaction
-                if (self::$db_reindex) {
+                if (self::getDbIsolationSetting()) {
                     $kernel = $client->getKernel();
                     $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
                     $application->setAutoExit(false);
@@ -94,50 +100,65 @@ abstract class WebTestCase extends BaseWebTestCase
         if (self::$internalClient) {
             /** @var Client $client */
             $client = self::$internalClient;
-            if (self::$db_isolation) {
+            if (self::getDbIsolationSetting()) {
                 $client->rollbackTransaction();
-                self::$db_isolation = false;
             }
             $client->setSoapClient(null);
             self::$internalClient = null;
         }
     }
 
-    public static function setUpBeforeClass()
-    {
-        $class = new \ReflectionClass(get_called_class());
-        $doc = $class->getDocComment();
-        if (preg_match(self::DB_ISOLATION, $doc, $matches) > 0) {
-            self::$db_isolation = true;
-        } else {
-            self::$db_isolation = false;
-        }
-
-        if (preg_match(self::DB_REINDEX, $doc, $matches) > 0) {
-            self::$db_reindex = true;
-        } else {
-            self::$db_reindex = false;
-        }
-    }
-
     /**
+     * Get value of dbIsolation option from annotation of called class
+     *
      * @return bool
      */
-    public function getIsolation()
+    protected static function getDbIsolationSetting()
     {
-        return self::$db_isolation;
+        $calledClass = get_called_class();
+        if (!isset(self::$dbIsolation[$calledClass])) {
+            self::$dbIsolation[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_ISOLATION_ANNOTATION);
+        }
+
+        return self::$dbIsolation[$calledClass];
     }
 
     /**
-     * @param bool $dbIsolation
+     * Get value of dbIsolation option from annotation of called class
+     *
+     * @return bool
      */
-    public function setIsolation($dbIsolation = false)
+    protected static function getDbReindexSetting()
     {
-        self::$db_isolation = $dbIsolation;
+        $calledClass = get_called_class();
+        if (!isset(self::$dbReindex[$calledClass])) {
+            self::$dbReindex[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_REINDEX_ANNOTATION);
+        }
+
+        return self::$dbReindex[$calledClass];
     }
 
-    public static function getInstance()
+    /**
+     * @param string $className
+     * @param string $annotationName
+     * @return bool
+     */
+    protected static function isClassHasAnnotation($className, $annotationName)
     {
+        $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
+        return isset($annotations['class'][$annotationName]);
+    }
+
+    /**
+     * @return Client
+     * @throws \BadMethodCallException
+     */
+    public static function getClientInstance()
+    {
+        if (!self::$internalClient) {
+            throw new \BadMethodCallException('Client instance is not initialized.');
+        }
+
         return self::$internalClient;
     }
 
@@ -147,7 +168,6 @@ abstract class WebTestCase extends BaseWebTestCase
      * When the Kernel is located, the file is required.
      *
      * @return string The Kernel class name
-     *
      * @throws \RuntimeException
      */
     protected static function getKernelClass()

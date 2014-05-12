@@ -10,8 +10,8 @@ use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUser
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class DashboardControllerAclTest extends WebTestCase
 {

@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ControllersTest extends WebTestCase
 {
@@ -50,7 +50,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, '');
+        ToolsAPI::assertJsonResponse($result, 200, false);
         $this->assertContains("Template saved", $crawler->html());
     }
 }

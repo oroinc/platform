@@ -10,8 +10,8 @@ use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class ControllersGroupTest extends WebTestCase
 {

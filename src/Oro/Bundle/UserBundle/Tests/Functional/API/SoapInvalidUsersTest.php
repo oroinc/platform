@@ -18,12 +18,6 @@ class SoapInvalidUsersTest extends WebTestCase
     /** @var Client */
     protected $client;
 
-    public function tearDown()
-    {
-        self::$internalClient = null;
-        parent::tearDown();
-    }
-
     public function testInvalidKey()
     {
         $this->client = static::createClient(

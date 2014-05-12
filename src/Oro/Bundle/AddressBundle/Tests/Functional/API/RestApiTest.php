@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
+use Symfony\Component\BrowserKit\Response;
+
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\BrowserKit\Response;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestApiTest extends WebTestCase
 {

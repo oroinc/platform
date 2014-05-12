@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ControllersTest extends WebTestCase
 {
@@ -83,7 +83,7 @@ class ControllersTest extends WebTestCase
             $this->client->generate('oro_entityconfig_view', array('id' => $id))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, '');
+        ToolsAPI::assertJsonResponse($result, 200, false);
         $this->assertContains('test entity label updated', $result->getContent());
 
     }

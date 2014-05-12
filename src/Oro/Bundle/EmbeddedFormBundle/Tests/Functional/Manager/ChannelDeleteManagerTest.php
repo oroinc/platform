@@ -9,7 +9,7 @@ use Oro\Bundle\IntegrationBundle\Tests\Functional\AbstractChannelDataDeleteTest;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ChannelDeleteManagerTest extends AbstractChannelDataDeleteTest
 {

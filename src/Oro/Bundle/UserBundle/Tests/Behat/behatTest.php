@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\BehatTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 /**
- * @db_isolation
+ * @dbIsolation
  */
 class BehatTest extends BehatTestCase
 {

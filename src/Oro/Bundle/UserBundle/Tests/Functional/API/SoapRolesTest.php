@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SoapRolesTest extends WebTestCase
 {

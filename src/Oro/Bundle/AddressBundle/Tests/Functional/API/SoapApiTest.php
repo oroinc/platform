@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SoapApiTest extends WebTestCase
 {
@@ -39,9 +39,9 @@ class SoapApiTest extends WebTestCase
 
     /**
      * @depends testGetCountries
-     * @param $countries
+     * @param array $countries
      */
-    public function testGetCountry($countries)
+    public function testGetCountry(array $countries)
     {
         foreach ($countries as $country) {
             $result = $this->client->getSoap()->getCountry($country['iso2Code']);
@@ -62,9 +62,9 @@ class SoapApiTest extends WebTestCase
 
     /**
      * @depends testGetRegions
-     * @param $regions
+     * @param array $regions
      */
-    public function testGetRegion($regions)
+    public function testGetRegion(array $regions)
     {
         foreach ($regions as $region) {
             $result = $this->client->getSoap()->getRegion($region['combinedCode']);

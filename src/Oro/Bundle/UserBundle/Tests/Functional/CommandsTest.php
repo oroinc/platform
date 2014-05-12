@@ -14,8 +14,8 @@ use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class CommandsTest extends WebTestCase
 {

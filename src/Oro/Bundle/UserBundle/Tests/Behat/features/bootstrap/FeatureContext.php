@@ -18,11 +18,11 @@ class FeatureContext extends BehatWebContext
     public function loginAsAnExistingUserAndPassword($user, $password)
     {
         /** @var Client $client */
-        $client = $this->getInstance();
+        $client = self::getClientInstance();
         $header = \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::generateBasicHeader($user, $password);
         //open default route
         $client->request('GET', $client->generate('oro_default'), array(), array(), $header);
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, '');
+        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
         PHPUnit_Framework_Assert::assertContains('Dashboard', $client->getCrawler()->html());
     }
 
@@ -31,10 +31,10 @@ class FeatureContext extends BehatWebContext
      */
     public function iOpenDialog($dialog)
     {
-        $client = $this->getInstance();
+        $client = self::getClientInstance();
         $route = 'oro_' . str_replace(' ', '_', strtolower($dialog));
         $client->request('GET', $client->generate($route));
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, '');
+        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
         PHPUnit_Framework_Assert::assertContains(
             'Create User - Users - Users Management - System',
             $client->getCrawler()->html()
@@ -46,7 +46,7 @@ class FeatureContext extends BehatWebContext
      */
     public function iFillInUserForm(TableNode $userTable)
     {
-        $client = $this->getInstance();
+        $client = self::getClientInstance();
         $this->form = $client->getCrawler()->selectButton('Save and Close')->form();
         //transform parameters
         foreach ($userTable->getHash() as $userHash) {
@@ -96,11 +96,11 @@ class FeatureContext extends BehatWebContext
      */
     public function iPress($button)
     {
-        $client = $this->getInstance();
+        $client = self::getClientInstance();
         $client->followRedirects();
         $client->submit($this->form);
 
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, '');
+        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
     }
 
     /**
@@ -108,7 +108,7 @@ class FeatureContext extends BehatWebContext
      */
     public function iShouldSee($message)
     {
-        $client = $this->getInstance();
+        $client = self::getClientInstance();
         $this->assertContains($message, $client->getCrawler()->html());
     }
 }
