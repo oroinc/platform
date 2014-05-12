@@ -70,7 +70,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
         $config->get('nonExistKey', true);
-
     }
 
     public function testSetState()
