@@ -1,3 +1,15 @@
+CHANGELOG for 1.2.0-rc1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.2.0 RC1 versions.
+
+* 1.2.0 RC1 (2014-05-12)
+ * Ability to delete Channels
+ * Workflow view
+ * Reset of Workflow data
+ * Fixed issues with Duplicated emails
+ * Fixed Issue Use of SQL keywords as extended entity field names
+ * Fixed Issue Creating one-to-many relationship on custom entity that inverses many-to-one relationship fails
+
 CHANGELOG for 1.1.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.1.0 versions.
