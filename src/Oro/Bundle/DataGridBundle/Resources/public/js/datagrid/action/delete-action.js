@@ -1,6 +1,11 @@
 /*global define*/
-define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oroui/js/delete-confirmation', './model-action'
-    ], function (_, messenger, __, DeleteConfirmation, ModelAction) {
+define([
+    'underscore',
+    'oroui/js/messenger',
+    'orotranslation/js/translator',
+    'oroui/js/delete-confirmation',
+    './model-action'
+], function (_, messenger, __, DeleteConfirmation, ModelAction) {
     'use strict';
 
     /**
@@ -32,17 +37,16 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
         /**
          * Confirm delete item
          */
-        doDelete: function () {
-            var that = this;
+        doDelete: function() {
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
-                error: function () {
-                    var messageText = __('Cannot delete item.');
+                error: function() {
+                    var messageText = __('You do not have permission to this action.');
                     messenger.notificationFlashMessage('error', messageText);
                 },
-                success: function () {
-                    var messageText = __(that.messages.success);
+                success: function() {
+                    var messageText = __('Item deleted');
                     messenger.notificationFlashMessage('success', messageText);
                 }
             });
