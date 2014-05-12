@@ -83,8 +83,7 @@ class RolesTest extends Selenium2TestCase
 
     public function testRolesAdd()
     {
-
-        $randomPrefix = ToolsAPI::randomGen(5);
+        $randomPrefix = ToolsAPI::generateRandomString(5);
 
         $login = $this->login();
         /** @var Roles $login */

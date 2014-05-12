@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Component\Yaml\Yaml;
@@ -9,17 +10,18 @@ class ToolsAPI
     /** Default WSSE credentials */
     const USER_NAME = 'admin';
     const USER_PASSWORD = 'admin_api_key';
-    const NONCE = 'd36e316282959a9ed4c89851497a717f';
 
     /**  Default user name and password */
     const AUTH_USER = 'admin@example.com';
     const AUTH_PW = 'admin';
 
-
-    protected static $random = null;
-
     /**
      * Generate WSSE authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @param string|null $nonce
+     * @return array
      */
     public static function generateWsseHeader(
         $userName = self::USER_NAME,
@@ -48,22 +50,31 @@ class ToolsAPI
 
     /**
      * Generate Basic  authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @return array
      */
     public static function generateBasicHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
     {
-        $basicHeader = array('PHP_AUTH_USER' =>  $userName, 'PHP_AUTH_PW' => $userPassword);
-        return $basicHeader;
+        return array('PHP_AUTH_USER' =>  $userName, 'PHP_AUTH_PW' => $userPassword);
     }
 
     /**
      * Data provider for REST/SOAP API tests
      *
-     * @param $folder
-     *
+     * @param string $folder
      * @return array
      */
     public static function requestsApi($folder)
     {
+        static $randomString;
+
+        // generate unique value
+        if (!$randomString) {
+            $randomString = self::generateRandomString(5);
+        }
+
         $parameters = array();
         $testFiles = new \RecursiveDirectoryIterator(
             $folder,
@@ -75,21 +86,23 @@ class ToolsAPI
                 unset($parameters[$fileName]['response']);
             }
         }
-        //generate unique value
-        if (is_null(self::$random)) {
-            self::$random = self::randomGen(5);
-        }
+
+        $replaceCallback = function (&$value) use ($randomString) {
+            if (!is_null($value)) {
+                $value = str_replace('%str%', $randomString, $value);
+            }
+        };
 
         foreach ($parameters as $key => $value) {
             array_walk(
                 $parameters[$key]['request'],
-                array(get_called_class(), 'replace'),
-                self::$random
+                $replaceCallback,
+                $randomString
             );
             array_walk(
                 $parameters[$key]['response'],
-                array(get_called_class(), 'replace'),
-                self::$random
+                $replaceCallback,
+                $randomString
             );
         }
 
@@ -101,22 +114,22 @@ class ToolsAPI
      * Test API response
      *
      * @param array $response
-     * @param $result
-     * @param $debugInfo
+     * @param string $result
+     * @param string $message
      */
-    public static function assertEqualsResponse($response, $result, $debugInfo = '')
+    public static function assertEqualsResponse($response, $result, $message = '')
     {
-        \PHPUnit_Framework_TestCase::assertEquals($response['return'], $result, $debugInfo);
+        \PHPUnit_Framework_TestCase::assertEquals($response['return'], $result, $message);
     }
 
     /**
      * Test API response status
      *
      * @param Response $response
-     * @param int    $statusCode
+     * @param int $statusCode
      * @param string $contentType
      */
-    public static function assertJsonResponse($response, $statusCode = 201, $contentType = 'application/json')
+    public static function assertJsonResponse(Response $response, $statusCode = 201, $contentType = 'application/json')
     {
         \PHPUnit_Framework_TestCase::assertEquals(
             $statusCode,
@@ -135,7 +148,7 @@ class ToolsAPI
     /**
      * Convert stdClass to array
      *
-     * @param $class
+     * @param string $class
      * @return array
      */
     public static function classToArray($class)
@@ -146,7 +159,7 @@ class ToolsAPI
     /**
      * Convert json to array
      *
-     * @param $json
+     * @param string $json
      * @return array
      */
     public static function jsonToArray($json)
@@ -155,54 +168,31 @@ class ToolsAPI
     }
 
     /**
-     * @param $length
-     * @return string
-     */
-    public static function randomGen($length)
-    {
-        $random= "";
-        srand((double) microtime()*1000000);
-        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $char_list .= "abcdefghijklmnopqrstuvwxyz";
-        $char_list .= "1234567890_";
-        // Add the special characters to $char_list if needed
-
-        for ($i = 0; $i < $length; $i++) {
-            $random .= substr($char_list, (rand()%(strlen($char_list))), 1);
-        }
-        self::$random = $random;
-
-        return $random;
-    }
-
-    /**
      * @param int $length
      * @return string
      */
     public static function generateRandomString($length = 10)
     {
-        return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
-    }
+        $random= "";
+        srand((double) microtime() * 1000000);
+        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $char_list .= "abcdefghijklmnopqrstuvwxyz";
+        $char_list .= "1234567890_";
 
-    /**
-     * @param $value
-     * @param $key
-     * @param $random
-     */
-    public static function replace(&$value, $key, $random)
-    {
-        if (!is_null($value)) {
-            $value = str_replace('%str%', $random, $value);
+        for ($i = 0; $i < $length; $i++) {
+            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
         }
+
+        return $random;
     }
 
     /**
      * @param Client $test
-     * @param $gridParameters
+     * @param array|string $gridParameters
      * @param array $filter
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public static function getEntityGrid($test, $gridParameters, $filter = array())
+    public static function getEntityGrid(Client $test, $gridParameters, $filter = array())
     {
         if (is_string($gridParameters)) {
             $gridParameters = array('gridName' => $gridParameters);

@@ -67,7 +67,7 @@ class GroupsTest extends Selenium2TestCase
 
     public function testGroupAdd()
     {
-        $randomPrefix = ToolsAPI::randomGen(5);
+        $randomPrefix = ToolsAPI::generateRandomString(5);
 
         $login = $this->login();
         /** @var Groups $login */
