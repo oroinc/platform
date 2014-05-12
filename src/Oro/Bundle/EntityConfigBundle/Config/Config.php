@@ -43,7 +43,7 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function get($code, $strict = false)
+    public function get($code, $strict = false, $default = null)
     {
         if (isset($this->values[$code])) {
             return $this->values[$code];
@@ -53,7 +53,7 @@ class Config implements ConfigInterface
             throw new RuntimeException(sprintf('Value "%s" for %s', $code, $this->getId()->toString()));
         }
 
-        return null;
+        return $default;
     }
 
     /**

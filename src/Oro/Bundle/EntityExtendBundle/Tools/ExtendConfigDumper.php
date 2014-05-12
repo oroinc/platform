@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -16,19 +17,13 @@ class ExtendConfigDumper
     const ENTITY         = 'Extend\\Entity\\';
     const DEFAULT_PREFIX = 'default_';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
-    /**
-     * @var OroEntityManager
-     */
+    /** @var OroEntityManager */
     protected $em;
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     /**
@@ -259,8 +254,8 @@ class ExtendConfigDumper
         $extendProvider = $this->em->getExtendConfigProvider();
         $targetConfig   = $extendProvider->getConfig($targetClass);
 
-        $relations = $targetConfig->get('relation') ? : [];
-        $schema    = $targetConfig->get('schema') ? : [];
+        $relations = $targetConfig->get('relation', false, []);
+        $schema    = $targetConfig->get('schema', false, []);
 
         foreach ($relations as &$relation) {
             if ($relation['target_field_id'] == $fieldId) {
@@ -268,6 +263,7 @@ class ExtendConfigDumper
                     $relation['assign'] = true;
                 }
 
+                /** @var FieldConfigId $relationFieldId */
                 $relationFieldId = $relation['field_id'];
                 if ($relationFieldId && count($schema)) {
                     $schema['relation'][$relationFieldId->getFieldName()] =
