@@ -71,11 +71,6 @@ define(function (require) {
         return {
             select2: {
                 formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
-            },
-            util: {
-                findEntity:  function (entityName) {
-                    return _.findWhere(options.entities, {name: entityName});
-                }
             }
         };
     }
@@ -91,7 +86,7 @@ define(function (require) {
     }
 
     function initGrouping(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, util, template;
+        var $editor, $fieldChoice, collection, template;
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
@@ -106,15 +101,13 @@ define(function (require) {
             collection: collection
         }));
 
-        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
         $(options.itemContainer).itemsManagerTable({
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                var name = util.splitFieldId(data.name);
-                data.name = template(name);
+                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
                 return tmpl(data);
             },
             deleteHandler: _.bind(deleteHandler, null, collection)
@@ -122,7 +115,7 @@ define(function (require) {
     }
 
     function initColumn(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, util, template, sortingLabels;
+        var $editor, $fieldChoice, collection, template, sortingLabels;
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
@@ -163,7 +156,6 @@ define(function (require) {
             sortingLabels[this.value] = $(this).text();
         });
 
-        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
         $(options.itemContainer).itemsManagerTable({
@@ -171,10 +163,9 @@ define(function (require) {
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
                 var item, itemFunc,
-                    func = data.func,
-                    name = util.splitFieldId(data.name);
+                    func = data.func;
 
-                data.name = template(name);
+                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
                 if (func && func.name) {
                     item = metadata[func.group_type][func.group_name];
                     if (item) {

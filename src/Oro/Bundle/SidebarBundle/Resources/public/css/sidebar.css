@@ -165,7 +165,8 @@
     cursor: pointer;
 }
 
-.sidebar-icon img {
+.sidebar-icon img, .sidebar-icon i {
+    font-size: 12pt;
     height: 16px;
     width: 16px;
     margin: 6px;
@@ -187,6 +188,7 @@
 .sidebar-icon-active{
     background-color: #cccccc;
 }
+.sidebar-icon:hover i,
 .sidebar-icon:hover img,
 .sidebar-icon.sidebar-icon-active img,
 .sidebar-widget-popup .sidebar-widget img{
@@ -250,9 +252,10 @@
     float: left;
     margin-top: 3px;
 }
-.sidebar-widget-header-title > img{
-    float: left;
-    margin: 2px 5px 0 0;
+.sidebar-widget-header-title > i, .sidebar-widget-header-title > img {
+    float:     left;
+    font-size: 12pt;
+    margin:    2px 5px 0 0;
 }
 .sidebar-widget-header-title .widget-title{
     display: inline-block;

@@ -1,0 +1,251 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as macros %}
+
+{% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
+
+{% set entityConfiguration = oro_entity_config(entity.relatedEntity, 'workflow') %}
+{% set isActive = entityConfiguration.active_workflow is defined and entityConfiguration.active_workflow == entity.name %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_workflow') %}
+        {% if isActive %}
+            {{ UI.button({
+                'iCss': 'icon-remove',
+                'aCss': 'no-hash btn-danger',
+                'id': entity.name ~ '-workflow-deactivate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
+                function($, Messenger, Navigation, mediator, Error) {
+                    var navigation = Navigation.getInstance();
+                    $('#{{ entity.name }}-workflow-deactivate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        $.ajax({
+                            url: el.prop('href'),
+                            type: 'GET',
+                            success: function(response) {
+                                if (navigation) {
+                                    if (response.message) {
+                                        mediator.once('hash_navigation_request:complete', function() {
+                                            Messenger.notificationFlashMessage('success', response.message);
+                                        });
+                                    }
+                                    navigation.loadPage(true);
+
+                                } else {
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(xhr, textStatus, error) {
+                                Error.handle({}, xhr, {enforce: true});
+                            }
+                        })
+                    });
+                });
+            </script>
+        {% else %}
+            {{ UI.button({
+                'iCss': 'icon-ok',
+                'aCss': 'no-hash btn-success',
+                'id': entity.name ~ '-workflow-activate-btn',
+                'label': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'path': path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
+            }) }}
+            <script type="text/javascript">
+                require(['jquery', 'oroworkflow/js/activation-handler', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/messenger'],
+                function($, activationHandler, Navigation, mediator, Messenger) {
+                    var navigation = Navigation.getInstance();
+                    $('#{{ entity.name }}-workflow-activate-btn').on('click', function(e) {
+                        e.preventDefault();
+                        var el = $(this);
+                        el.on('activation_success', function(e, response) {
+                            if (navigation) {
+                                if (response.message) {
+                                    mediator.once('hash_navigation_request:complete', function() {
+                                        Messenger.notificationFlashMessage('success', response.message);
+                                    });
+                                }
+                                navigation.loadPage(true);
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+                        activationHandler.call(el, el.prop('href'), true);
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+
+    {{ UI.button({
+        'iCss': 'icon-copy',
+        'label': 'oro.workflow.workflowdefinition.datagrid.clone',
+        'title': 'oro.workflow.workflowdefinition.datagrid.clone',
+        'path': path('oro_workflow_definition_clone', {'name': entity.name}),
+    }) }}
+    {% if not entity.system %}
+        {% if resource_granted('EDIT', entity) %}
+            {{ UI.editButton({
+                'path' : path('oro_workflow_definition_update', { 'name': entity.name }),
+                'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+            }) }}
+        {% endif %}
+        {% if resource_granted('DELETE', entity) %}
+            {{ UI.deleteButton({
+                'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
+                'dataRedirect': path('oro_workflow_definition_index'),
+                'aCss': 'no-hash remove-button',
+                'id': 'btn-remove-workflow-definition',
+                'dataId': entity.name,
+                'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
+            }) }}
+        {% endif %}
+    {% endif %}
+{% endblock navButtons %}
+
+{% block stats %}
+    <li>{{ 'oro.workflow.workflowdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflowdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_workflow_definition_index'),
+        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block breadcrumbs %}
+    {{ parent() }}
+
+    <div class="status-enabled pull-left">
+        {% if isActive %}
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+        {% else %}
+            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
+{% block content_data %}
+    {% set workflowDefinitionInfo %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_workflow_definition_info', {name: entity.name}),
+        }) }}
+    {% endset %}
+
+    {% set workflowStepsAndTransitions %}
+        <style type="text/css">
+            .transitions-list-short {
+                margin-left: 0;
+            }
+
+            .transitions-list-short li {
+                list-style: none;
+            }
+        </style>
+        <div class="workflow-definition-steps-list-container">
+            <div class="grid-container steps-list">
+                <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+                    <thead>
+                        <th class="label-column"><span>{{ "Step"|trans }}</span></th>
+                        <th><span>{{ "Transitions"|trans }}</span></th>
+                        <th>
+                            <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                {{ "Position"|trans }}
+                            </span>
+                        </th>
+                    </thead>
+                    <tbody class="item-container">
+                        {% set startTransitionNames = [] %}
+                        {% for transitionName, transitionConfig in entity.configuration.transitions %}
+                            {% if transitionConfig.is_start %}
+                                {% set startTransitionNames = startTransitionNames|merge([transitionName]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {% set startStep = [{
+                            'label': '(' ~ 'Start'|trans ~ ')',
+                            'order': -1,
+                            'is_final': false,
+                            'allowed_transitions': startTransitionNames
+                        }] %}
+
+                        {% if entity.configuration.steps is defined %}
+                            {% set steps = startStep|merge(entity.configuration.steps) %}
+                        {% else %}
+                            {% set steps = [startStep] %}
+                        {% endif %}
+
+                        {% for stepData in steps %}
+                            <tr>
+                                <td class="step-name">
+                                    {{ stepData.label }}
+                                    {% if stepData.is_final %}
+                                        &nbsp;
+                                        <strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">
+                                            ({{ "Final"|trans }})
+                                        </strong>
+                                    {% endif %}
+                                </td>
+                                <td class="step-transitions">
+                                    {% if stepData.allowed_transitions is not empty %}
+                                        <ul class="transitions-list-short">
+                                            {% for transitionName in stepData.allowed_transitions %}
+                                                {% set currentTransition = entity.configuration.transitions[transitionName] %}
+                                                {% set toStep = entity.configuration.steps[currentTransition.step_to] %}
+                                                <li>
+                                                    <span>{{ currentTransition.label }}</span>
+                                                    <i class="icon-long-arrow-right"></i>
+                                                    <span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">
+                                                        {{ toStep.label }}
+                                                    </span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">
+                                        {{ stepData.order }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [workflowDefinitionInfo] },
+            ]
+        },
+        {
+            'title': 'Configuration'|trans,
+            'subblocks': [
+                {
+                    'title': 'Workflow steps and transitions'|trans,
+                    'data':  [workflowStepsAndTransitions]
+                },
+            ]
+        },
+    ] %}
+
+    {% set id = 'workflowDefinitionView' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {{ parent() }}
+{% endblock content_data %}

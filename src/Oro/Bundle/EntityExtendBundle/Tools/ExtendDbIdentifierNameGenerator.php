@@ -26,6 +26,23 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     }
 
     /**
+     * Gets the max size of an custom entity field name
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
+     *
+     * @return int
+     */
+    public function getMaxCustomEntityFieldNameSize()
+    {
+        $subtractSize = max(
+            strlen(self::RELATION_DEFAULT_COLUMN_PREFIX),
+            strlen(self::RELATION_COLUMN_SUFFIX)
+        );
+
+        return $this->getMaxIdentifierSize() - $subtractSize;
+    }
+
+    /**
      * Builds a column name for a one-to-many relation
      *
      * @param string $entityClassName

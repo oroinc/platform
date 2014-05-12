@@ -10,13 +10,14 @@ define(['backbone', '../constants'], function (Backbone, constants) {
      */
     var WidgetContainerModel = Backbone.Model.extend({
         defaults: {
-            widgetName: '',
-            position: 0,
-            title: '',
-            icon: '#',
-            module: '',
-            settings: {},
-            state: constants.WIDGET_MINIMIZED
+            icon:       '#',
+            iconClass:  '',
+            module:     '',
+            position:   0,
+            title:      '',
+            settings:   {},
+            state:      constants.WIDGET_MINIMIZED,
+            widgetName: ''
         },
 
         initialize: function () {

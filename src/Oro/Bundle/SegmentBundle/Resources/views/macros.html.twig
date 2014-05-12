@@ -4,7 +4,6 @@
             select2: {
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
-            util: {},
             fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
@@ -17,9 +16,9 @@
                     quietMillis: 100,
                 }
             },
-            util: {},
             fieldsLoaderSelector: '#' ~ params.entity_choice_id,
-            currentSegment: params.currentSegmentId|default(null)
+            currentSegment: params.currentSegmentId|default(null),
+            pageLimit: params.page_limit|default(10)
         }
     } %}
     <div class="condition-builder left-panel-container">
@@ -188,8 +187,9 @@
     {{ _self.query_designer_segment_template('segment-template') }}
     {% set entityFieldsRouteParams = {
         'with-relations': 1,
+        'with-virtual-fields': 1,
         'with-entity-details': 1,
-        'deep-level': 2
+        'with-unidirectional': 1
     } %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
@@ -207,7 +207,7 @@
 
                     $entityChoice
                         .fieldsLoader({
-                            router: 'oro_api_get_entity_fields',
+                            router: 'oro_api_fields_entity',
                             routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
                             confirm: confirm,
                             requireConfirm: function () {
@@ -229,7 +229,7 @@
                         .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
 
                     {% if not form.entity.vars.value is empty %}
-                    {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                    {% set fieldsData = render(path('oro_api_fields_entity', {
                             'entityName': form.entity.vars.value|replace({'\\': '_'})
                         }|merge(entityFieldsRouteParams))) %};
                     $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});

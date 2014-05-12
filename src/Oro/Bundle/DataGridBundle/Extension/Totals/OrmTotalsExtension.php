@@ -98,7 +98,9 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $onlyOnePage  = $result['options']['totalRecords'] == count($result['data']);
+        $onlyOnePage  = !isset($result['options'], $result['options']['totalRecords']) ||
+            $result['options']['totalRecords'] == count($result['data']);
+
         $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $totalData = [];
         if (null != $totals && !empty($result['data'])) {

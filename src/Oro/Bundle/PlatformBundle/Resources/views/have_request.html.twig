@@ -10,7 +10,7 @@
 
             $.ajax(options).done(function() {
                 var options = {
-                    version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION')|json_encode|raw }}
+                    version: {{ oro_version()|json_encode|raw }}
                 };
                 new ORO.EmbedRequestForm(options);
             }).error(function() {

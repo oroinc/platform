@@ -18,7 +18,7 @@ class WorkflowDefinitionType extends AbstractType
                 'label',
                 'text',
                 array(
-                    'label' => 'oro.workflow.workflowdefinition.name.label',
+                    'label' => 'oro.workflow.workflowdefinition.label.label',
                     'required' => true,
                     'constraints' => array(array('NotBlank' => null)),
                     'tooltip' => 'oro.workflow.workflowdefinition.name.tooltip'

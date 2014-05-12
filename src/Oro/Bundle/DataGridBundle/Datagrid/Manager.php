@@ -17,45 +17,56 @@ class Manager implements ManagerInterface
     /** @var Builder */
     protected $datagridBuilder;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var ConfigurationProviderInterface */
     protected $configurationProvider;
+
+    /** @var RequestParameterBagFactory */
+    protected $parametersFactory;
 
     /**
      * Constructor
      *
      * @param ConfigurationProviderInterface $configurationProvider
      * @param Builder                        $builder
-     * @param RequestParameters              $requestParams
+     * @param RequestParameterBagFactory     $parametersFactory
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,
         Builder $builder,
-        RequestParameters $requestParams
+        RequestParameterBagFactory $parametersFactory
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->datagridBuilder       = $builder;
-        $this->requestParams         = $requestParams;
+        $this->parametersFactory     = $parametersFactory;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDatagrid($name, array $parameters = [])
+    public function getDatagrid($name, $parameters = null)
     {
-        // prepare for work with current grid
-        $this->requestParams->setRootParameter($name);
-        foreach ($parameters as $key => $value) {
-            $this->requestParams->set($key, $value);
+        if (null === $parameters) {
+            $parameters = new ParameterBag();
+        } elseif (is_array($parameters)) {
+            $parameters = new ParameterBag($parameters);
+        } elseif (!$parameters instanceof ParameterBag) {
+            throw new \InvalidArgumentException('$parameters must be an array or instance of ParameterBag.');
         }
 
-        $config = $this->getConfigurationForGrid($name);
+        $configuration = $this->getConfigurationForGrid($name);
 
-        $datagrid = $this->getDatagridBuilder()->build($config, $parameters);
+        return $this->datagridBuilder->build($configuration, $parameters);
+    }
 
-        return $datagrid;
+    /**
+     * {@inheritDoc}
+     */
+    public function getDatagridByRequestParams($name, array $additionalParameters = [])
+    {
+        $parameters = $this->parametersFactory->createParameters($name);
+        $parameters->add($additionalParameters);
+
+        return $this->getDatagrid($name, $parameters);
     }
 
     /**
@@ -64,15 +75,5 @@ class Manager implements ManagerInterface
     public function getConfigurationForGrid($name)
     {
         return $this->configurationProvider->getConfiguration($name);
-    }
-
-    /**
-     * Internal getter for builder
-     *
-     * @return Builder
-     */
-    protected function getDatagridBuilder()
-    {
-        return $this->datagridBuilder;
     }
 }

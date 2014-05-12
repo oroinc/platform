@@ -103,7 +103,17 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onStepAdd, this)
+                'submitHandler': _.bind(this.onStepAdd, this),
+                'ignore': '[type="hidden"]',
+                'highlight': function(element) {
+                    var tabContent = $(element).closest('.tab-pane');
+                    if (tabContent.is(':hidden')) {
+                        tabContent
+                            .closest('.oro-tabs')
+                            .find('[href="#' + tabContent.prop('id') + '"]')
+                            .click();
+                    }
+                }
             });
         },
 

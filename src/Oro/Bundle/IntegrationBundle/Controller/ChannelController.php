@@ -116,7 +116,6 @@ class ChannelController extends Controller
         return [
             'entity'   => $channel,
             'form'     => $form->createView(),
-            'isSynced' => ChannelFormSubscriber::wasChannelSynced($channel),
         ];
     }
 

@@ -1,28 +1,23 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroentity/js/entity-field-view',
-    'jquery-ui', 'jquery.select2', 'routing'
-], function ($, _, EntityFieldUtil, EntityFieldView, ui, select2, routing) {
+define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
+    ], function ($, _, routing) {
     'use strict';
 
     $.widget('orosegment.segmentChoice', {
         options: {
             entity: null,
-            fields: [],
+            data: {},
             segmentData: {},
-            util: {},
             select2: {
                 collapsibleResults: true,
-                dropdownAutoWidth: true,
-                minimumInputLength: 3
+                dropdownAutoWidth: true
             },
             exclude: [],
             fieldsLoaderSelector: ''
         },
 
         _create: function () {
-            this.entityFieldUtil = new EntityFieldUtil(this.element);
-
             this._on({
                 change: function (e) {
                     if (e.added) {
@@ -35,7 +30,6 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
         },
 
         _init: function () {
-            $.extend(this.entityFieldUtil, this.options.util);
             this._processSelect2Options();
             this._updateData(this.options.entity, this.options.segmentData);
         },
@@ -77,20 +71,17 @@ define(['jquery', 'underscore', 'oroentity/js/entity-field-select-util', 'oroent
                 this.options.select2.ajax,
                 {
                     url: url,
-                    data: function (term, page) {
+                    data: _.bind(function (term, page) {
                         return {
-                            term: term
+                            page: page,
+                            pageLimit: this.options.pageLimit,
+                            term: term,
+                            currentSegment: this.options.currentSegment
                         };
-                    },
-                    results: _.bind(function (data, page) {
-                        var currentId = this.options.currentSegment;
-                        var data = _.filter(data, function (item) {
-                            if (item.id != 'segment_'+currentId) {
-                                return true;
-                            }
-                        });
-                        return {results: data};
-                    }, this)
+                    }, this),
+                    results: function (data) {
+                        return data;
+                    }
                 }
             );
 

@@ -253,7 +253,17 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                'submitHandler': _.bind(this.onTransitionAdd, this)
+                'submitHandler': _.bind(this.onTransitionAdd, this),
+                'ignore': '[type="hidden"]',
+                'highlight': function(element) {
+                    var tabContent = $(element).closest('.tab-pane');
+                    if (tabContent.is(':hidden')) {
+                        tabContent
+                            .closest('.oro-tabs')
+                            .find('[href="#' + tabContent.prop('id') + '"]')
+                            .click();
+                    }
+                }
             });
         },
 
@@ -270,7 +280,13 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             var form = $(this.template(data));
 
             this.renderAddAttributeForm(form);
-            this.renderAttributesList(form);
+            if (this.options.workflow.entityFieldsInitialized) {
+                this.renderAttributesList(form);
+            } else {
+                this.listenTo(this.options.workflow, 'entityFieldsInitialize', _.bind(function() {
+                    this.renderAttributesList(form);
+                }, this));
+            }
 
             this.$el.append(form);
 

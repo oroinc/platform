@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -26,7 +26,7 @@ class Builder
     /** @var string */
     protected $acceptorClass;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DatasourceInterface[] */
@@ -41,7 +41,7 @@ class Builder
     public function __construct(
         $baseDatagridClass,
         $acceptorClass,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         SecurityFacade $securityFacade
     ) {
         $this->baseDatagridClass = $baseDatagridClass;
@@ -54,28 +54,34 @@ class Builder
      * Create, configure and build datagrid
      *
      * @param DatagridConfiguration $config
-     * @param array $parameters
+     * @param ParameterBag $parameters
      *
      * @return DatagridInterface
      */
-    public function build(DatagridConfiguration $config, array $parameters = [])
+    public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
         /** @var Acceptor $acceptor */
-        $acceptor = new $this->acceptorClass($config);
-        /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor);
+        $acceptor = new $this->acceptorClass();
+        $acceptor->setConfig($config);
 
-        $event = new BuildBefore($datagrid, $config, $parameters);
+        /** @var DatagridInterface $datagrid */
+        $datagrid = new $class($name, $acceptor, $parameters);
+
+        $event = new BuildBefore($datagrid, $config);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
-        // duplicate event dispatch with grid name
-        $this->eventDispatcher->dispatch(BuildBefore::NAME . '.' . $name, $event);
 
         $this->buildDataSource($datagrid, $config);
 
         foreach ($this->extensions as $extension) {
+            /**
+             * ATTENTION: extension object should be cloned cause it can contain some state
+             */
+            $extension = clone $extension;
+            $extension->setParameters($parameters);
+
             if ($extension->isApplicable($config)) {
                 $acceptor->addExtension($extension);
             }
@@ -83,10 +89,8 @@ class Builder
 
         $acceptor->processConfiguration();
 
-        $event = new BuildAfter($datagrid, $parameters);
+        $event = new BuildAfter($datagrid);
         $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);
-        // duplicate event dispatch with grid name
-        $this->eventDispatcher->dispatch(BuildAfter::NAME . '.' . $name, $event);
 
         return $datagrid;
     }

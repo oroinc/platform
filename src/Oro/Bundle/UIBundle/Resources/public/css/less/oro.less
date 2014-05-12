@@ -3208,3 +3208,24 @@ label .popover-content {
     }
   }
 }
+
+.entity-field-path {
+  > * {
+    &:before {
+      content: '/';
+      display: inline;
+      padding: 0 3px;
+    }
+    &:first-child {
+      &:before {
+        display: none;
+      }
+    }
+    &:last-child {
+      &:before {
+        content: '>';
+        font-weight: normal;
+      }
+    }
+  }
+}

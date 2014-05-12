@@ -1,6 +1,13 @@
 parameters:
+    oro_platform.composer.local_repo_factory.class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
+    oro_platform.composer.installed_json:           %kernel.root_dir%/../vendor/composer/installed.json
+
+    oro_platform.composer.version_helper.class:     Oro\Bundle\PlatformBundle\Composer\VersionHelper
+
     oro_platform.maintenance.class:                 Oro\Bundle\PlatformBundle\Maintenance\Mode
     oro_platform.event_listener.driver_lock.class:  Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
+
+    oro_platform.twig.platform_extension.class:     Oro\Bundle\PlatformBundle\Twig\PlatformExtension
 
 services:
     oro_platform.maintenance:
@@ -15,3 +22,21 @@ services:
             - "@event_dispatcher"
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+
+    oro_platform.composer.local_repo_factory:
+        class: %oro_platform.composer.local_repo_factory.class%
+        arguments:
+            - @filesystem
+            - %oro_platform.composer.installed_json%
+
+    oro_platform.composer.version_helper:
+        class: %oro_platform.composer.version_helper.class%
+        arguments:
+            - @oro_platform.composer.local_repo_factory
+
+    oro_platform.twig.platform_extension:
+        class: %oro_platform.twig.platform_extension.class%
+        arguments:
+            - @oro_platform.composer.version_helper
+        tags:
+            - { name: twig.extension }

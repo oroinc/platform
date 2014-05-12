@@ -48,6 +48,7 @@ datagrid:
                     data_name: channel.id
                     options:
                         field_options:
+                            multiple: true
                             class: OroIntegrationBundle:Channel
                             property: name
 
@@ -70,7 +71,7 @@ datagrid:
                 acl_resource: oro_embedded_form_view
                 type: navigate
                 label: View
-                icon: user
+                icon: eye-open
                 link: view_link
                 rowAction: true
             update:

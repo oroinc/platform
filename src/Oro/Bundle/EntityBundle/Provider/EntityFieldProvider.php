@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -12,8 +14,13 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EntityFieldProvider
 {
     /**
@@ -32,19 +39,27 @@ class EntityFieldProvider
     protected $entityClassResolver;
 
     /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
      * @var ManagerRegistry
      */
     protected $doctrine;
 
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $entityProvider;
 
     /**
-     * @var Translator
+     * @var array
      */
-    protected $translator;
+    protected $virtualFields;
+
+    /**
+     * @var array
+     */
+    protected $hiddenFields;
 
     /**
      * Constructor
@@ -54,19 +69,25 @@ class EntityFieldProvider
      * @param EntityClassResolver $entityClassResolver
      * @param ManagerRegistry     $doctrine
      * @param Translator          $translator
+     * @param array               $virtualFields
+     * @param array               $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
-        Translator $translator
+        Translator $translator,
+        $virtualFields,
+        $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
-        $this->doctrine             = $doctrine;
         $this->translator           = $translator;
+        $this->doctrine             = $doctrine;
+        $this->virtualFields        = $virtualFields;
+        $this->hiddenFields         = $hiddenFields;
     }
 
     /**
@@ -84,11 +105,11 @@ class EntityFieldProvider
      *
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
-     *                                       should be returned.
+     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
      * @param bool   $translate              Flag means that label, plural label should be translated
+     *
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -104,32 +125,38 @@ class EntityFieldProvider
      *                                       .       'related_entity_label'        - entity label
      *                                       .       'related_entity_plural_label' - entity plural label
      *                                       .       'related_entity_icon'         - an icon associated with an entity
-     *                                       If a field represents a relation and $deepLevel > 0
-     *                                       the related entity fields are added:
-     *                                       .       'related_entity_fields'       - array of fields
      */
     public function getFields(
         $entityName,
         $withRelations = false,
+        $withVirtualFields = false,
         $withEntityDetails = false,
-        $deepLevel = 0,
-        $lastDeepLevelRelations = false,
+        $withUnidirectional = false,
         $translate = true
     ) {
-        $result    = array();
+        $result    = [];
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
-        $this->addFields($result, $className, $em, $translate);
+
+        $this->addFields($result, $className, $em, $withVirtualFields, $translate);
         if ($withRelations) {
             $this->addRelations(
                 $result,
                 $className,
                 $em,
                 $withEntityDetails,
-                $deepLevel - 1,
-                $lastDeepLevelRelations,
                 $translate
             );
+
+            if ($withUnidirectional) {
+                $this->addUnidirectionalRelations(
+                    $result,
+                    $className,
+                    $em,
+                    $withEntityDetails,
+                    $translate
+                );
+            }
         }
         $this->sortFields($result);
 
@@ -142,15 +169,21 @@ class EntityFieldProvider
      * @param array         $result
      * @param string        $className
      * @param EntityManager $em
+     * @param bool          $withVirtualFields
      * @param bool          $translate
      */
-    protected function addFields(array &$result, $className, EntityManager $em, $translate)
+    protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
     {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
 
+            // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
+                if ($this->isIgnoredField($metadata, $fieldName)) {
+                    continue;
+                }
+
                 $fieldLabel = $this->getFieldLabel($className, $fieldName);
                 $this->addField(
                     $result,
@@ -161,7 +194,42 @@ class EntityFieldProvider
                     $translate
                 );
             }
+
+            // add virtual fields
+            if ($withVirtualFields && isset($this->virtualFields[$className])) {
+                foreach ($this->virtualFields[$className] as $fieldName => $config) {
+                    if ($this->isIgnoredField($metadata, $fieldName)) {
+                        continue;
+                    }
+
+                    $this->addField(
+                        $result,
+                        $fieldName,
+                        $config['query']['select']['return_type'],
+                        ConfigHelper::getTranslationKey('label', $className, $fieldName),
+                        false,
+                        $translate
+                    );
+                }
+            }
         }
+    }
+
+    /**
+     * Checks if the given field should be ignored
+     *
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
+     * @return bool
+     */
+    protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    {
+        // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
+        if (isset($this->hiddenFields[$metadata->name][$fieldName])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -194,8 +262,6 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
-     * @param int           $relationDeepLevel
-     * @param bool          $lastDeepLevelRelations
      * @param bool          $translate
      */
     protected function addRelations(
@@ -203,96 +269,204 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
-        $relationDeepLevel,
-        $lastDeepLevelRelations,
         $translate
     ) {
         // only configurable entities are supported
-        if ($this->entityConfigProvider->hasConfig($className)) {
-            $metadata = $em->getClassMetadata($className);
-            foreach ($metadata->getAssociationNames() as $associationName) {
-                $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                    // skip 'default_' extend field
-                    if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-                        $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-                        if ($this->isExtendField($className, $guessedFieldName)) {
-                            continue;
-                        }
-                    }
+        if (!$this->entityConfigProvider->hasConfig($className)) {
+            return;
+        }
 
-                    $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
-                    $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel      = $this->getFieldLabel($className, $associationName);
-                    $relationData    = array(
-                        'name'                => $associationName,
-                        'type'                => $targetMetadata->getTypeOfField($targetFieldName),
-                        'label'               => $fieldLabel,
-                        'relation_type'       => $this->getRelationType($className, $associationName),
-                        'related_entity_name' => $targetClassName
-                    );
-                    $this->addRelation(
-                        $result,
-                        $relationData,
-                        $withEntityDetails,
-                        $relationDeepLevel,
-                        $lastDeepLevelRelations,
-                        $translate
-                    );
+        $metadata         = $em->getClassMetadata($className);
+        $associationNames = $metadata->getAssociationNames();
+        foreach ($associationNames as $associationName) {
+            $targetClassName = $metadata->getAssociationTargetClass($associationName);
+            if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                if ($this->isIgnoredRelation($metadata, $associationName)) {
+                        continue;
                 }
+
+                $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
+                $targetMetadata  = $em->getClassMetadata($targetClassName);
+                $fieldLabel      = $this->getFieldLabel($className, $associationName);
+
+                $this->addRelation(
+                    $result,
+                    $associationName,
+                    $targetMetadata->getTypeOfField($targetFieldName),
+                    $fieldLabel,
+                    $this->getRelationType($className, $associationName),
+                    $targetClassName,
+                    $withEntityDetails,
+                    $translate
+                );
             }
         }
     }
 
     /**
-     * Adds a relation to $result
+     * Adds remote entities relations to $className entity into $result
      *
-     * @param array $result
-     * @param array $relation
-     * @param bool  $withEntityDetails
-     * @param int   $relationDeepLevel
-     * @param bool  $lastDeepLevelRelations
-     * @param bool  $translate
+     * @param array         $result
+     * @param string        $className
+     * @param EntityManager $em
+     * @param bool          $withEntityDetails
+     * @param bool          $translate
      */
-    protected function addRelation(
+    protected function addUnidirectionalRelations(
         array &$result,
-        array $relation,
+        $className,
+        EntityManager $em,
         $withEntityDetails,
-        $relationDeepLevel,
-        $lastDeepLevelRelations,
         $translate
     ) {
-        $name = $relation['name'];
-        if ($translate) {
-            $relation['label'] = $this->translator->trans($relation['label']);
+        $relations = $this->getUnidirectionalRelations($em, $className);
+        foreach ($relations as $name => $mapping) {
+            $relatedClassName = $mapping['sourceEntity'];
+            $fieldName        = $mapping['fieldName'];
+            $classMetadata    = $em->getClassMetadata($relatedClassName);
+            $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
+
+            if ($translate) {
+                $label =
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
+                    ) .
+                    ' (' .
+                    $this->translator->trans(
+                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
+                    ) .
+                    ')';
+            } else {
+                $label =
+                    $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') .
+                    ' (' . $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) . ')';
+            }
+
+            $this->addRelation(
+                $result,
+                $name,
+                $classMetadata->getTypeOfField($fieldName),
+                $label,
+                $this->getRelationType($relatedClassName, $fieldName),
+                $relatedClassName,
+                $withEntityDetails,
+                $translate
+            );
         }
-        $relatedEntityName = $relation['related_entity_name'];
-        if ($withEntityDetails) {
-            $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
-            foreach ($entity as $key => $val) {
-                if (!in_array($key, ['name'])) {
-                    $relation['related_entity_' . $key] = $val;
+    }
+
+    /**
+     * Return mapping data for entities that has one-way link to $className entity
+     *
+     * @param EntityManager $em
+     * @param string        $className
+     * @return array
+     */
+    protected function getUnidirectionalRelations(EntityManager $em, $className)
+    {
+        $relations = [];
+
+        /** @var EntityConfigId[] $entityConfigIds */
+        $entityConfigIds = $this->entityConfigProvider->getIds();
+        foreach ($entityConfigIds as $entityConfigId) {
+            /** @var ClassMetadata $classMetadata */
+            $classMetadata  = $em->getClassMetadata($entityConfigId->getClassName());
+            $targetMappings = $classMetadata->getAssociationMappings();
+            if (empty($targetMappings)) {
+                continue;
+            }
+
+            foreach ($targetMappings as $mapping) {
+                if ($mapping['isOwningSide']
+                    && empty($mapping['inversedBy'])
+                    && $mapping['targetEntity'] === $className
+                ) {
+                    $relations[$mapping['sourceEntity'] . '::' . $mapping['fieldName']] = $mapping;
                 }
             }
         }
-        if ($relationDeepLevel >= 0) {
-            // set some exceptions
-            // todo: we need to find more proper way to do this
-            if ($relationDeepLevel > 0 && ($name === 'owner' || $name === 'createdBy' || $name === 'updatedBy')) {
-                $relationDeepLevel = 0;
+
+        return $relations;
+    }
+
+    /**
+     * Checks if the given relation should be ignored
+     *
+     * @param ClassMetadata $metadata
+     * @param string        $associationName
+     * @return bool
+     */
+    protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
+    {
+        // skip 'default_' extend field
+        if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+            $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+            if ($this->isExtendField($metadata->name, $guessedFieldName)) {
+                return true;
             }
-            $relation['related_entity_fields'] =
-                $this->getFields(
-                    $relatedEntityName,
-                    $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
-                    $withEntityDetails,
-                    $relationDeepLevel,
-                    $lastDeepLevelRelations,
-                    $translate
-                );
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a relation to $result
+     *
+     * @param array  $result
+     * @param string $name
+     * @param string $type
+     * @param string $label
+     * @param string $relationType
+     * @param string $relatedEntityName
+     * @param bool   $withEntityDetails
+     * @param bool   $translate
+     */
+    protected function addRelation(
+        array &$result,
+        $name,
+        $type,
+        $label,
+        $relationType,
+        $relatedEntityName,
+        $withEntityDetails,
+        $translate
+    ) {
+        if ($translate) {
+            $label = $this->translator->trans($label);
+        }
+
+        $relation = [
+            'name'                => $name,
+            'type'                => $type,
+            'label'               => $label,
+            'relation_type'       => $relationType,
+            'related_entity_name' => $relatedEntityName
+        ];
+
+        if ($withEntityDetails) {
+            $this->addEntityDetails($relatedEntityName, $relation, $translate);
         }
 
         $result[] = $relation;
+    }
+
+    /**
+     * @param string $relatedEntityName
+     * @param array  $relation
+     * @param bool   $translate
+     *
+     * @return array
+     */
+    protected function addEntityDetails($relatedEntityName, array &$relation, $translate)
+    {
+        $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
+        foreach ($entity as $key => $val) {
+            if (!in_array($key, ['name'])) {
+                $relation['related_entity_' . $key] = $val;
+            }
+        }
+
+        return $relation;
     }
 
     /**

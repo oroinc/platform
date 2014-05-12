@@ -10,10 +10,19 @@ interface ManagerInterface
      * Returns prepared datagrid object for further operations
      *
      * @param string $name
-     *
+     * @param ParameterBag|array $parameters
      * @return DatagridInterface
      */
-    public function getDatagrid($name);
+    public function getDatagrid($name, $parameters = null);
+
+    /**
+     * Returns prepared datagrid object for further operations based on parameters of request
+     *
+     * @param string $name
+     * @param array $additionalParameters
+     * @return DatagridInterface
+     */
+    public function getDatagridByRequestParams($name, array $additionalParameters = []);
 
     /**
      * Returns prepared config for requested datagrid

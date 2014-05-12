@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
@@ -15,9 +14,6 @@ class UserEmailGridListener
 {
     /** @var  EntityManager */
     protected $em;
-
-    /** @var RequestParameters */
-    protected $requestParams;
 
     /** @var  EmailQueryFactory */
     protected $queryFactory;
@@ -27,21 +23,20 @@ class UserEmailGridListener
 
     public function __construct(
         EntityManager $em,
-        RequestParameters $requestParameters,
         EmailSynchronizationManager $emailSyncManager,
         EmailQueryFactory $factory = null
     ) {
         $this->em      = $em;
-        $this->requestParams = $requestParameters;
         $this->emailSyncManager = $emailSyncManager;
         $this->queryFactory = $factory;
     }
 
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            /** @var QueryBuilder $query */
+            $parameters = $datagrid->getParameters();
             $queryBuilder = $datasource->getQueryBuilder();
 
             if ($this->queryFactory !== null) {
@@ -49,18 +44,22 @@ class UserEmailGridListener
             }
 
             $originIds = []; // to make sure param bind passed
-            if ($id = $this->requestParams->get('userId')) {
+            $userId = $parameters->get('userId');
+            if ($userId) {
                 $user = $this->em
                     ->getRepository('OroUserBundle:User')
-                    ->find($id);
+                    ->find($userId);
 
                 $emailOrigins = $user->getEmailOrigins();
                 foreach ($emailOrigins as $emailOrigin) {
                     $originIds[] = $emailOrigin->getId();
                 }
 
-                $additionalParameters = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
-                if (!empty($originIds) && array_key_exists('refresh', $additionalParameters)) {
+                $additionalParameters = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS);
+                if (!empty($originIds)
+                    && !empty($additionalParameters)
+                    && array_key_exists('refresh', $additionalParameters)
+                ) {
                     $this->emailSyncManager->syncOrigins($emailOrigins);
                 }
             }
