@@ -1,6 +1,7 @@
 /* global define */
-define(['jquery', 'oro/translator', 'oro/locale-settings', 'jquery-ui'],
-function($, __, localeSettings) {
+define(['jquery', 'orotranslation/js/translator',
+        'orolocale/js/locale-settings','orolocale/js/formatter/datetime', 'jquery-ui'
+    ],  function($, __, localeSettings, dateTimeFormatter) {
     'use strict';
 
     var locale = localeSettings.getLocale();
@@ -21,13 +22,25 @@ function($, __, localeSettings) {
         // ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] For formatting
         dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
         // ["Su","Mo","Tu","We","Th","Fr","Sa"] Column headings for days starting at Sunday
-        dayNamesMin: localeSettings.getCalendarDayOfWeekNames('short', true),
+        dayNamesMin: localeSettings.getCalendarDayOfWeekNames('narrow', true),
         weekHeader: __("Wk"), // Column header for week of the year
         dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'), // See format options on parseDate
-        firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1 // The first day of the week, Sun = 0, Mon = 1, ...
+        firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1, // The first day of the week, Sun = 0, Mon = 1, ...
         //isRTL: false, // True if right-to-left language, false if left-to-right
         //showMonthAfterYear: false, // True if the year select precedes month, false for month then year
         //yearSuffix: "" // Additional text to append to the year in the month headers
+        gotoCurrent: true
     };
     $.datepicker.setDefaults($.datepicker.regional[locale]);
+
+    $.datepicker._orig_base_gotoToday = $.datepicker._base_gotoToday ||$.datepicker._gotoToday;
+    $.datepicker._base_gotoToday = $.datepicker._gotoToday = function (id) {
+        var inst = this._getInst($(id)[0]),
+            now = dateTimeFormatter.applyTimeZoneCorrection(new Date());
+        inst.today = now;
+        inst.currentDay = now.getDate();
+        inst.currentMonth = now.getMonth();
+        inst.currentYear = now.getFullYear();
+        $.datepicker._orig_base_gotoToday.apply(this, arguments);
+    };
 });

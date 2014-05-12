@@ -51,6 +51,9 @@ class BaseCartTest extends \PHPUnit_Framework_TestCase
             'id'        => ['id', self::TEST_ID, self::TEST_ID],
             'createdAt' => ['createdAt', $created, $created],
             'updatedAt' => ['updatedAt', $updated, $updated],
+            'grandTotal' => ['grandTotal', self::TEST_FLOAT, self::TEST_FLOAT],
+            'subTotal' => ['subTotal', self::TEST_FLOAT, self::TEST_FLOAT],
+            'taxAmount' => ['taxAmount', self::TEST_FLOAT, self::TEST_FLOAT],
         ];
     }
 }

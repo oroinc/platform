@@ -1,14 +1,16 @@
 oro_menu_config:
     items:
         emails:
-            label: oro.email.entity_plural_label
+            label: 'oro.email.entity_plural_label'
             uri: '#'
+            extras:
+                position: 40
         oro_email_emailtemplate_list:
-            label: oro.email.emailtemplate.entity_plural_label
+            label: 'oro.email.emailtemplate.entity_plural_label'
             route: 'oro_email_emailtemplate_index'
             extras:
                 routes: ['oro_email_emailtemplate_*']
-                description: 'List of email templates'
+                description: 'oro.email.menu.emailtemplate_list.description'
     tree:
         application_menu:
             children:

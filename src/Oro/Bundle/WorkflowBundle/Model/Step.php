@@ -15,11 +15,6 @@ class Step
     protected $label;
 
     /**
-     * @var string
-     */
-    protected $template;
-
-    /**
      * @var int
      */
     protected $order;
@@ -27,27 +22,25 @@ class Step
     /**
      * @var boolean
      */
-    protected $isFinal = false;
-
-    /**
-     * @var string
-     */
-    protected $formType;
-
-    /**
-     * @var array
-     */
-    protected $formOptions = array();
-
-    /**
-     * @var array[]
-     */
-    protected $viewAttributes = array();
+    protected $final = false;
 
     /**
      * @var string[]
      */
     protected $allowedTransitions = array();
+
+    /**
+     * array(
+     *      '<attribute_name>' => array(
+                'update' => true|false,
+     *          'delete' => true|false,
+     *      ),
+     *      ...
+     * )
+     *
+     * @var array
+     */
+    protected $entityAcls = array();
 
     /**
      * Set allowed transitions.
@@ -122,9 +115,9 @@ class Step
      * @param boolean $isFinal
      * @return Step
      */
-    public function setIsFinal($isFinal)
+    public function setFinal($isFinal)
     {
-        $this->isFinal = $isFinal;
+        $this->final = $isFinal;
         return $this;
     }
 
@@ -135,7 +128,7 @@ class Step
      */
     public function isFinal()
     {
-        return $this->isFinal;
+        return $this->final;
     }
 
     /**
@@ -183,28 +176,6 @@ class Step
     }
 
     /**
-     * Set template.
-     *
-     * @param string $template
-     * @return Step
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-        return $this;
-    }
-
-    /**
-     * Get template.
-     *
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
-    }
-
-    /**
      * Set label.
      *
      * @param string $label
@@ -227,56 +198,49 @@ class Step
     }
 
     /**
-     * @param string $formType
+     * @param array $entityAcls
      * @return Step
      */
-    public function setFormType($formType)
+    public function setEntityAcls(array $entityAcls)
     {
-        $this->formType = $formType;
+        $this->entityAcls = $entityAcls;
         return $this;
     }
 
     /**
-     * @return string
+     * @param string $attributeName
+     * @return bool
      */
-    public function getFormType()
+    public function isEntityAclDefined($attributeName)
     {
-        return $this->formType;
+        return array_key_exists($attributeName, $this->entityAcls);
     }
 
     /**
-     * @param array $formOptions
-     * @return Step
+     * @param string $attributeName
+     * @return bool
      */
-    public function setFormOptions(array $formOptions)
+    public function isEntityUpdateAllowed($attributeName)
     {
-        $this->formOptions = $formOptions;
-        return $this;
+        if (!$this->isEntityAclDefined($attributeName)) {
+            return true;
+        }
+
+        return !array_key_exists('update', $this->entityAcls[$attributeName])
+            || $this->entityAcls[$attributeName]['update'];
     }
 
     /**
-     * @return array
+     * @param string $attributeName
+     * @return bool
      */
-    public function getFormOptions()
+    public function isEntityDeleteAllowed($attributeName)
     {
-        return $this->formOptions;
-    }
+        if (!$this->isEntityAclDefined($attributeName)) {
+            return true;
+        }
 
-    /**
-     * @param array $viewAttributes
-     * @return Step
-     */
-    public function setViewAttributes(array $viewAttributes)
-    {
-        $this->viewAttributes = $viewAttributes;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getViewAttributes()
-    {
-        return $this->viewAttributes;
+        return !array_key_exists('delete', $this->entityAcls[$attributeName])
+            || $this->entityAcls[$attributeName]['delete'];
     }
 }

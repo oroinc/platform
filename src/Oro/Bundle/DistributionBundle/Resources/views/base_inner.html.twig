@@ -2,13 +2,13 @@
 
     {% block javascripts %}
         {{ parent() }}
-        <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="{{ asset('bundles/oroinstaller/lib/jquery-2.0.3.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/loader.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/util.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/package.manager.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootbox.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/jquery.cookie.js') }}"></script>
 
         <script type="text/javascript">
 
@@ -34,9 +34,25 @@
                     var me = $(this);
                     var action = me.data('action');
                     var params = me.data('params');
+                    var actionParams = {};
+                    for (var key in params) {
+                        if (params.hasOwnProperty(key)) {
+                            if (params[key].indexOf('#') === 0) {
+                                var $el = $(params[key]);
+                                var val = $el.val();
+                                if ($el.attr('required') && (!val || /^\s*$/.test(val))) {
+                                    util.error($el.data('required-message'));
+                                    return;
+                                }
+                                actionParams[key] = val;
+                            } else {
+                                actionParams[key] = params[key];
+                            }
+                        }
+                    }
                     loader.setClickedElement(me);
                     loader.displayLoadingProgress();
-                    pm[action](params, function () {
+                    pm[action](actionParams, function () {
                         loader.displayOriginalElement();
                     });
 
@@ -51,20 +67,21 @@
     {% block page %}
         <div class="wrapper">
             <div id="alerts">
-                <div class="alert fade in alert-notice">
-                    <i class="icon icon-info-sign"></i>
-                    Following directories/files have to be writable by web user:
-                    <ul>
-                        <li>vendor</li>
-                        <li>web/bundles</li>
-                        <li>web/js</li>
-                        <li>web/css</li>
-                        <li>composer.json</li>
-                    </ul>
-                </div>
+                {% if notWritableSystemPaths|length > 0 %}
+                    <div class="alert fade in alert-notice">
+                        <i class="icon icon-info-sign"></i>
+                        Following directories/files have to be writable by web user:
+                        <ul>
+                            {% for path in notWritableSystemPaths %}
+                                <li>{{ path }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                {% endif %}
             </div>
             <div class="content">
-                <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>
+                <img src="{{ asset('bundles/oroinstaller/img/icon/wait.png') }}" alt="" class="ajax-loading"/>
 
                 <div class="title clearfix">
                     <h2 class="pull-left">{{ block('title') }}</h2>

@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 
-class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
+class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
 {
     /**
      * @var DateTimeRangeFilterType
@@ -29,17 +30,18 @@ class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue(date_default_timezone_get()));
 
+        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
         $types = array(
             new FilterType($translator),
-            new DateRangeType($localeSettings),
+            new DateRangeType(),
             new DateTimeRangeType($localeSettings),
-            new DateRangeFilterType($translator)
+            new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber)
         );
 
         $this->formExtensions[] = new CustomFormExtension($types);
 
         parent::setUp();
-        $this->type = new DateTimeRangeFilterType($translator);
+        $this->type = new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber);
     }
 
     /**
@@ -60,13 +62,18 @@ class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
      */
     public function setDefaultOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => DateTimeRangeType::NAME,
-                )
-            )
-        );
+                    'widget_options' => [
+                        'showDatevariables' => true,
+                        'showTime'          => true,
+                        'showTimepicker'    => true,
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -74,18 +81,18 @@ class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                'viewData' => array(
-                    'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1)
-                ),
-                'customOptions' => array(
-                    'widget_options' => array('firstDay' => 1)
-                )
-            ),
-        );
+        return [
+            'empty' => [
+                'bindData'      => [],
+                'formData'      => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                'viewData'      => [
+                    'value'          => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                    'widget_options' => ['firstDay' => 1],
+                ],
+                'customOptions' => [
+                    'widget_options' => ['firstDay' => 1],
+                ]
+            ],
+        ];
     }
 }

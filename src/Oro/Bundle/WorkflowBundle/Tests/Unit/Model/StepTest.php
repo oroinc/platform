@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -33,23 +34,23 @@ class StepTest extends \PHPUnit_Framework_TestCase
 
     public function propertiesDataProvider()
     {
+        $entity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
         return array(
             'name' => array('name', 'test'),
             'order' => array('order', 1),
-            'template' => array('template', 'test'),
             'allowedTransitions' => array('allowedTransitions', array('one', 'two')),
             'label' => array('label', 'Value'),
-            'form_type' => array('formType', 'custom_workflow_step'),
-            'form_options' => array('formOptions', array('one', 'two')),
         );
     }
 
     public function testIsFinal()
     {
         $this->assertFalse($this->step->isFinal());
-        $this->step->setIsFinal(true);
+        $this->step->setFinal(true);
         $this->assertTrue($this->step->isFinal());
-        $this->step->setIsFinal(false);
+        $this->step->setFinal(false);
         $this->assertFalse($this->step->isFinal());
     }
 
@@ -85,14 +86,17 @@ class StepTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->step->isAllowedTransition('test2'), 'Unexpected transition allowed');
     }
 
-    public function testSetGetViewAttributes()
+    public function testEntityAclAllowed()
     {
-        $viewAttributes = array(
-            array('attribute' => 'foo'),
-            array('attribute' => 'bar')
-        );
-        $this->step->setViewAttributes($viewAttributes);
+        $this->assertTrue($this->step->isEntityUpdateAllowed('not_existing_attribute'));
+        $this->assertTrue($this->step->isEntityDeleteAllowed('not_existing_attribute'));
 
-        $this->assertEquals($viewAttributes, $this->step->getViewAttributes());
+        $this->step->setEntityAcls(array('existing_attribute' => array('update' => false, 'delete' => false)));
+        $this->assertFalse($this->step->isEntityUpdateAllowed('existing_attribute'));
+        $this->assertFalse($this->step->isEntityDeleteAllowed('existing_attribute'));
+
+        $this->step->setEntityAcls(array('existing_attribute' => array('update' => true, 'delete' => true)));
+        $this->assertTrue($this->step->isEntityUpdateAllowed('existing_attribute'));
+        $this->assertTrue($this->step->isEntityDeleteAllowed('existing_attribute'));
     }
 }

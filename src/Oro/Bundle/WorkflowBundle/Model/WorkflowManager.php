@@ -6,9 +6,11 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -30,18 +32,26 @@ class WorkflowManager
     protected $doctrineHelper;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @param ManagerRegistry $registry
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
+     * @param ConfigManager $configManager
      */
     public function __construct(
         ManagerRegistry $registry,
         WorkflowRegistry $workflowRegistry,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager
     ) {
         $this->registry = $registry;
         $this->workflowRegistry = $workflowRegistry;
         $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -82,36 +92,77 @@ class WorkflowManager
     /**
      * @param string|Transition $transition
      * @param string|Workflow $workflow
-     * @param object|null $entity
+     * @param object $entity
+     * @param array $data
      * @param Collection $errors
      * @return bool
      */
-    public function isStartTransitionAvailable($workflow, $transition, $entity = null, Collection $errors = null)
-    {
+    public function isStartTransitionAvailable(
+        $workflow,
+        $transition,
+        $entity,
+        array $data = array(),
+        Collection $errors = null
+    ) {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity);
 
-        return $workflow->isStartTransitionAvailable($transition, $initData, $errors);
+        return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
+    }
+
+    /**
+     * Perform reset of workflow item data - set $workflowItem and $workflowStep references into null
+     * and remove workflow item. If active workflow definition has a start step,
+     * then active workflow will be started automatically.
+     *
+     * @param WorkflowItem $workflowItem
+     * @return WorkflowItem|null workflowItem for workflow definition with a start step, null otherwise
+     * @throws \Exception
+     */
+    public function resetWorkflowItem(WorkflowItem $workflowItem)
+    {
+        $activeWorkflowItem = null;
+        $entity = $workflowItem->getEntity();
+
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass('OroWorkflowBundle:WorkflowItem');
+        $em->beginTransaction();
+
+        try {
+            $this->getWorkflow($workflowItem)->resetWorkflowData($entity);
+            $em->remove($workflowItem);
+            $em->flush();
+
+            $activeWorkflow = $this->getApplicableWorkflow($entity);
+            if ($activeWorkflow->getDefinition()->getStartStep()) {
+                $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
+            }
+
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+
+        return $activeWorkflowItem;
     }
 
     /**
      * @param string $workflow
-     * @param object|null $entity
+     * @param object $entity
      * @param string|Transition|null $transition
      * @param array $data
      * @return WorkflowItem
      * @throws \Exception
      */
-    public function startWorkflow($workflow, $entity = null, $transition = null, array $data = array())
+    public function startWorkflow($workflow, $entity, $transition = null, array $data = array())
     {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity, $data);
 
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $workflowItem = $workflow->start($initData, $transition);
+            $workflowItem = $workflow->start($entity, $data, $transition);
             $em->persist($workflowItem);
             $em->flush();
             $em->commit();
@@ -149,139 +200,43 @@ class WorkflowManager
 
     /**
      * @param object $entity
-     * @param WorkflowItem[]|Collection $workflowItems
-     * @param string|null $workflowName
-     * @return Workflow[]
+     * @return Workflow
      */
-    public function getApplicableWorkflows($entity, $workflowItems = null, $workflowName = null)
+    public function getApplicableWorkflow($entity)
     {
-        if (null === $workflowItems) {
-            $workflowItems = $this->getWorkflowItemsByEntity($entity, $workflowName);
-        }
-
-        $usedWorkflows = array();
-        foreach ($workflowItems as $workflowItem) {
-            $usedWorkflows[] = $workflowItem->getWorkflowName();
-        }
-
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        if ($workflowName) {
-            try {
-                $allowedWorkflows = array($this->workflowRegistry->getWorkflow($workflowName));
-            } catch (WorkflowNotFoundException $e) {
-                $allowedWorkflows = array();
-            }
-        } else {
-            $allowedWorkflows = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
-        }
-
-        $applicableWorkflows = array();
-        foreach ($allowedWorkflows as $workflow) {
-            if ($workflow->isEnabled()) {
-                $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-                if ($managedEntityAttribute) {
-                    $isMultiple = $managedEntityAttribute->getOption('multiple') == true;
-
-                    // if workflow allows multiple workflow items or there is no workflow item for current class
-                    if ($isMultiple || !in_array($workflow->getName(), $usedWorkflows)) {
-                        $applicableWorkflows[$workflow->getName()] = $workflow;
-                    }
-                }
-            }
-        }
-
-        return $applicableWorkflows;
-    }
-
-    /**
-     * @param object $entity
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return WorkflowItem[]
-     */
-    public function getWorkflowItemsByEntity($entity, $workflowName = null, $workflowType = null)
-    {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
-
-        /** @var WorkflowItemRepository $workflowItemsRepository */
-        $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
-
-        return $workflowItemsRepository->findByEntityMetadata(
-            $entityClass,
-            $entityIdentifier,
-            $workflowName,
-            $workflowType
+        return $this->getApplicableWorkflowByEntityClass(
+            $this->doctrineHelper->getEntityClass($entity)
         );
     }
 
     /**
-     * @param WorkflowItem $workflowItem
+     * @param string $entityClass
+     * @return null|Workflow
+     */
+    public function getApplicableWorkflowByEntityClass($entityClass)
+    {
+        return $this->workflowRegistry->getActiveWorkflowByEntityClass($entityClass);
+    }
+
+    /**
+     * @param string $entityClass
      * @return bool
      */
-    public function isAllManagedEntitiesSpecified(WorkflowItem $workflowItem)
+    public function hasApplicableWorkflowByEntityClass($entityClass)
     {
-        $workflow = $this->getWorkflow($workflowItem);
-
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            $attributeName = $attribute->getName();
-            if (!$workflowItem->getData()->get($attributeName)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->workflowRegistry->hasActiveWorkflowByEntityClass($entityClass);
     }
 
     /**
-     * @param Workflow $workflow
      * @param object $entity
-     * @param array $data
-     * @return array
-     * @throws UnknownAttributeException
+     * @return WorkflowItem|null
      */
-    public function getWorkflowData(Workflow $workflow, $entity = null, array $data = array())
-    {
-        // try to find appropriate entity
-        if ($entity) {
-            $entityAttributeName = null;
-            $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-            if ($managedEntityAttribute) {
-                $entityAttributeName = $managedEntityAttribute->getName();
-            }
-
-            if (!$entityAttributeName) {
-                throw new UnknownAttributeException(
-                    sprintf(
-                        'Can\'t find attribute for managed entity in workflow "%s"',
-                        $workflow->getName()
-                    )
-                );
-            }
-
-            $data[$entityAttributeName] = $entity;
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param object $entity
-     * @return null|Attribute
-     */
-    protected function getManagedEntityAttributeByEntity(Workflow $workflow, $entity)
+    public function getWorkflowItemByEntity($entity)
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
 
-        /** @var Attribute $attribute */
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            if ($attribute->getOption('class') == $entityClass) {
-                return $attribute;
-            }
-        }
-
-        return null;
+        return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**
@@ -306,5 +261,99 @@ class WorkflowManager
         }
 
         throw new WorkflowException('Can\'t find workflow by given identifier.');
+    }
+
+    /**
+     * @param string|Workflow|WorkflowItem|WorkflowDefinition $workflowIdentifier
+     */
+    public function activateWorkflow($workflowIdentifier)
+    {
+        if ($workflowIdentifier instanceof WorkflowDefinition) {
+            $entityClass = $workflowIdentifier->getRelatedEntity();
+            $workflowName = $workflowIdentifier->getName();
+        } else {
+            $workflow = $this->getWorkflow($workflowIdentifier);
+            $entityClass = $workflow->getDefinition()->getRelatedEntity();
+            $workflowName = $workflow->getName();
+        }
+
+        $this->setActiveWorkflow($entityClass, $workflowName);
+    }
+
+    /**
+     * @param string $entityClass
+     */
+    public function deactivateWorkflow($entityClass)
+    {
+        $this->setActiveWorkflow($entityClass, null);
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     */
+    public function resetWorkflowData(WorkflowDefinition $workflowDefinition)
+    {
+        $this->getWorkflowItemRepository()->resetWorkflowData(
+            $workflowDefinition->getRelatedEntity(),
+            array($workflowDefinition->getName())
+        );
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string|null $workflowName
+     */
+    protected function setActiveWorkflow($entityClass, $workflowName)
+    {
+        $entityConfig = $this->getEntityConfig($entityClass);
+        $entityConfig->set('active_workflow', $workflowName);
+        $this->persistEntityConfig($entityConfig);
+    }
+
+    /**
+     * @param $entityClass
+     * @return ConfigInterface
+     * @throws WorkflowException
+     */
+    protected function getEntityConfig($entityClass)
+    {
+        $workflowConfigProvider = $this->configManager->getProvider('workflow');
+        if (!$workflowConfigProvider->hasConfig($entityClass)) {
+            throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+        }
+
+        return $workflowConfigProvider->getConfig($entityClass);
+    }
+
+    /**
+     * Check that entity workflow item is equal to the active workflow item.
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function isResetAllowed($entity)
+    {
+        $currentWorkflowItem = $this->getWorkflowItemByEntity($entity);
+        $activeWorkflow      = $this->getApplicableWorkflow($entity);
+
+        return $activeWorkflow && $currentWorkflowItem &&
+               $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
+    }
+
+    /**
+     * @param ConfigInterface $entityConfig
+     */
+    protected function persistEntityConfig(ConfigInterface $entityConfig)
+    {
+        $this->configManager->persist($entityConfig);
+        $this->configManager->flush();
+    }
+
+    /**
+     * @return WorkflowItemRepository
+     */
+    protected function getWorkflowItemRepository()
+    {
+        return $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
     }
 }

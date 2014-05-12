@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -17,11 +15,6 @@ class NavigationListener
      * @var SecurityFacade
      */
     protected $securityFacade;
-
-    /**
-     * @var EntityManager|null
-     */
-    protected $em = null;
 
     /** @var ConfigProvider $entityConfigProvider */
     protected $entityConfigProvider = null;
@@ -34,20 +27,17 @@ class NavigationListener
 
     /**
      * @param SecurityFacade $securityFacade
-     * @param EntityManager  $entityManager
      * @param ConfigProvider $entityConfigProvider
      * @param ConfigProvider $entityExtendProvider
      * @param Translator     $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $entityExtendProvider,
         Translator $translator
     ) {
         $this->securityFacade       = $securityFacade;
-        $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->entityExtendProvider = $entityExtendProvider;
         $this->translator           = $translator;
@@ -67,14 +57,17 @@ class NavigationListener
 
             foreach ($extendConfigs as $extendConfig) {
                 if ($extendConfig->is('is_extend')
-                    && $extendConfig->get('owner') == ExtendManager::OWNER_CUSTOM
-                    && in_array(
-                        $extendConfig->get('state'),
-                        array(ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED)
+                    && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
+                    && $extendConfig->in(
+                        'state',
+                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
-                    if (!$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())) {
+                    if (!class_exists($config->getId()->getClassName()) ||
+                        !$this->securityFacade->hasLoggedUser() ||
+                        !$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
+                    ) {
                         continue;
                     }
 

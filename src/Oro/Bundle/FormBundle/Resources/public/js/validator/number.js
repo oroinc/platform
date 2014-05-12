@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'oro/translator'],
-function (_, __) {
+/*global define*/
+define(['underscore', 'orotranslation/js/translator'
+    ], function (_, __) {
     'use strict';
 
     var defaultParam = {
@@ -36,7 +36,7 @@ function (_, __) {
     }
 
     /**
-     * @export oro/validator/number
+     * @export oroform/js/validator/number
      */
     return [
         'Number',
@@ -44,9 +44,10 @@ function (_, __) {
             var result = between(Number(value), param.min, param.max);
             return result === true;
         },
-        function (param, element, value) {
+        function (param, element, value, placeholders) {
             var result,
-                message, placeholders = {}, number;
+                message,
+                number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
             result = between(Number(value), param.min, param.max);
@@ -66,7 +67,13 @@ function (_, __) {
                 default:
                     return '';
             }
+            if (_.isUndefined(placeholders)) {
+                placeholders = {};
+            }
             placeholders.limit = number;
+            if (_.isUndefined(placeholders.value)) {
+                placeholders.value = value;
+            }
             return __(message, placeholders, number);
         }
     ];

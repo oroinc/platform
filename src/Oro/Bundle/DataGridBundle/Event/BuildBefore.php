@@ -16,7 +16,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
  */
 class BuildBefore extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.datgrid.build.before';
+    const NAME = 'oro_datagrid.datagrid.build.before';
 
     /** @var DatagridInterface */
     protected $datagrid;
@@ -24,14 +24,10 @@ class BuildBefore extends Event implements GridEventInterface
     /** @var DatagridConfiguration */
     protected $config;
 
-    /** @var array */
-    protected $parameters;
-
-    public function __construct(DatagridInterface $datagrid, DatagridConfiguration $config, array $parameters = [])
+    public function __construct(DatagridInterface $datagrid, DatagridConfiguration $config)
     {
         $this->datagrid   = $datagrid;
         $this->config     = $config;
-        $this->parameters = $parameters;
     }
 
     /**
@@ -48,13 +44,5 @@ class BuildBefore extends Event implements GridEventInterface
     public function getConfig()
     {
         return $this->config;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
     }
 }

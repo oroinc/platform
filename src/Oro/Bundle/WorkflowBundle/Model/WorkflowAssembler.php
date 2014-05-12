@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
@@ -13,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class WorkflowAssembler extends AbstractAssembler
 {
     /**
-     * @var
+     * @var ContainerInterface
      */
     protected $container;
 
@@ -38,60 +39,70 @@ class WorkflowAssembler extends AbstractAssembler
     protected $transitionAssembler;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param ContainerInterface $container
-     * @param WorkflowConfiguration $workflowConfiguration
      * @param AttributeAssembler $attributeAssembler
      * @param StepAssembler $stepAssembler
      * @param TransitionAssembler $transitionAssembler
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ContainerInterface $container,
-        WorkflowConfiguration $workflowConfiguration,
         AttributeAssembler $attributeAssembler,
         StepAssembler $stepAssembler,
-        TransitionAssembler $transitionAssembler
+        TransitionAssembler $transitionAssembler,
+        TranslatorInterface $translator
     ) {
         $this->container = $container;
-        $this->workflowConfiguration = $workflowConfiguration;
         $this->attributeAssembler = $attributeAssembler;
         $this->stepAssembler = $stepAssembler;
         $this->transitionAssembler = $transitionAssembler;
+        $this->translator = $translator;
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition $definition
+     * @param bool $needValidation
      * @throws UnknownStepException
      * @throws AssemblerException
      * @return Workflow
      */
-    public function assemble(WorkflowDefinition $workflowDefinition)
+    public function assemble(WorkflowDefinition $definition, $needValidation = true)
     {
-        $configuration = $this->parseConfiguration($workflowDefinition);
+        $configuration = $this->parseConfiguration($definition);
         $this->assertOptions(
             $configuration,
             array(
                 WorkflowConfiguration::NODE_STEPS,
-                WorkflowConfiguration::NODE_TRANSITIONS,
-                WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS
+                WorkflowConfiguration::NODE_TRANSITIONS
             )
         );
 
-        $attributes = $this->assembleAttributes($configuration);
+        $attributes = $this->assembleAttributes($definition, $configuration);
         $steps = $this->assembleSteps($configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
 
         $workflow = $this->createWorkflow();
         $workflow
-            ->setName($workflowDefinition->getName())
-            ->setLabel($workflowDefinition->getLabel())
-            ->setType($workflowDefinition->getType())
-            ->setEnabled($workflowDefinition->isEnabled());
+            ->setName($definition->getName())
+            ->setLabel($definition->getLabel())
+            ->setDefinition($definition);
 
-        $workflow->getStepManager()->setSteps($steps);
-        $workflow->getAttributeManager()->setAttributes($attributes);
-        $workflow->getTransitionManager()->setTransitions($transitions);
+        $workflow->getStepManager()
+            ->setSteps($steps);
+        $workflow->getAttributeManager()
+            ->setAttributes($attributes)
+            ->setEntityAttributeName($definition->getEntityAttributeName());
+        $workflow->getTransitionManager()
+            ->setTransitions($transitions);
 
-        $this->validateWorkflow($workflow);
+        if ($needValidation) {
+            $this->validateWorkflow($workflow);
+        }
 
         return $workflow;
     }
@@ -115,35 +126,31 @@ class WorkflowAssembler extends AbstractAssembler
                 )
             );
         }
-
-        if ($workflow->getType() == Workflow::TYPE_ENTITY) {
-            /** @var Step $step */
-            foreach ($workflow->getStepManager()->getSteps() as $step) {
-                if ($step->getFormOptions()) {
-                    throw new AssemblerException(
-                        sprintf(
-                            'Workflow "%s" has type "entity" and cannot support form options in step "%s"',
-                            $workflow->getName(),
-                            $step->getName()
-                        )
-                    );
-                }
-            }
-        }
     }
 
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
     protected function parseConfiguration(WorkflowDefinition $workflowDefinition)
     {
-        return $this->prepareDefaultStartTransition(
-            $workflowDefinition,
-            $this->workflowConfiguration->processConfiguration($workflowDefinition->getConfiguration())
-        );
+        return $this->prepareDefaultStartTransition($workflowDefinition, $workflowDefinition->getConfiguration());
     }
 
-    protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, $configuration)
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param array $configuration
+     * @return array
+     */
+    protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, array $configuration)
     {
-        if ($workflowDefinition->getStartStep()) {
-            $startTransitionDefinitionName = Workflow::DEFAULT_START_TRANSITION_NAME . '_definition';
+        if ($workflowDefinition->getStartStep()
+            && !array_key_exists(
+                TransitionManager::DEFAULT_START_TRANSITION_NAME,
+                $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
+            )
+        ) {
+            $startTransitionDefinitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME . '_definition';
             if (!array_key_exists(
                 $startTransitionDefinitionName,
                 $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS]
@@ -152,38 +159,40 @@ class WorkflowAssembler extends AbstractAssembler
                     array();
             }
 
-            if (!array_key_exists(
-                Workflow::DEFAULT_START_TRANSITION_NAME,
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
-            )) {
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS][Workflow::DEFAULT_START_TRANSITION_NAME] =
-                    array(
-                        'label' => $workflowDefinition->getLabel(),
-                        'step_to' => $workflowDefinition->getStartStep(),
-                        'is_start' => true,
-                        'transition_definition' => $startTransitionDefinitionName
-                    );
-            }
+            $label = $this->translator->trans(
+                'oro.workflow.transition.start',
+                array('%workflow%' => $workflowDefinition->getLabel())
+            );
+
+            $configuration[WorkflowConfiguration::NODE_TRANSITIONS][TransitionManager::DEFAULT_START_TRANSITION_NAME] =
+                array(
+                    'label' => $label,
+                    'step_to' => $workflowDefinition->getStartStep()->getName(),
+                    'is_start' => true,
+                    'is_hidden' => true,
+                    'transition_definition' => $startTransitionDefinitionName,
+                );
         }
 
         return $configuration;
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param array $configuration
-     * @return Collection
+     * @return Attribute[]|Collection
      */
-    protected function assembleAttributes(array $configuration)
+    protected function assembleAttributes(WorkflowDefinition $definition, array $configuration)
     {
         $attributesConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_ATTRIBUTES, array());
 
-        return $this->attributeAssembler->assemble($attributesConfiguration);
+        return $this->attributeAssembler->assemble($definition, $attributesConfiguration);
     }
 
     /**
      * @param array $configuration
      * @param Collection $attributes
-     * @return Collection
+     * @return Step[]|Collection
      */
     protected function assembleSteps(array $configuration, Collection $attributes)
     {
@@ -196,7 +205,7 @@ class WorkflowAssembler extends AbstractAssembler
      * @param array $configuration
      * @param Collection $steps
      * @param Collection $attributes
-     * @return Collection
+     * @return Transition[]|Collection
      */
     protected function assembleTransitions(array $configuration, Collection $steps, Collection $attributes)
     {

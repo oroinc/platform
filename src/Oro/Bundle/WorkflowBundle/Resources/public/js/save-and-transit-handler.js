@@ -1,12 +1,13 @@
-define(['jquery', 'oro/mediator', 'routing', 'oro/buttons-widget'],
-function ($, mediator, routing, ButtonsWidget) {
+/*global define*/
+define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
+    ], function ($, mediator, routing, ButtonsWidget) {
     'use strict';
 
     /**
      * Save and transit button click handler
      *
-     * @export  oro/workflow-save-and-transit-handler
-     * @class   oro.WorkflowSaveAndTransitHandler
+     * @export  oroworkflow/js/save-and-transit-handler
+     * @class   oroworkflow.WorkflowSaveAndTransitHandler
      */
     return function() {
         var saveBtn = $(this);
@@ -18,7 +19,7 @@ function ($, mediator, routing, ButtonsWidget) {
 
         // On form submit response check for errors
         mediator.once('hash_navigation_request:refresh', function (navigation) {
-            var content = $(navigation.selectorCached.container);
+            var content = $(navigation.getCached$('container'));
             var hasErrors = content.find('.alert-error, .validation-error').length > 0;
             if (!hasErrors) {
                 var idRegexp = /update\/(\d+).*/;
@@ -31,7 +32,7 @@ function ($, mediator, routing, ButtonsWidget) {
                     var transitionsWidget = new ButtonsWidget({
                         'el': containerEl,
                         'elementFirst': false,
-                        'url': routing.generate('oro_workflow_widget_buttons_entity', {
+                        'url': routing.generate('oro_workflow_widget_buttons', {
                             'entityId': elementIdMatch[1],
                             'entityClass': saveBtn.data('entity-class')
                     })

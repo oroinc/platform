@@ -242,9 +242,9 @@ class AclHelper
         $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
 
         if ($resultData && is_array($resultData)) {
-            $entityField = $value = null;
+            $entityField = $value = $pathExpressionType = null;
             if (!empty($resultData)) {
-                list($entityField, $value) = $resultData;
+                list($entityField, $value, $pathExpressionType) = $resultData;
             }
 
             $joinConditions = isset($associationMapping['joinColumns'])
@@ -255,6 +255,7 @@ class AclHelper
                 $join->joinAssociationDeclaration->aliasIdentificationVariable,
                 $entityField,
                 $value,
+                $pathExpressionType,
                 $targetEntity,
                 $joinConditions
             );
@@ -281,14 +282,14 @@ class AclHelper
         $resultData = $this->builder->getAclConditionData($entityName, $permission);
 
         if ($resultData === null || !empty($resultData)) {
-            $entityField = $value = null;
+            $entityField = $value = $pathExpressionType = null;
             if (!empty($resultData)) {
-                list($entityField, $value) = $resultData;
+                list($entityField, $value, $pathExpressionType) = $resultData;
             }
             if ($isJoin) {
-                return new JoinAclCondition($entityAlias, $entityField, $value);
+                return new JoinAclCondition($entityAlias, $entityField, $value, $pathExpressionType);
             } else {
-                return new AclCondition($entityAlias, $entityField, $value);
+                return new AclCondition($entityAlias, $entityField, $value, $pathExpressionType);
             }
         }
 

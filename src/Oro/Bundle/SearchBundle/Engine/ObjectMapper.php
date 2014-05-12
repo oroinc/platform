@@ -3,6 +3,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class ObjectMapper extends AbstractMapper
 {
@@ -60,8 +61,8 @@ class ObjectMapper extends AbstractMapper
         $mappingConfig = $this->mappingConfig;
         $objectData = array();
 
-        if (is_object($object) && isset($mappingConfig[get_class($object)])) {
-            $objectClass = get_class($object);
+        $objectClass = ClassUtils::getRealClass($object);
+        if (is_object($object) && isset($mappingConfig[$objectClass])) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', array()) as $field) {
                 if (!isset($field['relation_type'])) {

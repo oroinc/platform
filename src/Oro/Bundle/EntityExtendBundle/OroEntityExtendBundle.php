@@ -5,16 +5,17 @@ namespace Oro\Bundle\EntityExtendBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
-use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
-
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
-use Symfony\Component\Process\Process;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
+use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 
 class OroEntityExtendBundle extends Bundle
@@ -27,16 +28,26 @@ class OroEntityExtendBundle extends Bundle
         ExtendClassLoadingUtils::registerClassLoader($this->kernel->getCacheDir());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function boot()
     {
         $this->ensureInitialized();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
+        parent::build($container);
+
         $this->ensureInitialized();
 
+        $container->addCompilerPass(new ConfigLoaderPass());
         $container->addCompilerPass(new EntityManagerPass());
+        $container->addCompilerPass(new MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 array(
@@ -64,7 +75,7 @@ class OroEntityExtendBundle extends Bundle
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
             $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
-            $process->setTimeout(100000);
+            $process->setTimeout(300);
             $process->run();
         }
     }

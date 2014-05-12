@@ -14,11 +14,6 @@ use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 class EmailTemplateType extends AbstractType
 {
     /**
-     * @var array
-     */
-    protected $entityNameChoices = array();
-
-    /**
      * @var UserConfigManager
      */
     private $userConfig;
@@ -29,19 +24,12 @@ class EmailTemplateType extends AbstractType
     private $localeSettings;
 
     /**
-     * @param array             $entitiesConfig
      * @param UserConfigManager $userConfig
      * @param LocaleSettings    $localeSettings
      */
-    public function __construct($entitiesConfig, UserConfigManager $userConfig, LocaleSettings $localeSettings)
+    public function __construct(UserConfigManager $userConfig, LocaleSettings $localeSettings)
     {
-        $this->entityNameChoices = array_map(
-            function ($value) {
-                return isset($value['name'])? $value['name'] : '';
-            },
-            $entitiesConfig
-        );
-        $this->userConfig = $userConfig;
+        $this->userConfig     = $userConfig;
         $this->localeSettings = $localeSettings;
     }
 
@@ -52,14 +40,10 @@ class EmailTemplateType extends AbstractType
     {
         $builder->add(
             'entityName',
-            'choice',
+            'oro_entity_choice',
             array(
-                'label'              => 'oro.email.emailtemplate.entity_name.label',
-                'choices'            => $this->entityNameChoices,
-                'multiple'           => false,
-                'empty_value'        => '',
-                'empty_data'         => null,
-                'required'           => true
+                'label'    => 'oro.email.emailtemplate.entity_name.label',
+                'required' => true
             )
         );
 
@@ -87,18 +71,18 @@ class EmailTemplateType extends AbstractType
             )
         );
 
-        $lang = $this->localeSettings->getLanguage();
+        $lang              = $this->localeSettings->getLanguage();
         $notificationLangs = $this->userConfig->get('oro_locale.languages');
         $notificationLangs = array_merge($notificationLangs, [$lang]);
-        $localeLabels = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
+        $localeLabels      = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
         $builder->add(
             'translations',
             'oro_email_emailtemplate_translatation',
             array(
-                'label' => 'oro.email.emailtemplate.translations.label',
+                'label'    => 'oro.email.emailtemplate.translations.label',
                 'required' => false,
-                'locales' => $notificationLangs,
-                'labels' => $localeLabels,
+                'locales'  => $notificationLangs,
+                'labels'   => $localeLabels,
             )
         );
 
@@ -118,7 +102,7 @@ class EmailTemplateType extends AbstractType
             }
             $options['disabled'] = true;
         };
-        $factory = $builder->getFormFactory();
+        $factory     = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($factory, $setDisabled) {
@@ -128,7 +112,7 @@ class EmailTemplateType extends AbstractType
                     // entityName field
                     $options = $form->get('entityName')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('entityName', 'choice', null, $options));
+                    $form->add($factory->createNamed('entityName', 'oro_entity_choice', null, $options));
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);

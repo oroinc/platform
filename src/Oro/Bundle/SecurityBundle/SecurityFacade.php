@@ -6,6 +6,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class SecurityFacade
 {
@@ -43,10 +45,10 @@ class SecurityFacade
         ObjectIdentityFactory $objectIdentityFactory,
         LoggerInterface $logger
     ) {
-        $this->securityContext = $securityContext;
-        $this->annotationProvider = $annotationProvider;
+        $this->securityContext       = $securityContext;
+        $this->annotationProvider    = $annotationProvider;
         $this->objectIdentityFactory = $objectIdentityFactory;
-        $this->logger = $logger;
+        $this->logger                = $logger;
     }
 
     /**
@@ -90,50 +92,85 @@ class SecurityFacade
     }
 
     /**
-     * Get permission for given class and method from the ACL annotation
+     * Gets ACL annotation is bound to the given class/method
      *
-     * @param $class
-     * @param $method
-     * @return string
+     * @param string $class
+     * @param string $method
+     * @return Acl|null
      */
-    public function getClassMethodAnnotationPermission($class, $method)
+    public function getClassMethodAnnotation($class, $method)
     {
-        $annotation = $this->annotationProvider->findAnnotation($class, $method);
-
-        if ($annotation) {
-            return $annotation->getPermission();
-        }
+        return $this->annotationProvider->findAnnotation($class, $method);
     }
 
     /**
      * Checks if an access to a resource is granted to the caller
      *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
+     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
+     *                                    string in format "permission;descriptor"
+     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
-     * @param  mixed $object A domain object, object identity or object identity descriptor (id:type)
+     * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
+     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     *
      * @return bool
      */
     public function isGranted($attributes, $object = null)
     {
-        if ($object === null
-            && is_string($attributes)
-            && $annotation = $this->annotationProvider->findAnnotationById($attributes)
-        ) {
-            $this->logger->debug(sprintf('Check an access using "%s" ACL annotation.', $annotation->getId()));
-            $isGranted = $this->securityContext->isGranted(
-                $annotation->getPermission(),
-                $this->objectIdentityFactory->get($annotation)
-            );
+        if (is_string($attributes) && $annotation = $this->annotationProvider->findAnnotationById($attributes)) {
+            if ($object === null) {
+                $this->logger->debug(
+                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
+                );
+                $isGranted = $this->securityContext->isGranted(
+                    $annotation->getPermission(),
+                    $this->objectIdentityFactory->get($annotation)
+                );
+            } else {
+                $this->logger->debug(
+                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
+                );
+                $isGranted = $this->securityContext->isGranted(
+                    $annotation->getPermission(),
+                    $object
+                );
+            }
         } elseif (is_string($object)) {
             $isGranted = $this->securityContext->isGranted(
                 $attributes,
                 $this->objectIdentityFactory->get($object)
             );
         } else {
+            if (is_string($attributes) && $object == null) {
+                $delimiter = strpos($attributes, ';');
+                if ($delimiter) {
+                    $object = substr($attributes, $delimiter + 1);
+                    $attributes = substr($attributes, 0, $delimiter);
+                }
+            }
+
             $isGranted = $this->securityContext->isGranted($attributes, $object);
         }
 
         return $isGranted;
+    }
+
+    /**
+     * Gets logged user object or null
+     *
+     * @return mixed
+     */
+    public function getLoggedUser()
+    {
+        if (null === $token = $this->securityContext->getToken()) {
+            return null;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return null;
+        }
+
+        return $user;
     }
 
     /**
@@ -143,15 +180,8 @@ class SecurityFacade
      */
     public function getLoggedUserId()
     {
-        if (null === $token = $this->securityContext->getToken()) {
-            return 0;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            return 0;
-        }
-
-        return $user->getId();
+        $user = $this->getLoggedUser();
+        return $user ? $user->getId() : 0;
     }
 
     /**
@@ -161,6 +191,6 @@ class SecurityFacade
      */
     public function hasLoggedUser()
     {
-        return ($this->getLoggedUserId() !== 0);
+        return ($this->getLoggedUser() !== null);
     }
 }

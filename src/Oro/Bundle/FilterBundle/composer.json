@@ -10,7 +10,9 @@
         "symfony/symfony": ">=2.1",
         "oro/ui-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/locale-bundle": "dev-master"
+        "oro/locale-bundle": "dev-master",
+        "luxifer/doctrine-functions": "1.2.*",
+        "nesbot/Carbon": "1.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\FilterBundle": "" }

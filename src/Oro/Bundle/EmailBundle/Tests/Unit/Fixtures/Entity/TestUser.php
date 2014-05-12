@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
-use Symfony\Component\Security\Core\User\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class TestUser implements UserInterface, EmailOwnerInterface
@@ -40,7 +39,7 @@ class TestUser implements UserInterface, EmailOwnerInterface
     {
     }
 
-    public function getPrimaryEmailField()
+    public function getEmailFields()
     {
     }
 

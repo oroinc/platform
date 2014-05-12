@@ -5,7 +5,6 @@ namespace Oro\Bundle\FilterBundle\Grid\Extension;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -29,10 +28,9 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    public function __construct(RequestParameters $requestParams, TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        parent::__construct($requestParams);
     }
 
     /**
@@ -131,7 +129,7 @@ class OrmFilterExtension extends AbstractExtension
 
         $data->offsetAddToArray('state', ['filters' => $filtersState])
             ->offsetAddToArray('filters', $filtersMetaData)
-            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['oro/datafilter-builder']);
+            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }
 
     /**
@@ -188,7 +186,7 @@ class OrmFilterExtension extends AbstractExtension
         $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
         $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
-        $filterBy       = $this->requestParams->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
+        $filterBy       = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
 
         foreach ($filterBy as $column => $value) {
             if (isset($filters[$column])) {

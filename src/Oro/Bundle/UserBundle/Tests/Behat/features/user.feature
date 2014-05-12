@@ -16,4 +16,4 @@ Scenario: Create new user
         | email      | email@test.com |
         | roles      | User           |
   And I press "Save And Close"
-  Then I should see "User successfully saved"
+  Then I should see "User saved"

@@ -1,0 +1,84 @@
+<div class="widget-content">
+    <table class="table table-hover table-bordered">
+        <colgroup>
+            <col width="150">
+            <col width="250">
+            <col width="150">
+            <col width="100">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>{% trans %}Language{% endtrans %}</th>
+                <th>{% trans %}Translation coverage{% endtrans %}<sup>&nbsp;1</sup></th>
+                <th>{% trans %}Translation status{% endtrans %}</th>
+                <th>{% trans %}Action{% endtrans %}</th>
+            </tr>
+        </thead>
+        {% for language in statistic if language.code != defaultLanguage %}
+            {%
+                set status = config[language.code] is defined
+                    ? config[language.code]
+                    : constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW')
+            %}
+            <tr>
+                <td>
+                    {% if locale[language.code] is defined %}
+                        {{ locale[language.code]|trans }}
+                    {% else %}
+                        {{ language.code|trans }}
+                    {% endif %}
+                </td>
+                <td class="translation-coverage">
+                    <div class="progress">
+                        <div class="bar bar-success" style="width: {{ language.translationStatus }}%;"></div>
+                    </div>
+                    <b>{{ (language.translationStatus / 100)|oro_format_percent }}</b>
+                </td>
+                <td class="translation-status">
+                    {% if status != constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
+                        {% if oro_translation_is_fresh(language.code) %}
+                            <span class="status-up-to-date">{% trans %}Up to date{% endtrans %}</span>
+                        {% else %}
+                            <span class="status-needs-update">{% trans %}Update needed{% endtrans %}</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
+                        {{ _self.renderButton(language.code, 'download', 'Download') }}
+                    {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
+                        {{ _self.renderButton(language.code, 'enable', 'Enable') }}
+
+                        {% if not oro_translation_is_fresh(language.code) %}
+                            {{ _self.renderButton(language.code, 'update', 'Update') }}
+                        {% endif %}
+                    {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
+                        {{ _self.renderButton(language.code, 'disable', 'Disable') }}
+
+                        {% if not oro_translation_is_fresh(language.code) %}
+                            {{ _self.renderButton(language.code, 'update', 'Update') }}
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="no-statistic">
+                    {% trans %}Sorry, but translation statistic is not available.{% endtrans %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{#
+    Renders action button
+        langCode - code of the row language
+        action   - enable | disable | download | update
+        label    - any label you want
+#}
+{% macro renderButton(langCode, action, label) %}
+    <button class="btn btn-mini" data-lang="{{ langCode }}" data-action="{{ action }}">
+        {{ label|trans }}
+    </button>
+{% endmacro %}

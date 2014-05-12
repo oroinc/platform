@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -139,13 +140,7 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function deleteAction($id)
     {
-        $securityToken = $this->get('security.context')->getToken();
-        $user = $securityToken ? $securityToken->getUser() : null;
-        if (is_object($user) && $user->getId() != $id) {
-            return $this->handleDeleteRequest($id);
-        } else {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
-        }
+        return $this->handleDeleteRequest($id);
     }
 
     /**
@@ -344,5 +339,13 @@ class UserController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.user.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_user.handler.delete');
     }
 }

@@ -2,26 +2,16 @@
 
 namespace Oro\Bundle\IntegrationBundle\Logger;
 
+use Psr\Log\NullLogger;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 /**
  * Class LoggerStrategy
- *
- * @package Oro\Bundle\IntegrationBundle\Logger
- * @method LoggerStrategy emergency($message, array $context = array())
- * @method LoggerStrategy alert($message, array $context = array())
- * @method LoggerStrategy critical($message, array $context = array())
- * @method LoggerStrategy error($message, array $context = array())
- * @method LoggerStrategy warning($message, array $context = array())
- * @method LoggerStrategy info($message, array $context = array())
- * @method LoggerStrategy notice($message, array $context = array())
- * @method LoggerStrategy debug($message, array $context = array())
- * @method LoggerStrategy log($level, $message, array $context = array())
  */
-class LoggerStrategy
+class LoggerStrategy implements LoggerInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
+    use LoggerAwareTrait;
 
     /**
      * Constructor allows us to pass logger when strategy is instantiating or whenever you want
@@ -30,42 +20,78 @@ class LoggerStrategy
      */
     public function __construct(LoggerInterface $logger = null)
     {
-        $this->setLogger($logger);
+        $this->setLogger($logger ? : new NullLogger());
     }
 
     /**
-     * Sets concrete logger
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setLogger(LoggerInterface $logger = null)
+    public function emergency($message, array $context = array())
     {
-        $this->logger = $logger;
-
-        return $this;
+        return $this->logger->emergency($message, $context);
     }
 
     /**
-     * Delegate calls to concrete logger
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return mixed
-     * @throws \LogicException in case when logger is not set or undefined method called
+     * {@inheritdoc}
      */
-    public function __call($name, $args)
+    public function alert($message, array $context = array())
     {
-        if (!$this->logger) {
-            throw new \LogicException('Logger strategy is not configured.');
-        }
+        return $this->logger->alert($message, $context);
+    }
 
-        if (method_exists($this->logger, $name)) {
-            return call_user_func_array([$this->logger, $name], $args);
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function critical($message, array $context = array())
+    {
+        return $this->logger->critical($message, $context);
+    }
 
-        throw new \LogicException(sprintf('Call to undefined method "%s"', $name));
+    /**
+     * {@inheritdoc}
+     */
+    public function error($message, array $context = array())
+    {
+        return $this->logger->error($message, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warning($message, array $context = array())
+    {
+        return $this->logger->warning($message, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function notice($message, array $context = array())
+    {
+        return $this->logger->notice($message, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function info($message, array $context = array())
+    {
+        return $this->logger->info($message, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function debug($message, array $context = array())
+    {
+        return $this->logger->debug($message, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function log($level, $message, array $context = array())
+    {
+        return $this->logger->log($message, $context);
     }
 }

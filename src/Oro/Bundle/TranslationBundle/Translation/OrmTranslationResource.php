@@ -13,7 +13,7 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
     protected $locale;
 
     /**
-     * @var OrmTranslationMetadataCache
+     * @var DynamicTranslationMetadataCache
      */
     protected $metadataCache;
 
@@ -21,11 +21,11 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
      * Constructor
      *
      * @param string                      $locale
-     * @param OrmTranslationMetadataCache $metadataCache
+     * @param DynamicTranslationMetadataCache $metadataCache
      */
     public function __construct(
         $locale,
-        OrmTranslationMetadataCache $metadataCache
+        DynamicTranslationMetadataCache $metadataCache
     ) {
         $this->locale        = $locale;
         $this->metadataCache = $metadataCache;

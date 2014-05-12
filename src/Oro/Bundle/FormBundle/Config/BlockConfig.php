@@ -218,16 +218,16 @@ class BlockConfig implements FormConfigInterface
      */
     public function toArray()
     {
+        $subBlocks = [];
+        foreach ($this->subBlocks as $config) {
+            $subBlocks[] = $config->toArray();
+        }
+
         return array(
             'title'       => $this->title,
             'description' => $this->description,
             'class'       => $this->class,
-            'subblocks'   => array_map(
-                function (SubBlockConfig $config) {
-                    return $config->toArray();
-                },
-                $this->subBlocks
-            )
+            'subblocks'   => $subBlocks
         );
     }
 

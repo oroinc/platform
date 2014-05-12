@@ -429,7 +429,7 @@ class Query
     private function clearString($inputString)
     {
         $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
-        $clearedString = trim(preg_replace('/ +/', ' ', preg_replace('/[^a-zA-Z0-9:*_]/s', ' ', $clearedString)));
+        $clearedString = trim(preg_replace('/ +/', ' ', mb_ereg_replace('[^\w:*]', ' ', $clearedString)));
         return $clearedString;
     }
 }

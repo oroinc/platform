@@ -4,13 +4,32 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
+use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
 abstract class OroKernel extends Kernel
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeBundles()
+    {
+        parent::initializeBundles();
+
+        // pass bundles to CumulativeResourceManager
+        $bundles       = [];
+        foreach ($this->bundles as $name => $bundle) {
+            $bundles[$name] = get_class($bundle);
+        }
+        CumulativeResourceManager::getInstance()->setBundles($bundles);
+    }
+
     /**
      * Get the list of all "autoregistered" bundles
      *
@@ -18,6 +37,9 @@ abstract class OroKernel extends Kernel
      */
     public function registerBundles()
     {
+        // clear state of CumulativeResourceManager
+        CumulativeResourceManager::getInstance()->clear();
+
         $bundles = array();
 
         if (!$this->getCacheDir()) {
@@ -43,23 +65,61 @@ abstract class OroKernel extends Kernel
         return $bundles;
     }
 
+    /**
+     * Finds all .../Resource/config/oro/bundles.yml in given root folders
+     *
+     * @param array $roots
+     * @return array
+     */
+    protected function findBundles($roots = [])
+    {
+        $paths = [];
+        foreach ($roots as $root) {
+            if (!is_dir($root)) {
+                continue;
+            }
+            $root   = realpath($root);
+            $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $filter = new \RecursiveCallbackFilterIterator(
+                $dir,
+                function (\SplFileInfo $current) use (&$paths) {
+                    $fileName = strtolower($current->getFilename());
+                    if ($fileName === '.'
+                        || $fileName === '..'
+                        || $fileName === 'tests'
+                        || $current->isFile()
+                    ) {
+                        return false;
+                    }
+                    if (!is_dir($current->getPathname() . '/Resources')) {
+                        return true;
+                    } else {
+                        $file = $current->getPathname() . '/Resources/config/oro/bundles.yml';
+                        if (is_file($file)) {
+                            $paths[] = $file;
+                        }
+                        return false;
+                    }
+                }
+            );
+
+            $iterator = new \RecursiveIteratorIterator($filter);
+            $iterator->rewind();
+        }
+
+        return $paths;
+    }
+
     protected function collectBundles()
     {
-        $finder = new Finder();
-        $bundles = array();
-
-        $finder
-            ->files()
-            ->in(
-                array(
-                    $this->getRootDir() . '/../src',
-                    $this->getRootDir() . '/../vendor',
-                )
-            )
-            ->name('bundles.yml');
-
-        foreach ($finder as $file) {
-            $import = Yaml::parse($file->getRealpath());
+        $files = $this->findBundles(
+            [
+                $this->getRootDir() . '/../src',
+                $this->getRootDir() . '/../vendor'
+            ]
+        );
+        foreach ($files as $file) {
+            $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
                 $kernel = false;
@@ -101,6 +161,9 @@ abstract class OroKernel extends Kernel
 
             // make sure OroCRM bundles follow Oro bundles
             if (strpos($n1, 'Oro') === 0 && strpos($n2, 'Oro') === 0) {
+                if ((strpos($n1, 'OroCRM') === 0) && (strpos($n2, 'OroCRM') === 0)) {
+                    return strcasecmp($n1, $n2);
+                }
                 if (strpos($n1, 'OroCRM') === 0) {
                     return 1;
                 }
@@ -115,5 +178,36 @@ abstract class OroKernel extends Kernel
 
         // sort be priority
         return ($p1 < $p2) ? -1 : 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    {
+        // cache the container
+        $dumper = new PhpDumper($container);
+
+        if ($container->getParameter('installed') && class_exists('ProxyManager\Configuration')) {
+            $dumper->setProxyDumper(new ProxyDumper());
+        }
+
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
+        $cache->write($content, $container->getResources());
+
+        if (!$this->debug) {
+            $cache->write(php_strip_whitespace($cache), $container->getResources());
+        }
+    }
+
+    /**
+     * Add custom error handler
+     */
+    protected function initializeContainer()
+    {
+        $handler = new ErrorHandler();
+        $handler->registerHandlers();
+
+        parent::initializeContainer();
     }
 }

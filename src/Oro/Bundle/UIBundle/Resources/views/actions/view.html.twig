@@ -5,9 +5,12 @@
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">
+        {% block workflowStepListContainer %}
+            {% placeholder page_title_before with {entity: entity} %}
+        {% endblock  %}
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
-                <div class="span9">
+                <div class="pull-left pull-left-extra">
                 {% block pageHeader %}
                     {% set hasAvatar = breadcrumbs.hasAvatar is defined and breadcrumbs.hasAvatar %}
                     <div class="clearfix customer-info well-small{% if not hasAvatar %} customer-simple{% endif %}">
@@ -38,6 +41,7 @@
                                         {% endif %}
                                         <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
                                     </div>
+                                    {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
                             </div>
                             <div class="clearfix">
@@ -60,9 +64,11 @@
                 </div>
                 <div class="pull-right">
                     <div class="pull-right title-buttons-container">
-                        {% placeholder view_navButtons_before with {entity: entity} %}
-                        {% block navButtons %}{% endblock navButtons %}
-                        {% placeholder view_navButtons_after with {entity: entity} %}
+                        {% block navButtonContainer %}
+                            {% placeholder view_navButtons_before with {entity: entity} %}
+                            {% block navButtons %}{% endblock navButtons %}
+                            {% placeholder view_navButtons_after with {entity: entity} %}
+                        {% endblock navButtonContainer%}
                     </div>
                     <div class="pull-right user-info-state">
                         <ul class="inline-decorate">
@@ -88,9 +94,48 @@
                 </div>
             </div>
         </div>
+        {% placeholder page_title_after with {entity: entity} %}
     </div>
+
     <div class="layout-content scrollable-container">
         {% block content_data %}
+            {% if data is defined and data.dataBlocks is defined %}
+                {% set dataBlocks = data.dataBlocks %}
+
+                {%- set communicationsData -%}
+                    {% placeholder view_content_data_communications with {entity: entity} %}
+                {%- endset -%}
+
+                {% if communicationsData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Communications'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [communicationsData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
+                {%- set additionalInformationData -%}
+                    {% placeholder view_content_data_additional_information with {entity: entity} %}
+                {%- endset -%}
+
+                {% if additionalInformationData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Additional Information'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [additionalInformationData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
+                {% set data = data|merge({'dataBlocks': dataBlocks}) %}
+            {% endif %}
             {{ UI.scrollData(id, data) }}
         {% endblock content_data %}
     </div>

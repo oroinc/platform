@@ -3,6 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,20 +15,18 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $bundles    = [
-            'TestBundle1' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1',
-            'TestBundle2' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2'
-        ];
+        $bundle1 = new TestBundle1();
+        $bundle2 = new TestBundle2();
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $result     = null;
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.bundles')
-            ->will($this->returnValue($bundles));
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with(ConfigurationPass::MANAGER_SERVICE_ID)
@@ -70,33 +72,37 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'filters'    => [
                 'filter1' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'string'],
                         ['type' => 'text'],
                     ],
-                    'type'       => 'string',
-                    'query_type' => ['all']
+                    'type'           => 'string',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter2' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['entity' => 'TestEntity', 'field' => 'TestField']
                     ],
-                    'type'       => 'string',
-                    'query_type' => ['all']
+                    'type'           => 'string',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter3' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'integer']
                     ],
-                    'type'       => 'number',
-                    'query_type' => ['all']
+                    'type'           => 'number',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter4' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'boolean']
                     ],
-                    'type'       => 'boolean',
-                    'query_type' => ['type1', 'type2']
+                    'type'           => 'boolean',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['type1', 'type2']
                 ],
             ],
             'grouping'   => [

@@ -5,8 +5,8 @@ define(['jquery', 'underscore'], function ($, _) {
     /**
      * Main Application
      *
-     * @export oro/app
-     * @name oro.app
+     * @export oroui/js/app
+     * @name oroui.app
      */
     return {
         /** @type {boolean} */
@@ -50,8 +50,8 @@ define(['jquery', 'underscore'], function ($, _) {
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
                 var pair  = nvp[i].split('=');
-                var name  = this._decodeComponent(pair[0]);
-                var value = this._decodeComponent(pair[1]);
+                var name  = this.decodeUriComponent(pair[0]);
+                var value = this.decodeUriComponent(pair[1]);
 
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
                 var first = path[1];
@@ -76,7 +76,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @return {String}
          * @protected
          */
-        _decodeComponent: function(string) {
+        decodeUriComponent: function(string) {
             var result = string.replace('+', '%20');
             result = decodeURIComponent(result);
             return result;
@@ -128,21 +128,20 @@ define(['jquery', 'underscore'], function ($, _) {
                     return (toNumber(value1) == toNumber(value2));
                 }
                 return ((value1 || '') == (value2 || ''));
-
             } else if (_.isObject(value1)) {
                 var valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
-                }
-
-                for (var index in valueKeys) {
-                    var key = valueKeys[index];
-                    if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
-                        return false;
+                    for (var index in valueKeys) {
+                        var key = valueKeys[index];
+                        if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
+                            return false;
+                        }
                     }
+                    return true;
                 }
-                return true;
+                return false;
             } else {
                 return value1 == value2;
             }

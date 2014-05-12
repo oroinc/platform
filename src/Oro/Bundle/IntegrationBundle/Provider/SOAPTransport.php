@@ -2,37 +2,44 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Guzzle\Http\Url;
+
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
 abstract class SOAPTransport implements TransportInterface
 {
+    /** @var ParameterBag */
+    protected $settings;
+
     /** @var \SoapClient */
     protected $client;
 
     /**
      * {@inheritdoc}
      */
-    public function init(ParameterBag $settings)
+    public function init(Transport $transportEntity)
     {
-        $wsdlUrl = $settings->get('wsdl_url');
-        if ($wsdlUrl) {
-            $isDebug      = $settings->get('debug', false);
-            $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
+        $this->settings = $transportEntity->getSettingsBag();
 
-            return true;
+        $wsdlUrl = $this->settings->get('wsdl_url');
+        if (!$wsdlUrl) {
+            throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
         }
 
-        throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
+        $isDebug      = $this->settings->get('debug', false);
+        $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function call($action, array $params = [])
+    public function call($action, $params = [])
     {
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
@@ -40,22 +47,6 @@ abstract class SOAPTransport implements TransportInterface
         $result = $this->client->__soapCall($action, $params);
 
         return $result;
-    }
-
-    /**
-     * @param string $wsdl_url
-     * @param bool   $isDebug
-     *
-     * @return \SoapClient
-     */
-    protected function getSoapClient($wsdl_url, $isDebug = false)
-    {
-        $options = [];
-        if ($isDebug) {
-            $options['trace'] = true;
-        }
-
-        return new \SoapClient($wsdl_url, $options);
     }
 
     /**
@@ -91,5 +82,28 @@ abstract class SOAPTransport implements TransportInterface
     public function __sleep()
     {
         return [];
+    }
+
+    /**
+     * @param string $wsdlUrl
+     * @param bool   $isDebug
+     *
+     * @return \SoapClient
+     */
+    protected function getSoapClient($wsdlUrl, $isDebug = false)
+    {
+        $options = [];
+        if ($isDebug) {
+            $options['trace'] = true;
+        }
+        $urlParts = parse_url($wsdlUrl);
+        if (isset($urlParts['user'], $urlParts['pass'])) {
+            $options['login']    = $urlParts['user'];
+            $options['password'] = $urlParts['pass'];
+            unset($urlParts['user'], $urlParts['pass']);
+        }
+        $wsdlUrl = Url::buildUrl($urlParts);
+
+        return new \SoapClient($wsdlUrl, $options);
     }
 }

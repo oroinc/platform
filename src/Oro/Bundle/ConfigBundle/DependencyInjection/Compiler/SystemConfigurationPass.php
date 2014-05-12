@@ -2,35 +2,36 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\ConfigBundle\Provider\FormProvider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Provider\Provider;
+
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class SystemConfigurationPass implements CompilerPassInterface
 {
-    const CONFIG_FILE_NAME = 'system_configuration.yml';
-
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
         $config    = array();
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME)) {
-                $bundleConfig = Yaml::parse(realpath($file));
-
-                $config = $processor->merge($config, $bundleConfig);
-            }
+        $configLoader = new CumulativeConfigLoader(
+            'oro_system_configuration',
+            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
+        );
+        $resources    = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $config = $processor->merge($config, $resource->data);
         }
 
-        $taggedServices = $container->findTaggedServiceIds(FormProvider::TAG_NAME);
+        $taggedServices = $container->findTaggedServiceIds(Provider::TAG_NAME);
         if ($taggedServices) {
             $config = $processor->process($config);
 

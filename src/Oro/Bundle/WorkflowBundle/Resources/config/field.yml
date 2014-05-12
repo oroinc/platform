@@ -1,0 +1,21 @@
+parameters:
+    oro_workflow.field_generator.class: Oro\Bundle\WorkflowBundle\Field\FieldGenerator
+    oro_workflow.field_provider.class: Oro\Bundle\WorkflowBundle\Field\FieldProvider
+
+services:
+    oro_workflow.field_generator:
+        class: %oro_workflow.field_generator.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.entity_processor
+            - @oro_workflow.entity_connector
+
+    oro_workflow.field_provider:
+        class: %oro_workflow.field_provider.class%
+        parent: oro_entity.entity_field_provider.abstract
+
+    oro_workflow.field_list_provider:
+        class: %oro_entity.entity_field_list_provider.class%
+        arguments:
+            - @oro_workflow.field_provider
+            - @oro_entity.entity_provider

@@ -3,8 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
@@ -40,7 +42,10 @@ class OrmTranslationLoader implements LoaderInterface
             /** @var Translation[] $translations */
             $translations = $translationRepo->findValues($locale);
             foreach ($translations as $translation) {
-                $messages[$translation->getKey()] = $translation->getValue();
+                // UI scope should override SYSTEM values if exist
+                if (!isset($messages[$translation->getKey()]) || $translation->getScope() == Translation::SCOPE_UI) {
+                    $messages[$translation->getKey()] = $translation->getValue();
+                }
             }
 
             $catalogue->add($messages, $domain);

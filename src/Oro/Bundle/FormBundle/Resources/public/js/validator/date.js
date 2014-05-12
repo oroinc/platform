@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'oro/translator', 'oro/formatter/datetime'],
-function (_, __, datetimeFormatter) {
+/*global define*/
+define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
+    ], function (_, __, datetimeFormatter) {
     'use strict';
 
     var defaultParam = {
@@ -8,16 +8,19 @@ function (_, __, datetimeFormatter) {
     };
 
     /**
-     * @export oro/validator/date
+     * @export oroform/js/validator/date
      */
     return [
         'Date',
         function (value, element) {
             return this.optional(element) || datetimeFormatter.isDateValid(String(value));
         },
-        function (param) {
+        function (param, element) {
+            var value = String(this.elementValue(element)),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

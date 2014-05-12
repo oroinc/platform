@@ -1,5 +1,12 @@
-"Delete Confirmation": "Delete Confirmation"
+"Yes": "Yes"
 "Yes, Delete": "Yes, Delete"
+"Yes, I Agree": "Yes, I Agree"
+"Yes, do it": "Yes, do it"
+"No": "No"
+"Ok, got it.": "Ok, got it."
+"Cancel": "Cancel"
+"Delete Confirmation": "Delete Confirmation"
+"Edit": "Edit"
 "Unexpected error occured. Please contact system administrator.": "Unexpected error occured. Please contact system administrator."
 Now: Now
 Prev: Prev
@@ -19,3 +26,6 @@ Second: Second
 Millisecond: Millisecond
 Microsecond: Microsecond
 "Time Zone": "Time Zone"
+"Server error": "Server error"
+"User input error": "User input error"
+"Error! Incorrect server response.": "Error! Incorrect server response."

@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class RequestEntity extends AbstractAction
@@ -107,7 +107,7 @@ class RequestEntity extends AbstractAction
      *
      * @param mixed $context
      * @return object
-     * @throws \Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException
+     * @throws NotManageableEntityException
      */
     protected function getEntityReference($context)
     {
@@ -167,7 +167,7 @@ class RequestEntity extends AbstractAction
     /**
      * @param string $entityClassName
      * @return EntityManager
-     * @throws \Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException
+     * @throws NotManageableEntityException
      */
     protected function getEntityManager($entityClassName)
     {

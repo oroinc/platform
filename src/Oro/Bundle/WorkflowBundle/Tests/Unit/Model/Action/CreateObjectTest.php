@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateObject;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateObjectTest extends \PHPUnit_Framework_TestCase
@@ -118,13 +118,13 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
         return array(
             'without data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                 )
             ),
             'with data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                     'data'      => array('key1' => 'value1', 'key2' => 'value2'),
                 )

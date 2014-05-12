@@ -57,12 +57,14 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider formatDataProvider
      * @param string $format
+     * @param string $regionCode
      * @param string $expected
      * @param bool $formatByCountry
      */
-    public function testFormat($format, $expected, $formatByCountry = false)
+    public function testFormat($format, $regionCode, $expected, $formatByCountry = false)
     {
         $address = new AddressStub();
+        $address->setRegionCode($regionCode);
         $locale = 'en';
         $country = 'CA';
         $addressFormats = array(
@@ -105,26 +107,43 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             'simple street' => array(
                 '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
+                'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
             ),
             'complex street' => array(
                 '%name%\n%organization%\n%street1%\n%street2%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
+                'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str.\napartment 10\nNEW YORK NY UNITED STATES 12345"
             ),
             'unknown field' => array(
                 '%unknown_data_one% %name%\n'
                 . '%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code% %unknown_data_two%',
+                'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
             ),
             'multi spaces' => array(
                 '%unknown_data_one% %name% %unknown_data_one%\n'
                 . '%organization%\n%street%\n'
                 . '%CITY% %unknown_data_one% %REGION_CODE% %COUNTRY% %postal_code% %unknown_data_two%',
+                'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
             ),
             'address country format' => array(
                 '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
+                'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345",
+                true
+            ),
+            'unknown region code' => array(
+                '%name%\n%organization%\n%street%\n%CITY% %region_code% %COUNTRY% %postal_code%',
+                null,
+                "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK New York UNITED STATES 12345",
+                true
+            ),
+            'region name' => array(
+                '%name%\n%organization%\n%street%\n%CITY% %region% %COUNTRY% %postal_code%',
+                null,
+                "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK New York UNITED STATES 12345",
                 true
             ),
         );

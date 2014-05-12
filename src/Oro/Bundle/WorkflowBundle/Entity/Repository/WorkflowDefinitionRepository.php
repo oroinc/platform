@@ -12,29 +12,33 @@ class WorkflowDefinitionRepository extends EntityRepository
      * Get available workflow definitions for entity class
      *
      * @param string $entityClass
+     * @param string|null $workflowName
      * @return WorkflowDefinition[]
      */
-    public function findByEntityClass($entityClass)
+    public function findByEntityClass($entityClass, $workflowName = null)
     {
-        $entityClasses = $this->getAllEntityClasses($entityClass);
-
         $queryBuilder = $this->createQueryBuilder('wd');
-        $queryBuilder->innerJoin('wd.workflowDefinitionEntities', 'wde')
-            ->where($queryBuilder->expr()->in('wde.className', $entityClasses));
+        $queryBuilder
+            ->where('wd.relatedEntity = :relatedEntity')
+            ->setParameter('relatedEntity', $entityClass);
 
-        return $queryBuilder->getQuery()->execute();
+        if ($workflowName) {
+            $queryBuilder->andWhere('wd.name = :workflowName')
+                ->setParameter('workflowName', $workflowName);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
-     * @param string $entityClass
-     * @return array
+     * @return WorkflowDefinition[]
      */
-    protected function getAllEntityClasses($entityClass)
+    public function findAllWithStartStep()
     {
-        $classes = array($entityClass);
-        $classes = array_merge($classes, class_parents($entityClass));
-        $classes = array_merge($classes, class_implements($entityClass));
+        $queryBuilder = $this->createQueryBuilder('wd');
+        $queryBuilder
+            ->where('wd.startStep IS NOT NULL');
 
-        return array_values($classes);
+        return $queryBuilder->getQuery()->getResult();
     }
 }

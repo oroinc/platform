@@ -4,21 +4,46 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class AttributeAssembler extends AbstractAssembler
 {
     /**
+     * @var AttributeGuesser
+     */
+    protected $attributeGuesser;
+
+    /**
+     * @param AttributeGuesser $attributeGuesser
+     */
+    public function __construct(AttributeGuesser $attributeGuesser)
+    {
+        $this->attributeGuesser = $attributeGuesser;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition,
      * @param array $configuration
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(array $configuration)
+    public function assemble(WorkflowDefinition $definition, array $configuration)
     {
+        $entityAttributeName = $definition->getEntityAttributeName();
+        if (!array_key_exists($entityAttributeName, $configuration)) {
+            $configuration[$entityAttributeName] = array(
+                'label' => $entityAttributeName,
+                'type' => 'entity',
+                'options' => array(
+                    'class' => $definition->getRelatedEntity(),
+                ),
+            );
+        }
+
         $attributes = new ArrayCollection();
         foreach ($configuration as $name => $options) {
-            $attribute = $this->assembleAttribute($name, $options);
+            $attribute = $this->assembleAttribute($definition, $name, $options);
             $attributes->set($name, $attribute);
         }
 
@@ -26,20 +51,26 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param string $name
      * @param array $options
      * @return Attribute
      */
-    protected function assembleAttribute($name, array $options)
+    protected function assembleAttribute(WorkflowDefinition $definition, $name, array $options)
     {
-        $options = $this->addDefaultOptions($options);
+        if (!empty($options['property_path'])) {
+            $options = $this->guessOptions($options, $definition->getRelatedEntity(), $options['property_path']);
+        }
 
         $this->assertOptions($options, array('label', 'type'));
+        $this->assertAttributeEntityAcl($options);
 
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
+        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', array()));
+        $attribute->setPropertyPath($this->getOption($options, 'property_path'));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);
@@ -47,18 +78,54 @@ class AttributeAssembler extends AbstractAssembler
         return $attribute;
     }
 
-    protected function addDefaultOptions(array $options)
+    /**
+     * @param array $options
+     * @param string $rootClass
+     * @param string $propertyPath
+     * @return array
+     */
+    protected function guessOptions(array $options, $rootClass, $propertyPath)
     {
-        if (isset($options['type']) && $options['type'] == 'entity') {
-            $options['options'] = isset($options['options']) && is_array($options['options']) ?
-                $options['options'] : array();
+        $guessedOptions = array('label', 'type', 'options');
+        $needGuess = false;
+        foreach ($guessedOptions as $option) {
+            if (empty($options[$option])) {
+                $needGuess = true;
+                break;
+            }
+        }
 
-            $options['options'] = array_merge(
-                array('multiple' => false, 'bind' => !empty($options['options']['managed_entity'])),
-                $options['options']
+        if (!$needGuess) {
+            return $options;
+        }
+
+        $attributeParameters = $this->attributeGuesser->guessAttributeParameters($rootClass, $propertyPath);
+        if ($attributeParameters) {
+            foreach ($guessedOptions as $option) {
+                if (empty($options[$option]) && !empty($attributeParameters[$option])) {
+                    $options[$option] = $attributeParameters[$option];
+                }
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param array $options
+     * @throws AssemblerException
+     */
+    protected function assertAttributeEntityAcl(array $options)
+    {
+        if ($options['type'] !== 'entity' && array_key_exists('entity_acl', $options)) {
+            throw new AssemblerException(
+                sprintf(
+                    'Attribute "%s" with type "%s" can\'t have entity ACL',
+                    $options['label'],
+                    $options['type']
+                )
             );
         }
-        return $options;
     }
 
     /**
@@ -73,23 +140,6 @@ class AttributeAssembler extends AbstractAssembler
             $this->assertAttributeHasClassOption($attribute);
         } else {
             $this->assertAttributeHasNoOptions($attribute, 'class');
-        }
-
-        if ($attribute->getType() == 'entity') {
-            $managedEntity = $attribute->getOption('managed_entity');
-            $multiple = $attribute->getOption('multiple');
-            $bind = $attribute->getOption('bind');
-            if ($managedEntity && !$multiple && !$bind) {
-                throw new AssemblerException(
-                    sprintf(
-                        'Options "multiple" and "bind" for managed entity in attribute "%s" ' .
-                        'cannot be both false simultaneously',
-                        $attribute->getName()
-                    )
-                );
-            }
-        } else {
-            $this->assertAttributeHasNoOptions($attribute, array('managed_entity', 'bind', 'multiple'));
         }
     }
 

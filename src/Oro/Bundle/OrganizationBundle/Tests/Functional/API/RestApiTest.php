@@ -81,6 +81,7 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty($responseData);
         $responseData = ToolsAPI::jsonToArray($responseData);
         $initialCount = $this->getCount();
+
         foreach ($responseData as $row) {
             if ($row['id'] == $id) {
                 $this->assertEquals($this->fixtureData['business_unit']['name'], $row['name']);
@@ -160,7 +161,6 @@ class RestApiTest extends WebTestCase
 
         $result = ToolsAPI::jsonToArray($result->getContent());
         $this->assertEquals($requestData['business_unit']['name'], $result['name']);
-
     }
 
     /**

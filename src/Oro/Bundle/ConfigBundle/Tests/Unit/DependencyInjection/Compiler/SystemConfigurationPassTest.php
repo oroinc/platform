@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\ConfigBundle\Provider\FormProvider;
+use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
+use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
+
+use Oro\Component\Config\CumulativeResourceManager;
 
 class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,12 +34,14 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $bundles, $expectedSet)
     {
-        $this->container->expects($this->once())->method('getParameter')->with('kernel.bundles')
-            ->will($this->returnValue($bundles));
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($bundles);
+
         if ($expectedSet) {
             $taggedServices = array('some.service.id' => 'some arguments');
 
-            $this->container->expects($this->once())->method('findTaggedServiceIds')->with(FormProvider::TAG_NAME)
+            $this->container->expects($this->once())->method('findTaggedServiceIds')->with(Provider::TAG_NAME)
                 ->will($this->returnValue($taggedServices));
 
             $definitionMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
@@ -56,13 +61,15 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function bundlesProvider()
     {
+        $bundle = new TestBundle();
+
         return array(
             'no one bundle specified config' => array(
                 'bundles'         => array(),
                 'should set data' => false
             ),
             'one bundle specified config'    => array(
-                'bundles'         => array('Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle'),
+                'bundles'         => array($bundle->getName() => get_class($bundle)),
                 'should set data' => true
             )
         );

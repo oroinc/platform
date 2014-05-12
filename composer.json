@@ -9,6 +9,12 @@
             "homepage": "http://www.orocrm.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packagist.orocrm.com"
+        }
+    ],
     "require": {
         "php": ">=5.4.4",
         "ext-intl": "*",
@@ -16,15 +22,14 @@
         "ext-gd": "*",
         "ext-xml": "*",
         "ext-mysql": "*",
-        "lib-ICU": ">=4.4",
         "symfony/symfony": "v2.3.6",
-        "doctrine/orm": "2.4.*@dev",
-        "doctrine/doctrine-bundle": "1.2.x-dev",
+        "doctrine/orm": "2.4.1",
+        "doctrine/doctrine-bundle": "1.2.0",
         "doctrine/data-fixtures": "1.0.0",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
         "twig/extensions": "1.0.1",
         "symfony/assetic-bundle": "2.3.0",
-        "symfony/icu": "1.2.x-dev",
+        "symfony/icu": "~1.1",
         "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.3.0",
         "sensio/distribution-bundle": "2.3.4",
@@ -47,7 +52,6 @@
         "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
         "liip/imagine-bundle": "0.17.*",
         "leafo/lessphp": "0.4.0",
-        "willdurand/expose-translation-bundle": "1.1.*",
         "genemu/form-bundle": "2.2.1",
         "zendframework/zend-mail": "2.1.*",
         "a2lix/translation-form-bundle": "1.2",
@@ -55,17 +59,23 @@
         "jdare/clank-bundle": "0.1.*",
         "lexik/maintenance-bundle": "dev-master",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.x-dev"
+        "composer/composer": "1.0.0-alpha8",
+        "akeneo/batch-bundle": "0.1.2",
+        "luxifer/doctrine-functions": "1.2.1",
+        "nesbot/Carbon": "1.8.*",
+        "monolog/monolog": "1.7.*",
+        "ocramius/proxy-manager": "0.4.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.x-dev"
         }
     },
     "autoload": {
         "psr-0": {
+              "Oro\\Component": "src/",
               "Oro\\Bundle": "src/"
         }
     }

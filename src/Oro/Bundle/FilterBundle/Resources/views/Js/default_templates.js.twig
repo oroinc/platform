@@ -1,0 +1,126 @@
+<script type="text/template" id="filter-wrapper-template">
+    <div class="filter-item oro-drop">
+        <a href="<%= nullLink %>"
+           class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <strong class="filter-criteria-hint"><%- criteriaHint %></strong>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+            <span class="caret"></span>
+        </a>
+        <div class="filter-criteria dropdown-menu" />
+    </div>
+</script>
+<script type="text/template" id="none-filter-template">
+    <div><%= popupHint %></div>
+</script>
+<script type="text/template" id="text-filter-template">
+    <div>
+        <div>
+            <input type="text" name="value" value=""/>
+        </div>
+        <div class="oro-action">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary filter-update"><%- _.__("Update") %></button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="choice-filter-template">
+    <div class="choicefilter">
+        <div class="input-prepend">
+            <div class="btn-group">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    <%- selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                        <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                            <a class="choice-value" href="#" data-value="<%= option.value %>"><%- option.label %></a>
+                        </li>
+                    <% }); %>
+                </ul>
+                <input type="text" name="value" value="">
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+            </div>
+        </div>
+        <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+    </div>
+</script>
+
+<script type="text/template" id="select-field-template">
+    <div class="horizontal clearfix">
+        <select name="<%= name %>" class="filter-select-oro">
+            <% _.each(choices, function (option) { %>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
+            <% }); %>
+        </select>
+    </div>
+</script>
+
+<script type="text/template" id="date-filter-template">
+    <div>
+        <%= parts.join('') %>
+        <div>
+            <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
+            <span class="filter-separator">-</span>
+            <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
+        </div>
+        <div class="oro-action">
+            <div class="btn-group">
+                <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="date-filter-dropdown-template">
+    <div class="dropdown-menu dropdown-menu-calendar">
+        <% if (!tabs.length) { %>
+        <div id="calendar<%= suffix %>"></div>
+        <% } else { %>
+        <ul class="nav nav-tabs nav-tabs-oro">
+            <% _.each(tabs, function (tab, i) { %>
+            <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
+            <% }); %>
+        </ul>
+        <div class="tab-content">
+            <% _.each(tabs, function (tab, i) { %>
+            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
+            <% }); %>
+        </div>
+        <% } %>
+    </div>
+</script>
+<script type="text/template" id="select-filter-template">
+    <div class="filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <strong class="select-filter-placeholder"><%= placeholder %></strong>
+            <select>
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>
+                    title="<%- option.label %>">
+                    <%- option.label %>
+                </option>
+                <% }); %>
+            </select>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="multiselect-filter-template">
+    <div class="filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <strong class="select-filter-placeholder"><%= placeholder %></strong>
+            <select multiple>
+                <% _.each(options, function (option) { %><option value="<%= option.value %>" title="<%- option.label %>">
+                    <%- option.label %>
+                </option><% }); %>
+            </select>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+                ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+        </div>
+    </div>
+</script>

@@ -1,38 +1,7 @@
-Oro Sync Bundle
-===============
-Provides websocket comminucation layer. Based on JDareClankBundle.
+OroSyncBundle
+=============
 
-## Installation ##
-Add the `oro/sync-bundle` package to your `require` section in the `composer.json` file.
-
-``` yaml
-"require": {
-    [...]
-    "oro/sync-bundle": "dev-master"
-},
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "git@github.com:laboro/SyncBundle.git",
-        "branch": "master"
-    }
-]
-```
-
-Add the SyncBundle to your application's kernel:
-
-``` php
-<?php
-public function registerBundles()
-{
-    $bundles = array(
-        // ...
-        new Oro\Bundle\SyncBundle\OroSyncBundle(),
-        // ...
-    );
-    ...
-}
-```
+Bundle adds support of websocket communications. Based on JDareClankBundle.
 
 ## Configuration ##
 Set port and host (optional) for websocket server in parameters.yml

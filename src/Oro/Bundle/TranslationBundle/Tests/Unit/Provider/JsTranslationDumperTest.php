@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
 {

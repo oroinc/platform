@@ -59,7 +59,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             ->addGroup($group)
             ->setBusinessUnits(
                 new ArrayCollection(array($unit))
-            );
+            )
+            ->setSalt('');
 
         $api   = new UserApi();
         if (!$admin->getApi()) {

@@ -43,8 +43,8 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
     public function loadSettingsProvider()
     {
         return array(
-            array(null, true),
-            array('oro_user', false),
+            array(true),
+            array(false),
         );
     }
 
@@ -53,7 +53,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider loadSettingsProvider
      */
-    public function testLoadSettings($section, $isScope)
+    public function testLoadSettings($isScope)
     {
         $criteria = array(
             'scopedEntity' => 'user',
@@ -86,8 +86,6 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
                 ->with($criteria)
                 ->will($this->returnValue($scope));
         } else {
-            $criteria['section'] = 'oro_user';
-
             $this->repository
                 ->expects($this->once())
                 ->method('findOneBy')
@@ -97,8 +95,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $settings = $this->repository->loadSettings(
             $criteria['scopedEntity'],
-            $criteria['recordId'],
-            $section
+            $criteria['recordId']
         );
 
         if ($isScope) {

@@ -18,7 +18,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -55,7 +55,8 @@ class EntitiesController extends Controller
         return [
             'entity_id'    => $id,
             'entity_class' => $extendEntityName,
-            'label'        => $entityConfig->get('label')
+            'label'        => $entityConfig->get('label'),
+            'plural_label' => $entityConfig->get('plural_label')
         ];
     }
 
@@ -85,7 +86,7 @@ class EntitiesController extends Controller
         $fields = $extendProvider->filter(
             function (ConfigInterface $config) use ($relationConfig) {
                 return
-                    !$config->is('state', ExtendManager::STATE_NEW)
+                    !$config->is('state', ExtendScope::STATE_NEW)
                     && !$config->is('is_deleted')
                     && in_array($config->getId()->getFieldName(), $relationConfig->get('target_detailed'));
             },
@@ -163,6 +164,10 @@ class EntitiesController extends Controller
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $record = $em->getRepository($extendEntityName)->find($id);
 
+        if (!$record) {
+            throw $this->createNotFoundException();
+        }
+
         return [
             'parent'        => $entity_id,
             'entity'        => $record,
@@ -226,21 +231,9 @@ class EntitiesController extends Controller
                     $this->get('translator')->trans('oro.entity.controller.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->actionRedirect(
-                    [
-                        'route'      => 'oro_entity_update',
-                        'parameters' => [
-                            'entity_id' => $entity_id,
-                            'id'        => $id
-                        ],
-                    ],
-                    [
-                        'route'      => 'oro_entity_view',
-                        'parameters' => [
-                            'entity_id' => $entity_id,
-                            'id'        => $id
-                        ]
-                    ]
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    ['route' => 'oro_entity_update', 'parameters' => ['entity_id' => $entity_id, 'id'=> $id]],
+                    ['route' => 'oro_entity_view', 'parameters' => ['entity_id' => $entity_id, 'id' => $id]]
                 );
             }
         }

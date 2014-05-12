@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\NotificationBundle\OroNotificationBundle, kernel: true }
+    - { name: Oro\Bundle\NotificationBundle\OroNotificationBundle }

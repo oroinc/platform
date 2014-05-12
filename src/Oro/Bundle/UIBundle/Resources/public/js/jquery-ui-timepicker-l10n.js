@@ -1,13 +1,9 @@
 /* global define */
-define(['jquery', 'oro/translator', 'oro/locale-settings', 'jquery-ui-timepicker'],
+define(['jquery', 'orotranslation/js/translator', 'orolocale/js/locale-settings', 'jquery-ui-timepicker'],
 function($, __, localeSettings) {
     'use strict';
 
     var locale = localeSettings.locale;
-
-    var separator = localeSettings.getVendorDateTimeFormat('jquery_ui', 'datetime', '')
-        .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'date'), '')
-        .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'time'), '');
 
     $.timepicker.regional[locale] = { // Default regional settings
         currentText: __('Now'),
@@ -24,8 +20,15 @@ function($, __, localeSettings) {
         millisecText: __('Millisecond'),
         microsecText: __('Microsecond'),
         timezoneText: __('Time Zone'),
-        defaultTimezone: localeSettings.getTimeZoneOffset().replace(':', ''),
-        separator: separator
+        timezone: localeSettings.getTimeZoneOffset().replace(':', ''),
+        separator: localeSettings.getDateTimeFormatSeparator()
     };
     $.timepicker.setDefaults($.timepicker.regional[locale]);
+
+    $.datepicker._orig_gotoToday = $.datepicker._gotoToday;
+    $.datepicker._gotoToday = function(id) {
+        var inst = this._getInst($(id)[0]);
+        this._base_gotoToday(id);
+        this._setTime(inst, inst.today);
+    };
 });

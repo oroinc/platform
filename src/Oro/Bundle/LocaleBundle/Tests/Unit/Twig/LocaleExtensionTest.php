@@ -47,6 +47,7 @@ class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
             'oro_locale' => array($this->localeSettings, 'getLocale'),
             'oro_language' => array($this->localeSettings, 'getLanguage'),
             'oro_country' => array($this->localeSettings, 'getCountry'),
+            'oro_currency_symbol' => array($this->localeSettings, 'getCurrencySymbolByCurrency'),
             'oro_currency' => array($this->localeSettings, 'getCurrency'),
             'oro_timezone' => array($this->localeSettings, 'getTimeZone'),
             'oro_timezone_offset' => array($this->extension, 'getTimeZoneOffset'),

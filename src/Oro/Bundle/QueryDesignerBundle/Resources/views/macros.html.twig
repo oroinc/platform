@@ -1,141 +1,195 @@
-{% macro query_designer_filter_list(attr) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-filters-grid-container')|trim}) %}
-    <div{{ UI.attributes(attr) }}>
-        <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
-            <thead>
-            <tr>
-                <th class="index-column"><span>{{ 'oro.query_designer.datagrid.filter.index'|trans }}</span></th>
-                <th class="string-column"><span>{{ 'oro.query_designer.datagrid.filter.filter'|trans }}</span></th>
-                <th class="action-column"><span>{{ 'oro.query_designer.datagrid.filter.actions'|trans }}</span></th>
-            </tr>
-            </thead>
-            <tbody class="item-container">
-            </tbody>
-        </table>
+{% macro query_designer_condition_builder(params) %}
+    {% set fieldConditionOptions = {
+        fieldChoice: {
+            select2: {
+                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+            },
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id
+        }
+    } %}
+    <div class="condition-builder left-panel-container">
+        <div class="panel-placeholder">
+            <div>
+                <div class="row-fluid">
+                    <div class="span3 filter-criteria">
+                        <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                            <li class="option" data-criteria="condition-item"
+                                data-module="oroquerydesigner/js/field-condition"
+                                data-widget="fieldCondition"
+                                data-options="{{ fieldConditionOptions|json_encode }}">
+                                {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
+                            </li>
+                            <li class="option" data-criteria="conditions-group">
+                                {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="span9">
+                        <div class="condition-builder" id="{{ params.id }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-{% endmacro %}
+    <script type="text/javascript">
+        require(['oroquerydesigner/js/condition-builder'], function ($) {
+            var $criteriaList = $('#{{ params.criteria_list_id }}'),
+                $fieldConditionCriteria = $criteriaList.find('[data-criteria=condition-item]'),
+                $groupConditionCriteria = $criteriaList.find('[data-criteria=conditions-group]'),
+                $conditions = $('#{{ params.id }}');
 
-{% macro query_designer_filter_template(id) %}
-    <script type="text/html" id="{{ id }}">
-        <tr data-id="<%= id %>">
-            <td class="index-cell"><%= index %></td>
-            <td class="string-cell"><%= filter %></td>
-            <td class="action-cell">
-                <a href="javascript: void(0);" class="action no-hash edit-button"
-                   title="{{ 'oro.query_designer.datagrid.action.update_filter'|trans }}"
-                ><i class="icon-edit hide-text"></i></a>
-                <a href="javascript: void(0);" class="action no-hash delete-button"
-                   data-message="{{ 'oro.query_designer.datagrid.action.delete_filter_confirmation'|trans }}"
-                   title="{{ 'oro.query_designer.datagrid.action.delete_filter'|trans }}"
-                ><i class="icon-trash hide-text"></i></a>
-            </td>
-        </tr>
+            $('#{{ params.entity_choice_id }}')
+                .on('fieldsloaderupdate', function (e, fields) {
+                    $conditions.conditionBuilder('setValue', []);
+
+                    var isEmptyObject = $.isEmptyObject(fields);
+                    $fieldConditionCriteria
+                        .toggleClass('disabled', isEmptyObject);
+                    $groupConditionCriteria
+                        .toggleClass('disabled', isEmptyObject);
+                });
+
+            $conditions.conditionBuilder({
+                criteriaListSelector: '#{{ params.criteria_list_id }}'
+            });
+        });
     </script>
 {% endmacro %}
 
-{% macro query_designer_filter_form(form, form_filters_logic, attr) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
-    <div{{ UI.attributes(attr) }}>
-        {{ form_row(form.columnName, {
-            'label': 'oro.query_designer.form.column'|trans,
-            'attr': {
-                'data-purpose': 'column-selector'
-            }
-        }) }}
-        {{ form_row(form.criterion, {
-            'label': 'oro.query_designer.form.condition'|trans,
-            'attr': {
-                'data-purpose': 'criterion-selector'
-            }
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash cancel-button',
-            'label' : 'oro.query_designer.form.action.cancel'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-success save-button',
-            'label' : 'oro.query_designer.form.action.save'|trans
-        }) }}
-        {{ UI.clientButton({
-            'aCss': 'no-hash btn-primary add-button',
-            'label' : 'oro.query_designer.form.action.add'|trans
-        }) }}
-    </div>
-    <div class="query-designer-filter-logic-form query-designer-form clearfix">
-        {{ form_row(form_filters_logic, {
-            'label': 'oro.query_designer.form.filter_logic'|trans,
-            'tooltip': 'oro.query_designer.form.filter_logic_tooltip',
-            'attr': {
-                'data-purpose': 'filter-logic'
-            }
-        }) }}
-    </div>
-{% endmacro %}
-
-{% macro query_designer_column_list(attr) %}
+{% macro query_designer_column_list(attr, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
             <thead>
             <tr>
+                {% if ('column' in showItems) %}
                 <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
+                {% endif %}
+                {% if ('label' in showItems) %}
                 <th class="label-column"><span>{{ 'oro.query_designer.datagrid.column.label'|trans }}</span></th>
+                {% endif %}
+                {% if ('function' in showItems) %}
                 <th class="function-column"><span>{{ 'oro.query_designer.datagrid.column.function'|trans }}</span></th>
+                {% endif %}
+                {% if ('sorting' in showItems) %}
                 <th class="sorting-column"><span>{{ 'oro.query_designer.datagrid.column.sorting'|trans }}</span></th>
+                {% endif %}
+                {% if ('action' in showItems) %}
                 <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
+                {% endif %}
             </tr>
             </thead>
             <tbody class="item-container">
             </tbody>
         </table>
     </div>
+    {{ _self.query_designer_column_template(attr.rowId, showItems) }}
 {% endmacro %}
 
-{% macro query_designer_column_template(id) %}
+{% macro query_designer_grouping_list(attr) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
+    <div{{ UI.attributes(attr) }}>
+        <div class="grid-container query-designer-grid-container query-designer-columns-grid-container">
+            <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
+                <thead>
+                <tr>
+                    <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
+                    <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
+                </tr>
+                </thead>
+                <tbody class="grouping-item-container">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro query_designer_column_template(id, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     <script type="text/html" id="{{ id }}">
-        <tr data-id="<%= id %>">
+        <tr data-cid="<%= cid %>">
+            {% if ('column' in showItems) %}
             <td class="name-cell"><%= name %></td>
-            <td class="label-cell"><%= label %></td>
+            {% endif %}
+            {% if ('label' in showItems) %}
+            <td class="label-cell"><%- label %></td>
+            {% endif %}
+            {% if ('function' in showItems) %}
             <td class="function-cell"><%= func %></td>
+            {% endif %}
+            {% if ('sorting' in showItems) %}
             <td class="sorting-cell"><%= sorting %></td>
+            {% endif %}
+            {% if ('action' in showItems) %}
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
-                   title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
-                ><i class="icon-edit hide-text"></i></a>
+                        title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
+                        data-collection-action="edit">
+                    <i class="icon-edit hide-text"></i></a>
                 <a href="javascript: void(0);" class="action no-hash delete-button"
-                   data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}"
-                   title="{{ 'oro.query_designer.datagrid.action.delete_column'|trans }}"
-                ><i class="icon-trash hide-text"></i></a>
-                <span
-                   title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}"
-                ><i class="icon-list handle"></i></span>
+                        title="{{ 'oro.query_designer.datagrid.action.delete_column'|trans }}"
+                        data-collection-action="delete"
+                        data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
+                    <i class="icon-trash hide-text"></i></a>
+                <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
+                    <i class="icon-list handle"></i></span>
+            </td>
+            {% endif %}
+        </tr>
+    </script>
+{% endmacro %}
+
+{% macro query_designer_grouping_item_template(id) %}
+    <script type="text/html" id="{{ id }}">
+        <tr data-cid="<%= cid %>">
+            <td class="name-cell"><%= name %></td>
+            <td class="action-cell">
+                <a href="javascript: void(0);" class="action no-hash edit-button"
+                        title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
+                        data-collection-action="edit">
+                    <i class="icon-edit hide-text"></i></a>
+                <a href="javascript: void(0);" class="action no-hash delete-button"
+                        title="{{ 'oro.query_designer.datagrid.action.delete_column'|trans }}"
+                        data-collection-action="delete"
+                        data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
+                    <i class="icon-trash hide-text"></i></a>
+                <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
+                    <i class="icon-list handle"></i></span>
             </td>
         </tr>
     </script>
 {% endmacro %}
 
-{% macro query_designer_column_form(form, attr) %}
+{% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
+        {# @todo own formtype for this kind field based on hidden input #}
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {% if ('column' in showItems) %}
         {{ form_row(form.name, {
             'label': 'oro.query_designer.form.column'|trans,
+            'entity_choice_selector': '#' ~ params.entity_choice_id,
             'attr': {
-                'data-purpose': 'column-selector'
+                'data-purpose': 'column-selector',
+                'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
+        {% endif %}
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {% if ('label' in showItems) %}
         {{ form_row(form.label, {
             'label': 'oro.query_designer.form.label'|trans,
             'attr': {
                 'class': 'label-text',
-                'data-purpose': 'label'
+                'data-purpose': 'label',
+                'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
+        {% endif %}
+        {% if ('function' in showItems) %}
         {{ form_row(form.func, {
             'label': 'oro.query_designer.form.function'|trans,
             'attr': {
@@ -143,6 +197,8 @@
                 'data-purpose': 'function-selector'
             }
         }) }}
+        {% endif %}
+        {% if ('sorting' in showItems) %}
         {{ form_row(form.sorting, {
             'label': 'oro.query_designer.form.sorting'|trans,
             'attr': {
@@ -150,36 +206,98 @@
                 'data-purpose': 'sorting-selector'
             }
         }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash cancel-button',
-            'label' : 'oro.query_designer.form.action.cancel'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-success save-button',
-            'label' : 'oro.query_designer.form.action.save'|trans
-        }) }}
-        {{ UI.clientButton({
-            'aCss': 'no-hash btn-primary add-button',
-            'label' : 'oro.query_designer.form.action.add'|trans
-        }) }}
+        {% endif %}
+        {% if ('action' in showItems) %}
+        <div class="pull-right">
+            {{ UI.clientButton({
+                'aCss': 'no-hash cancel-button column-form-button',
+                'label' : 'oro.query_designer.form.action.cancel'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-success save-button column-form-button',
+                'label' : 'oro.query_designer.form.action.save'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-primary add-button column-form-button',
+                'label' : 'oro.query_designer.form.action.add'|trans
+            }) }}
+        </div>
+        {% endif %}
     </div>
+    <script type="text/javascript">
+        require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
+            var $form = $('#{{ attr.id }}'),
+                $fields = $form.find('[data-purpose=column-selector]'),
+                $functions = $form.find('[data-purpose=function-selector]'),
+                $label = $form.find('[data-purpose=label]');
+
+            {% if ('function' in showItems) %}
+            $functions.functionChoice({
+                fieldChoiceSelector: $fields
+            });
+            {% endif %}
+
+            $fields
+                .on('change', function (e) {
+                    if (e.added) {
+                        // update label input on field change
+                        $label.val(e.added.text).trigger('change');
+                    }
+                });
+        });
+    </script>
 {% endmacro %}
 
-{% macro query_designer_grouping_form(form, attr) %}
+{% macro query_designer_grouping_form(form, attr, params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
+        {# @todo own formtype for this kind field based on hidden input #}
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {{ form_row(form.columnNames, {
             'label': 'oro.query_designer.form.grouping_columns'|trans,
+            'entity_choice_selector': '#' ~ params.entity_choice_id,
             'attr': {
-                'data-purpose': 'column-selector'
+                'data-purpose': 'column-selector',
+                'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
+        <div class="pull-right">
+            {{ UI.clientButton({
+                'aCss': 'no-hash cancel-button',
+                'label' : 'oro.query_designer.form.action.cancel'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-success save-button',
+                'label' : 'oro.query_designer.form.action.save'|trans
+            }) }}
+            {{ UI.clientButton({
+                'visible': false,
+                'aCss': 'no-hash btn-primary add-button',
+                'label' : 'oro.query_designer.form.action.add'|trans
+            }) }}
+        </div>
     </div>
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}
-    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %></script>
+    {% spaceless %}
+    <script type="text/html" id="{{ id }}">
+        <span class="entity-field-path">
+        <% _.each(obj, function (item, index, list) { if (index > 0) { %>
+            <% if (index === 1) { %>
+                <span><%= item.field.entity.label %></span>
+            <% } %>
+            <% if (index !== list.length - 1) { %>
+                <span><%= item.field.label %></span>
+            <% } else { %>
+                <b><%= item.field.label %></b>
+            <% } %>
+        <% }}) %>
+        </span>
+    </script>
+    {% endspaceless %}
 {% endmacro %}

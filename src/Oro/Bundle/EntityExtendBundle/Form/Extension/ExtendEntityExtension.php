@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
@@ -13,22 +14,15 @@ use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
 class ExtendEntityExtension extends AbstractTypeExtension
 {
     /**
-     * @var ExtendManager
-     */
-    protected $extendManager;
-
-    /**
      * @var ConfigManager
      */
     protected $configManager;
 
     /**
-     * @param ExtendManager $extendManager
      * @param ConfigManager $configManager
      */
-    public function __construct(ExtendManager $extendManager, ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->extendManager = $extendManager;
         $this->configManager = $configManager;
     }
 
@@ -37,16 +31,13 @@ class ExtendEntityExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($builder->getForm()->getName() == CustomEntityType::NAME) {
+        $name = $builder instanceof FormConfigBuilder ? $builder->getName() : $builder->getForm()->getName();
+        if ($name == CustomEntityType::NAME || empty($options['data_class'])) {
             return;
         }
 
-        $className = !empty($options['data_class']) ? $options['data_class'] : null;
-        if (!$className) {
-            return;
-        }
-
-        if (!$this->extendManager->getConfigProvider()->hasConfig($className)) {
+        $className = $options['data_class'];
+        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
             return;
         }
 
@@ -93,7 +84,7 @@ class ExtendEntityExtension extends AbstractTypeExtension
             $extendConfig = $extendConfigProvider->getConfig($className, $formConfig->getId()->getFieldName());
             if ($formConfig->get('is_enabled')
                 && !$extendConfig->is('is_deleted')
-                && $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
+                && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 && !in_array($formConfig->getId()->getFieldType(), array('ref-one', 'ref-many'))
             ) {
                 return true;

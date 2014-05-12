@@ -6,6 +6,8 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectConfiguration\CorrectConfigurationBundle;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectSplitConfiguration\CorrectSplitConfigurationBundle;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectSplitConfig\IncorrectSplitConfigBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfiguration\DuplicateConfigurationBundle;
@@ -41,6 +43,17 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Resource "first_workflow.yml" is unreadable
+     */
+    public function testGetWorkflowDefinitionsIncorrectSplitConfig()
+    {
+        $bundles = array(new IncorrectSplitConfigBundle());
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+        $configurationProvider->getWorkflowDefinitionConfiguration();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
@@ -52,6 +65,17 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowDefinitions()
     {
         $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $this->assertEquals(
+            $this->getExpectedWokflowConfiguration('CorrectConfiguration'),
+            $configurationProvider->getWorkflowDefinitionConfiguration()
+        );
+    }
+
+    public function testGetSplittedWorkflowDefinitions()
+    {
+        $bundles = array(new CorrectSplitConfigurationBundle(), new EmptyConfigurationBundle());
         $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
 
         $this->assertEquals(

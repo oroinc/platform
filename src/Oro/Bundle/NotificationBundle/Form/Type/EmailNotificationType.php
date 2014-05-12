@@ -17,12 +17,7 @@ class EmailNotificationType extends AbstractType
     /**
      * @var array
      */
-    protected $entityNameChoices = array();
-
-    /**
-     * @var array
-     */
-    protected $entitiesData = array();
+    protected $ownershipEntities = array();
 
     /**
      * @var BuildTemplateFormSubscriber
@@ -30,29 +25,22 @@ class EmailNotificationType extends AbstractType
     protected $subscriber;
 
     /**
-     * @param array                       $entitiesConfig
      * @param BuildTemplateFormSubscriber $subscriber
-     * @param ConfigProvider              $configManager
+     * @param ConfigProvider              $ownershipConfigProvider
      */
-    public function __construct($entitiesConfig, BuildTemplateFormSubscriber $subscriber, ConfigProvider $configManager)
-    {
+    public function __construct(
+        BuildTemplateFormSubscriber $subscriber,
+        ConfigProvider $ownershipConfigProvider
+    ) {
         $this->subscriber = $subscriber;
-        $this->entityNameChoices = array_map(
-            function ($value) {
-                return isset($value['name']) ? $value['name'] : '';
-            },
-            $entitiesConfig
-        );
 
-        $this->entitiesData = $entitiesConfig;
-        array_walk(
-            $this->entitiesData,
-            function (&$value, $class) use ($configManager) {
-                $ownerType = $configManager->hasConfig($class) ?
-                    $configManager->getConfig($class)->get('owner_type') : null;
-                $value = !empty($ownerType) && $ownerType != OwnershipType::OWNER_TYPE_NONE;
+        $this->ownershipEntities = [];
+        foreach ($ownershipConfigProvider->getConfigs() as $config) {
+            $ownerType = $config->get('owner_type');
+            if (!empty($ownerType) && $ownerType != OwnershipType::OWNER_TYPE_NONE) {
+                $this->ownershipEntities[$config->getId()->getClassName()] = true;
             }
-        );
+        }
     }
 
     /**
@@ -64,23 +52,19 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'entityName',
-            'choice',
+            'oro_email_notification_entity_choice',
             array(
                 'label'              => 'oro.notification.emailnotification.entity_name.label',
-                'choices'            => $this->entityNameChoices,
-                'multiple'           => false,
-                'empty_value'        => '',
-                'empty_data'         => null,
                 'required'           => true,
                 'attr'               => array(
-                    'data-entities' => json_encode($this->entitiesData)
+                    'data-ownership-entities' => json_encode($this->ownershipEntities)
                 )
             )
         );
 
         $builder->add(
             'event',
-            'entity',
+            'genemu_jqueryselect2_entity',
             array(
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
@@ -89,6 +73,9 @@ class EmailNotificationType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
+                'configs' => array(
+                    'placeholder' => 'oro.notification.form.choose_event',
+                ),
                 'empty_value'   => '',
                 'empty_data'    => null,
                 'required'      => true

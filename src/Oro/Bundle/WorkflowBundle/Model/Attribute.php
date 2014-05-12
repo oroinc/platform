@@ -15,9 +15,19 @@ class Attribute
     protected $type;
 
     /**
+     * @var array
+     */
+    protected $entityAcl = array();
+
+    /**
      * @var string
      */
     protected $label;
+
+    /**
+     * @var string
+     */
+    protected $propertyPath;
 
     /**
      * @var array
@@ -44,6 +54,30 @@ class Attribute
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param array $entityAcl
+     */
+    public function setEntityAcl(array $entityAcl)
+    {
+        $this->entityAcl = $entityAcl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEntityUpdateAllowed()
+    {
+        return !array_key_exists('update', $this->entityAcl) || $this->entityAcl['update'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEntityDeleteAllowed()
+    {
+        return !array_key_exists('delete', $this->entityAcl) || $this->entityAcl['delete'];
     }
 
     /**
@@ -145,5 +179,24 @@ class Attribute
     public function hasOption($key)
     {
         return isset($this->options[$key]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPropertyPath()
+    {
+        return $this->propertyPath;
+    }
+
+    /**
+     * @param string $propertyPath
+     * @return Attribute
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        $this->propertyPath = $propertyPath;
+
+        return $this;
     }
 }

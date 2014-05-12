@@ -8,8 +8,8 @@ class Mcrypt extends Origin
 {
     public function __construct($key = null)
     {
-        if ($key !== null && strlen($key) < 32) {
-            // use hash in case when key length less than needed
+        if ($key !== null && strlen($key) != 32) {
+            // use hash in case when key length is not 32
             $key = md5($key);
         }
         parent::__construct($key);

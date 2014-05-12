@@ -24,6 +24,33 @@
     </div>
 {% endmacro %}
 
+{% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
+    {% set details_anchor = details_anchor|default(null) %}
+    {% set details_link = details_link|default(null) %}
+    {% set details_enabled = details_enabled|default(false) %}
+    {% set tooltip_parameters = tooltip_parameters|default({}) %}
+    {% set tooltip_placement = tooltip_placement|default(null) %}
+    {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+
+    {# Help link logic #}
+    {% if details_enabled or details_anchor or details_link %}
+        {% set helpLink = details_link|default(get_help_link()) %}
+        {% if details_anchor %}
+            {% set helpLink = helpLink ~ '#' ~ details_anchor %}
+        {% endif %}
+        {% set tooltip = tooltip
+            ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">'
+            ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
+        %}
+    {% endif %}
+    {# End help link logic #}
+
+    <i class="icon-info-sign tooltip-icon"
+       {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
+       data-content="{{ tooltip }}"
+       data-toggle="popover"></i>
+{% endmacro %}
+
 {#
     Render flexible attribute row
     Parameters:
@@ -44,15 +71,15 @@
     {% macro attribute_data(value, additionalData) %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
-                <p class="control-label">{{ value }}</p>
+                <div class="control-label">{{ value }}</div>
             {% else %}
-                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
             {% for data in additionalData.data %}
                 <div class="clearfix-oro">
-                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                    <div class="control-label">{{ attribute(data, additionalData.field) }}</div>
                 </div>
             {% endfor %}
         {% endif %}
@@ -82,64 +109,202 @@
         data  - property data
 #}
 {% macro renderProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
+    {{ _self.renderHtmlProperty(title, data|escape) }}
+{% endmacro %}
+
+{#
+    Render html property block
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderHtmlProperty(title, data) %}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
+    Create the link
+    Parameters - array:
+        [
+            'path'  - button url
+            'class' - default class
+            'aCss'  - additional button class
+            'title' - button title
+            'iCss'  - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro link(parameters) %}
+    {# need to remove spaces just before label #}
+    {% set iconHtml = '' %}
+    {% if parameters.iCss is defined %}
+        {% set iconHtml %}
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endset %}
+    {% else %}
+    {% endif %}
+    {% spaceless %}
+    <a href="{{ parameters.path }}"
+        {% if (parameters.id is defined) %}
+            id="{{ parameters.id }}"
+        {% endif %}
+        {% if parameters.data is defined %}
+            {% for dataItemName,dataItemValue in parameters.data %}
+                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+            {% endfor %}
+        {% endif %}
+       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+       title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+    {% endspaceless %}
 {% endmacro %}
 
 {#
     Create the button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title
-            'iClass' - css class for 'i' tag (icon)
+            'iCss'  - css class for 'i' tag (icon)
             'label' - button label
         ]
 #}
 {% macro button(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="{{ parameters.path }}"
-           class="btn back icons-holder-text {{ parameters.aClass is defined? parameters.aClass : '' }}"
-           title="{{ parameters.title|trans }}">
-            {% if parameters.iClass is defined %}
-                <i class="{{ parameters.iClass }} hide-text" >{{ parameters.label|trans }}</i>
+        {{ _self.link(parameters|merge({'class': 'btn back icons-holder-text'})) }}
+    </div>
+{% endmacro %}
+
+{#
+    Create dropdown button
+    Parameters - array:
+        [
+            'label' - button label
+            'elements' - dropdown elements
+            'html' - html from placeholder
+            'aCss'  - additional drop down class
+        ]
+#}
+{% macro dropdownButton(parameters) %}
+    <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            {% if parameters.iCss is defined %}
+                <i class="{{ parameters.iCss }}"></i>
             {% endif %}
             {{ parameters.label|trans }}
+            <span class="caret"></span>
         </a>
+        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
+            {% if parameters.elements is defined and parameters.elements is not empty %}
+                {% for item in parameters.elements %}
+                    {{ _self.dropdownItem(parameters) }}
+                {% endfor %}
+            {% endif %}
+            {% if parameters.html is defined and parameters.html is not empty %}
+                {{ parameters.html }}
+            {% endif %}
+        </ul>
     </div>
+{% endmacro %}
+
+{#
+    Create the dropdown button item
+    Parameters - array:
+        [
+            'path'  - button url
+            'aCss'  - additional button class
+            'title' - button title
+            'iCss'  - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro dropdownItem(parameters) %}
+    <li>{{ _self.link(parameters) }}</li>
+{% endmacro %}
+
+{#
+    Create the dropdown button wich preserves last used button
+    Parameters - array:
+        [
+            'html'     - original buttons markup
+            'groupKey' - key, to remember last used button
+            'options'  - options for pinnedDropdownButtonProcessor widget
+        ]
+#}
+{% macro pinnedDropdownButton(parameters) %}
+    {% if isDesktopVersion() %}
+        {% set options = parameters.options|default({})|merge({
+            groupKey: parameters.groupKey,
+            useMainButtonsClone: true
+        }) %}
+        <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
+            {{ parameters.html|raw }}
+        </div>
+    {% else %}
+        {{ parameters.html|raw }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Predefiend pinnedDropdownButton's settings for save button
+#}
+{% macro dropdownSaveButton(parameters) %}
+    {% set parameters = {
+        'groupKey': 'saveButtons',
+        'options': {
+            'moreButtonAttrs': {
+                'class': 'btn-success'
+            }
+        }
+    }|merge(parameters|default({})) %}
+    {{ _self.pinnedDropdownButton(parameters) }}
+{% endmacro %}
+
+{#
+    Create 'Cancel' button
+    Parameters
+        'path' - button url
+        'label' - button label | 'Cancel' by default
+#}
+{% macro cancelButton(path, label = 'Cancel') %}
+    {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
 {% endmacro %}
 
 {#
     Create 'Edit' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Edit' by default
             'label' - button label | 'Edit' by default
             'entity_label' - if specified will be added for title and label
         ]
 #}
 {% macro editButton(parameters) %}
-    {% set iClass = ['icon-edit'] %}
-    {% set aClass = ['edit-button', 'main-group'] %}
-    {% if parameters.iClass is defined %}
-        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% set iCss = ['icon-edit'] %}
+    {% set aCss = ['edit-button', 'main-group'] %}
+    {% if parameters.iCss is defined %}
+        {% set iCss = parameters.iCss|split(' ')|merge(iCss) %}
     {% endif %}
-    {% if parameters.aClass is defined %}
-        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% if parameters.aCss is defined %}
+        {% set aCss = parameters.aCss|split(' ')|merge(aCss) %}
     {% endif %}
-    {% set title = parameters.title is defined
-        ? parameters.title
-        : 'Edit'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '')
-    %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.edit_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.edit'|trans
+        %}
+    {% endif %}
     {% set label = parameters.label is defined
         ? parameters.label
-        : 'Edit'|trans
+        : 'oro.ui.edit'|trans
     %}
     {% set parameters = parameters|merge({
-        'iClass': iClass|join(' '),
-        'aClass': aClass|join(' '),
+        'iCss': iCss|join(' '),
+        'aCss': aCss|join(' '),
         'title': title,
         'label': label
     }) %}
@@ -150,19 +315,35 @@
     Create 'add' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Create' by default
             'label' - button label | 'Create' by default
             'entity_label' - if specified will be added for title and label
         ]
 #}
 {% macro addButton(parameters) %}
+    {% if parameters.label is defined %}
+        {% set label = parameters.label %}
+    {% else %}
+        {% set label = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.create_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.create'|trans
+        %}
+    {% endif %}
     <a href="{{ parameters.path }}"
-        class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
-        title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+        class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        title="{{ title }}"
     >
-        {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
+        {{ label }}
     </a>
 {% endmacro %}
 
@@ -178,42 +359,136 @@
             'title' - button title | 'Delete' by default
             'label' - button label | 'Delete' by default
             'entity_label' - if specified will be added for title, label and messages| 'item' by default
+            'disabled' - if true this control is rendered as disabled
         ]
 #}
 {% macro deleteButton(parameters) %}
+    {% set aCss = 'btn icons-holder-text' %}
+
+    {% if parameters.disabled is defined and parameters.disabled %}
+        {% set aCss = aCss ~ ' disabled' %}
+    {% endif %}
+
+    {% if parameters.aCss is defined %}
+        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+    {% endif %}
+
+    {% set parameters = parameters|merge({'aCss': aCss}) %}
+
     <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined? parameters.aCss : '' }}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {% if (parameters.dataId is defined) %}
-                data-id="{{ parameters.dataId }}"
-            {% endif %}
-            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'Are you sure you want to delete this %entity_label%?'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label|lower : 'item'|trans }) }}"
-            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : '%entity_label% deleted'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label : 'Item'|trans }) }}"
-            {% if (parameters.dataUrl is defined) %}
-                data-url="{{ parameters.dataUrl }}"
-            {% endif %}
-            {% if parameters.dataRedirect is defined %}
-                data-redirect="{{ parameters.dataRedirect  }}"
-            {% endif %}
-            {% if parameters.data is defined %}
-                {% for dataItemName,dataItemValue in parameters.data %}
-                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
-                {% endfor %}
-            {% endif %}
-            title="{{ parameters.title is defined ? parameters.title : 'Delete'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
-        >
-            <i class="icon-trash hide-text"></i>
-            {{ parameters.label is defined ? parameters.label : 'Delete'|trans }}
-        </a>
+        {{ _self.deleteLink(parameters) }}
     </div>
+{% endmacro %}
+
+{% macro deleteLink(parameters) %}
+    {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'oro.ui.item'|trans %}
+    {% set label = parameters.label is defined ? parameters.label : 'oro.ui.delete'|trans %}
+    {% if parameters.title is defined %}
+        {% set title = parameters.title %}
+    {% else %}
+        {% set title = parameters.entity_label is defined
+            ? 'oro.ui.delete_entity'|trans({'%entityName%': parameters.entity_label})
+            : 'oro.ui.delete'|trans
+        %}
+    {% endif %}
+
+    {% set message = parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
+    {% set linkParams = {
+        'data': {
+            'message': message,
+            'success-message': successMessage,
+            'url':url
+        },
+        'iCss': 'icon-trash',
+        'aCss': parameters.aCss,
+        'title': title,
+        'label': label,
+        'path': 'javascript:void(0);'
+    } %}
+
+
+    {% if (parameters.dataId is defined) %}
+        {% set data = linkParams.data|merge({'id': parameters.dataId}) %}
+        {% set linkParams = linkParams|merge({ 'data': data }) %}
+    {% endif %}
+    {% if parameters.dataRedirect is defined %}
+        {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
+        {% set linkParams = linkParams|merge({ 'data': data }) %}
+    {% endif %}
+
+    {{ _self.link(linkParams) }}
 {% endmacro %}
 
 {#
     A button with javascript handler
     Parameters - array:
         [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the button is visible or not. Defaults to true,
+            'dataAttributes' - additional data attributes
+        ]
+#}
+{% macro clientLink(parameters) %}
+    <a href="javascript: void(0);" class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+        {% if (parameters.id is defined) %}
+        id="{{ parameters.id }}"
+        {% endif %}
+        {% if (parameters.dataId is defined) %}
+        data-id="{{ parameters.dataId }}"
+        {% endif %}
+        {% if (parameters.dataUrl is defined) %}
+        data-url="{{ parameters.dataUrl }}"
+        {% endif %}
+        {% if (parameters.successMessage is defined) %}
+        data-success-message="{{ parameters.successMessage|trans }}"
+        {% endif %}
+        {% if parameters.dataRedirect is defined %}
+        data-redirect="{{ parameters.dataRedirect  }}"
+        {% endif %}
+        {% if (parameters.title is defined) %}
+        title="{{ parameters.title|trans }}"
+        {% endif -%}
+        {% if (parameters.visible is defined and not parameters.visible) %}
+        style="display: none"
+        {% endif -%}
+        {% if parameters.widget is defined and parameters.widget|length %}
+            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
+        {% endif %}
+        {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
+            {{ _self.renderAttributes(parameters.dataAttributes) }}
+        {% endif %}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
+    </a>
+{% endmacro %}
+
+{% macro renderWidgetDataAttributes(options) %}
+    {{ _self.renderAttributes(options, 'widget') }}
+{% endmacro %}
+
+{% macro renderAttributes(options, prefix) %}
+    {% for name, value in options %}
+        {% if (value is iterable) %}
+            {% set value = value|json_encode(constant('JSON_FORCE_OBJECT')) %}
+        {% endif %}
+        data-{% if prefix is not empty %}{{ prefix }}-{% endif %}{{ name }}="{{ value }}"
+    {% endfor %}
+{% endmacro %}
+
+{#
+    A button with javascript handler
+    Parameters - array:
+        [
+            'class' - default class
             'aCss' - additional css class for 'a' tag
             'iCss' - additional css class for 'i' tag
             'dataId' - data-id parameter
@@ -227,31 +502,28 @@
 #}
 {% macro clientButton(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}"
-            {% if (parameters.id is defined) %}
-            id="{{ parameters.id }}"
-            {% endif %}
-            {% if (parameters.dataId is defined) %}
-            data-id="{{ parameters.dataId }}"
-            {% endif %}
-            {% if (parameters.dataUrl is defined) %}
-            data-url="{{ parameters.dataUrl }}"
-            {% endif %}
-            {% if (parameters.successMessage is defined) %}
-            data-success-message="{{ parameters.successMessage|trans }}"
-            {% endif %}
-            {% if parameters.dataRedirect is defined %}
-            data-redirect="{{ parameters.dataRedirect  }}"
-            {% endif %}
-            {% if (parameters.title is defined) %}
-            title="{{ parameters.title|trans }}"
-            {% endif -%}
-            {% if (parameters.visible is defined and not parameters.visible) %}
-            style="display: none"
-            {% endif -%}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
-        </a>
+        {{ _self.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
     </div>
+{% endmacro %}
+
+{#
+    A button with javascript handler
+    Parameters - array:
+        [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the button is visible or not. Defaults to true
+        ]
+#}
+{% macro dropdownClientItem(parameters) %}
+    <li>{{ _self.clientLink(parameters) }}</li>
 {% endmacro %}
 
 {#
@@ -276,10 +548,8 @@
     {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(acl = '', label = 'Save') %}
-    {% if acl is empty or resource_granted(acl) %}
+{% macro saveAndStayButton(label = 'Save') %}
     {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
-    {% endif %}
 {% endmacro %}
 
 {#
@@ -495,15 +765,17 @@
 {% endmacro %}
 
 {%- macro renderUrl(url, title, class) -%}
-    {% if title is empty %}
-        {% set title = url %}
-    {% endif %}
-    {% if class is empty %}
-        {% set class = '' %}
-    {% endif %}
-    {% if url is not empty %}
-        <a href="{{ url|raw }}" title="{{ title|escape }}" class="{{ class }}">{{ title }}</a>
-    {% endif %}
+    {% spaceless %}
+        {% if title is empty %}
+            {% set title = url %}
+        {% endif %}
+        {% if class is empty %}
+            {% set class = '' %}
+        {% endif %}
+        {% if url is not empty %}
+            <a href="{{ url|raw }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title|escape }}</a>
+        {% endif %}
+    {% endspaceless %}
 {%- endmacro -%}
 
 {%- macro renderPhone(phone, title) -%}
@@ -511,6 +783,15 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title|escape }}</a>
     {% endif %}
 {%- endmacro -%}
+
+{% macro getApplicableForUnderscore(str) %}
+    {{ str|replace({
+        "<script": '<% print("<sc" + "ript"); %>',
+        "</script": '<% print("</sc" + "ript"); %>',
+        "<%": '<% print("<" + "%"); %>',
+        "%>": '<% print("%" + ">"); %>',
+    })|raw }}
+{% endmacro %}

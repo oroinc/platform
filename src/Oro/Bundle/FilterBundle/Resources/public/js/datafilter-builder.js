@@ -1,18 +1,12 @@
-/* jshint browser:true */
-/* global define, require */
-define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'oro/datafilter/collection-filters-manager'],
-function($, _, tools,  mediator, FiltersManager) {
+/*jshint browser:true*/
+/*jslint nomen: true*/
+/*global define, require*/
+define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
+        './map-filter-module-name', './collection-filters-manager'
+    ], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var initialized = false,
-        filterModuleName = 'oro/datafilter/{{type}}-filter',
-        filterTypes = {
-            string:      'choice',
-            choice:      'select',
-            selectrow:   'select-row',
-            multichoice: 'multiselect',
-            boolean:     'select'
-        },
         methods = {
             initBuilder: function () {
                 this.metadata = _.extend({filters: {}}, this.$el.data('metadata'));
@@ -26,9 +20,9 @@ function($, _, tools,  mediator, FiltersManager) {
              */
             collectModules: function () {
                 var modules = this.modules;
-                _.each((this.metadata.filters || {}) || {}, function (filter) {
+                _.each(this.metadata.filters || {}, function (filter) {
                      var type = filter.type;
-                     modules[type] = filterModuleName.replace('{{type}}', filterTypes[type] || type);
+                     modules[type] = mapFilterModuleName(type);
                 });
             },
 
@@ -38,7 +32,8 @@ function($, _, tools,  mediator, FiltersManager) {
                 var filtersList = new FiltersManager(options);
                 this.$el.prepend(filtersList.render().$el);
                 mediator.trigger('datagrid_filters:rendered', this.collection);
-                if (this.collection.length === 0) {
+                this.metadata.state.filters = this.metadata.state.filters || [];
+                if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                     filtersList.$el.hide();
                 }
             },
@@ -58,7 +53,8 @@ function($, _, tools,  mediator, FiltersManager) {
                         if (options.type == 'selectrow') {
                             options.collection = collection
                         }
-                        filters[options.name] = new (modules[options.type].extend(options));
+                        var Filter = modules[options.type].extend(options);
+                        filters[options.name] = new Filter();
                     }
                 });
                 return {filters: filters};

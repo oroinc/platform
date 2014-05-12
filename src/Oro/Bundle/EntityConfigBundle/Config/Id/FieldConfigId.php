@@ -24,16 +24,20 @@ class FieldConfigId implements ConfigIdInterface
      */
     protected $fieldType;
 
-    /**
-     * @param $className
-     * @param $scope
-     * @param $fieldName
-     * @param $fieldType
-     */
-    public function __construct($className, $scope, $fieldName, $fieldType = null)
+    public function __construct($scope, $className, $fieldName, $fieldType = null)
     {
-        $this->className = $className;
+        if (empty($scope)) {
+            throw new \InvalidArgumentException('$scope must not be empty');
+        }
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+
         $this->scope     = $scope;
+        $this->className = $className;
         $this->fieldName = $fieldName;
         $this->fieldType = $fieldType;
     }
@@ -128,8 +132,8 @@ class FieldConfigId implements ConfigIdInterface
     public static function __set_state($data)
     {
         return new FieldConfigId(
-            $data['className'],
             $data['scope'],
+            $data['className'],
             $data['fieldName'],
             $data['fieldType']
         );

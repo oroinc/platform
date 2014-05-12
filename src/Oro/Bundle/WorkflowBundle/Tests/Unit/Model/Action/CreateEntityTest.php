@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateEntityTest extends \PHPUnit_Framework_TestCase
@@ -86,13 +86,13 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
         return array(
             'without data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                 )
             ),
             'with data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
                     'data'      => array('key1' => 'value1', 'key2' => 'value2'),
                 )
@@ -101,7 +101,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "stdClass" is not manageable.
      */
     public function testExecuteEntityNotManageable()

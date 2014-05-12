@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Oro\Bundle\TestFrameworkBundle\Test\SoapClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\TerminableInterface;
+
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
 
 class Client extends BaseClient
 {
-
     const LOCAL_URL = 'http://localhost';
 
     /** @var  SoapClient */
@@ -84,6 +83,11 @@ class Client extends BaseClient
         if (strpos($uri, 'http://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
+        if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
+        //generate new WSSE header
+            parent::setServerParameters(ToolsAPI::generateWsseHeader());
+        }
+
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
@@ -129,6 +133,17 @@ class Client extends BaseClient
     }
 
     /**
+     * @param array $server
+     *
+     * @return $this
+     */
+    public function setServerParameters(array $server)
+    {
+        parent::setServerParameters($server);
+        return $this;
+    }
+
+    /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -156,15 +171,33 @@ class Client extends BaseClient
     }
 
     /**
-     * @param $folder
+     * @param string $folder
+     * @param array $filter
      */
-    public function appendFixtures($folder)
+    public function appendFixtures($folder, $filter = null)
     {
         $loader = new \Doctrine\Common\DataFixtures\Loader;
-        $fixtures = $loader->loadFromDirectory($folder);
+        $loader->loadFromDirectory($folder);
+        $fixtures = array_values($loader->getFixtures());
 
+        //filter fixtures by className
+        if (!is_null($filter)) {
+            $fixturesCount = count($fixtures);
+            for ($i = 0; $i < $fixturesCount; $i++) {
+                $fixture = $fixtures[$i];
+                foreach ($filter as $flt) {
+                    if (!strpos(get_class($fixture), $flt)) {
+                        unset($fixtures[$i]);
+                    }
+                }
+            }
+        }
+
+        //init fixture container
         foreach ($fixtures as $fixture) {
-            $fixture->setContainer($this->getContainer());
+            if (method_exists($fixture, 'setContainer')) {
+                $fixture->setContainer($this->getContainer());
+            }
         }
 
         $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger(
@@ -174,7 +207,7 @@ class Client extends BaseClient
             $this->getContainer()->get('doctrine.orm.entity_manager'),
             $purger
         );
-        $executor->execute($loader->getFixtures(), true);
+        $executor->execute($fixtures, true);
     }
 
     public function startTransaction()

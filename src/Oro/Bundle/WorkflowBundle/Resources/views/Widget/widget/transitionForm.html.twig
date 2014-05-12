@@ -1,7 +1,8 @@
+{% form_theme form with ['OroWorkflowBundle:Form:fields.html.twig'] %}
 <div class="widget-content">
     {% if saved %}
         <script type="text/javascript">
-            require(['oro/widget-manager'],
+            require(['oroui/js/widget-manager'],
             function(widgetManager){
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                     widget.trigger(
@@ -16,6 +17,14 @@
             });
         </script>
     {% elseif form.vars.errors|length > 0 %}
+        <script type="text/javascript">
+            require(['oroui/js/widget-manager'],
+            function(widgetManager){
+                widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    widget.trigger('formSaveError');
+                });
+            });
+        </script>
         <div class="alert alert-error">
             {{ form_errors(form) }}
         </div>
@@ -27,18 +36,12 @@
     <form method="post"
           data-nohash="true"
           data-disable-autofocus="true"
+          {% if transition.displayType != 'dialog' %}data-collect="true"{% endif %}
           id="{{ form.vars.name }}"
           action="{{ app.request.uri }}"
           class="form-dialog"
     >
-        <fieldset class="form-horizontal">
-        {{ form_rest(form) }}
-        </fieldset>
-
-        <div class="widget-actions">
-            <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
-            <button type="submit" class="btn btn-success">{{ 'Submit'|trans }}</button>
-        </div>
+        {{ form_row(form) }}
     </form>
     {{ oro_form_js_validation(form) }}
 </div>

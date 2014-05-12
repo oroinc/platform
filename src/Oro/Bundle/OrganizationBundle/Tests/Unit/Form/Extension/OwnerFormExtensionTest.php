@@ -79,21 +79,13 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $businessUnitsTree = array(
-            array(
-                'id' => 1,
-                'name' => 'Root',
-                'children' => array(
-                    array(
-                        'id' => 2,
-                        'name' => 'Child',
-                    )
-                )
-            )
-        );
         $this->businessUnitManager->expects($this->any())
-            ->method('getBusinessUnitsTree')
-            ->will($this->returnValue($businessUnitsTree));
+            ->method('getBusinessUnitIds')
+            ->will(
+                $this->returnValue(
+                    array(1, 2)
+                )
+            );
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,11 +107,13 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
             ->disableOriginalConstructor()
             ->getMock();
+        $config->expects($this->any())->method('getCompound')->will($this->returnValue(true));
         $config->expects($this->any())->method('getDataClass')->will($this->returnValue($this->entityClassName));
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $this->builder->expects($this->any())->method('getFormConfig')->will($this->returnValue($config));
+        $this->builder->expects($this->any())->method('getOption')->with('required')->will($this->returnValue(true));
         $this->fieldName = RecordOwnerDataListener::OWNER_FIELD_NAME;
         $this->tranlsator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -148,6 +142,29 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetExtendedType()
     {
         $this->assertEquals('form', $this->extension->getExtendedType());
+    }
+
+    public function testNotCompoundForm()
+    {
+        $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->any())->method('getCompound')->will($this->returnValue(false));
+
+        $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->builder->expects($this->any())->method('getFormConfig')->will($this->returnValue($config));
+        $this->builder->expects($this->never())
+            ->method('add');
+
+        $this->securityContext->expects($this->never())
+            ->method('getToken');
+
+        $this->ownershipMetadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        $this->extension->buildForm($this->builder, array());
     }
 
     public function testAnonymousUser()
@@ -199,24 +216,20 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function testBusinessUnitOwnerBuildFormGranted()
     {
         $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
-        $businessUnits = array(
-            1 => "Root",
-            2 => "&nbsp;&nbsp;&nbsp;Child"
-        );
+
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
             'oro_business_unit_tree_select',
             array(
                 'empty_value' => null,
-                'choices' => $businessUnits,
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'Owner',
                 'business_unit_ids' => null,
                 'configs'     => array(
-                    'is_translate_option' => false,
-                    'is_safe'             => true
+                    'is_translated_option' => true,
+                    'is_safe'              => true
                 )
             )
         );
@@ -436,6 +449,9 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+        $form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->builder));
         $form->expects($this->any())
             ->method('getParent')
             ->will($this->returnValue(false));

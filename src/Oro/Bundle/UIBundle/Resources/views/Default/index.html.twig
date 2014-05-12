@@ -19,12 +19,12 @@
                 {% endblock %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
                 <script type="text/javascript">
-                    require(['oro/init-layout', 'oro/init-user', 'oro/widget-manager', 'jquery.uniform']);
+                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
-                    require(['oro/mobile/layout'], function (layout) {layout.init();});
+                    require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oro/app'], function(app){app.debug = true;});
+                    require(['oroui/js/app'], function(app){app.debug = true;});
                 {% endif %}
                 </script>
                 {% block hash_nav %}
@@ -36,7 +36,7 @@
             {% endblock %}
         {% endblock %}
     </head>
-    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
+    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
         <h3>{% trans %}Loading ...{% endtrans %}</h3>
@@ -107,7 +107,7 @@
                                     </div>
                                 </script>
                                 <script type="text/javascript">
-                                    require(['jquery', 'oro/messenger'],
+                                    require(['jquery', 'oroui/js/messenger'],
                                             function($, messenger) {
                                                 messenger.setup({
                                                     container: '#flash-messages .flash-messages-holder',
@@ -132,8 +132,8 @@
                     <div class="hash-loading-mask"></div>
                     <div id="container" class="scrollable-container">
                         {% block page_container %}
+                            {% placeholder content_before %}
                             {% block content %}
-                                {% placeholder content_before %}
                                 <div class="container" style="background: #fff">
                                     <div class="row">
                                         <div class="span4">
@@ -175,19 +175,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% placeholder content_after %}
                             {% endblock content %}
+                            {% placeholder content_after %}
                         {% endblock page_container %}
                     </div>
                 </div>
             {% endblock main %}
             {% block footer %}
                 <div id="dialog-extend-fixed-container"></div>
-                {#<footer id="footer" class="footer">#}
-                      {#<div class="alert">#}
-                          {#{% placeholder footer_inner %}#}
-                      {#</div>#}
-                {#</footer>#}
+                <footer id="footer" class="footer">
+                    {% placeholder footer_inner %}
+                </footer>
             {% endblock footer %}
         </div>
     </div>

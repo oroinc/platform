@@ -4,7 +4,7 @@ function(_, Backbone) {
     'use strict';
 
     /**
-     * @export oro/mediator
+     * @export oroui/js/mediator
      * @name   oro.mediator
      */
     return _.extend({}, Backbone.Events);

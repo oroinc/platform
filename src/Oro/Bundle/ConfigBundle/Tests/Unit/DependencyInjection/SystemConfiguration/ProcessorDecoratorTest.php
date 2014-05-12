@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\SystemConfiguration;
 
+use Symfony\Component\Config\Definition\Processor;
+
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
 class ProcessorDecoratorTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +13,7 @@ class ProcessorDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->processor = new ProcessorDecorator();
+        $this->processor = new ProcessorDecorator(new Processor());
     }
 
     public function tearDown()

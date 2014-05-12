@@ -4,6 +4,47 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
 class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
+    protected function getVirtualFieldProvider(array $config = [])
+    {
+        $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface');
+        $provider->expects($this->any())
+            ->method('isVirtualField')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use (&$config) {
+                        $result = false;
+                        foreach ($config as $item) {
+                            if ($item[0] === $className && $item[1] === $fieldName) {
+                                $result = true;
+                                break;
+                            }
+                        }
+
+                        return $result;
+                    }
+                )
+            );
+        $provider->expects($this->any())
+            ->method('getVirtualFieldQuery')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use (&$config) {
+                        $result = [];
+                        foreach ($config as $item) {
+                            if ($item[0] === $className && $item[1] === $fieldName) {
+                                $result = $item[2];
+                                break;
+                            }
+                        }
+
+                        return $result;
+                    }
+                )
+            );
+
+        return $provider;
+    }
+
     protected function getFunctionProvider(array $config = [])
     {
         $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface');
@@ -19,7 +60,7 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         return $provider;
     }
 
-    protected function getDoctrine(array $config = [])
+    protected function getDoctrine(array $config = [], array $identifiersConfig = [])
     {
         $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -48,6 +89,11 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
             $metadata->expects($this->any())
                 ->method('getTypeOfField')
                 ->will($this->returnValueMap($typeMap));
+
+            if (!empty($identifiersConfig[$entity])) {
+                $metadata->expects($this->any())->method('getIdentifier')
+                    ->will($this->returnValue($identifiersConfig[$entity]));
+            }
             if (!empty($associationMap)) {
                 $metadata->expects($this->any())
                     ->method('getAssociationMapping')

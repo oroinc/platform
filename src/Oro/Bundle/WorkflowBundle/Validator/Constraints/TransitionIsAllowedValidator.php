@@ -71,7 +71,7 @@ class TransitionIsAllowedValidator extends ConstraintValidator
                             'message' => $constraint->stepHasNotAllowedTransitionMessage,
                             'parameters' => array(
                                 '{{ transition }}' => $transitionName,
-                                '{{ step }}' => $workflowItem->getCurrentStepName()
+                                '{{ step }}' => $workflowItem->getCurrentStep()->getName()
                             )
                         )
                     );

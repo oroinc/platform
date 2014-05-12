@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'backbone', 'backgrid'],
-function ($, Backbone, Backgrid) {
+/*global define*/
+define(['jquery', 'backbone', 'backgrid'
+    ], function ($, Backbone, Backgrid) {
     "use strict";
 
     /**
      * Renders a checkbox for row selection.
      *
-     * @export  oro/datagrid/select-row-cell
-     * @class   oro.datagrid.SelectRowCell
+     * @export  orodatagrid/js/datagrid/cell/select-row-cell
+     * @class   orodatagrid.datagrid.cell.SelectRowCell
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -33,7 +33,7 @@ function ($, Backbone, Backgrid) {
          * @param {Backbone.Model} options.model
          */
         initialize: function (options) {
-            //Backgrid.requireOptions(options, ["model", "column"]);
+            Backgrid.requireOptions(options, ["model", "column"]);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {

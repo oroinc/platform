@@ -93,6 +93,7 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
                     $this->translationLocales[] = $matches[1];
                 }
             }
+            $this->translationLocales = array_unique($this->translationLocales);
         }
 
         return $this->translationLocales;

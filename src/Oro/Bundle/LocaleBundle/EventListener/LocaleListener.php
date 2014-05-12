@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\EventListener;
 
+use Doctrine\DBAL\DBALException;
+
+use Gedmo\Translatable\TranslatableListener;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,18 +22,28 @@ class LocaleListener implements EventSubscriberInterface
     protected $localeSettings;
 
     /**
+     * @var TranslatableListener
+     */
+    protected $translatableListener;
+
+    /**
      * @var bool
      */
     protected $isInstalled;
 
     /**
-     * @param LocaleSettings $localeSettings
-     * @param string|bool|null $installed
+     * @param LocaleSettings       $localeSettings
+     * @param TranslatableListener $translatableListener
+     * @param bool|null|string     $installed
      */
-    public function __construct(LocaleSettings $localeSettings, $installed)
-    {
-        $this->localeSettings = $localeSettings;
-        $this->isInstalled = !empty($installed);
+    public function __construct(
+        LocaleSettings $localeSettings,
+        TranslatableListener $translatableListener,
+        $installed
+    ) {
+        $this->localeSettings       = $localeSettings;
+        $this->translatableListener = $translatableListener;
+        $this->isInstalled          = !empty($installed);
     }
 
     /**
@@ -45,6 +60,10 @@ class LocaleListener implements EventSubscriberInterface
                 $request->setLocale($this->localeSettings->getLanguage());
             }
             $this->setPhpDefaultLocale($this->localeSettings->getLocale());
+
+            $this->translatableListener->setTranslatableLocale(
+                $this->localeSettings->getLanguage()
+            );
         }
     }
 
@@ -66,13 +85,41 @@ class LocaleListener implements EventSubscriberInterface
     }
 
     /**
+     * @param ConsoleCommandEvent $event
+     */
+    public function onConsoleCommand(ConsoleCommandEvent $event)
+    {
+        $isForced = $event->getInput()->hasParameterOption('--force');
+        if ($isForced) {
+            $this->isInstalled = false;
+
+            return;
+        }
+
+        if ($this->isInstalled) {
+            try {
+                $this->setPhpDefaultLocale(
+                    $this->localeSettings->getLocale()
+                );
+
+                $this->translatableListener->setTranslatableLocale(
+                    $this->localeSettings->getLanguage()
+                );
+            } catch (DBALException $exception) {
+                throw new \RuntimeException('Oro Application already installed. Use --force option to reinstall.');
+            }
+        }
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
     {
         return array(
             // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST => array(array('onKernelRequest', 15)),
+            KernelEvents::REQUEST  => array(array('onKernelRequest', 15)),
+            ConsoleEvents::COMMAND => array(array('onConsoleCommand')),
         );
     }
 }

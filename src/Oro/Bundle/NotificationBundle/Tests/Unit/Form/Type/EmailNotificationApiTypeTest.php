@@ -23,8 +23,11 @@ class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configProvider->expects($this->once())
+            ->method('getConfigs')
+            ->will($this->returnValue([]));
 
-        $this->type = new EmailNotificationApiType(array(), $listener, $this->configProvider);
+        $this->type = new EmailNotificationApiType($listener, $this->configProvider);
     }
 
     public function testSetDefaultOptions()

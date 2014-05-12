@@ -6,13 +6,14 @@ parameters:
     oro_workflow.action.assign_value.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignValue
     oro_workflow.action.unset_value.class: Oro\Bundle\WorkflowBundle\Model\Action\UnsetValue
     oro_workflow.action.create_object.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
+    oro_workflow.action.create_date.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+    oro_workflow.action.create_datetime.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime
     oro_workflow.action.create_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+    oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
     oro_workflow.action.request_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity
     oro_workflow.action.call_method.class: Oro\Bundle\WorkflowBundle\Model\Action\CallMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
-    oro_workflow.action.close_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow
     oro_workflow.action.redirect.class: Oro\Bundle\WorkflowBundle\Model\Action\Redirect
-    oro_workflow.action.redirect_to_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow
     oro_workflow.action.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
     oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
@@ -59,6 +60,21 @@ services:
         tags:
             - { name: oro_workflow.action, alias: create_object }
 
+    oro_workflow.action.create_date:
+        class: %oro_workflow.action.create_date.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_locale.settings
+        tags:
+            - { name: oro_workflow.action, alias: create_date }
+
+    oro_workflow.action.create_datetime:
+        class: %oro_workflow.action.create_datetime.class%
+        arguments:
+            - @oro_workflow.context_accessor
+        tags:
+            - { name: oro_workflow.action, alias: create_datetime }
+
     oro_workflow.action.create_entity:
         class: %oro_workflow.action.create_entity.class%
         arguments:
@@ -66,6 +82,14 @@ services:
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: create_entity }
+
+    oro_workflow.action.create_related_entity:
+        class: %oro_workflow.action.create_related_entity.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: create_related_entity }
 
     oro_workflow.action.request_entity:
         class: %oro_workflow.action.request_entity.class%
@@ -90,11 +114,6 @@ services:
         tags:
             - { name: oro_workflow.action, alias: start_workflow }
 
-    oro_workflow.action.close_workflow:
-        class: %oro_workflow.action.close_workflow.class%
-        tags:
-            - { name: oro_workflow.action, alias: close_workflow }
-
     oro_workflow.action.redirect:
         class: %oro_workflow.action.redirect.class%
         arguments:
@@ -103,13 +122,6 @@ services:
             - 'result.redirectUrl'
         tags:
             - { name: oro_workflow.action, alias: redirect }
-
-    oro_workflow.action.redirect_to_workflow:
-        class: %oro_workflow.action.redirect_to_workflow.class%
-        arguments:
-            - @oro_workflow.action.redirect
-        tags:
-            - { name: oro_workflow.action, alias: redirect_to_workflow }
 
     oro_workflow.action.format_string:
         class: %oro_workflow.action.format_string.class%

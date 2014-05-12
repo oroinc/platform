@@ -68,24 +68,6 @@ class FieldNodeDefinition extends AbstractNodeDefinition
     }
 
     /**
-     * Returns options in specific format for config form field
-     *
-     * @return array
-     */
-    public function toFormFieldOptions()
-    {
-        return array_merge(
-            array(
-                'target_field' => $this
-            ),
-            array_intersect_key(
-                $this->getOptions(),
-                array_flip(array('label', 'required', 'block', 'subblock', 'tooltip'))
-            )
-        );
-    }
-
-    /**
      * Prepare definition, set default values
      *
      * @param array $definition

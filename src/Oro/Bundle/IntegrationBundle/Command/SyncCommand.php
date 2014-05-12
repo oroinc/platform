@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use JMS\JobQueueBundle\Entity\Job;
-
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
 /**
  * Class SyncCommand
@@ -20,123 +18,120 @@ use Oro\Bundle\CronBundle\Command\CronCommandInterface;
  *
  * @package Oro\Bundle\IntegrationBundle\Command
  */
-class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
+class SyncCommand extends AbstractSyncCronCommand
 {
-    const COMMAND_NAME   = 'oro:cron:channels:sync';
-    const SYNC_PROCESSOR = 'oro_integration.sync.processor';
+    const COMMAND_NAME = 'oro:cron:channels:sync';
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
-        return '0 1 * * *';
+        return '*/5 * * * *';
     }
 
     /**
-     * Console command configuration
+     * {@inheritdoc}
      */
     public function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
+            ->setName(static::COMMAND_NAME)
             ->addOption(
                 'channel-id',
                 'c',
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given channel id'
             )
-            ->setDescription('Runs synchronization for each configured channel');
+            ->addOption(
+                'connector',
+                'con',
+                InputOption::VALUE_OPTIONAL,
+                'If option exists sync will be performed for given connector name'
+            )
+            ->addArgument(
+                'connector-parameters',
+                InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+                'Additional connector parameters array. Format - parameterKey=parameterValue',
+                []
+            )
+            ->setDescription('Runs synchronization for channel');
     }
 
     /**
-     * Runs command
-     *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     *
-     * @throws \InvalidArgumentException
-     * @return int|null|void
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $channelId = $input->getOption('channel-id');
-        $strategy  = $this->getContainer()
-            ->get('oro_integration.logger.strategy');
-        $strategy->setLogger(new OutputLogger($output));
-        $repo = $this->getContainer()->get('doctrine.orm.entity_manager')
+        /** @var ChannelRepository $repository */
+        /** @var SyncProcessor $processor */
+        $connector           = $input->getOption('connector');
+        $channelId           = $input->getOption('channel-id');
+        $connectorParameters = $this->getConnectorParameters($input);
+        $repository          = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
+        $logger              = new OutputLogger($output);
+        $processor           = $this->getService(self::SYNC_PROCESSOR);
+        $processor->getLoggerStrategy()->setLogger($logger);
+
+        $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($channelId)) {
-            $strategy->warning('Job already running. Terminating....');
+            $logger->warning('Job already running. Terminating....');
 
             return 0;
         }
 
         if ($channelId) {
-            $channel = $repo->getOrLoadById($channelId);
+            $channel = $repository->getOrLoadById($channelId);
             if (!$channel) {
                 throw new \InvalidArgumentException('Channel with given ID not found');
             }
             $channels = [$channel];
         } else {
-            $channels = $repo->getConfiguredChannelsForSync();
+            $channels = $repository->getConfiguredChannelsForSync();
         }
-
 
         /** @var Channel $channel */
         foreach ($channels as $channel) {
             try {
-                $strategy->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
+                $logger->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
 
-                $this->getContainer()
-                    ->get(self::SYNC_PROCESSOR)
-                    ->process($channel);
+                $processor->process($channel, $connector, $connectorParameters);
             } catch (\Exception $e) {
-                if ($output instanceof ConsoleOutputInterface) {
-                    $this->getApplication()->renderException($e, $output->getErrorOutput());
-                } else {
-                    $this->getApplication()->renderException($e, $output);
-                }
-
+                $logger->critical($e->getMessage(), ['exception' => $e]);
                 //process another channel even in case if exception thrown
                 continue;
             }
         }
-        $strategy->notice('Completed');
+
+        $logger->notice('Completed');
+
+        return 0;
     }
 
     /**
-     * Check is job running (from previous schedule)
+     * Get connector additional parameters array from the input
      *
-     * @param null|int $channelId
-     *
-     * @return bool
+     * @param InputInterface $input
+     * @return array key - parameter name, value - parameter value
+     * @throws \LogicException
      */
-    protected function isJobRunning($channelId)
+    protected function getConnectorParameters(InputInterface $input)
     {
-        $qb = $this->getContainer()->get('doctrine.orm.entity_manager')
-            ->getRepository('JMSJobQueueBundle:Job')
-            ->createQueryBuilder('j')
-            ->select('count(j.id)')
-            ->andWhere('j.command=:commandName')
-            ->andWhere('j.state=:stateName')
-            ->setParameter('commandName', $this->getName())
-            ->setParameter('stateName', Job::STATE_RUNNING);
-
-        if ($channelId) {
-            $qb->andWhere(
-                $qb->expr()->orX(
-                    $qb->expr()->like('j.args', ':channelIdType1'),
-                    $qb->expr()->like('j.args', ':channelIdType2')
-                )
-            )->setParameter('channelIdType1', '%--channel-id=' . $channelId . '%')
-             ->setParameter('channelIdType2', '%-c=' . $channelId . '%');
+        $result              = [];
+        $connectorParameters = $input->getArgument('connector-parameters');
+        if (!empty($connectorParameters)) {
+            foreach ($connectorParameters as $parameterString) {
+                $parameterConfigArray = explode('=', $parameterString);
+                if (!isset($parameterConfigArray[1])) {
+                    throw new \LogicException('Format for connector parameters is parameterKey=parameterValue');
+                }
+                $result[$parameterConfigArray[0]] = $parameterConfigArray[1];
+            }
         }
 
-        $running = $qb->getQuery()
-            ->getSingleScalarResult();
-
-        return $running > 1;
+        return $result;
     }
 }

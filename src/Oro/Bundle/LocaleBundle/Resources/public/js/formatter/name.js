@@ -1,13 +1,13 @@
-/* global define */
-define(['oro/locale-settings'],
-function(localeSettings) {
+/*global define*/
+define(['../locale-settings'
+    ], function (localeSettings) {
     'use strict';
 
     /**
      * Name formatter
      *
-     * @export  oro/formatter/name
-     * @name    oro.formatter.name
+     * @export  orolocale/js/formatter/name
+     * @name    orolocale.formatter.name
      */
     return {
         /**
@@ -26,13 +26,13 @@ function(localeSettings) {
          * @param {string} locale
          * @returns {string}
          */
-        format: function(person, locale) {
+        format: function (person, locale) {
             if (!locale) {
                 locale = localeSettings.getLocale();
             }
 
             var format = this.getNameFormat(locale);
-            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
+            var formatted = format.replace(/%(\w+)%/g, function (pattern, key) {
                 var lowerCaseKey = key.toLowerCase();
                 var value = '';
                 if (person.hasOwnProperty(lowerCaseKey)) {
@@ -53,7 +53,7 @@ function(localeSettings) {
          * @param {string} locale
          * @returns {string}
          */
-        getNameFormat: function(locale) {
+        getNameFormat: function (locale) {
             if (!this.formatCache.hasOwnProperty(locale)) {
                 var localeFallback = localeSettings.getLocaleFallback(locale);
 

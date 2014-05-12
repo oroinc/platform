@@ -9,7 +9,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -61,7 +60,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                     'configs'            => $defaultConfig,
                     'converter'          => null,
                     'autocomplete_alias' => null,
-                    'excluded'           => null
+                    'excluded'           => null,
+                    'random_id'          => true,
                 )
             );
 
@@ -152,9 +152,13 @@ class OroJquerySelect2HiddenType extends AbstractType
                         }
                     }
 
-                    if (empty($result['route_name']) && empty($result['ajax']['url'])) {
+                    if (!array_key_exists('route_parameters', $result)) {
+                        $result['route_parameters'] = array();
+                    }
+
+                    if (empty($result['route_name'])) {
                         throw new InvalidConfigurationException(
-                            'Either option "configs.route_name" or "configs.ajax.url" must be set.'
+                            'Option "configs.route_name" must be set.'
                         );
                     }
 
@@ -191,16 +195,18 @@ class OroJquerySelect2HiddenType extends AbstractType
 
         if ($form->getData()) {
             $result = array();
+            /** @var ConverterInterface $converter */
+            $converter = $options['converter'];
             if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
                 foreach ($form->getData() as $item) {
-                    $result[] = $options['converter']->convertItem($item);
+                    $result[] = $converter->convertItem($item);
                 }
             } else {
-                $result[] = $options['converter']->convertItem($form->getData());
+                $result[] = $converter->convertItem($form->getData());
             }
 
             $vars['attr'] = array(
-                'data-entities' => json_encode($result)
+                'data-selected-data' => json_encode($result)
             );
         }
 

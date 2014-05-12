@@ -1,0 +1,24 @@
+oro:
+    entity_merge:
+        controller:
+            merged_successful: Entities were successfully merged.
+            select_error: Select entities to merge.
+        action:
+            merge: Merge {{ label }}
+        acl:
+            merge: Merge entities
+
+        hint:
+            other_related_entities: All other related entities will be merged using an append strategy
+
+        merge_modes:
+            replace: Replace
+            unite: Append
+
+        form:
+            empty:         Empty
+            master_record: Master Record
+            strategy:      Strategy
+            select_all:    Select All Values
+            merge_values:  Merge Values
+            merge_button:  Merge

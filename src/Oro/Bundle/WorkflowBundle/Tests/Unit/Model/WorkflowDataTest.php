@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityNotFoundException;
 
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class WorkflowDataTest extends \PHPUnit_Framework_TestCase
 {
@@ -214,5 +215,41 @@ class WorkflowDataTest extends \PHPUnit_Framework_TestCase
 
         $this->data->set($name, $removedEntity);
         $this->assertNull($this->data->get($name));
+    }
+
+    public function testUnknownPathGet()
+    {
+        $path = 'unknown_ppp.another';
+        $this->assertNull($this->data->get($path));
+    }
+
+    public function testUnknownPathSet()
+    {
+        $path = 'unknown_ppp.another';
+        $this->assertSame($this->data, $this->data->set($path, 'test'));
+    }
+
+    public function testMappedField()
+    {
+        $data = new \stdClass();
+        $data->value = 'one';
+        $this->data->setFieldsMapping(array('test2' => 'test.value'));
+
+        $this->assertFalse($this->data->has('test'), 'no test');
+        $this->assertFalse($this->data->has('test2'), 'no test2');
+        $this->data->set('test', $data);
+        $this->assertSame($data, $this->data->get('test'));
+        $this->assertEquals('one', $this->data->get('test2'));
+
+        $this->assertTrue($this->data->has('test'), 'has test');
+        $this->assertTrue($this->data->has('test2'), 'has test2');
+
+        $this->data->set('test2', 'two');
+        $this->assertEquals('two', $this->data->get('test2'));
+        $actualTest = $this->data->get('test');
+        $this->assertEquals('two', $actualTest->value);
+
+        $propertyPath = new PropertyPath('[test].value');
+        $this->assertEquals('two', $this->data->get($propertyPath));
     }
 }

@@ -18,33 +18,10 @@ class ColumnType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('name', 'oro_field_choice', array('required' => true))
             ->add('label', 'text', array('required' => true))
             ->add('func', 'oro_function_choice', array('required' => false))
             ->add('sorting', 'oro_sorting_choice', array('required' => false));
-
-        $factory = $builder->getFormFactory();
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($factory) {
-                $form = $event->getForm();
-
-                $form->add(
-                    $factory->createNamed(
-                        'name',
-                        $form->getConfig()->getOption('column_choice_type'),
-                        null,
-                        array(
-                            'required'           => true,
-                            'entity'             => $form->getConfig()->getOption('entity'),
-                            'skip_load_entities' => true,
-                            'with_relations'     => true,
-                            'deep_level'         => 1,
-                            'auto_initialize'    => false
-                        )
-                    )
-                );
-            }
-        );
     }
 
     /**
@@ -57,7 +34,7 @@ class ColumnType extends AbstractType
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
                 'intention'          => 'query_designer_column',
-                'column_choice_type' => 'oro_entity_field_choice'
+                'column_choice_type' => 'oro_entity_field_select'
             )
         );
     }

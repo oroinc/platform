@@ -7,7 +7,7 @@ use Doctrine\Common\Cache\Cache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 
@@ -31,15 +31,15 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Events::NEW_ENTITY_CONFIG_MODEL => 'newEntityConfig',
-            Events::PRE_PERSIST_CONFIG      => 'persistConfig',
+            Events::NEW_ENTITY_CONFIG  => 'newEntityConfig',
+            Events::PRE_PERSIST_CONFIG => 'persistConfig',
         );
     }
 
     /**
-     * @param NewEntityConfigModelEvent $event
+     * @param EntityConfigEvent $event
      */
-    public function newEntityConfig(NewEntityConfigModelEvent $event)
+    public function newEntityConfig(EntityConfigEvent $event)
     {
         // clear cache when new entity added to configurator
         // in case if default value for some fields will equal true

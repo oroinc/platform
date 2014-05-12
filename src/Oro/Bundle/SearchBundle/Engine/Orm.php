@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -66,7 +67,7 @@ class Orm extends AbstractEngine
         foreach ($entities as $entityName) {
             $entityData = $this->em->getRepository($entityName)->findAll();
             foreach ($entityData as $entity) {
-                if ($this->save($entity, true) !== false) {
+                if ($this->save($entity, true) !== null) {
                     $recordsCount++;
                 }
             }
@@ -89,7 +90,7 @@ class Orm extends AbstractEngine
     {
         $item = $this->getIndexRepo()->findOneBy(
             array(
-                'entity'   => get_class($entity),
+                'entity'   => ClassUtils::getRealClass($entity),
                 'recordId' => $entity->getId()
             )
         );
@@ -118,7 +119,7 @@ class Orm extends AbstractEngine
      * @param bool   $realtime [optional] Perform immediate insert/update to
      *                              search attributes table(s). True by default.
      * @param bool   $needToCompute
-     * @return Item Index item id on success, false otherwise
+     * @return Item Index item on success, null otherwise
      */
     public function save($entity, $realtime = true, $needToCompute = false)
     {
@@ -127,8 +128,8 @@ class Orm extends AbstractEngine
             return null;
         }
 
-        $name = get_class($entity);
-        $entityMeta = $this->em->getClassMetadata(get_class($entity));
+        $name = ClassUtils::getRealClass($entity);
+        $entityMeta = $this->em->getClassMetadata($name);
         $identifierField = $entityMeta->getSingleIdentifierFieldName($entityMeta);
         $id = $entityMeta->getReflectionProperty($identifierField)->getValue($entity);
 
@@ -187,8 +188,9 @@ class Orm extends AbstractEngine
      */
     public function getEntityTitle($entity)
     {
-        if ($this->mapper->getEntityMapParameter(get_class($entity), 'title_fields')) {
-            $fields = $this->mapper->getEntityMapParameter(get_class($entity), 'title_fields');
+        $entityClass = ClassUtils::getRealClass($entity);
+        if ($this->mapper->getEntityMapParameter($entityClass, 'title_fields')) {
+            $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
             $title = array();
             foreach ($fields as $field) {
                 $title[] = $this->mapper->getFieldValue($entity, $field);

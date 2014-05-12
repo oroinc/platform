@@ -38,4 +38,13 @@ interface ConfigProviderInterface
      * @return ConfigInterface
      */
     public function getConfig($className, $fieldName = null);
+
+    /**
+     * Determines if this provider has configuration data for the given class or field.
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return bool
+     */
+    public function hasConfig($className, $fieldName = null);
 }

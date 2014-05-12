@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
@@ -37,18 +38,29 @@ class EntityChoiceType extends AbstractType
             return $that->getChoices($options['show_plural']);
         };
 
+        $defaultConfigs = array(
+            'is_translated_option'    => true,
+            'placeholder'             => 'oro.entity.form.choose_entity',
+            'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
+            'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
+        );
+
+        // this normalizer allows to add/override config options outside.
+        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
+            return array_merge($defaultConfigs, $configs);
+        };
+
         $resolver->setDefaults(
             array(
                 'choices'     => $choices,
                 'empty_value' => '',
-                'show_plural' => true,
-                'configs'     => array(
-                    'is_translate_option'     => false,
-                    'is_group_collapsible'    => true,
-                    'placeholder'             => 'oro.entity.form.choose_entity',
-                    'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
-                    'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
-                )
+                'show_plural' => false,
+                'configs'     => $defaultConfigs
+            )
+        );
+        $resolver->setNormalizers(
+            array(
+                'configs' => $configsNormalizer
             )
         );
     }
@@ -69,7 +81,7 @@ class EntityChoiceType extends AbstractType
             $attributes = [];
             foreach ($entity as $key => $val) {
                 if (!in_array($key, ['name'])) {
-                    $attributes['data-' . str_replace('_', '-', $key)] = $val;
+                    $attributes['data-' . $key] = $val;
                 }
             }
             $choices[$entity['name']] = new ChoiceListItem(

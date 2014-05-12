@@ -25,6 +25,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Region implements Translatable
 {
+    const SEPARATOR = '-';
+
     /**
      * @var string
      *
@@ -208,5 +210,17 @@ class Region implements Translatable
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * Get combined region code.
+     *
+     * @param string $country Country ISO2 code
+     * @param string $region Region ISO2 code
+     * @return string
+     */
+    public static function getRegionCombinedCode($country, $region)
+    {
+        return $country . self::SEPARATOR . $region;
     }
 }

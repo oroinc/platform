@@ -62,6 +62,11 @@ class Transition
     protected $formType;
 
     /**
+     * @var string
+     */
+    protected $displayType;
+
+    /**
      * @var array
      */
     protected $formOptions = array();
@@ -279,10 +284,7 @@ class Transition
     {
         if ($this->isAllowed($workflowItem)) {
             $stepTo = $this->getStepTo();
-            $workflowItem->setCurrentStepName($stepTo->getName());
-            if ($stepTo->isFinal() || !$stepTo->hasAllowedTransitions()) {
-                $workflowItem->setClosed(true);
-            }
+            $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
 
             if ($this->postAction) {
                 $this->postAction->execute($workflowItem);
@@ -341,7 +343,7 @@ class Transition
      */
     public function hasForm()
     {
-        return !empty($this->formOptions);
+        return !empty($this->formOptions) && !empty($this->formOptions['attribute_fields']);
     }
 
     /**
@@ -431,6 +433,25 @@ class Transition
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayType()
+    {
+        return $this->displayType;
+    }
+
+    /**
+     * @param string $displayType
+     * @return Transition
+     */
+    public function setDisplayType($displayType)
+    {
+        $this->displayType = $displayType;
+
         return $this;
     }
 }

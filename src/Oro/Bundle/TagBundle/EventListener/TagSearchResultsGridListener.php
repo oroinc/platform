@@ -2,26 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
 class TagSearchResultsGridListener
 {
-    /** @var  RequestParameters */
-    protected $requestParams;
-
     /** @var string */
     protected $paramName;
 
+    /** @var SecurityProvider  */
+    protected $securityProvider;
+
     /**
-     * @param RequestParameters $requestParams
+     * @param SecurityProvider $securityProvider
      */
-    public function __construct(RequestParameters $requestParams)
+    public function __construct(SecurityProvider $securityProvider)
     {
-        $this->requestParams = $requestParams;
+        $this->securityProvider = $securityProvider;
     }
 
     /**
@@ -32,14 +30,17 @@ class TagSearchResultsGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            /** @var QueryBuilder $query */
+            $parameters = $datagrid->getParameters();
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $queryBuilder->setParameter('tag', $this->requestParams->get('tag_id', 0));
+            $this->securityProvider->applyAcl($queryBuilder, 'tt');
 
-            $searchEntity = $this->requestParams->get('from', '*');
+            $queryBuilder->setParameter('tag', $parameters->get('tag_id', 0));
+
+            $searchEntity = $parameters->get('from', '*');
             if ($searchEntity != '*' && !empty($searchEntity)) {
                 $queryBuilder->andWhere('tt.alias = :alias')
                     ->setParameter('alias', $searchEntity);

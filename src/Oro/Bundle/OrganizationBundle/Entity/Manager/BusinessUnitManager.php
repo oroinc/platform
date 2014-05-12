@@ -3,9 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -45,20 +45,6 @@ class BusinessUnitManager
     public function getBusinessUnitIds()
     {
         return $this->getBusinessUnitRepo()->getBusinessUnitIds();
-    }
-
-    /**
-     * @param User $entity
-     * @param array $businessUnits
-     */
-    public function assignBusinessUnits($entity, array $businessUnits)
-    {
-        if ($businessUnits) {
-            $businessUnits = $this->getBusinessUnitRepo()->getBusinessUnits($businessUnits);
-        } else {
-            $businessUnits = new ArrayCollection();
-        }
-        $entity->setBusinessUnits($businessUnits);
     }
 
     /**

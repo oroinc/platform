@@ -7,6 +7,8 @@ parameters:
     oro_datagrid.extension.action.class:           Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension
     oro_datagrid.extension.mass_action.class:      Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension
     oro_datagrid.extension.views.class:            Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension
+    oro_datagrid.extension.export.class:           Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension
+    oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -15,24 +17,23 @@ services:
             - @translator
         tags:
             - { name: oro_datagrid.extension }
+        lazy: true
 
     oro_datagrid.extension.orm_pager:
         class: %oro_datagrid.extension.orm_pager.class%
         arguments:
             - @oro_datagrid.extension.pager.orm.pager
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.pager.orm.pager:
         arguments:
             - @oro_security.acl_helper
+            - @oro_batch.orm.query_builder.count_query_optimizer
         class: %oro_datagrid.extension.pager.orm.pager.class%
 
     oro_datagrid.extension.orm_sorter:
         class: %oro_datagrid.extension.orm_sorter.class%
-        arguments:
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }
 
@@ -56,12 +57,29 @@ services:
 
     oro_datagrid.extension.toolbar:
         class: %oro_datagrid.extension.toolbar.class%
+        arguments:
+            - @oro_config.global
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.views:
         class: %oro_datagrid.extension.views.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.export:
+        class: %oro_datagrid.extension.export.class%
         arguments:
-            - @oro_datagrid.datagrid.request_params
+            - @translator
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.totals:
+        class: %oro_datagrid.extension.totals.class%
+        arguments:
+            - @translator
+            - @oro_locale.formatter.number
+            - @oro_locale.formatter.date_time
+            - @oro_security.acl_helper
         tags:
             - { name: oro_datagrid.extension }

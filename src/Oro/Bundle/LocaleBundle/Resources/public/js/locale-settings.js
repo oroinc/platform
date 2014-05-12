@@ -1,12 +1,12 @@
-/* global define */
-define(['underscore', 'oro/locale-settings/data'],
-function(_, settings) {
+/*global define*/
+define(['underscore', 'orolocale/js/locale-settings/data'
+    ], function (_, settings) {
     'use strict';
 
     /**
      * Locale settings
      *
-     * @export  oro/locale-settings
+     * @export  orolocale/js/locale-settings
      * @class   oro.LocaleSettings
      */
     var localeSettings = {
@@ -23,9 +23,14 @@ function(_, settings) {
             language: 'en',
             country: 'US',
             currency: 'USD',
+            datetime_separator: false,
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
+            unit: {
+                'temperature': 'fahrenheit',
+                'wind_speed':  'miles_per_hour'
+            },
             locale_data: {
                 US: {
                     phone_prefix: '1',
@@ -150,6 +155,21 @@ function(_, settings) {
             return this.settings.timezone_offset;
         },
 
+        /**
+         * Calculates minutes of time zone shift
+         * analog of (new Date).getTimezoneOffset()
+         *
+         * @returns {number}
+         */
+        getTimeZoneShift: function () {
+            var tz = localeSettings.getTimeZoneOffset(),
+                matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
+                sign = Number(matches[1] + '1'),
+                hours = Number(matches[2]),
+                minutes = Number(matches[3]);
+            return sign * (hours * 60 + minutes);
+        },
+
         getNameFormats: function() {
             return this.settings.format.name;
         },
@@ -181,6 +201,21 @@ function(_, settings) {
                 return this.settings.format.datetime[vendor][type];
             }
             return defaultValue;
+        },
+
+        /**
+         * Return separator betwean date and time for current format
+         *
+         * @returns {string}
+         */
+        getDateTimeFormatSeparator: function() {
+            if (!this.settings.datetime_separator) {
+                this.settings.datetime_separator = this.getVendorDateTimeFormat('jquery_ui', 'datetime', '')
+                    .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'date'), '')
+                    .replace(localeSettings.getVendorDateTimeFormat('jquery_ui', 'time'), '');
+            }
+
+            return this.settings.datetime_separator;
         },
 
         getLocaleData: function(country, dataType) {

@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\ImportExportBundle\Context\Context as ExportContext;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
@@ -24,19 +25,54 @@ class GridController extends Controller
 
     /**
      * @Route(
+     *      "/widget/{gridName}",
+     *      name="oro_datagrid_widget",
+     *      requirements={"gridName"="[\w-]+"}
+     * )
+     * @Template
+     *
+     * @param string $gridName
+     *
+     * @return Response
+     */
+    public function widgetAction($gridName)
+    {
+        return array(
+            'gridName'     => $gridName,
+            'params'       => $this->getRequest()->get('params', array()),
+            'renderParams' => $this->getRequest()->get('renderParams', array())
+        );
+    }
+
+    /**
+     * @Route(
      *      "/{gridName}",
      *      name="oro_datagrid_index",
      *      requirements={"gridName"="[\w-]+"}
      * )
      *
      * @param string $gridName
-     *
      * @return Response
+     * @throws \Exception
      */
     public function getAction($gridName)
     {
-        $grid   = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName);
-        $result = $grid->getData();
+        $grid = $this->get('oro_datagrid.datagrid.manager')->getDatagridByRequestParams($gridName);
+
+        try {
+            $result = $grid->getData();
+        } catch (\Exception $e) {
+            if ($e instanceof UserInputErrorExceptionInterface) {
+                return new JsonResponse(
+                    [
+                        'type'    => UserInputErrorExceptionInterface::TYPE,
+                        'message' => $this->get('translator')->trans($e->getMessageTemplate(), $e->getMessageParams())
+                    ],
+                    500
+                );
+            }
+            throw $e;
+        }
 
         return new JsonResponse($result->toArray());
     }
@@ -86,10 +122,11 @@ class GridController extends Controller
         // prepare response
         $response = new StreamedResponse($this->exportCallback($context, $executor));
         $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Transfer-Encoding', 'binary');
         $outputFileName = sprintf('datagrid_%s_%s.%s', str_replace('-', '_', $gridName), date('Y_m_d_H_i_s'), $format);
         $response->headers->set(
             'Content-Disposition',
-            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $outputFileName)
+            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $outputFileName)
         );
 
         return $response->send();
@@ -112,15 +149,9 @@ class GridController extends Controller
     {
         $request = $this->getRequest();
 
-        /** @var MassActionParametersParser $massActionParametersParser */
-        $parametersParser = $this->get('oro_datagrid.mass_action.parameters_parser');
-        $parameters       = $parametersParser->parse($request);
-
-        $requestData = array_merge($request->query->all(), $request->request->all());
-
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
-        $response             = $massActionDispatcher->dispatch($gridName, $actionName, $parameters, $requestData);
+        $response             = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
         $data = [
             'successful' => $response->isSuccessful(),
@@ -133,6 +164,7 @@ class GridController extends Controller
     /**
      * @param ContextInterface $context
      * @param StepExecutor     $executor
+     *
      * @return \Closure
      */
     protected function exportCallback(ContextInterface $context, StepExecutor $executor)

@@ -1,16 +1,34 @@
 oro:
     entity_config:
+        entity_config:
+            entity_name.label:  Name
+            module_name.label:  Module
+            updated.label:      Updated at
+
+        field_config:
+            field_name.label:   Name
+            type.label:         Data Type
+
+        config_log:
+            user.label:         Author
+            diffs.label:        Diffs
+            logged_at.label:    Logged at
+
+        menu:
+            entities_list.label: Entities
+            entities_list.description: List of entities
         action:
-            manage: "Manage configurable entities"
-            view_entities: "View configurable entities"
-            update_entity: "Update configurable entity"
-            view_entity: "View configurable entity"
-            update_entity_field: "Update configurable entity field"
-            field_search: "Return varchar type field(s) in given entity"
+            manage: Manage configurable entities
+            view_entities: View configurable entities
+            update_entity: Update configurable entity
+            view_entity: View configurable entity
+            update_entity_field: Update configurable entity field
+            field_search: Return varchar type field(s) in given entity
         controller:
             config_entity:
                 message:
-                    saved: "Entity saved"
+                    saved: Entity saved
+                    update: Schema updated
             config_field:
                 message:
-                    saved: "Field saved"
+                    saved: Field saved

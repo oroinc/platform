@@ -14,10 +14,14 @@ class EntityConfigId implements ConfigIdInterface
      */
     protected $className;
 
-    public function __construct($className, $scope)
+    public function __construct($scope, $className = null)
     {
-        $this->className = $className;
+        if (empty($scope)) {
+            throw new \InvalidArgumentException('$scope must not be empty');
+        }
+
         $this->scope     = $scope;
+        $this->className = $className;
     }
 
     /**
@@ -78,7 +82,7 @@ class EntityConfigId implements ConfigIdInterface
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        return new EntityConfigId($data['className'], $data['scope']);
+        return new EntityConfigId($data['scope'], $data['className']);
     }
     // @codingStandardsIgnoreEnd
 }

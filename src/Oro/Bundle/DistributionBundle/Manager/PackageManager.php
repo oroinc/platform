@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\DistributionBundle\Manager;
 
 use Composer\Composer;
@@ -16,12 +17,15 @@ use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Script\Runner;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
+use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
 class PackageManager
 {
@@ -53,7 +57,10 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages = array('oro/platform', 'oro/platform-dist');
+    protected $constantPackages = [
+        OroPlatformBundle::PACKAGE_NAME,
+        OroPlatformBundle::PACKAGE_DIST_NAME
+    ];
 
     /**
      * @var Pool
@@ -66,10 +73,16 @@ class PackageManager
     protected $logger;
 
     /**
+     * @var MaintenanceMode
+     */
+    protected $maintenance;
+
+    /**
      * @param Composer $composer
      * @param Installer $installer
      * @param BufferIO $composerIO
      * @param Runner $scriptRunner
+     * @param MaintenanceMode $maintenance
      * @param LoggerInterface $logger
      * @param string $pathToComposerJson
      */
@@ -78,6 +91,7 @@ class PackageManager
         Installer $installer,
         BufferIO $composerIO,
         Runner $scriptRunner,
+        MaintenanceMode $maintenance,
         LoggerInterface $logger,
         $pathToComposerJson
     ) {
@@ -87,6 +101,7 @@ class PackageManager
         $this->scriptRunner = $scriptRunner;
         $this->pathToComposerJson = $pathToComposerJson;
 
+        $this->maintenance = $maintenance;
         $this->logger = $logger;
     }
 
@@ -284,11 +299,15 @@ class PackageManager
                 $loadDemoData ? 'with demo data' : 'without demo data'
             )
         );
+
+        $this->maintenance->activate();
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
+
         $justInstalledPackages = [];
         try {
+            $this->scriptRunner->removeApplicationCache();
             if ($this->doInstall($package->getName())) {
                 $installedPackages = $this->getInstalled();
                 $justInstalledPackages = array_filter(
@@ -301,12 +320,10 @@ class PackageManager
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
-                        $this->scriptRunner->install($package);
+                        $this->scriptRunner->runInstallScripts($package);
                     },
                     $justInstalledPackages
                 );
-                $this->scriptRunner->updateDBSchema();
-                $this->scriptRunner->loadFixtures($justInstalledPackages);
                 if ($loadDemoData) {
                     $this->scriptRunner->loadDemoData($justInstalledPackages);
                 }
@@ -350,23 +367,25 @@ class PackageManager
     {
         $localRepository = $this->getLocalRepository();
         $dependents = [];
-        /** @var PackageInterface $localPackage */
-        foreach ($localRepository->getCanonicalPackages() as $localPackage) {
-            $packageRequirements = array_reduce(
-                array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
-                function (array $result, Link $item) {
-                    $result[] = $item->getTarget();
-                    return $result;
-                },
-                []
-            );
+        array_map(
+            function (PackageInterface $localPackage) use (&$dependents, $needleName) {
+                $packageRequirements = array_reduce(
+                    array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
+                    function (array $result, Link $item) {
+                        $result[] = $item->getTarget();
+                        return $result;
+                    },
+                    []
+                );
 
-            if (in_array($needleName, $packageRequirements)) {
-                $dependents[] = $localPackage->getName();
-                $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
+                if (in_array($needleName, $packageRequirements)) {
+                    $dependents[] = $localPackage->getName();
+                    $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
 
-            }
-        }
+                }
+            },
+            $localRepository->getCanonicalPackages()
+        );
 
         return $dependents;
     }
@@ -390,6 +409,7 @@ class PackageManager
             $packageNames
         );
 
+        $this->maintenance->activate();
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
@@ -399,7 +419,7 @@ class PackageManager
         array_map(
             function ($name) use ($installationManager, $localRepository) {
                 $package = $this->findInstalledPackage($name);
-                $this->scriptRunner->uninstall($package);
+                $this->scriptRunner->runUninstallScripts($package);
                 $installationManager->uninstall(
                     $localRepository,
                     new UninstallOperation($package)
@@ -408,6 +428,7 @@ class PackageManager
             $packageNames
         );
         $this->scriptRunner->removeCachedFiles();
+        $this->scriptRunner->clearApplicationCache();
         $this->scriptRunner->runPlatformUpdate();
         $this->scriptRunner->clearDistApplicationCache();
         $this->logger->info('Packages uninstalled', $packageNames);
@@ -481,9 +502,13 @@ class PackageManager
     public function update($packageName)
     {
         $this->logger->info(sprintf('%s updating begin', $packageName));
+
+        $this->maintenance->activate();
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
+        $this->scriptRunner->removeApplicationCache();
+
         if ($this->doInstall($packageName)) {
             $currentlyInstalled = $this->getInstalled();
             $changeSetBuilder = new ChangeSetBuilder();
@@ -494,7 +519,7 @@ class PackageManager
             );
             array_map(
                 function (PackageInterface $p) {
-                    $this->scriptRunner->install($p);
+                    $this->scriptRunner->runInstallScripts($p);
                 },
                 $installedPackages
             );
@@ -509,20 +534,20 @@ class PackageManager
 
                 return '';
             };
-            $this->scriptRunner->runPlatformUpdate();
             array_map(
                 function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
                     $previousInstalledPackageVersion = $fetchPreviousInstalledPackageVersion($p->getName());
-                    $this->scriptRunner->update($p, $previousInstalledPackageVersion);
+                    $this->scriptRunner->runUpdateScripts($p, $previousInstalledPackageVersion);
                 },
                 $updatedPackages
             );
             array_map(
                 function (PackageInterface $p) {
-                    $this->scriptRunner->uninstall($p);
+                    $this->scriptRunner->runUninstallScripts($p);
                 },
                 $uninstalledPackages
             );
+            $this->scriptRunner->clearApplicationCache();
             $this->scriptRunner->runPlatformUpdate();
             $this->scriptRunner->clearDistApplicationCache();
             $justInstalledPackage = $this->findInstalledPackage($packageName);

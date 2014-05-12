@@ -2,28 +2,20 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Install;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\OroAdministration;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\OroConfiguration;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\OroFinish;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\OroInstall;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\OroRequirements;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroAdministration;
+use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroConfiguration;
+use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroFinish;
+use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroInstall;
+use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroRequirements;
 
 class InstallTest extends Selenium2TestCase
 {
     protected function setUp()
     {
-        $this->setHost(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
-        $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
-        $this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-        $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL);
-        $this->setSeleniumServerRequestsTimeout(MAX_EXECUTION_TIME);
-    }
-
-    public function tearDown()
-    {
-        $this->cookie()->clear();
+        parent::setUp();
+        //to prevent timeout exception on step pages
+        $this->setSeleniumServerRequestsTimeout((int)(MAX_EXECUTION_TIME / 1000));
     }
 
     public function testInstallation()

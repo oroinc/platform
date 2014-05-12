@@ -1,10 +1,10 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone'],
-function($, _, Backbone) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
+    ], function ($, _, Backbone, __) {
     'use strict';
 
     /**
-     * @export  oro/email/variable/view
+     * @export  oroemail/js/email/variable/view
      * @class   oro.email.variable.View
      * @extends Backbone.View
      */
@@ -28,6 +28,10 @@ function($, _, Backbone) {
 
             $('input[name*="subject"], textarea[name*="content"]')
                 .on('blur', _.bind(this._updateElementsMetaData, this));
+
+            // set default to content
+            this.lastElement = $('textarea[name*="content"]');
+
             this.render();
         },
 
@@ -47,13 +51,34 @@ function($, _, Backbone) {
          *
          * @returns {*}
          */
-        render: function() {
-            var html = _.template(this.options.template.html(), {
-                userVars: this.model.get('user'),
-                entityVars: this.model.get('entity')
-            });
+        render: function () {
+            var userVars   = this.model.get('user'),
+                entityVars = this.model.get('entity'),
+                $el        = $(this.el);
 
-            $(this.el).html(html);
+            if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
+                $el.parent().hide();
+            } else {
+                var html = _.template(this.options.template.html(), {
+                    userVars: this.model.get('user'),
+                    entityVars: this.model.get('entity'),
+                    title: __('Click to insert variable or drag it.')
+                });
+
+                $el.html(html);
+                $el.parent().show();
+
+                $el.find('ul li a').draggable({helper: 'clone'});
+                $('input[name*="subject"], textarea[name*="content"]')
+                    .droppable({
+                        drop: function Drop(event, ui) {
+                            var variable = ui.draggable.text(),
+                                textarea = $(this);
+
+                            textarea.val(textarea.val() + variable);
+                        }
+                    });
+            }
 
             return this;
         },
@@ -64,7 +89,7 @@ function($, _, Backbone) {
          * @param e
          * @returns {*}
          */
-        addVariable: function(e) {
+        addVariable: function (e) {
             if (!_.isNull(this.lastElement) && this.lastElement.is(':visible')) {
                 this.lastElement.val(this.lastElement.val() + $(e.currentTarget).html());
             }
@@ -79,7 +104,7 @@ function($, _, Backbone) {
          * @private
          * @returns {*}
          */
-        _updateElementsMetaData: function(e) {
+        _updateElementsMetaData: function (e) {
             this.lastElement = $(e.currentTarget);
 
             return this;

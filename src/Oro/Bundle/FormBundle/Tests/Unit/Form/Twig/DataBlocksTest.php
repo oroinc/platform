@@ -29,11 +29,11 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     private $testFormConfig = array(
-        'second' => array(
+        0 => array(
             'title'       => 'Second',
             'class'       => null,
             'subblocks'   => array(
-                'text_3__subblock' => array(
+                0 => array(
                     'code'        => 'text_3__subblock',
                     'title'       => null,
                     'data'        => array(null),
@@ -43,18 +43,18 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
             ),
             'description' => null
         ),
-        'first'  => array(
+        1 => array(
             'title'       => 'First Block',
             'class'       => null,
             'subblocks'   => array(
-                'first'  => array(
+                0 => array(
                     'code'        => 'first',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
                     'useSpan'     => true
                 ),
-                'second' => array(
+                1 => array(
                     'code'        => 'second',
                     'title'       => 'Second SubBlock',
                     'data'        => array(null),
@@ -64,19 +64,19 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
             ),
             'description' => 'some desc'
         ),
-        'third'  => array(
+        2  => array(
             'title'       => 'Third',
             'class'       => null,
             'subblocks'   => array(
-                'text_4__subblock' => array(
-                    'code'        => 'text_4__subblock',
+                0 => array(
+                    'code'        => 'first',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
                     'useSpan'     => true
                 ),
-                'first'            => array(
-                    'code'        => 'first',
+                1 => array(
+                    'code'        => 'text_4__subblock',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,

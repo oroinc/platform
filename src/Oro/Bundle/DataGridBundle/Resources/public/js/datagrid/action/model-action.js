@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'oro/datagrid/abstract-action'],
-function(_, AbstractAction) {
+/*global define*/
+define(['underscore', './abstract-action'
+    ], function (_, AbstractAction) {
     'use strict';
 
     /**
      * Basic model action class.
      *
-     * @export  oro/datagrid/model-action
-     * @class   oro.datagrid.ModelAction
-     * @extends oro.datagrid.AbstractAction
+     * @export  orodatagrid/js/datagrid/action/model-action
+     * @class   orodatagrid.datagrid.action.ModelAction
+     * @extends orodatagrid.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
         /** @property {Backbone.Model} */
@@ -30,20 +30,20 @@ function(_, AbstractAction) {
          * @param {Backbone.Model} options.model Optional parameter
          * @throws {TypeError} If model is undefined
          */
-        initialize: function(options) {
-            options = options || {};
+        initialize: function (options) {
+            var opts = options || {};
 
-            if (!options.model) {
+            if (!opts.model) {
                 throw new TypeError("'model' is required");
             }
-            this.model = options.model;
+            this.model = opts.model;
 
-            if (_.has(options, 'backUrl')) {
-                this.backUrl = options.backUrl;
+            if (_.has(opts, 'backUrl')) {
+                this.backUrl = opts.backUrl;
             }
 
-            if (_.has(options, 'backUrlParameter')) {
-                this.backUrlParameter = options.backUrlParameter;
+            if (_.has(opts, 'backUrlParameter')) {
+                this.backUrlParameter = opts.backUrlParameter;
             }
 
             AbstractAction.prototype.initialize.apply(this, arguments);
@@ -55,12 +55,11 @@ function(_, AbstractAction) {
          * @return {String}
          * @throws {TypeError} If route is undefined
          */
-        getLink: function() {
+        getLink: function () {
+            var result, backUrl;
             if (!this.link) {
                 throw new TypeError("'link' is required");
             }
-
-            var result;
 
             if (this.model.has(this.link)) {
                 result = this.model.get(this.link);
@@ -69,7 +68,7 @@ function(_, AbstractAction) {
             }
 
             if (this.backUrl) {
-                var backUrl = _.isBoolean(this.backUrl) ? window.location.href : this.backUrl;
+                backUrl = _.isBoolean(this.backUrl) ? window.location.href : this.backUrl;
                 backUrl = encodeURIComponent(backUrl);
                 result = this.addUrlParameter(result, this.backUrlParameter, backUrl);
             }
@@ -86,11 +85,11 @@ function(_, AbstractAction) {
          * @return {String}
          * @protected
          */
-        addUrlParameter: function(url, parameterName, parameterValue) {
+        addUrlParameter: function (url, parameterName, parameterValue) {
             var urlhash, sourceUrl, replaceDuplicates = true;
-            if(url.indexOf('#') > 0){
+            if (url.indexOf('#') > 0) {
                 var cl = url.indexOf('#');
-                urlhash = url.substring(url.indexOf('#'),url.length);
+                urlhash = url.substring(url.indexOf('#'), url.length);
             } else {
                 urlhash = '';
                 cl = url.length;

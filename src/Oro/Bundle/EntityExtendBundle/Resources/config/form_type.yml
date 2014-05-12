@@ -1,4 +1,5 @@
 parameters:
+    oro_entity_extend.type.entity.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\EntityType
     oro_entity_extend.type.field.class:                         Oro\Bundle\EntityExtendBundle\Form\Type\FieldType
     oro_entity_extend.type.relation.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
 
@@ -6,10 +7,19 @@ parameters:
     oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
 
 services:
+    oro_entity_extend.type.entity:
+        class:                                                  %oro_entity_extend.type.entity.class%
+        arguments:
+            - @oro_entity_extend.db_id_name_generator
+        tags:
+            - { name: form.type, alias: oro_entity_extend_entity_type }
+
     oro_entity_extend.type.field:
         class:                                                  %oro_entity_extend.type.field.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @translator
+            - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: form.type, alias: oro_entity_extend_field_type }
 

@@ -5,10 +5,6 @@
     'OroNotificationBundle:Form:fields.html.twig',
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
-{% set title = form.vars.value.id
-    ? 'Edit'|trans ~ ' ' ~ 'notification rule'|trans ~ ' ' ~ form.vars.value.id
-    : 'New'|trans ~ ' ' ~ 'notification rule'|trans
-%}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
 {% endif %}
@@ -19,20 +15,23 @@
 %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('oro_notification_emailnotification_remove') %}
+    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_emailnotication', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_notification_emailnotification_index'),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-emailnotification',
             'dataId': form.vars.value.id,
-            'entity_label': 'notification rule'|trans
+            'entity_label': 'oro.notification.emailnotification.entity_label'|trans
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ UI.button({'path' : path('oro_notification_emailnotification_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
-    {{ UI.saveAndStayButton('oro_notification_emailnotification_update') }}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.cancelButton(path('oro_notification_emailnotification_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_notification_emailnotification_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
@@ -41,12 +40,13 @@
                 'entity':      form.vars.value,
                 'indexPath':   path('oro_notification_emailnotification_index'),
                 'indexLabel':  'oro.notification.emailnotification.entity_plural_label'|trans,
-                'entityTitle': title
+                'entityTitle': 'oro.notification.emailnotification.edit_entity'|trans({'%name%': form.vars.value.id})
             }
         %}
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.notification.emailnotification.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 

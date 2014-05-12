@@ -5,10 +5,12 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -16,8 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class CustomEntityGridListener extends AbstractConfigGridListener
 {
@@ -27,14 +28,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var null original entity class */
     protected $entityClass = null;
-
-    /** @var array fields to be shown on grid */
-    protected $queryFields = [];
 
     /** @var  integer parent entity id */
     protected $parentId;
@@ -44,6 +39,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
     /** @var Request */
     protected $request;
+
+    /** @var DatagridInterface[] */
+    protected $visitedDatagrids = array();
 
     protected $filterMap = array(
         'string'   => 'string',
@@ -55,6 +53,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'range',
         'text'     => 'string',
         'float'    => 'number',
+        'money'    => 'number',
+        'percent'  => 'percent'
     );
 
     protected $typeMap = array(
@@ -67,21 +67,23 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         'date'     => 'datetime',
         'text'     => 'string',
         'float'    => 'decimal',
+        'money'    => 'number',
+        'percent'  => 'percent'
     );
 
     /**
-     * @param ConfigManager $configManager
-     * @param RequestParameters $requestParameters
-     * @param Router $router
+     * @param ConfigManager       $configManager
+     * @param SystemAwareResolver $datagridResolver
+     * @param Router              $router
      */
     public function __construct(
         ConfigManager $configManager,
-        RequestParameters $requestParameters,
+        SystemAwareResolver $datagridResolver,
         Router $router
     ) {
-        $this->configManager = $configManager;
-        $this->requestParams = $requestParameters;
-        $this->router = $router;
+        parent::__construct($configManager, $datagridResolver);
+
+        $this->router        = $router;
     }
 
     /**
@@ -98,7 +100,12 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $entityClass = $this->getRequestParam('class_name');
+        $datagrid = $event->getDatagrid();
+
+        $this->addVisitedDatagrid($datagrid);
+
+        $entityClass = $this->getParam($datagrid, 'class_name');
+
         if (empty($entityClass)) {
             $entityClass = $this->request->attributes->get('id');
         }
@@ -140,7 +147,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         }
 
         // set entity to select from
-        $from = $config->offsetGetByPath(self::PATH_FROM, []);
+        $from    = $config->offsetGetByPath(self::PATH_FROM, []);
         $from[0] = array_merge($from[0], ['table' => $this->entityClass]);
         $config->offsetSetByPath('[source][query][from]', $from);
     }
@@ -150,43 +157,44 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     protected function getDynamicFields($alias = null, $itemsType = null)
     {
-        $fields = $select = [];
+        $columns = $selects = [];
 
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $extendConfigs        = $extendConfigProvider->getConfigs($this->entityClass);
 
         foreach ($extendConfigs as $extendConfig) {
-            if ($extendConfig->get('state') != ExtendManager::STATE_NEW && !$extendConfig->get('is_deleted')) {
+            if (!$extendConfig->is('state', ExtendScope::STATE_NEW) && !$extendConfig->get('is_deleted')) {
                 list($field, $selectField) = $this->getDynamicFieldItem($alias, $extendConfig);
 
                 if (!empty($field)) {
-                    $fields[] = $field;
+                    $columns[] = $field;
                 }
 
                 if (!empty($selectField)) {
-                    $select[] = $selectField;
+                    $selects[] = $selectField;
                 }
             }
         }
 
-        ksort($fields);
+        ksort($columns);
 
-        $orderedFields = $sorters = $filters = [];
+        $orderedColumns = $sorters = $filters = [];
         // compile field list with pre-defined order
-        foreach ($fields as $field) {
-            $orderedFields = array_merge($orderedFields, $field);
+        foreach ($columns as $field) {
+            $orderedColumns = array_merge($orderedColumns, $field);
         }
 
         $result = [
-            'columns' => $orderedFields,
+            'columns' => $orderedColumns,
         ];
 
-        if (!empty($select)) {
+        if (!empty($selects)) {
             $result = array_merge(
                 $result,
-                ['source' => [
-                    'query' => ['select' => $select],
+                [
+                    'source' => [
+                        'query' => ['select' => $selects],
                     ]
                 ]
             );
@@ -198,94 +206,130 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /**
      * Get dynamic field or empty array if field is not visible
      *
-     * @param $alias
+     * @param                 $alias
      * @param ConfigInterface $extendConfig
      * @return array
      */
     public function getDynamicFieldItem($alias, ConfigInterface $extendConfig)
     {
-        /** @var FieldConfigId $fieldConfig */
-        $fieldConfig = $extendConfig->getId();
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $extendConfig->getId();
 
         /** @var ConfigProvider $datagridProvider */
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
         $datagridConfig         = $datagridConfigProvider->getConfig(
             $this->entityClass,
-            $fieldConfig->getFieldName()
+            $fieldConfigId->getFieldName()
         );
 
         $select = '';
-        $field = [];
+        $field  = [];
         if ($datagridConfig->is('is_visible')) {
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
             $entityConfig         = $entityConfigProvider->getConfig(
                 $this->entityClass,
-                $fieldConfig->getFieldName()
+                $fieldConfigId->getFieldName()
             );
 
-            $label = $entityConfig->get('label') ?: $fieldConfig->getFieldName();
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfig->getFieldName()
-                : $fieldConfig->getFieldName();
+            $label     = $entityConfig->get('label') ? : $fieldConfigId->getFieldName();
+            $fieldName = $fieldConfigId->getFieldName();
 
-            $this->queryFields[] = $code;
-
-            $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
-            $select = $alias . '.' . $code;
+            $field  = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfigId);
+            $select = $alias . '.' . $fieldName;
         }
 
         return [$field, $select];
     }
 
     /**
-     * @param string $code
-     * @param $label
-     * @param FieldConfigId $fieldConfig
+     * @param string        $code
+     * @param string        $label
+     * @param FieldConfigId $fieldConfigId
+     * @param bool          $isVisible
      *
      * @return array
      */
-    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfig)
+    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId, $isVisible = true)
     {
+        // TODO: getting a field type from a model here is a temporary solution.
+        // We need to use $fieldConfigId->getFieldType()
+        $fieldType = $this->configManager->getConfigFieldModel(
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName()
+        )->getType();
+
         return [
             $code => [
-                'type'        => 'field',
-                'label'       => $label,
-                'field_name'  => $code,
-                'filter_type' => $this->filterMap[$fieldConfig->getFieldType()],
-                'required'    => false,
-                'sortable'    => true,
-                'filterable'  => true,
-                'show_filter' => true,
+                'type'          => 'field',
+                'label'         => $label,
+                'field_name'    => $code,
+                'filter_type'   => $this->filterMap[$fieldType],
+                'required'      => false,
+                'sortable'      => true,
+                'filterable'    => true,
+                'show_filter'   => true,
+                'frontend_type' => $this->getFrontendFieldType($fieldConfigId->getFieldType()),
+                'renderable'    => $isVisible
             ]
         ];
     }
 
     /**
+     * Gets a datagrid column frontend type for the given field type
+     *
+     * @param string $fieldType
+     * @return string
+     */
+    protected function getFrontendFieldType($fieldType)
+    {
+        switch ($fieldType) {
+            case 'integer':
+            case 'smallint':
+            case 'bigint':
+                return PropertyInterface::TYPE_INTEGER;
+            case 'decimal':
+            case 'float':
+                return PropertyInterface::TYPE_DECIMAL;
+            case 'boolean':
+                return PropertyInterface::TYPE_BOOLEAN;
+            case 'date':
+                return PropertyInterface::TYPE_DATE;
+            case 'datetime':
+                return PropertyInterface::TYPE_DATETIME;
+            case 'money':
+                return PropertyInterface::TYPE_CURRENCY;
+            case 'percent':
+                return PropertyInterface::TYPE_PERCENT;
+        }
+
+        return PropertyInterface::TYPE_STRING;
+    }
+
+    /**
      * @param string $gridName
      * @param string $keyName
-     * @param array $node
+     * @param array  $node
      *
      * @return callable
      */
     public function getLinkProperty($gridName, $keyName, $node)
     {
-        $router    = $this->router;
+        $router = $this->router;
         if (!isset($node['route'])) {
             return false;
         } else {
             $route = $node['route'];
         }
 
-        $requestParams = $this->requestParams;
-
-        return function (ResultRecord $record) use ($router, $requestParams, $route) {
-            $className = $requestParams->get('class_name');
+        return function (ResultRecord $record) use ($gridName, $router, $route) {
+            $datagrid = $this->getVisitedDatagrid($gridName);
+            $className = $this->getParam($datagrid, 'class_name');
             return $router->generate(
                 $route,
                 array(
                     'entity_id' => str_replace('\\', '_', $className),
-                    'id' => $record->getValue('id')
+                    'id'        => $record->getValue('id')
                 )
             );
         };
@@ -296,20 +340,20 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - first from current request query
      * - then from master request attributes
      *
-     * @param $paramName
-     * @param bool $default
+     * @param DatagridInterface $datagrid
+     * @param string $name
+     * @param bool   $default
+     *
      * @return mixed
      */
-    protected function getRequestParam($paramName, $default = false)
+    protected function getParam(DatagridInterface $datagrid, $name, $default = false)
     {
-        $paramValue = $this->requestParams->get($paramName, $default);
+        $paramValue = $datagrid->getParameters()->get($name, $default);
         if ($paramValue === false) {
             $paramNameCamelCase = str_replace(
                 ' ',
                 '',
-                lcfirst(
-                    ucwords(str_replace('_', ' ', $paramName))
-                )
+                lcfirst(ucwords(str_replace('_', ' ', $name)))
             );
 
             $paramValue = $this->request->attributes->get($paramNameCamelCase, $default);
@@ -334,5 +378,28 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         if ($request instanceof Request) {
             $this->request = $request;
         }
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     */
+    protected function addVisitedDatagrid(DatagridInterface $datagrid)
+    {
+        $this->visitedDatagrids[$datagrid->getName()] = $datagrid;
+    }
+
+    /**
+     * @param string $datagridName
+     * @return DatagridInterface
+     * @throws \InvalidArgumentException
+     */
+    protected function getVisitedDatagrid($datagridName)
+    {
+        if (!isset($this->visitedDatagrids[$datagridName])) {
+            throw new \InvalidArgumentException(
+                sprintf('Can\'t get instance of grid "%s".', $datagridName)
+            );
+        }
+        return $this->visitedDatagrids[$datagridName];
     }
 }

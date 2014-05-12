@@ -6,13 +6,19 @@ Table of Contents
  - [Add Custom Action](#add-custom-action)
  - [Configuration Syntax](#configuration-syntax)
  - [Assign Value](#assign-value)
+ - [Assign Active User](#assign-active-user)
  - [Unset Value](#unset-value)
+ - [Create Object](#create-object)
  - [Create Entity](#create-entity)
+ - [Create Related Entity](#create-related-entity)
  - [Find Entity](#find-entity)
+ - [Format Name](#format-name)
+ - [Format String](#format-string)
+ - [Call Method](#call-method)
+ - [Create Date](#create-date)
+ - [Create Date Time](#create-date-time)
  - [Start Workflow](#start-workflow)
- - [Close Workflow](#close-workflow)
  - [Redirect](#redirect)
- - [Redirect To Workflow](#redirect-to-workflow)
  - [Tree Executor](#tree-executor)
  - [Configurable](#configurable)
 
@@ -95,6 +101,29 @@ OR
 - @assign_value: [$call_successfull, true]
 ```
 
+Assign Active User
+------------------
+
+**Class** Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
+
+**Alias** assign_active_user or get_active_user
+
+**Description** Set currently logged in user to attribute
+
+**Parameters**
+ - attribute / 0 - attribute where value should be set;
+
+**Configuration Example**
+```
+- @assign_active_user: $opportunity_owner
+
+OR
+
+- @assign_active_user:
+    parameters:
+        attribute: $opportunity_owner
+```
+
 Unset Value
 ------------
 
@@ -122,6 +151,38 @@ OR
 OR
 
 - @unset_value: [$call_successfull]
+```
+
+Create Object
+-------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+
+**Alias:** create_object
+
+**Description:** Creates object with specified class and data, and sets it as attribute value.
+
+**Parameters:**
+ - class - class name of created object;
+ - arguments - array of object constructor arguments;
+ - attribute - attribute that will contain entity instance;
+ - data - array of data that should be set to entity.
+
+**Configuration Example**
+```
+- @create_object:
+    class: \DateTimeZone
+    arguments: ['UTC']
+    attribute: $.result.timezone
+
+OR
+
+- @create_object:
+    class: \DateTime
+    arguments: ['2014-04-01']
+    data:
+        timezone: $.result.timezone
+    attribute: $.result.release_date
 ```
 
 Create Entity
@@ -157,6 +218,41 @@ OR
 - @create_entity:
     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
     attribute: $conversation
+    data:
+        result: $conversation_result
+        comment: $conversation_comment
+        successful: $conversation_successful
+        call: $managed_entity
+
+```
+
+Create Related Entity
+---------------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
+
+**Alias:** create_related_entity
+
+**Description:** Creates workflow related entity with data, persists it to Db and sets it as WorkflowItem entity value.
+
+**Parameters:**
+ - data - array of data that should be set to entity.
+
+**Configuration Example**
+```
+- @create_related_entity:
+    conditions:
+        # optional condition configuration
+    parameters:
+        data:
+            result: $conversation_result
+            comment: $conversation_comment
+            successful: $conversation_successful
+            call: $managed_entity
+
+OR
+
+- @create_entity:
     data:
         result: $conversation_result
         comment: $conversation_comment
@@ -211,6 +307,50 @@ OR
     case_insensitive: true
 ```
 
+Format Name
+-----------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FormatName
+
+**Alias:** format_name
+
+**Description:** Format object that implements locale name interfaces based on locale settings.
+
+**Parameters:**
+ - attribute - target path where result of action will be saved;
+ - object - object that implements locale name interface;
+
+**Configuration Example**
+```
+- @format_name:
+    attribute: $.result.formattedCustomerName
+    object: $cart.customer
+```
+
+Format String
+-------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FormatString
+
+**Alias:** format_string
+
+**Description:** Replace placeholders in string with passed values.
+
+**Parameters:**
+ - attribute - target path where result of action will be saved;
+ - string - string with placeholders. Placeholder keys must be in format %placeholder_key%;
+ - arguments - placeholder values
+
+**Configuration Example**
+```
+- @format_string:
+    attribute: $opportunity_name
+    string: '%customer_name% - %shopping_cart_id%'
+    arguments:
+        customer_name: $.result.formattedCustomerName
+        shopping_cart_id: $cart.id
+```
+
 Call Method
 -----------
 
@@ -242,6 +382,64 @@ OR
     method: addAddress
     method_parameters: [$.result.address]
 
+```
+
+Create Date
+-----------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+
+**Alias:** create_date
+
+**Description:** Create DateTime object based on date string
+
+**Parameters:**
+ - date - (optional) date as string. Current date by default;
+ - attribute - target path where result of action will be saved;
+
+**Configuration Example**
+```
+- @create_date:
+    attribute: $sales_funnel_start_date
+
+OR
+
+- @create_date:
+    conditions:
+            # optional condition configuration
+    parameters:
+        attribute: $sales_funnel_start_date
+        date: 2014-04-01
+```
+
+Create Date Time
+----------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateDate
+
+**Alias:** create_datetime
+
+**Description:** Create DateTime object based on date time string
+
+**Parameters:**
+ - time - (optional) date time as string. Current time by default;
+ - timezone - (optional) timezone as string. UTC timezone by default;
+ - attribute - target path where result of action will be saved;
+
+**Configuration Example**
+```
+- @create_datetime:
+    attribute: $sales_funnel_start_datetime
+
+OR
+
+- @create_datetime:
+    conditions:
+            # optional condition configuration
+    parameters:
+        attribute: $sales_funnel_start_date
+        time: 2014-04-01 12:12:00
+        timezone: Europe/Kiev
 ```
 
 Start Workflow
@@ -279,25 +477,6 @@ OR
     transition: develop
 ```
 
-Close Workflow
---------------
-
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow
-
-**Alias:** close_workflow
-
-**Description:** Triggers closing of current workflow item.
-
-**Parameters:**
- - workflow_item / 0 - path to instance of Workflow Item
- - route - name of the route (by default route "oro_workflow_step_edit")
- - route_parameters - additional parameters of route
-
-**Configuration Example**
-```
-- @close_workflow: ~
-```
-
 Redirect
 --------
 
@@ -329,29 +508,6 @@ OR
     parameters:
         route: some_route_name
         route_parameters: {id: $some_entity.id}
-```
-
-Redirect To Workflow
---------------------
-
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow
-
-**Alias:** redirect_to_workflow
-
-**Description:** Redirects to another workflow item.
-
-**Parameters:**
- - workflow_item \ 0 - path where instance of Workflow Item is located
-
-**Configuration Example**
-```
-- @redirect_to_workflow:
-    parameters:
-        workflow_item: $.result.workflowItem
-
-OR
-
-- @redirect_to_workflow: [$.result.workflowItem]
 ```
 
 Tree Executor

@@ -36,8 +36,9 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     public function testUpload()
     {
         $mode = 'add';
+        $separator = DIRECTORY_SEPARATOR;
         $files = [
-            'some/path/to/file.yml' => 'api/path/test.yml',
+            "some{$separator}path{$separator}to{$separator}file.yml" => "api{$separator}path{$separator}test.yml",
         ];
 
         $this->adapter->setProjectId(1);
@@ -145,7 +146,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->will($this->returnValue(true));
 
-        $res = $this->adapter->download($path, $locale);
+        $res = $this->adapter->download($path, [$locale]);
         $this->assertTrue($res);
         unlink($path);
     }

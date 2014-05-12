@@ -86,7 +86,7 @@ class DateTimeExtension extends \Twig_Extension
     {
         $dateType = $this->getOption($options, 'dateType');
         $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone');
+        $timeZone = $this->getOption($options, 'timeZone', 'UTC');
 
         return $this->formatter->formatDate($date, $dateType, $locale, $timeZone);
     }
@@ -109,7 +109,7 @@ class DateTimeExtension extends \Twig_Extension
     {
         $timeType = $this->getOption($options, 'timeType');
         $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone');
+        $timeZone = $this->getOption($options, 'timeZone', 'UTC');
 
         return $this->formatter->formatTime($date, $timeType, $locale, $timeZone);
     }

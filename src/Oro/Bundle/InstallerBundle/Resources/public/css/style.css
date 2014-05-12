@@ -521,7 +521,7 @@ a.button:hover {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    padding: 0 0 0 136px;
+    padding: 0 0 0 156px;
     margin: 0 0 10px
 }
 
@@ -532,7 +532,7 @@ a.button:hover {
 }
 
 .horizontal-form label {
-    width: 135px;
+    width: 145px;
     text-align: right;
     margin: 0 0 0 -146px;
     float: left;
@@ -592,7 +592,7 @@ a.button:hover {
     display: block
 }
 
-span.validation-faled:before {
+span.validation-failed:before {
     color: #C81717;
     content: "×";
     display: inline-block;
@@ -601,7 +601,7 @@ span.validation-faled:before {
     width: 14px
 }
 
-span.validation-faled {
+span.validation-failed {
     clear: both;
     color: #C81717;
     display: block;

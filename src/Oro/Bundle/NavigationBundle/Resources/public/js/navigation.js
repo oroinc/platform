@@ -7,17 +7,17 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var __ = require('oro/translator');
-    var app = require('oro/app');
-    var mediator = require('oro/mediator');
-    var messenger = require('oro/messenger');
-    var Modal = require('oro/modal');
-    var LoadingMask = require('oro/loading-mask');
-    var PagestateView = require('oro/navigation/pagestate/view');
-    var PagestateModel = require('oro/navigation/pagestate/model');
-    var PageableCollection = require('oro/pageable-collection');
-    var widgetManager = require('oro/widget-manager');
-    var contentManager = require('oro/content-manager');
+    var __ = require('orotranslation/js/translator');
+    var app = require('oroui/js/app');
+    var mediator = require('oroui/js/mediator');
+    var messenger = require('oroui/js/messenger');
+    var Modal = require('oroui/js/modal');
+    var LoadingMask = require('oroui/js/loading-mask');
+    var PagestateView = require('./pagestate/view');
+    var PagestateModel = require('./pagestate/model');
+    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    var widgetManager = require('oroui/js/widget-manager');
+    var contentManager = require('./content-manager');
     var _jqueryForm = require('jquery.form');
 
     var Navigation;
@@ -26,32 +26,21 @@ define(function (require) {
     var pageCacheStates = {
         state: {},
 
-        registerStateObject: function(type, fields) {
-            this.state[type] = {};
-            _.each(fields, function(field) {
-                this.state[type][field] = '';
-            }, this);
+        saveObjectCache: function (key, state) {
+            this.state[key] = this.state[key] || {};
+            _.extend(this.state[key], state);
         },
 
-        saveObjectCache: function(type, values) {
-            _.each(values, function(value, key) {
-                this.state[type][key] = value;
-            }, this);
-        },
-
-        getObjectCache: function(type) {
-            return this.state[type];
+        getObjectCache: function (key) {
+            return this.state[key] || {};
         }
     };
-
-    pageCacheStates.registerStateObject('grid',['collection']);
-    pageCacheStates.registerStateObject('form',['form_data']);
 
     /**
      * Router for hash navigation
      *
-     * @export  oro/navigation
-     * @class   oro.Navigation
+     * @_export  oronavigation/js/navigation
+     * @class   oronavigation
      * @extends Backbone.Router
      */
     Navigation = Backbone.Router.extend({
@@ -102,7 +91,7 @@ define(function (require) {
          * Cached jQuery objects by selectors from selectors property
          * @property {Object}
          */
-        selectorCached: {},
+        _selectorCached: {},
 
         /**
          * @property {oro.LoadingMask}
@@ -170,11 +159,6 @@ define(function (require) {
          * @param options
          */
         initialize: function (options) {
-            var selectors = this.selectorCached;
-            _.each(this.selectors, function (selector, name) {
-                selectors[name] = $(selector);
-            });
-
             if (!options.baseUrl || !options.headerId) {
                 throw new TypeError("'baseUrl' and 'headerId' are required");
             }
@@ -194,6 +178,26 @@ define(function (require) {
             Backbone.Router.prototype.initialize.apply(this, arguments);
         },
 
+        isMaintenancePage: function(){
+            var metaError = $('meta[name="error"]');
+            return metaError.length && metaError.attr('content') == 503;
+        },
+
+        /**
+         * Returns cached jQuery object by name
+         * @param name
+         * @returns {Object}
+         */
+        getCached$: function (name) {
+            var selectors = this._selectorCached;
+
+            if (!selectors[name]) {
+                selectors[name] = $(this.selectors[name]);
+            }
+
+            return selectors[name];
+        },
+
         /**
          * Init
          */
@@ -202,7 +206,7 @@ define(function (require) {
              * Processing all links in grid after grid load
              */
             mediator.bind("grid_load:complete", function (collection) {
-                this.updateCachedContent('grid', {'collection': collection});
+                this.updateCachedContent(collection.inputName, {'collection': collection});
                 if (pinbarView) {
                     var item = pinbarView.getItemForCurrentPage(true);
                     if (item.length && this.useCache) {
@@ -215,12 +219,13 @@ define(function (require) {
             /**
              * Loading grid collection from cache
              */
-            mediator.bind("datagrid_collection_set_before", function (obj) {
-                var data = this.getCachedData();
+            mediator.bind("datagrid_collection_set_before", function (payload) {
+                var gridName = payload.name,
+                    data = this.getCachedData();
                 if (data.states) {
-                    var girdState = data.states.getObjectCache('grid');
+                    var girdState = data.states.getObjectCache(gridName);
                     if (girdState.collection) {
-                        obj.collection = girdState.collection.clone();
+                        payload.collection = girdState.collection.clone();
                     }
                 }
             }, this);
@@ -229,12 +234,13 @@ define(function (require) {
              * Updating grid collection in cache
              */
             mediator.bind("datagrid_collection_set_after", function (collection) {
-                var data = this.getCachedData();
+                var gridName = collection.inputName,
+                    data = this.getCachedData();
                 if (data.states) {
-                    var girdState = data.states.getObjectCache('grid');
+                    var girdState = data.states.getObjectCache(gridName);
                     girdState.collection = collection;
                 } else { //updating temp cache with collection
-                    this.updateCachedContent('grid', {collection: collection});
+                    this.updateCachedContent(gridName, {collection: collection});
                 }
             }, this);
 
@@ -267,7 +273,7 @@ define(function (require) {
              * Add "pinned" page to cache
              */
             mediator.bind("pagestate_collected", function (pagestateModel) {
-                this.updateCachedContent('form', {'form_data': pagestateModel.get('pagestate').data});
+                this.updateCachedContent('form', {formData: pagestateModel.get('pagestate').data});
                 if (this.useCache) {
                     contentManager.addPage(this.getHashUrl(), this.tempCache);
                 }
@@ -293,6 +299,13 @@ define(function (require) {
             }, this);
 
             /**
+             * Add processing links of loaded widget content
+             */
+            mediator.bind("widget:contentLoad", function (widgetEl) {
+                this.processClicks(widgetEl.find(this.selectors.links));
+            }, this);
+
+            /**
              * Processing links in 3 dots menu after item is added (e.g. favourites)
              */
             mediator.bind("navigaion_item:added", function (item) {
@@ -303,7 +316,7 @@ define(function (require) {
              * Processing links in search result dropdown
              */
             mediator.bind("top_search_request:complete", function () {
-                this.processClicks($(this.selectorCached.searchDropdown).find(this.selectors.links));
+                this.processClicks($(this.getCached$('searchDropdown')).find(this.selectors.links));
             }, this);
 
             /**
@@ -336,7 +349,7 @@ define(function (require) {
                      */
                     //this.formState = formState;
                 }
-                if (formState && formState['form_data'].length) {
+                if (formState && formState.formData.length) {
                     this.confirmModal.open();
                 } else {
                     this.refreshPage();
@@ -346,11 +359,11 @@ define(function (require) {
             /**
              * Processing all links
              */
-            this.processClicks(this.selectorCached.links);
-            this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
+            this.processClicks(this.getCached$('links'));
+            this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
 
             this.processForms(this.selectors.forms);
-            this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
+            this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
 
             this.loadingMask = new LoadingMask();
             this.renderLoadingMask();
@@ -428,63 +441,66 @@ define(function (require) {
         /**
          * Ajax call for loading page content
          */
-        loadPage: function() {
-            if (this.url) {
-                this.beforeRequest();
-                var cacheData;
-                if (cacheData = this.getCachedData()) {
-                    widgetManager.resetWidgets();
-                    this.tempCache = cacheData;
-                    this.handleResponse(cacheData, {fromCache: true});
-                    this.afterRequest();
-                } else {
-                    var pageUrl = this.baseUrl + this.url;
-                    var stringState = [];
-                    this.skipGridStateChange = false;
-                    if (this.encodedStateData) {
-                        var state = PageableCollection.prototype.decodeStateData(this.encodedStateData);
-                        var collection = new PageableCollection({}, {inputName: state.gridName});
-
-                        stringState = collection.processQueryParams({}, state);
-                        stringState = collection.processFiltersParams(stringState, state);
-
-                        mediator.once(
-                            "datagrid_filters:rendered",
-                            function (collection) {
-                                collection.trigger('updateState', collection);
-                            },
-                            this
-                        );
-
-                        this.skipGridStateChange = true;
-                    }
-
-                    var useCache = this.useCache;
-                    $.ajax({
-                        url: pageUrl,
-                        headers: this.headerObject,
-                        data: stringState,
-                        beforeSend: function( xhr ) {
-                            $.isActive(false);
-                            //remove standard ajax header because we already have a custom header sent
-                            xhr.setRequestHeader('X-Requested-With', {toString: function(){ return ''; }});
-                        },
-
-                        error: _.bind(this.processError, this),
-
-                        success: _.bind(function (data, textStatus, jqXHR) {
-                            if (!cacheData) {
-                                this.handleResponse(data);
-                                this.updateDebugToolbar(jqXHR);
-                                this.afterRequest();
-                            }
-                            if (useCache) {
-                                contentManager.addPage(this.getHashUrl(), this.tempCache);
-                            }
-                        }, this)
-                    });
-                }
+        loadPage: function(forceLoad) {
+            forceLoad = forceLoad || false;
+            if (!this.url) {
+                return;
             }
+
+            this.beforeRequest();
+
+            var cacheData = this.getCachedData();
+            if (!forceLoad && cacheData) {
+                widgetManager.resetWidgets();
+                this.tempCache = cacheData;
+                this.handleResponse(cacheData, {fromCache: true});
+                this.afterRequest();
+                return;
+            }
+
+            var pageUrl = this.baseUrl + this.url;
+            var stringState = [];
+            this.skipGridStateChange = false;
+            if (this.encodedStateData) {
+                var state = PageableCollection.prototype.decodeStateData(this.encodedStateData);
+                var collection = new PageableCollection({}, {inputName: state.gridName});
+
+                stringState = collection.processQueryParams({}, state);
+                stringState = collection.processFiltersParams(stringState, state);
+
+                mediator.once(
+                    "datagrid_filters:rendered",
+                    function (collection) {
+                        collection.trigger('updateState', collection);
+                    },
+                    this
+                );
+
+                this.skipGridStateChange = true;
+            }
+
+            var useCache = this.useCache;
+            $.ajax({
+                url: pageUrl,
+                headers: this.headerObject,
+                data: stringState,
+                beforeSend: function( xhr ) {
+                    $.isActive(false);
+                    //remove standard ajax header because we already have a custom header sent
+                    xhr.setRequestHeader('X-Requested-With', {toString: function(){ return ''; }});
+                },
+
+                error: _.bind(this.processError, this),
+
+                success: _.bind(function (data, textStatus, jqXHR) {
+                    this.handleResponse(data);
+                    this.updateDebugToolbar(jqXHR);
+                    this.afterRequest();
+                    if (useCache) {
+                        contentManager.addPage(this.getHashUrl(), this.tempCache);
+                    }
+                }, this)
+            });
         },
 
         /**
@@ -500,8 +516,8 @@ define(function (require) {
             } else if (cacheData.states) {
                 formState = cacheData.states.getObjectCache('form');
             }
-            if (formState['form_data'] && formState['form_data'].length) {
-                pagestate.updateState(formState['form_data']);
+            if (formState.formData && formState.formData.length) {
+                pagestate.updateState(formState.formData);
                 pagestate.restore();
                 pagestate.needServerRestore = false;
             }
@@ -526,7 +542,7 @@ define(function (require) {
                         var dtContainer = $('<div class="sf-toolbar" id="sfwdt' + debugBarToken + '" style="display: block;" data-sfurl="' + url + '"/>');
                         dtContainer.html(data);
                         var scrollable = $('.scrollable-container:last');
-                        var container = scrollable.length ? scrollable : this.selectorCached['container'];
+                        var container = scrollable.length ? scrollable : this.getCached$('container');
                         if (!container.closest('body').length) {
                             container = $(document.body);
                         }
@@ -562,12 +578,24 @@ define(function (require) {
         /**
          * Save page content to cache
          *
-         * @param objectName
+         * @param key
          * @param state
          */
-        updateCachedContent: function(objectName, state) {
+        updateCachedContent: function (key, state) {
             if (this.tempCache.states) {
-                this.tempCache.states.saveObjectCache(objectName, state);
+                this.tempCache.states.saveObjectCache(key, state);
+            }
+        },
+
+        showLoading: function() {
+            if (this.loadingMask) {
+                this.loadingMask.show();
+            }
+        },
+
+        hideLoading: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
             }
         },
 
@@ -575,7 +603,7 @@ define(function (require) {
          *  Triggered before hash navigation ajax request
          */
         beforeRequest: function() {
-            this.loadingMask.show();
+            this.showLoading();
             this.gridRoute = ''; //clearing grid router
             this.tempCache = '';
             /**
@@ -598,8 +626,8 @@ define(function (require) {
          * @protected
          */
         renderLoadingMask: function() {
-            this.selectorCached.loadingMask.append(this.loadingMask.render().$el);
-            this.loadingMask.hide();
+            this.getCached$('loadingMask').append(this.loadingMask.render().$el);
+            this.hideLoading();
         },
 
         refreshPage: function() {
@@ -689,30 +717,32 @@ define(function (require) {
                     if (data.redirect !== undefined && data.redirect) {
                         this.processRedirect(data);
                     } else {
+                        this.removeErrorClass();
+
                         if (!options.fromCache && !options.skipCache) {
                             this.savePageToCache(data);
                         }
                         this.clearContainer();
                         var content = data.content;
-                        this.selectorCached.container.html(content);
-                        this.selectorCached.menu.html(data.mainMenu);
-                        this.selectorCached.userMenu.html(data.userMenu);
-                        this.selectorCached.breadcrumb.html(data.breadcrumb);
+                        this.getCached$('container').html(content);
+                        this.getCached$('menu').html(data.mainMenu);
+                        this.getCached$('userMenu').html(data.userMenu);
+                        this.getCached$('breadcrumb').html(data.breadcrumb);
                         /**
                          * Collecting javascript from head and append them to content
                          */
                         if (data.scripts.length) {
-                            this.selectorCached.container.append(data.scripts);
+                            this.getCached$('container').append(data.scripts);
                         }
                         /**
                          * Setting page title
                          */
                         document.title = data.title;
-                        this.processClicks(this.selectorCached.menu.find(this.selectors.links));
-                        this.processClicks(this.selectorCached.userMenu.find(this.selectors.links));
-                        this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
-                        this.processClicks(this.selectorCached.container.find(this.selectors.links));
-                        this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
+                        this.processClicks(this.getCached$('menu').find(this.selectors.links));
+                        this.processClicks(this.getCached$('userMenu').find(this.selectors.links));
+                        this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
+                        this.processClicks(this.getCached$('container').find(this.selectors.links));
+                        this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
                         this.processPinButton(data);
                         this.restoreFormState(this.tempCache);
                         if (!options.fromCache) {
@@ -721,7 +751,7 @@ define(function (require) {
                         }
                         this.hideActiveDropdowns();
                         mediator.trigger("hash_navigation_request:refresh", this);
-                        this.loadingMask.hide();
+                        this.hideLoading();
                     }
                 }
             }
@@ -733,7 +763,7 @@ define(function (require) {
                     document.body.innerHTML = rawData;
                 } else {
                     messenger.notificationMessage('error', __('Sorry, page was not loaded correctly'));
-                    this.loadingMask.hide();
+                    this.hideLoading();
                 }
             }
             this.triggerCompleteEvent();
@@ -783,31 +813,21 @@ define(function (require) {
          * @param {String} errorThrown
          */
         processError: function(XMLHttpRequest, textStatus, errorThrown) {
-            var message403 = 'You do not have permission to this action';
             if (app.debug) {
-                if (XMLHttpRequest.status == 403) {
-                    messenger.notificationMessage('error', __(message403));
-                    this.loadingMask.hide();
-                } else {
-                    document.body.innerHTML = XMLHttpRequest.responseText;
-                }
                 this.updateDebugToolbar(XMLHttpRequest);
-            } else {
-                var message = 'Sorry, page was not loaded correctly';
-                if (XMLHttpRequest.status == 403) {
-                    message = message403;
-                }
-                messenger.notificationMessage('error', __(message));
-                this.loadingMask.hide();
             }
+
+            this.handleResponse(XMLHttpRequest.responseText);
+            this.addErrorClass();
+            this.hideLoading();
         },
 
         /**
          * Hide active dropdowns
          */
         hideActiveDropdowns: function() {
-            this.selectorCached.searchDropdown.removeClass('header-search-focused');
-            this.selectorCached.menuDropdowns.removeClass('open');
+            this.getCached$('searchDropdown').removeClass('header-search-focused');
+            this.getCached$('menuDropdowns').removeClass('open');
         },
 
         /**
@@ -816,7 +836,7 @@ define(function (require) {
          * @param messages
          */
         addMessages: function(messages) {
-            this.selectorCached.flashMessages.find('.flash-messages-holder').empty();
+            this.getCached$('flashMessages').find('.flash-messages-holder').empty();
             _.each(messages, function (messages, type) {
                 _.each(messages, function (message) {
                     messenger.notificationFlashMessage(type, message);
@@ -831,18 +851,18 @@ define(function (require) {
          */
         processPinButton: function(data) {
             if (data.showPinButton) {
-                this.selectorCached.pinButtonsContainer.show();
+                this.getCached$('pinButtonsContainer').show();
                 /**
                  * Setting serialized titles for pinbar and favourites buttons
                  */
                 var titleSerialized = data.titleSerialized;
                 if (titleSerialized) {
                     titleSerialized = $.parseJSON(titleSerialized);
-                    this.selectorCached.pinButtonsContainer.find(this.selectors.pinButtons).data('title', titleSerialized);
+                    this.getCached$('pinButtonsContainer').find(this.selectors.pinButtons).data('title', titleSerialized);
                 }
-                this.selectorCached.pinButtonsContainer.find(this.selectors.pinButtons).data('title-rendered-short', data.titleShort);
+                this.getCached$('pinButtonsContainer').find(this.selectors.pinButtons).data('title-rendered-short', data.titleShort);
             } else {
-                this.selectorCached.pinButtonsContainer.hide();
+                this.getCached$('pinButtonsContainer').hide();
             }
         },
 
@@ -852,13 +872,13 @@ define(function (require) {
          * @param data
          */
         updateMenuTabs: function(data) {
-            this.selectorCached.historyTab.html(data.history);
-            this.selectorCached.mostViewedTab.html(data.mostviewed);
+            this.getCached$('historyTab').html(data.history);
+            this.getCached$('mostViewedTab').html(data.mostviewed);
             /**
              * Processing links for history and most viewed tabs
              */
-            this.processClicks(this.selectorCached.historyTab.find(this.selectors.links));
-            this.processClicks(this.selectorCached.mostViewedTab.find(this.selectors.links));
+            this.processClicks(this.getCached$('historyTab').find(this.selectors.links));
+            this.processClicks(this.getCached$('mostViewedTab').find(this.selectors.links));
         },
 
         /**
@@ -952,12 +972,12 @@ define(function (require) {
                 this.method = $form.attr('method') || "get";
 
                 if (url) {
-                    $form.data('sent', true);
                     var formStartSettings = {
                         form_validate: true
                     };
                     mediator.trigger('hash_navigation_request:form-start', $form.get(0), formStartSettings);
                     if (formStartSettings.form_validate) {
+                        $form.data('sent', true);
                         var data = $form.serialize();
                         if (this.method === 'get') {
                             if (data) {
@@ -1074,6 +1094,26 @@ define(function (require) {
         back: function() {
             window.history.back();
             return true;
+        },
+
+        /**
+         * Adds error class to body
+         *
+         * @return {Boolean}
+         */
+        addErrorClass: function() {
+            $('body').addClass('error-page');
+            return true;
+        },
+
+        /**
+         * Removes error class from body
+         *
+         * @return {Boolean}
+         */
+        removeErrorClass: function() {
+            $('body').removeClass('error-page');
+            return true;
         }
     });
 
@@ -1089,7 +1129,7 @@ define(function (require) {
     /**
      * Fetches navigation (Oro router) instance
      *
-     * @returns {oro.Navigation}
+     * @returns {oronavigation.Navigation}
      */
     Navigation.getInstance = function() {
         return instance;

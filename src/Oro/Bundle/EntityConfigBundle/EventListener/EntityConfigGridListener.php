@@ -14,12 +14,10 @@ class EntityConfigGridListener extends AbstractConfigGridListener
 {
     const GRID_NAME = 'entityconfig-grid';
 
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var array Filter choices for name and module column filters */
-    protected $filterChoices = ['name' => [], 'module' => []];
+    /**
+     * @var array|null
+     */
+    protected $moduleChoices;
 
     /**
      * @param BuildAfter $event
@@ -48,63 +46,28 @@ class EntityConfigGridListener extends AbstractConfigGridListener
      *
      * @return array
      */
-    public function getChoicesName()
+    public function getModuleChoices()
     {
-        return $this->getObjectName();
-    }
+        if (null === $this->moduleChoices) {
+            $repository = $this->configManager->getEntityManager()
+                ->getRepository('OroEntityConfigBundle:ConfigModelIndexValue');
 
-    /**
-     * Call this method from datagrid.yml
-     * invoked in Manager when datagrid configuration prepared for grid build process
-     *
-     * @return array
-     */
-    public function getChoicesModule()
-    {
-        return $this->getObjectName('module');
-    }
+            $queryBuilder = $repository->createQueryBuilder('indexValue')
+                ->select('indexValue.value')
+                ->distinct()
+                ->where('indexValue.scope = :scope')->setParameter('scope', 'entity_config')
+                ->andWhere('indexValue.code = :code')->setParameter('code', 'module_name')
+                ->orderBy('indexValue.value');
 
-    /**
-     *
-     * @param  string $scope
-     * @return array
-     */
-    protected function getObjectName($scope = 'name')
-    {
-        if (empty($this->filterChoices[$scope])) {
-            $alias = 'ce';
-            $qb = $this->configManager->getEntityManager()->createQueryBuilder();
-            $qb->select($alias)
-                ->from(EntityConfigModel::ENTITY_NAME, $alias)
-                ->add('select', $alias.'.className')
-                ->distinct($alias.'.className');
+            $result = $queryBuilder->getQuery()->getArrayResult();
 
-            $result = $qb->getQuery()->getArrayResult();
-
-            $options = ['name' => [], 'module' => []];
-            foreach ((array) $result as $value) {
-                $className = explode('\\', $value['className']);
-
-                $options['name'][$value['className']]   = '';
-                $options['module'][$value['className']] = '';
-
-                if (strpos($value['className'], 'Extend\\Entity') === false) {
-                    foreach ($className as $index => $name) {
-                        if (count($className) - 1 == $index) {
-                            $options['name'][$value['className']] = $name;
-                        } elseif (!in_array($name, array('Bundle', 'Entity'))) {
-                            $options['module'][$value['className']] .= $name;
-                        }
-                    }
-                } else {
-                    $options['name'][$value['className']]   = str_replace('Extend\\Entity\\', '', $value['className']);
-                    $options['module'][$value['className']] = 'System';
-                }
+            $this->moduleChoices = array();
+            foreach ($result as $row) {
+                $module = $row['value'];
+                $this->moduleChoices[$module] = $module;
             }
-
-            $this->filterChoices = $options;
         }
 
-        return $this->filterChoices[$scope];
+        return $this->moduleChoices;
     }
 }

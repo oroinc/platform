@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'jquery.validate'],
-function ($, _, __) {
+/*global define*/
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
+    ], function ($, _, __) {
     'use strict';
 
     var defaultParam = {
@@ -8,7 +8,7 @@ function ($, _, __) {
     };
 
     /**
-     * @export oro/validator/email
+     * @export oroform/js/validator/email
      */
     return [
         'Email',
@@ -16,9 +16,12 @@ function ($, _, __) {
             // @TODO add support of MX check action
             return $.validator.methods.email.apply(this, arguments);
         },
-        function (param) {
+        function (param, element) {
+            var value = this.elementValue(element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

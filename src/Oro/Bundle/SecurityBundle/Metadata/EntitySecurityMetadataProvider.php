@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntitySecurityMetadataProvider
 {
@@ -18,6 +19,11 @@ class EntitySecurityMetadataProvider
      * @var ConfigProvider
      */
     protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
 
     /**
      * @var CacheProvider
@@ -41,11 +47,13 @@ class EntitySecurityMetadataProvider
     public function __construct(
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider,
         CacheProvider $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->cache = $cache;
+        $this->entityConfigProvider   = $entityConfigProvider;
+        $this->extendConfigProvider   = $extendConfigProvider;
+        $this->cache                  = $cache;
     }
 
     /**
@@ -65,7 +73,7 @@ class EntitySecurityMetadataProvider
     /**
      * Gets metadata for all entities marked with the given security type.
      *
-     * @param  string                   $securityType The security type. Defaults to ACL.
+     * @param  string $securityType The security type. Defaults to ACL.
      * @return EntitySecurityMetadata[]
      */
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
@@ -88,7 +96,7 @@ class EntitySecurityMetadataProvider
             }
         }
         foreach ($securityTypes as $securityType) {
-            $this->ensureMetadataLoaded($securityType);
+            $this->loadMetadata($securityType);
         }
     }
 
@@ -136,7 +144,7 @@ class EntitySecurityMetadataProvider
     }
 
     /**
-     * Makes sure that metadata for the given security type is loaded
+     * Makes sure that metadata for the given security type are loaded and cached
      *
      * @param string $securityType The security type.
      */
@@ -147,38 +155,57 @@ class EntitySecurityMetadataProvider
             if ($this->cache) {
                 $data = $this->cache->fetch($securityType);
             }
-            if (!$data) {
-                $securityConfigs = $this->securityConfigProvider->getConfigs();
-                foreach ($securityConfigs as $securityConfig) {
-                    if ($securityConfig->get('type') === $securityType) {
-                        $className = $securityConfig->getId()->getClassName();
-                        $label = '';
-                        if ($this->entityConfigProvider->hasConfig($className)) {
-                            $label = $this->entityConfigProvider
-                                ->getConfig($className)
-                                ->get('label');
-                        }
-                        $permissions = $securityConfig->get('permissions');
-                        if (!$permissions || $permissions == 'All') {
-                            $permissions = array();
-                        } else {
-                            $permissions = explode(';', $permissions);
-                        }
-                        $data[$className] = new EntitySecurityMetadata(
-                            $securityType,
-                            $className,
-                            $securityConfig->get('group_name'),
-                            $label,
-                            $permissions
-                        );
-                    }
-                }
-                if ($this->cache) {
-                    $this->cache->save($securityType, $data);
-                }
+            if ($data) {
+                $this->localCache[$securityType] = $data;
+            } else {
+                $this->loadMetadata($securityType);
             }
-
-            $this->localCache[$securityType] = $data;
         }
+    }
+
+    /**
+     * Loads metadata for the given security type and save them in cache
+     *
+     * @param $securityType
+     */
+    protected function loadMetadata($securityType)
+    {
+        $data = array();
+        $securityConfigs = $this->securityConfigProvider->getConfigs();
+        foreach ($securityConfigs as $securityConfig) {
+            $className = $securityConfig->getId()->getClassName();
+            if ($securityConfig->get('type') === $securityType
+                && $this->extendConfigProvider->getConfig($className)->in(
+                    'state',
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                )
+            ) {
+                $label = '';
+                if ($this->entityConfigProvider->hasConfig($className)) {
+                    $label = $this->entityConfigProvider
+                        ->getConfig($className)
+                        ->get('label');
+                }
+                $permissions = $securityConfig->get('permissions');
+                if (!$permissions || $permissions == 'All') {
+                    $permissions = array();
+                } else {
+                    $permissions = explode(';', $permissions);
+                }
+                $data[$className] = new EntitySecurityMetadata(
+                    $securityType,
+                    $className,
+                    $securityConfig->get('group_name'),
+                    $label,
+                    $permissions
+                );
+            }
+        }
+
+        if ($this->cache) {
+            $this->cache->save($securityType, $data);
+        }
+
+        $this->localCache[$securityType] = $data;
     }
 }

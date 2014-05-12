@@ -1,5 +1,6 @@
 parameters:
-    oro_translation.form.type.translatable_entity.class: Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
+    oro_translation.form.type.translatable_entity.class:     Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
+    oro_translation.form.type.available_translations.class: Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType
 
 services:
     oro_translation.form.type.translatable_entity:
@@ -7,6 +8,11 @@ services:
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: translatable_entity }
+
+    oro_translation.form.type.available_translations:
+        class: %oro_translation.form.type.available_translations.class%
+        tags:
+            - { name: form.type, alias: oro_translation_available_translations }
 
     oro_translation.form.type.jqueryselect2_translatable_entity:
         parent: genemu.form.jquery.type.select2

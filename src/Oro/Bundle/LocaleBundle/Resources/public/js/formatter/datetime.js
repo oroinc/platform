@@ -1,6 +1,6 @@
-/* global define */
-define(['oro/locale-settings', 'moment'],
-function(localeSettings, moment) {
+/*global define*/
+define(['../locale-settings', 'moment'
+    ], function (localeSettings, moment) {
     'use strict';
 
     var datetimeVendor = 'moment';
@@ -8,8 +8,8 @@ function(localeSettings, moment) {
     /**
      * Datetime formatter
      *
-     * @export  oro/formatter/datetime
-     * @name    oro.formatter.datetime
+     * @export  orolocale/js/formatter/datetime
+     * @name    orolocale.formatter.datetime
      */
     return {
         /**
@@ -38,21 +38,21 @@ function(localeSettings, moment) {
         /**
          * @returns {string}
          */
-        getDateFormat: function() {
+        getDateFormat: function () {
             return this.frontendFormats.date;
         },
 
         /**
          * @returns {string}
          */
-        getTimeFormat: function() {
+        getTimeFormat: function () {
             return this.frontendFormats.time;
         },
 
         /**
          * @returns {string}
          */
-        getDateTimeFormat: function() {
+        getDateTimeFormat: function () {
             return this.frontendFormats.datetime;
         },
 
@@ -60,7 +60,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {*}
          */
-        isDateValid: function(value) {
+        isDateValid: function (value) {
             return moment(value, this.getDateFormat()).isValid();
         },
 
@@ -68,7 +68,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Boolean}
          */
-        isTimeValid: function(value) {
+        isTimeValid: function (value) {
             return moment(value, this.getTimeFormat()).isValid();
         },
 
@@ -76,7 +76,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Boolean}
          */
-        isDateTimeValid: function(value) {
+        isDateTimeValid: function (value) {
             return moment(value, this.getDateTimeFormat()).isValid();
         },
 
@@ -84,7 +84,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {string}
          */
-        formatDate: function(value) {
+        formatDate: function (value) {
             return this.getMomentForBackendDate(value).format(this.getDateFormat());
         },
 
@@ -94,7 +94,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Date}
          */
-        unformatBackendDate: function(value) {
+        unformatBackendDate: function (value) {
             return this.getMomentForBackendDate(value).toDate();
         },
 
@@ -104,7 +104,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {moment}
          */
-        getMomentForBackendDate: function(value) {
+        getMomentForBackendDate: function (value) {
             var momentDate = moment.utc(value);
             if (!momentDate.isValid()) {
                 throw new Error('Invalid backend date ' + value);
@@ -116,7 +116,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {string}
          */
-        formatTime: function(value) {
+        formatTime: function (value) {
             return this.getMomentForBackendTime(value).format(this.getTimeFormat());
         },
 
@@ -126,7 +126,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Date}
          */
-        unformatBackendTime: function(value) {
+        unformatBackendTime: function (value) {
             return this.getMomentForBackendTime(value).toDate();
         },
 
@@ -136,7 +136,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {moment}
          */
-        getMomentForBackendTime: function(value) {
+        getMomentForBackendTime: function (value) {
             var momentTime = moment.utc(value, ['HH:mm:ss', 'HH:mm']);
             if (!momentTime.isValid()) {
                 throw new Error('Invalid backend time ' + value);
@@ -148,7 +148,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {string}
          */
-        formatDateTime: function(value) {
+        formatDateTime: function (value) {
             return this.getMomentForBackendDateTime(value).format(this.getDateTimeFormat());
         },
 
@@ -158,7 +158,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Date}
          */
-        unformatBackendDateTime: function(value) {
+        unformatBackendDateTime: function (value) {
             return this.getMomentForBackendDateTime(value).toDate();
         },
 
@@ -168,7 +168,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {moment}
          */
-        getMomentForBackendDateTime: function(value) {
+        getMomentForBackendDateTime: function (value) {
             var momentDateTime = moment.utc(value).zone(this.timezoneOffset);
             if (!momentDateTime.isValid()) {
                 throw new Error('Invalid backend datetime ' + value);
@@ -180,7 +180,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {string}
          */
-        convertDateToBackendFormat: function(value) {
+        convertDateToBackendFormat: function (value) {
             return this.getMomentForFrontendDate(value).format(this.backendFormats.date);
         },
 
@@ -188,7 +188,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {string}
          */
-        convertTimeToBackendFormat: function(value) {
+        convertTimeToBackendFormat: function (value) {
             return this.getMomentForFrontendTime(value).format(this.backendFormats.time);
         },
 
@@ -197,8 +197,25 @@ function(localeSettings, moment) {
          * @param {string} [timezoneOffset]
          * @returns {string}
          */
-        convertDateTimeToBackendFormat: function(value, timezoneOffset) {
+        convertDateTimeToBackendFormat: function (value, timezoneOffset) {
             return this.getMomentForFrontendDateTime(value, timezoneOffset).format(this.backendFormats.datetime);
+        },
+
+        /**
+         * Applies time zone diff to date object,
+         *  subtracts/adds sum of diff local-zone and system-zone time shift
+         *
+         * @param {Date|string|number} date
+         * @param {number=} sign -1|1 means add o remove time zones diff
+         * @returns {Date}
+         */
+        applyTimeZoneCorrection: function (date, sign) {
+            var localShift, systemShift;
+            sign = sign ||  1;
+            date = typeof date !== 'object' ? new Date(date) : date;
+            localShift = localeSettings.getTimeZoneShift();
+            systemShift = date.getTimezoneOffset();
+            return new Date(date.getTime() + sign * (localShift + systemShift) * 60000);
         },
 
         /**
@@ -207,7 +224,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {moment}
          */
-        getMomentForFrontendDate: function(value) {
+        getMomentForFrontendDate: function (value) {
             if (this.isDateObject(value)) {
                 return this.formatDate(value);
             } else if (!this.isDateValid(value)) {
@@ -223,7 +240,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Date}
          */
-        unformatDate: function(value) {
+        unformatDate: function (value) {
             return this.getMomentForFrontendDate(value).toDate();
         },
 
@@ -233,7 +250,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {moment}
          */
-        getMomentForFrontendTime: function(value) {
+        getMomentForFrontendTime: function (value) {
             if (this.isDateObject(value)) {
                 value = this.formatTime(value);
             } else if (!this.isTimeValid(value)) {
@@ -249,7 +266,7 @@ function(localeSettings, moment) {
          * @param {string} value
          * @returns {Date}
          */
-        unformatTime: function(value) {
+        unformatTime: function (value) {
             return this.getMomentForFrontendTime(value).toDate();
         },
 
@@ -260,7 +277,7 @@ function(localeSettings, moment) {
          * @param {string} [timezoneOffset]
          * @returns {moment}
          */
-        getMomentForFrontendDateTime: function(value, timezoneOffset) {
+        getMomentForFrontendDateTime: function (value, timezoneOffset) {
             if (this.isDateObject(value)) {
                 value = this.formatDateTime(value);
             } else if (!this.isDateTimeValid(value)) {
@@ -286,7 +303,7 @@ function(localeSettings, moment) {
          * @param {string} [timezoneOffset]
          * @returns {Date}
          */
-        unformatDateTime: function(value, timezoneOffset) {
+        unformatDateTime: function (value, timezoneOffset) {
             return this.getMomentForFrontendDateTime(value, timezoneOffset).toDate();
         },
 
@@ -297,7 +314,7 @@ function(localeSettings, moment) {
          * @param {string|Date} obj
          * @returns {boolean}
          */
-        isDateObject: function(obj) {
+        isDateObject: function (obj) {
             return Object.prototype.toString.call(obj) == '[object Date]'
         }
     }

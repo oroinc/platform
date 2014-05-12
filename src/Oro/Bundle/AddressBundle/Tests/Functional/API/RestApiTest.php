@@ -62,13 +62,13 @@ class RestApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_region'),
-            array('id' => 'US.LA')
+            array('id' => 'US-LA')
         );
         /** @var $result Response */
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
-        $this->assertEquals('US.LA', $result['combinedCode']);
+        $this->assertEquals('US-LA', $result['combinedCode']);
     }
 
     public function testGetCountryRegions()
@@ -85,7 +85,9 @@ class RestApiTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->client->generate('oro_api_get_region'),
-                array('id' => $region['combinedCode'])
+                array('id' => $region['combinedCode']),
+                array(),
+                ToolsAPI::generateWsseHeader()
             );
             /** @var $result Response */
             $expectedResult = $this->client->getResponse();

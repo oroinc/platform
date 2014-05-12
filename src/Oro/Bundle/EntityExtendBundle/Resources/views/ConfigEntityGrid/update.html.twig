@@ -9,10 +9,10 @@
 {% set audit_path = 'oro_entityconfig_audit' %}
 
 {% block navButtons %}
-    {{ UI.button({'path' : path('oro_entityconfig_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
-
-    {{ UI.saveAndStayButton() }}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.cancelButton(path('oro_entityconfig_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% set html = html ~ UI.saveAndStayButton() %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

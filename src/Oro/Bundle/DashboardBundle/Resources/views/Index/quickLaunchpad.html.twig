@@ -1,13 +1,79 @@
-{% extends 'OroDashboardBundle:Index:default.html.twig' %}
+{% extends bap.layout %}
 
+{% block content %}
+    <div class="layout-content dashboard-container-wrapper">
+        <div class="container-fluid page-title">
+            <div class="navigation clearfix navbar-extra navbar-extra-right">
+                <div class="row">
+                    {% block title %}
+                        <div class="pull-left pull-left-extra">
+                            <div class="pull-left">
+                                <h1 class="oro-subtitle">{{ 'oro.dashboard.title.quick_launchpad'|trans }}</h1>
+                            </div>
+                        </div>
+                    {% endblock title %}
+                    {% block titleNavButtons %}
+                        <div class="pull-right title-buttons-container">
+                            {% placeholder dashboard_navButtons_before %}
 
-{% block widgets_content %}
-    {% set contentClass = 'launchpad-container' %}
-    {{ parent() }}
-{% endblock %}
+                            {% block navButtons %}
+                                {% if dashboards|length > 1 %}
+                                    <div class="dashboard-selector-container pull-left">
+                                        <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
+                                        <select id="dashboard_selector">
+                                            <option>{{ 'oro.dashboard.title.chose_dashboard'|trans }}</option>
+                                            {% for dashboardModel in dashboards %}
+                                                <option value="{{ dashboardModel.id }}">
+                                                    {{ dashboardModel.getLabel()|trans }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 
-{% block widgets %}
-<div class="container">
-    {{ parent() }}
-</div>
-{% endblock %}
+                                    <script type="text/javascript">
+                                        require(['jquery', 'routing', 'oronavigation/js/navigation'],
+                                                function($, routing, Navigation){
+                                                    $(function () {
+                                                        $('#dashboard_selector').on('change', function (e) {
+                                                            var url = routing.generate('oro_dashboard_open', {id: $(e.currentTarget).val(), change_dashboard: true}),
+                                                                    navigation = Navigation.getInstance();
+                                                            if (navigation) {
+                                                                navigation.processRedirect({
+                                                                    fullRedirect: false,
+                                                                    location: url
+                                                                });
+                                                            } else {
+                                                                location.href = url;
+                                                            }
+                                                        });
+                                                    });
+                                                });
+                                    </script>
+                                {% endif %}
+                            {% endblock navButtons %}
+                            {% placeholder dashboard_navButtons_after %}
+                        </div>
+                    {% endblock titleNavButtons %}
+                </div>
+            </div>
+        </div>
+        {% block widgets_content %}
+            <div class="scrollable-container">
+                <div class="responsive-section launchpad-container">
+                    <div class="clearfix">
+                        <div class="container">
+                            {% block widgets %}
+                                <div class="responsive-cell dashboard-column">
+                                    {% placeholder quick_launchpad_left_column %}
+                                </div>
+                                <div class="responsive-cell dashboard-column">
+                                    {% placeholder quick_launchpad_right_column %}
+                                </div>
+                            {% endblock widgets %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock widgets_content %}
+    </div>
+{% endblock content %}

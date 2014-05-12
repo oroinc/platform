@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-class SimpleChannelType implements ChannelTypeInterface
+class SimpleChannelType implements ChannelInterface
 {
     /**
      * {@inheritdoc}

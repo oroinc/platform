@@ -5,22 +5,20 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -30,17 +28,11 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $extendConfigProvider;
 
     /**
-     * @var  ExtendManager
+     * @param ConfigProvider $extendConfigProvider
      */
-    protected $extendManager;
-
-    /**
-     * @param ExtendManager $extendManager
-     */
-    public function __construct(ExtendManager $extendManager)
+    public function __construct(ConfigProvider $extendConfigProvider)
     {
-        $this->extendConfigProvider = $extendManager->getConfigProvider();
-        $this->extendManager        = $extendManager;
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -49,9 +41,11 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PRE_PERSIST_CONFIG      => 'persistConfig',
-            Events::NEW_ENTITY_CONFIG_MODEL => 'newEntity',
-            Events::NEW_FIELD_CONFIG_MODEL  => 'newField',
+            Events::PRE_PERSIST_CONFIG     => 'persistConfig',
+            Events::NEW_ENTITY_CONFIG      => 'updateEntityConfig',
+            Events::UPDATE_ENTITY_CONFIG   => 'updateEntityConfig',
+            Events::NEW_FIELD_CONFIG       => 'newFieldConfig',
+            Events::RENAME_FIELD           => 'renameField',
         ];
     }
 
@@ -60,6 +54,7 @@ class ConfigSubscriber implements EventSubscriberInterface
      *
      * @todo as discussed with Alpha team thm method will be refactored in this sprint
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function persistConfig(PersistConfigEvent $event)
     {
@@ -69,31 +64,29 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         if ($scope == 'extend'
             && $event->getConfig()->getId() instanceof FieldConfigId
-            && $event->getConfig()->is('owner', ExtendManager::OWNER_CUSTOM)
+            && $event->getConfig()->is('owner', ExtendScope::OWNER_CUSTOM)
             && count(array_intersect_key(array_flip(['length', 'precision', 'scale', 'state']), $change))
         ) {
             $entityConfig = $event->getConfigManager()->getProvider($scope)->getConfig($className);
 
-            if ($event->getConfig()->get('state') != ExtendManager::STATE_NEW
-                && $event->getConfig()->get('state') != ExtendManager::STATE_DELETED
+            if ($event->getConfig()->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED])
                 && !isset($change['state'])
             ) {
-                $event->getConfig()->set('state', ExtendManager::STATE_UPDATED);
+                $event->getConfig()->set('state', ExtendScope::STATE_UPDATED);
                 $event->getConfigManager()->calculateConfigChangeSet($event->getConfig());
             }
 
             /**
              * Relations case
              */
-            if ($event->getConfig()->get('state') == ExtendManager::STATE_NEW
+            if ($event->getConfig()->is('state', ExtendScope::STATE_NEW)
                 && in_array($event->getConfig()->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
             ) {
                 $this->createRelation($event->getConfig());
             }
 
-            if ($entityConfig->get('state') != ExtendManager::STATE_NEW) {
-                $entityConfig->set('state', ExtendManager::STATE_UPDATED);
-
+            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
+                $entityConfig->set('state', ExtendScope::STATE_UPDATED);
                 $event->getConfigManager()->persist($entityConfig);
             }
         }
@@ -105,8 +98,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($scope == 'datagrid'
             && $event->getConfig()->getId() instanceof FieldConfigId
             && !in_array($event->getConfig()->getId()->getFieldType(), ['text'])
-            && $extendFieldConfig->is('is_extend')
-            && isset($change['is_visible'])
+            && ($extendFieldConfig->is('is_extend') || $extendFieldConfig->is('extend'))
         ) {
             $index        = [];
             $extendConfig = $extendConfigProvider->getConfig($className);
@@ -114,18 +106,31 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $index = $extendConfig->get('index');
             }
 
-            $index[$event->getConfig()->getId()->getFieldName()] = $event->getConfig()->get('is_visible');
+            if (!isset($index[$event->getConfig()->getId()->getFieldName()])
+                || $index[$event->getConfig()->getId()->getFieldName()] != $event->getConfig()->get('is_visible')
+            ) {
+                $index[$event->getConfig()->getId()->getFieldName()] = $event->getConfig()->get('is_visible');
 
-            $extendConfig->set('index', $index);
+                $extendConfig->set('index', $index);
 
-            $event->getConfigManager()->persist($extendConfig);
+                if (!$extendConfig->is('state', ExtendScope::STATE_NEW)) {
+                    $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                }
+
+                if (!$extendFieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
+                    $extendFieldConfig->set('state', ExtendScope::STATE_UPDATED);
+                    $event->getConfigManager()->persist($extendFieldConfig);
+                }
+
+                $event->getConfigManager()->persist($extendConfig);
+            }
         }
     }
 
     /**
-     * @param NewEntityConfigModelEvent $event
+     * @param EntityConfigEvent $event
      */
-    public function newEntity(NewEntityConfigModelEvent $event)
+    public function updateEntityConfig(EntityConfigEvent $event)
     {
         $originalClassName       = $event->getClassName();
         $originalParentClassName = get_parent_class($originalClassName);
@@ -138,17 +143,26 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         if ($parentClassName == 'Extend' . $className) {
             $config = $event->getConfigManager()->getProvider('extend')->getConfig($event->getClassName());
-            $config->set('is_extend', true);
-            $config->set('extend_class', ExtendConfigDumper::ENTITY . $parentClassName);
-
-            $event->getConfigManager()->persist($config);
+            $hasChanges = false;
+            if (!$config->is('is_extend')) {
+                $config->set('is_extend', true);
+                $hasChanges = true;
+            }
+            $extendClass = ExtendConfigDumper::ENTITY . $parentClassName;
+            if (!$config->is('extend_class', $extendClass)) {
+                $config->set('extend_class', $extendClass);
+                $hasChanges = true;
+            }
+            if ($hasChanges) {
+                $event->getConfigManager()->persist($config);
+            }
         }
     }
 
     /**
-     * @param NewFieldConfigModelEvent $event
+     * @param FieldConfigEvent $event
      */
-    public function newField(NewFieldConfigModelEvent $event)
+    public function newFieldConfig(FieldConfigEvent $event)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $event->getConfigManager()->getProvider('extend');
@@ -160,25 +174,64 @@ class ConfigSubscriber implements EventSubscriberInterface
         }
     }
 
-    protected function createRelation(Config $fieldConfig)
+    /**
+     * @param RenameFieldEvent $event
+     */
+    public function renameField(RenameFieldEvent $event)
+    {
+        $extendEntityConfig = $event->getConfigManager()->getProvider('extend')->getConfig($event->getClassName());
+        if ($extendEntityConfig->has('index')) {
+            $index = $extendEntityConfig->get('index');
+            if (isset($index[$event->getFieldName()])) {
+                $index[$event->getNewFieldName()] = $index[$event->getFieldName()];
+                unset($index[$event->getFieldName()]);
+                $extendEntityConfig->set('index', $index);
+                $event->getConfigManager()->persist($extendEntityConfig);
+            }
+        }
+    }
+
+    protected function isInverseSideRelationExist(Config $fieldConfig)
     {
         $selfConfig = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
-        $relations  = $selfConfig->get('relation');
-        foreach ($relations as $relation) {
-            if ($relation['field_id'] == $fieldConfig->getId()) {
-                return;
+        if ($selfConfig->has('relation')) {
+            $selfRelations  = $selfConfig->get('relation');
+            foreach ($selfRelations as $relation) {
+                if ($relation['field_id'] == $fieldConfig->getId()) {
+                    return true;
+                }
             }
         }
+
+        return false;
+    }
+
+    protected function createRelation(Config $fieldConfig)
+    {
+        if ($this->isInverseSideRelationExist($fieldConfig)) {
+            return;
+        }
+
+        $createSelfRelation = true;
+        $relationKey        = null;
 
         if ($fieldConfig->is('relation_key')) {
-            $targetConfig = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
-            $relations    = $targetConfig->get('relation');
-            if (isset($relations[$fieldConfig->get('relation_key')])) {
+            $targetConfig    = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
+            $targetRelations = $targetConfig->get('relation');
+            $relationKey     = $fieldConfig->get('relation_key');
+            if (isset($targetRelations[$relationKey])) {
+
                 $this->createTargetRelation($fieldConfig, $fieldConfig->get('relation_key'));
+
+                if ($targetRelations[$relationKey]['assign']) {
+                    $createSelfRelation = false;
+                }
             }
         }
 
-        $this->createSelfRelation($fieldConfig);
+        if ($createSelfRelation) {
+            $this->createSelfRelation($fieldConfig);
+        }
     }
 
     protected function createSelfRelation(Config $fieldConfig)
@@ -188,7 +241,12 @@ class ConfigSubscriber implements EventSubscriberInterface
         $selfFieldType     = $fieldConfig->getId()->getFieldType();
         $selfFieldName     = $fieldConfig->getId()->getFieldName();
         $selfConfig        = $this->extendConfigProvider->getConfig($selfEntityClass);
-        $relationKey       = implode('|', [$selfFieldType, $selfEntityClass, $targetEntityClass, $selfFieldName]);
+        $relationKey       = ExtendHelper::buildRelationKey(
+            $selfEntityClass,
+            $selfFieldName,
+            $selfFieldType,
+            $targetEntityClass
+        );
         $scope             = 'extend';
 
         /**
@@ -209,8 +267,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
 
             $targetFieldId = new FieldConfigId(
-                $targetEntityClass,
                 $scope,
+                $targetEntityClass,
                 $relationFieldName,
                 ExtendHelper::getReversRelationType($selfFieldType)
             );
@@ -224,7 +282,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'target_field_id' => $targetFieldId // for 1:*, create field
         ];
 
-        $selfRelations                 = $selfConfig->get('relation') ? : [];
+        $selfRelations               = $selfConfig->get('relation') ? : [];
         $selfRelations[$relationKey] = $selfRelationConfig;
 
         $selfConfig->set('relation', $selfRelations);
@@ -248,7 +306,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         $fieldConfig->set('relation_key', $relationKey);
 
         $this->extendConfigProvider->persist($targetConfig);
-        //$this->extendConfigProvider->persist($fieldConfig);
     }
 
     protected function createTargetRelation(Config $fieldConfig, $relationKey)
@@ -258,37 +315,19 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         $selfConfig         = $this->extendConfigProvider->getConfig($selfEntityClass);
         $selfRelations      = $selfConfig->get('relation');
-        $selfRelationConfig = &$selfRelations[$relationKey];
+        $selfRelationConfig = & $selfRelations[$relationKey];
 
-        $selfRelationConfig['field_id'] = $fieldConfig;
+        $selfRelationConfig['field_id'] = $fieldConfig->getId();
 
         $targetConfig         = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelations      = $targetConfig->get('relation');
-        $targetRelationConfig = &$targetRelations[$relationKey];
+        $targetRelationConfig = & $targetRelations[$relationKey];
 
-        $targetRelationConfig['target_field_id'] = $fieldConfig;
+        $targetRelationConfig['target_field_id'] = $fieldConfig->getId();
 
         $selfConfig->set('relation', $selfRelations);
         $targetConfig->set('relation', $targetRelations);
 
         $this->extendConfigProvider->persist($targetConfig);
-    }
-
-    /**
-     * @param ConfigInterface   $entityConfig
-     * @param ConfigIdInterface $fieldConfigId
-     * @param bool              $target
-     * @return null|string
-     */
-    protected function findRelationKey(ConfigInterface $entityConfig, ConfigIdInterface $fieldConfigId, $target = false)
-    {
-        $relations = $entityConfig->get('relation');
-        foreach ($relations as $key => $relation) {
-            if ($relation[$target ? 'target_field_id' : 'field_id'] == $fieldConfigId) {
-                return $key;
-            }
-        }
-
-        return null;
     }
 }

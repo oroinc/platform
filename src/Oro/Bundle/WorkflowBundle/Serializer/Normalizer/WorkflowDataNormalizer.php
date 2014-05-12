@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -63,7 +64,10 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
             $denormalizedData[$attributeName] = $attributeValue;
         }
 
-        return $object = new $class($denormalizedData);
+        /** @var WorkflowData $object */
+        $object = new $class($denormalizedData);
+        $object->setFieldsMapping($workflow->getAttributesMapping());
+        return $object;
     }
 
     /**

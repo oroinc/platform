@@ -1,0 +1,7 @@
+lazy_services:
+    - assetic.asset_manager
+    - knp_menu.renderer.twig
+    - templating
+    - twig
+    - templating.engine.twig
+    - twig.controller.exception

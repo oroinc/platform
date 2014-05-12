@@ -6,12 +6,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
-use Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter;
-use Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter;
 
 class OroDateType extends AbstractType
 {
@@ -22,7 +16,7 @@ class OroDateType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['placeholder'] = $options['placeholder'];
+        $view->vars['attr']['placeholder'] = $options['placeholder'];
     }
 
     /**

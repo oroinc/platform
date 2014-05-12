@@ -2,22 +2,30 @@ parameters:
     oro_entity.listener.navigation_listener.class:                 Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.owner.entity_config_subscriber.class:               Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
     oro_entity.datagrid.extension.class:                           Oro\Bundle\EntityBundle\Grid\ExtendExtension
+    oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.relation_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\RelationEntityGridListener
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
+    oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
+    oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
+    oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
 
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
             - @oro_security.security_facade
-            - @doctrine.orm.entity_manager
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @translator
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_entity.doctrine_helper:
+        class: %oro_entity.doctrine_helper.class%
+        arguments:
+            - @doctrine
 
     oro_entity.owner.entity_config_subscriber:
         class: %oro_entity.owner.entity_config_subscriber.class%
@@ -31,11 +39,16 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_entity.datagrid_helper:
+        class: %oro_entity.datagrid_helper.class%
+        arguments:
+            - @oro_entity.entity_provider
+
     oro_entity.event_listener.custom_entity_grid_subscriber:
         class: %oro_entity.event_listener.custom_entity_grid_subscriber.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_datagrid.datagrid.request_params
+            - @oro_datagrid.provider.resolver
             - @router
         calls:
             - [setRequest, [@?request=]]
@@ -46,26 +59,49 @@ services:
         class: %oro_entity.event_listener.relation_entity_grid_subscriber.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_datagrid.datagrid.request_params
+            - @oro_datagrid.provider.resolver
             - @router
         calls:
             - [setRequest, [@?request=]]
         tags:
             - { name: kernel.event_subscriber }
 
-    oro_entity.entity_provider:
-        class: %oro_entity.entity_provider.class%
+    oro_entity.entity_provider.abstract:
+        abstract: true
         arguments:
             - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
             - @translator
 
-    oro_entity.entity_field_provider:
-        class: %oro_entity.entity_field_provider.class%
+    oro_entity.entity_provider:
+        class: %oro_entity.entity_provider.class%
+        parent: oro_entity.entity_provider.abstract
+
+    oro_entity.entity_field_provider.abstract:
+        abstract: true
         arguments:
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
-            - @oro_entity.entity_provider
             - @translator
+            - %oro_entity.virtual_fields%
+            - %oro_entity.hidden_fields%
+        calls:
+            - [setEntityProvider, [@oro_entity.entity_provider]]
+
+    oro_entity.entity_field_provider:
+        class: %oro_entity.entity_field_provider.class%
+        parent: oro_entity.entity_field_provider.abstract
+
+    oro_entity.entity_field_list_provider:
+        class: %oro_entity.entity_field_list_provider.class%
+        arguments:
+            - @oro_entity.entity_field_provider
+            - @oro_entity.entity_provider
+
+    oro_entiy.twig.extension.class_name:
+        class: %oro_entity.twig.extension.class_name.class%
+        tags:
+            - { name: twig.extension }

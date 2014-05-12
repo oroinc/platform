@@ -21,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -53,10 +53,10 @@ class ConfigFieldGridController extends Controller
      */
     public function createAction(EntityConfigModel $entity)
     {
-        /** @var ExtendManager $extendManager */
-        $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
+        /** @var ConfigProvider $entityConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
 
-        if (!$extendManager->isExtend($entity->getClassName())) {
+        if (!$extendConfigProvider->getConfig($entity->getClassName())->is('is_extend')) {
             $this->get('session')->getFlashBag()->add('error', $entity->getClassName() . 'isn\'t extend');
 
             return $this->redirect(
@@ -140,16 +140,11 @@ class ConfigFieldGridController extends Controller
         $relationValues  = [];
         $relationOptions = explode('||', $fieldType);
         $relationName    = $relationOptions[0];
-
-        if (isset($relationOptions[1])) {
-            $fieldName = $relationOptions[1];
-        }
-
         $relationOptions = explode('|', $relationOptions[0]);
 
         /**
-         * fieldType example: relation|manyToOne|testentity5_relation_7
-         * check if fieldType has 3rd option [fieldName]
+         * fieldType example: oneToMany|EntityFrom|EntityTo|test_one_to_many
+         * check if fieldType has 4th option [fieldName]
          */
         if (count($relationOptions) == 4) {
             $fieldType = ExtendHelper::getReversRelationType($relationOptions[0]);
@@ -164,8 +159,8 @@ class ConfigFieldGridController extends Controller
         $newFieldModel = $configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
 
         $extendFieldConfig = $extendProvider->getConfig($entity->getClassName(), $fieldName);
-        $extendFieldConfig->set('owner', ExtendManager::OWNER_CUSTOM);
-        $extendFieldConfig->set('state', ExtendManager::STATE_NEW);
+        $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
         $extendFieldConfig->set('extend', true);
 
         foreach ($relationValues as $key => $value) {
@@ -184,8 +179,8 @@ class ConfigFieldGridController extends Controller
                     $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved')
                 );
 
-                if ($extendEntityConfig->get('state') != ExtendManager::STATE_NEW) {
-                    $extendEntityConfig->set('state', ExtendManager::STATE_UPDATED);
+                if (!$extendEntityConfig->is('state', ExtendScope::STATE_NEW)) {
+                    $extendEntityConfig->set('state', ExtendScope::STATE_UPDATED);
                 }
 
                 $extendEntityConfig->set('upgradeable', true);
@@ -193,7 +188,7 @@ class ConfigFieldGridController extends Controller
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
 
-                return $this->get('oro_ui.router')->actionRedirect(
+                return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $newFieldModel->getId()]],
                     ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $entity->getId()]]
                 );
@@ -241,31 +236,30 @@ class ConfigFieldGridController extends Controller
 
         $className = $field->getEntity()->getClassName();
 
-        /** @var ExtendManager $extendManager */
-        $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
+        $extendConfigProvider = $configManager->getProvider('extend');
 
-        $fieldConfig = $extendManager->getConfigProvider()->getConfig($className, $field->getFieldName());
+        $fieldConfig = $extendConfigProvider->getConfig($className, $field->getFieldName());
 
-        if (!$fieldConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+        if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $fieldConfig->set('state', ExtendManager::STATE_DELETED);
+        $fieldConfig->set('state', ExtendScope::STATE_DELETED);
         $configManager->persist($fieldConfig);
 
-        $fields = $extendManager->getConfigProvider()->filter(
+        $fields = $extendConfigProvider->filter(
             function (ConfigInterface $config) {
                 return in_array(
                     $config->get('state'),
-                    array(ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED)
+                    array(ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED)
                 );
             },
             $className
         );
 
-        $entityConfig = $extendManager->getConfigProvider()->getConfig($className);
+        $entityConfig = $extendConfigProvider->getConfig($className);
         if (!count($fields)) {
             $entityConfig->set('upgradeable', false);
         } else {
@@ -300,22 +294,30 @@ class ConfigFieldGridController extends Controller
 
         $className = $field->getEntity()->getClassName();
 
-        /** @var ExtendManager $extendManager */
-        $extendManager = $this->get('oro_entity_extend.extend.extend_manager');
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
+        $extendConfigProvider = $configManager->getProvider('extend');
 
-        $fieldConfig = $extendManager->getConfigProvider()->getConfig($className, $field->getFieldName());
+        $fieldConfig = $extendConfigProvider->getConfig($className, $field->getFieldName());
 
-        if (!$fieldConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+        if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $fieldConfig->set('state', ExtendManager::STATE_UPDATED);
+        // TODO: property_exists works only for regular fields, not for relations and option sets. Need better approach
+        $isFieldExist = class_exists($field->getEntity()->getClassName())
+            && property_exists(
+                $field->getEntity()->getClassName(),
+                $field->getFieldName()
+            );
+        $fieldConfig->set(
+            'state',
+            $isFieldExist ? ExtendScope::STATE_UPDATED : ExtendScope::STATE_NEW
+        );
 
         $configManager->persist($fieldConfig);
 
-        $entityConfig = $extendManager->getConfigProvider()->getConfig($className);
+        $entityConfig = $extendConfigProvider->getConfig($className);
         $entityConfig->set('upgradeable', true);
 
         $configManager->persist($entityConfig);

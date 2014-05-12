@@ -6,13 +6,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use JMS\Serializer\Annotation as Serializer;
+
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
-
-use JMS\Serializer\Annotation as Serializer;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -20,14 +19,17 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Table(
  *      name="oro_workflow_item",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(name="oro_workflow_item_entity_definition_unq",columns={"entity_id", "workflow_name"})
+ *      },
  *      indexes={
  *          @ORM\Index(name="oro_workflow_item_workflow_name_idx", columns={"workflow_name"})
  *      }
  *  )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
+ * @Config()
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
- * @Config()
  */
 class WorkflowItem
 {
@@ -52,36 +54,20 @@ class WorkflowItem
     protected $workflowName;
 
     /**
-     * Name of current Step
+     * @var int
      *
-     * @var string
-     *
-     * @ORM\Column(name="current_step", type="string", length=255)
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
      * @Serializer\Expose()
      */
-    protected $currentStepName;
+    protected $entityId;
 
     /**
-     * @var string
+     * @var WorkflowStep
      *
-     * @ORM\Column(name="closed", type="boolean")
-     * @Serializer\Expose()
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $closed;
-
-    /**
-     * Entities related to this WorkflowItems
-     *
-     * @var Collection|WorkflowBindEntity[]
-     *
-     * @ORM\OneToMany(
-     *  targetEntity="WorkflowBindEntity",
-     *  mappedBy="workflowItem",
-     *  cascade={"persist", "remove"},
-     *  orphanRemoval=true
-     * )
-     */
-    protected $bindEntities;
+    protected $currentStep;
 
     /**
      * Corresponding Workflow Definition
@@ -109,6 +95,20 @@ class WorkflowItem
     protected $transitionRecords;
 
     /**
+     * ACL identities of related entities
+     *
+     * @var Collection|WorkflowEntityAclIdentity[]
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="WorkflowEntityAclIdentity",
+     *  mappedBy="workflowItem",
+     *  cascade={"all"},
+     *  orphanRemoval=true
+     * )
+     */
+    protected $aclIdentities;
+
+    /**
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
@@ -132,6 +132,11 @@ class WorkflowItem
     protected $serializedData;
 
     /**
+     * @var object
+     */
+    protected $entity;
+
+    /**
      * @var WorkflowData
      */
     protected $data;
@@ -153,14 +158,10 @@ class WorkflowItem
      */
     protected $serializeFormat;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
-        $this->bindEntities = new ArrayCollection();
         $this->transitionRecords = new ArrayCollection();
-        $this->closed = false;
+        $this->aclIdentities = new ArrayCollection();
         $this->data = new WorkflowData();
         $this->result = new WorkflowResult();
     }
@@ -212,145 +213,50 @@ class WorkflowItem
     }
 
     /**
-     * Set current Step name
-     *
-     * @param string $currentStep
+     * @param WorkflowStep $currentStep
      * @return WorkflowItem
      */
-    public function setCurrentStepName($currentStep)
+    public function setCurrentStep($currentStep)
     {
-        $this->currentStepName = $currentStep;
+        $this->currentStep = $currentStep;
 
         return $this;
     }
 
     /**
-     * Get current Step name
-     *
-     * @return string
+     * @return WorkflowStep
      */
-    public function getCurrentStepName()
+    public function getCurrentStep()
     {
-        return $this->currentStepName;
+        return $this->currentStep;
     }
 
     /**
-     * Set closed
+     * This method should be called only from WorkflowDataSerializeSubscriber.
      *
-     * @param boolean $closed
+     * @param int $entityId
      * @return WorkflowItem
+     * @throws WorkflowException
      */
-    public function setClosed($closed)
+    public function setEntityId($entityId)
     {
-        $this->closed = (bool)$closed;
+        if ($this->entityId !== null && $this->entityId !== $entityId) {
+            throw new WorkflowException('Workflow item entity ID can not be changed');
+        }
+
+        $this->entityId = $entityId;
 
         return $this;
     }
 
     /**
-     * Is closed
+     * This method should be called only from WorkflowDataSerializeSubscriber.
      *
-     * @return string
+     * @return int
      */
-    public function isClosed()
+    public function getEntityId()
     {
-        return $this->closed;
-    }
-
-    /**
-     * Get entities
-     *
-     * @return Collection
-     */
-    public function getBindEntities()
-    {
-        return $this->bindEntities;
-    }
-
-    /**
-     * Add WorkflowBindEntity
-     *
-     * @param WorkflowBindEntity $entity
-     * @return WorkflowItem
-     */
-    public function addBindEntity(WorkflowBindEntity $entity)
-    {
-        if (!$this->hasBindEntity($entity)) {
-            $entity->setWorkflowItem($this);
-            $this->getBindEntities()->add($entity);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Is entity already bind to WorkflowItem
-     *
-     * @param WorkflowBindEntity $originalEntity
-     * @return bool
-     */
-    public function hasBindEntity(WorkflowBindEntity $originalEntity)
-    {
-        $bindEntities = $this->getBindEntities()->filter(
-            function (WorkflowBindEntity $existedEntity) use ($originalEntity) {
-                return $originalEntity->hasSameEntity($existedEntity);
-            }
-        );
-
-        return $bindEntities->count() > 0;
-    }
-
-    /**
-     * Remove WorkflowBindEntity
-     *
-     * @param WorkflowBindEntity $entity
-     * @return WorkflowItem
-     */
-    public function removeBindEntity(WorkflowBindEntity $entity)
-    {
-        if ($this->getBindEntities()->contains($entity)) {
-            $this->getBindEntities()->removeElement($entity);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Synchronize current bind entities with the list of actual bind entities, removes entities that are outdated and
-     * adds new entities.
-     *
-     * @param WorkflowBindEntity[] $actualBindEntities
-     * @return bool
-     */
-    public function syncBindEntities(array $actualBindEntities)
-    {
-        $hasChanges = false;
-
-        // Remove connections with WorkflowBindEntity that are outdated
-        /** @var $bindEntity WorkflowBindEntity */
-        foreach ($this->getBindEntities() as $bindEntity) {
-            $isActual = false;
-            foreach ($actualBindEntities as $actualBindEntity) {
-                if ($actualBindEntity->hasSameEntity($bindEntity)) {
-                    $isActual = true;
-                    break;
-                }
-            }
-            if (!$isActual) {
-                $hasChanges = true;
-                $this->removeBindEntity($bindEntity);
-            }
-        }
-
-        // Add WorkflowBindEntity that are missing entities
-        foreach ($actualBindEntities as $bindEntity) {
-            if (!$this->hasBindEntity($bindEntity)) {
-                $this->addBindEntity($bindEntity);
-                $hasChanges = true;
-            }
-        }
-
-        return $hasChanges;
+        return $this->entityId;
     }
 
     /**
@@ -404,8 +310,6 @@ class WorkflowItem
     }
 
     /**
-     * Set data
-     *
      * @param WorkflowData $data
      * @return WorkflowItem
      */
@@ -414,6 +318,32 @@ class WorkflowItem
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * This method should be called only during creation of WorkflowItem.
+     *
+     * @param object $entity
+     * @return WorkflowItem
+     * @throws WorkflowException
+     */
+    public function setEntity($entity)
+    {
+        if ($this->entity !== null && $this->entity !== $entity) {
+            throw new WorkflowException('Workflow item entity can not be changed');
+        }
+
+        $this->entity = $entity;
+
+        return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 
     /**
@@ -433,9 +363,10 @@ class WorkflowItem
                 $this->serializer->setWorkflowName($this->workflowName);
                 $this->data = $this->serializer->deserialize(
                     $this->serializedData,
-                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData', // @TODO Make this class name configurable?
+                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
                     $this->serializeFormat
                 );
+                $this->data->set($this->getDefinition()->getEntityAttributeName(), $this->getEntity(), false);
             }
         }
         return $this->data;
@@ -487,6 +418,96 @@ class WorkflowItem
     }
 
     /**
+     * @return WorkflowEntityAclIdentity[]|Collection
+     */
+    public function getAclIdentities()
+    {
+        return $this->aclIdentities;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity[]|Collection $aclIdentities
+     * @return WorkflowItem
+     */
+    public function setAclIdentities($aclIdentities)
+    {
+        $newAttributeSteps = array();
+        foreach ($aclIdentities as $aclIdentity) {
+            $newAttributeSteps[] = $aclIdentity->getAclAttributeStepKey();
+        }
+
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if (!in_array($aclIdentity->getAclAttributeStepKey(), $newAttributeSteps)) {
+                $this->removeEntityAcl($aclIdentity);
+            }
+        }
+
+        foreach ($aclIdentities as $aclIdentity) {
+            $this->addEntityAcl($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function addEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
+
+        if (!$this->hasAclIdentityByAttribute($attributeStep)) {
+            $aclIdentity->setWorkflowItem($this);
+            $this->aclIdentities->add($aclIdentity);
+        } else {
+            $this->getAclIdentityByAttributeStep($attributeStep)->import($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function removeEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
+
+        if ($this->hasAclIdentityByAttribute($attributeStep)) {
+            $aclIdentity = $this->getAclIdentityByAttributeStep($attributeStep);
+            $this->aclIdentities->removeElement($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $attribute
+     * @return bool
+     */
+    public function hasAclIdentityByAttribute($attribute)
+    {
+        return $this->getAclIdentityByAttributeStep($attribute) !== null;
+    }
+
+    /**
+     * @param string $attributeStep
+     * @return null|WorkflowEntityAclIdentity
+     */
+    public function getAclIdentityByAttributeStep($attributeStep)
+    {
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if ($aclIdentity->getAclAttributeStepKey() == $attributeStep) {
+                return $aclIdentity;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get created date/time
      *
      * @return \DateTime
@@ -514,6 +535,7 @@ class WorkflowItem
     public function prePersist()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->setUpdated();
     }
 
     /**

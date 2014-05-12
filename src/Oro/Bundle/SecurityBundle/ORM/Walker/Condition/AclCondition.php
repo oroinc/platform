@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker\Condition;
 
+use Doctrine\ORM\Query\AST\PathExpression;
 
 class AclCondition
 {
@@ -21,15 +22,26 @@ class AclCondition
     protected $value;
 
     /**
-     * @param $entityAlias
-     * @param null $entityField
-     * @param null $value
+     * @var int
      */
-    public function __construct($entityAlias, $entityField = null, $value = null)
-    {
-        $this->entityAlias = $entityAlias;
-        $this->entityField = $entityField;
-        $this->value = $value;
+    protected $pathExpressionType;
+
+    /**
+     * @param string $entityAlias
+     * @param string $entityField
+     * @param mixed  $value
+     * @param int    $pathExpressionType
+     */
+    public function __construct(
+        $entityAlias,
+        $entityField = null,
+        $value = null,
+        $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+    ) {
+        $this->entityAlias        = $entityAlias;
+        $this->entityField        = $entityField;
+        $this->value              = $value;
+        $this->pathExpressionType = $pathExpressionType;
     }
 
     /**
@@ -78,5 +90,21 @@ class AclCondition
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @param int $pathExpressionType
+     */
+    public function setPathExpressionType($pathExpressionType)
+    {
+        $this->pathExpressionType = $pathExpressionType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPathExpressionType()
+    {
+        return $this->pathExpressionType;
     }
 }

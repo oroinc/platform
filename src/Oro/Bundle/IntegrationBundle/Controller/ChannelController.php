@@ -7,7 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use FOS\Rest\Util\Codes;
+
 use JMS\JobQueueBundle\Entity\Job;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -16,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
  * @Route("/channel")
@@ -73,7 +76,7 @@ class ChannelController extends Controller
      */
     public function scheduleAction(Channel $channel)
     {
-        $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v']);
+        $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v', '--env=prod']);
 
         $error = false;
         try {
@@ -102,15 +105,17 @@ class ChannelController extends Controller
                 $this->get('translator')->trans('oro.integration.controller.channel.message.saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
+            return $this->get('oro_ui.router')->redirectAfterSave(
                 ['route' => 'oro_integration_channel_update', 'parameters' => ['id' => $channel->getId()]],
-                ['route' => 'oro_integration_channel_index']
+                ['route' => 'oro_integration_channel_index'],
+                $channel
             );
         }
         $form = $this->getForm();
 
         return [
-            'form' => $form->createView()
+            'entity'   => $channel,
+            'form'     => $form->createView(),
         ];
     }
 

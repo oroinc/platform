@@ -2,18 +2,24 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\InstallerBundle\ScriptManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -27,6 +33,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
+            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Timeout for child command execution', 300)
             ->addOption(
                 'sample-data',
                 null,
@@ -35,6 +42,9 @@ class InstallCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $forceInstall = $input->getOption('force');
@@ -42,8 +52,10 @@ class InstallCommand extends ContainerAwareCommand
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
-            $this->getApplication()
+            $this->getApplication(),
+            $this->getContainer()->get('oro_cache.oro_data_cache_manager')
         );
+        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
 
         // if there is application is not installed or no --force option
         if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
@@ -53,7 +65,14 @@ class InstallCommand extends ContainerAwareCommand
         } elseif ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
-            $commandExecutor->runCommand('cache:clear');
+            $commandExecutor->runCommand(
+                'cache:clear',
+                array(
+                    '--no-optional-warmers' => true,
+                    '--process-isolation' => true,
+                    '--no-debug' => false
+                )
+            );
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -65,7 +84,18 @@ class InstallCommand extends ContainerAwareCommand
             ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
-        $output->writeln('<info>Oro Application has been successfully installed.</info>');
+        $output->writeln(
+            sprintf(
+                '<info>Oro Application has been successfully installed in <comment>%s</comment> mode.</info>',
+                $input->getOption('env')
+            )
+        );
+        if ('prod' != $input->getOption('env')) {
+            $output->writeln(
+                '<info>To run application in <comment>prod</comment> mode, ' .
+                'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+            );
+        }
     }
 
     /**
@@ -116,54 +146,50 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('<info>Setting up database.</info>');
 
         /** @var DialogHelper $dialog */
-        $dialog    = $this->getHelperSet()->get('dialog');
-        $container = $this->getContainer();
-        $options   = $input->getOptions();
+        $dialog  = $this->getHelperSet()->get('dialog');
+        $options = $input->getOptions();
 
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true)
+                array(
+                    '--force' => true,
+                    '--full-database' => true,
+                    '--process-isolation' => true,
+                )
             )
-            ->runCommand('doctrine:schema:create')
-            ->runCommand('oro:entity-config:init')
-            ->runCommand('oro:entity-extend:init')
+            ->runCommand('oro:entity-config:clear')
+            ->runCommand('oro:entity-extend:clear')
             ->runCommand(
-                'oro:entity-extend:update-config',
-                array('--process-isolation' => true)
-            )
-            ->runCommand(
-                'doctrine:schema:update',
-                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
-            )
-            ->runCommand(
-                'doctrine:fixtures:load',
-                array('--process-isolation' => true, '--no-interaction' => true, '--append' => true)
+                'oro:migration:load',
+                array(
+                    '--process-isolation' => true,
+                )
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
-                array('--process-isolation' => true)
-            )->runCommand(
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
                 'oro:process:configuration:load',
-                array('--process-isolation' => true)
+                array(
+                    '--process-isolation' => true
+                )
+            )
+            ->runCommand(
+                'oro:migration:data:load',
+                array(
+                    '--process-isolation' => true,
+                    '--no-interaction' => true,
+                )
             );
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
-
-        $user = $container->get('oro_user.manager')->createUser();
-        $role = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-
-        $businessUnit = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(array('name' => 'Main'));
 
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
@@ -225,17 +251,19 @@ class InstallCommand extends ContainerAwareCommand
             ? strtolower($options['sample-data']) == 'y'
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
-        $user
-            ->setUsername($userName)
-            ->setEmail($userEmail)
-            ->setFirstName($userFirstName)
-            ->setLastName($userLastName)
-            ->setPlainPassword($userPassword)
-            ->setEnabled(true)
-            ->addRole($role)
-            ->setOwner($businessUnit)
-            ->addBusinessUnit($businessUnit);
-        $container->get('oro_user.manager')->updateUser($user);
+        // Update administrator with user input
+        $commandExecutor->runCommand(
+            'oro:user:update',
+            array(
+                'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+                '--process-isolation' => true,
+                '--user-name' => $userName,
+                '--user-email' => $userEmail,
+                '--user-firstname' => $userFirstName,
+                '--user-lastname' => $userLastName,
+                '--user-password' => $userPassword
+            )
+        );
 
         // update company name and title if specified
         if (!empty($companyName) && $companyName !== $defaultCompanyName) {
@@ -249,8 +277,11 @@ class InstallCommand extends ContainerAwareCommand
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:demo:fixtures:load',
-                array('--process-isolation' => true, '--process-timeout' => 300)
+                'oro:migration:data:load',
+                array(
+                    '--process-isolation' => true,
+                    '--fixtures-type' => 'demo'
+                )
             );
         }
 
@@ -272,14 +303,45 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:search:create-index')
-            ->runCommand('oro:navigation:init')
-            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
+            ->runCommand(
+                'oro:navigation:init',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'fos:js-routing:dump',
+                array(
+                    '--target' => 'web/js/routes.js',
+                    '--process-isolation' => true,
+                )
+            )
             ->runCommand('oro:localization:dump')
-            ->runCommand('assets:install')
-            ->runCommand('assetic:dump')
-            ->runCommand('oro:translation:dump')
-            ->runCommand('oro:requirejs:build');
+            ->runCommand(
+                'oro:assets:install',
+                array(
+                    '--exclude' => array('OroInstallerBundle')
+                )
+            )
+            ->runCommand(
+                'assetic:dump',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'oro:translation:dump',
+                array(
+                    '--process-isolation' => true,
+                )
+            )
+            ->runCommand(
+                'oro:requirejs:build',
+                array(
+                    '--ignore-errors' => true,
+                    '--process-isolation' => true,
+                )
+            );
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -287,7 +349,14 @@ class InstallCommand extends ContainerAwareCommand
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand('cache:clear');
+        // --no-debug set to false, as Twig cache clear memory usage dramatically rise with true
+        $commandExecutor->runCommand(
+            'cache:clear',
+            array(
+                '--process-isolation' => true,
+                '--no-debug' => false
+            )
+        );
 
         $output->writeln('');
 
@@ -349,12 +418,14 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function renderTable(array $collection, $header, OutputInterface $output)
     {
+        /** @var TableHelper $table */
         $table = $this->getHelperSet()->get('table');
 
         $table
             ->setHeaders(array('Check  ', $header))
             ->setRows(array());
 
+        /** @var \Requirement $requirement */
         foreach ($collection as $requirement) {
             if ($requirement->isFulfilled()) {
                 $table->addRow(array('OK', $requirement->getTestMessage()));

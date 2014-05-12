@@ -161,10 +161,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'autocomplete_alias' => 'foo',
                         'properties' => array('bar', 'baz'),
                         'route_name' => 'oro_form_autocomplete_search',
+                        'route_parameters' => array(),
                         'extra_config' => 'autocomplete'
                     ),
                     'attr' => array(
-                        'data-entities' => json_encode(
+                        'data-selected-data' => json_encode(
                             array(
                                 array('id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value')
                             )
@@ -178,7 +179,8 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                 '1',
                 array(
                     'configs' => array(
-                        'route_name' => 'custom_route'
+                        'route_name' => 'custom_route',
+                        'route_parameters' => array('test' => 'hello')
                     ),
                     'converter' => 'getMockConverter',
                     'entity_class' => 'TestEntityClass'
@@ -204,10 +206,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'placeholder' => 'oro.form.choose_value',
                         'allowClear' => 1,
                         'minimumInputLength' => 1,
-                        'route_name' => 'custom_route'
+                        'route_name' => 'custom_route',
+                        'route_parameters' => array('test' => 'hello'),
                     ),
                     'attr' => array(
-                        'data-entities' => json_encode(
+                        'data-selected-data' => json_encode(
                             array(
                                 array('id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value')
                             )
@@ -255,11 +258,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     public function createErrorsDataProvider()
     {
         return array(
-            'configs.route_name or configs.ajax.url must be set' => array(
+            'configs.route_name must be set' => array(
                 array(),
                 'expectedCalls' => array(),
                 'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'expectedExceptionMessage' => 'Either option "configs.route_name" or "configs.ajax.url" must be set.'
+                'expectedExceptionMessage' => 'Option "configs.route_name" must be set.'
             ),
             'converter must be set' => array(
                 array(

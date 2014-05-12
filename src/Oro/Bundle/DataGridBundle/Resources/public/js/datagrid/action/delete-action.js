@@ -1,65 +1,55 @@
-/* global define */
-define(['underscore', 'oro/messenger', 'oro/translator', 'oro/delete-confirmation', 'oro/modal', 'oro/datagrid/model-action'],
-    function(_, messenger, __, DeleteConfirmation, Modal, ModelAction) {
-        'use strict';
+/*global define*/
+define([
+    'underscore',
+    'oroui/js/messenger',
+    'orotranslation/js/translator',
+    'oroui/js/delete-confirmation',
+    './model-action'
+], function (_, messenger, __, DeleteConfirmation, ModelAction) {
+    'use strict';
+
+    /**
+     * Delete action with confirm dialog, triggers REST DELETE request
+     *
+     * @export  orodatagrid/js/datagrid/action/delete-action
+     * @class   orodatagrid.datagrid.action.DeleteAction
+     * @extends orodatagrid.datagrid.action.ModelAction
+     */
+    return ModelAction.extend({
+
+        /** @property {Function} */
+        confirmModalConstructor: DeleteConfirmation,
+
+        defaultMessages: {
+            confirm_title: 'Delete Confirmation',
+            confirm_content: 'Are you sure you want to delete this item?',
+            confirm_ok: 'Yes, Delete',
+            success: 'Item deleted'
+        },
 
         /**
-         * Delete action with confirm dialog, triggers REST DELETE request
-         *
-         * @export  oro/datagrid/delete-action
-         * @class   oro.datagrid.DeleteAction
-         * @extends oro.datagrid.ModelAction
+         * Execute delete model
          */
-        return ModelAction.extend({
+        execute: function () {
+            this.getConfirmDialog(_.bind(this.doDelete, this)).open();
+        },
 
-            /** @property {Function} */
-            confirmModalConstructor: DeleteConfirmation,
-
-            defaultMessages: {
-                confirm_title: __('Delete Confirmation'),
-                confirm_content: __('Are you sure you want to delete this item?'),
-                confirm_ok: __('Yes, Delete')
-            },
-
-            /**
-             * Execute delete model
-             */
-            execute: function() {
-                this.getConfirmDialog(_.bind(this.doDelete, this)).open();
-            },
-
-            /**
-             * Confirm delete item
-             */
-            doDelete: function() {
-                var self = this;
-                this.model.destroy({
-                    url: this.getLink(),
-                    wait: true,
-                    error: function() {
-                        self.getErrorDialog().open();
-                    },
-                    success: function() {
-                        var messageText = __('Item deleted');
-                        messenger.notificationFlashMessage('success', messageText);
-                    }
-                });
-            },
-
-            /**
-             * Get view for error modal
-             *
-             * @return {oro.Modal}
-             */
-            getErrorDialog: function() {
-                if (!this.errorModal) {
-                    this.errorModal = new Modal({
-                        title: __('Delete Error'),
-                        content: __('Cannot delete item.'),
-                        cancelText: false
-                    });
+        /**
+         * Confirm delete item
+         */
+        doDelete: function() {
+            this.model.destroy({
+                url: this.getLink(),
+                wait: true,
+                error: function() {
+                    var messageText = __('You do not have permission to this action.');
+                    messenger.notificationFlashMessage('error', messageText);
+                },
+                success: function() {
+                    var messageText = __('Item deleted');
+                    messenger.notificationFlashMessage('success', messageText);
                 }
-                return this.errorModal;
-            }
-        });
+            });
+        }
     });
+});

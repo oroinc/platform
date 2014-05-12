@@ -2,7 +2,7 @@
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
 
-require(['oro/mediator'], function (mediator) {
+require(['oroui/js/mediator'], function (mediator) {
     'use strict';
     mediator.once('tab:changed', function () {
         setTimeout(function () {
@@ -13,8 +13,10 @@ require(['oro/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
-    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
+        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
+        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
@@ -25,9 +27,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl()) {
+        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
             if ($('#page-title').size()) {
-                document.title = $('#page-title').text();
+                document.title = _.unescape($('#page-title').text());
             }
             layout.hideProgressBar();
         }
@@ -133,12 +135,30 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         dropdownToggles.click(function (e) {
             var $parent = $(this).parent().toggleClass('open');
             if ($parent.hasClass('open')) {
+                $parent.find('.dropdown-menu').focus();
                 $parent.find('input[type=text]').first().focus().select();
             }
         });
-        $('body').on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
+        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function (e) {
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
+
+        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function (e) {
+            if (e.keyCode === 27) {
+                $(e.currentTarget).parent().removeClass('open');
+            }
+        });
+
+        // fixes submit by enter key press on select element
+        $(document).on('keydown', 'form select', function(e) {
+            if (e.keyCode === 13) {
+                $(e.target.form).submit();
+            }
+        });
+
+        $(document).on('focus', '.select2-focusser, .select2-input', function (e) {
+            $('.hasDatepicker').datepicker('hide')
+        });
 
         var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
@@ -168,14 +188,21 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
+
+        layout.pageRendered();
+    });
+
+    mediator.bind('hash_navigation_request:before', function () {
+        layout.pageRendering();
     });
 
     /**
      * Init page layout js and hide progress bar after hash navigation request is completed
      */
     mediator.bind("hash_navigation_request:complete", function () {
-        layout.hideProgressBar();
         layout.init();
+        layout.hideProgressBar();
+        layout.pageRendered();
     });
 
     /* ============================================================
@@ -193,7 +220,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
                 if (!app.isMobile()) {
-                    content.css('overflow', 'auto');
+                    content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
                     content.last().css('overflow-y', 'auto');
@@ -230,22 +257,6 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             });
         };
 
-        var tries = 0;
-        var waitForDebugBar = function () {
-            var debugBar = $('.sf-toolbar');
-            if (debugBar.children().length) {
-                window.setTimeout(adjustHeight, 500);
-            } else if (tries < 100) {
-                tries += 1;
-                window.setTimeout(waitForDebugBar, 500);
-            }
-        };
-
-        var adjustReloaded = function () {
-            content = false;
-            adjustHeight();
-        };
-
         if (!anchor.length) {
             anchor = $('<div id="bottom-anchor"/>')
                 .css({
@@ -258,24 +269,44 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 .appendTo($(document.body));
         }
 
-        mediator.once("page-rendered", function () {
-            var debugBar = $('.sf-toolbar');
-            if (debugBar.length) {
-                waitForDebugBar();
-            } else {
-                adjustHeight();
-            }
-        });
+        if ($('.sf-toolbar').length) {
+            adjustHeight = (function () {
+                var orig = adjustHeight;
+                var waitForDebugBar = function (attempt) {
+                    if ($('.sf-toolbar').children().length) {
+                        $('body').addClass('dev-mode');
+                        _.delay(orig, 10);
+                    } else if (attempt < 100) {
+                        _.delay(waitForDebugBar, 500, attempt + 1);
+                    }
+                };
+
+                return _.wrap(adjustHeight, function (orig) {
+                    $('body').removeClass('dev-mode');
+                    orig();
+                    waitForDebugBar(0);
+                });
+            }());
+        }
+
+        var adjustReloaded = function () {
+            content = false;
+            adjustHeight();
+        };
+
+        layout.onPageRendered(adjustHeight);
 
         $(window).on('resize', adjustHeight);
 
-        mediator.bind("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("hash_navigation_request:complete", adjustReloaded);
 
-        mediator.bind('layout:adjustHeight', adjustHeight);
+        mediator.on('layout:adjustReloaded', adjustReloaded);
+        mediator.on('layout:adjustHeight', adjustHeight);
+        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
 
-        if ($('body').hasClass('error-page')) {
+        $(function () {
             adjustHeight();
-        }
+        });
     }());
 
     /* ============================================================
@@ -292,50 +323,52 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * ============================================================ */
     $(function () {
         $(document).on('click', '.remove-button', function (e) {
-            var confirm,
-                el = $(this),
-                message = el.data('message');
+            var el = $(this);
+            if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
+                var confirm,
+                    message = el.data('message');
 
-            confirm = new DeleteConfirmation({
-                content: message
-            });
-
-            confirm.on('ok', function () {
-                var navigation = Navigation.getInstance();
-                if (navigation) {
-                    navigation.loadingMask.show();
-                }
-
-                $.ajax({
-                    url: el.data('url'),
-                    type: 'DELETE',
-                    success: function (data) {
-                        el.trigger('removesuccess');
-                        messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
-                        if (el.data('redirect')) {
-                            $.isActive(true);
-                            if (navigation) {
-                                navigation.setLocation(el.data('redirect'));
-                            } else {
-                                window.location.href = el.data('redirect');
-                            }
-                        } else if (navigation) {
-                            navigation.loadingMask.hide();
-                        }
-                    },
-                    error: function () {
-                        if (navigation) {
-                            navigation.loadingMask.hide();
-                        }
-
-                        messenger.notificationMessage(
-                            'error',
-                            el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
-                        );
-                    }
+                confirm = new DeleteConfirmation({
+                    content: message
                 });
-            });
-            confirm.open();
+
+                confirm.on('ok', function () {
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        navigation.loadingMask.show();
+                    }
+
+                    $.ajax({
+                        url: el.data('url'),
+                        type: 'DELETE',
+                        success: function (data) {
+                            el.trigger('removesuccess');
+                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                            if (el.data('redirect')) {
+                                $.isActive(true);
+                                if (navigation) {
+                                    navigation.setLocation(el.data('redirect'));
+                                } else {
+                                    window.location.href = el.data('redirect');
+                                }
+                            } else if (navigation) {
+                                navigation.loadingMask.hide();
+                            }
+                        },
+                        error: function () {
+                            if (navigation) {
+                                navigation.loadingMask.hide();
+                            }
+
+                            messenger.notificationMessage(
+                                'error',
+                                el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
+                            );
+                        }
+                    });
+                });
+                confirm.open();
+            }
 
             return false;
         });
@@ -352,7 +385,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
 
         data.children().appendTo(cList);
         /* temporary solution need add init only for new created row */
-        layout.styleForm(data);
+        layout.styleForm(cList);
         /* temporary solution finish */
     });
 

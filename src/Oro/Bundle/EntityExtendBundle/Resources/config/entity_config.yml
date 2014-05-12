@@ -1,12 +1,12 @@
 oro_entity_config:
     extend:
         entity:
-            require_js:                     ['oro/init-entity-extend-apply', 'oro/init-entity-extend-relation']
+            require_js:                     ['oroentityextend/js/init-entity-extend-apply', 'oroentityextend/js/init-entity-extend-relation']
             grid_action:
                 -
                     name:                   'Remove'
                     route:                  'oro_entityextend_entity_remove'
-                    type:                   'ajax'
+                    type:                   'ajaxdelete'
                     icon:                   'trash'
                     filter:                 { owner: 'Custom', state: ['New', 'Requires update', 'Active']}
                     args:                   ['id']
@@ -27,6 +27,7 @@ oro_entity_config:
                         priority:           40
                         auditable:          false
                         default_value:      'System'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Type'
@@ -36,19 +37,13 @@ oro_entity_config:
                         sortable:           true
                         filterable:         true
                         show_filter:        true
-                    form:
-                        type:               text
-                        block:              entity
-                        options:
-                            read_only:      true
-                            required:       false
-                            label:          'Type'
 
                 is_extend:
                     options:
                         priority:           27
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
                         type:               boolean
                         label:              'Is Extend'
@@ -62,7 +57,7 @@ oro_entity_config:
                     options:
                         priority:           25
                         default_value:      'Active'
-                        label:              'Schema status'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Schema status'
@@ -77,9 +72,8 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
-                        # TODO: remove/deprecate show_column key here with GridBundle
-                        show_column:        false
                         renderable:         false
                         query:
                             operator:       '!='
@@ -88,12 +82,10 @@ oro_entity_config:
                 unique_key:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 index:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 upgradeable:
                     options:
@@ -103,14 +95,10 @@ oro_entity_config:
                 relation:
                     options:
                         auditable:          false
-                        serializable:       true
-                        default_value:      []
 
                 schema:
                     options:
                         auditable:          false
-                        serializable:       true
-                        default_value:      []
 
         field:
             grid_action:
@@ -133,7 +121,7 @@ oro_entity_config:
                     name:                   'Manage unique keys'
                     route:                  'oro_entityextend_entity_unique_key'
                     entity_id:              true
-                    filter:                 { is_extend: true, upgradeable: true }
+                    filter:                 { is_extend: true }
                 -
                     name:                   'Create field'
                     route:                  'oro_entityextend_field_create'
@@ -143,7 +131,7 @@ oro_entity_config:
                     name:                   'Update schema'
                     route:                  'oro_entityextend_update'
                     entity_id:              true
-                    aClass:                 'btn-danger entity-extend-apply'
+                    aCss:                   'btn-danger entity-extend-apply'
                     void:                   true
                     filter:                 { upgradeable: true, state: ['New', 'Requires update', 'Deleted'] }
             items:
@@ -152,6 +140,7 @@ oro_entity_config:
                         priority:           20
                         default_value:      'System'
                         auditable:          false
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Type'
@@ -165,7 +154,7 @@ oro_entity_config:
                     options:
                         priority:           25
                         default_value:      'Active'
-                        label:              'Schema status'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              'Schema status'
@@ -254,9 +243,8 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
+                        indexed:            true
                     grid:
-                        # TODO: remove/deprecate show_column key here with GridBundle
-                        show_column:        false
                         renderable:         false
                         query:
                             operator:       '!='
@@ -273,10 +261,10 @@ oro_entity_config:
                 relation:
                     options:
                         allowed_type:       [oneToMany, manyToOne, manyToMany]
-                        serializable:       true
+                        auditable:          false
                         required_property:
                             config_id:
-                                field_name:  null
+                                field_name: null
                                 scope:      extend
                             code:           is_extend
                             value:          true
@@ -285,10 +273,6 @@ oro_entity_config:
                         options:
                             block:          entity
                             subblock:       properties
-                schema:
-                    options:
-                        serializable:       true
-
                 target_entity:
                     options:
                         auditable:          false
@@ -300,17 +284,14 @@ oro_entity_config:
                 target_grid:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 target_title:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 target_detailed:
                     options:
                         auditable:          false
-                        serializable:       true
 
                 #
                 # OptionSet form type fields
@@ -342,4 +323,4 @@ oro_entity_config:
                             block:          entity
                             subblock:       properties
                             type:           oro_entity_option_set
-                            tooltip:        'Deleting an option will remove these values from related records.'
+                            tooltip:        oro.entity_extend.field.option_set.option.tooltip

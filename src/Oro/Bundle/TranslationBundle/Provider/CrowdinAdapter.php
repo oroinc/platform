@@ -8,11 +8,6 @@ class CrowdinAdapter extends AbstractAPIAdapter
     const FILE_NOT_FOUND     = 8;
 
     /**
-     * @var string
-     */
-    protected $projectId;
-
-    /**
      * Add or update file API method
      *
      * @param string $remotePath Path in remove API service
@@ -138,7 +133,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
+    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
         $result = parent::request($uri, $data, $method, $curlOptions);
         if (!isset($curlOptions[CURLOPT_FILE])) {
@@ -178,7 +173,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    public function download($path, $package = null)
+    public function download($path, array $projects, $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 
@@ -197,13 +192,5 @@ class CrowdinAdapter extends AbstractAPIAdapter
         fclose($fileHandler);
 
         return $result;
-    }
-
-    /**
-     * @param string $projectId
-     */
-    public function setProjectId($projectId)
-    {
-        $this->projectId = $projectId;
     }
 }

@@ -30,6 +30,19 @@ class ReportType extends AbstractQueryDesignerType
                     'empty_value' => 'oro.report.form.choose_report_type'
                 )
             )
+            ->add(
+                'hasChart',
+                'checkbox',
+                array(
+                    'mapped'   => false,
+                    'required' => false,
+                )
+            )
+            ->add(
+                'chartOptions',
+                'oro_report_chart',
+                array('required' => true)
+            )
             ->add('description', 'textarea', array('required' => false));
 
         parent::buildForm($builder, $options);
@@ -43,12 +56,9 @@ class ReportType extends AbstractQueryDesignerType
         $options = array_merge(
             $this->getDefaultOptions(),
             array(
-                'data_class'                  => 'Oro\Bundle\ReportBundle\Entity\Report',
-                'intention'                   => 'report',
-                'cascade_validation'          => true,
-                'grouping_column_choice_type' => 'oro_report_entity_field_choice',
-                'column_column_choice_type'   => 'oro_report_entity_field_choice',
-                'filter_column_choice_type'   => 'oro_report_entity_field_choice'
+                'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
+                'intention'          => 'report',
+                'cascade_validation' => true
             )
         );
 

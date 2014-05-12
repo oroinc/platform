@@ -27,6 +27,8 @@ oro:
                     hint: Maximum value
 
     report:
+        menu:
+            manage_reports.label:   Manage Custom Reports
         type:
             table: Table
         datagrid:
@@ -36,7 +38,9 @@ oro:
                 report_type:        Report type
         form:
             designer:               Designer
+            chart_designer:         Chart Designer
             columns:                Columns
+            grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
 
@@ -59,6 +63,11 @@ oro:
             entity_description:  Represent Report Type
             name.label:          Name
             label.label:         Label
+            chart.label:         Chart
+            hasChart:
+                label:   Report design
+                tooltip: Add chart to the report
+
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

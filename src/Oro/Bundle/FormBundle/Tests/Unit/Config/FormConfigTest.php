@@ -13,6 +13,8 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     private $blocks = array();
 
+    private $reportingLevel;
+
     private $testSubBlocksConfig = array(
         'common' => array(
             'title'    => 'Common Setting',
@@ -30,7 +32,13 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->reportingLevel = error_reporting(E_ALL);
         $this->formConfig = new FormConfig();
+    }
+
+    public function tearDown()
+    {
+        error_reporting($this->reportingLevel);
     }
 
     public function testAddBlock()
@@ -58,7 +66,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             $blockConfig->addSubBlock($subBlock);
 
             $subblocks[] = $subBlock;
-            $subblocksArray[$code] = $subBlock->toArray();
+            $subblocksArray[] = $subBlock->toArray();
         }
 
         $this->formConfig->addBlock($blockConfig);
@@ -76,7 +84,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         /** test toArray() */
         $this->assertEquals(
             array(
-                'testBlock' => array(
+                array(
                     'title'       => 'Test Block',
                     'class'       => 'Oro\Bundle\UserBundle\Entity\User',
                     'subblocks'   => $subblocksArray,

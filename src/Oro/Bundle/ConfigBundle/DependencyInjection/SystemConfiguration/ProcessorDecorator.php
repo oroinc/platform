@@ -17,13 +17,21 @@ class ProcessorDecorator
     protected $processor;
 
     /**
+     * @param Processor $processor
+     */
+    public function __construct(Processor $processor)
+    {
+        $this->processor = $processor;
+    }
+
+    /**
      * @param array $data
      *
      * @return array
      */
     public function process(array $data)
     {
-        $result = $this->getProcessor()->process($this->getConfigurationTree()->buildTree(), $data);
+        $result = $this->processor->process($this->getConfigurationTree()->buildTree(), $data);
 
         return $result;
     }
@@ -82,16 +90,6 @@ class ProcessorDecorator
     }
 
     /**
-     * Getter for processor
-     *
-     * @return Processor
-     */
-    protected function getProcessor()
-    {
-        return $this->processor ? : new Processor();
-    }
-
-    /**
      * Getter for configuration tree
      *
      * @return TreeBuilder
@@ -123,6 +121,7 @@ class ProcessorDecorator
                     ->scalarNode('title')->isRequired()->end()
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
+                    ->scalarNode('configurator')->end()
                     ->integerNode('priority')->end()
                 ->end()
             ->end();

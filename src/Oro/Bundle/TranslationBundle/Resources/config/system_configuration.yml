@@ -1,0 +1,20 @@
+oro_system_configuration:
+    fields:
+        oro_translation.available_translations:
+            type:  oro_translation_available_translations
+            options:
+                label:      'Available translations'
+                required:   false
+                resettable: false
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            language_settings:
+                                children:
+                                    language_languages:
+                                        children:
+                                            - oro_translation.available_translations

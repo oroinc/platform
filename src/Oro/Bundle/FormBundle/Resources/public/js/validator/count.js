@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'oro/validator/number'],
-function (_, numberValidator) {
+/*global define*/
+define(['underscore', './number'
+    ], function (_, numberValidator) {
     'use strict';
 
     var defaultParam = {
@@ -22,18 +22,20 @@ function (_, numberValidator) {
     }
 
     /**
-     * @export oro/validator/count
+     * @export oroform/js/validator/count
      */
     return [
         'Count',
         function (value, element, param) {
             value = getCount(this, element);
-            return this.optional(element) || numberValidator[1].call(this, value, element, param);
+            return numberValidator[1].call(this, value, element, param);
         },
         function (param, element) {
-            var value = getCount(this, element);
+            var value = getCount(this, element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return numberValidator[2].call(this, param, element, value);
+            placeholders.count = value;
+            return numberValidator[2].call(this, param, element, value, placeholders);
         }
     ];
 });

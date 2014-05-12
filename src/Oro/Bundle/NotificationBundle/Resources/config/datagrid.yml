@@ -9,6 +9,7 @@ datagrid:
                 select:
                     - e
                     - event.name as eventName
+                    - event.id as eventId
                     - recipientList.owner as ownerRecipient
                     - recipientList.email as emailRecipient
                     - template.name as templateName
@@ -27,9 +28,10 @@ datagrid:
                 label: oro.notification.emailnotification.entity_name.label
                 data_name: entityName
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/entityName.html.twig
+                template: OroEntityBundle:Datagrid:Property/entity.html.twig
                 frontend_type: html
-                choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
+                context:
+                    entity_provider: @oro_entity.entity_provider
 
             eventName:
                 label: oro.notification.emailnotification.event.label
@@ -83,7 +85,7 @@ datagrid:
             delete:
                 type: delete
                 label: Delete
-                acl_resource: oro_notification_emailnotification_remove
+                acl_resource: oro_notification_emailnotification_delete
                 icon: trash
                 link: delete_link
 
@@ -95,14 +97,15 @@ datagrid:
                     type: choice
                     data_name: e.entityName
                     options:
-                        translation_domain: config
+                        is_translated_choices: true
                         field_options:
                             multiple: true
-                            choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
+                            choices: @oro_entity.datagrid_helper->getEntityNames
 
                 eventName:
+                    filter_by_having: true
                     type: choice
-                    data_name: eventName
+                    data_name: eventId
                     options:
                         field_options:
                             multiple: true
@@ -114,7 +117,7 @@ datagrid:
 
                 recipientUsersList:
                     type: choice
-                    data_name: recipientUsersList
+                    data_name: recipientUsersList.id
                     options:
                         field_options:
                             multiple: true
@@ -122,7 +125,7 @@ datagrid:
 
                 recipientGroupsList:
                     type: choice
-                    data_name: recipientGroupsList
+                    data_name: recipientGroupsList.id
                     options:
                         field_options:
                             multiple: true

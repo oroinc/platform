@@ -1,0 +1,5 @@
+"You need minimum {{ limit }} entities to merge.": "You need minimum {{ limit }} entities to merge."
+"You can merge only {{ limit }} entities at once.": "You can merge only {{ limit }} entities at once."
+"Add entity before setting it as master.": "Add entity before setting it as master."
+"Add entity before setting it as a source entity for {{ field }} field.": "Add entity before setting it as a source entity for {{ field }} field."
+"Merge entities should be unique.": "Merge entities should be unique."

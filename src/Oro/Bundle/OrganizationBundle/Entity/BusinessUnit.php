@@ -20,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Oro\Loggable
  * @Config(
  *  defaultValues={
+ *      "entity"={"icon"="icon-building"},
  *      "ownership"={
  *          "owner_type"="BUSINESS_UNIT",
  *          "owner_field_name"="owner",

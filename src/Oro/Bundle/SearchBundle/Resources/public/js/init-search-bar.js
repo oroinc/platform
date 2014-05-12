@@ -1,5 +1,5 @@
 /* global require */
-require(['jquery', 'underscore', 'routing', 'oro/mediator'],
+require(['jquery', 'underscore', 'routing', 'oroui/js/mediator'],
 function($, _, routing, mediator) {
   'use strict';
       $(function() {
@@ -7,11 +7,11 @@ function($, _, routing, mediator) {
               timeout = 700,
               searchBarContainer = $('#search-div'),
               searchBarInput = searchBarContainer.find('#search-bar-search'),
+              searchBarFrame = searchBarContainer.find('div.header-search-frame'),
               searchBarDropdown = searchBarContainer.find('#search-bar-dropdown'),
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
-
           mediator.bind(
               'hash_navigation_request:complete',
               searchByTagClose,
@@ -41,7 +41,6 @@ function($, _, routing, mediator) {
               searchByTagClose();
           });
 
-
           searchBarDropdown.find('li a').click(function(e) {
               searchBarDropdown
                   .find('li.active')
@@ -51,12 +50,13 @@ function($, _, routing, mediator) {
                   .addClass('active');
               searchBarForm.val($(this).parent().attr('data-alias'));
               searchBarButton.find('.search-bar-type').html($(this).html());
+              updateSearchBar();
               searchByTagClose();
               e.preventDefault();
           });
 
           var searchInterval = null;
-          function SearchByTag() {
+          function searchByTag() {
               clearInterval(searchInterval);
               var queryString = searchBarInput.val();
 
@@ -108,6 +108,10 @@ function($, _, routing, mediator) {
               }
           }
 
+          function updateSearchBar() {
+              searchBarFrame.css('margin-left', searchBarContainer.find('div.btn-group.btn-block').outerWidth());
+          }
+
           searchBarInput.keydown(function(event) {
               if (event.keyCode === 13) {
                   $('#top-search-form').submit();
@@ -120,7 +124,7 @@ function($, _, routing, mediator) {
           searchBarInput.keypress(function(e) {
               if (e.keyCode === 8 || e.keyCode === 46 || (e.which !== 0 && e.charCode !== 0 && !e.ctrlKey && !e.altKey)) {
                   clearInterval(searchInterval);
-                  searchInterval = setInterval(SearchByTag, timeout);
+                  searchInterval = setInterval(searchByTag, timeout);
               } else {
                   switch (e.keyCode) {
                       case 40:

@@ -1,11 +1,12 @@
 oro_menu_config:
     items:
         audit_list:
-            label: 'Data Audit'
+            label: 'oro.dataaudit.menu.audit_list.label'
             route: 'oro_dataaudit_index'
             extras:
-                routes: ['oro_dataaudit_*']
-                description: 'Data Audit'
+                position:    70
+                routes:      ['oro_dataaudit_*']
+                description: 'oro.dataaudit.menu.audit_list.description'
 
     tree:
         application_menu:

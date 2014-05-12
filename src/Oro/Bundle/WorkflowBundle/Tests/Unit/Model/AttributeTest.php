@@ -42,4 +42,20 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $obj->setOption('key', 'test_changed');
         $this->assertEquals('test_changed', $obj->getOption('key'));
     }
+
+    public function testEntityAclAllowed()
+    {
+        $attribute = new Attribute();
+
+        $this->assertTrue($attribute->isEntityUpdateAllowed());
+        $this->assertTrue($attribute->isEntityDeleteAllowed());
+
+        $attribute->setEntityAcl(array('update' => false, 'delete' => false));
+        $this->assertFalse($attribute->isEntityUpdateAllowed());
+        $this->assertFalse($attribute->isEntityDeleteAllowed());
+
+        $attribute->setEntityAcl(array('update' => true, 'delete' => true));
+        $this->assertTrue($attribute->isEntityUpdateAllowed());
+        $this->assertTrue($attribute->isEntityDeleteAllowed());
+    }
 }

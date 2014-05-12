@@ -1,29 +1,30 @@
 /* jshint devel:true */
-/* global define */
-define(['underscore', 'backbone', 'oro/multiple-entity/view', 'oro/multiple-entity/model', 'oro/dialog-widget'],
-function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+/*global define*/
+define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
+    ], function (_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/multiple-entity
-     * @class   oro.multipleEntity
+     * @export  oroform/js/multiple-entity
+     * @class   oroform.MultipleEntity
      * @extends Backbone.View
      */
     return Backbone.View.extend({
         options: {
-            template: null,
-            elementTemplate: null,
+            addedElement:              null,
+            allowAction:               true,
+            collection:                null,
+            defaultElement:            null,
+            elementTemplate:           null,
             entitiesContainerSelector: '.entities',
-            name: null,
-            collection: null,
-            selectionUrl: null,
-            addedElement: null,
-            removedElement: null,
-            defaultElement: null,
-            itemsPerRow: 4,
-            selectorWindowTitle: null
+            itemsPerRow:               4,
+            name:                      null,
+            removedElement:            null,
+            selectionUrl:              null,
+            selectorWindowTitle:       null,
+            template:                  null
         },
 
         events: {
@@ -31,9 +32,9 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template)
+            this.template = _.template(this.options.template);
             this.listenTo(this.getCollection(), 'add', this.addEntity);
-            this.listenTo(this.getCollection(), 'reset', this.addAll);
+            this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
 
             this.$addedEl = $(this.options.addedElement);
@@ -43,16 +44,37 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
             }
 
+            this.initialCollectionItems = [];
+            this.addedCollectionItems = [];
+            this.removedCollectionItems = [];
+
             this.render();
         },
 
-        handleRemove: function(item) {
-            var removedElVal = this.$removedEl.val();
-            var removed = removedElVal ? this.$removedEl.val().split(',') : [];
-            if (item.get('id') && removed.indexOf(item.get('id')) === -1) {
-                removed.push(item.get('id'));
-                this.$removedEl.val(removed.join(','));
+        handleRemove: function (item) {
+            var itemId = item && item.get('id');
+            if (!itemId) {
+                return;
             }
+
+            var addedElVal = this.$addedEl.val();
+            var removedElVal = this.$removedEl.val();
+
+            var added = (addedElVal && addedElVal.split(',')) || [];
+            var removed = (removedElVal && removedElVal.split(',')) || [];
+
+            if (_.contains(added, itemId)) {
+                added = _.without(added, itemId);
+            }
+            if (!_.contains(removed, itemId)) {
+                removed.push(itemId);
+            }
+
+            this.addedCollectionItems = added;
+            this.removedCollectionItems = removed;
+
+            this.$addedEl.val(added.join(','));
+            this.$removedEl.val(removed.join(','));
         },
 
         removeDefault: function(item) {
@@ -69,12 +91,39 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             return this.options.collection;
         },
 
-        addAll: function(items) {
+        _onCollectionReset: function (items) {
             this._resortCollection();
             this.$entitiesContainer.empty();
             items.each(function(item) {
                 this.addEntity(item);
             }, this);
+
+            this.initialCollectionItems = this.getCollection().map(function (model) {
+                return model.get('id');
+            });
+            this.addedCollectionItems = [];
+            this.removedCollectionItems = [];
+        },
+
+        _isInitialCollectionItem: function (itemId) {
+            var isInitial = !!_.find(this.initialCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isInitial;
+        },
+
+        _isAddedCollectionItem: function (itemId) {
+            var isAdded = !!_.find(this.addedCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isAdded;
+        },
+
+        _isRemovedCollectionItem: function (itemId) {
+            var isRemoved = !!_.find(this.removedCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isRemoved;
         },
 
         _resortCollection: function() {
@@ -127,7 +176,29 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             }
         },
 
-        processSelectedEntities: function(added, addedModels, removed) {
+        processSelectedEntities: function (added, addedModels, removed) {
+            var self = this;
+
+            _.intersection(added, removed).forEach(function (itemId) {
+                if (self._isInitialCollectionItem(itemId)) {
+                    added = _.without(added, itemId);
+                    removed = _.without(removed, itemId);
+                    return;
+                }
+
+                if (self._isAddedCollectionItem(itemId)) {
+                    added = _.without(added, itemId);
+                    return;
+                }
+
+                if (self._isRemovedCollectionItem(itemId)) {
+                    removed = _.without(removed, itemId);
+                }
+            });
+
+            this.addedCollectionItems = added;
+            this.removedCollectionItems = removed;
+
             this.$addedEl.val(added.join(','));
             this.$removedEl.val(removed.join(','));
 
@@ -147,6 +218,11 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
 
         render: function() {
             this.$el.html(this.template());
+
+            if (!this.options.allowAction) {
+                this.$el.children('.actions.clearfix').remove();
+            }
+
             this.$entitiesContainer = this.$el.find(this.options.entitiesContainerSelector);
 
             return this;

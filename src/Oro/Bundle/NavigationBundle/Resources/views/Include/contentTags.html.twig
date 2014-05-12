@@ -1,6 +1,6 @@
 {% macro navigationContentTags(data, includeCollectionTag = false) %}
     <script type="text/javascript">
-        require([ 'oro/content-manager'],
+        require([ 'oronavigation/js/content-manager'],
         function (contentManager) {
             contentManager.tagContent({{ oro_navigation_get_content_tags(data, includeCollectionTag)|json_encode|raw }});
         });

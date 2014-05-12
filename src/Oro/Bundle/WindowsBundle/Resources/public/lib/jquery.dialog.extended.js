@@ -56,6 +56,15 @@ $.widget( "ui.dialog", $.ui.dialog, {
 
         this._verifySettings();
         this._initBottomLine();
+
+        this._onBackspacePress = $.proxy(this._onBackspacePress, this);
+        this._windowResizeHandler = $.proxy(this._windowResizeHandler, this);
+
+        // prevents history navigation over backspace while dialog is opened
+        $(document).bind('keydown.dialog', this._onBackspacePress);
+
+        // Handle window resize
+        $(window).bind('resize.dialog', this._windowResizeHandler);
     },
 
     _limitTo: function() {
@@ -73,9 +82,15 @@ $.widget( "ui.dialog", $.ui.dialog, {
         this._initButtons();
         this._initializeContainer();
         this._initializeState(this.options.state);
+        this.adjustContentSize();
+    },
 
-        // Handle window resize
-        $(window).bind('resize.dialog', $.proxy(this._windowResizeHandler, this));
+    _destroy: function () {
+        this._super();
+
+        // remove custom handler
+        $(document).unbind('keydown.dialog', this._onBackspacePress);
+        $(window).unbind('resize.dialog', this._windowResizeHandler);
     },
 
     _makeDraggable: function() {
@@ -122,7 +137,9 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _minimize: function () {
-        this._normalize();
+        if (this.state() !== 'minimized') {
+            this._normalize();
+        }
 
         var widget = this.widget();
 
@@ -185,7 +202,9 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _maximize: function () {
-        this._normalize();
+        if (this.state() !== 'maximized') {
+            this._normalize();
+        }
 
         this._trigger("beforeMaximize");
         this._saveSnapshot();
@@ -291,7 +310,16 @@ $.widget( "ui.dialog", $.ui.dialog, {
                 position: [offset.left, offset.top]
             });
         }
+        this.adjustContentSize();
         return this;
+    },
+
+    adjustContentSize: function () {
+        var viewportHeight = $(window).height(),
+            dialogHeight = this.widget().outerHeight(),
+            widgetHeight = this.element.innerHeight(),
+            maxHeight = viewportHeight + widgetHeight - dialogHeight;
+        this.element.css('max-height', maxHeight);
     },
 
     _getTitleBarHeight: function() {
@@ -412,7 +440,7 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _windowResizeHandler: function(e) {
-        if (e.target == window) {
+        if (e.target === window) {
             switch (this.state()) {
                 case 'maximized':
                     this._calculateNewMaximizedDimensions();
@@ -421,6 +449,14 @@ $.widget( "ui.dialog", $.ui.dialog, {
                     this._moveToVisible();
                     break;
             }
+        }
+    },
+
+    _onBackspacePress: function (e) {
+        // prevents history navigation over backspace while dialog is opened
+        var exclude = ':button,:reset,:submit,:checkbox,:radio,select,[type=image],[type=file]';
+        if (this._isOpen && e.keyCode === 8 && !$(e.target).not(exclude).is(':input')) {
+            e.preventDefault();
         }
     },
 

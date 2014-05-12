@@ -6,25 +6,17 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('oro/translator');
-    var tools = require('oro/tools');
-    var mediator = require('oro/mediator');
-    var LoadingMask = require('oro/loading-mask');
-    var PageableCollection = require('oro/pageable-collection');
-    var Grid = require('oro/datagrid/grid');
-    var GridRouter = require('oro/datagrid/router');
-    var GridViewsView = require('oro/datagrid/grid-views/view');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var PageableCollection = require('./pageable-collection');
+    var Grid = require('./datagrid/grid');
+    var GridRouter = require('./datagrid/router');
+    var GridViewsView = require('./datagrid/grid-views/view');
+    var mapActionModuleName = require('./map-action-module-name');
+    var mapCellModuleName = require('./map-cell-module-name');
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
-        cellModuleName = 'oro/datagrid/{{type}}-cell',
-        actionModuleName = 'oro/datagrid/{{type}}-action',
-        cellTypes = {
-            integer:   'number',
-            decimal:   'number',
-            percent:   'number',
-            currency:  'number'
-        },
 
         helpers = {
             cellType: function (type) {
@@ -69,22 +61,21 @@ define(function (require) {
              */
             collectModules: function () {
                 var modules = this.modules,
-                    metadata = this.metadata,
-                    moduleName = function (template, type) {
-                        return template.replace('{{type}}', type);
-                    };
+                    metadata = this.metadata;
                 // cells
                 _.each(metadata.columns, function (column) {
                     var type = column.type;
-                    modules[helpers.cellType(type)] = moduleName(cellModuleName, cellTypes[type] || type);
+                    modules[helpers.cellType(type)] = mapCellModuleName(type);
                 });
                 // row actions
                 _.each(_.values(metadata.rowActions), function (action) {
-                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
+                    var type = action.frontend_type;
+                    modules[helpers.actionType(type)] = mapActionModuleName(type);
                 });
                 // mass actions
                 _.each(_.values(metadata.massActions), function (action) {
-                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
+                    var type = action.frontend_type;
+                    modules[helpers.actionType(type)] = mapActionModuleName(type);
                 });
             },
 
@@ -92,23 +83,28 @@ define(function (require) {
              * Build grid
              */
             buildGrid: function () {
-                var options, collection, grid, obj;
+                var options, collectionOptions, collection, grid, payload;
 
                 // collection can be stored in the page cache
-                mediator.trigger('datagrid_collection_set_before', obj = {});
-                if (obj.collection) {
-                    collection = obj.collection;
+                payload = {name: this.metadata.options.gridName};
+                mediator.trigger('datagrid_collection_set_before', payload);
+                if (payload.collection) {
+                    collection = payload.collection;
                 } else {
                     // otherwise, create collection from metadata
-                    options = methods.combineCollectionOptions.call(this);
-                    collection = new PageableCollection(this.$el.data('data'), options);
+                    collectionOptions = methods.combineCollectionOptions.call(this);
+                    collection = new PageableCollection(this.$el.data('data'), collectionOptions);
                 }
 
                 // create grid
                 options = methods.combineGridOptions.call(this);
+                mediator.trigger('datagrid_create_before', options, collection);
                 grid = new Grid(_.extend({collection: collection}, options));
+                mediator.trigger('datagrid_create_after', grid);
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
+                this.$el.data('datagrid', grid);
+                mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
                     // register router
@@ -161,7 +157,7 @@ define(function (require) {
 
                 // columns
                 columns = _.map(metadata.columns, function (cell) {
-                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable'],
+                    var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'],
                         cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys))),
                         extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type'))),
                         cellType = modules[helpers.cellType(cell.type)];
@@ -190,6 +186,7 @@ define(function (require) {
                     toolbarOptions: metadata.options.toolbarOptions || {},
                     multipleSorting: metadata.options.multipleSorting || false,
                     entityHint: metadata.options.entityHint,
+                    exportOptions: metadata.options.export || {},
                     routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
                 };
             },
@@ -208,11 +205,16 @@ define(function (require) {
     /**
      * Process datagirid's metadata and creates datagrid
      *
-     * @export oro/datagrid-builder
-     * @name   oro.datagridBuilder
+     * @export orodatagrid/js/datagrid-builder
+     * @name   orodatagrid.datagridBuilder
+     *
+     * @param {array} builders
+     * @param {string} selector
      */
-    return function (builders) {
-        $(gridSelector).each(function (i, el) {
+    return function (builders, selector) {
+        var $el = $(selector).filter(gridSelector);
+
+        $el.each(function (i, el) {
             var $el = $(el);
             var gridName = (($el.data('metadata') || {}).options || {}).gridName;
             if (!gridName) {

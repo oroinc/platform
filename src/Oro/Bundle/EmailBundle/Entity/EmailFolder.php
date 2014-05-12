@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
@@ -16,11 +15,11 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
-    const INBOX = 'inbox';
-    const SENT = 'sent';
-    const TRASH = 'trash';
+    const INBOX  = 'inbox';
+    const SENT   = 'sent';
+    const TRASH  = 'trash';
     const DRAFTS = 'drafts';
-    const OTHER = 'other';
+    const OTHER  = 'other';
 
     /**
      * @var integer
@@ -71,7 +70,7 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Email", mappedBy="folder", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist", "remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emails;
@@ -209,8 +208,6 @@ class EmailFolder
     public function addEmail(Email $email)
     {
         $this->emails[] = $email;
-
-        $email->setFolder($this);
 
         return $this;
     }

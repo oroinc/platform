@@ -7,6 +7,8 @@ change_password:
     flash:
         success: The password has been changed
 
+"Bad credentials": "Invalid user name or password."
+
 resetting:
     flash:
         success: The password has been successfully reset
@@ -82,21 +84,38 @@ Login: Login
 "View role": "View role"
 "Remove role": "Remove role"
 "Template controller": "Template controller"
-
 oro:
     dashboard:
         recent_emails:
-            title:      Recent Emails
-            inbox:      Inbox
-            sent:       Sent
-            view_all:   View All
+            title:       Recent Emails
+            inbox:       Inbox
+            sent:        Sent
+            view_all:    View All
+            description: This widget allows you to see most recent additions to your inbox and outbox
 
     user:
+        menu:
+            system_tab.label: System
+            user_list.description: List of system users
+            user_roles.description: List of system roles
+            user_groupes.description: List of system groups
+            users_management.label: Users Management
+            user_create.label: Create User
+            shortcut_new_user.label: Create new user
+            shortcut_new_user.description: Create new user instance
+            shortcut_list_users.label: Show users list
+            shortcut_list_users.description: List of all system users
+            shortcut_new_role.label: Create new role
+            shortcut_new_role.description: Create new role instance
+            shortcut_new_group.label: Create new group
+            shortcut_new_group.description: Create new group instance
+            oro_user_profile_view.label: My User
         controller:
             group.message.saved: "Group saved"
             role.message.saved: "Role saved"
             user.message.saved: "User saved"
             status.message.saved: "Status saved"
+            invite.fail.message: An invitation email sending was failed
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
@@ -105,7 +124,7 @@ oro:
         entity_description:  Represent user profile
         id.label:          Id
         username.label:    Username
-        email.label:       Email
+        email.label:       Primary Email
         name_prefix.label: Name prefix
         first_name.label:  First name
         middle_name.label: Middle name
@@ -124,6 +143,7 @@ oro:
         roles.label:       Roles
         groups.label:      Groups
         api.label:         API key
+
         statuses.label:    Statuses
         emails.label:      Emails
         current_status.label: Current status
@@ -153,3 +173,5 @@ oro:
             role.label:   Role
             label.label:  Label
             owner.label:  Owner
+        invite:
+            label: Send an Email Invitation

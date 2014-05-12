@@ -7,7 +7,7 @@ and stored in Oro/Bundle/AddressBundle/Entity/AddressType.php. It has two proper
 "name" that defined symbolic name of type and "label" that is used at frontend.
 Address types are translatable entities - their label should be defined for each supported locale.
 Loading and translation of address types performed in data fixture
-Oro/Bundle/AddressBundle/DataFixtures/ORM/LoadAddressTypeData.php.
+Oro/Bundle/AddressBundle/Data/ORM/LoadAddressTypeData.php.
 
 There is abstract address entity that support types - AbstractTypedAddress.
 It has property "types" and methods to work with it, but DB relation between address and address type

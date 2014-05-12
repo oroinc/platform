@@ -6,6 +6,11 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 
 class RegionTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetRegionCombinedCode()
+    {
+        $this->assertEquals('US-CA', Region::getRegionCombinedCode('US', 'CA'));
+    }
+
     public function testConstructorData()
     {
         $combinedCode = 'combinedCode';

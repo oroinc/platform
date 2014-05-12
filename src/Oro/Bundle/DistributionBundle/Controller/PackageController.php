@@ -22,6 +22,7 @@ class PackageController extends Controller
         $kernelRootDir = $this->container->getParameter('kernel.root_dir');
         putenv(sprintf('COMPOSER_HOME=%s/cache/composer', $kernelRootDir));
         chdir(realpath($kernelRootDir . '/../'));
+        set_time_limit(0);
     }
 
     /**
@@ -42,7 +43,10 @@ class PackageController extends Controller
             ];
         }
 
-        return ['items' => $items];
+        return [
+            'items' => $items,
+            'notWritableSystemPaths' => $this->getNotWritablePaths()
+        ];
     }
 
     /**
@@ -54,7 +58,10 @@ class PackageController extends Controller
         $this->setUpEnvironment();
         $packageManager = $this->getPackageManager();
 
-        return ['packages' => $packageManager->getAvailable()];
+        return [
+            'packages' => $packageManager->getAvailable(),
+            'notWritableSystemPaths' => $this->getNotWritablePaths()
+        ];
     }
 
     /**
@@ -227,5 +234,21 @@ class PackageController extends Controller
     protected function getParamValue(array $params, $paramName, $defaultValue)
     {
         return isset($params[$paramName]) ? $params[$paramName] : $defaultValue;
+    }
+
+    protected function getNotWritablePaths()
+    {
+        $paths = $this->container->getParameter('oro_distribution.package_manager.system_paths');
+        $kernelRootDir = $this->container->getParameter('kernel.root_dir');
+
+        $notWritablePaths = [];
+        foreach ($paths as $path) {
+            $realPath = realpath($kernelRootDir . '/../' . $path);
+            if (!is_writable($realPath)) {
+                $notWritablePaths[] = $path;
+            }
+        }
+
+        return $notWritablePaths;
     }
 }

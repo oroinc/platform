@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
-use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
-use Oro\Bundle\InstallerBundle\InstallerEvents;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class InstallationStep extends AbstractStep
 {
@@ -17,9 +19,7 @@ class InstallationStep extends AbstractStep
         $action = $this->getRequest()->query->get('action');
         switch ($action) {
             case 'fixtures':
-                return $this->handleAjaxAction('oro:demo:fixtures:load');
-            case 'search':
-                return $this->handleAjaxAction('oro:search:create-index');
+                return $this->handleAjaxAction('oro:migration:data:load', array('--fixtures-type' => 'demo'));
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
             case 'js-routing':
@@ -27,13 +27,16 @@ class InstallationStep extends AbstractStep
             case 'localization':
                 return $this->handleAjaxAction('oro:localization:dump');
             case 'assets':
-                return $this->handleAjaxAction('assets:install', array('target' => './'));
+                return $this->handleAjaxAction(
+                    'oro:assets:install',
+                    array('target' => './', '--exclude' => ['OroInstallerBundle'])
+                );
             case 'assetic':
                 return $this->handleAjaxAction('assetic:dump');
             case 'translation':
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':
-                return $this->handleAjaxAction('oro:requirejs:build');
+                return $this->handleAjaxAction('oro:requirejs:build', array('--ignore-errors' => true));
             case 'finish':
                 $this->get('event_dispatcher')->dispatch(InstallerEvents::FINISH);
                 // everything was fine - update installed flag in parameters.yml

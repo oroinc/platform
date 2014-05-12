@@ -1,14 +1,15 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'],
-function($, _, mediator) {
+/*global define*/
+/*jslint nomen:true*/
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'
+    ], function ($, _, mediator) {
     'use strict';
 
     /**
      * Multiselect decorator class.
      * Wraps multiselect widget and provides design modifications
      *
-     * @export oro/multiselect-decorator
-     * @class  oro.MultiselectDecorator
+     * @export orofilter/js/multiselect-decorator
+     * @class  orofilter.MultiselectDecorator
      */
     var MultiselectDecorator = function(options) {
         this.initialize(options);
@@ -45,16 +46,15 @@ function($, _, mediator) {
             }
             this.element = options.element;
 
-            if (options.parameters) {
-                _.extend(this.parameters, options.parameters);
-            }
-
             if (_.has(options, 'contextSearch')) {
                 this.contextSearch = options.contextSearch;
             }
 
+            options.parameters = options.parameters || {};
+            _.defaults(options.parameters, this.parameters);
+
             // initialize multiselect widget
-            this.multiselect(this.parameters);
+            this.multiselect(options.parameters);
 
             // initialize multiselect filter
             if (this.contextSearch) {
@@ -115,6 +115,7 @@ function($, _, mediator) {
          */
         getMinimumDropdownWidth: function() {
             var minimumWidth = 0;
+            this.getWidget().find('.ui-multiselect-checkboxes').removeClass('fixed-li');
             var elements = this.getWidget().find('.ui-multiselect-checkboxes li');
             _.each(elements, function(element) {
                 var width = this._getTextWidth($(element).find('label'));
@@ -122,7 +123,7 @@ function($, _, mediator) {
                     minimumWidth = width;
                 }
             }, this);
-
+            this.getWidget().find('.ui-multiselect-checkboxes').addClass('fixed-li');
             return minimumWidth;
         },
 
@@ -137,7 +138,7 @@ function($, _, mediator) {
             var html_org = element.html();
             var html_calc = '<span>' + html_org + '</span>';
             element.html(html_calc);
-            var width = element.find('span:first').width();
+            var width = element.outerWidth();
             element.html(html_org);
             return width;
         },
@@ -173,15 +174,9 @@ function($, _, mediator) {
 
         /**
          *  Set dropdown position according to button element
-         *
-         * @param {Object} button
          */
-        updateDropdownPosition: function(button) {
-            var position = button.offset();
-            this.getWidget().css({
-                top: position.top + button.outerHeight(),
-                left: position.left
-            });
+        updateDropdownPosition: function() {
+            this.multiselect('updatePos');
         }
     };
 

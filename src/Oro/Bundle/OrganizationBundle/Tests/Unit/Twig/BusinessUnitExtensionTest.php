@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundlee\Tests\Unit\Twig;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension;
 

@@ -1,7 +1,8 @@
- /* global define */
-define(['jquery', 'underscore', 'backbone', 'routing', 'oro/navigation', 'oro/translator', 'oro/mediator',
-    'oro/messenger', 'oro/error', 'oro/modal', 'oro/datagrid/action-launcher'],
-function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation',
+        'orotranslation/js/translator', 'oroui/js/mediator',
+        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
+    ], function ($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 
     /**
@@ -11,8 +12,8 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
      *  - "preExecute" before action is executed
      *  - "postExecute" after action is executed
      *
-     * @export  oro/datagrid/abstract-action
-     * @class   oro.datagrid.AbstractAction
+     * @export  orodatagrid/js/datagrid/action/abstract-action
+     * @class   orodatagrid.datagrid.action.AbstractAction
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -22,7 +23,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /** @property {String} */
         name: null,
 
-        /** @property {oro.datagrid.Grid} */
+        /** @property {orodatagrid.datagrid.Grid} */
         datagrid: null,
 
         /** @property {string} */
@@ -57,12 +58,12 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
 
         /** @property {Object} */
         defaultMessages: {
-            confirm_title: __('Execution Confirmation'),
-            confirm_content: __('Are you sure you want to do this?'),
-            confirm_ok: __('Yes, do it'),
-            success: __('Action performed.'),
-            error: __('Action is not performed.'),
-            empty_selection: __('Please, select item to perform action.')
+            confirm_title: 'Execution Confirmation',
+            confirm_content: 'Are you sure you want to do this?',
+            confirm_ok: 'Yes, do it',
+            success: 'Action performed.',
+            error: 'Action is not performed.',
+            empty_selection: 'Please, select item to perform action.'
         },
 
         /**
@@ -71,7 +72,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @param {Object} options
          * @param {Object} [options.launcherOptions] Options for new instance of launcher object
          */
-        initialize: function(options) {
+        initialize: function (options) {
             if (!options.datagrid) {
                 throw new TypeError("'datagrid' is required");
             }
@@ -87,10 +88,10 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /**
          * Creates launcher
          *
-         * @param {Object} options Launcher options
-         * @return {oro.datagrid.ActionLauncher}
+         * @param {Object=} options Launcher options
+         * @return {orodatagrid.datagrid.ActionLauncher}
          */
-        createLauncher: function(options) {
+        createLauncher: function (options) {
             options = options || {};
             if (_.isUndefined(options.icon) && !_.isUndefined(this.icon)) {
                 options.icon = this.icon;
@@ -102,7 +103,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /**
          * Run action
          */
-        run: function() {
+        run: function () {
             var options = {
                 doExecute: true
             };
@@ -116,11 +117,11 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /**
          * Execute action
          */
-        execute: function() {
+        execute: function () {
             this._confirmationExecutor(_.bind(this.executeConfiguredAction, this));
         },
 
-        executeConfiguredAction: function() {
+        executeConfiguredAction: function () {
             switch (this.frontend_handle) {
                 case 'ajax':
                     this._handleAjax();
@@ -133,7 +134,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _confirmationExecutor: function(callback) {
+        _confirmationExecutor: function (callback) {
             if (this.confirmation) {
                 this.getConfirmDialog(callback).open();
             } else {
@@ -141,7 +142,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _handleWidget: function() {
+        _handleWidget: function () {
             if (this.dispatched) {
                 return;
             }
@@ -154,7 +155,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             });
         },
 
-        _handleRedirect: function() {
+        _handleRedirect: function () {
             if (this.dispatched) {
                 return;
             }
@@ -170,7 +171,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _handleAjax: function() {
+        _handleAjax: function () {
             if (this.dispatched) {
                 return;
             }
@@ -191,14 +192,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             });
         },
 
-        _onAjaxError: function(jqXHR, textStatus, errorThrown) {
-            error.dispatch(null, jqXHR);
+        _onAjaxError: function (jqXHR) {
+            error.handle({}, jqXHR, {enforce: true});
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
         },
 
-        _onAjaxSuccess: function(data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data, textStatus, jqXHR) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch();
@@ -206,9 +207,9 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             this._showAjaxSuccessMessage(data);
         },
 
-        _showAjaxSuccessMessage: function(data) {
+        _showAjaxSuccessMessage: function (data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                message = data.message || defaultMessage;
+                message = __(data.message || defaultMessage);
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);
             }
@@ -220,14 +221,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @return {String}
          * @private
          */
-        getLink: function(parameters) {
+        getLink: function (parameters) {
             if (_.isUndefined(parameters)) {
                 parameters = {};
             }
             return routing.generate(
                 this.route,
                 _.extend(
-                    this.route_parameters,
+                    _.extend([], this.route_parameters),
                     parameters
                 )
             );
@@ -238,7 +239,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @returns {String}
          */
-        getLinkWithParameters: function() {
+        getLinkWithParameters: function () {
             return this.getLink(this.getActionParameters());
         },
 
@@ -247,7 +248,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @returns {Object}
          */
-        getActionParameters: function() {
+        getActionParameters: function () {
             return {};
         },
 
@@ -256,12 +257,12 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @return {oro.Modal}
          */
-        getConfirmDialog: function(callback) {
+        getConfirmDialog: function (callback) {
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
-                    title: this.messages.confirm_title,
-                    content: this.messages.confirm_content,
-                    okText: this.messages.confirm_ok
+                    title: __(this.messages.confirm_title),
+                    content: __(this.messages.confirm_content),
+                    okText: __(this.messages.confirm_ok)
                 }));
                 this.confirmModal.on('ok', callback);
             }

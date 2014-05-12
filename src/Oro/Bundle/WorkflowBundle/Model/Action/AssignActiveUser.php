@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class AssignActiveUser extends AbstractAction
 {
@@ -43,7 +44,7 @@ class AssignActiveUser extends AbstractAction
         }
 
         if (!$activeUser) {
-            throw new \LogicException('Can\'t extract active user');
+            throw new WorkflowException('Can\'t extract active user');
         }
 
         $this->contextAccessor->setValue($context, $this->options['attribute'], $activeUser);

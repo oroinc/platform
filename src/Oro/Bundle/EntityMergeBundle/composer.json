@@ -1,0 +1,28 @@
+{
+    "name": "oro/entity-merge-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Entity Merge Bundle",
+    "keywords": ["BAP"],
+    "homepage": "https://github.com/laboro/EntityMergeBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.4",
+        "symfony/symfony": "2.3.*",
+        "oro/entity-config-bundle": "dev-master",
+        "oro/ui-bundle": "dev-master",
+        "oro/grid-bundle": "dev-master",
+        "oro/navigation-bundle": "dev-master",
+        "oro/form-bundle": "dev-master",
+        "oro/user-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\EntityMergeBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/EntityMergeBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

@@ -1,4 +1,4 @@
-{% if entity is auditable and resource_granted('oro_dataaudit_history') %}
+{% if (entity is auditable or entity_class is auditable) and resource_granted('oro_dataaudit_history') %}
     <li>
         <a class="no-hash"
            href="{{ path(audit_path, {entity:entity_class, id:id}) }}"

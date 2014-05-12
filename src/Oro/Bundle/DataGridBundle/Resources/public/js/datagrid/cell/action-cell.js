@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backgrid'],
-function($, _, Backgrid) {
+/*global define*/
+define(['jquery', 'underscore', 'backgrid'
+    ], function ($, _, Backgrid) {
     'use strict';
 
     /**
      * Cell for grid, contains actions
      *
-     * @export  oro/datagrid/action-cell
-     * @class   oro.datagrid.ActionCell
+     * @export  orodatagrid/js/datagrid/cell/action-cell
+     * @class   orodatagrid.datagrid.cell.ActionCell
      * @extends Backgrid.Cell
      */
     return Backgrid.Cell.extend({
@@ -22,7 +22,7 @@ function($, _, Backgrid) {
         launchers: undefined,
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
@@ -47,7 +47,9 @@ function($, _, Backgrid) {
 
         /** @property */
         events: {
-            'click': '_onCellClick'
+            'click': '_toggleDropdown',
+            'mouseover .dropdown-toggle': '_toggleDropdown',
+            'mouseleave .dropdown-menu': '_toggleDropdown'
         },
 
         /**
@@ -66,7 +68,7 @@ function($, _, Backgrid) {
         /**
          * Handle action run
          *
-         * @param {oro.datagrid.AbstractAction} action
+         * @param {orodatagrid.datagrid.action.AbstractAction} action
          */
         onActionRun: function(action) {
             this.$('.dropdown.open').removeClass('open');
@@ -185,7 +187,7 @@ function($, _, Backgrid) {
         /**
          * Render launcher
          *
-         * @param {oro.datagrid.ActionLauncher} launcher
+         * @param {orodatagrid.datagrid.ActionLauncher} launcher
          * @param {Object} [templateParameters]
          * @return {jQuery} Rendered element wrapped with jQuery
          */
@@ -226,7 +228,7 @@ function($, _, Backgrid) {
          * @param {Event} e
          * @protected
          */
-        _onCellClick: function(e) {
+        _toggleDropdown: function(e) {
             this.$('.dropdown-toggle').dropdown('toggle');
             e.stopPropagation();
         }

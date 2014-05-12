@@ -7,59 +7,78 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Config
-     */
-    protected $config;
-
-    public function setUp()
-    {
-        $this->config = new Config(new EntityConfigId('testClass', 'testScope'));
-    }
-
     public function testCloneConfig()
     {
+        $config = new Config(new EntityConfigId('testScope', 'testClass'));
+
         $values = array('firstKey' => 'firstValue', 'secondKey' => new \stdClass());
-        $this->config->setValues($values);
+        $config->setValues($values);
 
-        $clone = clone $this->config;
+        $clone = clone $config;
 
-        $this->assertTrue($this->config == $clone);
-        $this->assertFalse($this->config === $clone);
+        $this->assertTrue($config == $clone);
+        $this->assertFalse($config === $clone);
 
     }
 
     public function testValueConfig()
     {
-        $values = array('firstKey' => 'firstValue', 'secondKey' => 'secondValue', 'fourthKey' => new \stdClass());
-        $this->config->setValues($values);
+        $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
-        $this->assertEquals($values, $this->config->all());
+        $values = array(
+            'firstKey' => 'firstValue',
+            'secondKey' => 'secondValue',
+            'thirdKey' => 3,
+            'fourthKey' => new \stdClass()
+        );
+        $config->setValues($values);
+
+        $this->assertEquals($values, $config->all());
         $this->assertEquals(
             array('firstKey' => 'firstValue'),
-            $this->config->all(
+            $config->all(
                 function ($value) {
                     return $value == 'firstValue';
                 }
             )
         );
 
-        $this->assertEquals('firstValue', $this->config->get('firstKey'));
-        $this->assertEquals('secondValue', $this->config->get('secondKey'));
+        $this->assertEquals('firstValue', $config->get('firstKey'));
+        $this->assertEquals('secondValue', $config->get('secondKey'));
 
-        $this->assertEquals(true, $this->config->is('secondKey'));
+        $this->assertEquals(true, $config->is('secondKey'));
 
-        $this->assertEquals(true, $this->config->has('secondKey'));
-        $this->assertEquals(false, $this->config->has('thirdKey'));
+        $this->assertEquals(true, $config->in('thirdKey', ['3']));
+        $this->assertEquals(false, $config->in('thirdKey', ['3'], true));
+        $this->assertEquals(true, $config->in('thirdKey', [3]));
+        $this->assertEquals(true, $config->in('thirdKey', [3], true));
+        $this->assertEquals(false, $config->in('thirdKey', [100]));
 
-        $this->assertEquals(null, $this->config->get('thirdKey'));
+        $this->assertEquals(true, $config->has('secondKey'));
+        $this->assertEquals(false, $config->has('nonExistKey'));
 
-        $this->assertEquals($this->config, unserialize(serialize($this->config)));
+        $this->assertEquals(null, $config->get('nonExistKey'));
 
-        $this->config->set('secondKey', 'secondValue2');
-        $this->assertEquals('secondValue2', $this->config->get('secondKey'));
+        $this->assertEquals($config, unserialize(serialize($config)));
+
+        $config->set('secondKey', 'secondValue2');
+        $this->assertEquals('secondValue2', $config->get('secondKey'));
 
         $this->setExpectedException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
-        $this->config->get('thirdKey', true);
+        $config->get('nonExistKey', true);
+    }
+
+    public function testSetState()
+    {
+        $configId = new EntityConfigId('testScope', 'Test\Class');
+        $configValues = ['test' => 'testVal'];
+        $config = Config::__set_state(
+            [
+                'id' => $configId,
+                'values' => $configValues,
+            ]
+        );
+        $this->assertEquals($configId, $config->getId());
+        $this->assertEquals($configValues['test'], $config->get('test'));
     }
 }

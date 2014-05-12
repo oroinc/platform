@@ -8,10 +8,9 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -24,43 +23,36 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     protected $mailer;
 
     /** @var string */
-    protected $sendFrom;
-
-    /** @var string */
     protected $messageLimit = 100;
+
+    /** @var ConfigManager */
+    protected $cm;
 
     /** @var string */
     protected $env = 'prod';
 
     /**
-     * @var LocaleSettings
-     */
-    private $localeSettings;
-
-    /**
      * Constructor
      *
-     * @param EmailRenderer                                 $emailRenderer
-     * @param \Swift_Mailer                                 $mailer
-     * @param EntityManager                                 $em
-     * @param string                                        $sendFrom
-     * @param LoggerInterface                               $logger
-     * @param LocaleSettings $localeSettings
+     * @param LoggerInterface $logger
+     * @param EntityManager   $em
+     * @param EntityPool      $entityPool
+     * @param EmailRenderer   $emailRenderer
+     * @param \Swift_Mailer   $mailer
+     * @param ConfigManager   $cm
      */
     public function __construct(
+        LoggerInterface $logger,
+        EntityManager $em,
+        EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        EntityManager $em,
-        $sendFrom,
-        LoggerInterface $logger,
-        LocaleSettings $localeSettings
+        ConfigManager $cm
     ) {
-        parent::__construct($logger, $em);
-
+        parent::__construct($logger, $em, $entityPool);
         $this->renderer = $emailRenderer;
         $this->mailer   = $mailer;
-        $this->sendFrom = $sendFrom;
-        $this->localeSettings = $localeSettings;
+        $this->cm       = $cm;
     }
 
     /**
@@ -99,80 +91,42 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate($this->localeSettings->getLanguage());
+            $emailTemplate = $notification->getTemplate();
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,
                     array('entity' => $object)
                 );
-            } catch (\Twig_Error $ex) {
+            } catch (\Twig_Error $e) {
                 $logger->error(
                     sprintf(
                         'Rendering of email template "%s"%s failed. %s',
                         $emailTemplate->getSubject(),
                         method_exists($emailTemplate, 'getId') ? sprintf(' (id: %d)', $emailTemplate->getId()) : '',
-                        $ex->getMessage()
+                        $e->getMessage()
                     ),
-                    array('exception' => $ex)
+                    array('exception' => $e)
                 );
 
                 continue;
             }
 
-            // TODO: use locale for subject and body
-            $params = new ParameterBag(
-                array(
-                    'subject' => $subjectRendered,
-                    'body'    => $templateRendered,
-                    'from'    => $this->sendFrom,
-                    'to'      => $notification->getRecipientEmails(),
-                    'type'    => $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html'
-                )
-            );
+            $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
+            $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
+            $type        = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
+            $recipients  = $notification->getRecipientEmails();
+            foreach ((array)$recipients as $email) {
+                $message = \Swift_Message::newInstance()
+                    ->setSubject($subjectRendered)
+                    ->setFrom($senderEmail, $senderName)
+                    ->setTo($email)
+                    ->setBody($templateRendered, $type);
+                $this->mailer->send($message);
+            }
 
-            $this->notify($params);
             $this->addJob(self::SEND_COMMAND);
         }
-
-        /**
-         * Usage of EntityManager->flush is not safe here, cause this can happen in
-         * event listener postUpdate, onFlush, etc
-         */
-        $this->getEntityPersister(AbstractNotificationProcessor::JOB_ENTITY)
-             ->executeInserts();
-    }
-
-    /**
-     * Process with actual notification
-     *
-     * @param ParameterBag $params
-     * @return bool
-     */
-    protected function notify(ParameterBag $params)
-    {
-        $recipients = $params->get('to');
-        if (empty($recipients)) {
-            return false;
-        }
-
-        foreach ($recipients as $email) {
-            $message = \Swift_Message::newInstance()
-                ->setSubject($params->get('subject'))
-                ->setFrom($params->get('from'))
-                ->setTo($email)
-                ->setBody($params->get('body'), $params->get('type'));
-            $this->mailer->send($message);
-        }
-
-        /**
-         * Usage of EntityManager->flush is not safe here, cause this can happen in
-         * event listener postUpdate, onFlush, etc
-         */
-        $this->getEntityPersister(AbstractNotificationProcessor::SPOOL_ITEM_ENTITY)
-             ->executeInserts();
-
-        return true;
     }
 
     /**
@@ -180,9 +134,10 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      *
      * @param string $command
      * @param array  $commandArgs
+     *
      * @return Job
      */
-    protected function addJob($command, $commandArgs = [])
+    protected function createJob($command, $commandArgs = [])
     {
         $commandArgs = array_merge(
             [
@@ -197,6 +152,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $commandArgs[] = '--no-debug';
         }
 
-        return parent::addJob($command, $commandArgs);
+        return parent::createJob($command, $commandArgs);
     }
 }

@@ -10,11 +10,15 @@ use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
 
 abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTestCase
 {
@@ -22,11 +26,22 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      * @param string $workflowName
      * @param array $attributes
      * @param array $steps
+     * @param string|null $relatedEntity
      * @return Workflow
      */
-    protected function createWorkflow($workflowName, array $attributes = array(), array $steps = array())
-    {
-        $workflow = new Workflow();
+    protected function createWorkflow(
+        $workflowName,
+        array $attributes = array(),
+        array $steps = array(),
+        $relatedEntity = null
+    ) {
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow = new Workflow($entityConnector, $aclManager);
 
         $workflow->setName($workflowName);
 
@@ -35,6 +50,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         }
 
         $workflow->getStepManager()->setSteps($steps);
+
+        $definition = new WorkflowDefinition();
+        $definition->setRelatedEntity($relatedEntity);
+        $workflow->setDefinition($definition);
 
         return $workflow;
     }
@@ -56,14 +75,16 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      * @param string|null $name
      * @param string|null $type
      * @param string|null $label
+     * @param string|null $propertyPath
      * @return Attribute
      */
-    protected function createAttribute($name = null, $type = null, $label = null)
+    protected function createAttribute($name = null, $type = null, $label = null, $propertyPath = null)
     {
         $result = new Attribute();
         $result->setName($name);
         $result->setType($type);
         $result->setLabel($label);
+        $result->setPropertyPath($propertyPath);
         return $result;
     }
 
@@ -80,25 +101,29 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
     /**
      * @param Workflow $workflow
-     * @param string $currentStepName
+     * @param WorkflowStep $currentStep
      * @return WorkflowItem
      */
-    protected function createWorkflowItem(Workflow $workflow, $currentStepName = null)
+    protected function createWorkflowItem(Workflow $workflow, $currentStep = null)
     {
         $result = new WorkflowItem();
-        $result->setCurrentStepName($currentStepName);
+        $result->setCurrentStep($currentStep);
         $result->setWorkflowName($workflow->getName());
         return $result;
     }
 
     protected function createWorkflowAttributesType(
         WorkflowRegistry $workflowRegistry = null,
+        AttributeGuesser $attributeGuesser = null,
         DefaultValuesListener $defaultValuesListener = null,
         InitActionsListener $initActionListener = null,
         RequiredAttributesListener $requiredAttributesListener = null
     ) {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
+        }
+        if (!$attributeGuesser) {
+            $attributeGuesser = $this->createAttributeGuesserMock();
         }
         if (!$defaultValuesListener) {
             $defaultValuesListener = $this->createDefaultValuesListenerMock();
@@ -112,10 +137,18 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
         return new WorkflowAttributesType(
             $workflowRegistry,
+            $attributeGuesser,
             $defaultValuesListener,
             $initActionListener,
             $requiredAttributesListener
         );
+    }
+
+    protected function createFormRegistryMock()
+    {
+        return $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     protected function createWorkflowRegistryMock()
@@ -123,6 +156,14 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
             ->setMethods(array('getWorkflow'))
+            ->getMock();
+    }
+
+    protected function createAttributeGuesserMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeGuesser')
+            ->disableOriginalConstructor()
+            ->setMethods(array('guessClassAttributeForm'))
             ->getMock();
     }
 

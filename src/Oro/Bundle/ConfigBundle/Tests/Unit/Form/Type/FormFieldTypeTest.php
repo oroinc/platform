@@ -2,10 +2,11 @@
 
 namespace ConfigBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 
 class FormFieldTypeTest extends TypeTestCase
 {
@@ -25,6 +26,20 @@ class FormFieldTypeTest extends TypeTestCase
         parent::tearDown();
         unset($this->formType);
     }
+
+    protected function getExtensions()
+    {
+        $useParentScope = new ParentScopeCheckbox();
+        return [
+            new PreloadedExtension(
+                array(
+                    $useParentScope->getName() => $useParentScope
+                ),
+                array()
+            )
+        ];
+    }
+
 
     /**
      * @dataProvider buildFormOptionsProvider
@@ -60,25 +75,8 @@ class FormFieldTypeTest extends TypeTestCase
             ),
             'target field options from array'           => array(
                 'options'         => array(
-                    'target_field' => array(
-                        'type'    => 'choice',
-                        'options' => array('label' => self::TEST_LABEL)
-                    )
-                ),
-                'expectedType'    => 'choice',
-                'expectedOptions' => array('label' => self::TEST_LABEL)
-            ),
-            'target field options from FieldDefinition' => array(
-                'options'         => array(
-                    'target_field' => new FieldNodeDefinition(
-                        'test_field_name',
-                        array(
-                            'type'    => 'choice',
-                            'options' => array(
-                                'label' => self::TEST_LABEL
-                            )
-                        )
-                    )
+                    'target_field_type'    => 'choice',
+                    'target_field_options' => array('label' => self::TEST_LABEL)
                 ),
                 'expectedType'    => 'choice',
                 'expectedOptions' => array('label' => self::TEST_LABEL)

@@ -29,12 +29,12 @@ Table of Contents
 Overview
 ========
 
-Configuration of Workfow declares all aspects related to specific workflow:
+Configuration of Workflow declares all aspects related to specific workflow:
 
 * basic properties of workflow like name and label
 * steps and transitions
 * attributes involved in workflow
-* entities that are related to workflow
+* entity that is related to workflow
 
 Structure of configuration is declared in class Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration.
 
@@ -44,24 +44,49 @@ Configuration File
 Configuration must be placed in a file named Resources/config/workflow.yml. For example
 src/Acme/DemoWorkflowBundle/Resources/config/workflow.yml.
 
+Configuration file may be split by parts. All included parts must be placed under imports section. Imports may be used
+in any part of workflow configuration.
+
+**Example - workflow.yml**
+```
+imports:
+    - { resource: 'oro/workflow/b2b_flow_lead.yml' }
+    - { resource: 'oro/workflow/b2b_flow_sales.yml' }
+    - { resource: 'oro/workflow/b2b_flow_sales_funnel.yml' }
+```
+
+**Example - b2b_flow_lead.yml**
+```
+imports:
+    - { resource: 'b2b_flow_lead/steps.yml' }
+    - { resource: 'b2b_flow_lead/attributes.yml' }
+    - { resource: 'b2b_flow_lead/transitions.yml' }
+    - { resource: 'b2b_flow_lead/transition_definitions.yml' }
+
+workflows:
+    b2b_flow_lead:
+        label: 'Unqualified Sales Lead'
+        entity: OroCRM\Bundle\SalesBundle\Entity\Lead
+        entity_attribute: lead
+        start_step: new
+```
 
 Configuration Loading
 =====================
 
-To load configuration execute a command
+To load configuration execute a command:
 
 ```
-php app/console doctrine:fixtures:load --app/console doctrine:fixtures:load --append --fixtures=/path/to/bundles/WorkflowBundle/DataFixture
+php app/console oro:workflow:definitions:load
 ```
+Command has two options: "directories" that allows user to specify which directories will be used to find definitions,
+and "workflows" that define names of definitions required to load.
 
-This command will save configuration from all workflow.yml files of loaded bundles into WorkflowDefinition entities.
-It can be used in both cases when you want to load a new workflow or update existed one.
-
-**Warning** *--append* options is crucial, if you skip it your database will be purged.
+**Important**
 
 Workflow configuration cannot be merged, it means that you cannot override workflow that is defined in other bundle.
 If you will declare a workflow and another bundle will declare it's own workflow with the same name the command will
-trigger exception and data won't saved.
+trigger exception and data won't be saved.
 
 Defining a Workflow
 ===================
@@ -71,20 +96,30 @@ Root element of configuration is "workflows". Under this element workflows can b
 Single workflow configuration has next properties:
 
 * **name**
+    *string*
     Workflow should have a unique name in scope of all application. As workflow configuration doesn't support merging
     two workflows with the same name will lead to exception during configuration loading.
 * **label**
     *string*
     This value will be shown in the UI
-* **enabled**
-    *boolean (true - default)*
-    If not enabled, operations with workflow will be be restricted.
-* **type**
-    *string ("wizard", "entity" - default)*
-    type of workflow.
+* **entity**
+    *string*
+    Class name of workflow related entity. **Important:** Entity either must be extended or custom
+    or it must have fields to contain workflow item and step.
+* **entity_attribute**
+    *string*
+    Name of the attribute used to store related entity
+* **is_system**
+    *boolean*
+    Flag that define whether this definition is system. System definition can't be edited or removed.
+    All definitions loaded from *.yml files automatically marked as system.
 * **start_step**
     *string*
-    The name of start step. It's optional if Workflow has start transition, otherwise start_step is required.
+    The name of start step. If Workflow has start transition then start_step is optional, otherwise it's required.
+* **steps_display_ordered**
+    *boolean*
+    If this flag is true, then workflow step widget will show all steps according to their order (including not passed)
+    on entity view page, otherwise widget will show only passed steps.
 * **attributes**
     Contains configuration for Attributes
 * **steps**
@@ -97,19 +132,22 @@ Single workflow configuration has next properties:
 Example
 -------
 ```
-workflows:                        # Root elements
-    phone_call:                   # A unique name of workflow
-        label: Demo Call Workflow # This will be shown in UI
-        enabled: true             # If not enabled, operations with workflow will be restricted.
-        start_step: start_call    # name of start step
-        attributes:               # configuration for Attributes
-            # ...
-        steps:                    # configuration for Steps
-            # ...
-        transitions:              # configuration for Transitions
-            # ...
-        transition_definitions:   # configuration for Transition Definitions here
-            # ...
+workflows:                                                    # Root elements
+    b2b_flow_sales:                                           # A unique name of workflow
+        label: B2B Sales Flow                                 # This will be shown in UI
+        entity: OroCRM\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        entity_attribute: opportunity                         # Attribute name used to store root entity
+        is_system: true                                       # Workflow is system, i.e. not editable and not deletable
+        start_step: qualify                                   # Name of start step
+        steps_display_ordered: true                           # Show all steps in step widget
+        attributes:                                           # configuration for Attributes
+                                                              # ...
+        steps:                                                # configuration for Steps
+                                                              # ...
+        transitions:                                          # configuration for Transitions
+                                                              # ...
+        transition_definitions:                               # configuration for Transition Definitions
+                                                              # ...
 ```
 
 Attributes Configuration
@@ -122,7 +160,7 @@ not mapped by any attribute or mismatched with attribute type is restricted.
 
 Single attribute can be described with next configuration:
 
-* **unique name***
+* **unique name**
     Workflow attributes should have unique name in scope of Workflow that they belong to.
     Step configuration references attributes by this value.
 * **type**
@@ -141,32 +179,28 @@ Single attribute can be described with next configuration:
     * **object**
         object should support serialize/deserialize, option "class" is required for this type
     * **entity**
-        Doctrine entity, option "class" is required and must be a class of Doctrine entity, also options
-        "managed_entity", "bind" and "multiple" can be used
+        Doctrine entity, option "class" is required and it must be a Doctrine manageable class
 * **label**
     *string*
     Label can be shown in the UI
+* **entity_acl**
+    Defines an ACL for the specific entity stored in this attribute.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
+* **property_path**
+    *string*
+    Used to work with attribute value by reference and specifies path to data storage. If property path is specified
+    then all other attribute properties except name are optional - they can be automatically guessed
+    based on last element (field) of property path.
 * **options**
-    Options of this attribute. Currently next options are supported
+    Options of an attribute. Currently next options are supported
     * **class**
         *string*
         Fully qualified class name. Allowed only when type either entity or object.
-    * **managed_entity**
-        *boolean*
-        Allowed only when type is entity.
-        If *true* than Workflow can be found by entity. It's useful when you need to give to user possibility to start
-        Workflow that is applicable for specific entity.
-    * **bind**
-        *boolean*
-        By default is *true* when *managed_entity* is *true*. Allowed only when type is entity. If true than instances of
-        Workflow will be bound to entity that is saved in data as value of this attribute. It's useful when you need to
-        find all Workflow Items that are connected with entity instance.
-    * **multiple**
-        *boolean (false - default)*
-        By default is same as managed_entity value.
-        If *true* than it will be possible to multiple instances of Workflow for this entity. If *false* than the
-        restriction of one instance of Workflow for entity will be applied. Also false value is possible only if bind
-        is true because of check relation between instances of Workflow and entity is possible only when bind is true.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,
@@ -178,37 +212,22 @@ Example
 
 ```
 workflows:
-    phone_call:
+    b2b_flow_sales:
         # ...
-        attributes:
-            phone_call:                  # unique attribute name
-                label: Phone Call        # attribute label
-                type: entity             # attribute type
-                options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall # entity class
-                    managed_entity: true # this is a managed entity, so on page of PhoneCall user will be able to start this workflow
-                    multiple: true       # many instances of workflow can be started for PhoneCall
-                    bind: true           # all instances of workflow items can be found by PhoneCall instance
-            call_timeout:
-                type: integer
-                label: 'Call Timeout'
-            call_successfull:
-                type: boolean
-                label: 'Call Successful'
-            conversation_successful:
-                type: boolean
-                label: 'Conversation Successful'
-            conversation_comment:
-                type: string
-                label: 'Conversation Comment'
-            conversation_result:
-                type: string
-                label: 'Conversation Result'
-            conversation:
-                type: entity
-                label: 'Conversation'
-                options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+        new_account:
+            label: 'Account'
+            type: entity
+            entity_acl:
+                delete: false
+            options:
+                class: OroCRM\Bundle\AccountBundle\Entity\Account
+        new_company_name:
+            label: 'Company name'
+            type: string
+        opportunity:
+            property_path: sales_funnel.opportunity
+        opportunity_name:
+            property_path: sales_funnel.opportunity.name
 ```
 
 Steps configuration
@@ -228,25 +247,20 @@ Summarizing all above, step has next configuration:
 * **label**
     *string*
     Label of step, can be shown in UI if Workflow has type wizard
-* **template**
-    *string*
-    A custom Twig template that is used to render Worklflow in step in wizard page.
-    By default template OroWorkflowBundle:WorkflowStep:edit.html.twig is used.
 * **order**
     *integer*
     This value is used in wizard page to sort steps in UI.
 * **is_final**
     *boolean*
-    If true than workflow instance will be automatically closed after transition to this step will be performed.
-* **form_type**
-    *string (oro_workflow_step - default)*
-    A form type that will be used to render form of step.
-* **form_options**
-    These options will be passed to form type of step, they can contain options for form types of attributes.
-* **view_attributes**
-    List of attributes that will be shown when step is selected on Workflow wizard UI. Custom path could be specified
-    instead of name of attribute. Each view attribute could have "view_type" option which is used to find Twig block
-    than will render value.
+    If true than step will be counted as workflow final step.
+* **entity_acl**
+    Defines an ACL for the workflow related entity when workflow is in this step.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
 * **allowed_transitions**
     Optional list of allowed transitions. If no transitions are allowed it's same as is_final option set to true
 
@@ -260,44 +274,16 @@ workflows:
         steps:
             start_call:
                 label: 'Start Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig' # custom template that will be rendered on wizard page for this step
-                allowed_transitions:           # list of allowed transitions from this step
+                allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
-                form_type: oro_workflow_step   # used by default
-                form_options:                  # options will be passed to step form type
-                    attribute_fields:
-                        call_timeout:          # must be a name of attribute that is configured in workflow
-                            form_type: integer # this is a name of form type that will be added to step form to represent value of attribute
-                            options:           # any options that should be applied to form type that represents attribute's value
-                                required: true
-                view_attributes:
-                    - { path: $phone_call.number, label: "Phone number" } # render number property of phone_call attribute
-            start_conversation:
+             start_conversation:
                 label: 'Call Phone Conversation'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - end_conversation
-                form_options:
-                    attribute_fields:
-                        conversation_result:
-                            form_type: text
-                        conversation_comment:
-                            form_type: text
-                        conversation_successful:
-                            form_type: choice
-                            options:
-                                choices: {1: 'Yes', 0: 'No'}
-                                required: true
-                                multiple: false
-                view_attributes:
-                    - call_timeout # render call_timeout attribute
             end_call:
                 label: 'End Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 is_final: true
-                view_attributes:
-                    - { attribute: conversation_result, view_type: custom } # render conversation_result attribute using custom block
 ```
 
 Transitions Configuration
@@ -308,18 +294,37 @@ it's allowed and to perform Post Actions.
 
 Transition configuration has next options:
 
-* **unique name***
+* **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
-* **step_to***
+* **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.
-* **transition_definition***
+* **transition_definition**
     A references to Transition Definition configuration
 * **is_start**
     *boolean*
     If true than this transition can be used to start new workflow. At least one start transition is required if
     workflow doesn't have start_step attribute.
+* **is_hidden**
+    *boolean*
+    Indicates that this transition must be hidden at frontend.
+* **is_unavailable_hidden**
+    *boolean*
+    Indicates that this transition must be hidden at frontend in case when transition is not allowed.
+* **acl_resource**
+    *string*
+    ACL resource name that will be checked while checking that transition execution is allowed
+* **acl_message**
+    *string*
+    Message, that will be sown in case when acl_resource is not granted.
+* **message**
+    *string*
+    Notification message, that will be shown at frontend before transition execution.
+* **display_type**
+    *string*
+    Frontend transition form display type. Possible options are: dialog, page.
+    Display type "page" require "form_options" to be set.
 * **form_type**
     *string (oro_workflow_attributes - default)*
     A form type that will be used to render form of transition.
@@ -329,6 +334,9 @@ Transition configuration has next options:
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
     will be shown when user clicks transition button.
+* **transition_definition**
+    *string*
+    Name of associated transition definition.
 
 Example
 -------
@@ -527,7 +535,7 @@ In this example configuration of Workflow there are two entities:
 
 When Workflow Item is created it's connected to Phone Call. On the first step "Start Call" user can go to
 "Call Phone Conversation Step" if a callee answered or to "End Phone Call" step if callee didn't answer.
-On the step "Call Phone Conversation" User enter Worfklow Data and go to "End Phone Call" step via "End conversation"
+On the step "Call Phone Conversation" User enter Workflow Data and go to "End Phone Call" step via "End conversation"
 transition. On this transition a new Entity of Phone Conversation is created and assigned to Phone Call entity.
 
 Configuration
@@ -537,57 +545,28 @@ Configuration
 workflows:
     phone_call:
         label: 'Demo Call Workflow'
+        entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
         enabled: true
-        type: wizard
         start_step: start_call
         steps:
             start_call:
                 label: 'Start Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - connected
                     - not_answered
-                form_options:
-                    attribute_fields:
-                        call_timeout:
-                            form_type: integer
-                            options:
-                                required: true
-                view_attributes:
-                    - { path: $phone_call.number, label: "Phone number" } # render number property of phone_call attribute
             start_conversation:
                 label: 'Call Phone Conversation'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - end_conversation
-                form_options:
-                    attribute_fields:
-                        conversation_result:
-                            form_type: text
-                        conversation_comment:
-                            form_type: text
-                        conversation_successful:
-                            form_type: choice
-                            options:
-                                choices: {1: 'Yes', 0: 'No'}
-                                required: true
-                                multiple: false
-                view_attributes:
-                    - call_timeout # render call_timeout attribute
             end_call:
                 label: 'End Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 is_final: true
-                view_attributes:
-                    - { attribute: conversation_result, view_type: custom } # render conversation_result attribute using custom block
         attributes:
             phone_call:
                 label: Phone Call
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-                    managed_entity: true
-                    multiple: true
             call_timeout:
                 type: integer
                 label: 'Call Timeout'
@@ -613,15 +592,6 @@ workflows:
                 label: 'Connected'
                 step_to: start_conversation
                 transition_definition: connected_definition
-                frontend_options:
-                    icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
-                    class: 'btn-primary'                    # add css class "btn-primary" to transition button
-                form_options:
-                    attribute_fields:                       # fields of form that will be shown when transition button is clicked
-                        call_timeout:
-                            form_type: integer
-                            options:
-                                required: false
             not_answered:
                 label: "Not answered"
                 step_to: end_call
@@ -637,9 +607,8 @@ workflows:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
                 post_actions:
-                    - @assign_value: [$call_successfull, true]
-                init_actions:
-                    - @increment_value: [$call_attempt]
+                    - @assign_value:
+                        parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
                 # Make sure that caller waited at least 60 seconds
                 conditions: # call_timeout not empty and >= 60
@@ -648,7 +617,8 @@ workflows:
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
                 post_actions:
-                    - @assign_value: [$call_successfull, false]
+                    - @assign_value:
+                        parameters: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
                     # Check required properties are set
@@ -660,13 +630,14 @@ workflows:
                 # Pass data from workflow to conversation
                 post_actions:
                     - @create_entity: # create PhoneConversation
-                        class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
-                        attribute: $conversation
-                        data:
-                            result: $conversation_result
-                            comment: $conversation_comment
-                            successful: $conversation_successful
-                            call: $phone_call
+                        parameters:
+                            class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+                            attribute: $conversation
+                            data:
+                                result: $conversation_result
+                                comment: $conversation_comment
+                                successful: $conversation_successful
+                                call: $phone_call
 ```
 
 PhoneCall Entity

@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -35,8 +36,24 @@ class ReportController extends Controller
 
         if ($reportType === 'table') {
             $gridName = sprintf('oro_report_table_%d', $entity->getId());
+
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
+            }
+
+            $datagrid = $this->get('oro_datagrid.datagrid.manager')
+                ->getDatagrid(
+                    $gridName,
+                    array(PagerInterface::PAGER_ROOT_PARAM => array(PagerInterface::DISABLED_PARAM => true))
+                );
+
+            $chartOptions = $entity->getChartOptions($datagrid->getConfig());
+
+            if (!empty($chartOptions)) {
+                $parameters['chartView'] = $this->get('oro_chart.view_builder')
+                    ->setDataGrid($datagrid)
+                    ->setOptions($chartOptions)
+                    ->getView();
             }
         }
 
@@ -95,23 +112,17 @@ class ReportController extends Controller
 
     protected function update(Report $entity)
     {
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
         if ($this->get('oro_report.form.handler.report')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('Report saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
-                    'route'      => 'oro_report_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
-                    'route'      => 'oro_report_index',
-                    // @todo: WILL BE IMPLEMENTER LATER
-                    //'route'      => 'oro_report_view',
-                    'parameters' => array()
-                )
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_report_update', 'parameters' => ['id' => $entity->getId()]],
+                ['route' => 'oro_report_view', 'parameters' => ['id' => $entity->getId()]],
+                $entity
             );
         }
 

@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
 use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures;
 
+use Oro\Component\Config\CumulativeResourceManager;
+
 class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -14,16 +16,16 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $configs, array $expectedThemeSettings)
     {
+        $bundle1 = new Fixtures\FooBundle\FooBundle();
+        $bundle2 = new Fixtures\BarBundle\BarBundle();
+
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+
         $extension = new OroSidebarExtension();
 
         $container = new ContainerBuilder();
-        $container->setParameter(
-            'kernel.bundles',
-            array(
-                new Fixtures\FooBundle\FooBundle(),
-                new Fixtures\BarBundle\BarBundle(),
-            )
-        );
 
         $extension->load($configs, $container);
 
@@ -47,13 +49,15 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                     'foo' => array(
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
+                        'iconClass' => null,
                         'module' => 'widget/foo',
                         'placement' => 'left',
                         'settings' => array('test' => 'Hello')
                     ),
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'bar.ico',
+                        'icon' => null,
+                        'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
                         'settings' => null
@@ -66,7 +70,9 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'sidebar_widgets' => array(
                             'foo' => array(
                                 'title' => 'Foo Extended',
-                                'settings' => array('test2' => 'Rewritten')
+                                'settings' => array('test2' => 'Rewritten'),
+                                'icon' => null,
+                                'iconClass' => 'test2'
                             )
                         )
                     )
@@ -74,7 +80,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedThemeSettings' => array(
                     'foo' => array(
                         'title' => 'Foo Extended',
-                        'icon' => 'foo.ico',
+                        'icon' => null,
+                        'iconClass' => 'test2',
                         'module' => 'widget/foo',
                         'placement' => 'left',
                         'settings' => array('test2' => 'Rewritten')
@@ -82,7 +89,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'bar.ico',
+                        'icon' => null,
+                        'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
                         'settings' => null

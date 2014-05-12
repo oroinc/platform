@@ -4,39 +4,59 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
-    protected $types = array(
-        'string'     => 'String',
-        'integer'    => 'Integer',
-        'smallint'   => 'SmallInt',
-        'bigint'     => 'BigInt',
-        'boolean'    => 'Boolean',
-        'decimal'    => 'Decimal',
-        'date'       => 'Date',
-        'text'       => 'Text',
-        'float'      => 'Float',
-        'oneToMany'  => 'Relation one to many',
-        'manyToOne'  => 'Relation many to one',
-        'manyToMany' => 'Relation many to many',
-        'optionSet'  => 'Option set'
-    );
+    protected $types = [
+        'string'     => 'oro.entity_extend.form.data_type.string',
+        'integer'    => 'oro.entity_extend.form.data_type.integer',
+        'smallint'   => 'oro.entity_extend.form.data_type.smallint',
+        'bigint'     => 'oro.entity_extend.form.data_type.bigint',
+        'boolean'    => 'oro.entity_extend.form.data_type.boolean',
+        'decimal'    => 'oro.entity_extend.form.data_type.decimal',
+        'date'       => 'oro.entity_extend.form.data_type.date',
+        'text'       => 'oro.entity_extend.form.data_type.text',
+        'float'      => 'oro.entity_extend.form.data_type.float',
+        'money'      => 'oro.entity_extend.form.data_type.money',
+        'percent'    => 'oro.entity_extend.form.data_type.percent',
+        'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
+        'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
+        'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
+        'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
+    ];
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    public function __construct(ConfigManager $configManager)
-    {
+    /** @var Translator */
+    protected $translator;
+
+    /** @var ExtendDbIdentifierNameGenerator */
+    protected $nameGenerator;
+
+    /**
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     */
+    public function __construct(
+        ConfigManager $configManager,
+        Translator $translator,
+        ExtendDbIdentifierNameGenerator $nameGenerator
+    ) {
         $this->configManager = $configManager;
+        $this->translator    = $translator;
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -47,10 +67,13 @@ class FieldType extends AbstractType
         $builder->add(
             'fieldName',
             'text',
-            array(
-                'label' => 'Field Name',
-                'block' => 'type',
-            )
+            [
+                'label'       => 'Field Name',
+                'block'       => 'type',
+                'constraints' => [
+                    new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])
+                ],
+            ]
         );
 
         $entityProvider = $this->configManager->getProvider('entity');
@@ -58,18 +81,35 @@ class FieldType extends AbstractType
 
         $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
-            $types = array();
-            foreach ($entityConfig->get('relation') as $relationKey => $relation) {
+            $types = [];
+            $relations = $entityConfig->get('relation');
+            foreach ($relations as $relationKey => $relation) {
+                /** @var FieldConfigId $fieldId */
                 $fieldId       = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
                 if (!$relation['assign'] || !$targetFieldId) {
-                    continue;
+                    if (!$targetFieldId) {
+                        continue;
+                    }
+
+                    // additional check for revers relation of manyToOne field type
+                    $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
+                    if (false === (!$relation['assign']
+                        && !$fieldId
+                        && $targetFieldId
+                        && $targetFieldId->getFieldType() == 'manyToOne'
+                        && $targetEntityConfig->get('relation')
+                        && $targetEntityConfig->get('relation')[$relationKey]['assign']
+                    )) {
+                        continue;
+                    }
                 }
 
                 if ($fieldId
                     && $extendProvider->hasConfigById($fieldId)
-                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendManager::STATE_DELETED)
+                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
                 ) {
                     continue;
                 }
@@ -78,7 +118,12 @@ class FieldType extends AbstractType
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
 
                 $key         = $relationKey . '||' . ($fieldId ? $fieldId->getFieldName() : '');
-                $types[$key] = 'Relation (' . $entityLabel . ') ' . $fieldLabel;
+                $types[$key] = sprintf(
+                    '%s (%s) %s',
+                    $this->translator->trans('Relation'),
+                    $this->translator->trans($entityLabel),
+                    $this->translator->trans($fieldLabel)
+                );
             }
 
             $this->types = array_merge($this->types, $types);
@@ -87,11 +132,11 @@ class FieldType extends AbstractType
         $builder->add(
             'type',
             'choice',
-            array(
+            [
                 'choices'     => $this->types,
-                'empty_value' => 'Please choice type...',
+                'empty_value' => 'Select field type',
                 'block'       => 'type',
-            )
+            ]
         );
     }
 
@@ -101,17 +146,17 @@ class FieldType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver
-            ->setRequired(array('class_name'))
+            ->setRequired(['class_name'])
             ->setDefaults(
-                array(
-                    'require_js'   => array(),
-                    'block_config' => array(
-                        'type' => array(
+                [
+                    'require_js'   => [],
+                    'block_config' => [
+                        'type' => [
                             'title'    => 'General',
                             'priority' => 1,
-                        )
-                    )
-                )
+                        ]
+                    ]
+                ]
             );
     }
 

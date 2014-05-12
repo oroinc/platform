@@ -50,6 +50,19 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
+    protected function timezoneExhibitsDST($tzId)
+    {
+        $tz = new \DateTimeZone($tzId);
+        $date = new \DateTime("now", $tz);
+        $trans = $tz->getTransitions();
+        foreach ($trans as $k => $t) {
+            if ($t["ts"] > $date->format('U')) {
+                return $trans[$k-1]['isdst'];
+            }
+        }
+        return false;
+    }
+
     /**
      * @return array
      */
@@ -66,11 +79,11 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
             ),
             'positive shift' => array(
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('Europe/Athens')),
-                'expected' => '06:00:00',
+                'expected' => ($this->timezoneExhibitsDST('Europe/Athens')) ? '05:00:00': '06:00:00',
             ),
             'negative shift' => array(
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('America/Los_Angeles')),
-                'expected' => '16:00:00',
+                'expected' => ($this->timezoneExhibitsDST('America/Los_Angeles')) ? '15:00:00': '16:00:00',
             ),
         );
     }

@@ -6,7 +6,7 @@ use \SoapClient as BasicSoapClient;
 class SoapClient extends BasicSoapClient
 {
     /** @var \Symfony\Bundle\FrameworkBundle\Client */
-    protected $kernel;
+    protected $client;
 
     /**
      * Overridden constructor
@@ -17,14 +17,14 @@ class SoapClient extends BasicSoapClient
      */
     public function __construct($wsdl, $options, &$client)
     {
-        $this->kernel =  $client;
+        $this->client =  $client;
         parent::__construct($wsdl, $options);
 
     }
 
     public function __destruct()
     {
-        unset($this->kernel);
+        unset($this->client);
     }
 
     /**
@@ -44,9 +44,9 @@ class SoapClient extends BasicSoapClient
         $_SERVER['HTTP_SOAPACTION'] = $action;
         $_SERVER['CONTENT_TYPE'] = 'application/soap+xml';
         //make POST request
-        $this->kernel->request('POST', (string)$location, array(), array(), array(), (string)$request);
+        $this->client->request('POST', (string)$location, array(), array(), array(), (string)$request);
         unset($_SERVER['HTTP_SOAPACTION']);
         unset($_SERVER['CONTENT_TYPE']);
-        return $this->kernel->getResponse()->getContent();
+        return $this->client->getResponse()->getContent();
     }
 }

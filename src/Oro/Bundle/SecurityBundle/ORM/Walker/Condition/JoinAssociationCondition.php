@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker\Condition;
 
 
+use Doctrine\ORM\Query\AST\PathExpression;
+
 class JoinAssociationCondition extends JoinAclCondition
 {
     /**
@@ -11,28 +13,30 @@ class JoinAssociationCondition extends JoinAclCondition
     protected $entityClass;
 
     /**
-     * @var []
+     * @var array
      */
     protected $joinConditions;
 
     /**
-     * @param $entityAlias
-     * @param $entityField
-     * @param $value
-     * @param $entityClass
-     * @param $joinConditions
+     * @param string $entityAlias
+     * @param string $entityField
+     * @param mixed  $value
+     * @param int    $pathExpressionType
+     * @param string $entityClass
+     * @param array  $joinConditions
      */
     public function __construct(
         $entityAlias,
         $entityField = null,
         $value = null,
+        $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
         $entityClass = null,
         $joinConditions = null
     ) {
-        $this->entityClass = $entityClass;
+        $this->entityClass    = $entityClass;
         $this->joinConditions = $joinConditions;
 
-        parent::__construct($entityAlias, $entityField, $value);
+        parent::__construct($entityAlias, $entityField, $value, $pathExpressionType);
     }
 
     /**

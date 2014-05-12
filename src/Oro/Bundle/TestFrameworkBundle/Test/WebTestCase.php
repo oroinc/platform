@@ -4,9 +4,16 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
+
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+
+/**
+ * Class WebTestCase
+ *
+ * @package Oro\Bundle\TestFrameworkBundle\Test
+ */
 abstract class WebTestCase extends BaseWebTestCase
 {
     const DB_ISOLATION = '/@db_isolation(.*)(\r|\n)/U';
@@ -19,6 +26,17 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var Client
      */
     static protected $internalClient;
+
+    protected function tearDown()
+    {
+        $refClass = new \ReflectionClass($this);
+        foreach ($refClass->getProperties() as $prop) {
+            if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
+                $prop->setAccessible(true);
+                $prop->setValue($this, null);
+            }
+        }
+    }
 
     /**
      * Creates a Client.
@@ -64,6 +82,8 @@ abstract class WebTestCase extends BaseWebTestCase
                     }
                 }
             }
+        } else {
+            self::$internalClient->setServerParameters($server);
         }
 
         return self::$internalClient;

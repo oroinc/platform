@@ -2,12 +2,24 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
 
 class SoapTransportTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SOAPTransport */
+    /** @var SOAPTransport|\PHPUnit_Framework_MockObject_MockObject */
     protected $transport;
+
+    /** @var Transport|\PHPUnit_Framework_MockObject_MockObject */
+    protected $transportEntity;
+
+    /** @var ParameterBag */
+    protected $settings;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $soapClientMock;
 
     /**
      * Setup test entity
@@ -29,7 +41,10 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['__soapCall'])
             ->getMock();
 
-        $this->settings = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->settings        = new ParameterBag();
+        $this->transportEntity = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $this->transportEntity->expects($this->any())->method('getSettingsBag')
+            ->will($this->returnValue($this->settings));
     }
 
     /**
@@ -37,7 +52,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        unset($this->transport, $this->soapClientMock, $this->settings);
+        unset($this->transport, $this->transportEntity, $this->soapClientMock, $this->settings);
     }
 
     /**
@@ -51,18 +66,11 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
             ->method('getSoapClient')
             ->will($this->returnValue($this->soapClientMock));
 
-        $this->settings->expects($this->at(0))
-            ->method('get')
-            ->with('wsdl_url')
-            ->will($this->returnValue('http://localhost.not.exists/?wsdl'));
-        $this->settings->expects($this->at(1))
-            ->method('get')
-            ->with('debug')
-            ->will($this->returnValue($isDebug));
+        $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
+        $this->settings->set('debug', $isDebug);
 
         try {
-            $result = $this->transport->init($this->settings);
-            $this->assertTrue($result);
+            $this->transport->init($this->transportEntity);
         } catch (\SoapFault $e) {
             $this->assertNotEmpty($e->getMessage());
         }
@@ -75,16 +83,10 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test init method errors
-     *
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testInitErrors()
     {
-        $this->settings->expects($this->at(0))
-            ->method('get')
-            ->with('wsdl_url')
-            ->will($this->returnValue(null));
-
-        $this->transport->init($this->settings);
+        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->transport->init($this->transportEntity);
     }
 }

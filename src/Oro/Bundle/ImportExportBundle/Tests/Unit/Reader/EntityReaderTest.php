@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,7 +59,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $iterator->expects($this->at(10))->method('valid')->will($this->returnValue(false));
         $iterator->expects($this->at(11))->method('valid')->will($this->returnValue(false));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');
@@ -84,7 +85,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         $iterator = new \ArrayIterator(array($fooEntity, $barEntity, $bazEntity));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');
@@ -108,7 +109,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
         $stepExecution->expects($this->never())->method($this->anything());
@@ -182,6 +183,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $classMetadata->expects($this->once())->method('getAssociationMappings')->will($this->returnValue(array()));
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(['id']));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->once())->method('getClassMetadata')
@@ -250,7 +254,6 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-
         $classMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->will(
@@ -260,12 +263,19 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
                     )
                 )
             );
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(['id']));
+
         $queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('_test');
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('o.test', '_test');
+        $queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with('o.id', 'ASC');
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
@@ -297,7 +307,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStepExecution($context)
     {
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
 

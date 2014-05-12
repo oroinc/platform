@@ -1,0 +1,14 @@
+{% extends 'OroEmbeddedFormBundle::base.html.twig' %}
+
+{% block stylesheet %}
+    {{ parent() }}
+
+    <style type="text/css">
+        {{ formEntity.css|raw }}
+    </style>
+
+{% endblock %}
+
+{% block page %}
+    {% include [customFormLayout, 'OroEmbeddedFormBundle:EmbedForm:formLayout.html.twig'] with {'form': form} %}
+{% endblock %}

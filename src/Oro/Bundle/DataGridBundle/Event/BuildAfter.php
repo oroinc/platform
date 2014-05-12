@@ -14,18 +14,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
  */
 class BuildAfter extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.datgrid.build.after';
+    const NAME = 'oro_datagrid.datagrid.build.after';
 
     /** @var DatagridInterface */
     protected $datagrid;
 
-    /** @var array */
-    protected $parameters;
-
-    public function __construct(DatagridInterface $datagrid, array $parameters = array())
+    public function __construct(DatagridInterface $datagrid)
     {
         $this->datagrid = $datagrid;
-        $this->parameters = $parameters;
     }
 
     /**
@@ -34,13 +30,5 @@ class BuildAfter extends Event implements GridEventInterface
     public function getDatagrid()
     {
         return $this->datagrid;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
     }
 }

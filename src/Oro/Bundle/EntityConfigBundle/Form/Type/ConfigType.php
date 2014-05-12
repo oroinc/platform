@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigType extends AbstractType
 {
@@ -29,19 +29,19 @@ class ConfigType extends AbstractType
     protected $translator;
 
     /**
-     * @var OrmTranslationMetadataCache
+     * @var DynamicTranslationMetadataCache
      */
     protected $dbTranslationMetadataCache;
 
     /**
      * @param ConfigManager $configManager
      * @param Translator    $translator
-     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
+     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
         ConfigManager $configManager,
         Translator $translator,
-        OrmTranslationMetadataCache $dbTranslationMetadataCache
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
@@ -61,6 +61,29 @@ class ConfigType extends AbstractType
             $fieldName  = $configModel->getFieldName();
             $fieldType  = $configModel->getType();
             $configType = PropertyConfigContainer::TYPE_FIELD;
+
+            /**
+             * Add read only field name and field type
+             */
+            $builder->add(
+                'fieldName',
+                'text',
+                array(
+                    'block'     => 'entity',
+                    'disabled'  => true,
+                    'data'      => $fieldName,
+                )
+            );
+            $builder->add(
+                'type',
+                'choice',
+                array(
+                    'choices'     => [],
+                    'block'       => 'entity',
+                    'disabled'    => true,
+                    'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
+                )
+            );
         } else {
             $className  = $configModel->getClassName();
             $fieldName  = null;
@@ -70,7 +93,8 @@ class ConfigType extends AbstractType
 
         foreach ($this->configManager->getProviders() as $provider) {
             if ($provider->getPropertyConfig()->hasForm($configType, $fieldType)) {
-                $config = $provider->getConfig($className, $fieldName);
+                $config = $this->configManager->getConfig($provider->getId($className, $fieldName, $fieldType));
+
                 $builder->add(
                     $provider->getScope(),
                     new ConfigScopeType(

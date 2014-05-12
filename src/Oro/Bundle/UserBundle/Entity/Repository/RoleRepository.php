@@ -5,13 +5,14 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class RoleRepository extends EntityRepository
 {
     /**
-     * Get user query builder
+     * Returns a query builder which can be used to get a list of users assigned to the given role
      *
-     * @param  Role         $role
+     * @param  Role $role
      * @return QueryBuilder
      */
     public function getUserQueryBuilder(Role $role)
@@ -22,5 +23,36 @@ class RoleRepository extends EntityRepository
             ->join('u.roles', 'role')
             ->where('role = :role')
             ->setParameter('role', $role);
+    }
+
+    /**
+     * Checks if there are at least one user assigned to the given role
+     *
+     * @param Role $role
+     * @return bool
+     */
+    public function hasAssignedUsers(Role $role)
+    {
+        $findResult = $this->getUserQueryBuilder($role)
+            ->select('role.id')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getArrayResult();
+
+        return !empty($findResult);
+    }
+
+    /**
+     * @param Role $role
+     * @return User
+     */
+    public function getFirstMatchedUser(Role $role)
+    {
+        return $this
+            ->getUserQueryBuilder($role)
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

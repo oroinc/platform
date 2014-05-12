@@ -5,23 +5,49 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
+
 class AttributeManager
 {
     /**
-     * @var Collection
+     * @var string
+     */
+    protected $entityAttributeName;
+
+    /**
+     * @var Attribute[]|Collection
      */
     protected $attributes;
 
     /**
-     * @param Collection $attributes
+     * @param Attribute[]|Collection $attributes
      */
-    public function __construct(Collection $attributes = null)
+    public function __construct($attributes = null)
     {
-        $this->attributes = $attributes ?: new ArrayCollection();
+        $this->setAttributes($attributes);
     }
 
     /**
-     * @return Collection
+     * @param string $entityAttributeName
+     * @return AttributeManager
+     */
+    public function setEntityAttributeName($entityAttributeName)
+    {
+        $this->entityAttributeName = $entityAttributeName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
+    }
+
+    /**
+     * @return Attribute[]|Collection
      */
     public function getAttributes()
     {
@@ -30,20 +56,18 @@ class AttributeManager
 
     /**
      * @param Attribute[]|Collection $attributes
-     * @return Workflow
+     * @return AttributeManager
      */
     public function setAttributes($attributes)
     {
-        if ($attributes instanceof Collection) {
-            $this->attributes = $attributes;
-        } else {
-            $data = array();
+        $data = array();
+        if ($attributes) {
             foreach ($attributes as $attribute) {
                 $data[$attribute->getName()] = $attribute;
             }
             unset($attributes);
-            $this->attributes = new ArrayCollection($data);
         }
+        $this->attributes = new ArrayCollection($data);
 
         return $this;
     }
@@ -58,47 +82,41 @@ class AttributeManager
     }
 
     /**
-     * Get attributes with option "managed_entity"
+     * Get related entity attribute
      *
-     * @return Collection|Attribute[]
+     * @return Attribute
+     * @throws UnknownAttributeException
      */
-    public function getManagedEntityAttributes()
+    public function getEntityAttribute()
     {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('managed_entity');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes that require binding
-     *
-     * @return Collection|Attribute[]
-     */
-    public function getBindEntityAttributes()
-    {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('bind');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes names that require binding
-     *
-     * @return array
-     */
-    public function getBindEntityAttributeNames()
-    {
-        $result = array();
-
-        /** @var Attribute $attribute  */
-        foreach ($this->getBindEntityAttributes() as $attribute) {
-            $result[] = $attribute->getName();
+        if (!$this->attributes->containsKey($this->entityAttributeName)) {
+            throw new UnknownAttributeException('There is no entity attribute');
         }
 
-        return $result;
+        return $this->attributes->get($this->entityAttributeName);
+    }
+
+    /**
+     * @param string $type
+     * @return Collection|Attribute[]
+     */
+    public function getAttributesByType($type)
+    {
+        return $this->attributes->filter(
+            function ($attribute) use ($type) {
+                /** @var Attribute $attribute */
+                return $attribute->getType() == $type;
+            }
+        );
+    }
+
+    /**
+     * Get list of all attributes with type entity
+     *
+     * @return Collection|Attribute[]
+     */
+    public function getEntityAttributes()
+    {
+        return $this->getAttributesByType('entity');
     }
 }

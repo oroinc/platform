@@ -1,5 +1,5 @@
 {% macro renderTransitionButton(workflow, transition, workflowItem, transitionData) %}
-    {% if (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
+    {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
         {% set transitionData = transitionData|merge({
             'dialog-url': path(
                 'oro_workflow_widget_transition_form',
@@ -23,7 +23,7 @@
         }) %}
     {% endif %}
 
-    {% if not transitionData['enabled'] and transitionData['transition-condition-messages'] %}
+    {% if transitionData['transition-condition-messages'] %}
         {% set conditionMessages = [] %}
         {% for error in transitionData['transition-condition-messages'] %}
             {% set conditionMessages = conditionMessages|merge(['<li>' ~ error.message|trans(error.parameters) ~ '</li>']) %}
@@ -47,7 +47,8 @@
             data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
         {% endif %}
         title="{{ transition.label|trans }}"
-        class="btn icons-holder-text no-hash
+        class="btn icons-holder-text
+            {% if transition.displayType == 'dialog' %}no-hash{% endif %}
             {% if not transitionData.enabled %}disabled{% endif %}
             {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}"
         id="transition-{{ workflow.name }}-{{ transition.name }}">
@@ -60,7 +61,7 @@
 
 {% macro renderTransitionsJs(transitionsData, blockId) %}
     <script type="text/javascript">
-        require(['jquery', 'oro/workflow-transition-handler', 'popover-extra-placements'],
+        require(['jquery', 'oroworkflow/js/transition-handler'],
         function($, workflowTransitionHandler) {
             'use strict';
 
@@ -69,6 +70,7 @@
                 {% for data in transitionsData %}
                 (function(transitionBtn) {
                     if (transitionBtn.data('enabled')) {
+                        {% if data.transition.displayType == 'dialog' %}
                         transitionBtn.data('executor', function() {
                             workflowTransitionHandler.call(transitionBtn);
                         });
@@ -76,7 +78,8 @@
                             e.preventDefault();
                             $(this).data('executor').call();
                         });
-                        transitionBtn.trigger('transitionHandlerInitialized');
+                        {% endif %}
+                        //transitionBtn.trigger('transitionHandlerInitialized');
                     } else {
                         transitionBtn.on('click', function(e) {
                             e.preventDefault();
@@ -84,7 +87,8 @@
                         if (transitionBtn.data('transition-condition-messages')) {
                             transitionBtn.popover({
                                 'html': true,
-                                'placement': 'bottomRight',
+                                'placement': 'bottom',
+                                'container': $('body'),
                                 'trigger': 'hover',
                                 'title': '<i class="icon-exclamation-sign"></i>' + {{ 'Unmet conditions'|trans|json_encode|raw }},
                                 'content': transitionBtn.data('transition-condition-messages')
@@ -95,5 +99,35 @@
                 {% endfor %}
             });
         });
+    </script>
+{% endmacro %}
+
+{% macro renderResetButton(data, blockId) %}
+    {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
+    <a href="javascript:void(0);"
+       data-url="{{ data.url }}"
+       title="{{ data.title|trans }}"
+       class="btn icons-holder-text btn-primary"
+       id="{{ resetButtonId }}">
+            <i class="icon-repeat"></i>
+            {{ data.title|trans }}
+    </a>
+
+    <script type="text/javascript">
+        require(['jquery', 'oroworkflow/js/reset-handler'],
+            function($, workflowResetHandler) {
+                'use strict';
+
+                $(function() {
+                    var resetBtn = $('#{{ blockId }}').find('#{{ resetButtonId }}');
+                    resetBtn.data('executor', function() {
+                        workflowResetHandler.call(resetBtn);
+                    });
+                    resetBtn.on('click', function(e) {
+                        e.preventDefault();
+                        $(this).data('executor').call();
+                    });
+                });
+            });
     </script>
 {% endmacro %}

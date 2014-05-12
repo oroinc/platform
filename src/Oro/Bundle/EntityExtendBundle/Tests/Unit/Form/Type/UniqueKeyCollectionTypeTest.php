@@ -17,9 +17,9 @@ class UniqueKeyCollectionTypeTest extends TypeTestCase
         parent::setUp();
 
         $this->fields = array(
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'firstName', 'string'),
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'lastName', 'string'),
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'email', 'string'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'firstName', 'string'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'lastName', 'string'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'email', 'string'),
         );
 
         $this->type = new UniqueKeyCollectionType($this->fields);

@@ -1,16 +1,17 @@
 oro_menu_config:
     items:
         oro_tag_list:
-            label: oro.tag.entity_plural_label
-            route: oro_tag_index
+            label: 'oro.tag.entity_plural_label'
+            route: 'oro_tag_index'
             extras:
-                routes: ['oro_tag_*']
-                description: Tags list
+                position:    90
+                routes:      ['oro_tag_*']
+                description: 'oro.tag.menu.tag_list.description'
         shortcut_new_tag:
-            label: Create new tag
-            route: oro_tag_create
+            label: 'oro.tag.menu.shortcut_new_tag.label'
+            route: 'oro_tag_create'
             extras:
-                description: Create new tag
+                description: 'oro.tag.menu.shortcut_new_tag.description'
     tree:
         application_menu:
             children:
@@ -23,6 +24,6 @@ oro_menu_config:
 
 oro_titles:
     oro_tag_index:  ~
-    oro_tag_update: %%tag.name%% Tag - Edit
-    oro_tag_create: Create Tag
-    oro_tag_search: Records tagged as "%%tag.name%%"
+    oro_tag_update: '%%tag.name%% Tag - Edit'
+    oro_tag_create: 'Create Tag'
+    oro_tag_search: 'Records tagged as "%%tag.name%%"'

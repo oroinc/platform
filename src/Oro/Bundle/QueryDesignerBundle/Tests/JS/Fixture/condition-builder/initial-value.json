@@ -1,0 +1,9 @@
+[
+    {"criteria": "matrix-condition", "great": 10},
+    "AND",
+    [
+        {"equal": 5},
+        "OR",
+        {"criteria": "matrix-condition", "less": 8}
+    ]
+]

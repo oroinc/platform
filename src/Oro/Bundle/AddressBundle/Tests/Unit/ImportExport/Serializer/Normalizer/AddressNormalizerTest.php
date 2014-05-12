@@ -111,7 +111,7 @@ class AddressNormalizerTest extends \PHPUnit_Framework_TestCase
             ),
             'with_country_and_region' => array(
                 $this->createAddress()
-                    ->setRegion($this->createRegion('US.CA')->setCode('CA'))
+                    ->setRegion($this->createRegion('US-CA')->setCode('CA'))
                     ->setCountry($this->createCountry('US'))
                 ,
                 array(
@@ -157,7 +157,7 @@ class AddressNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $address = $this->normalizer->denormalize(
             array(
-                'region' => $this->createRegion('US.CA')->setCode('CA')
+                'region' => $this->createRegion('US-CA')->setCode('CA')
             ),
             self::ADDRESS_TYPE
         );

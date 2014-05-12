@@ -32,6 +32,30 @@ oro_system_configuration:
         platform:
             title: 'New title' # overridden title
 ```
+
+To customize system configuration form without implementing own form type, it is possible to use configurator when
+defining form-level group. Configurator is callable with static access syntax.
+```
+oro_system_configuration:
+    groups:
+        custom_group:
+            title: 'Settings form'
+             configurator: Acme\Bundle\DemoBundle\SettingsFormConfigurator::buildForm
+```
+
+This will call buildForm method from Acme\Bundle\DemoBundle\SettingsFormConfigurator class with parameters, so it will
+be possible to modify form.
+```
+class SettingsFormConfigurator
+{
+    public static function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        // put your configuration code here
+        $form = $builder->getForm();
+    }
+}
+```
+
 #### Fields
 Field declaration have required property `type`.
 `type` - refers to form type of which field should be created
@@ -49,6 +73,7 @@ oro_system_configuration:
             type: text # can be any custom type
             options:
                label: 'Date format'
+               resettable: false  # should "use default checkbox" be shown(optional, default: true)
                # here we can override any default option of the given form type
                # also here can be added field tooltips
             tooltip: 'Some additional information'

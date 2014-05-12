@@ -6,8 +6,8 @@ use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
 
 class EntityReaderTestAdapter extends EntityReader
 {
-    public function setSourceIterator(\Iterator $iterator)
+    public function setSomeSourceIterator(\Iterator $iterator)
     {
-        $this->sourceIterator = $iterator;
+        $this->setSourceIterator($iterator);
     }
 }

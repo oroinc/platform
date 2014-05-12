@@ -33,14 +33,14 @@ class Title
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255)
+     * @ORM\Column(name="title", type="text")
      */
     private $title;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="short_title", type="string", length=255)
+     * @ORM\Column(name="short_title", type="text")
      */
     private $shortTitle;
 

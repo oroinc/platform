@@ -4,42 +4,33 @@ namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class FieldConfigGridListener extends AbstractConfigGridListener
 {
     const GRID_NAME = 'entityfields-grid';
     const ENTITY_PARAM = 'entityId';
 
-    /** @var  RequestParameters */
-    protected $requestParams;
-
     /**
-     * @param ConfigManager $configManager
-     * @param RequestParameters $requestParams
+     * @var ParameterBag
      */
-    public function __construct(ConfigManager $configManager, RequestParameters $requestParams)
-    {
-        parent::__construct($configManager);
-
-        $this->requestParams = $requestParams;
-    }
+    protected $parameters;
 
     /**
      * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
+            $this->parameters = $datagrid->getParameters();
             $queryBuilder = $datasource->getQueryBuilder();
-
             $this->prepareQuery($queryBuilder, 'cf', 'cfv_', PropertyConfigContainer::TYPE_FIELD);
         }
     }
@@ -58,7 +49,7 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $alias, $itemsType)
     {
-        $entityId = $this->requestParams->get(self::ENTITY_PARAM, 0);
+        $entityId = $this->parameters->get(self::ENTITY_PARAM, 0);
 
         $query->where($rootAlias.'.mode <> :mode');
         $query->setParameter('mode', ConfigModelManager::MODE_HIDDEN);

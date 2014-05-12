@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 class DoctrineClearWriter implements ItemWriterInterface
 {

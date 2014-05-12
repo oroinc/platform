@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\Condition;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EqualToTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,7 +53,7 @@ class EqualToTest extends \PHPUnit_Framework_TestCase
     protected function getMockDoctrineHelper()
     {
         if (!$this->doctrineHelper) {
-            $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\DoctrineHelper')
+            $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
                 ->disableOriginalConstructor()
                 ->getMock();
         }

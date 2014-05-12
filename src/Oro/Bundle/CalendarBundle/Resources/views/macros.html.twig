@@ -6,7 +6,7 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
-            form_row(form.reminder),
+            form_row(form.reminders)
         ]
     %}
     <div class="alert alert-error" style="display: none;"></div>
@@ -39,8 +39,8 @@
 
 {% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions, callbackMacro) %}
 <script type="text/javascript">
-    require(['jquery', 'underscore', 'oro/calendar', 'oro/calendar/event/collection',
-        'oro/calendar/connection/collection', 'oro/locale-settings'],
+    require(['jquery', 'underscore', 'orocalendar/js/calendar', 'orocalendar/js/calendar/event/collection',
+        'orocalendar/js/calendar/connection/collection', 'orolocale/js/locale-settings'],
     function($, _, Calendar, EventCollection, ConnectionCollection, localeSettings){
         var connections = new ConnectionCollection();
         connections.reset({{ render(path('oro_api_get_calendar_connections', {id: entity.id})) }});
@@ -68,7 +68,7 @@
                 {% if eventsOptions.contentHeight is defined %}
                 contentHeight: {{ eventsOptions.contentHeight|json_encode|raw }},
                 {% endif %}
-                date: "{{ 'now'|date('Y-m-d') }}",
+                date: "{{ 'now'|date('c') }}",
                 firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
                 {% if eventsOptions.firstHour is defined %}
                 firstHour: {{ eventsOptions.firstHour|json_encode|raw }},

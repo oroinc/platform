@@ -1,11 +1,12 @@
 oro_menu_config:
     items:
         entities_list:
-            label: 'Entities'
+            label: 'oro.entity_config.menu.entities_list.label'
             route: 'oro_entityconfig_index'
             extras:
-                routes: ['oro_entityconfig*', 'oro_entityextend*']
-                description: 'List of entities'
+                position:    80
+                routes:      ['oro_entityconfig*', 'oro_entityextend*']
+                description: 'oro.entity_config.menu.entities_list.description'
 
     tree:
         application_menu:
@@ -16,6 +17,6 @@ oro_menu_config:
 
 oro_titles:
     oro_entityconfig_index: ~
-    oro_entityconfig_view: %%entityName%%
-    oro_entityconfig_update: %%entityName%%
-    oro_entityconfig_field_update: %%fieldName%% - %%entityName%%
+    oro_entityconfig_view: '%%entityName%%'
+    oro_entityconfig_update: '%%entityName%%'
+    oro_entityconfig_field_update: '%%fieldName%% - %%entityName%%'

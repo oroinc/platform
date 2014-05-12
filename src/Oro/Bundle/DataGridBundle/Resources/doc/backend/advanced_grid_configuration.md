@@ -23,10 +23,9 @@ This param will be passed to request and could be applied to datasource in build
         class: %oro_datagrid.event_listener.base_orm_relation.class%
         arguments:
           - groupId # param name
-          - @oro_datagrid.datagrid.request_params
           - false   # edit mode disabled
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.GRID_NAME, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.GRID_NAME, method: onBuildAfter }
 ```
 #### Problem:
 Let's take previous problem, but in additional we need to fill some form field dependent on grid state.
@@ -80,7 +79,7 @@ datagrid:
         options:
             entityHint: account
             requireJSModules:
-              - oro/datagrid/column-form-listener
+              - orodatagrid/js/datagrid/listener/column-form-listener
             columnListener:
                 dataField: id
                 columnName: isAssigned    # frontend column name

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
@@ -18,16 +19,41 @@ abstract class AbstractConfigurationProvider
     protected $kernelBundles = array();
 
     /**
-     * @var array
-     */
-    protected $usedDirectories = null;
-
-    /**
      * @param array $kernelBundles
      */
     public function __construct(array $kernelBundles)
     {
         $this->kernelBundles = $kernelBundles;
+    }
+
+    /**
+     * @param array $directoriesWhiteList
+     * @return Finder
+     */
+    protected function getConfigFinder(array $directoriesWhiteList = array())
+    {
+        $configDirectories = $this->getConfigDirectories($directoriesWhiteList);
+
+        // prepare finder
+        $finder = new Finder();
+        $finder->in($configDirectories)->name($this->getConfigFilePattern());
+
+        if ($directoriesWhiteList) {
+            $finder->filter(
+                function ($file) use ($directoriesWhiteList) {
+                    foreach ($directoriesWhiteList as $allowedDirectory) {
+                        if ($allowedDirectory &&
+                            strpos($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR) === 0
+                        ) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            );
+        }
+
+        return $finder;
     }
 
     /**
@@ -50,58 +76,36 @@ abstract class AbstractConfigurationProvider
     }
 
     /**
-     * @return Finder
+     * Load config file and include imports.
+     *
+     * @param \SplFileInfo $file
+     * @throws InvalidConfigurationException
+     * @return array
      */
-    protected function getConfigFinder()
+    protected function loadConfigFile(\SplFileInfo $file)
     {
-        $configDirectories = $this->getConfigDirectories();
+        $realPathName = $file->getRealPath();
+        $configData = Yaml::parse($realPathName);
 
-        // prepare finder
-        $finder = new Finder();
-        $finder->in($configDirectories)->name($this->getConfigFilePattern());
-
-        return $finder;
-    }
-
-    /**
-     * @param array $directories
-     */
-    protected function setUsedDirectories(array $directories = null)
-    {
-        if ($directories) {
-            foreach ($directories as $key => $directory) {
-                if (is_dir($directory) && is_readable($directory)) {
-                    $directories[$key] = rtrim(realpath($directory), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-                } else {
-                    unset($directories[$key]);
+        if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
+            $imports = $configData['imports'];
+            unset($configData['imports']);
+            foreach ($imports as $importData) {
+                if (array_key_exists('resource', $importData)) {
+                    $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
+                    if ($resourceFile->isReadable()) {
+                        $includedData = $this->loadConfigFile($resourceFile);
+                        $configData = array_merge_recursive($configData, $includedData);
+                    } else {
+                        throw new InvalidConfigurationException(
+                            sprintf('Resource "%s" is unreadable', $resourceFile->getBasename())
+                        );
+                    }
                 }
             }
         }
 
-        $this->usedDirectories = $directories;
-    }
-
-    /**
-     * @param string $fileName
-     * @return bool
-     */
-    protected function isFileAllowed($fileName)
-    {
-        if (!is_file($fileName) || !is_readable($fileName)) {
-            return false;
-        }
-
-        if (null === $this->usedDirectories) {
-            return true;
-        }
-
-        foreach ($this->usedDirectories as $usedDirectory) {
-            if (strpos($fileName, $usedDirectory) === 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return $configData;
     }
 
     /**

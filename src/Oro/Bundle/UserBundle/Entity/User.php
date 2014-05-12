@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -20,16 +21,13 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\ImapBundle\Entity\ImapConfigurationOwnerInterface;
-
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tag;
-
+use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\UserBundle\Model\ExtendUser;
@@ -40,7 +38,7 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyFields)
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
  * @ORM\Table(name="oro_user")
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
@@ -58,6 +56,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "form"={
+ *              "form_type"="oro_user_select"
  *          }
  *      }
  * )
@@ -70,12 +71,13 @@ class User extends ExtendUser implements
     Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
-    ImapConfigurationOwnerInterface,
     FullNameInterface,
-    NotificationEmailInterface
+    NotificationEmailInterface,
+    AdvancedApiUserInterface
 {
-    const ROLE_DEFAULT   = 'ROLE_USER';
-    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_DEFAULT       = 'ROLE_USER';
+    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * @ORM\Id
@@ -351,14 +353,15 @@ class User extends ExtendUser implements
     protected $businessUnits;
 
     /**
-     * @var ImapEmailOrigin
+     * @var EmailOrigin[]
      *
-     * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin", cascade={"all"}
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
+     * @ORM\JoinTable(name="oro_user_email_origin",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @ORM\JoinColumn(name="imap_configuration_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
      */
-    protected $imapConfiguration;
+    protected $emailOrigins;
 
     /**
      * @var \DateTime $createdAt
@@ -382,6 +385,7 @@ class User extends ExtendUser implements
         $this->statuses        = new ArrayCollection();
         $this->emails          = new ArrayCollection();
         $this->businessUnits   = new ArrayCollection();
+        $this->emailOrigins    = new ArrayCollection();
     }
 
     /**
@@ -440,13 +444,13 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Get name of field contains the primary email address
+     * Get names of fields contain email addresses
      *
-     * @return string
+     * @return string[]|null
      */
-    public function getPrimaryEmailField()
+    public function getEmailFields()
     {
-        return 'email';
+        return ['email'];
     }
 
     /**
@@ -645,6 +649,14 @@ class User extends ExtendUser implements
     public function getApi()
     {
         return $this->api;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getApiKey()
+    {
+        return $this->api ? $this->getApi()->getApiKey() : uniqid('undefined');
     }
 
     /**
@@ -1375,24 +1387,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getImapConfiguration()
-    {
-        return $this->imapConfiguration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setImapConfiguration(ImapEmailOrigin $imapConfiguration = null)
-    {
-        $this->imapConfiguration = $imapConfiguration;
-
-        return $this;
-    }
-
-    /**
      * @return BusinessUnit
      */
     public function getOwner()
@@ -1417,5 +1411,83 @@ class User extends ExtendUser implements
     public function getNotificationEmails()
     {
         return new ArrayCollection([$this->getEmail()]);
+    }
+
+    /**
+     * Get IMAP configuration
+     *
+     * @return ImapEmailOrigin
+     */
+    public function getImapConfiguration()
+    {
+        $items = $this->emailOrigins->filter(
+            function ($item) {
+                return $item instanceof ImapEmailOrigin;
+            }
+        );
+
+        return $items->isEmpty()
+            ? null
+            : $items->first();
+    }
+
+    /**
+     * Set IMAP configuration
+     *
+     * @param ImapEmailOrigin $imapConfiguration
+     *
+     * @return $this
+     */
+    public function setImapConfiguration(ImapEmailOrigin $imapConfiguration = null)
+    {
+        $currentImapConfiguration = $this->getImapConfiguration();
+        if (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration) {
+            // deactivate current IMAP configuration and remove a reference to it
+            if ($currentImapConfiguration) {
+                $currentImapConfiguration->setIsActive(false);
+                $this->removeEmailOrigin($currentImapConfiguration);
+            }
+        }
+        if (null !== $imapConfiguration) {
+            $this->addEmailOrigin($imapConfiguration);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get email origins assigned to user
+     *
+     * @return EmailOrigin[]|ArrayCollection
+     */
+    public function getEmailOrigins()
+    {
+        return $this->emailOrigins;
+    }
+
+    /**
+     * Add email origin
+     *
+     * @param EmailOrigin $emailOrigin
+     * @return User
+     */
+    public function addEmailOrigin(EmailOrigin $emailOrigin)
+    {
+        $this->emailOrigins->add($emailOrigin);
+
+        return $this;
+    }
+
+    /**
+     * Delete email origin
+     *
+     * @param EmailOrigin $emailOrigin
+     * @return User
+     */
+    public function removeEmailOrigin(EmailOrigin $emailOrigin)
+    {
+        $this->emailOrigins->removeElement($emailOrigin);
+
+        return $this;
     }
 }

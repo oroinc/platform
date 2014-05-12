@@ -22,6 +22,13 @@ interface ApiRequestInterface
     public function execute();
 
     /**
+     * Returns response code
+     *
+     * @return int
+     */
+    public function getResponseCode();
+
+    /**
      * Close curl resource
      *
      * @return void

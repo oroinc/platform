@@ -3,20 +3,35 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class DoctrineSubscriber implements EventSubscriber
 {
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     *
+     * TODO: remove ' = null' in the next release. It is related to https://magecore.atlassian.net/browse/BAP-3543
+     */
+    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator = null)
+    {
+        $this->nameGenerator = $nameGenerator;
+    }
+
     /**
      * @return array
      */
@@ -35,10 +50,10 @@ class DoctrineSubscriber implements EventSubscriber
         /** @var OroEntityManager $em */
         $em = $event->getEntityManager();
 
-        $configProvider = $em->getExtendManager()->getConfigProvider();
+        $configProvider = $em->getExtendConfigProvider();
         $className      = $event->getClassMetadata()->getName();
 
-        if ($configProvider->hasConfig($className)) {
+        if (!ConfigHelper::isConfigModelEntity($className) && $configProvider->hasConfig($className)) {
             $config = $configProvider->getConfig($className);
             if ($config->is('is_extend')) {
                 $cmBuilder = new ClassMetadataBuilder($event->getClassMetadata());
@@ -47,11 +62,12 @@ class DoctrineSubscriber implements EventSubscriber
                     foreach ($config->get('index') as $columnName => $enabled) {
                         $fieldConfig = $configProvider->getConfig($className, $columnName);
 
-                        if ($enabled && !$fieldConfig->is('state', ExtendManager::STATE_NEW)) {
-                            $cmBuilder->addIndex(
-                                array(ExtendConfigDumper::FIELD_PREFIX . $columnName),
-                                'oro_idx_' . $columnName
+                        if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                            $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
+                                $className,
+                                $columnName
                             );
+                            $cmBuilder->addIndex([$columnName], $indexName);
                         }
                     }
                 }
@@ -70,17 +86,19 @@ class DoctrineSubscriber implements EventSubscriber
     protected function prepareRelations(ConfigInterface $config, ClassMetadataBuilder $cmBuilder)
     {
         if ($config->is('relation')) {
-            foreach ($config->get('relation') as $relation) {
-                /** @var FieldConfigId $fieldId */
-                if ($relation['assign'] && $fieldId = $relation['field_id']) {
+            $relations = $config->get('relation');
+            foreach ($relations as $relation) {
+                /** @var FieldConfigId|Config $fieldId */
+                $fieldId = $relation['field_id'];
+                if ($relation['assign'] && $fieldId) {
                     /** @var FieldConfigId $targetFieldId */
                     $targetFieldId = $relation['target_field_id'];
 
                     $targetFieldName = $targetFieldId
-                        ? ExtendConfigDumper::FIELD_PREFIX . $targetFieldId->getFieldName()
+                        ? $targetFieldId->getFieldName()
                         : null;
 
-                    $fieldName   = ExtendConfigDumper::FIELD_PREFIX . $fieldId->getFieldName();
+                    $fieldName   = $fieldId->getFieldName();
                     $defaultName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName();
 
                     switch ($fieldId->getFieldType()) {
@@ -120,8 +138,9 @@ class DoctrineSubscriber implements EventSubscriber
                                 }
 
                                 $builder->setJoinTable(
-                                    ExtendHelper::generateManyToManyJoinTableName(
-                                        $fieldId,
+                                    $this->nameGenerator->generateManyToManyJoinTableName(
+                                        $fieldId->getClassName(),
+                                        $fieldId->getFieldName(),
                                         $relation['target_entity']
                                     )
                                 );

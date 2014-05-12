@@ -1,0 +1,2 @@
+bundles:
+    - OroEntityMergeBundle:Form:fields.html.twig

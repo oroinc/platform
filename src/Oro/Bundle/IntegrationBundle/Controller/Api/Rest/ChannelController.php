@@ -11,9 +11,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
  * @RouteResource("channel")
@@ -40,15 +40,13 @@ class ChannelController extends FOSRestController
      */
     public function deleteAction($id)
     {
-        $entity = $this->getManager()->find($id);
+        $entity   = $this->getManager()->find($id);
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-
-        $em = $this->getManager()->getObjectManager();
-        $em->remove($entity);
-        $em->flush();
-
+        if (!$this->get('oro_integration.channel_delete_manager')->deleteChannel($entity)) {
+            return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
+        }
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 

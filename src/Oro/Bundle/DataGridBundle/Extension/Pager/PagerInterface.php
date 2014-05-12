@@ -5,6 +5,16 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 interface PagerInterface
 {
     /**
+     * Pager parameters
+     */
+    const PAGER_ROOT_PARAM = '_pager';
+    const PAGE_PARAM       = '_page';
+    const PER_PAGE_PARAM   = '_per_page';
+    const DISABLED_PARAM   = '_disabled';
+
+    const TOTAL_PATH_PARAM = '[options][totalRecords]';
+
+    /**
      * Initialize the pager.
      *
      * @return void

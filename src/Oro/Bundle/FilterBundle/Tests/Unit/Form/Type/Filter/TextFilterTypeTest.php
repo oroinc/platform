@@ -51,6 +51,8 @@ class TextFilterTypeTest extends AbstractTypeTestCase
                         TextFilterType::TYPE_EQUAL        => 'oro.filter.form.label_type_equals',
                         TextFilterType::TYPE_STARTS_WITH  => 'oro.filter.form.label_type_start_with',
                         TextFilterType::TYPE_ENDS_WITH    => 'oro.filter.form.label_type_end_with',
+                        TextFilterType::TYPE_IN           => 'oro.filter.form.label_type_in',
+                        TextFilterType::TYPE_NOT_IN       => 'oro.filter.form.label_type_not_in',
                     )
                 )
             )

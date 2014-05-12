@@ -39,6 +39,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             'stepTo' => array('stepTo', $this->getStepMock('testStep')),
             'frontendOptions' => array('frontendOptions', array('key' => 'value')),
             'form_type' => array('formType', 'custom_workflow_transition'),
+            'display_type' => array('displayType', 'page'),
             'form_options' => array('formOptions', array('one', 'two')),
             'pre_condition' => array(
                 'preCondition',
@@ -218,7 +219,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $workflowItem->expects($this->never())
-            ->method('setCurrentStepName');
+            ->method('setCurrentStep');
 
         $preCondition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface');
         $preCondition->expects($this->any())
@@ -260,20 +261,29 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransit($isFinal, $hasAllowedTransition)
     {
+        $currentStepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition, $currentStepEntity);
+
+        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowDefinition->expects($this->once())
+            ->method('getStepByName')
+            ->with($step->getName())
+            ->will($this->returnValue($currentStepEntity));
+
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
         $workflowItem->expects($this->once())
-            ->method('setCurrentStepName')
-            ->with('currentStep');
-        if ($isFinal || !$hasAllowedTransition) {
-            $workflowItem->expects($this->once())
-                ->method('setClosed')
-                ->with(true);
-        } else {
-            $workflowItem->expects($this->never())
-                ->method('setClosed');
-        }
+            ->method('getDefinition')
+            ->will($this->returnValue($workflowDefinition));
+        $workflowItem->expects($this->once())
+            ->method('setCurrentStep')
+            ->with($currentStepEntity);
 
         $preCondition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface');
         $preCondition->expects($this->once())
@@ -291,8 +301,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $postAction->expects($this->once())
             ->method('execute')
             ->with($workflowItem);
-
-        $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition);
 
         $obj = new Transition();
         $obj->setPreCondition($preCondition);
@@ -314,7 +322,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true)
+    protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true, $stepEntity = null)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
             ->disableOriginalConstructor()
@@ -328,6 +336,9 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $step->expects($this->any())
             ->method('hasAllowedTransitions')
             ->will($this->returnValue($hasAllowedTransitions));
+        $step->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($stepEntity));
         return $step;
     }
 
@@ -357,6 +368,12 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($obj->hasForm()); // by default transition has form
 
         $obj->setFormOptions(array('key' => 'value'));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array()));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array('key' => 'value')));
         $this->assertTrue($obj->hasForm());
     }
 }

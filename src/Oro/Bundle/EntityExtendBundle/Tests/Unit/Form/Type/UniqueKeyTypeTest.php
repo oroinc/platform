@@ -15,9 +15,9 @@ class UniqueKeyTypeTest extends TypeTestCase
         parent::setUp();
 
         $fields = array(
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'firstName'),
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'lastName'),
-            new FieldConfigId('Oro\Bundle\UserBundle\Entity\User', 'entity', 'email'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'firstName', 'string'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'lastName', 'string'),
+            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'email', 'string'),
         );
 
         $this->type = new UniqueKeyType($fields);

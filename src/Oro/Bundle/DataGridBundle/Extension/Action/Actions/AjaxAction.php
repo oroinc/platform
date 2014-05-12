@@ -18,6 +18,10 @@ class AjaxAction extends AbstractAction
 
         $options['frontend_type'] = 'ajax';
 
+        if (empty($options['frontend_handle'])) {
+            $options['frontend_handle'] = 'ajax';
+        }
+
         return $options;
     }
 }

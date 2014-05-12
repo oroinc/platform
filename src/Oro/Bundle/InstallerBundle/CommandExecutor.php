@@ -5,8 +5,11 @@ namespace Oro\Bundle\InstallerBundle;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
+
+use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 
 class CommandExecutor
 {
@@ -26,24 +29,45 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var OroDataCacheManager
+     */
+    protected $dataCacheManager;
+
+    /**
+     * @var int
+     */
+    protected $lastCommandExitCode;
+
+    /**
+     * @var int
+     */
+    protected $defaultTimeout = 300;
+
+    /**
      * Constructor
      *
-     * @param string|null     $env
-     * @param OutputInterface $output
-     * @param Application     $application
+     * @param string|null         $env
+     * @param OutputInterface     $output
+     * @param Application         $application
+     * @param OroDataCacheManager $dataCacheManager
      */
-    public function __construct($env, OutputInterface $output, Application $application)
-    {
-        $this->env         = $env;
-        $this->output      = $output;
-        $this->application = $application;
+    public function __construct(
+        $env,
+        OutputInterface $output,
+        Application $application,
+        OroDataCacheManager $dataCacheManager = null
+    ) {
+        $this->env              = $env;
+        $this->output           = $output;
+        $this->application      = $application;
+        $this->dataCacheManager = $dataCacheManager;
     }
 
     /**
      * Launches a command.
      * If '--process-isolation' parameter is specified the command will be launched as a separate process.
      * In this case you can parameter '--process-timeout' to set the process timeout
-     * in seconds. Default timeout is 60 seconds.
+     * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
      *
@@ -52,15 +76,18 @@ class CommandExecutor
      * @return CommandExecutor
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
-    public function runCommand($command, $params = array())
+    public function runCommand($command, $params = [])
     {
         $params = array_merge(
-            array(
+            [
                 'command'    => $command,
                 '--no-debug' => true,
-            ),
+            ],
             $params
         );
+        if (!$params['--no-debug']) {
+            unset($params['--no-debug']);
+        }
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
         }
@@ -72,28 +99,20 @@ class CommandExecutor
 
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
-            $phpFinder = new PhpExecutableFinder();
-            $php       = $phpFinder->find();
-            $pb        = new ProcessBuilder();
+            $pb = new ProcessBuilder();
             $pb
-                ->add($php)
+                ->add($this->getPhp())
                 ->add($_SERVER['argv'][0]);
 
             if (array_key_exists('--process-timeout', $params)) {
                 $pb->setTimeout($params['--process-timeout']);
                 unset($params['--process-timeout']);
+            } else {
+                $pb->setTimeout($this->defaultTimeout);
             }
 
-            foreach ($params as $param => $val) {
-                if ($param && '-' === $param[0]) {
-                    if ($val === true) {
-                        $this->addParameter($pb, $param);
-                    } else {
-                        $this->addParameter($pb, $param, $val);
-                    }
-                } else {
-                    $this->addParameter($pb, $val);
-                }
+            foreach ($params as $name => $val) {
+                $this->processParameter($pb, $name, $val);
             }
 
             $process = $pb
@@ -106,33 +125,78 @@ class CommandExecutor
                     $output->write($data);
                 }
             );
-            $ret = $process->getExitCode();
+            $this->lastCommandExitCode = $process->getExitCode();
+
+            // synchronize all data caches
+            if ($this->dataCacheManager) {
+                $this->dataCacheManager->sync();
+            }
         } else {
             $this->application->setAutoExit(false);
-            $ret = $this->application->run(new ArrayInput($params), $this->output);
+            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
-        if (0 !== $ret) {
-            if ($ignoreErrors) {
-                $this->output->writeln(
-                    sprintf('<error>The command terminated with an error code: %u.</error>', $ret)
-                );
-            } else {
-                throw new \RuntimeException(
-                    sprintf('The command terminated with an error status: %u.', $ret)
-                );
-            }
-        }
+        $this->processResult($ignoreErrors);
 
         return $this;
     }
 
     /**
-     * @param ProcessBuilder $processBuilder
-     * @param string $name
+     * Gets an exit code of last executed command
+     *
+     * @return int
+     */
+    public function getLastCommandExitCode()
+    {
+        return $this->lastCommandExitCode;
+    }
+
+    /**
+     * @param bool $ignoreErrors
+     * @throws \RuntimeException
+     */
+    protected function processResult($ignoreErrors)
+    {
+        if (0 !== $this->lastCommandExitCode) {
+            if ($ignoreErrors) {
+                $this->output->writeln(
+                    sprintf(
+                        '<error>The command terminated with an exit code: %u.</error>',
+                        $this->lastCommandExitCode
+                    )
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
      * @param array|string|null $value
      */
-    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    protected function processParameter(ProcessBuilder $pb, $name, $value)
+    {
+        if ($name && '-' === $name[0]) {
+            if ($value === true) {
+                $this->addParameter($pb, $name);
+            } else {
+                $this->addParameter($pb, $name, $value);
+            }
+        } else {
+            $this->addParameter($pb, $value);
+        }
+    }
+
+    /**
+     * @param ProcessBuilder    $pb
+     * @param string            $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $pb, $name, $value = null)
     {
         $parameters = array();
 
@@ -149,7 +213,40 @@ class CommandExecutor
         }
 
         foreach ($parameters as $parameter) {
-            $processBuilder->add($parameter);
+            $pb->add($parameter);
         }
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    protected function getPhp()
+    {
+        $phpFinder = new PhpExecutableFinder();
+        $phpPath   = $phpFinder->find();
+        if (!$phpPath) {
+            throw new FileNotFoundException('The PHP executable could not be found.');
+        }
+
+        return $phpPath;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTimeout()
+    {
+        return $this->defaultTimeout;
+    }
+
+    /**
+     * @param int $defaultTimeout
+     */
+    public function setDefaultTimeout($defaultTimeout)
+    {
+        $this->defaultTimeout = $defaultTimeout;
     }
 }

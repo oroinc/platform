@@ -62,8 +62,8 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->any())->method('getUpdateConfig')->will(
             $this->returnValue(
                 array(
-                    new Config(new EntityConfigId('testClass', 'testScope')),
-                    new Config(new FieldConfigId('testClass', 'testScope', 'testField', 'string')),
+                    new Config(new EntityConfigId('testScope', 'testClass')),
+                    new Config(new FieldConfigId('testScope', 'testClass', 'testField', 'string')),
                 )
             )
         );

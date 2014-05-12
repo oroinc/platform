@@ -1,13 +1,13 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
+/*jshint browser:true*/
+/*global define, confirm*/
+define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/translator'],
     function (_, Backbone, mediator, __) {
         'use strict';
 
-        var $ = Backbone.$;
-
-        var formState = function () {
-            this.initialize.apply(this, arguments);
-        };
+        var $ = Backbone.$,
+            formState = function () {
+                this.initialize.apply(this, arguments);
+            };
 
         _.extend(formState.prototype, {
             UNLOAD_EVENT: 'beforeunload.configFormState',
@@ -39,7 +39,7 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
              */
             isChanged: function () {
                 if (!_.isNull(this.data)) {
-                    return this.data != this.getState();
+                    return this.data !== this.getState();
                 }
 
                 return false;
@@ -56,7 +56,7 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
                         _.reject(
                             this.form.serializeArray(),
                             function (el) {
-                                return el.name == 'input_action';
+                                return el.name === 'input_action';
                             }
                         )
                     );
@@ -105,5 +105,4 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
         });
 
         return formState;
-    }
-);
+    });

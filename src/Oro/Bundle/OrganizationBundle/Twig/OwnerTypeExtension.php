@@ -3,7 +3,8 @@
 namespace Oro\Bundle\OrganizationBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Doctrine\Common\Util\ClassUtils;
+
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class OwnerTypeExtension extends \Twig_Extension
 {
@@ -43,7 +44,7 @@ class OwnerTypeExtension extends \Twig_Extension
      */
     public function getOwnerType($entity)
     {
-        $ownerClassName = ClassUtils::getRealClass(get_class($entity));
+        $ownerClassName = ClassUtils::getRealClass($entity);
         if (!$this->configProvider->hasConfig($ownerClassName)) {
             return;
         }

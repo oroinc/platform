@@ -26,7 +26,6 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->type = new EmailTemplateApiType(
-            [['name' => 'test']],
             $this->configManager,
             $this->localeSettings
         );

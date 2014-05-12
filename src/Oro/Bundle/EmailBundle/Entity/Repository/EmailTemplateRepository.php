@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 class EmailTemplateRepository extends EntityRepository
@@ -34,7 +35,7 @@ class EmailTemplateRepository extends EntityRepository
      * Return templates query builder filtered by entity name
      *
      * @param $entityName
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntityTemplatesQueryBuilder($entityName)
     {
@@ -42,5 +43,18 @@ class EmailTemplateRepository extends EntityRepository
             ->where('e.entityName = :entityName')
             ->orderBy('e.name', 'ASC')
             ->setParameter('entityName', $entityName);
+    }
+
+    /**
+     * Return a query builder which can be used to get names of entities
+     * which have at least one email template
+     *
+     * @return QueryBuilder
+     */
+    public function getDistinctByEntityNameQueryBuilder()
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.entityName')
+            ->distinct();
     }
 }

@@ -13,12 +13,15 @@ class FilterUtility
     const TYPE_KEY          = 'type';
     const FRONTEND_TYPE_KEY = 'ftype';
     const DATA_NAME_KEY     = 'data_name';
-    const TRANSLATABLE_KEY     = 'translatable';
+    const TRANSLATABLE_KEY  = 'translatable';
     const FORM_OPTIONS_KEY  = 'options';
 
     public function getParamMap()
     {
-        return [self::FRONTEND_TYPE_KEY => self::TYPE_KEY];
+        return [
+            self::FRONTEND_TYPE_KEY => self::TYPE_KEY,
+            'template_theme'        => 'templateTheme',
+        ];
     }
 
     public function getExcludeParams()

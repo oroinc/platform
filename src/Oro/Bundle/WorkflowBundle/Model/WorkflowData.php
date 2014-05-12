@@ -4,6 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -18,12 +22,70 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     protected $modified;
 
     /**
+     * @var array
+     */
+    protected $mapping;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * Constructor
      */
     public function __construct(array $data = array())
     {
         $this->data = $data;
         $this->modified = false;
+        $this->mapping = array();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+    }
+
+    /**
+     * Set mapping between fields.
+     *
+     * @param array $mapping
+     * @return WorkflowData
+     */
+    public function setFieldsMapping(array $mapping)
+    {
+        $this->mapping = $mapping;
+
+        return $this;
+    }
+
+    /**
+     * Get mapped field path by field name.
+     *
+     * @param string|PropertyPath $propertyPath
+     * @return null|string
+     */
+    protected function getMappedPath($propertyPath)
+    {
+        if ($propertyPath instanceof PropertyPath) {
+            return $propertyPath;
+        }
+
+        if (is_array($this->mapping) && array_key_exists($propertyPath, $this->mapping)) {
+            $propertyPath = $this->mapping[$propertyPath];
+        }
+
+        return $this->getConstructedPropertyPath($propertyPath);
+    }
+
+    /**
+     * Get property path for array as first accessor.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function getConstructedPropertyPath($path)
+    {
+        $pathParts = explode('.', $path);
+        $pathParts[0] = '[' . $pathParts[0] . ']';
+
+        return new PropertyPath(join('.', $pathParts));
     }
 
     /**
@@ -39,15 +101,22 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name
      * @param mixed $value
+     * @param boolean $changeModified
      * @return WorkflowData
      */
-    public function set($name, $value)
+    public function set($name, $value, $changeModified = true)
     {
-        if (!array_key_exists($name, $this->data) || $this->data[$name] !== $value) {
-            $this->data[$name] = $value;
-            $this->modified = true;
+        try {
+            $propertyPath = $this->getMappedPath($name);
+            if ($changeModified && $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value) {
+                $this->modified = true;
+            }
+            $this->propertyAccessor->setValue($this->data, $propertyPath, $value);
+
+            return $this;
+        } catch (\Exception $e) {
+            return $this;
         }
-        return $this;
     }
 
     /**
@@ -72,14 +141,17 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function get($name)
     {
-        if (isset($this->data[$name])) {
-            $value = $this->data[$name];
+        try {
+            $propertyPath = $this->getMappedPath($name);
+            $value = $this->propertyAccessor->getValue($this->data, $propertyPath);
             if ($value instanceof Proxy && !$value->__isInitialized()) {
                 // set value as null if entity is not exist
-                $this->set($name, $this->extractProxyEntity($value));
+                $value = $this->extractProxyEntity($value);
+                $this->set($name, $value);
             }
-            return $this->data[$name];
-        } else {
+
+            return $value;
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -114,7 +186,15 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->data);
+        if (array_key_exists($name, $this->data)) {
+            return true;
+        } else {
+            try {
+                return null !== $this->propertyAccessor->getValue($this->data, $this->getMappedPath($name));
+            } catch (NoSuchPropertyException $e) {
+                return false;
+            }
+        }
     }
 
     /**

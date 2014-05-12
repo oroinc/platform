@@ -8,7 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class ResetController extends Controller
 {
@@ -54,12 +53,16 @@ class ResetController extends Controller
 
         $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
 
+        $cm          = $this->get('oro_config.global');
+        $senderEmail = $cm->get('oro_notification.email_notification_sender_email');
+        $senderName  = $cm->get('oro_notification.email_notification_sender_name');
+
         /**
          * @todo Move to postUpdate lifecycle event handler as service
          */
         $message = \Swift_Message::newInstance()
             ->setSubject('Reset password')
-            ->setFrom($this->container->getParameter('oro_user.email'))
+            ->setFrom($senderEmail, $senderName)
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView('OroUserBundle:Mail:reset.html.twig', array('user' => $user)),

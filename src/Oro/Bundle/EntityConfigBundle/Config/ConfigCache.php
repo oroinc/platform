@@ -68,24 +68,45 @@ class ConfigCache
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @return bool|null
+     * Gets a flag indicates whether an entity or entity field is configurable or not.
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return bool|null true if an entity or entity field is configurable;
+     *                   false if not;
+     *                   null if unknown (it means that "is configurable" flag was not set yet)
      */
     public function getConfigurable($className, $fieldName = null)
     {
-        return $this->modelCache->fetch($this->buildModelCacheKey($className, $fieldName));
+        $flag = $this->modelCache->fetch(
+            $this->buildModelCacheKey($className, $fieldName)
+        );
+
+        if ($flag === false) {
+            // no cache entry exists
+            $flag = null;
+        } elseif ($flag === null) {
+            // no cache entry exists and it say that an entity or entity field is not configurable
+            $flag = false;
+        }
+
+        return $flag;
     }
 
     /**
-     * @param        $value
-     * @param string $className
-     * @param string $fieldName
+     * Sets a flag indicates whether an entity or entity field is configurable or not.
+     *
+     * @param bool        $flag      true if an entity or entity field is configurable; otherwise, false
+     * @param string      $className
+     * @param string|null $fieldName
      * @return bool
      */
-    public function setConfigurable($value, $className, $fieldName = null)
+    public function setConfigurable($flag, $className, $fieldName = null)
     {
-        return $this->modelCache->save($this->buildModelCacheKey($className, $fieldName), $value);
+        return $this->modelCache->save(
+            $this->buildModelCacheKey($className, $fieldName),
+            $flag === false ? null : $flag
+        );
     }
 
     /**

@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\EmailBundle\OroEmailBundle, kernel: true }
+    - { name: Oro\Bundle\EmailBundle\OroEmailBundle, kernel: true, priority: -60 }

@@ -1,14 +1,14 @@
 /* jshint browser:true  */
-/* global define, google */
-define(['underscore', 'backbone', 'oro/translator'],
-function(_, Backbone, __) {
+/*global define, google*/
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/locale-settings'
+    ], function (_, Backbone, __, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/mapservice/googlemaps
-     * @class   oro.mapservice.Googlemaps
+     * @export  oroaddress/js/mapservice/googlemaps
+     * @class   oroaddress.mapservice.Googlemaps
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -28,7 +28,7 @@ function(_, Backbone, __) {
         mapLocationCache: {},
         mapsLoadExecuted: false,
 
-        initialize: function() {
+        initialize: function () {
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
             this.$unknownAddress = $('<div class="map-unknown">' + __('map.unknown.location') + '</div>')
@@ -36,7 +36,7 @@ function(_, Backbone, __) {
             this.mapLocationUnknown();
         },
 
-        _initMapOptions: function() {
+        _initMapOptions: function () {
             if (_.isUndefined(this.options.mapOptions.mapTypeControlOptions)) {
                 this.options.mapOptions.mapTypeControlOptions = {
                     style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
@@ -52,7 +52,8 @@ function(_, Backbone, __) {
             }
         },
 
-        _initMap: function(location) {
+        _initMap: function (location) {
+            var weatherLayer, cloudLayer;
             this._initMapOptions();
             this.map = new google.maps.Map(
                 this.$mapContainer[0],
@@ -66,15 +67,20 @@ function(_, Backbone, __) {
             });
 
             if (this.options.showWeather) {
-                var weatherLayer = new google.maps.weather.WeatherLayer();
+                var temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
+                var windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
+                weatherLayer = new google.maps.weather.WeatherLayer({
+                    temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
+                    windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
+                });
                 weatherLayer.setMap(this.map);
 
-                var cloudLayer = new google.maps.weather.CloudLayer();
+                cloudLayer = new google.maps.weather.CloudLayer();
                 cloudLayer.setMap(this.map);
             }
         },
 
-        loadGoogleMaps: function() {
+        loadGoogleMaps: function () {
             var googleMapsSettings = 'sensor=' + (this.options.sensor ? 'true' : 'false');
 
             if (this.options.showWeather) {
@@ -89,18 +95,24 @@ function(_, Backbone, __) {
                 url: window.location.protocol + "//www.google.com/jsapi",
                 dataType: "script",
                 cache: true,
-                success: _.bind(function() {
+                success: _.bind(function () {
                     google.load('maps', this.options.apiVersion, {
                         other_params: googleMapsSettings,
                         callback: _.bind(this.onGoogleMapsInit, this)
                     });
+
+                    this.mapsLoadExecuted = false;
                 }, this)
             });
         },
 
-        updateMap: function(address, label) {
+        updateMap: function (address, label) {
             // Load google maps js
-            if (!this.hasGoogleMaps() && !this.mapsLoadExecuted) {
+            if (!this.hasGoogleMaps()) {
+                if (this.mapsLoadExecuted) {
+                    return;
+                }
+
                 this.mapsLoadExecuted = true;
                 this.requestedLocation = {
                     'address': address,
@@ -114,8 +126,8 @@ function(_, Backbone, __) {
             if (this.mapLocationCache.hasOwnProperty(address)) {
                 this.updateMapLocation(this.mapLocationCache[address], label);
             } else {
-                this.getGeocoder().geocode({'address': address}, _.bind(function(results, status) {
-                    if(status == google.maps.GeocoderStatus.OK) {
+                this.getGeocoder().geocode({'address': address}, _.bind(function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
                         //Move location marker and map center to new coordinates
                         this.updateMapLocation(results[0].geometry.location, label);
@@ -126,28 +138,28 @@ function(_, Backbone, __) {
             }
         },
 
-        onGoogleMapsInit: function() {
+        onGoogleMapsInit: function () {
             if (!_.isUndefined(this.requestedLocation)) {
                 this.updateMap(this.requestedLocation.address, this.requestedLocation.label);
                 delete this.requestedLocation;
             }
         },
 
-        hasGoogleMaps: function() {
+        hasGoogleMaps: function () {
             return !_.isUndefined(window.google) && google.hasOwnProperty('maps');
         },
 
-        mapLocationUnknown: function() {
+        mapLocationUnknown: function () {
             this.$mapContainer.hide();
             this.$unknownAddress.show();
         },
 
-        mapLocationKnown: function() {
+        mapLocationKnown: function () {
             this.$mapContainer.show();
             this.$unknownAddress.hide();
         },
 
-        updateMapLocation: function(location, label) {
+        updateMapLocation: function (location, label) {
             this.mapLocationKnown();
             if (location && (!this.location || location.toString() !== this.location.toString())) {
                 this._initMap(location);
@@ -158,7 +170,7 @@ function(_, Backbone, __) {
             }
         },
 
-        getGeocoder: function() {
+        getGeocoder: function () {
             if (_.isUndefined(this.geocoder)) {
                 this.geocoder = new google.maps.Geocoder();
             }

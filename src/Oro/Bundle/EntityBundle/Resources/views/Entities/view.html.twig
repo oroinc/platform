@@ -33,16 +33,6 @@
 {% block stats %}
 {% endblock stats%}
 
-{% macro attibuteRow(title, value) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% macro attribute_data(value) %}
-        <div class="clearfix-oro">
-            <p class="control-label">{{ value|raw }}</p>
-        </div>
-    {% endmacro %}
-    {{ UI.renderAttribute(title, _self.attribute_data(value)) }}
-{% endmacro %}
-
 {% block content_data %}
     {% set data = { 'dataBlocks': [{
         'title': 'General',

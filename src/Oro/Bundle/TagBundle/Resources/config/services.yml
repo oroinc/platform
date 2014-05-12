@@ -2,7 +2,6 @@ parameters:
     oro_tag.tag.entity.class: Oro\Bundle\TagBundle\Entity\Tag
     oro_tag.tagging.entity.class: Oro\Bundle\TagBundle\Entity\Tagging
     oro_tag.tag_listener.class: Oro\Bundle\TagBundle\EventListener\TagListener
-    oro_tag.owner_listener.class: Oro\Bundle\TagBundle\EventListener\OwnerListener
 
     oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
     oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
@@ -18,10 +17,14 @@ parameters:
     oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
 
     oro_tag.provider.search_provider.class: Oro\Bundle\TagBundle\Provider\SearchProvider
+    oro_tag.security_provider.class: Oro\Bundle\TagBundle\Security\SecurityProvider
 
     oro_tag.twig.tag.extension.class: Oro\Bundle\TagBundle\Twig\TagExtension
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
 
+    oro_tag.owner_assignment_checker.tag.class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
+
+    oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -65,6 +68,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_search.mapper
+            - @oro_tag.security_provider
 
     # Tag API
     oro_tag.tag.manager.api:
@@ -134,9 +138,30 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_tag.security_provider:
+        class: %oro_tag.security_provider.class%
+        arguments:
+            - @oro_search.security_provider
+
     oro_tag.event_listener.search_results_grid_listener:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
-          - @oro_datagrid.datagrid.request_params
+          - @oro_tag.security_provider
         tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.tag-results-grid, method: onBuildAfter }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
+        lazy: true
+
+    oro_tag.owner_assignment_checker.tag:
+        class: %oro_tag.owner_assignment_checker.tag.class%
+        tags:
+            - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\TagBundle\Entity\Tag }
+
+    # Merge listener
+    oro_tag.event_listener.merge_listener:
+        class: %oro_tag.event_listener.merge_listener.class%
+        arguments:
+          - @oro_tag.tag.manager
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
+          - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
+          - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }

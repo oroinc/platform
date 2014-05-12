@@ -1,9 +1,10 @@
 oro_menu_config:
     items:
         system_configuration:
-            label: 'Configuration'
+            label: 'oro.config.menu.system_configuration.label'
             extras:
-                description: 'System configuration'
+                position:    10
+                description: 'oro.config.menu.system_configuration.description'
             route: 'oro_config_configuration_system'
 
     tree:

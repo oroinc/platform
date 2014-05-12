@@ -1,0 +1,3 @@
+css:
+    'orolocale':
+        - 'bundles/orolocale/css/style.css'

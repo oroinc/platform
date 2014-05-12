@@ -1,0 +1,18 @@
+{% if entity is defined and entity
+    and has_workflow_item(entity)
+    and not is_workflow_reset_allowed(entity)
+    and resource_granted('oro_workflow')
+%}
+    <div class="workflow-steps-container">
+    {{
+        oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_workflow_widget_steps', {
+                entityClass: oro_class_name(entity),
+                entityId: entity.id
+            }),
+            'alias': 'workflow_steps'
+        })
+    }}
+    </div>
+{% endif %}

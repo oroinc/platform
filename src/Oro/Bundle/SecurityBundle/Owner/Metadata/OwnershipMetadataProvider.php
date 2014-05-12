@@ -109,7 +109,8 @@ class OwnershipMetadataProvider
     public function warmUpCache($className = null)
     {
         if ($className === null) {
-            foreach ($this->configProvider->getConfigs() as $config) {
+            $configs = $this->configProvider->getConfigs();
+            foreach ($configs as $config) {
                 $this->ensureMetadataLoaded($config->getId()->getClassName());
             }
         } else {

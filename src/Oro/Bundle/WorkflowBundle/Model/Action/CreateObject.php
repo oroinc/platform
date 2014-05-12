@@ -7,6 +7,11 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 class CreateObject extends AbstractAction
 {
+    const OPTION_KEY_DATA = 'data';
+    const OPTION_KEY_CLASS = 'class';
+    const OPTION_KEY_ATTRIBUTE = 'attribute';
+    const OPTION_KEY_ARGUMENTS = 'arguments';
+
     /**
      * @var array
      */
@@ -18,7 +23,7 @@ class CreateObject extends AbstractAction
     protected function executeAction($context)
     {
         $object = $this->createObject($context);
-        $this->contextAccessor->setValue($context, $this->options['attribute'], $object);
+        $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $object);
     }
 
     /**
@@ -26,22 +31,22 @@ class CreateObject extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (empty($options['class'])) {
+        if (empty($options[self::OPTION_KEY_CLASS])) {
             throw new InvalidParameterException('Class name parameter is required');
         }
 
-        if (empty($options['attribute'])) {
+        if (empty($options[self::OPTION_KEY_ATTRIBUTE])) {
             throw new InvalidParameterException('Attribute name parameter is required');
         }
-        if (!$options['attribute'] instanceof PropertyPath) {
+        if (!$options[self::OPTION_KEY_ATTRIBUTE] instanceof PropertyPath) {
             throw new InvalidParameterException('Attribute must be valid property definition.');
         }
 
-        if (!empty($options['data']) && !is_array($options['data'])) {
+        if (!empty($options[self::OPTION_KEY_DATA]) && !is_array($options[self::OPTION_KEY_DATA])) {
             throw new InvalidParameterException('Object data must be an array.');
         }
 
-        if (!empty($options['arguments']) && !is_array($options['arguments'])) {
+        if (!empty($options[self::OPTION_KEY_ARGUMENTS]) && !is_array($options[self::OPTION_KEY_ARGUMENTS])) {
             throw new InvalidParameterException('Object constructor arguments must be an array.');
         }
 
@@ -92,7 +97,7 @@ class CreateObject extends AbstractAction
      */
     protected function getObjectClassName()
     {
-        return $this->options['class'];
+        return $this->options[self::OPTION_KEY_CLASS];
     }
 
     /**
@@ -100,7 +105,7 @@ class CreateObject extends AbstractAction
      */
     protected function getObjectData()
     {
-        return $this->getOption($this->options, 'data', array());
+        return $this->getOption($this->options, self::OPTION_KEY_DATA, array());
     }
 
     /**
@@ -108,6 +113,6 @@ class CreateObject extends AbstractAction
      */
     protected function getConstructorArguments()
     {
-        return $this->getOption($this->options, 'arguments', array());
+        return $this->getOption($this->options, self::OPTION_KEY_ARGUMENTS, array());
     }
 }

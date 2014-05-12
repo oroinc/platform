@@ -31,7 +31,7 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function createStepExecution()
     {
-        return $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        return $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionFactory;
@@ -82,6 +83,9 @@ class TransitionAssembler extends AbstractAssembler
     {
         $definitions = array();
         foreach ($configuration as $name => $options) {
+            if (empty($options)) {
+                $options = array();
+            }
             $definitions[$name] = array(
                 'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
                 'conditions' => $this->getOption($options, 'conditions', array()),
@@ -113,14 +117,18 @@ class TransitionAssembler extends AbstractAssembler
         $transition->setName($name)
             ->setLabel($options['label'])
             ->setStepTo($steps[$stepToName])
-            ->setMessage($this->getOption($options, 'message', null))
+            ->setMessage($this->getOption($options, 'message'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()));
+            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
+            ->setDisplayType(
+                $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
+            );
 
+        $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {
             $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['pre_conditions']);
             $transition->setPreCondition($condition);
@@ -137,6 +145,38 @@ class TransitionAssembler extends AbstractAssembler
         }
 
         return $transition;
+    }
+
+    /**
+     * @param array $options
+     * @param array $definition
+     * @return array
+     */
+    protected function addAclPreConditions(array $options, array $definition)
+    {
+        $aclResource = $this->getOption($options, 'acl_resource');
+
+        if ($aclResource) {
+            $aclPreConditionDefinition = array('parameters' => array($aclResource));
+            $aclMessage = $this->getOption($options, 'acl_message');
+            if ($aclMessage) {
+                $aclPreConditionDefinition['message'] = $aclMessage;
+            }
+            $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+
+            if (empty($definition['pre_conditions'])) {
+                $definition['pre_conditions'] = $aclPreCondition;
+            } else {
+                $definition['pre_conditions'] = array(
+                    '@and' => array(
+                        $aclPreCondition,
+                        $definition['pre_conditions']
+                    )
+                );
+            }
+        }
+
+        return !empty($definition['pre_conditions']) ? $definition['pre_conditions'] : array();
     }
 
     /**

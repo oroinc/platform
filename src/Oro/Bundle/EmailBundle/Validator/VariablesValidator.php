@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Validator;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,10 +21,22 @@ class VariablesValidator extends ConstraintValidator
     /** @var SecurityContextInterface */
     protected $securityContext;
 
-    public function __construct(\Twig_Environment $twig, SecurityContextInterface $securityContext)
-    {
-        $this->twig = $twig;
+    /** @var EntityManager */
+    protected $entityManager;
+
+    /**
+     * @param \Twig_Environment        $twig
+     * @param SecurityContextInterface $securityContext
+     * @param EntityManager            $entityManager
+     */
+    public function __construct(
+        \Twig_Environment $twig,
+        SecurityContextInterface $securityContext,
+        EntityManager $entityManager
+    ) {
+        $this->twig            = $twig;
         $this->securityContext = $securityContext;
+        $this->entityManager   = $entityManager;
     }
 
     /**
@@ -43,29 +58,43 @@ class VariablesValidator extends ConstraintValidator
             }
         }
 
-        $relatedEntity = false;
         if (class_exists($emailTemplate->getEntityName())) {
             $className = $emailTemplate->getEntityName();
-            $relatedEntity = new $className;
-        }
 
-        $errors = array();
-        foreach ($fieldsToValidate as $field => $value) {
-            try {
-                $this->twig->render(
-                    $value,
-                    array(
-                        'entity' => $relatedEntity,
-                        'user'   => $this->getUser()
-                    )
+            /** @var ClassMetadataInfo $metadata */
+            $classMetadata = $this->entityManager->getClassMetadata($className);
+            if ($classMetadata->getReflectionClass()->isAbstract()) {
+                $this->context->addViolation(
+                    sprintf('Its not possible to create template for "%s"', $className)
                 );
-            } catch (\Exception $e) {
-                $errors[$field] = true;
             }
-        }
 
-        if (!empty($errors)) {
-            $this->context->addViolation($constraint->message);
+            $entity = $classMetadata->newInstance();
+
+            /** @var \Twig_Extension_Sandbox $sandbox */
+            $sandbox = $this->twig->getExtension('sandbox');
+            $sandbox->enableSandbox();
+
+            $hasErrors = false;
+            foreach ($fieldsToValidate as $template) {
+                try {
+                    $this->twig->render(
+                        $template,
+                        array(
+                            'entity' => $entity,
+                            'user'   => $this->getUser()
+                        )
+                    );
+                } catch (\Twig_Error $e) {
+                    $hasErrors = true;
+                }
+            }
+
+            $sandbox->disableSandbox();
+
+            if ($hasErrors) {
+                $this->context->addViolation($constraint->message);
+            }
         }
     }
 

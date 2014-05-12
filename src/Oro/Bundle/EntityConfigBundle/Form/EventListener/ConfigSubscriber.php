@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\Form\FormEvent;
@@ -39,19 +41,19 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $em;
 
     /**
-     * @var OrmTranslationMetadataCache
+     * @var DynamicTranslationMetadataCache
      */
     protected $dbTranslationMetadataCache;
 
     /**
-     * @param ConfigManager               $configManager
-     * @param Translator                  $translator
-     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
+     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
         ConfigManager $configManager,
         Translator $translator,
-        OrmTranslationMetadataCache $dbTranslationMetadataCache
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
@@ -87,7 +89,9 @@ class ConfigSubscriber implements EventSubscriberInterface
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             if (isset($data[$scope])) {
-                $translatable = $this->getTranslatableValues($configModel, $provider);
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
+                    $this->configManager->getConfigIdByModel($configModel, $scope)
+                );
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         if ($this->translator->hasTrans($value)) {
@@ -129,7 +133,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $config = $provider->getConfig($className, $fieldName);
 
                 // config translations
-                $translatable = $this->getTranslatableValues($configModel, $provider);
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
+                    $this->configManager->getConfigIdByModel($configModel, $scope)
+                );
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         $key = $this->configManager->getProvider('entity')
@@ -137,10 +143,19 @@ class ConfigSubscriber implements EventSubscriberInterface
                             ->get($code);
 
                         if ($event->getForm()->get($scope)->get($code)->isValid()
-                            && $value != $this->translator->trans($config->get($code))) {
+                            && $value != $this->translator->trans($config->get($code))
+                        ) {
                             $locale = $this->translator->getLocale();
                             // save into translation table
-                            $this->saveTranslationValue($key, $value, $locale);
+                            /** @var TranslationRepository $translationRepo */
+                            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
+                            $translationRepo->saveValue(
+                                $key,
+                                $value,
+                                $locale,
+                                TranslationRepository::DEFAULT_DOMAIN,
+                                Translation::SCOPE_UI
+                            );
                             // mark translation cache dirty
                             $this->dbTranslationMetadataCache->updateTimestamp($locale);
                         }
@@ -153,7 +168,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                     }
                 }
 
-                $config->setValues($data[$scope]);
+                foreach ($data[$scope] as $code => $value) {
+                    $config->set($code, $value);
+                }
                 $this->configManager->persist($config);
             }
         }
@@ -161,47 +178,5 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($event->getForm()->isValid()) {
             $this->configManager->flush();
         }
-    }
-
-    /**
-     * Get translatable property's codes
-     *
-     * @param AbstractConfigModel $configModel
-     * @param ConfigProvider      $provider
-     * @return array
-     */
-    protected function getTranslatableValues(AbstractConfigModel $configModel, ConfigProvider $provider)
-    {
-        $type = $configModel instanceof FieldConfigModel
-            ? PropertyConfigContainer::TYPE_FIELD
-            : PropertyConfigContainer::TYPE_ENTITY;
-
-        return $provider->getPropertyConfig()->getTranslatableValues($type);
-    }
-
-    /**
-     * Update existing translation value or create new one if it is not exist
-     *
-     * @param string $key
-     * @param string $value
-     * @param string $locale
-     */
-    protected function saveTranslationValue($key, $value, $locale)
-    {
-        /** @var TranslationRepository $translationRepo */
-        $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
-        /** @var Translation $translationValue */
-        $translationValue = $translationRepo->findValue($key, $locale);
-        if (!$translationValue) {
-            $translationValue = new Translation();
-            $translationValue
-                ->setKey($key)
-                ->setValue($value)
-                ->setLocale($locale)
-                ->setDomain(TranslationRepository::DEFAULT_DOMAIN);
-        } else {
-            $translationValue->setValue($value);
-        }
-        $this->em->persist($translationValue);
     }
 }

@@ -1,0 +1,19 @@
+parameters:
+    oro_workflow.security.acl.manager.class: Oro\Bundle\WorkflowBundle\Acl\AclManager
+    oro_workflow.security.acl.voter.entity.class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
+
+services:
+    oro_workflow.security.acl.manager:
+        class: %oro_workflow.security.acl.manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_workflow.registry
+
+    oro_workflow.security.acl.voter.entity:
+        class: %oro_workflow.security.acl.voter.entity.class%
+        arguments:
+            - @doctrine
+            - @oro_entity.doctrine_helper
+            - @oro_workflow.manager
+        tags:
+            - { name: security.voter, priority: 500 }

@@ -39,7 +39,7 @@ class RestDataAuditApiTest extends WebTestCase
                 "lastName" => "lastName",
                 "nameSuffix" => "Sn.",
                 "roles" => array("2"),
-                "owner" => "1",
+                "owner" => "1"
             )
         );
 
@@ -57,7 +57,10 @@ class RestDataAuditApiTest extends WebTestCase
      */
     public function testGetAudits($response)
     {
-        $this->client->request('GET', $this->client->generate('oro_api_get_audits'));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_audits')
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
@@ -69,7 +72,7 @@ class RestDataAuditApiTest extends WebTestCase
         $this->assertEquals($response['user']['username'], $resultActual['data']['username']['new']);
         $this->assertEquals($response['user']['email'], $resultActual['data']['email']['new']);
         $this->assertEquals($response['user']['enabled'], $resultActual['data']['enabled']['new']);
-        $this->assertEquals('User', $resultActual['data']['roles']['new']);
+        $this->assertContains($resultActual['data']['roles']['new'], array('User', 'Sales Rep'));
 
         return $result;
     }
@@ -81,7 +84,10 @@ class RestDataAuditApiTest extends WebTestCase
     public function testGetAudit($response)
     {
         foreach ($response as $audit) {
-            $this->client->request('GET', $this->client->generate('oro_api_get_audit', array('id' => $audit['id'])));
+            $this->client->request(
+                'GET',
+                $this->client->generate('oro_api_get_audit', array('id' => $audit['id']))
+            );
             $result = $this->client->getResponse();
             ToolsAPI::assertJsonResponse($result, 200);
             $result = ToolsAPI::jsonToArray($result->getContent());

@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {
@@ -137,36 +137,5 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 
         $attributeName = self::ATTRIBUTE_NAME;
         $this->assertEquals($user, $context->$attributeName);
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Can't extract active user
-     */
-    public function testExecuteExceptionNoToken()
-    {
-        $this->action->initialize(array(new PropertyPath(self::ATTRIBUTE_NAME)));
-        $this->action->execute(new ItemStub());
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Can't extract active user
-     */
-    public function testExecuteExceptionNoUser()
-    {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue(null));
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->action->initialize(array(new PropertyPath(self::ATTRIBUTE_NAME)));
-        $this->action->execute(new ItemStub());
     }
 }

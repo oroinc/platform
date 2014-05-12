@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oro/app'],
-function(_, Backbone, BackbonePageableCollection, app) {
+/*global define*/
+define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
+    ], function (_, Backbone, BackbonePageableCollection, app) {
     'use strict';
 
     /**
@@ -11,8 +11,8 @@ function(_, Backbone, BackbonePageableCollection, app) {
      * updateState: Fired when collection state is updated using updateState method
      * beforeFetch: Fired when collection starts to fetch, before request is formed
      *
-     * @export  oro/pageable-collection
-     * @class   oro.PageableCollection
+     * @export  orodatagrid/js/pageable-collection
+     * @class   orodatagrid.PageableCollection
      * @extends Backbone.PageableCollection
      */
     var PageableCollection = BackbonePageableCollection.extend({
@@ -111,6 +111,10 @@ function(_, Backbone, BackbonePageableCollection, app) {
             this.on('remove', this.onRemove, this);
 
             BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+
+            if (models.options) {
+                this.state.totals = models.options.totals;
+            }
         },
 
         /**
@@ -232,7 +236,9 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @return {Object}
          */
         parse: function(resp, options) {
-            this.state.totalRecords = resp.options.totalRecords;
+            resp.options = resp.options || {};
+            this.state.totalRecords = resp.options.totalRecords || 0;
+            this.state.hideToolbar = resp.options.hideToolbar;
             this.state = this._checkState(this.state);
             return resp.data;
         },
@@ -244,7 +250,7 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @param options
          */
         reset: function(models, options) {
-            this.trigger('beforeReset', this, options);
+            this.trigger('beforeReset', this, models, options);
             BackbonePageableCollection.prototype.reset.apply(this, arguments);
         },
 
@@ -346,10 +352,23 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @returns {Array}
          */
         getFetchData: function () {
-            var state = this._checkState(this.state);
             var data = {};
+
+            // extract params from a grid collection url
+            var url = _.result(this, "url") || '';
+            var qsi = url.indexOf('?');
+            if (qsi != -1) {
+                var nvp = url.slice(qsi + 1).split('&');
+                for (var i = 0 ; i < nvp.length ; i++) {
+                    var pair  = nvp[i].split('=');
+                    data[app.decodeUriComponent(pair[0])] = app.decodeUriComponent(pair[1]);
+                }
+            }
+
+            var state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
+
             return data;
         },
 

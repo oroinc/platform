@@ -9,23 +9,12 @@ class EmailNotificationGridHelper
     /** @var EntityManager */
     protected $em;
 
-    /** @var array */
-    protected $entityNameChoices;
-
     /**
-     * @param EntityManager $em
-     * @param array $entitiesConfig
+     * @param EntityManager  $em
      */
-    public function __construct(EntityManager $em, $entitiesConfig = array())
+    public function __construct(EntityManager $em)
     {
         $this->em = $em;
-
-        $this->entityNameChoices = array_map(
-            function ($value) {
-                return isset($value['name'])? $value['name'] : '';
-            },
-            $entitiesConfig
-        );
     }
 
     /**
@@ -86,13 +75,5 @@ class EmailNotificationGridHelper
         return $this->em
             ->getRepository('OroNotificationBundle:Event')
             ->getEventNamesChoices();
-    }
-
-    /**
-     * @return array
-     */
-    public function getEntityNameChoices()
-    {
-        return $this->entityNameChoices;
     }
 }

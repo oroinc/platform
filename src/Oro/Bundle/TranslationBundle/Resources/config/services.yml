@@ -1,15 +1,21 @@
 parameters:
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
+    oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
+    oro_translation.database_translation.persister.class:       Oro\Bundle\TranslationBundle\Translation\DatabasePersister
     oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
-    oro_translation.database_translation.metadata.cache.class:  Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache
-    oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
+    oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
-    oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.statistic_provider.class:                   Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider
+    oro_translation.crowdin.adapter.class:                      Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
     oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
     oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
+
+    oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
+    oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
 
 services:
     oro_translation.controller:
@@ -19,6 +25,7 @@ services:
             - @templating
             - OroTranslationBundle:Translation:translation.js.twig
             - ""
+        lazy: true
 
     oro_translation.extractor.php_code_extractor:
         class: %oro_translation.extractor.php_code_extractor.class%
@@ -30,20 +37,38 @@ services:
     oro_translation.service_provider:
         class: %oro_translation.service_provider.class%
         arguments:
-            - @oro_translation.uploader.crowdin_adapter
+            - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
+            - @translation.loader
+            - @oro_translation.database_translation.persister
+            - %kernel.root_dir%
+        lazy: true
+
+    oro_translation.statistic_provider:
+        class: %oro_translation.statistic_provider.class%
+        arguments:
+            - @oro_translation.cache
+            - @oro_translation.oro_translation_adapter
+            - @oro_translation.packages_provider
 
     oro_translation.curl_request:
         class: %oro_translation.curl_request.class%
 
     oro_translation.uploader.crowdin_adapter:
-        class: %oro_translation.adapter.class%
+        class: %oro_translation.crowdin.adapter.class%
         arguments:
             - %oro_translation.api.crowdin.endpoint%
             - @oro_translation.curl_request
 
+    oro_translation.oro_translation_adapter:
+        class: %oro_translation.oro_translation.adapter.class%
+        arguments:
+            - @oro_translation.curl_request
+            - %oro_translation.api.oro_service.endpoint%
+            - %oro_translation.api.oro_service.key%
+
     oro_translation.database_translation.metadata.cache:
-        class: %oro_translation.database_translation.metadata.cache.class%
+        class: %oro_translation.dynamic_translation.metadata.cache.class%
         arguments:
             - @oro_translation.database_translation.metadata.cache_impl
 
@@ -53,6 +78,12 @@ services:
         calls:
             - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
 
+    oro_translation.database_translation.persister:
+        class: %oro_translation.database_translation.persister.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_translation.database_translation.metadata.cache
+
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
         arguments:
@@ -60,13 +91,10 @@ services:
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
-    oro_translation.listener.request:
-        class: %oro_translation.listener.request.class%
-        arguments:
-            - @translator
-            - @oro_translation.database_translation.metadata.cache
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
+    oro_translation.cache:
+          parent: oro.cache.abstract
+          calls:
+              - [setNamespace, ['oro_translation.cache']]
 
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%
@@ -76,4 +104,23 @@ services:
             - %oro_translation.js_translation.domains%
             - %kernel.root_dir%
             - %kernel.default_locale%
+        lazy: true
 
+    oro_translation.twig.translation_status.extension:
+        class: %oro_translation.twig.translation_status.extension.class%
+        arguments:
+            - @oro_config.global
+            - @oro_translation.statistic_provider
+        tags:
+            - { name: twig.extension }
+
+    oro_translation.distribution.package_manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_distribution.package_manager }
+
+    oro_translation.packages_provider:
+        class: %oro_translation.packages_provider.class%
+        arguments:
+            - @oro_translation.distribution.package_manager.link
+            - %kernel.bundles%
+            - %kernel.root_dir%

@@ -45,7 +45,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var string
      *
-     * @ORM\Column(name="street", type="string", length=500)
+     * @ORM\Column(name="street", type="string", length=500, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $street;
@@ -61,7 +61,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var string
      *
-     * @ORM\Column(name="city", type="string", length=255)
+     * @ORM\Column(name="city", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $city;
@@ -69,7 +69,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var string
      *
-     * @ORM\Column(name="postal_code", type="string", length=20)
+     * @ORM\Column(name="postal_code", type="string", length=20, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $postalCode;

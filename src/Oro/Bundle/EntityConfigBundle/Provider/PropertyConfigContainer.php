@@ -55,7 +55,9 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * Gets all configuration values for the given config type
+     *
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getItems($type = self::TYPE_ENTITY)
@@ -103,9 +105,7 @@ class PropertyConfigContainer
 
         $result = array();
         foreach ($this->getItems($type) as $code => $item) {
-            if ((isset($item['options']['auditable']) && $item['options']['auditable'] === false)
-                || (isset($item['options']['serializable']) && $item['options']['serializable'] === true)
-            ) {
+            if (isset($item['options']['auditable']) && $item['options']['auditable'] === false) {
                 $result[$code] = true;
             }
         }
@@ -137,14 +137,14 @@ class PropertyConfigContainer
      * @param string $type
      * @return array
      */
-    public function getSerializableValues($type = self::TYPE_ENTITY)
+    public function getIndexedValues($type = self::TYPE_ENTITY)
     {
         $type = $this->getConfigType($type);
 
         $result = array();
         foreach ($this->getItems($type) as $code => $item) {
-            if (isset($item['options']['serializable'])) {
-                $result[$code] = (bool) $item['options']['serializable'];
+            if (isset($item['options']['indexed']) && $item['options']['indexed'] === true) {
+                $result[$code] = true;
             }
         }
 
@@ -293,7 +293,9 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param $type
+     * Gets a string represents a type of a config
+     *
+     * @param string|ConfigIdInterface $type
      * @return string
      */
     protected function getConfigType($type)

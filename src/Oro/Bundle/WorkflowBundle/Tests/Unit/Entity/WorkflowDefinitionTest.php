@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,27 +40,30 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->workflowDefinition->getLabel());
     }
 
-    public function testType()
-    {
-        $this->assertNull($this->workflowDefinition->getType());
-        $value = Workflow::TYPE_ENTITY;
-        $this->workflowDefinition->setType($value);
-        $this->assertEquals($value, $this->workflowDefinition->getType());
-    }
-
-    public function testEnabled()
-    {
-        $this->assertFalse($this->workflowDefinition->isEnabled());
-        $this->workflowDefinition->setEnabled(true);
-        $this->assertTrue($this->workflowDefinition->isEnabled());
-    }
-
     public function testStartStep()
     {
         $this->assertNull($this->workflowDefinition->getStartStep());
-        $value = 'step_one';
-        $this->workflowDefinition->setStartStep($value);
-        $this->assertEquals($value, $this->workflowDefinition->getStartStep());
+        $startStep = new WorkflowStep();
+        $startStep->setName('start_step');
+        $this->workflowDefinition->setSteps(array($startStep));
+        $this->workflowDefinition->setStartStep($startStep);
+        $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
+        $this->workflowDefinition->setStartStep(null);
+        $this->assertNull($this->workflowDefinition->getStartStep());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow "test" does not contain step "start_step"
+     */
+    public function testStartStepNoStep()
+    {
+        $this->workflowDefinition->setName('test');
+        $this->assertNull($this->workflowDefinition->getStartStep());
+        $startStep = new WorkflowStep();
+        $startStep->setName('start_step');
+        $this->workflowDefinition->setStartStep($startStep);
+        $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
     }
 
     public function testConfiguration()
@@ -72,31 +76,92 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testImport()
     {
+        $startStep = new WorkflowStep();
+        $startStep->setName('start');
         $expectedData = array(
             'name' => 'test_name',
             'label' => 'test_label',
-            'enabled' => false,
-            'start_step' => 'test_step',
+            'steps' => new ArrayCollection(array($startStep)),
+            'start_step' => $startStep,
             'configuration' => array('test', 'configuration'),
-            'entities' => array(
-                array('class' => 'TestClass')
-            )
         );
 
         $this->assertNotEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
 
-        $definitionEntity = new WorkflowDefinitionEntity();
-        $definitionEntity->setClassName($expectedData['entities'][0]['class']);
-
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName($expectedData['name'])
+            ->setSteps($expectedData['steps'])
             ->setLabel($expectedData['label'])
             ->setStartStep($expectedData['start_step'])
-            ->setConfiguration($expectedData['configuration'])
-            ->setWorkflowDefinitionEntities(array($definitionEntity));
+            ->setConfiguration($expectedData['configuration']);
 
-        $this->workflowDefinition->import($newDefinition);
+        $this->assertEquals($this->workflowDefinition, $this->workflowDefinition->import($newDefinition));
         $this->assertEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
+    }
+
+    public function testSetSteps()
+    {
+        $stepOne = new WorkflowStep();
+        $stepOne->setName('step1');
+        $this->workflowDefinition->addStep($stepOne);
+
+        $stepTwo = new WorkflowStep();
+        $stepTwo->setName('step2');
+        $this->workflowDefinition->addStep($stepTwo);
+
+        $stepThree = new WorkflowStep();
+        $stepThree->setName('step3');
+        $this->workflowDefinition->addStep($stepThree);
+
+        $this->assertCount(3, $this->workflowDefinition->getSteps());
+
+        $this->assertTrue($this->workflowDefinition->hasStepByName('step3'));
+        $this->workflowDefinition->removeStep($stepThree);
+        $this->assertFalse($this->workflowDefinition->hasStepByName('step3'));
+
+        $this->assertCount(2, $this->workflowDefinition->getSteps());
+        $this->workflowDefinition->setSteps(new ArrayCollection(array($stepOne)));
+        $actualSteps = $this->workflowDefinition->getSteps();
+        $this->assertCount(1, $actualSteps);
+        $this->assertEquals($stepOne, $actualSteps[0]);
+    }
+
+    public function testSetGetAclIdentities()
+    {
+        $firstStep = new WorkflowStep();
+        $firstStep->setName('first_step');
+        $secondStep = new WorkflowStep();
+        $secondStep->setName('second_step');
+        $this->workflowDefinition->setSteps(array($firstStep, $secondStep));
+
+        $firstEntityAcl = new WorkflowEntityAcl();
+        $firstEntityAcl->setStep($firstStep)->setAttribute('first_attribute');
+        $secondEntityAcl = new WorkflowEntityAcl();
+        $secondEntityAcl->setStep($secondStep)->setAttribute('second_attribute');
+
+        // default
+        $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
+
+        // adding
+        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl));
+        $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
+        $this->assertEquals($firstEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
+
+        // merging
+        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl, $secondEntityAcl));
+        $this->assertCount(2, $this->workflowDefinition->getEntityAcls());
+        $entityAcls = array_values($this->workflowDefinition->getEntityAcls()->toArray());
+        $this->assertEquals($firstEntityAcl, $entityAcls[0]);
+        $this->assertEquals($secondEntityAcl, $entityAcls[1]);
+
+        // removing
+        $this->workflowDefinition->setEntityAcls(array($secondEntityAcl));
+        $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
+        $this->assertEquals($secondEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
+
+        // resetting
+        $this->workflowDefinition->setEntityAcls(array());
+        $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
     }
 
     /**
@@ -105,49 +170,12 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDefinitionAsArray(WorkflowDefinition $definition)
     {
-        $entitiesData = array();
-        /** @var WorkflowDefinitionEntity $entity */
-        foreach ($definition->getWorkflowDefinitionEntities() as $entity) {
-            $entitiesData[] = array('class' => $entity->getClassName());
-        }
-
         return array(
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
-            'enabled' => $definition->isEnabled(),
+            'steps' => $definition->getSteps(),
             'start_step' => $definition->getStartStep(),
             'configuration' => $definition->getConfiguration(),
-            'entities' => $entitiesData,
-        );
-    }
-
-    public function testSetWorkflowDefinitionEntities()
-    {
-        $firstEntity = new WorkflowDefinitionEntity();
-        $firstEntity->setClassName('FirstClass');
-
-        $secondEntity = new WorkflowDefinitionEntity();
-        $secondEntity->setClassName('SecondClass');
-
-        $secondEntitySameClass = new WorkflowDefinitionEntity();
-        $secondEntitySameClass->setClassName('SecondClass');
-
-        $thirdEntity = new WorkflowDefinitionEntity();
-        $thirdEntity->setClassName('ThirdClass');
-
-        $newDefinition = new WorkflowDefinition();
-        $newDefinition->setWorkflowDefinitionEntities(array($firstEntity, $secondEntity));
-
-        $this->assertEquals(
-            array($firstEntity, $secondEntity),
-            array_values($newDefinition->getWorkflowDefinitionEntities()->toArray())
-        );
-
-        $newDefinition->setWorkflowDefinitionEntities(array($secondEntitySameClass, $thirdEntity));
-
-        $this->assertEquals(
-            array($secondEntity, $thirdEntity),
-            array_values($newDefinition->getWorkflowDefinitionEntities()->toArray())
         );
     }
 }

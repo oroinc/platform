@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Extension;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -6,7 +7,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -35,21 +35,17 @@ class SearchResultsExtension extends AbstractExtension
     protected $dispatcher;
 
     /**
-     * @param RequestParameters        $requestParams
      * @param ResultFormatter          $formatter
      * @param EntityManager            $em
      * @param ObjectMapper             $mapper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        RequestParameters $requestParams,
         ResultFormatter $formatter,
         EntityManager $em,
         ObjectMapper $mapper,
         EventDispatcherInterface $dispatcher
     ) {
-        parent::__construct($requestParams);
-
         $this->resultFormatter = $formatter;
         $this->em              = $em;
         $this->mapper          = $mapper;
@@ -69,13 +65,16 @@ class SearchResultsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows       = $result->offsetGetByPath('[data]');
-        $rows       = array_map(
+        $rows = $result->offsetGetByPath('[data]');
+        $rows = is_array($rows) ? $rows : array();
+
+        $rows = array_map(
             function (ResultRecordInterface $record) {
                 return $record->getRootEntity();
             },
             $rows
         );
+
         $entities   = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
@@ -85,6 +84,8 @@ class SearchResultsExtension extends AbstractExtension
             $entityId   = $row->getRecordId();
             if (isset($entities[$entityName][$entityId])) {
                 $entity = $entities[$entityName][$entityId];
+            } else {
+                continue;
             }
 
             $item         = new ResultItem(
@@ -106,7 +107,7 @@ class SearchResultsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPriority()
     {
