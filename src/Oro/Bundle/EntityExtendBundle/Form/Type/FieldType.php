@@ -154,7 +154,7 @@ class FieldType extends AbstractType
     }
 
     /**
-     * Check reverse relation for availability to be created
+     * Check if reverse relation can be created
      *
      * @param ConfigProvider $extendProvider
      * @param FieldConfigId  $fieldId
