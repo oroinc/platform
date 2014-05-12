@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
 
 class ChannelType extends AbstractType
 {
@@ -29,6 +30,7 @@ class ChannelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
+        $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
 
         $builder->add(
             self::TYPE_FIELD_NAME,
