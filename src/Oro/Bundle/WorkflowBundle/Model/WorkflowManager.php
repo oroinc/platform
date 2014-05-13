@@ -175,6 +175,38 @@ class WorkflowManager
     }
 
     /**
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massStartWorkflow(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            foreach ($data as $row) {
+                if (empty($row['workflow']) || empty($row['entity'])) {
+                    continue;
+                }
+
+                $workflow = $this->getWorkflow($row['workflow']);
+                $entity = $row['entity'];
+                $transition = !empty($row['transition']) ? $row['transition'] : null;
+                $data = !empty($row['data']) ? $row['data'] : array();
+
+                $workflowItem = $workflow->start($entity, $data, $transition);
+                $em->persist($workflowItem);
+            }
+
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * Perform workflow item transition.
      *
      * @param WorkflowItem $workflowItem
