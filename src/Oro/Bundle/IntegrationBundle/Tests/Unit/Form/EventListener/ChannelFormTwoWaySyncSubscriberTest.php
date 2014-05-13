@@ -104,7 +104,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRegisteredConnectorsTypes')
             ->will($this->returnValue([$this->connector]));
 
-        $this->formMock->expects($this->exactly(2))
+        $this->formMock->expects($this->once())
             ->method('add')
             ->will($this->returnValue($this->formMock));
 
