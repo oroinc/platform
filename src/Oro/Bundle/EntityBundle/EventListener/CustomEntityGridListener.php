@@ -246,7 +246,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * @param string        $code
      * @param string        $label
      * @param FieldConfigId $fieldConfigId
-     * @param boolean       $isVisible
+     * @param bool          $isVisible
      *
      * @return array
      */
@@ -342,7 +342,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      *
      * @param DatagridInterface $datagrid
      * @param string $name
-     * @param bool $default
+     * @param bool   $default
+     *
      * @return mixed
      */
     protected function getParam(DatagridInterface $datagrid, $name, $default = false)
