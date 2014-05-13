@@ -29,6 +29,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
+            ->addOption('process-timeout', null, InputOption::VALUE_OPTIONAL, 'Process timeout', 360)
             ->addOption(
                 'sample-data',
                 null,
@@ -56,12 +57,13 @@ class InstallCommand extends ContainerAwareCommand
         } elseif ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
+            $timeout = $input->getOption('process-timeout');
             $commandExecutor->runCommand(
                 'cache:clear',
                 array(
                     '--no-optional-warmers' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 300,
+                    '--process-timeout' => $timeout,
                     '--no-debug' => false
                 )
             );
@@ -141,6 +143,7 @@ class InstallCommand extends ContainerAwareCommand
         $dialog    = $this->getHelperSet()->get('dialog');
         $container = $this->getContainer();
         $options   = $input->getOptions();
+        $timeout   = $input->getOption('process-timeout');
 
         $input->setInteractive(false);
 
@@ -151,7 +154,7 @@ class InstallCommand extends ContainerAwareCommand
                     '--force' => true,
                     '--full-database' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 360
+                    '--process-timeout' => $timeout
                 )
             )
             ->runCommand('oro:entity-config:clear')
@@ -160,7 +163,7 @@ class InstallCommand extends ContainerAwareCommand
                 'oro:migration:load',
                 array(
                     '--process-isolation' => true,
-                    '--process-timeout' => 300
+                    '--process-timeout' => $timeout
                 )
             )
             ->runCommand(
@@ -262,7 +265,7 @@ class InstallCommand extends ContainerAwareCommand
         if ($demo) {
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
-                array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
+                array('--process-isolation' => true, '--process-timeout' => $timeout, '--fixtures-type' => 'demo')
             );
         }
 
@@ -282,6 +285,7 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('<info>Preparing application.</info>');
 
         $input->setInteractive(false);
+        $timeout = $input->getOption('process-timeout');
 
         $commandExecutor
             ->runCommand('oro:navigation:init', array('--process-isolation' => true))
@@ -290,7 +294,8 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
             ->runCommand('assetic:dump', array('--process-isolation' => true))
             ->runCommand('oro:translation:dump', array('--process-isolation' => true))
-            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
+            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true,
+                '--process-timeout' => $timeout));
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -303,7 +308,7 @@ class InstallCommand extends ContainerAwareCommand
             'cache:clear',
             array(
                 '--process-isolation' => true,
-                '--process-timeout' => 300,
+                '--process-timeout' => $timeout,
                 '--no-debug' => false
             )
         );
