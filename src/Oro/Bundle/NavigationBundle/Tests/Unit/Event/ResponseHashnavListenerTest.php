@@ -25,8 +25,24 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $response;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $kernel;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $templating;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $event;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $securityContext;
 
     public function setUp()
@@ -48,7 +64,8 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->templating = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->listener = new ResponseHashnavListener($this->securityContext, $this->templating);
+        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->listener = new ResponseHashnavListener($this->securityContext, $this->templating, $this->kernel);
     }
 
     public function testPlainRequest()
@@ -91,6 +108,34 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->setStatusCode(404);
         $this->serverErrorHandle();
+    }
+
+    public function testFullRedirectProducedInProdEnv()
+    {
+        $expected = array('full_redirect' => 1, 'location'  => self::TEST_URL);
+        $this->response->headers->add(array('location' => self::TEST_URL));
+        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $this->response->setStatusCode(503);
+        $this->templating
+            ->expects($this->once())
+            ->method('renderResponse')
+            ->with('OroNavigationBundle:HashNav:redirect.html.twig', $expected)
+            ->will($this->returnValue($response));
+
+        $this->event->expects($this->once())->method('setResponse')->with($response);
+        $this->kernel->expects($this->once())->method('getEnvironment')->will($this->returnValue('prod'));
+        $this->listener->onResponse($this->event);
+    }
+
+    public function testFullRedirectNotProducedInDevEnv()
+    {
+        $this->response->headers->add(array('location' => self::TEST_URL));
+        $this->response->setStatusCode(503);
+        $this->templating->expects($this->never())->method('renderResponse');
+
+        $this->event->expects($this->never())->method('setResponse');
+        $this->kernel->expects($this->once())->method('getEnvironment')->will($this->returnValue('dev'));
+        $this->listener->onResponse($this->event);
     }
 
     private function serverErrorHandle()

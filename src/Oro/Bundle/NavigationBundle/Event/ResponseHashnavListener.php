@@ -2,7 +2,7 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
@@ -21,10 +21,19 @@ class ResponseHashnavListener
      */
     protected $templating;
 
-    public function __construct(SecurityContextInterface $security, EngineInterface $templating)
-    {
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
+
+    public function __construct(
+        SecurityContextInterface $security,
+        EngineInterface $templating,
+        KernelInterface $kernel
+    ) {
         $this->security = $security;
         $this->templating = $templating;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -45,7 +54,8 @@ class ResponseHashnavListener
                     $isFullRedirect = true;
                 }
             }
-            if ($response->isNotFound() || $response->getStatusCode() == 503) {
+            $environment = $this->kernel->getEnvironment();
+            if ($response->isNotFound() || ($response->getStatusCode() == 503 && $environment != 'dev' )) {
                 $location = $request->getUri();
                 $isFullRedirect = true;
             }
