@@ -101,6 +101,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
             this.element.find('.accordion-body')
                 .removeClass('accordion-body collapse in')
                 .removeAttr('id')
+                .removeAttr('style')
                 .addClass('dropdown-menu');
             this.element.find('.accordion-group').removeClass('accordion-group').addClass('dropdown');
             this.element.find('.accordion-toggle').removeClass('accordion-toggle collapsed');
