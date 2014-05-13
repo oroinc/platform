@@ -54,8 +54,7 @@ class ResponseHashnavListener
                     $isFullRedirect = true;
                 }
             }
-            $environment = $this->kernel->getEnvironment();
-            if ($response->isNotFound() || ($response->getStatusCode() == 503 && $environment != 'dev' )) {
+            if ($response->isNotFound() || ($response->getStatusCode() == 503 && !$this->kernel->isDebug() )) {
                 $location = $request->getUri();
                 $isFullRedirect = true;
             }

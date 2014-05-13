@@ -123,7 +123,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($response));
 
         $this->event->expects($this->once())->method('setResponse')->with($response);
-        $this->kernel->expects($this->once())->method('getEnvironment')->will($this->returnValue('prod'));
+        $this->kernel->expects($this->once())->method('isDebug')->will($this->returnValue(false));
         $this->listener->onResponse($this->event);
     }
 
@@ -134,7 +134,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
         $this->templating->expects($this->never())->method('renderResponse');
 
         $this->event->expects($this->never())->method('setResponse');
-        $this->kernel->expects($this->once())->method('getEnvironment')->will($this->returnValue('dev'));
+        $this->kernel->expects($this->once())->method('isDebug')->will($this->returnValue(true));
         $this->listener->onResponse($this->event);
     }
 
