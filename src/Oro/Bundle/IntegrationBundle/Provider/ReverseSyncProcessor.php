@@ -143,7 +143,7 @@ class ReverseSyncProcessor
             ->setConnector($connector);
 
         $this->em->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($channel, false);
+            ->addStatus($channel, $status);
         return $this;
     }
 }
