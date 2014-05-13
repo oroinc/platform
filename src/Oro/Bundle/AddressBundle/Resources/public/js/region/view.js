@@ -60,7 +60,7 @@ function(_, Backbone) {
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
-                    .prepend('<em>*</em>');
+                    .append('<em>*</em>');
             }
         },
 

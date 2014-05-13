@@ -326,6 +326,10 @@ class EntityFieldProvider
             $classMetadata    = $em->getClassMetadata($relatedClassName);
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
+            if ($this->isIgnoredRelation($classMetadata, $fieldName)) {
+                continue;
+            }
+
             if ($translate) {
                 $label =
                     $this->translator->trans(
