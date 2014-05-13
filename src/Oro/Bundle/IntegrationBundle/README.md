@@ -68,7 +68,7 @@ This will export your data to your store based on channel definition.
 
 **oro_integration.reader.entity.by_id** - service reads from entity by ID.
 
-**processor.reverse** - service is processing each record.
+**processor.reverse** - service which processing each record.
 
 **oro_integration.writer.reverse** - service is writing collection of entities.
 
