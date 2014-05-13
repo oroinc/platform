@@ -29,6 +29,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
+            ->addOption('process-timeout', null, InputOption::VALUE_OPTIONAL, 'Process timeout', 360)
             ->addOption(
                 'sample-data',
                 null,
@@ -56,12 +57,13 @@ class InstallCommand extends ContainerAwareCommand
         } elseif ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
+            $timeout = $input->getOption('process-timeout');
             $commandExecutor->runCommand(
                 'cache:clear',
                 array(
                     '--no-optional-warmers' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 300,
+                    '--process-timeout' => $timeout,
                     '--no-debug' => false
                 )
             );
@@ -141,35 +143,36 @@ class InstallCommand extends ContainerAwareCommand
         $dialog    = $this->getHelperSet()->get('dialog');
         $container = $this->getContainer();
         $options   = $input->getOptions();
+        $timeout = $input->getOption('process-timeout');
 
         $input->setInteractive(false);
 
         $commandExecutor
             ->runCommand(
                 'doctrine:schema:drop',
-                array(
+                [
                     '--force' => true,
                     '--full-database' => true,
                     '--process-isolation' => true,
-                    '--process-timeout' => 360
-                )
+                    '--process-timeout' => $timeout
+                ]
             )
             ->runCommand('oro:entity-config:clear')
             ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'oro:migration:load',
-                array(
+                [
                     '--process-isolation' => true,
-                    '--process-timeout' => 300
-                )
+                    '--process-timeout' => $timeout
+                ]
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
-                array('--process-isolation' => true)
+                ['--process-isolation' => true, '--process-timeout' => $timeout]
             )
             ->runCommand(
                 'oro:migration:data:load',
-                array('--process-isolation' => true, '--no-interaction' => true)
+                ['--process-isolation' => true, '--no-interaction' => true, '--process-timeout' => $timeout]
             );
 
         $output->writeln('');
@@ -238,15 +241,16 @@ class InstallCommand extends ContainerAwareCommand
         // Update administrator with user input
         $commandExecutor->runCommand(
             'oro:user:update',
-            array(
+            [
                 'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                 '--process-isolation' => true,
                 '--user-name' => $userName,
                 '--user-email' => $userEmail,
                 '--user-firstname' => $userFirstName,
                 '--user-lastname' => $userLastName,
-                '--user-password' => $userPassword
-            )
+                '--user-password' => $userPassword,
+                '--process-timeout' => $timeout
+            ]
         );
 
         // update company name and title if specified
@@ -262,7 +266,7 @@ class InstallCommand extends ContainerAwareCommand
         if ($demo) {
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
-                array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
+                ['--process-isolation' => true, '--process-timeout' => $timeout, '--fixtures-type' => 'demo']
             );
         }
 
@@ -282,15 +286,18 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('<info>Preparing application.</info>');
 
         $input->setInteractive(false);
+        $timeout = $input->getOption('process-timeout');
 
         $commandExecutor
-            ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js', '--process-isolation' => true))
-            ->runCommand('oro:localization:dump')
-            ->runCommand('oro:assets:install', array('--exclude' => ['OroInstallerBundle']))
-            ->runCommand('assetic:dump', array('--process-isolation' => true))
-            ->runCommand('oro:translation:dump', array('--process-isolation' => true))
-            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
+            ->runCommand('oro:navigation:init', ['--process-isolation' => true, '--process-timeout' => $timeout])
+            ->runCommand('fos:js-routing:dump', ['--target' => 'web/js/routes.js', '--process-isolation' => true,
+                '--process-timeout' => $timeout])
+            ->runCommand('oro:localization:dump', ['--process-timeout' => $timeout])
+            ->runCommand('oro:assets:install', ['--exclude' => ['OroInstallerBundle'], '--process-timeout' => $timeout])
+            ->runCommand('assetic:dump', ['--process-isolation' => true, '--process-timeout' => $timeout])
+            ->runCommand('oro:translation:dump', ['--process-isolation' => true, '--process-timeout' => $timeout])
+            ->runCommand('oro:requirejs:build', ['--ignore-errors' => true, '--process-isolation' => true,
+                '--process-timeout' => $timeout]);
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -301,11 +308,11 @@ class InstallCommand extends ContainerAwareCommand
         // --no-debug set to false, as Twig cache clear memory usage dramatically rise with true
         $commandExecutor->runCommand(
             'cache:clear',
-            array(
+            [
                 '--process-isolation' => true,
-                '--process-timeout' => 300,
+                '--process-timeout' => $timeout,
                 '--no-debug' => false
-            )
+            ]
         );
 
         $output->writeln('');
