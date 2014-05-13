@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -19,19 +18,19 @@ class ControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicHeader());
     }
 
     public function testIndex()
     {
         $this->client->request('GET', $this->client->generate('oro_tag_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testIndexJson()
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'tag-grid',
             array(
@@ -41,8 +40,8 @@ class ControllersTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
+
         $this->assertEquals(0, $result['options']['totalRecords']);
     }
 
@@ -55,22 +54,19 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Tag saved", $crawler->html());
     }
 
     public function testUpdate()
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'tag-grid',
-            array(
-                'tag-grid[_filter][name][value]' => 'tag758'
-            )
+            array('tag-grid[_filter][name][value]' => 'tag758')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $crawler = $this->client->request(
@@ -83,35 +79,30 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Tag saved", $crawler->html());
 
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'tag-grid',
-            array(
-                'tag-grid[_filter][name][value]' => 'tag758_updated'
-            )
+            array('tag-grid[_filter][name][value]' => 'tag758_updated')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
+
         $this->assertEquals('tag758_updated', $result['name']);
     }
 
     public function testSearch()
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'tag-grid',
-            array(
-                'tag-grid[_filter][name][value]' => 'tag758_updated'
-            )
+            array('tag-grid[_filter][name][value]' => 'tag758_updated')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $this->client->request('GET', $this->client->generate('oro_tag_search', array('id' => $result['id'])));

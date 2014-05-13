@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -23,7 +22,7 @@ class SoapSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
 
         $this->client->soap(
             "http://localhost/api/soap",
@@ -40,12 +39,12 @@ class SoapSearchApiTest extends WebTestCase
     }
 
     /**
-     * @param string $request
-     * @param array  $response
+     * @param array $request
+     * @param array $response
      *
      * @dataProvider requestsApi
      */
-    public function testApi($request, $response)
+    public function testApi(array $request, array $response)
     {
         if (is_null($request['search'])) {
             $request['search'] ='';
@@ -62,7 +61,7 @@ class SoapSearchApiTest extends WebTestCase
             $request['offset'],
             $request['max_results']
         );
-        $result = ToolsAPI::classToArray($result);
+        $result = $this->valueToArray($result);
         $this->assertEqualsResponse($response, $result);
     }
 
@@ -73,7 +72,7 @@ class SoapSearchApiTest extends WebTestCase
      */
     public function requestsApi()
     {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 
     /**

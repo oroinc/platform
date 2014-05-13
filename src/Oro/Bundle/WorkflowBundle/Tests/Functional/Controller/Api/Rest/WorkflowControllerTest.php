@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
@@ -42,7 +41,7 @@ class WorkflowControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         if (!self::$fixturesLoaded) {
             $prev = '..' . DIRECTORY_SEPARATOR;
             $path = __DIR__ . DIRECTORY_SEPARATOR . $prev . $prev . $prev . 'DataFixtures';
@@ -99,7 +98,7 @@ class WorkflowControllerTest extends WebTestCase
 
         // check is deleting workflow item has been performed successfully
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->entityManager->refresh($entity);
         if ($finalDefinitionHasStartStep) {
@@ -138,8 +137,9 @@ class WorkflowControllerTest extends WebTestCase
                 array('entityClass' => $this->entityClass)
             )
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, null);
 
@@ -155,8 +155,9 @@ class WorkflowControllerTest extends WebTestCase
                 array('workflowDefinition' => LoadWorkflowDefinitions::NO_START_STEP)
             )
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::NO_START_STEP);
 

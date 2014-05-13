@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -18,7 +17,7 @@ class DashboardControllerTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicHeader());
     }
 
     public function testIndex()
@@ -28,7 +27,7 @@ class DashboardControllerTest extends WebTestCase
             $this->client->generate('oro_dashboard_index')
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Dashboard', $result->getContent());
     }
 
@@ -39,7 +38,7 @@ class DashboardControllerTest extends WebTestCase
             $this->client->generate('oro_dashboard_view')
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains(
             'Dashboard',
             $result->getContent()

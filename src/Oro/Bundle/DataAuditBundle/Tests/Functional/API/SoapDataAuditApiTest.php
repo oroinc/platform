@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -17,7 +16,7 @@ class SoapDataAuditApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         $this->client->soap(
             "http://localhost/api/soap",
             array(
@@ -47,7 +46,7 @@ class SoapDataAuditApiTest extends WebTestCase
             "owner" => "1"
         );
 
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
+        $this->client->setServerParameters($this->generateWsseHeader());
         $id = $this->client->getSoap()->createUser($request);
         $this->assertInternalType('int', $id, $this->client->getSoap()->__getLastResponse());
         $this->assertGreaterThan(0, $id);
@@ -63,7 +62,7 @@ class SoapDataAuditApiTest extends WebTestCase
     public function testGetAudits($response)
     {
         $result = $this->client->getSoap()->getAudits();
-        $result = ToolsAPI::classToArray($result);
+        $result = $this->valueToArray($result);
 
         if (!is_array(reset($result['item']))) {
             $result[] = $result['item'];
@@ -89,7 +88,7 @@ class SoapDataAuditApiTest extends WebTestCase
     {
         foreach ($response as $audit) {
             $result = $this->client->getSoap()->getAudit($audit['id']);
-            $result = ToolsAPI::classToArray($result);
+            $result = $this->valueToArray($result);
             unset($result['loggedAt']);
             unset($audit['loggedAt']);
             $this->assertEquals($audit, $result);

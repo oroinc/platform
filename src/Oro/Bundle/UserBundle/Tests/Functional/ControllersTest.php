@@ -4,10 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -23,14 +22,14 @@ class ControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicHeader());
     }
 
     public function testIndex()
     {
         $this->client->request('GET', $this->client->generate('oro_user_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
@@ -58,23 +57,19 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
     }
 
     public function testUpdate()
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'users-grid',
-            array(
-                'users-grid[_filter][username][value]' => 'testUser1'
-            )
+            array('users-grid[_filter][username][value]' => 'testUser1')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $crawler = $this->client->request(
@@ -96,23 +91,19 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
     }
 
     public function testApiGen()
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'users-grid',
-            array(
-                'users-grid[_filter][username][value]' => 'testUser1'
-            )
+            array('users-grid[_filter][username][value]' => 'testUser1')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $this->client->request(
@@ -131,7 +122,7 @@ class ControllersTest extends WebTestCase
             ->findOneBy(array('id' => $result['id']));
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, false);
+        $this->assertJsonResponseStatusCodeEquals($result, 200, false);
 
         //verify result
         $this->assertEquals($user->getApi()->getApiKey(), trim($result->getContent(), '"'));
@@ -141,14 +132,14 @@ class ControllersTest extends WebTestCase
     {
         $this->client->request('GET', $this->client->generate('oro_user_profile_view'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('John Doe - Users - Users Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()
     {
         $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
-        ToolsAPI::assertJsonResponse($this->client->getResponse(), 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
             'John Doe - Edit - Users - Users Management - System',
             $this->client->getResponse()->getContent()
@@ -161,11 +152,11 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
 
         $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
-        ToolsAPI::assertJsonResponse($this->client->getResponse(), 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
             'John Doe - Edit - Users - Users Management - System',
             $this->client->getResponse()->getContent()

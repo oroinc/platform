@@ -85,7 +85,7 @@ class Client extends BaseClient
         }
         if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
         //generate new WSSE header
-            parent::setServerParameters(ToolsAPI::generateWsseHeader());
+            parent::setServerParameters(WebTestCase::generateWsseHeader());
         }
 
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\DomCrawler\Form;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -20,9 +20,9 @@ class ChannelControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             array(),
-            array_merge(ToolsAPI::generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
     }
 
@@ -30,7 +30,7 @@ class ChannelControllersTest extends WebTestCase
     {
         $crawler = $this->client->request('GET', $this->client->generate('oro_integration_channel_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Channels - System', $crawler->html());
     }
 
@@ -39,7 +39,7 @@ class ChannelControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->client->generate('oro_integration_channel_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $name = 'name' . ToolsAPI::generateRandomString();
+        $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = 'Simple channel';
         $form['oro_integration_channel_form[type]'] = 'simple';
 
@@ -47,7 +47,7 @@ class ChannelControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Channel saved", $crawler->html());
 
         return $name;
@@ -61,7 +61,7 @@ class ChannelControllersTest extends WebTestCase
      */
     public function testUpdate($name)
     {
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'channels-grid',
             array(
@@ -69,10 +69,9 @@ class ChannelControllersTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
+
         $channel = $result;
         $crawler = $this->client->request(
             'GET',
@@ -81,14 +80,14 @@ class ChannelControllersTest extends WebTestCase
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $name = 'name' . ToolsAPI::generateRandomString();
+        $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
         $this->assertContains("Channel saved", $crawler->html());
 
         $channel['name'] = $name;
@@ -108,9 +107,8 @@ class ChannelControllersTest extends WebTestCase
             $this->client->generate('oro_integration_channel_schedule', array('id' => $channel['id']))
         );
 
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result['job_id']);
     }
@@ -126,10 +124,10 @@ class ChannelControllersTest extends WebTestCase
             $this->client->generate('oro_api_delete_channel', array('id' => $channel['id']))
         );
 
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $response = $this->client->getResponse();
+        $this->assertJsonResponseStatusCodeEquals($response, 204);
 
-        $result = ToolsAPI::getEntityGrid(
+        $response = $this->getGridResponse(
             $this->client,
             'channels-grid',
             array(
@@ -137,8 +135,8 @@ class ChannelControllersTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
+
         $this->assertEmpty($result['data']);
         $this->assertEmpty($result['options']['totalRecords']);
     }

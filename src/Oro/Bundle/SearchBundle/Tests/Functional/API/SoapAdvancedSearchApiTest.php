@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -15,6 +14,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 {
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
+
     /** @var Client */
     protected $client;
 
@@ -22,7 +22,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         $this->client->soap(
             "http://localhost/api/soap",
             array(
@@ -38,12 +38,12 @@ class SoapAdvancedSearchApiTest extends WebTestCase
     }
 
     /**
-     * @dataProvider requestsApi
+     * @dataProvider advancedSearchDataProvider
      */
-    public function testApi($request, $response)
+    public function testAdvancedSearch(array $request, array $response)
     {
         $result = $this->client->getSoap()->advancedSearch($request['query']);
-        $result = ToolsAPI::classToArray($result);
+        $result = $this->valueToArray($result);
         $this->assertEquals($response['count'], $result['count']);
     }
 
@@ -52,32 +52,8 @@ class SoapAdvancedSearchApiTest extends WebTestCase
      *
      * @return array
      */
-    public function requestsApi()
+    public function advancedSearchDataProvider()
     {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'advanced_requests');
-    }
-
-    /**
-     * Test API response
-     *
-     * @param array $response
-     * @param array $result
-     */
-    protected function assertEqualsResponse($response, $result)
-    {
-        $this->assertEquals($response['records_count'], $result['recordsCount']);
-        $this->assertEquals($response['count'], $result['count']);
-        if (isset($response['soap']['item']) && is_array($response['soap']['item'])) {
-            foreach ($response['soap']['item'] as $key => $object) {
-                foreach ($object as $property => $value) {
-                    if (isset($result['elements']['item'][0])) {
-                        $this->assertEquals($value, $result['elements']['item'][$key][$property]);
-                    } else {
-                        $this->assertEquals($value, $result['elements']['item'][$property]);
-                    }
-
-                }
-            }
-        }
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'advanced_requests');
     }
 }

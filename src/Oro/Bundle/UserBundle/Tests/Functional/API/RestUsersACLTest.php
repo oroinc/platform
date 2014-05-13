@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -26,9 +25,9 @@ class RestUsersACLTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         if (!self::$hasLoaded) {
             $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
@@ -55,10 +54,10 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_post_user'),
             $request,
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 
     public function testGetUsers()
@@ -69,10 +68,10 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_get_users'),
             array('limit' => 100),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 
     public function testGetUser()
@@ -83,10 +82,10 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 
     public function testUpdateUser()
@@ -107,10 +106,10 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
             $request,
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 
     public function testDeleteUser()
@@ -120,9 +119,9 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID)),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 }

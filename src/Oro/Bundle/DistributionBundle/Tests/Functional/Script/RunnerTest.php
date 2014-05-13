@@ -23,7 +23,7 @@ class RunnerTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient();
+        $this->client = self::createClient();
         $this->applicationRootDir = $this->client->getKernel()->getRootDir();
         if (!is_dir($this->applicationRootDir . '/config/dist')) {
             $this->markTestSkipped('Distribution tests are not compatibility with CRM environment');

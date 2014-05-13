@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -22,14 +21,14 @@ class ControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicHeader());
     }
 
     public function testDefault()
     {
         $crawler = $this->client->request('GET', $this->client->generate('oro_calendar_view_default'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertEquals('My Calendar - John Doe', $crawler->filter('#page-title')->html());
     }
 
@@ -43,7 +42,7 @@ class ControllersTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertEquals('John Doe - Calendars - John Doe', $crawler->filter('#page-title')->html());
     }
 }

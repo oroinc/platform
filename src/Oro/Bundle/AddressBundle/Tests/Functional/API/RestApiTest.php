@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Symfony\Component\BrowserKit\Response;
-
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
@@ -19,7 +16,7 @@ class RestApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
     }
 
     /**
@@ -32,10 +29,8 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_get_countries')
         );
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         return array_slice($result, 0, 5);
     }
 
@@ -50,10 +45,9 @@ class RestApiTest extends WebTestCase
                 'GET',
                 $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
             );
-            /** @var $result Response */
-            $result = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($result, 200);
-            $result = ToolsAPI::jsonToArray($result->getContent());
+
+            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             $this->assertEquals($country, $result);
         }
     }
@@ -65,10 +59,9 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_get_region'),
             array('id' => 'US-LA')
         );
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals('US-LA', $result['combinedCode']);
     }
 
@@ -78,22 +71,20 @@ class RestApiTest extends WebTestCase
             'GET',
             $this->client->generate('oro_api_country_get_regions', array('country' => 'US'))
         );
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         foreach ($result as $region) {
             $this->client->request(
                 'GET',
                 $this->client->generate('oro_api_get_region'),
                 array('id' => $region['combinedCode']),
                 array(),
-                ToolsAPI::generateWsseHeader()
+                $this->generateWsseHeader()
             );
-            /** @var $result Response */
-            $expectedResult = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($expectedResult, 200);
-            $expectedResult = ToolsAPI::jsonToArray($expectedResult->getContent());
+
+            $expectedResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             $this->assertEquals($expectedResult, $region);
         }
     }

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -19,7 +18,7 @@ class RestCalendarEventTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
     }
 
     public function testGets()
@@ -32,9 +31,8 @@ class RestCalendarEventTest extends WebTestCase
         );
 
         $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEmpty($result);
     }
@@ -55,9 +53,8 @@ class RestCalendarEventTest extends WebTestCase
             'allDay'   => true
         );
         $this->client->request('POST', $this->client->generate('oro_api_post_calendarevent'), $request);
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->assertNotEmpty($result);
         $this->assertTrue(isset($result['id']));
@@ -83,11 +80,12 @@ class RestCalendarEventTest extends WebTestCase
             $this->client->generate('oro_api_put_calendarevent', array("id" => $id)),
             $request
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 204);
 
         $this->assertEmpty($result);
+
+        return $id;
     }
 
     /**
@@ -103,9 +101,8 @@ class RestCalendarEventTest extends WebTestCase
             'subordinate' => true
         );
         $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result[0]['id']);

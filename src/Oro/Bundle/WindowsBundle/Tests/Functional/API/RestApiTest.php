@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -22,7 +22,7 @@ class RestApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient();
+        $this->client = self::createClient();
     }
 
     /**
@@ -42,13 +42,13 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_post_windows'),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -74,13 +74,13 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -101,13 +101,13 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_get_windows'),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -129,13 +129,13 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 
@@ -153,12 +153,12 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
 
         $this->client->restart();
 
@@ -167,13 +167,13 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     /**
@@ -224,13 +224,13 @@ class RestApiTest extends WebTestCase
                 $url,
                 array(),
                 array(),
-                ToolsAPI::generateWsseHeader()
+                $this->generateWsseHeader()
             );
 
             /** @var $response Response */
             $response = $this->client->getResponse();
 
-            ToolsAPI::assertJsonResponse($response, 400);
+            $this->assertJsonResponseStatusCodeEquals($response, 400);
 
             $responseJson = json_decode($response->getContent(), true);
 

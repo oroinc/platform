@@ -2,27 +2,23 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
+use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
  */
 class SoapInvalidUsersTest extends WebTestCase
 {
-
-    const USER_NAME = 'user_wo_permissions';
-    const USER_PASSWORD = 'no_key';
-
     /** @var Client */
     protected $client;
 
     public function testInvalidKey()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseHeader()
         );
         try {
             $this->client->soap(
@@ -39,9 +35,9 @@ class SoapInvalidUsersTest extends WebTestCase
 
     public function testInvalidUser()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, ToolsAPI::USER_PASSWORD)
+            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         try {
             $this->client->soap(

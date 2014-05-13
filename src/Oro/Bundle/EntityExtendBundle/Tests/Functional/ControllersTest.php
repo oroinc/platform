@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -19,14 +18,14 @@ class ControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicHeader());
     }
 
     public function testIndex()
     {
         $this->client->request('GET', $this->client->generate('oro_entityconfig_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
@@ -41,7 +40,7 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Entity saved", $crawler->html());
         preg_match('/\/view\/(\d+)/', $this->client->getHistory()->current()->getUri(), $matches);
         $this->assertCount(2, $matches);
@@ -67,7 +66,7 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Entity saved", $crawler->html());
 
         return $id;
@@ -83,7 +82,7 @@ class ControllersTest extends WebTestCase
             $this->client->generate('oro_entityconfig_view', array('id' => $id))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, false);
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('test entity label updated', $result->getContent());
 
     }

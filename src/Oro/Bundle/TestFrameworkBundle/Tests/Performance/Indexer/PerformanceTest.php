@@ -14,7 +14,7 @@ class PerformanceTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array("debug"=>false));
+        $this->client = self::createClient(array("debug"=>false));
         $container = $this->client->getContainer();
         $doctrine = $container->get('doctrine');
         $em = $doctrine->getEntityManager();

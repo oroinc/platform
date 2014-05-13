@@ -5,9 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -33,7 +32,7 @@ class DashboardControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = static::createClient([], ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient([], $this->generateWsseHeader());
         $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $this->dashboard = new Dashboard();
@@ -58,7 +57,7 @@ class DashboardControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'DELETE',
@@ -70,6 +69,6 @@ class DashboardControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 }

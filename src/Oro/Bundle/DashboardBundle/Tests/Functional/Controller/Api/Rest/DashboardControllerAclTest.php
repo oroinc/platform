@@ -4,9 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -32,9 +31,9 @@ class DashboardControllerAclTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             [],
-            ToolsAPI::generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
@@ -66,10 +65,10 @@ class DashboardControllerAclTest extends WebTestCase
             ),
             [],
             [],
-            ToolsAPI::generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
 
         $this->assertNotNull($dashboard);
     }

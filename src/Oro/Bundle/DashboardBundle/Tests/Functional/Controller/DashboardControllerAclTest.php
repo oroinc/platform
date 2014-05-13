@@ -3,10 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -32,9 +31,9 @@ class DashboardControllerAclTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->client = self::createClient(
             [],
-            ToolsAPI::generateBasicHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateBasicHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
@@ -53,7 +52,7 @@ class DashboardControllerAclTest extends WebTestCase
             $this->client->generate('oro_dashboard_view')
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains(
             'Quick Launchpad',
             $result->getContent()

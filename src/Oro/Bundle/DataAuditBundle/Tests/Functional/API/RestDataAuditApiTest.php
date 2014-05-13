@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -18,7 +17,7 @@ class RestDataAuditApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
     }
 
     /**
@@ -45,7 +44,7 @@ class RestDataAuditApiTest extends WebTestCase
 
         $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
     }
@@ -61,10 +60,10 @@ class RestDataAuditApiTest extends WebTestCase
             'GET',
             $this->client->generate('oro_api_get_audits')
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $resultActual = reset($result);
+
         $this->assertEquals('create', $resultActual['action']);
         $this->assertEquals('Oro\Bundle\UserBundle\Entity\User', $resultActual['object_class']);
         $this->assertEquals($response['user']['username'], $resultActual['object_name']);
@@ -88,11 +87,12 @@ class RestDataAuditApiTest extends WebTestCase
                 'GET',
                 $this->client->generate('oro_api_get_audit', array('id' => $audit['id']))
             );
-            $result = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($result, 200);
-            $result = ToolsAPI::jsonToArray($result->getContent());
+
+            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             unset($result['loggedAt']);
             unset($audit['loggedAt']);
+
             $this->assertEquals($audit, $result);
         }
     }

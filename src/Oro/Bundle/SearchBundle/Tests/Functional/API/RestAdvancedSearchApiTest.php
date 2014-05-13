@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -19,7 +18,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         if (!self::$hasLoaded) {
             $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
         }
@@ -30,9 +29,9 @@ class RestAdvancedSearchApiTest extends WebTestCase
      * @param array $request
      * @param array $response
      *
-     * @dataProvider requestsApi
+     * @dataProvider advancedSearchDataProvider
      */
-    public function testApi($request, $response)
+    public function testAdvancedSearch(array $request, array $response)
     {
         $requestUrl = $request['query'];
         $this->client->request(
@@ -43,31 +42,19 @@ class RestAdvancedSearchApiTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
         $result = json_decode($result->getContent(), true);
+
         //compare result
-        $this->assertEqualsResponse($response, $result);
-    }
-
-    /**
-     * Data provider for REST API tests
-     *
-     * @return array
-     */
-    public function requestsApi()
-    {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'advanced_requests');
-    }
-
-    /**
-     * Test API response
-     *
-     * @param array $response
-     * @param array $result
-     */
-    protected function assertEqualsResponse($response, $result)
-    {
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
+    }
+
+    /**
+     * @return array
+     */
+    public function advancedSearchDataProvider()
+    {
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'advanced_requests');
     }
 }

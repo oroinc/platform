@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -17,7 +16,7 @@ class SoapGroupsTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         $this->client->soap(
             "http://localhost/api/soap",
             array(
@@ -28,12 +27,10 @@ class SoapGroupsTest extends WebTestCase
     }
 
     /**
-     * @param string $request
-     * @param array  $response
-     *
-     * @dataProvider requestsApi
+     * @param array $request
+     * @dataProvider groupsDataProvider
      */
-    public function testCreateGroup($request, $response)
+    public function testCreateGroup(array $request)
     {
         $id = $this->client->getSoap()->createGroup($request);
         $this->assertInternalType('int', $id);
@@ -46,21 +43,21 @@ class SoapGroupsTest extends WebTestCase
     public function testGetGroups()
     {
         $groups = $this->client->getSoap()->getGroups();
-        $groups = ToolsAPI::classToArray($groups);
+        $groups = $this->valueToArray($groups);
         $this->assertEquals(6, count($groups['item']));
     }
 
     /**
-     * @param string $request
-     * @param array  $response
+     * @param array $request
+     * @param array $response
      *
-     * @dataProvider requestsApi
+     * @dataProvider groupsDataProvider
      * @depends testCreateGroup
      */
-    public function testUpdateGroup($request, $response)
+    public function testUpdateGroup(array $request, array $response)
     {
         $groups = $this->client->getSoap()->getGroups();
-        $groups = ToolsAPI::classToArray($groups);
+        $groups = $this->valueToArray($groups);
 
         $group = array_filter(
             $groups['item'],
@@ -76,11 +73,10 @@ class SoapGroupsTest extends WebTestCase
         $request['name'] .= '_Updated';
 
         $result = $this->client->getSoap()->updateGroup($groupId, $request);
-        $result = ToolsAPI::classToArray($result);
-        ToolsAPI::assertEqualsResponse($response, $result);
+        $this->assertEquals($response['return'], $result);
 
         $group = $this->client->getSoap()->getGroup($groupId);
-        $group = ToolsAPI::classToArray($group);
+        $group = $this->valueToArray($group);
         $this->assertEquals($request['name'], $group['name']);
     }
 
@@ -90,7 +86,7 @@ class SoapGroupsTest extends WebTestCase
     public function testDeleteGroups()
     {
         $groups = $this->client->getSoap()->getGroups();
-        $groups = ToolsAPI::classToArray($groups);
+        $groups = $this->valueToArray($groups);
         $this->assertEquals(6, count($groups['item']));
 
         foreach ($groups['item'] as $k => $group) {
@@ -102,17 +98,15 @@ class SoapGroupsTest extends WebTestCase
         }
 
         $groups = $this->client->getSoap()->getGroups();
-        $groups = ToolsAPI::classToArray($groups);
+        $groups = $this->valueToArray($groups);
         $this->assertEquals(2, count($groups['item']));
     }
 
     /**
-     * Data provider for REST API tests
-     *
      * @return array
      */
-    public function requestsApi()
+    public function groupsDataProvider()
     {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'GroupRequest');
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'GroupRequest');
     }
 }

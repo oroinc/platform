@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat;
 
 use Oro\Bundle\TestFrameworkBundle\Test\BehatTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 /**
  * @dbIsolation
@@ -12,7 +11,7 @@ class BehatTest extends BehatTestCase
 {
     protected function setUp()
     {
-        static::createClient();
+        self::createClient();
     }
 
     public function testCreateUserAcceptanceCriteria()

@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 abstract class AbstractChannelDataDeleteTest extends WebTestCase
 {
@@ -34,9 +33,9 @@ abstract class AbstractChannelDataDeleteTest extends WebTestCase
 
     public function setUp()
     {
-        $client = static::createClient(
+        $client = self::createClient(
             array(),
-            array_merge(ToolsAPI::generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->container = $client->getKernel()->getContainer();
         $this->em = $this->container->get('doctrine.orm.entity_manager');

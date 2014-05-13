@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
@@ -14,12 +13,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 class RestSearchApiTest extends WebTestCase
 {
     protected static $hasLoaded = false;
+
     /** @var client */
     protected $client;
 
     public function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseHeader());
         if (!self::$hasLoaded) {
             $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
         }
@@ -30,9 +30,9 @@ class RestSearchApiTest extends WebTestCase
      * @param array $request
      * @param array $response
      *
-     * @dataProvider requestsApi
+     * @dataProvider searchDataProvider
      */
-    public function testApi($request, $response)
+    public function testSearch(array $request, array $response)
     {
         foreach ($request as $key => $value) {
             if (is_null($value)) {
@@ -48,20 +48,9 @@ class RestSearchApiTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
         $result = json_decode($result->getContent(), true);
-        //compare result
-        $this->assertEqualsResponse($response, $result);
-    }
 
-    /**
-     * Test API response
-     *
-     * @param array $response
-     * @param array $result
-     */
-    protected function assertEqualsResponse($response, $result)
-    {
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
         if (isset($response['rest']['data']) && is_array($response['rest']['data'])) {
@@ -74,12 +63,10 @@ class RestSearchApiTest extends WebTestCase
     }
 
     /**
-     * Data provider for REST API tests
-     *
      * @return array
      */
-    public function requestsApi()
+    public function searchDataProvider()
     {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 }

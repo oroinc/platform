@@ -5,6 +5,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\BehatWebContext;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FeatureContext extends BehatWebContext
 {
@@ -19,10 +20,10 @@ class FeatureContext extends BehatWebContext
     {
         /** @var Client $client */
         $client = self::getClientInstance();
-        $header = \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::generateBasicHeader($user, $password);
+        $header = \Oro\Bundle\TestFrameworkBundle\Test\$this->generateBasicHeader($user, $password);
         //open default route
         $client->request('GET', $client->generate('oro_default'), array(), array(), $header);
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
+        WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains('Dashboard', $client->getCrawler()->html());
     }
 
@@ -34,7 +35,7 @@ class FeatureContext extends BehatWebContext
         $client = self::getClientInstance();
         $route = 'oro_' . str_replace(' ', '_', strtolower($dialog));
         $client->request('GET', $client->generate($route));
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
+        WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains(
             'Create User - Users - Users Management - System',
             $client->getCrawler()->html()
@@ -100,7 +101,7 @@ class FeatureContext extends BehatWebContext
         $client->followRedirects();
         $client->submit($this->form);
 
-        \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, false);
+        WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
     }
 
     /**

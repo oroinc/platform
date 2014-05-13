@@ -2,22 +2,29 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Component\Finder\Finder;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 /**
- * Class WebTestCase
- *
- * @package Oro\Bundle\TestFrameworkBundle\Test
+ * Abstract class for functional and integration tests
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_REINDEX_ANNOTATION = 'dbReindex';
+
+    /** Default WSSE credentials */
+    const USER_NAME = 'admin';
+    const USER_PASSWORD = 'admin_api_key';
+
+    /**  Default user name and password */
+    const AUTH_USER = 'admin@example.com';
+    const AUTH_PW = 'admin';
 
     /**
      * @var bool[]
@@ -191,5 +198,232 @@ abstract class WebTestCase extends BaseWebTestCase
         require_once $file;
 
         return $class;
+    }
+
+    /**
+     * Generate WSSE authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @param string|null $nonce
+     * @return array
+     */
+    public static function generateWsseHeader(
+        $userName = self::USER_NAME,
+        $userPassword = self::USER_PASSWORD,
+        $nonce = null
+    ) {
+        if (null === $nonce) {
+            $nonce = uniqid();
+        }
+
+        $created  = date('c');
+        $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
+        $wsseHeader = array(
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
+            'HTTP_X-WSSE' => sprintf(
+                'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
+                $userName,
+                $digest,
+                $nonce,
+                $created
+            )
+        );
+        return $wsseHeader;
+    }
+
+    /**
+     * Generate Basic  authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @return array
+     */
+    public static function generateBasicHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
+    {
+        return array('PHP_AUTH_USER' =>  $userName, 'PHP_AUTH_PW' => $userPassword);
+    }
+
+    /**
+     * @param Client $client
+     * @param array|string $gridParameters
+     * @param array $filter
+     * @return Response
+     */
+    public static function getGridResponse(Client $client, $gridParameters, $filter = array())
+    {
+        if (is_string($gridParameters)) {
+            $gridParameters = array('gridName' => $gridParameters);
+        }
+
+        //transform parameters to nested array
+        $parameters = array();
+        foreach ($filter as $param => $value) {
+            $param .= '=' . $value;
+            parse_str($param, $output);
+            $parameters = array_merge_recursive($parameters, $output);
+        }
+
+        $gridParameters = array_merge_recursive($gridParameters, $parameters);
+        $client->request(
+            'GET',
+            $client->generate('oro_datagrid_index', $gridParameters)
+        );
+
+        return $client->getResponse();
+    }
+
+    /**
+     * Data provider for REST/SOAP API tests
+     *
+     * @param string $folder
+     * @return array
+     */
+    public static function getApiRequestsData($folder)
+    {
+        static $randomString;
+
+        // generate unique value
+        if (!$randomString) {
+            $randomString = self::generateRandomString(5);
+        }
+
+        $parameters = array();
+        $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
+        foreach ($testFiles as $fileName => $object) {
+            $parameters[$fileName] = Yaml::parse($fileName);
+            if (is_null($parameters[$fileName]['response'])) {
+                unset($parameters[$fileName]['response']);
+            }
+        }
+
+        $replaceCallback = function (&$value) use ($randomString) {
+            if (!is_null($value)) {
+                $value = str_replace('%str%', $randomString, $value);
+            }
+        };
+
+        foreach ($parameters as $key => $value) {
+            array_walk(
+                $parameters[$key]['request'],
+                $replaceCallback,
+                $randomString
+            );
+            array_walk(
+                $parameters[$key]['response'],
+                $replaceCallback,
+                $randomString
+            );
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Convert value to array
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public static function valueToArray($value)
+    {
+        return (array)json_decode(json_encode($value), true);
+    }
+
+    /**
+     * Convert json to array
+     *
+     * @param string $json
+     * @return array
+     */
+    public static function jsonToArray($json)
+    {
+        return json_decode($json, true);
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public static function generateRandomString($length = 10)
+    {
+        $random= "";
+        srand((double) microtime() * 1000000);
+        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $char_list .= "abcdefghijklmnopqrstuvwxyz";
+        $char_list .= "1234567890_";
+
+        for ($i = 0; $i < $length; $i++) {
+            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+        }
+
+        return $random;
+    }
+
+    /**
+     * Checks json response status code and return content as array
+     *
+     * @param Response $response
+     * @param int $statusCode
+     * @return array
+     */
+    public static function getJsonResponseContent(Response $response, $statusCode)
+    {
+        self::assertJsonResponseStatusCodeEquals($response, $statusCode);
+        return self::jsonToArray($response->getContent());
+    }
+
+    /**
+     * Assert response is json and has status code
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertResponseContentTypeEquals($response, 'application/json');
+    }
+
+    /**
+     * Assert response is html and has status code
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8');
+    }
+
+    /**
+     * Assert response status code equals
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        \PHPUnit_Framework_TestCase::assertEquals(
+            $statusCode,
+            $response->getStatusCode(),
+            $response->getContent()
+        );
+    }
+
+    /**
+     * Assert response content type equals
+     *
+     * @param Response $response
+     * @param string $contentType
+     */
+    public static function assertResponseContentTypeEquals(Response $response, $contentType)
+    {
+        \PHPUnit_Framework_TestCase::assertTrue(
+            $response->headers->contains('Content-Type', $contentType),
+            $response->headers
+        );
     }
 }

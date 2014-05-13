@@ -26,7 +26,7 @@ abstract class FunctionalTestCase extends WebTestCase
     protected function getContainer()
     {
         if (!$this->container) {
-            $this->container = static::createClient()->getKernel()->getContainer();
+            $this->container = self::createClient()->getKernel()->getContainer();
         }
 
         return $this->container;
