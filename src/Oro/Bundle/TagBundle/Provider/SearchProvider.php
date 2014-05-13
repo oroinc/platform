@@ -4,6 +4,8 @@ namespace Oro\Bundle\TagBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\TagBundle\Entity\Tagging;
@@ -11,6 +13,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class SearchProvider extends ResultStatisticsProvider
 {
@@ -29,11 +32,18 @@ class SearchProvider extends ResultStatisticsProvider
      */
     protected $securityProvider;
 
-    public function __construct(EntityManager $em, ObjectMapper $mapper, SecurityProvider $securityProvider)
-    {
+    public function __construct(
+        EntityManager $em,
+        ObjectMapper $mapper,
+        SecurityProvider $securityProvider,
+        Indexer $indexer,
+        ConfigManager $configManager,
+        Translator $translator
+    ) {
         $this->em = $em;
         $this->mapper = $mapper;
         $this->securityProvider = $securityProvider;
+        parent::__construct($indexer, $configManager, $translator);
     }
 
     /**

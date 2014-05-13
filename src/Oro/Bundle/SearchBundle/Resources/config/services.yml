@@ -52,7 +52,7 @@ services:
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
-        arguments:                    ["@oro_search.index"]
+        arguments:                    ["@oro_search.index", "@oro_entity_config.config_manager", "@translator"]
         lazy: true
 
     oro_search.formatter.result_formatter:
