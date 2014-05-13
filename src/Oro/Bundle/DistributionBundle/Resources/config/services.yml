@@ -95,7 +95,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
-
     ### Form
     oro_distribution.form.type.composer_config:
         class: %oro_distribution.form.type.composer_config.class%

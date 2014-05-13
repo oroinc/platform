@@ -3,10 +3,14 @@
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-class NavigationListener
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+
+class NavigationListener implements ContainerAwareInterface
 {
     /**
      * @var SecurityContextInterface
@@ -19,13 +23,31 @@ class NavigationListener
     protected $entryPoint;
 
     /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * @param SecurityContextInterface $securityContext
      * @param null|string              $entryPoint
      */
-    public function __construct(SecurityContextInterface $securityContext, $entryPoint = null)
-    {
+    public function __construct(
+        SecurityContextInterface $securityContext,
+        $entryPoint = null
+    ) {
         $this->securityContext = $securityContext;
-        $this->entryPoint      = $entryPoint;
+
+        $this->entryPoint = $entryPoint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        if ($container->hasScope('request')) {
+            $this->basePath = $container->get('request')->getBasePath();
+        }
     }
 
     /**
@@ -40,6 +62,12 @@ class NavigationListener
             return;
         }
 
+        $uri = '/' . $this->entryPoint;
+
+        if ($this->basePath) {
+            $uri = $this->basePath . $uri;
+        }
+
         /** @var ItemInterface $systemTabMenuItem */
         $systemTabMenuItem = $event->getMenu()->getChild('system_tab');
         if ($systemTabMenuItem) {
@@ -47,7 +75,7 @@ class NavigationListener
                 'package_manager',
                 [
                     'label'          => 'Package Manager',
-                    'uri'            => $this->entryPoint,
+                    'uri'            => $uri,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110'],
                 ]
