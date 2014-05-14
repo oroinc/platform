@@ -4,13 +4,12 @@ namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
-class NavigationListener implements ContainerAwareInterface
+class NavigationListener
 {
     /**
      * @var SecurityContextInterface
@@ -18,14 +17,14 @@ class NavigationListener implements ContainerAwareInterface
     protected $securityContext;
 
     /**
-     * @var string
+     * @var Request
      */
-    protected $entryPoint;
+    protected $request;
 
     /**
      * @var string
      */
-    protected $basePath;
+    protected $entryPoint;
 
     /**
      * @param SecurityContextInterface $securityContext
@@ -36,18 +35,15 @@ class NavigationListener implements ContainerAwareInterface
         $entryPoint = null
     ) {
         $this->securityContext = $securityContext;
-
-        $this->entryPoint = $entryPoint;
+        $this->entryPoint      = $entryPoint;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Request $request
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setRequest(Request $request = null)
     {
-        if ($container->hasScope('request')) {
-            $this->basePath = $container->get('request')->getBasePath();
-        }
+        $this->request = $request;
     }
 
     /**
@@ -64,8 +60,8 @@ class NavigationListener implements ContainerAwareInterface
 
         $uri = '/' . $this->entryPoint;
 
-        if ($this->basePath) {
-            $uri = $this->basePath . $uri;
+        if ($this->request) {
+            $uri = $this->request->getBasePath() . $uri;
         }
 
         /** @var ItemInterface $systemTabMenuItem */

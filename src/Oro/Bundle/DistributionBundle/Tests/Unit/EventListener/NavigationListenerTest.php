@@ -24,7 +24,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function couldBeConstructedWithEntryPoint()
     {
-        new NavigationListener($this->createSecurityContextMock(), $entryPoint = self::ENTRY_POINT);
+        new NavigationListener($this->createSecurityContextMock(), self::ENTRY_POINT);
     }
 
     /**
@@ -55,7 +55,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $security->expects($this->never())
             ->method('isGranted');
 
-        $listener = new NavigationListener($security, $entryPoint = self::ENTRY_POINT);
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -74,7 +74,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with('ROLE_ADMINISTRATOR')
             ->will($this->returnValue(false));
 
-        $listener = new NavigationListener($security, $entryPoint = self::ENTRY_POINT);
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -84,7 +84,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNotAddMenuItemIfMenuDoesNotHaveSystemTab()
     {
         $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, $entryPoint = self::ENTRY_POINT);
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
 
         $security->expects($this->once())
             ->method('getToken')
@@ -114,7 +114,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldAddMenuItem()
     {
         $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, $entryPoint = self::ENTRY_POINT);
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
 
         $security->expects($this->once())
             ->method('getToken')
@@ -142,7 +142,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 'package_manager',
                 [
                     'label'          => 'Package Manager',
-                    'uri'            => '/' . $entryPoint,
+                    'uri'            => '/' . self::ENTRY_POINT,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110']
                 ]
@@ -158,9 +158,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldAddMenuItemForSubdirectory()
     {
         $security = $this->createSecurityContextMock();
-        $container  = $this->createContainerMock();
 
-        $listener = new NavigationListener($security, $entryPoint = self::ENTRY_POINT);
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
 
         $security
             ->expects($this->once())
@@ -171,24 +170,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->will($this->returnValue(true));
 
-        $container
-            ->expects($this->once())
-            ->method('hasScope')
-            ->will($this->returnValue(true));
-
         $request = $this->createRequestMock();
         $request
             ->expects($this->once())
             ->method('getBasePath')
             ->will($this->returnValue('/subdir'));
 
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('request'))
-            ->will($this->returnValue($request));
-
-        $listener->setContainer($container);
+        $listener->setRequest($request);
 
         $event = $this->createEventMock();
 
@@ -212,7 +200,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
                 'package_manager',
                 [
                     'label'          => 'Package Manager',
-                    'uri'            => '/subdir/' . $entryPoint,
+                    'uri'            => '/subdir/' . self::ENTRY_POINT,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110']
                 ]
@@ -244,14 +232,6 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     protected function createSecurityContextMock()
     {
         return $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createContainerMock()
-    {
-        return $this->createConstructorLessMock('Symfony\Component\DependencyInjection\ContainerInterface');
     }
 
     /**
