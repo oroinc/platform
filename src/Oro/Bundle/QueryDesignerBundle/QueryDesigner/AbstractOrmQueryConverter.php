@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter

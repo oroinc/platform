@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
 
-
 use Oro\Bundle\DistributionBundle\EventListener\NavigationListener;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
 class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 {
     use MockHelperTrait;
+
+    const ENTRY_POINT = 'install.php';
 
     /**
      * @test
@@ -23,10 +24,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function couldBeConstructedWithEntryPoint()
     {
-        new NavigationListener(
-            $this->createSecurityContextMock(),
-            $entryPoint = '/install.php'
-        );
+        new NavigationListener($this->createSecurityContextMock(), self::ENTRY_POINT);
     }
 
     /**
@@ -57,7 +55,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $security->expects($this->never())
             ->method('isGranted');
 
-        $listener = new NavigationListener($security, '/install.php');
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -76,7 +74,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with('ROLE_ADMINISTRATOR')
             ->will($this->returnValue(false));
 
-        $listener = new NavigationListener($security, '/install.php');
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -86,7 +84,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNotAddMenuItemIfMenuDoesNotHaveSystemTab()
     {
         $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, '/install.php');
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
 
         $security->expects($this->once())
             ->method('getToken')
@@ -116,7 +114,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldAddMenuItem()
     {
         $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, $entryPoint = '/install.php');
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
 
         $security->expects($this->once())
             ->method('getToken')
@@ -143,10 +141,68 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'package_manager',
                 [
-                    'label' => 'Package Manager',
-                    'uri' => $entryPoint,
+                    'label'          => 'Package Manager',
+                    'uri'            => '/' . self::ENTRY_POINT,
                     'linkAttributes' => ['class' => 'no-hash'],
-                    'extras' => ['position' => '110']
+                    'extras'         => ['position' => '110']
+                ]
+            )
+            ->will($this->returnValue($systemTab));
+
+        $listener->onNavigationConfigure($event);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAddMenuItemForSubdirectory()
+    {
+        $security = $this->createSecurityContextMock();
+
+        $listener = new NavigationListener($security, self::ENTRY_POINT);
+
+        $security
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(true));
+        $security
+            ->expects($this->once())
+            ->method('isGranted')
+            ->will($this->returnValue(true));
+
+        $request = $this->createRequestMock();
+        $request
+            ->expects($this->once())
+            ->method('getBasePath')
+            ->will($this->returnValue('/subdir'));
+
+        $listener->setRequest($request);
+
+        $event = $this->createEventMock();
+
+        $menu = $this->createMenuItemMock();
+        $event
+            ->expects($this->once())
+            ->method('getMenu')
+            ->will($this->returnValue($menu));
+
+        $systemTab = $this->createMenuItemMock();
+        $menu
+            ->expects($this->once())
+            ->method('getChild')
+            ->with('system_tab')
+            ->will($this->returnValue($systemTab));
+
+        $systemTab
+            ->expects($this->once())
+            ->method('addChild')
+            ->with(
+                'package_manager',
+                [
+                    'label'          => 'Package Manager',
+                    'uri'            => '/subdir/' . self::ENTRY_POINT,
+                    'linkAttributes' => ['class' => 'no-hash'],
+                    'extras'         => ['position' => '110']
                 ]
             )
             ->will($this->returnValue($systemTab));
@@ -176,5 +232,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     protected function createSecurityContextMock()
     {
         return $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createRequestMock()
+    {
+        return $this->createConstructorLessMock('Symfony\Component\HttpFoundation\Request');
     }
 }

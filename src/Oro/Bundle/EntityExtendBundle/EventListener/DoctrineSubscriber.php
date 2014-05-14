@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -85,9 +86,11 @@ class DoctrineSubscriber implements EventSubscriber
     protected function prepareRelations(ConfigInterface $config, ClassMetadataBuilder $cmBuilder)
     {
         if ($config->is('relation')) {
-            foreach ($config->get('relation') as $relation) {
-                /** @var FieldConfigId $fieldId */
-                if ($relation['assign'] && $fieldId = $relation['field_id']) {
+            $relations = $config->get('relation');
+            foreach ($relations as $relation) {
+                /** @var FieldConfigId|Config $fieldId */
+                $fieldId = $relation['field_id'];
+                if ($relation['assign'] && $fieldId) {
                     /** @var FieldConfigId $targetFieldId */
                     $targetFieldId = $relation['target_field_id'];
 

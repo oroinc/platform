@@ -9,3 +9,5 @@ oro.locale:
             timezone: "Select the timezone of your location. All dates and times will be displayed in the specified timezone."
             currency: "Select the default currency"
             quarter_start: "Select the starting date of the first quarter in year."
+            temperature_unit: "Select the temperature unit. This settings will be applied for weather on map."
+            wind_speed_unit: "Select the wind speed unit. This settings will be applied for weather on map."

@@ -27,6 +27,10 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
+            unit: {
+                'temperature': 'fahrenheit',
+                'wind_speed':  'miles_per_hour'
+            },
             locale_data: {
                 US: {
                     phone_prefix: '1',
