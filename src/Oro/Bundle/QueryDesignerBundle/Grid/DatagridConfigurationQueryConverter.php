@@ -72,6 +72,15 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $this->leftJoins       = null;
 
         $this->config->offsetSetByPath('[source][type]', 'orm');
+        $this->config->offsetSetByPath(
+            '[source][hints]',
+            [
+                [
+                    'name' => 'doctrine.customOutputWalker',
+                    'value' => 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                ]
+            ]
+        );
     }
 
     /**
