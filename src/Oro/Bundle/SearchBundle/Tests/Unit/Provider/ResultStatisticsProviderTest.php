@@ -135,7 +135,12 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    protected function getSearchResultEntity($config, $class)
+    /**
+     * @param array $config
+     * @param string $class
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getSearchResultEntity(array $config, $class)
     {
         $entity = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
             ->disableOriginalConstructor()
@@ -150,6 +155,11 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @param string $label
+     * @param string $icon
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getConfigEntity($label, $icon)
     {
         $configEntity = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
