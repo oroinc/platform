@@ -19,6 +19,7 @@ define(function (require) {
     var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
     var _jqueryForm = require('jquery.form');
+    var routing = require('routing');
 
     var Navigation;
     var instance;
@@ -530,14 +531,8 @@ define(function (require) {
          */
         updateDebugToolbar: function(jqXHR) {
             var debugBarToken = jqXHR.getResponseHeader('x-debug-token');
-            var entryPoint = window.location.pathname;
-            if (entryPoint.indexOf('.php') !== -1) {
-                entryPoint = entryPoint.substr(0, entryPoint.indexOf('.php') + 4);
-            } else {
-                entryPoint = '';
-            }
             if(debugBarToken) {
-                var url = entryPoint + '/_wdt/' + debugBarToken;
+                var url = routing.getBaseUrl() + '/_wdt/' + debugBarToken;
                 $.get(
                     this.baseUrl + url,
                     _.bind(function(data) {
