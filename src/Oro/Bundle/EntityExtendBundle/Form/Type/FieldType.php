@@ -156,18 +156,18 @@ class FieldType extends AbstractType
     /**
      * Check if reverse relation can be created
      *
-     * @param ConfigProvider $extendProvider
-     * @param FieldConfigId  $fieldId
-     * @param FieldConfigId  $targetFieldId
-     * @param array          $relation
-     * @param string         $relationKey
+     * @param ConfigProvider      $extendProvider
+     * @param FieldConfigId|false $fieldId
+     * @param FieldConfigId|false $targetFieldId
+     * @param array               $relation
+     * @param string              $relationKey
      *
      * @return bool
      */
     protected function isAvailableRelation(
         ConfigProvider $extendProvider,
-        FieldConfigId $fieldId,
-        FieldConfigId $targetFieldId,
+        $fieldId,
+        $targetFieldId,
         array $relation,
         $relationKey
     ) {
