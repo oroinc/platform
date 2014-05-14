@@ -141,23 +141,23 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-//    public function testTypeWithAssignedRelations()
-//    {
-//        $this->prepareTestTypeWithRelations($this->prepareRelationsConfig());
-//
-//        $form = $this->factory->create($this->type, null, $this->formOptions);
-//
-//        $this->assertEquals(
-//            array_merge(
-//                $this->defaultFieldTypesKeys,
-//                ['oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1||testentity1_rel1']
-//            ),
-//            array_keys($form->offsetGet('type')->getConfig()->getOption('choices'))
-//        );
-//
-//        $form->submit(['fieldName' => 'name', 'type' => 'string']);
-//        $this->assertTrue($form->isSynchronized());
-//    }
+    public function testTypeWithAssignedRelations()
+    {
+        $this->prepareTestTypeWithRelations($this->prepareRelationsConfig());
+
+        $form = $this->factory->create($this->type, null, $this->formOptions);
+
+        $this->assertEquals(
+            array_merge(
+                $this->defaultFieldTypesKeys,
+                ['oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1||testentity1_rel1']
+            ),
+            array_keys($form->offsetGet('type')->getConfig()->getOption('choices'))
+        );
+
+        $form->submit(['fieldName' => 'name', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
+    }
 
     public function testTypeWithUnAssignedRelations()
     {
