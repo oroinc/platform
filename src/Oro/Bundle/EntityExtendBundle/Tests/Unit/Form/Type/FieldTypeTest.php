@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
@@ -13,6 +11,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
@@ -263,10 +263,6 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
             'relationConfigFieldId'       => $relationConfigFieldId,
             'relationTargetConfigFieldId' => $relationTargetConfigFieldId,
             'relationConfig'              => $relationConfig,
-            'target' =>
-                new Config(
-                    new EntityConfigId('entity', 'Extend\Entity\testEntity1')
-                )
         ];
     }
 
