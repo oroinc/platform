@@ -112,6 +112,13 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
                 this.execute();
                 this.trigger('postExecute', this, options);
             }
+
+            mediator.once('navigation:page_load:error', function(xmlHttp, options) {
+                if (403 == xmlHttp.status) {
+                    options.stopPageProcessing = true;
+                    messenger.notificationFlashMessage('error', __('You do not have permission to perform this action.'));
+                }
+            });
         },
 
         /**

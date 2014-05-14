@@ -34,7 +34,6 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/mediator', './mo
             }
 
             this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
-            mediator.bind('grid_action:navigateAction:error', _.bind(this._processError, this));
 
             if (this.useDirectLauncherLink) {
                 this.launcherOptions = _.extend({
@@ -49,17 +48,6 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/mediator', './mo
          */
         execute: function () {
             window.location.href = this.getLink();
-        },
-
-        /**
-         * Processes errors
-         *
-         * @private
-         */
-        _processError: function (action, HttpRequestStatus) {
-            if (403 == HttpRequestStatus) {
-                action.errorMessage = __('You do not have permission to this action.');
-            }
         },
 
         /**
