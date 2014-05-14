@@ -118,19 +118,19 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
 
     protected function prepareReverseRelationsConfig()
     {
-        $targetFieldId  = new FieldConfigId(
-            'extend',
-            'Extend\Entity\testEntity1',
-            'rel_m_t_o',
-            'manyToOne'
-        );
-        $relationConfig = [
+        $selfEntityConfig   = new Config(new EntityConfigId('extend', 'Oro\Bundle\UserBundle\Entity\User'));
+        $selfEntityRelation = [
             'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o' => [
                 'assign'          => false,
                 'field_id'        => false,
                 'owner'           => false,
                 'target_entity'   => 'Extend\Entity\testEntity1',
-                'target_field_id' => $targetFieldId
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Extend\Entity\testEntity1',
+                    'rel_m_t_o',
+                    'manyToOne'
+                )
             ],
             'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_o_t_m' => [
                 'assign'          => true,
@@ -145,6 +145,7 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
                 'target_field_id' => false
             ]
         ];
+        $selfEntityConfig->set('relation', $selfEntityRelation);
 
         $targetEntityConfig   = new Config(new EntityConfigId('extend', 'Extend\Entity\testEntity1'));
         $targetEntityRelation = [
@@ -164,8 +165,7 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig->set('relation', $targetEntityRelation);
 
         return [
-            'targetFieldId'      => $targetFieldId,
-            'relationConfig'     => $relationConfig,
+            'selfEntityConfig'   => $selfEntityConfig,
             'targetEntityConfig' => $targetEntityConfig
         ];
     }
@@ -175,11 +175,11 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
         $config = $this->prepareReverseRelationsConfig();
 
         $entityConfigMockUser = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->setConstructorArgs([new EntityConfigId('extend', 'Oro\Bundle\UserBundle\Entity\User')])
+            ->setConstructorArgs([$config['selfEntityConfig']->getId()])
             ->setMockClassName('entityConfigMockUser')
             ->setMethods(null)
             ->getMock();
-        $entityConfigMockUser->set('relation', $config['relationConfig']);
+        $entityConfigMockUser->set('relation', $config['selfEntityConfig']->get('relation'));
 
         $entityConfigMockTarget = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->setConstructorArgs([$config['targetEntityConfig']->getId()])
