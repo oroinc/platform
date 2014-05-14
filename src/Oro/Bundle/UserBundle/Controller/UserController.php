@@ -49,11 +49,13 @@ class UserController extends Controller
      */
     public function updateProfileAction()
     {
-        return $this->update(
+        $updateParams = $this->update(
             $this->getUser(),
             'oro_user_profile_update',
             array('route' => 'oro_user_profile_view')
         );
+        $updateParams['cancelRoute'] = 'oro_user_profile_view';
+        return $updateParams;
     }
 
     /**
