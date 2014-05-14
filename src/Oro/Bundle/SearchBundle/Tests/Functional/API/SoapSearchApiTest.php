@@ -22,9 +22,9 @@ class SoapSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
 
-        $this->client->soap(
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -56,7 +56,7 @@ class SoapSearchApiTest extends WebTestCase
             $request['max_results'] = self::DEFAULT_VALUE;
         }
 
-        $result = $this->client->getSoap()->search(
+        $result = $this->client->getSoapClient()->search(
             $request['search'],
             $request['offset'],
             $request['max_results']

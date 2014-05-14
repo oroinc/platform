@@ -45,7 +45,7 @@ class WidgetControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client           = self::createClient([], $this->generateWsseHeader());
+        $this->client           = self::createClient([], $this->generateWsseAuthHeader());
         $this->em               = $this->client->getContainer()->get('doctrine.orm.entity_manager');
         $this->configProvider   = $this->client->getContainer()->get('oro_dashboard.config_provider');
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');

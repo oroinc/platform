@@ -32,7 +32,7 @@ class DashboardControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = self::createClient([], $this->generateWsseHeader());
+        $this->client = self::createClient([], $this->generateWsseAuthHeader());
         $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $this->dashboard = new Dashboard();
@@ -41,7 +41,6 @@ class DashboardControllerTest extends WebTestCase
         $this->em->persist($this->dashboard);
         $this->em->flush();
     }
-
 
     public function testDelete()
     {

@@ -23,8 +23,8 @@ class SoapUsersACLTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -41,7 +41,7 @@ class SoapUsersACLTest extends WebTestCase
     public function testWsseAccess()
     {
         try {
-            $this->client->soap(
+            $this->client->createSoapClient(
                 "http://localhost/api/soap",
                 array(
                     'location' => 'http://localhost/api/soap',

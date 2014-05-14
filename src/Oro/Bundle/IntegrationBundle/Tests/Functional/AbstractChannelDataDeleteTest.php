@@ -35,7 +35,7 @@ abstract class AbstractChannelDataDeleteTest extends WebTestCase
     {
         $client = self::createClient(
             array(),
-            array_merge($this->generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->container = $client->getKernel()->getContainer();
         $this->em = $this->container->get('doctrine.orm.entity_manager');

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 /**
@@ -62,38 +62,22 @@ abstract class WebTestCase extends BaseWebTestCase
     protected static function createClient(array $options = array(), array $server = array())
     {
         if (!self::$internalClient) {
-            self::$internalClient = parent::createClient($options, $server);
+            /** @var Client $client */
+            $client = self::$internalClient = parent::createClient($options, $server);
 
             if (self::getDbIsolationSetting()) {
-                /** @var Client $client */
-                $client = self::$internalClient;
-
                 //workaround MyISAM search tables are not on transaction
-                if (self::getDbIsolationSetting()) {
+                if (self::getDbReindexSetting()) {
                     $kernel = $client->getKernel();
-                    $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
+                    $application = new Application($kernel);
                     $application->setAutoExit(false);
                     $options = array('command' => 'oro:search:reindex');
                     $options['--env'] = "test";
                     $options['--quiet'] = null;
-                    $application->run(new \Symfony\Component\Console\Input\ArrayInput($options));
+                    $application->run(new ArrayInput($options));
                 }
 
                 $client->startTransaction();
-                $pdoConnection = Client::getPdoConnection();
-                if ($pdoConnection) {
-                    //set transaction level to 1 for entityManager
-                    $connection = $client->createConnection($pdoConnection);
-                    $client->getContainer()->set('doctrine.dbal.default_connection', $connection);
-
-                    /** @var EntityManager $entityManager */
-                    $entityManager = $client->getContainer()->get('doctrine.orm.entity_manager');
-                    if (spl_object_hash($entityManager->getConnection()) != spl_object_hash($connection)) {
-                        $reflection = new \ReflectionProperty('Doctrine\ORM\EntityManager', 'conn');
-                        $reflection->setAccessible(true);
-                        $reflection->setValue($entityManager, $connection);
-                    }
-                }
             }
         } else {
             self::$internalClient->setServerParameters($server);
@@ -105,12 +89,10 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function tearDownAfterClass()
     {
         if (self::$internalClient) {
-            /** @var Client $client */
-            $client = self::$internalClient;
             if (self::getDbIsolationSetting()) {
-                $client->rollbackTransaction();
+                self::$internalClient->rollbackTransaction();
             }
-            $client->setSoapClient(null);
+            self::$internalClient->setSoapClient(null);
             self::$internalClient = null;
         }
     }
@@ -208,7 +190,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string|null $nonce
      * @return array
      */
-    public static function generateWsseHeader(
+    public static function generateWsseAuthHeader(
         $userName = self::USER_NAME,
         $userPassword = self::USER_PASSWORD,
         $nonce = null
@@ -240,7 +222,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $userPassword
      * @return array
      */
-    public static function generateBasicHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
+    public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
     {
         return array('PHP_AUTH_USER' =>  $userName, 'PHP_AUTH_PW' => $userPassword);
     }

@@ -15,8 +15,8 @@ class SoapAddressTypeApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -30,7 +30,7 @@ class SoapAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
-        $result = $this->client->getSoap()->getAddressTypes();
+        $result = $this->client->getSoapClient()->getAddressTypes();
         $result = $this->valueToArray($result);
         if (is_array(reset($result['item']))) {
             $actualData = $result['item'];
@@ -49,7 +49,7 @@ class SoapAddressTypeApiTest extends WebTestCase
     public function testGetAddressType($expected)
     {
         foreach ($expected as $addressType) {
-            $result = $this->client->getSoap()->getAddressType($addressType['name']);
+            $result = $this->client->getSoapClient()->getAddressType($addressType['name']);
             $result = $this->valueToArray($result);
             $this->assertNotEmpty($result);
             $this->assertEquals($addressType, $result);

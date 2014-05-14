@@ -22,8 +22,8 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -42,7 +42,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
      */
     public function testAdvancedSearch(array $request, array $response)
     {
-        $result = $this->client->getSoap()->advancedSearch($request['query']);
+        $result = $this->client->getSoapClient()->advancedSearch($request['query']);
         $result = $this->valueToArray($result);
         $this->assertEquals($response['count'], $result['count']);
     }

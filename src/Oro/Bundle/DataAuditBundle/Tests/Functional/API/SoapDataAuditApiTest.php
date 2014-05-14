@@ -16,8 +16,8 @@ class SoapDataAuditApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -46,9 +46,9 @@ class SoapDataAuditApiTest extends WebTestCase
             "owner" => "1"
         );
 
-        $this->client->setServerParameters($this->generateWsseHeader());
-        $id = $this->client->getSoap()->createUser($request);
-        $this->assertInternalType('int', $id, $this->client->getSoap()->__getLastResponse());
+        $this->client->setServerParameters($this->generateWsseAuthHeader());
+        $id = $this->client->getSoapClient()->createUser($request);
+        $this->assertInternalType('int', $id, $this->client->getSoapClient()->__getLastResponse());
         $this->assertGreaterThan(0, $id);
 
         return $request;
@@ -61,7 +61,7 @@ class SoapDataAuditApiTest extends WebTestCase
      */
     public function testGetAudits($response)
     {
-        $result = $this->client->getSoap()->getAudits();
+        $result = $this->client->getSoapClient()->getAudits();
         $result = $this->valueToArray($result);
 
         if (!is_array(reset($result['item']))) {
@@ -87,7 +87,7 @@ class SoapDataAuditApiTest extends WebTestCase
     public function testGetAudit($response)
     {
         foreach ($response as $audit) {
-            $result = $this->client->getSoap()->getAudit($audit['id']);
+            $result = $this->client->getSoapClient()->getAudit($audit['id']);
             $result = $this->valueToArray($result);
             unset($result['loggedAt']);
             unset($audit['loggedAt']);

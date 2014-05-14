@@ -18,10 +18,10 @@ class SoapInvalidUsersTest extends WebTestCase
     {
         $this->client = self::createClient(
             array(),
-            $this->generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
         try {
-            $this->client->soap(
+            $this->client->createSoapClient(
                 "http://localhost/api/soap",
                 array(
                     'location' => 'http://localhost/api/soap',
@@ -37,10 +37,10 @@ class SoapInvalidUsersTest extends WebTestCase
     {
         $this->client = self::createClient(
             array(),
-            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         try {
-            $this->client->soap(
+            $this->client->createSoapClient(
                 "http://localhost/api/soap",
                 array(
                     'location' => 'http://localhost/api/soap',

@@ -33,7 +33,7 @@ class DashboardControllerAclTest extends WebTestCase
     {
         $this->client = self::createClient(
             [],
-            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
@@ -65,7 +65,7 @@ class DashboardControllerAclTest extends WebTestCase
             ),
             [],
             [],
-            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 403);

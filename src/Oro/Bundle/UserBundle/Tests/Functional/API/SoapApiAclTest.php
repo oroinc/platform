@@ -20,8 +20,8 @@ class SoapApiAclTest extends WebTestCase
     public function setUp()
     {
         $this->markTestSkipped("API for new ACL isn't implemented");
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -35,7 +35,7 @@ class SoapApiAclTest extends WebTestCase
      */
     public function testGetAcls()
     {
-        $result = $this->client->getSoap()->getAclIds();
+        $result = $this->client->getSoapClient()->getAclIds();
         $result = $this->valueToArray($result);
         $result = $result['item'];
         sort($result);
@@ -50,7 +50,7 @@ class SoapApiAclTest extends WebTestCase
     {
         $i = 0;
         foreach ($acls as $acl) {
-            $result = $this->client->getSoap()->getAcl($acl);
+            $result = $this->client->getSoapClient()->getAcl($acl);
             $result = $this->valueToArray($result);
             $this->assertEquals($acl, $result['id']);
             $i++;
@@ -67,9 +67,9 @@ class SoapApiAclTest extends WebTestCase
      */
     public function testGetRoleAcl($acls)
     {
-        $role =  $this->client->getSoap()->getRoleByName(self::TEST_ROLE);
+        $role =  $this->client->getSoapClient()->getRoleByName(self::TEST_ROLE);
         $role = $this->valueToArray($role);
-        $result = $this->client->getSoap()->getRoleAcl($role['id']);
+        $result = $this->client->getSoapClient()->getRoleAcl($role['id']);
         $result = $this->valueToArray($result);
         $result = $result['item'];
         sort($result);
@@ -83,9 +83,9 @@ class SoapApiAclTest extends WebTestCase
      */
     public function testGetUserAcl($acls)
     {
-        $userId = $this->client->getSoap()->getUserBy(array('item' => array('key' =>'username', 'value' =>'admin')));
+        $userId = $this->client->getSoapClient()->getUserBy(array('item' => array('key' =>'username', 'value' =>'admin')));
         $userId = $this->valueToArray($userId);
-        $result =  $this->client->getSoap()->getUserAcl($userId['id']);
+        $result =  $this->client->getSoapClient()->getUserAcl($userId['id']);
         $result = $this->valueToArray($result);
         $result = $result['item'];
         sort($result);
@@ -94,10 +94,10 @@ class SoapApiAclTest extends WebTestCase
 
     public function testRemoveAclFromRole()
     {
-        $role =  $this->client->getSoap()->getRoleByName(self::TEST_EDIT_ROLE);
+        $role =  $this->client->getSoapClient()->getRoleByName(self::TEST_EDIT_ROLE);
         $role = $this->valueToArray($role);
 
-        $result =  $this->client->getSoap()->getRoleAcl($role['id']);
+        $result =  $this->client->getSoapClient()->getRoleAcl($role['id']);
         $result = $this->valueToArray($result);
         $expectedAcl = $result['item'];
 
@@ -111,8 +111,8 @@ class SoapApiAclTest extends WebTestCase
         }
         sort($expectedAcl);
 
-        $this->client->getSoap()->removeAclFromRole($role['id'], 'oro_address');
-        $result =  $this->client->getSoap()->getRoleAcl($role['id']);
+        $this->client->getSoapClient()->removeAclFromRole($role['id'], 'oro_address');
+        $result =  $this->client->getSoapClient()->getRoleAcl($role['id']);
         $result = $this->valueToArray($result);
         $actualAcl = $result['item'];
         sort($actualAcl);
@@ -128,13 +128,13 @@ class SoapApiAclTest extends WebTestCase
      */
     public function testAddAclToRole($expectedAcl)
     {
-        $roleId = $this->client->getSoap()->getRoleByName(self::TEST_EDIT_ROLE);
+        $roleId = $this->client->getSoapClient()->getRoleByName(self::TEST_EDIT_ROLE);
         $roleId = $this->valueToArray($roleId);
 
-        $this->client->getSoap()->addAclToRole($roleId['id'], 'oro_address');
-        $this->client->getSoap()->addAclToRole($roleId['id'], 'root');
+        $this->client->getSoapClient()->addAclToRole($roleId['id'], 'oro_address');
+        $this->client->getSoapClient()->addAclToRole($roleId['id'], 'root');
 
-        $result = $this->client->getSoap()->getRoleAcl($roleId['id']);
+        $result = $this->client->getSoapClient()->getRoleAcl($roleId['id']);
         $result = $this->valueToArray($result);
         $actualAcl = $result['item'];
         sort($actualAcl);
@@ -151,7 +151,7 @@ class SoapApiAclTest extends WebTestCase
     public function testRemoveAclsFromRole($expectedAcl)
     {
         $this->markTestSkipped('BAP-1058');
-        $roleId =  $this->client->getSoap()->getRoleByName(self::TEST_EDIT_ROLE);
+        $roleId =  $this->client->getSoapClient()->getRoleByName(self::TEST_EDIT_ROLE);
         $roleId = $this->valueToArray($roleId);
 
         $tmpExpectedAcl = $expectedAcl;
@@ -169,9 +169,9 @@ class SoapApiAclTest extends WebTestCase
         }
         sort($expectedAcl);
 
-        $this->client->getSoap()->removeAclsFromRole($roleId['id'], array('oro_security','oro_address'));
+        $this->client->getSoapClient()->removeAclsFromRole($roleId['id'], array('oro_security','oro_address'));
 
-        $result = $this->client->getSoap()->getRoleAcl($roleId['id']);
+        $result = $this->client->getSoapClient()->getRoleAcl($roleId['id']);
         $result = $this->valueToArray($result);
         $actualAcl = $result['item'];
         sort($actualAcl);
@@ -186,12 +186,12 @@ class SoapApiAclTest extends WebTestCase
      */
     public function testAddAclsToRole($expectedAcl)
     {
-        $roleId =  $this->client->getSoap()->getRoleByName(self::TEST_EDIT_ROLE);
+        $roleId =  $this->client->getSoapClient()->getRoleByName(self::TEST_EDIT_ROLE);
         $roleId = $this->valueToArray($roleId);
 
-        $this->client->getSoap()->addAclsToRole($roleId['id'], array('oro_security','oro_address'));
+        $this->client->getSoapClient()->addAclsToRole($roleId['id'], array('oro_security','oro_address'));
 
-        $result =  $this->client->getSoap()->getRoleAcl($roleId['id']);
+        $result =  $this->client->getSoapClient()->getRoleAcl($roleId['id']);
         $result = $this->valueToArray($result);
         $actualAcl = $result['item'];
         sort($actualAcl);

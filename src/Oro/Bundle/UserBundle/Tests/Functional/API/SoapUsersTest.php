@@ -19,8 +19,8 @@ class SoapUsersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -35,7 +35,7 @@ class SoapUsersTest extends WebTestCase
      */
     public function testCreateUser(array $request)
     {
-        $id = $this->client->getSoap()->createUser($request);
+        $id = $this->client->getSoapClient()->createUser($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
     }
@@ -49,7 +49,7 @@ class SoapUsersTest extends WebTestCase
     public function testUpdateUser(array $request, array $response)
     {
         //get user id
-        $userId = $this->client->getSoap()
+        $userId = $this->client->getSoapClient()
             ->getUserBy(array('item' => array('key' =>'username', 'value' => $request['username'])));
         $userId = $this->valueToArray($userId);
 
@@ -57,10 +57,10 @@ class SoapUsersTest extends WebTestCase
         $request['email'] = 'Updated_' . $request['email'];
         unset($request['plainPassword']);
 
-        $result = $this->client->getSoap()->updateUser($userId['id'], $request);
+        $result = $this->client->getSoapClient()->updateUser($userId['id'], $request);
         $this->assertEquals($response['return'], $result);
 
-        $user = $this->client->getSoap()->getUser($userId['id']);
+        $user = $this->client->getSoapClient()->getUser($userId['id']);
         $user = $this->valueToArray($user);
         $this->assertEquals($request['username'], $user['username']);
         $this->assertEquals($request['email'], $user['email']);
@@ -72,7 +72,7 @@ class SoapUsersTest extends WebTestCase
      */
     public function testGetUsers(array $request)
     {
-        $users = $this->client->getSoap()->getUsers(1, 1000);
+        $users = $this->client->getSoapClient()->getUsers(1, 1000);
         $users = $this->valueToArray($users);
 
         $user = array_filter(
@@ -88,14 +88,14 @@ class SoapUsersTest extends WebTestCase
 
     public function testGetUserRoles()
     {
-        $roles = $this->client->getSoap()->getUserRoles(1);
+        $roles = $this->client->getSoapClient()->getUserRoles(1);
         $roles = $this->valueToArray($roles);
         $this->assertEquals('Administrator', $roles['item']['label']);
     }
 
     public function testGetUserGroups()
     {
-        $groups = $this->client->getSoap()->getUserGroups(1);
+        $groups = $this->client->getSoapClient()->getUserGroups(1);
         $groups = $this->valueToArray($groups);
         $this->assertEquals('Administrators', $groups['item']['name']);
     }
@@ -106,7 +106,7 @@ class SoapUsersTest extends WebTestCase
      */
     public function testGetUserByException()
     {
-        $this->client->getSoap()->getUserBy();
+        $this->client->getSoapClient()->getUserBy();
     }
 
     /**
@@ -118,7 +118,7 @@ class SoapUsersTest extends WebTestCase
     public function testDeleteUser(array $request)
     {
         //get user id
-        $user = $this->client->getSoap()->getUserBy(
+        $user = $this->client->getSoapClient()->getUserBy(
             array(
                 'item' => array(
                     'key' =>'username',
@@ -127,10 +127,10 @@ class SoapUsersTest extends WebTestCase
         );
         $user = $this->valueToArray($user);
 
-        $result = $this->client->getSoap()->deleteUser($user['id']);
+        $result = $this->client->getSoapClient()->deleteUser($user['id']);
         $this->assertTrue($result);
 
-        $this->client->getSoap()->getUserBy(
+        $this->client->getSoapClient()->getUserBy(
             array(
                 'item' => array(
                     'key' =>'username',
@@ -145,7 +145,7 @@ class SoapUsersTest extends WebTestCase
      */
     public function testSelfDeleteUser()
     {
-        $this->client->getSoap()->deleteUser(1);
+        $this->client->getSoapClient()->deleteUser(1);
     }
 
     /**

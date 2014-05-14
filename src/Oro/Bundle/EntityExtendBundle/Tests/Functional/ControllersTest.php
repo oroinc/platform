@@ -18,7 +18,7 @@ class ControllersTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicHeader());
+        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()

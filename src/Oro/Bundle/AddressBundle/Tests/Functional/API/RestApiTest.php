@@ -16,7 +16,7 @@ class RestApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -80,7 +80,7 @@ class RestApiTest extends WebTestCase
                 $this->client->generate('oro_api_get_region'),
                 array('id' => $region['combinedCode']),
                 array(),
-                $this->generateWsseHeader()
+                $this->generateWsseAuthHeader()
             );
 
             $expectedResult = $this->getJsonResponseContent($this->client->getResponse(), 200);

@@ -20,8 +20,8 @@ class SoapRolesTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -40,7 +40,7 @@ class SoapRolesTest extends WebTestCase
             $request['label'] = self::DEFAULT_VALUE;
         }
 
-        $id = $this->client->getSoap()->createRole($request);
+        $id = $this->client->getSoapClient()->createRole($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
 
@@ -58,7 +58,7 @@ class SoapRolesTest extends WebTestCase
             $managerRole = $roles->findOneBy(array('label' => 'Marketing Manager'));
         }
 
-        $roleByName = $this->client->getSoap()->getRoleByName($managerRole->getLabel());
+        $roleByName = $this->client->getSoapClient()->getRoleByName($managerRole->getLabel());
         $roleByName = $this->valueToArray($roleByName);
 
         $this->assertEquals($managerRole->getLabel(), $roleByName['label']);
@@ -71,7 +71,7 @@ class SoapRolesTest extends WebTestCase
      */
     public function testGetRoleByNameException()
     {
-        $this->client->getSoap()->getRoleByName('NonExistRole');
+        $this->client->getSoapClient()->getRoleByName('NonExistRole');
     }
 
     /**
@@ -87,14 +87,14 @@ class SoapRolesTest extends WebTestCase
         }
 
         //get role id
-        $roleId = $this->client->getSoap()->getRoleByName($request['label']);
+        $roleId = $this->client->getSoapClient()->getRoleByName($request['label']);
         $roleId = $this->valueToArray($roleId);
         $request['label'] .= '_Updated';
 
-        $result =  $this->client->getSoap()->updateRole($roleId['id'], $request);
+        $result =  $this->client->getSoapClient()->updateRole($roleId['id'], $request);
         $this->assertEquals($response['return'], $result);
 
-        $role = $this->client->getSoap()->getRole($roleId['id']);
+        $role = $this->client->getSoapClient()->getRole($roleId['id']);
         $role = $this->valueToArray($role);
         $this->assertEquals($request['label'], $role['label']);
     }
@@ -106,7 +106,7 @@ class SoapRolesTest extends WebTestCase
     public function testGetRoles()
     {
         //get roles
-        $roles = $this->client->getSoap()->getRoles();
+        $roles = $this->client->getSoapClient()->getRoles();
         $roles = $this->valueToArray($roles);
         //filter roles
         $roles = array_filter(
@@ -128,11 +128,11 @@ class SoapRolesTest extends WebTestCase
     {
         //get roles
         foreach ($roles as $role) {
-            $result =  $this->client->getSoap()->deleteRole($role['id']);
+            $result =  $this->client->getSoapClient()->deleteRole($role['id']);
             $this->assertTrue($result);
         }
 
-        $roles = $this->client->getSoap()->getRoles();
+        $roles = $this->client->getSoapClient()->getRoles();
         $roles = $this->valueToArray($roles);
         if (!empty($roles)) {
             $roles = array_filter(

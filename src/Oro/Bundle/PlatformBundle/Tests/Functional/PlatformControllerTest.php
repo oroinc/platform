@@ -20,7 +20,7 @@ class PlatformControllerTest extends WebTestCase
     {
         $this->client = self::createClient(
             array(),
-            $this->generateBasicHeader()
+            $this->generateBasicAuthHeader()
         );
     }
 

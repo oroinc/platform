@@ -19,7 +19,7 @@ class RestSearchApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
         if (!self::$hasLoaded) {
             $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
         }

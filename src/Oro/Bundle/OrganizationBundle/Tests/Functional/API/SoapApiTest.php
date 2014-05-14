@@ -28,8 +28,8 @@ class SoapApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
-        $this->client->soap(
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->client->createSoapClient(
             "http://localhost/api/soap",
             array(
                 'location' => 'http://localhost/api/soap',
@@ -44,7 +44,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testCreate()
     {
-        $id = $this->client->getSoap()->createBusinessUnit($this->fixtureData['business_unit']);
+        $id = $this->client->getSoapClient()->createBusinessUnit($this->fixtureData['business_unit']);
         $this->assertGreaterThan(0, $id);
 
         return $id;

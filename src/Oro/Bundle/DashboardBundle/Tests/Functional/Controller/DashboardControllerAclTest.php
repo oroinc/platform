@@ -33,7 +33,7 @@ class DashboardControllerAclTest extends WebTestCase
     {
         $this->client = self::createClient(
             [],
-            $this->generateBasicHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateBasicAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');

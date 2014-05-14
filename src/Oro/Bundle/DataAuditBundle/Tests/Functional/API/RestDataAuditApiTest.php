@@ -17,7 +17,7 @@ class RestDataAuditApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**

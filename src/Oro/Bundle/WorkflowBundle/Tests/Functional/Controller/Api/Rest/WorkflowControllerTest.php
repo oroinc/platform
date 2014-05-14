@@ -41,7 +41,7 @@ class WorkflowControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
         if (!self::$fixturesLoaded) {
             $prev = '..' . DIRECTORY_SEPARATOR;
             $path = __DIR__ . DIRECTORY_SEPARATOR . $prev . $prev . $prev . 'DataFixtures';

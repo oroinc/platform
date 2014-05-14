@@ -39,7 +39,7 @@ class RestInvalidUsersTest extends WebTestCase
             $request,
             array(),
             array(),
-            $this->generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 401);
@@ -64,7 +64,7 @@ class RestInvalidUsersTest extends WebTestCase
             $request,
             array(),
             array(),
-            $this->generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 401);

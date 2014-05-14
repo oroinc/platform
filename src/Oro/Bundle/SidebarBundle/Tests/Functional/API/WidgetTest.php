@@ -27,7 +27,7 @@ class WidgetTest extends WebTestCase
     public function setUp()
     {
         // TODO: Implement position tests
-        $this->client = self::createClient(array(), $this->generateWsseHeader());
+        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
