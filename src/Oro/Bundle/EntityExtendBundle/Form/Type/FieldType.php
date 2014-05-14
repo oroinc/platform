@@ -85,23 +85,18 @@ class FieldType extends AbstractType
             $types     = [];
             $relations = $entityConfig->get('relation');
             foreach ($relations as $relationKey => $relation) {
+                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
+                    continue;
+                }
+
                 /** @var FieldConfigId $fieldId */
                 $fieldId = $relation['field_id'];
                 /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
-                if (!$this->isAvailableRelation($extendProvider, $fieldId, $targetFieldId, $relation, $relationKey)) {
-                    continue;
-                }
-
                 $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-                $fieldName   = '';
-
-                if ($fieldId) {
-                    $fieldName = $fieldId->getFieldName();
-                }
-
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
                 $key         = $relationKey . '||' . $fieldName;
                 $types[$key] = sprintf(
                     '%s (%s) %s',
@@ -156,21 +151,22 @@ class FieldType extends AbstractType
     /**
      * Check if reverse relation can be created
      *
-     * @param ConfigProvider      $extendProvider
-     * @param FieldConfigId|false $fieldId
-     * @param FieldConfigId|false $targetFieldId
-     * @param array               $relation
-     * @param string              $relationKey
+     * @param ConfigProvider $extendProvider
+     * @param array          $relation
+     * @param string         $relationKey
      *
      * @return bool
      */
     protected function isAvailableRelation(
         ConfigProvider $extendProvider,
-        $fieldId,
-        $targetFieldId,
         array $relation,
         $relationKey
     ) {
+        /** @var FieldConfigId|false $fieldId */
+        $fieldId = $relation['field_id'];
+        /** @var FieldConfigId $targetFieldId */
+        $targetFieldId = $relation['target_field_id'];
+
         if (!$relation['assign'] || !$targetFieldId) {
             if (!$targetFieldId) {
                 return false;
