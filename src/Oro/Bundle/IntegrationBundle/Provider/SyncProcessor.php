@@ -65,7 +65,7 @@ class SyncProcessor
         } else {
             $connectors = $channel->getConnectors();
             foreach ((array)$connectors as $connector) {
-                $this->processChannelConnector($channel, $connector);
+                $this->processChannelConnector($channel, $connector, $parameters);
             }
         }
     }
@@ -106,7 +106,6 @@ class SyncProcessor
 
             $this->em->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($channel, $status);
-            return;
         }
         $jobName = $realConnector->getImportJobName();
 
