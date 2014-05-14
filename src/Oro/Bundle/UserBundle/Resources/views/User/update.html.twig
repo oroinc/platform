@@ -23,7 +23,7 @@
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ UI.cancelButton(path(cancelRoute|default('oro_user_index'))) }}
+    {{ UI.cancelButton(path(cancelRoute)) }}
     {% set html = UI.saveAndCloseButton() %}
     {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
         {% set html = html ~ UI.saveAndStayButton() %}
