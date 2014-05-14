@@ -125,7 +125,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(['getProvider', 'getConfigChangeSet'])
             ->getMock();
         $configManager
             ->expects($this->any())
