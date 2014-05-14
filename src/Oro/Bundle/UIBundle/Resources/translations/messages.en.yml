@@ -21,4 +21,3 @@ oro:
             groups:
                 navbar_settings:
                     title: 'Navigation bar'
-                    description: 'Reload the page for settings to take effect'

@@ -2534,7 +2534,7 @@ div.uploader.focus,
   margin-bottom: 0;
 }
 #flash-messages {
-  overflow: hidden;
+  position: relative;
   .alert {
     margin: 3px 0 0;
     background-color: @warningBackground;
@@ -2578,8 +2578,7 @@ div.uploader.focus,
   }
 }
 .flash-messages-frame {
-  position: fixed;
-  top: 66px;
+  position: absolute;
   left: 25%;
   z-index: 500;
   width: 50%;

@@ -7,7 +7,6 @@ oro_system_configuration:
             title:  'Name'
         navbar_settings:
             title:       oro.ui.system_configuration.groups.navbar_settings.title
-            description: oro.ui.system_configuration.groups.navbar_settings.description
     fields:
         oro_ui.application_name:
             type: text
