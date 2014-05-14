@@ -1,7 +1,7 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block list %}
-    {% if isMobileVersion() and item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
+    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
         <script type="text/javascript">
             require(['jquery', 'oronavigation/js/shortcuts/view'],
             function($, ShortcutsView) {
