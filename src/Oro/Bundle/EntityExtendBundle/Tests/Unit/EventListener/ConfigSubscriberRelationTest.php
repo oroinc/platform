@@ -17,6 +17,8 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
     protected $event;
 
+    protected $persistedItems = [];
+
     /**
      * Test create new field (relation type [*:*])
      *
@@ -59,13 +61,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                             'TestEntity',
                             'rel',
                             'manyToMany'
-                        ),
-                        /*'target_field_id' => new FieldConfigId(
-                            'extend',
-                            'Oro\Bundle\UserBundle\Entity\User',
-                            'testclass_rel',
-                            'manyToMany'
-                        ),*/
+                        )
                     ]
                 ],
                 'schema'      => [],
@@ -106,6 +102,29 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfigById')
             ->will($this->returnValue($eventConfig));
+        $configProvider
+            ->expects($this->any())
+            ->method('persist')
+            ->will(
+                $this->returnCallback(
+                    function (Config $item) {
+                        $this->persistedItems[] = $item;
+                        if ($item->has('relation')) {
+                            $relations = $item->get('relation');
+                            foreach ($relations as $relation) {
+                                $this->assertInstanceOf(
+                                    'Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId',
+                                    $relation['field_id']
+                                );
+                                $this->assertInstanceOf(
+                                    'Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId',
+                                    $relation['target_field_id']
+                                );
+                            }
+                        }
+                    }
+                )
+            );
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
