@@ -106,6 +106,7 @@ class SyncProcessor
 
             $this->em->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($channel, $status);
+            return;
         }
         $jobName = $realConnector->getImportJobName();
 
