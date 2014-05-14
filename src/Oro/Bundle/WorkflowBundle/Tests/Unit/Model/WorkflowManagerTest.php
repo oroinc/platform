@@ -14,6 +14,9 @@ use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_WORKFLOW_NAME = 'test_workflow';
@@ -309,11 +312,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
-            ->will($this->returnCallback(
-                function ($workflowIdentifier) use (&$workflow, &$activeWorkflow) {
-                    return is_string($workflowIdentifier) ? $activeWorkflow : $workflow;
-                }
-            ));
+            ->will(
+                $this->returnCallback(
+                    function ($workflowIdentifier) use ($workflow, $activeWorkflow) {
+                        return is_string($workflowIdentifier) ? $activeWorkflow : $workflow;
+                    }
+                )
+            );
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowByEntityClass')
@@ -450,6 +455,118 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityManager));
 
         $this->workflowManager->startWorkflow($this->createWorkflow(), null, 'test_transition');
+    }
+
+    /**
+     * @param array $source
+     * @param array $expected
+     * @dataProvider massStartDataProvider
+     */
+    public function testMassStartWorkflow(array $source, array $expected)
+    {
+        $entityManager = $this->createEntityManager();
+        $this->registry->expects($this->once())->method('getManager')
+            ->will($this->returnValue($entityManager));
+
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        $workflowMap = array();
+        $workflowItems = array();
+        foreach ($expected as $row) {
+            $workflowName = $row['workflow'];
+            $workflow = $this->createWorkflow($workflowName);
+            $workflowItem = $this->createWorkflowItem($workflowName);
+
+            $workflow->expects($this->once())->method('start')->with($row['entity'], $row['data'], $row['transition'])
+                ->will($this->returnValue($workflowItem));
+
+            $workflowMap[] = array($workflowName, $workflow);
+            $workflowItems[] = $workflowItem;
+        }
+
+        foreach ($workflowItems as $index => $workflowItem) {
+            $entityManager->expects($this->at($index + 1))->method('persist')->with($workflowItem);
+        }
+
+        $this->workflowRegistry->expects($this->any())->method('getWorkflow')->with($this->isType('string'))
+            ->will($this->returnValueMap($workflowMap));
+
+        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->once())->method('commit');
+
+        $this->workflowManager->massStartWorkflow($source);
+    }
+
+    public function massStartDataProvider()
+    {
+        $firstEntity = new \DateTime('2012-12-12');
+        $secondEntity = new \DateTime('2012-12-13');
+
+        return array(
+            'no data' => array(
+                'source' => array(),
+                'expected' => array(),
+            ),
+            'regualar data' => array(
+                'source' => array(
+                    array('workflow' => 'first', 'entity' => $firstEntity),
+                    array('workflow' => 'second', 'entity' => $secondEntity),
+                ),
+                'expected' => array(
+                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => null, 'data' => array()),
+                    array('workflow' => 'second', 'entity' => $secondEntity, 'transition' => null, 'data' => array()),
+                ),
+            ),
+            'extra cases' => array(
+                'source' => array(
+                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start'),
+                    array(
+                        'workflow' => 'second',
+                        'entity' => $secondEntity,
+                        'transition' => 'start',
+                        'data' => array('field' => 'value')
+                    ),
+                    array('some', 'strange', 'data'),
+                ),
+                'expected' => array(
+                    array('workflow' => 'first', 'entity' => $firstEntity, 'transition' => 'start', 'data' => array()),
+                    array(
+                        'workflow' => 'second',
+                        'entity' => $secondEntity,
+                        'transition' => 'start',
+                        'data' => array('field' => 'value'),
+                    ),
+                ),
+            )
+        );
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Mass start workflow exception message
+     */
+    public function testMassStartWorkflowException()
+    {
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())->method('beginTransaction');
+        $entityManager->expects($this->once())->method('rollback');
+        $entityManager->expects($this->never())->method('persist');
+
+        $this->registry->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($entityManager));
+
+        $workflowName = 'test_workflow';
+        $entity = new \DateTime();
+        $workflow = $this->createWorkflow($workflowName);
+
+        $workflow->expects($this->once())->method('start')->with($entity, array(), null)
+            ->will($this->throwException(new \Exception('Mass start workflow exception message')));
+
+        $this->workflowRegistry->expects($this->once())->method('getWorkflow')->with($workflowName)
+            ->will($this->returnValue($workflow));
+
+        $this->workflowManager->massStartWorkflow(array(array('workflow' => $workflowName, 'entity' => $entity)));
     }
 
     public function testTransit()
