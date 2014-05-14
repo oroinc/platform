@@ -62,7 +62,9 @@ class ResultStatisticsProvider
             '' => array(
                 'count'  => 0,
                 'class'  => '',
-                'config' => array()
+                'config' => array(),
+                'icon'   => '',
+                'label'  => ''
             )
         );
 
@@ -72,39 +74,35 @@ class ResultStatisticsProvider
             $alias  = $config['alias'];
 
             if (!isset($result[$alias])) {
-                $result[$alias] = array(
+
+                $group = array(
                     'count'  => 0,
                     'class'  => $item->getEntityName(),
                     'config' => $config,
+                    'icon'   => '',
+                    'label'  => ''
                 );
+
+                if (!empty($group['class']) && $this->configManager->hasConfig($group['class'])) {
+                    $entityConfigId = new EntityConfigId('entity', $group['class']);
+                    $entityConfig = $this->configManager->getConfig($entityConfigId);
+                    if ($entityConfig->has('plural_label')) {
+                        $group['label'] = $this->translator->trans($entityConfig->get('plural_label'));
+                    }
+                    if ($entityConfig->has('icon')) {
+                        $group['icon'] = $entityConfig->get('icon');
+                    }
+                }
+
+                $result[$alias] = $group;
             }
 
             $result[$alias]['count']++;
             $result['']['count']++;
         }
 
-        return $this->sortResultGroups($result);
-    }
-
-    protected function sortResultGroups(array $results)
-    {
-        foreach ($results as &$result) {
-            $result['label'] = '';
-            $result['icon'] = '';
-            if (!empty($result['class']) && $this->configManager->hasConfig($result['class'])) {
-                $entityConfigId = new EntityConfigId('entity', $result['class']);
-                $entityConfig = $this->configManager->getConfig($entityConfigId);
-                if ($entityConfig->has('plural_label')) {
-                    $result['label'] = $this->translator->trans($entityConfig->get('plural_label'));
-                }
-                if ($entityConfig->has('icon')) {
-                    $result['icon'] = $entityConfig->get('icon');
-                }
-            }
-        }
-
         uasort(
-            $results,
+            $result,
             function ($first, $second) {
                 if ($first['label'] == $second['label']) {
                     return 0;
@@ -114,6 +112,6 @@ class ResultStatisticsProvider
             }
         );
 
-        return $results;
+        return $result;
     }
 }
