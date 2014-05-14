@@ -17,8 +17,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
     protected $event;
 
-    protected $persistedItems = [];
-
     /**
      * Test create new field (relation type [*:*])
      *
@@ -108,7 +106,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function (Config $item) {
-                        $this->persistedItems[] = $item;
                         if ($item->has('relation')) {
                             $relations = $item->get('relation');
                             foreach ($relations as $relation) {
