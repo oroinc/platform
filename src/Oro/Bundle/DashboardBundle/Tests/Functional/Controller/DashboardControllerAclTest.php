@@ -24,25 +24,15 @@ class DashboardControllerAclTest extends WebTestCase
      */
     protected $dashboardManager;
 
-    /**
-     * @var bool
-     */
-    protected static $hasLoaded = false;
-
     protected function setUp()
     {
         $this->client = self::createClient(
             [],
             $this->generateBasicAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
+        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
 
         $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
-
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-
-        self::$hasLoaded = true;
     }
 
     public function testView()

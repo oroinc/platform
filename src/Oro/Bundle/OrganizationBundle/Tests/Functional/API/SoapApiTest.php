@@ -11,9 +11,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SoapApiTest extends WebTestCase
 {
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
+    /**
+     * @var array
+     */
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
@@ -40,6 +45,7 @@ class SoapApiTest extends WebTestCase
 
     /**
      * Test POST
+     *
      * @return string
      */
     public function testCreate()

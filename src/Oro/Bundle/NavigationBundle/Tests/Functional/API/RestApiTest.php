@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
@@ -17,6 +16,9 @@ class RestApiTest extends WebTestCase
     /** @var  Client */
     protected $client;
 
+    /**
+     * @var array
+     */
     protected static $entities;
 
     public function setUp()
@@ -26,6 +28,7 @@ class RestApiTest extends WebTestCase
 
     /**
      * Data provider
+     *
      * @return array
      */
     public static function navagationItemsProvider()

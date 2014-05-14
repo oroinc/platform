@@ -18,11 +18,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 class WorkflowControllerTest extends WebTestCase
 {
     /**
-     * @var bool
-     */
-    static protected $fixturesLoaded = false;
-
-    /**
      * @var string
      */
     protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
@@ -42,12 +37,10 @@ class WorkflowControllerTest extends WebTestCase
         parent::setUp();
 
         $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        if (!self::$fixturesLoaded) {
-            $prev = '..' . DIRECTORY_SEPARATOR;
-            $path = __DIR__ . DIRECTORY_SEPARATOR . $prev . $prev . $prev . 'DataFixtures';
-            $this->client->appendFixtures($path, array('LoadWorkflowDefinitions'));
-            self::$fixturesLoaded = true;
-        }
+
+        $prev = '..' . DIRECTORY_SEPARATOR;
+        $path = __DIR__ . DIRECTORY_SEPARATOR . $prev . $prev . $prev . 'DataFixtures';
+        $this->client->appendFixturesOnce($path, array('LoadWorkflowDefinitions'));
 
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass($this->entityClass);
     }

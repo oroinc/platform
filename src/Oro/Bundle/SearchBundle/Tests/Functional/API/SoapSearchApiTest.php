@@ -15,10 +15,10 @@ class SoapSearchApiTest extends WebTestCase
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
-
-    protected static $hasLoaded = false;
 
     public function setUp()
     {
@@ -32,19 +32,16 @@ class SoapSearchApiTest extends WebTestCase
             )
         );
 
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-        self::$hasLoaded = true;
+        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
     }
 
     /**
      * @param array $request
      * @param array $response
      *
-     * @dataProvider requestsApi
+     * @dataProvider searchDataProvider
      */
-    public function testApi(array $request, array $response)
+    public function testSearch(array $request, array $response)
     {
         if (is_null($request['search'])) {
             $request['search'] ='';
@@ -62,27 +59,7 @@ class SoapSearchApiTest extends WebTestCase
             $request['max_results']
         );
         $result = $this->valueToArray($result);
-        $this->assertEqualsResponse($response, $result);
-    }
 
-    /**
-     * Data provider for SOAP API tests
-     *
-     * @return array
-     */
-    public function requestsApi()
-    {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
-    }
-
-    /**
-     * Test API response
-     *
-     * @param array $response
-     * @param array $result
-     */
-    protected function assertEqualsResponse($response, $result)
-    {
         $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
         if (isset($response['soap']['item']) && is_array($response['soap']['item'])) {
@@ -97,5 +74,15 @@ class SoapSearchApiTest extends WebTestCase
                 }
             }
         }
+    }
+
+    /**
+     * Data provider for SOAP API tests
+     *
+     * @return array
+     */
+    public function searchDataProvider()
+    {
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 }

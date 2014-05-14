@@ -90,7 +90,7 @@ class ControllersTest extends WebTestCase
 
     /**
      * @param array $report
-     * @param $reportResult
+     * @param array $reportResult
      * @depends testView
      * @dataProvider reportDataProvider
      */

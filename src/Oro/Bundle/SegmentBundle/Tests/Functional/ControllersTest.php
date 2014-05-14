@@ -36,9 +36,9 @@ class ControllersTest extends WebTestCase
 
     /**
      * @param array $report
-     * @dataProvider requestsApi()
+     * @dataProvider segmentsDataProvider
      */
-    public function testCreate($report)
+    public function testCreate(array $report)
     {
         $crawler = $this->client->request('GET', $this->client->generate('oro_segment_create'));
         /** @var Form $form */
@@ -56,9 +56,9 @@ class ControllersTest extends WebTestCase
 
     /**
      * @depends testCreate
-     * @dataProvider requestsApi()
+     * @dataProvider segmentsDataProvider
      */
-    public function testView($report, $reportResult)
+    public function testView(array $report, array $reportResult)
     {
         $response = $this->getGridResponse(
             $this->client,
@@ -92,11 +92,11 @@ class ControllersTest extends WebTestCase
 
     /**
      * @param array $report
-     * @param $reportResult
+     * @param array $reportResult
      * @depends testView
-     * @dataProvider requestsApi()
+     * @dataProvider segmentsDataProvider
      */
-    public function testUpdate($report, $reportResult)
+    public function testUpdate(array $report, array $reportResult)
     {
         $response = $this->getGridResponse(
             $this->client,
@@ -141,11 +141,12 @@ class ControllersTest extends WebTestCase
     /**
      * @param array $report
      * @param array $reportResult
+     * @param array $segmentExport
      *
      * @depends testView
-     * @dataProvider requestsApi()
+     * @dataProvider segmentsDataProvider
      */
-    public function testExport($report, $reportResult, $segmentExport)
+    public function testExport(array $report, array $reportResult, array $segmentExport)
     {
         $response = $this->getGridResponse(
             $this->client,
@@ -187,12 +188,13 @@ class ControllersTest extends WebTestCase
         }
         $this->verifyReport($segmentExport, $content, count($content));
     }
-        /**
+
+    /**
      * @param array $report
      * @depends testView
-     * @dataProvider requestsApi()
+     * @dataProvider segmentsDataProvider
      */
-    public function testDelete($report)
+    public function testDelete(array $report)
     {
         $response = $this->getGridResponse(
             $this->client,
@@ -225,7 +227,7 @@ class ControllersTest extends WebTestCase
      *
      * @return array
      */
-    public function requestsApi()
+    public function segmentsDataProvider()
     {
         return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');
     }

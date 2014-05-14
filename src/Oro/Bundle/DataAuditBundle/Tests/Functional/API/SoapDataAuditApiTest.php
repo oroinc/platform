@@ -11,7 +11,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SoapDataAuditApiTest extends WebTestCase
 {
-    /** @var Client  */
+    /**
+     * @var Client
+     */
     protected $client = null;
 
     public function setUp()
@@ -55,11 +57,11 @@ class SoapDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param $response
+     * @param array $response
      * @return array
      * @depends testPreconditions
      */
-    public function testGetAudits($response)
+    public function testGetAudits(array $response)
     {
         $result = $this->client->getSoapClient()->getAudits();
         $result = $this->valueToArray($result);
@@ -80,7 +82,7 @@ class SoapDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param  array $response
+     * @param array $response
      * @return array
      * @depends testGetAudits
      */

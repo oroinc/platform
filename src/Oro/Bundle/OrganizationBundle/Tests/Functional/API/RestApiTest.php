@@ -13,9 +13,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestApiTest extends WebTestCase
 {
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
 
+    /**
+     * @var array
+     */
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
@@ -36,6 +41,7 @@ class RestApiTest extends WebTestCase
 
     /**
      * Test POST
+     *
      * @return string
      */
     public function testCreate()

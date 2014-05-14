@@ -145,19 +145,22 @@ class WidgetTest extends WebTestCase
     {
         return array(
             array(
-          'left-maximized' => array_merge(
-              array('placement' => 'left'),
-              $this->widget,
-              array('state' => 'SIDEBAR_MINIMIZED')
-          )),
+                'left-maximized' => array_merge(
+                    array('placement' => 'left'),
+                    $this->widget,
+                    array('state' => 'SIDEBAR_MINIMIZED')
+                )
+            ),
             array(
-            'right-maximized' => array_merge(
-                array('placement' => 'right'),
-                $this->widget,
-                array('state' => 'SIDEBAR_MINIMIZED')
-            ))
+                'right-maximized' => array_merge(
+                    array('placement' => 'right'),
+                    $this->widget,
+                    array('state' => 'SIDEBAR_MINIMIZED')
+                )
+            )
         );
     }
+
     public function positionsPutProvider()
     {
         return array(
@@ -166,25 +169,29 @@ class WidgetTest extends WebTestCase
                     array('placement' => 'left'),
                     $this->widget,
                     array('state' => 'SIDEBAR_MINIMIZED')
-                )),
+                )
+            ),
             array(
                 'left-maximized' => array_merge(
                     array('placement' => 'left'),
                     $this->widget,
                     array('state' => 'SIDEBAR_MAXIMIZED')
-                )),
+                )
+            ),
             array(
                 'right-minimized' => array_merge(
                     array('placement' => 'right'),
                     $this->widget,
                     array('state' => 'SIDEBAR_MINIMIZED')
-                )),
+                )
+            ),
             array(
                 'right-maximized' => array_merge(
                     array('placement' => 'right'),
                     $this->widget,
                     array('state' => 'SIDEBAR_MAXIMIZED')
-                )),
+                )
+            ),
         );
     }
 }

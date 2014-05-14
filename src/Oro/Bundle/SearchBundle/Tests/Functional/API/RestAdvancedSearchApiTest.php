@@ -12,17 +12,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestAdvancedSearchApiTest extends WebTestCase
 {
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
-    protected static $hasLoaded = false;
 
     public function setUp()
     {
         $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-        self::$hasLoaded = true;
+        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
     }
 
     /**

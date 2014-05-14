@@ -50,11 +50,11 @@ class RestDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param $response
+     * @param array $response
      * @return array
      * @depends testPreconditions
      */
-    public function testGetAudits($response)
+    public function testGetAudits(array $response)
     {
         $this->client->request(
             'GET',
@@ -80,7 +80,7 @@ class RestDataAuditApiTest extends WebTestCase
      * @param  array $response
      * @depends testGetAudits
      */
-    public function testGetAudit($response)
+    public function testGetAudit(array $response)
     {
         foreach ($response as $audit) {
             $this->client->request(

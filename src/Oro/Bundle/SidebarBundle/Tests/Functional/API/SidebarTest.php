@@ -11,7 +11,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SidebarTest extends WebTestCase
 {
-    /** @var Client  */
+    /**
+     * @var Client
+     */
     protected $client;
 
     public function setUp()
@@ -19,7 +21,6 @@ class SidebarTest extends WebTestCase
         $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
     }
 
-    /**
     /**
      * @dataProvider positionsPostProvider
      */
@@ -121,22 +122,26 @@ class SidebarTest extends WebTestCase
                 'left-minimized' => array(
                     'position' => 'SIDEBAR_LEFT',
                     'state' => 'SIDEBAR_MINIMIZED'
-                )),
+                )
+            ),
             array(
                 'left-maximized' => array(
                     'position' => 'SIDEBAR_LEFT',
                     'state' => 'SIDEBAR_MAXIMIZED'
-                )),
+                )
+            ),
             array(
                 'right-minimized' => array(
                     'position' => 'SIDEBAR_RIGHT',
                     'state' => 'SIDEBAR_MINIMIZED'
-                )),
+                )
+            ),
             array(
                 'right-maximized' => array(
                     'position' => 'SIDEBAR_RIGHT',
                     'state' => 'SIDEBAR_MAXIMIZED'
-                )),
+                )
+            ),
         );
     }
 }

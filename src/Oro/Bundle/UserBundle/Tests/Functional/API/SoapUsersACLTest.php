@@ -17,9 +17,10 @@ class SoapUsersACLTest extends WebTestCase
 
     const DEFAULT_USER_ID = '1';
 
-    /** @var Client */
+    /**
+     * @var Client
+     */
     protected $client;
-    protected static $hasLoaded = false;
 
     public function setUp()
     {
@@ -31,11 +32,7 @@ class SoapUsersACLTest extends WebTestCase
                 'soap_version' => SOAP_1_2
             )
         );
-
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-        self::$hasLoaded = true;
+        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
     }
 
     public function testWsseAccess()

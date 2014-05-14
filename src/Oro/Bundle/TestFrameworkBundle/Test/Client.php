@@ -4,11 +4,11 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDOConnection;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
@@ -24,14 +24,9 @@ class Client extends BaseClient
     static protected $soapClient;
 
     /**
-     * @var Connection
+     * @var PDOConnection
      */
-    static public $connection = null;
-
-    /**
-     * @var \Doctrine\DBAL\Driver\PDOConnection shared PDO connection
-     */
-    static protected $pdoConnection = null;
+    protected $pdoConnection;
 
     /**
      * @var KernelInterface
@@ -43,6 +38,14 @@ class Client extends BaseClient
      */
     protected $hasPerformedRequest;
 
+    /**
+     * @var boolean[]
+     */
+    protected $loadedFixtures;
+
+    /**
+     * Destructor
+     */
     public function __destruct()
     {
         $this->setSoapClient(null);
@@ -62,14 +65,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $method
-     * @param string $uri
-     * @param array $parameters
-     * @param array $files
-     * @param array $server
-     * @param string $content
-     * @param bool $changeHistory
-     * @return Crawler
+     * {@inheritdoc}
      */
     public function request(
         $method,
@@ -103,7 +99,7 @@ class Client extends BaseClient
     {
         if (!self::$soapClient || $new) {
             if (is_null($wsdl)) {
-                throw new \Exception('wsdl should not be NULL');
+                throw new \InvalidArgumentException('wsdl should not be NULL');
             }
 
             $this->request('GET', $wsdl);
@@ -156,7 +152,7 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
-        $this->refreshConnection();
+        $this->refreshDoctrineConnection();
 
         $response = $this->kernel->handle($request);
 
@@ -191,7 +187,7 @@ class Client extends BaseClient
 
         //init fixture container
         foreach ($fixtures as $fixture) {
-            if (method_exists($fixture, 'setContainer')) {
+            if ($fixture instanceof ContainerAwareInterface) {
                 $fixture->setContainer($this->getContainer());
             }
         }
@@ -202,11 +198,28 @@ class Client extends BaseClient
     }
 
     /**
-     * @return Connection
+     * @param string $folder
+     * @param array|null $filter
      */
-    protected function refreshConnection()
+    public function appendFixturesOnce($folder, array $filter = null)
     {
-        if (!self::$pdoConnection) {
+        $key = $folder;
+        if ($filter) {
+            $key .= ':' . implode(':', $filter);
+        }
+        if (isset($this->loadedFixtures[$key])) {
+            return;
+        }
+        $this->loadedFixtures[$key] = true;
+        $this->appendFixtures($folder, $filter);
+    }
+
+    /**
+     * Refresh doctrine connection services
+     */
+    protected function refreshDoctrineConnection()
+    {
+        if (!$this->pdoConnection) {
             return;
         }
 
@@ -215,7 +228,7 @@ class Client extends BaseClient
 
         $newConnection =  $this->getContainer()->get('doctrine.dbal.connection_factory')
             ->createConnection(
-                array_merge($oldConnection->getParams(), array('pdo' => self::$pdoConnection)),
+                array_merge($oldConnection->getParams(), array('pdo' => $this->pdoConnection)),
                 $oldConnection->getConfiguration(),
                 $oldConnection->getEventManager()
             );
@@ -236,20 +249,26 @@ class Client extends BaseClient
         }
     }
 
+    /**
+     * Start transaction
+     */
     public function startTransaction()
     {
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine.dbal.default_connection');
-        self::$pdoConnection = $connection->getWrappedConnection();
-        self::$pdoConnection->beginTransaction();
+        $this->pdoConnection = $connection->getWrappedConnection();
+        $this->pdoConnection->beginTransaction();
 
-        $this->refreshConnection();
+        $this->refreshDoctrineConnection();
     }
 
+    /**
+     * Rollback transaction
+     */
     public function rollbackTransaction()
     {
-        if (self::$pdoConnection) {
-            self::$pdoConnection->rollBack();
+        if ($this->pdoConnection) {
+            $this->pdoConnection->rollBack();
         }
     }
 }

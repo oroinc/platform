@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\FunctionalTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;

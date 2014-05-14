@@ -18,6 +18,9 @@ class RestApiTest extends WebTestCase
      */
     protected $client;
 
+    /**
+     * @var array
+     */
     protected static $entity;
 
     public function setUp()

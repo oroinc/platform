@@ -14,16 +14,15 @@ class RestSearchApiTest extends WebTestCase
 {
     protected static $hasLoaded = false;
 
-    /** @var client */
+    /**
+     * @var Client
+     */
     protected $client;
 
     public function setUp()
     {
         $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-        self::$hasLoaded = true;
+        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
     }
 
     /**
