@@ -445,6 +445,8 @@ references into null and remove workflow item. If active workflow definition has
 then active workflow will be started automatically;
 * **startWorkflow(workflow, entity, transition, data)** - start workflow for input entity using start transition
 and workflow data as array;
+* **massStartWorkflow(data)** - starts several workflows in one transitions, receives set of array that contains
+workflow identifier, entity, transition (optional) and workflow data (optional);
 * **transit(WorkflowItem, transition)** - perform transition for specified workflow item;
 * **getApplicableWorkflow(entity)** - returns active workflow by related entity object;
 * **getApplicableWorkflowByEntityClass(entityClass)** - returns active workflow by related entity class;

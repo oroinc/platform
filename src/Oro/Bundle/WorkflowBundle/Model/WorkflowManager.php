@@ -175,6 +175,19 @@ class WorkflowManager
     }
 
     /**
+     * Start several workflows in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflow'   => <workflow identfier: string|Workflow>,
+     *          'entity'     => <entity used in workflow: object>,
+     *          'transition' => <start transition name: string>,     // optional
+     *          'data'       => <additional workflow data : array>,  // optional
+     *      ),
+     *      ...
+     * )
+     *
      * @param array $data
      * @throws \Exception
      */
