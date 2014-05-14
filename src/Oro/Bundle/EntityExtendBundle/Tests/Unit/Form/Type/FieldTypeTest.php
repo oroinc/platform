@@ -177,23 +177,6 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testTypeWithReverseRelations()
-    {
-        $config = $this->prepareReverseRelationsConfig();
-
-        $this->prepareTestTypeWithRelations($config, false);
-
-        $form = $this->factory->create($this->type, null, $this->formOptions);
-
-        $this->assertEquals(
-            $this->defaultFieldTypesKeys,
-            array_keys($form->offsetGet('type')->getConfig()->getOption('choices'))
-        );
-
-        $form->submit(['fieldName' => 'name', 'type' => 'string']);
-        $this->assertTrue($form->isSynchronized());
-    }
-
     protected function prepareRelationsConfig()
     {
         $relationConfigFieldId       = new FieldConfigId(
@@ -220,47 +203,8 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
         ];
 
         return [
-            'relationConfigFieldId'       => $relationConfigFieldId,
             'relationTargetConfigFieldId' => $relationTargetConfigFieldId,
             'relationConfig'              => $relationConfig
-        ];
-    }
-
-    protected function prepareReverseRelationsConfig()
-    {
-        $relationConfigFieldId       = false;
-        $relationTargetConfigFieldId = new FieldConfigId(
-            'extend',
-            'Extend\Entity\testEntity1',
-            'rel_m_t_o',
-            'manyToOne'
-        );
-        $relationConfig = [
-            'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o' => [
-                'assign'          => false,
-                'field_id'        => $relationConfigFieldId,
-                'owner'           => false,
-                'target_entity'   => 'Extend\Entity\testEntity1',
-                'target_field_id' => $relationTargetConfigFieldId
-            ],
-            'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_o_t_m' => [
-                'assign'          => true,
-                'field_id'        => new FieldConfigId(
-                    'extend',
-                    'Extend\Entity\testEntity1',
-                    'rel_o_t_m',
-                    'oneToMany'
-                ),
-                'owner'           => true,
-                'target_entity'   => 'Extend\Entity\testEntity1',
-                'target_field_id' => false
-            ]
-        ];
-
-        return [
-            'relationConfigFieldId'       => $relationConfigFieldId,
-            'relationTargetConfigFieldId' => $relationTargetConfigFieldId,
-            'relationConfig'              => $relationConfig,
         ];
     }
 
