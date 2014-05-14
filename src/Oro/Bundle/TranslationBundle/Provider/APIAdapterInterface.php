@@ -10,12 +10,12 @@ interface APIAdapterInterface extends LoggerAwareInterface
      * Download translations
      *
      * @param string $path save downloaded file to this path
-     * @param array  $projects project names, some adapters may need it
+     * @param array  $projects project names
      * @param string $package package or locale (e.g. for crowdin)
      *
      * @return mixed
      */
-    public function download($path, array $projects, $package = null);
+    public function download($path, array $projects = [], $package = null);
 
     /**
      * Perform request
