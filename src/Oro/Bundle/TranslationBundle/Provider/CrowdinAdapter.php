@@ -173,7 +173,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    public function download($path, array $projects, $package = null)
+    public function download($path, array $projects = [], $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 
