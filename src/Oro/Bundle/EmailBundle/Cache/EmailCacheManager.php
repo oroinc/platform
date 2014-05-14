@@ -44,6 +44,7 @@ class EmailCacheManager
             return;
         }
 
+        // body loader can load email from any folder
         $folder = $email->getFolders()->first();
         $origin = $folder->getOrigin();
 
