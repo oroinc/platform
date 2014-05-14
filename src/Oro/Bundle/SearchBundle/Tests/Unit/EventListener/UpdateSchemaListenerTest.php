@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
-
 use Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener;
 
 class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $searchEngine;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -34,11 +37,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
     protected $doctrineCommand;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $application;
-
-    /**
      * @var UpdateSchemaDoctrineListener
      */
     protected $listener;
@@ -50,7 +48,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $this->input  = $this->getMock('Symfony\Component\Console\Input\InputInterface');
         $this->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
         $this->eventMock
@@ -63,16 +61,17 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getOutput')
             ->will($this->returnValue($this->output));
 
-        $this->command = $this->getMock('Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand', ['execute']);
+        $this->doctrineCommand = $this
+            ->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->doctrineCommand = $this->getMock(
-            'Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand',
-            ['execute', 'getApplication']
-        );
+        $this->searchEngine = $this
+            ->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Orm')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->application = $this->getMock('Symfony\Component\Console\Application');
-
-        $this->listener = new UpdateSchemaDoctrineListener();
+        $this->listener = new UpdateSchemaDoctrineListener($this->searchEngine);
     }
 
     public function testNotRelatedCommand()
@@ -84,23 +83,29 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getCommand')
             ->will($this->returnValue($command));
 
-        $this->application
+        $this->searchEngine
             ->expects($this->never())
-            ->method('run');
+            ->method('reindex');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }
 
     public function testRelatedCommandWithoutOption()
     {
+        $this->input
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('force')
+            ->will($this->returnValue(null));
+
         $this->eventMock
             ->expects($this->any())
             ->method('getCommand')
-            ->will($this->returnValue(new UpdateSchemaDoctrineCommand()));
+            ->will($this->returnValue($this->doctrineCommand));
 
-        $this->application
+        $this->searchEngine
             ->expects($this->never())
-            ->method('run');
+            ->method('reindex');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }
@@ -113,19 +118,14 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->with('force')
             ->will($this->returnValue(true));
 
-        $this->doctrineCommand
-            ->expects($this->once())
-            ->method('getApplication')
-            ->will($this->returnValue($this->application));
-
         $this->eventMock
             ->expects($this->any())
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
 
-        $this->application
+        $this->searchEngine
             ->expects($this->once())
-            ->method('run');
+            ->method('reindex');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }

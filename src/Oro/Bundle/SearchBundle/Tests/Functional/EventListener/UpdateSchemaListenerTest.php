@@ -47,7 +47,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
         rewind($output->getStream());
         $this->$method(
-            'Schema update and create index completed',
+            'Schema update and create index completed. 1 index entities were added',
             stream_get_contents($output->getStream())
         );
     }
