@@ -18,6 +18,7 @@ define(function (require) {
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
+    var _jqueryForm = require('jquery.form');
 
     var Navigation;
     var instance;
@@ -151,12 +152,6 @@ define(function (require) {
         formState: '',
 
         confirmModal: null,
-
-        /**
-         * Message that will been shown when error has been detected.
-         * When this message is defined, response will not be rendered.
-         */
-        errorMessage: null,
 
         /**
          * Initialize hash navigation
@@ -822,15 +817,17 @@ define(function (require) {
                 this.updateDebugToolbar(XMLHttpRequest);
             }
 
-            mediator.trigger('grid_action:navigateAction:error', this, XMLHttpRequest.status);
+            var options = {
+                stopPageProcessing: false
+            };
 
-            if (this.errorMessage) {
-                messenger.notificationFlashMessage('error', this.errorMessage);
-            } else {
+            mediator.trigger('navigation:page_load:error', XMLHttpRequest, options);
+
+            if (!options.stopPageProcessing) {
                 this.handleResponse(XMLHttpRequest.responseText);
+                this.addErrorClass();
             }
 
-            this.addErrorClass();
             this.hideLoading();
         },
 

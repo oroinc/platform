@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/mediator', './model-action'
-    ], function (_, __, mediator, ModelAction) {
+define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action'
+    ], function (_, __, messenger, mediator, ModelAction) {
     'use strict';
 
     /**
@@ -34,7 +34,6 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/mediator', './mo
             }
 
             this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
-            mediator.bind('grid_action:navigateAction:error', _.bind(this._processError, this));
 
             if (this.useDirectLauncherLink) {
                 this.launcherOptions = _.extend({
@@ -52,23 +51,18 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/mediator', './mo
         },
 
         /**
-         * Processes errors
-         *
-         * @private
-         */
-        _processError: function (action, HttpRequestStatus) {
-            if (403 == HttpRequestStatus) {
-                action.errorMessage = __('You do not have permission to this action.');
-            }
-        },
-
-        /**
          * Trigger global event
          *
          * @private
          */
         _preExecuteSubscriber: function (action, options) {
             mediator.trigger('grid_action:navigateAction:preExecute', action, options);
+            mediator.once('navigation:page_load:error', function(xmlHttp, options) {
+                if (403 == xmlHttp.status) {
+                    options.stopPageProcessing = true;
+                    messenger.notificationFlashMessage('error', __('You do not have permission to perform this action.'));
+                }
+            });
         }
     });
 });
