@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
+use Doctrine\ORM\Query;
+
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -90,6 +92,12 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                     'column_aliases' => ['userName' => 'c1',]
                 ],
                 'type'         => 'orm',
+                'hints' => [
+                    [
+                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
+                        'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
+                    ]
+                ],
                 'acl_resource' => 'oro_segment_view',
             ],
             'options' => ['export' => true],
