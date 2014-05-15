@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
 class PermissionsHandler
 {
     const SETFACL = 'setfacl -dR -m u:"%s":rwX %s';
-    const CHMOD = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
+    const CHMOD   = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
 
     const USER_COMMAND = '`whoami`';
 

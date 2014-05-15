@@ -33,24 +33,35 @@ class ScriptHandler extends SensioScriptHandler
      */
     public static function setPermissions(CommandEvent $event)
     {
-        $directories  = [
+        $directories = [
             'app/cache',
             'app/logs',
         ];
 
         $permissionHandler = new PermissionsHandler();
-        $filesystem = new Filesystem();
+        $filesystem        = new Filesystem();
 
-        foreach($directories as $directory) {
+        $withoutPermissionsList = [];
+        foreach ($directories as $directory) {
             if ($filesystem->exists($directory)) {
                 $isPermissionSet = $permissionHandler->setPermissions($directory);
 
                 if (!$isPermissionSet) {
-                    $event->getIO()->write(
-                        sprintf('Permissions for "%s" directory were not set', $directory)
-                    );
+                    $withoutPermissionsList[] = $directory;
                 }
             }
+        }
+
+        if ($withoutPermissionsList) {
+            $withoutPermissions = implode(' ', $withoutPermissionsList);
+            $event->getIO()->write(
+                sprintf('Permissions for "%s" directories were not set', $withoutPermissions)
+            );
+
+            $commandToRun = sprintf(PermissionsHandler::CHMOD, PermissionsHandler::USER_COMMAND, $withoutPermissions);
+            $event->getIO()->write(
+                sprintf('Please run "sudo %s" manually from console', $commandToRun)
+            );
         }
     }
 }
