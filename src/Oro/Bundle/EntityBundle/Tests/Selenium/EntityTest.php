@@ -60,7 +60,7 @@ class EntityTest extends Selenium2TestCase
             ->setLabel($newEntityName)
             ->save()
             ->assertMessage('Entity saved')
-            ->assertTitle($newEntityName .' - Entities - System')
+            ->assertTitle($newEntityName .' - Entity Management - Entities - System')
             ->createField()
             ->setFieldName('test_field2')
             ->setType('Integer')
