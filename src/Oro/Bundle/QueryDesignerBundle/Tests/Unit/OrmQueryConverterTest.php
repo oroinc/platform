@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
+use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+
 class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
@@ -113,5 +116,28 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         }
 
         return $doctrine;
+    }
+
+    /**
+     * @param QueryDesignerModel                            $model
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $doctrine
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $functionProvider
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $virtualFieldProvider
+     *
+     * @return DatagridConfigurationBuilder
+     */
+    protected function createDatagridConfigurationBuilder(
+        QueryDesignerModel $model,
+        $doctrine = null,
+        $functionProvider = null,
+        $virtualFieldProvider = null
+    ) {
+        return new DatagridConfigurationBuilder(
+            'test_grid',
+            $model,
+            $functionProvider ? : $this->getFunctionProvider(),
+            $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
+            $doctrine ? : $this->getDoctrine()
+        );
     }
 }
