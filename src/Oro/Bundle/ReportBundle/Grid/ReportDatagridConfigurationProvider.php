@@ -104,7 +104,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $fromPart = $this->configuration->offsetGetByPath('[source][query][from]');
 
         $entityAlias = null;
-        $doctrineMetadata = $this->doctrine->getManager()->getClassMetadata($className);
+        $doctrineMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
         $identifiers = $doctrineMetadata->getIdentifier();
         $pkName = array_shift($identifiers);
 
@@ -114,7 +114,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
             }
         }
 
-        if (!$entityAlias || $pkName === null) {
+        if (!$entityAlias || $pkName === null || count($identifiers) > 1) {
             return;
         }
 
