@@ -375,7 +375,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $result
         );
 
-        $srcStack = [];
+        $newImapIds = [];
         foreach ($emails as $src) {
             if (!in_array($src->getId()->getUid(), $existingUids)) {
                 $this->log->notice(
@@ -398,7 +398,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $email->setXMessageId($src->getXMessageId());
                 $email->setXThreadId($src->getXThreadId());
 
-                $srcStack[$src->getMessageId()] = $src->getId()->getUid();
+                $newImapIds[$src->getMessageId()] = $src->getId()->getUid();
 
                 $this->log->notice(sprintf('The "%s" email was persisted.', $src->getSubject()));
             } else {
@@ -421,7 +421,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 continue;
             }
 
-            $uid = $srcStack[$email->getMessageId()];
+            $uid = $newImapIds[$email->getMessageId()];
 
             $imapEmail = new ImapEmail();
             $imapEmail
