@@ -119,18 +119,20 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
     protected function prepareReverseRelationsConfig()
     {
         $selfEntityConfig   = new Config(new EntityConfigId('extend', 'Oro\Bundle\UserBundle\Entity\User'));
+        $selfTargetFieldId  = new FieldConfigId(
+            'extend',
+            'Extend\Entity\testEntity1',
+            'rel_m_t_o',
+            'manyToOne'
+        );
+
         $selfEntityRelation = [
             'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o' => [
                 'assign'          => false,
                 'field_id'        => false,
                 'owner'           => false,
                 'target_entity'   => 'Extend\Entity\testEntity1',
-                'target_field_id' => new FieldConfigId(
-                    'extend',
-                    'Extend\Entity\testEntity1',
-                    'rel_m_t_o',
-                    'manyToOne'
-                )
+                'target_field_id' => $selfTargetFieldId
             ],
             'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_o_t_m' => [
                 'assign'          => true,
@@ -166,6 +168,7 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
 
         return [
             'selfEntityConfig'   => $selfEntityConfig,
+            'targetFieldId'      => $selfTargetFieldId,
             'targetEntityConfig' => $targetEntityConfig
         ];
     }
