@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Symfony\Component\Translation\Translator;
+
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Symfony\Component\Translation\Translator;
 
 class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
 {
@@ -17,35 +19,33 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /** @var Translator */
     protected $translator;
 
-    /** @var  EntityHierarchyBuilder */
-    protected $hierarchyBuilder;
+    /** @var  EntityHierarchyProvider */
+    protected $entityHierarchyProvider;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $virtualFields;
 
     /**
      * Constructor
      *
-     * @param array                  $config
-     * @param ConfigurationResolver  $resolver
-     * @param EntityHierarchyBuilder $hierarchyBuilder
-     * @param Translator             $translator
-     * @param array                  $virtualFields
+     * @param array                   $config
+     * @param ConfigurationResolver   $resolver
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param Translator              $translator
+     * @param array                   $virtualFields
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        EntityHierarchyBuilder $hierarchyBuilder,
+        EntityHierarchyProvider $entityHierarchyProvider,
         Translator $translator,
         $virtualFields
     ) {
         $resolver->resolve($config);
-        $this->config     = ConfigurationObject::create($config);
-        $this->hierarchyBuilder = $hierarchyBuilder;
-        $this->translator = $translator;
-        $this->virtualFields = $virtualFields;
+        $this->config                  = ConfigurationObject::create($config);
+        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->translator              = $translator;
+        $this->virtualFields           = $virtualFields;
     }
 
     /**
@@ -67,7 +67,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
             'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
-            'hierarchy'  => $this->hierarchyBuilder->getHierarchy()
+            'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
         ];
     }
 

@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
+namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-class EntityHierarchyBuilder
+class EntityHierarchyProvider
 {
     /** @var  EntityManager */
     protected $entityManager;
@@ -42,12 +41,14 @@ class EntityHierarchyBuilder
         foreach ($entities as $entity) {
             $className = $entity->getClassName();
             if ($parents = $this->getParents($className)) {
-                $hierarchy[$className] = $parents; //implode(',', $parents);
+                $hierarchy[$className] = $parents;
             }
         }
 
         return $hierarchy;
     }
+
+
 
     /**
      * Returns parent doctrine entities for given entity class name
@@ -76,4 +77,4 @@ class EntityHierarchyBuilder
 
         return $parents;
     }
-} 
+}
