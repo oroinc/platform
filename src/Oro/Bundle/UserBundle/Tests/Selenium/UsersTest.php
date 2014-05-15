@@ -53,7 +53,7 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->edit()
-            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - User - Users Management - System')
+            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - Users - User Management - System')
             ->setUsername($newUsername)
             ->setFirstName('First_' . $newUsername)
             ->setLastName('Last_' . $newUsername)
