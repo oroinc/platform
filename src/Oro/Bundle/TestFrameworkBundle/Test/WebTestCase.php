@@ -121,7 +121,46 @@ abstract class WebTestCase extends BaseWebTestCase
         $this->client = self::$clientInstance;
     }
 
+    /**
+     * Get value of dbIsolation option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbIsolationSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbIsolation[$calledClass])) {
+            self::$dbIsolation[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_ISOLATION_ANNOTATION);
+        }
 
+        return self::$dbIsolation[$calledClass];
+    }
+
+    /**
+     * Get value of dbIsolation option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbReindexSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbReindex[$calledClass])) {
+            self::$dbReindex[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_REINDEX_ANNOTATION);
+        }
+
+        return self::$dbReindex[$calledClass];
+    }
+
+    /**
+     * @param string $className
+     * @param string $annotationName
+     * @return bool
+     */
+    private static function isClassHasAnnotation($className, $annotationName)
+    {
+        $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
+        return isset($annotations['class'][$annotationName]);
+    }
 
     /**
      * @param string $wsdl
@@ -278,60 +317,6 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get value of dbIsolation option from annotation of called class
-     *
-     * @return bool
-     */
-    private static function getDbIsolationSetting()
-    {
-        $calledClass = get_called_class();
-        if (!isset(self::$dbIsolation[$calledClass])) {
-            self::$dbIsolation[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_ISOLATION_ANNOTATION);
-        }
-
-        return self::$dbIsolation[$calledClass];
-    }
-
-    /**
-     * Get value of dbIsolation option from annotation of called class
-     *
-     * @return bool
-     */
-    private static function getDbReindexSetting()
-    {
-        $calledClass = get_called_class();
-        if (!isset(self::$dbReindex[$calledClass])) {
-            self::$dbReindex[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_REINDEX_ANNOTATION);
-        }
-
-        return self::$dbReindex[$calledClass];
-    }
-
-    /**
-     * @param string $className
-     * @param string $annotationName
-     * @return bool
-     */
-    private static function isClassHasAnnotation($className, $annotationName)
-    {
-        $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
-        return isset($annotations['class'][$annotationName]);
-    }
-
-    /**
-     * @return Client
-     * @throws \BadMethodCallException
-     */
-    public static function getClientInstance()
-    {
-        if (!self::$clientInstance) {
-            throw new \BadMethodCallException('Client instance is not initialized.');
-        }
-
-        return self::$clientInstance;
-    }
-
-    /**
      * Creates a mock object of a service identified by its id.
      *
      * @param string $id
@@ -345,51 +330,6 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Generate WSSE authorization header
-     *
-     * @param string $userName
-     * @param string $userPassword
-     * @param string|null $nonce
-     * @return array
-     */
-    public static function generateWsseAuthHeader(
-        $userName = self::USER_NAME,
-        $userPassword = self::USER_PASSWORD,
-        $nonce = null
-    ) {
-        if (null === $nonce) {
-            $nonce = uniqid();
-        }
-
-        $created  = date('c');
-        $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
-        $wsseHeader = array(
-            'CONTENT_TYPE' => 'application/json',
-            'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
-            'HTTP_X-WSSE' => sprintf(
-                'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
-                $userName,
-                $digest,
-                $nonce,
-                $created
-            )
-        );
-        return $wsseHeader;
-    }
-
-    /**
-     * Generate Basic  authorization header
-     *
-     * @param string $userName
-     * @param string $userPassword
-     * @return array
-     */
-    public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
-    {
-        return array('PHP_AUTH_USER' => $userName, 'PHP_AUTH_PW' => $userPassword);
-    }
-
-    /**
      * Generates a URL or path for a specific route based on the given parameters.
      *
      * @param string $name
@@ -400,6 +340,29 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function getUrl($name, $parameters = array(), $absolute = false)
     {
         return self::getContainer()->get('router')->generate($name, $parameters, $absolute);
+    }
+
+    /**
+     * Get an instance of the dependency injection container.
+     *
+     * @return ContainerInterface
+     */
+    protected static function getContainer()
+    {
+        return static::getClientInstance()->getContainer();
+    }
+
+    /**
+     * @return Client
+     * @throws \BadMethodCallException
+     */
+    public static function getClientInstance()
+    {
+        if (!self::$clientInstance) {
+            throw new \BadMethodCallException('Client instance is not initialized.');
+        }
+
+        return self::$clientInstance;
     }
 
     /**
@@ -449,6 +412,70 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @param int $length
+     * @return string
+     */
+    public static function generateRandomString($length = 10)
+    {
+        $random= "";
+        srand((double) microtime() * 1000000);
+        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $char_list .= "abcdefghijklmnopqrstuvwxyz";
+        $char_list .= "1234567890_";
+
+        for ($i = 0; $i < $length; $i++) {
+            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+        }
+
+        return $random;
+    }
+
+    /**
+     * Generate WSSE authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @param string|null $nonce
+     * @return array
+     */
+    public static function generateWsseAuthHeader(
+        $userName = self::USER_NAME,
+        $userPassword = self::USER_PASSWORD,
+        $nonce = null
+    ) {
+        if (null === $nonce) {
+            $nonce = uniqid();
+        }
+
+        $created  = date('c');
+        $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
+        $wsseHeader = array(
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
+            'HTTP_X-WSSE' => sprintf(
+                'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
+                $userName,
+                $digest,
+                $nonce,
+                $created
+            )
+        );
+        return $wsseHeader;
+    }
+
+    /**
+     * Generate Basic  authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @return array
+     */
+    public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
+    {
+        return array('PHP_AUTH_USER' => $userName, 'PHP_AUTH_PW' => $userPassword);
+    }
+
+    /**
      * Convert value to array
      *
      * @param mixed $value
@@ -468,35 +495,6 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function jsonToArray($json)
     {
         return (array)json_decode($json, true);
-    }
-
-    /**
-     * Get an instance of the dependency injection container.
-     *
-     * @return ContainerInterface
-     */
-    protected static function getContainer()
-    {
-        return static::getClientInstance()->getContainer();
-    }
-
-    /**
-     * @param int $length
-     * @return string
-     */
-    public static function generateRandomString($length = 10)
-    {
-        $random= "";
-        srand((double) microtime() * 1000000);
-        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $char_list .= "abcdefghijklmnopqrstuvwxyz";
-        $char_list .= "1234567890_";
-
-        for ($i = 0; $i < $length; $i++) {
-            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
-        }
-
-        return $random;
     }
 
     /**
