@@ -88,6 +88,7 @@ services:
             - @translator
             - %oro_entity.virtual_fields%
             - %oro_entity.hidden_fields%
+            - @oro_query_designer.entity_data_provider.storage
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
 
