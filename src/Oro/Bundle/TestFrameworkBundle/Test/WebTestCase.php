@@ -341,6 +341,19 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Creates a mock object of a service identified by its id.
+     *
+     * @param string $id
+     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     */
+    protected function getServiceMockBuilder($id)
+    {
+        $service = $this->getContainer()->get($id);
+        $class = get_class($service);
+        return $this->getMockBuilder($class)->disableOriginalConstructor();
+    }
+
+    /**
      * Generate WSSE authorization header
      *
      * @param string $userName
