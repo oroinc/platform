@@ -100,6 +100,11 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow->getTransitionManager()
             ->setTransitions($transitions);
 
+        if ($definition->getStartStep()) {
+            $startStepName = $definition->getStartStep()->getName();
+            $workflow->getStepManager()->setStartStepName($startStepName);
+        }
+
         if ($needValidation) {
             $this->validateWorkflow($workflow);
         }

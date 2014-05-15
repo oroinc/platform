@@ -320,17 +320,6 @@ steps (all steps for current definition and start step in particular). Also has 
 * **import(WorkflowDefinition)** - import data from passed workflow definition into the current;
 * **getObjectIdentifier()** - returns a unique identifier for this domain object;
 
-Workflow Definition Repository
-------------------------------
-
-**Class:**
-Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository
-
-**Methods:**
-* **findByEntityClass(entityClass, workflowName)** - returns available workflow definitions for entity class. Also has
-possibility to get single workflow definition if specify workflowName as second parameter;
-* **findAllWithStartStep()** - returns list of workflow definition, where start step has been defined;
-
 Workflow Item
 -------------
 **Class:**

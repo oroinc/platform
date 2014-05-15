@@ -86,7 +86,8 @@ class WorkflowItemSubscriber implements EventSubscriber
     {
         $entity = $args->getEntity();
         $activeWorkflow = $this->workflowManager->getApplicableWorkflow($entity);
-        if ($activeWorkflow && $activeWorkflow->getDefinition()->getStartStep()) {
+
+        if ($activeWorkflow && $activeWorkflow->getStepManager()->hasStartStep()) {
             $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
                 'entity' => $entity,
                 'workflow' => $activeWorkflow

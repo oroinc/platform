@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -17,7 +18,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $workflowRegistry;
+    protected $registry;
 
     /**
      * @var WorkflowSelectType
@@ -28,18 +29,18 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new WorkflowSelectType($this->workflowRegistry);
+        $this->type = new WorkflowSelectType($this->registry);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
 
-        unset($this->workflowRegistry);
+        unset($this->registry);
         unset($this->type);
     }
 
@@ -50,19 +51,22 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
      */
     public function testSetDefaultOptions(array $inputOptions, array $expectedOptions)
     {
-        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $testWorkflow = new Workflow($entityConnector, $aclManager);
-        $testWorkflow->setName(self::TEST_WORKFLOW_NAME)
+        $testWorkflowDefinition = new WorkflowDefinition();
+        $testWorkflowDefinition->setName(self::TEST_WORKFLOW_NAME)
             ->setLabel(self::TEST_WORKFLOW_LABEL);
-        $this->workflowRegistry->expects($this->any())
-            ->method('getWorkflowsByEntityClass')
-            ->with(self::TEST_ENTITY_CLASS)
-            ->will($this->returnValue(array($testWorkflow)));
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->any())
+            ->method('findBy')
+            ->with(array('relatedEntity' => self::TEST_ENTITY_CLASS))
+            ->will($this->returnValue(array($testWorkflowDefinition)));
+
+        $this->registry->expects($this->any())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowDefinition')
+            ->will($this->returnValue($repository));
 
         $form = $this->factory->create($this->type, null, $inputOptions);
 
