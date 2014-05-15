@@ -20,6 +20,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 /**
  * Abstract class for functional and integration tests
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
