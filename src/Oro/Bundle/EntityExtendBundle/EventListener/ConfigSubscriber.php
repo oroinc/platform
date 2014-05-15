@@ -191,28 +191,47 @@ class ConfigSubscriber implements EventSubscriberInterface
         }
     }
 
-    protected function createRelation(Config $fieldConfig)
+    protected function isInverseSideRelationExist(Config $fieldConfig)
     {
         $selfConfig = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
-
         if ($selfConfig->has('relation')) {
-            $relations  = $selfConfig->get('relation');
-            foreach ($relations as $relation) {
+            $selfRelations  = $selfConfig->get('relation');
+            foreach ($selfRelations as $relation) {
                 if ($relation['field_id'] == $fieldConfig->getId()) {
-                    return;
+                    return true;
                 }
             }
         }
 
+        return false;
+    }
+
+    protected function createRelation(Config $fieldConfig)
+    {
+        if ($this->isInverseSideRelationExist($fieldConfig)) {
+            return;
+        }
+
+        $createSelfRelation = true;
+        $relationKey        = null;
+
         if ($fieldConfig->is('relation_key')) {
-            $targetConfig = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
-            $relations    = $targetConfig->get('relation');
-            if (isset($relations[$fieldConfig->get('relation_key')])) {
+            $targetConfig    = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
+            $targetRelations = $targetConfig->get('relation');
+            $relationKey     = $fieldConfig->get('relation_key');
+            if (isset($targetRelations[$relationKey])) {
+
                 $this->createTargetRelation($fieldConfig, $fieldConfig->get('relation_key'));
+
+                if ($targetRelations[$relationKey]['assign']) {
+                    $createSelfRelation = false;
+                }
             }
         }
 
-        $this->createSelfRelation($fieldConfig);
+        if ($createSelfRelation) {
+            $this->createSelfRelation($fieldConfig);
+        }
     }
 
     protected function createSelfRelation(Config $fieldConfig)
@@ -298,13 +317,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         $selfRelations      = $selfConfig->get('relation');
         $selfRelationConfig = & $selfRelations[$relationKey];
 
-        $selfRelationConfig['field_id'] = $fieldConfig;
+        $selfRelationConfig['field_id'] = $fieldConfig->getId();
 
         $targetConfig         = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelations      = $targetConfig->get('relation');
         $targetRelationConfig = & $targetRelations[$relationKey];
 
-        $targetRelationConfig['target_field_id'] = $fieldConfig;
+        $targetRelationConfig['target_field_id'] = $fieldConfig->getId();
 
         $selfConfig->set('relation', $selfRelations);
         $targetConfig->set('relation', $targetRelations);
