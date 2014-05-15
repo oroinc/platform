@@ -1,0 +1,38 @@
+#
+# FOR TESTING virtual fields with hierarchycal configuration
+# REMOVE this before merge
+#
+oro_entity_virtual_fields:
+    OroCRM\Bundle\ContactBundle\Entity\ContactAddress:
+        country_virtual:
+            entity_alias: address
+            query:
+                select:
+                    expr:         country.name
+                    return_type:  string
+                join:
+                    left:
+                        - { join: address.country, alias: country }
+
+    Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+        country_hierarchy:
+            entity_alias: address
+            query:
+                select:
+                    expr:         country.name
+                    return_type:  string
+                join:
+                    left:
+                        - { join: address.country, alias: country }
+#        region:
+#            query:
+#                select:
+#                    - region.name
+#                join:
+#                    left:
+#                        - { join: entity.regions, alias: region }
+
+# DO NOT FORGET to create virtual fields for
+#  - Country->ISO2_code
+#  - Country->ISO3_code
+#  - Country->name
