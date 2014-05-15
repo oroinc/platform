@@ -107,14 +107,9 @@ abstract class WebTestCase extends BaseWebTestCase
             $client = self::$clientInstance = static::createClient($options, $server);
 
             if (self::getDbIsolationSetting()) {
-                //workaround MyISAM search tables are not on transaction
+                //This is a workaround for MyISAM search tables that are not transactionanl
                 if (self::getDbReindexSetting()) {
-                    self::runCommand(
-                        'oro:search:reindex',
-                        array(
-                            '--quiet' => null
-                        )
-                    );
+                    self::getContainer()->get('oro_search.search.engine')->reindex();
                 }
 
                 $client->startTransaction();
@@ -131,13 +126,13 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @param string $wsdl
      * @param array $options
-     * @param bool $new
+     * @param bool $force
      * @return SoapClient
      * @throws \Exception
      */
-    protected function initSoapClient($wsdl = null, array $options = array(), $new = false)
+    protected function initSoapClient($wsdl = null, array $options = array(), $force = false)
     {
-        if (!self::$soapClientInstance || $new) {
+        if (!self::$soapClientInstance || $force) {
 
             if ($wsdl === null) {
                 $wsdl = "http://localhost/api/soap";
@@ -145,15 +140,11 @@ abstract class WebTestCase extends BaseWebTestCase
 
             $options = array_merge(
                 array(
-                    'location' => 'http://localhost/api/soap',
+                    'location' => $wsdl,
                     'soap_version' => SOAP_1_2
                 ),
                 $options
             );
-
-            if (is_null($wsdl)) {
-                throw new \InvalidArgumentException('wsdl should not be NULL');
-            }
 
             $client = $this->getClientInstance();
             $client->request('GET', $wsdl);
@@ -395,7 +386,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
     {
-        return array('PHP_AUTH_USER' =>  $userName, 'PHP_AUTH_PW' => $userPassword);
+        return array('PHP_AUTH_USER' => $userName, 'PHP_AUTH_PW' => $userPassword);
     }
 
     /**
@@ -465,7 +456,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function valueToArray($value)
     {
-        return (array)json_decode(json_encode($value), true);
+        return self::jsonToArray(json_encode($value));
     }
 
     /**
@@ -476,7 +467,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function jsonToArray($json)
     {
-        return json_decode($json, true);
+        return (array)json_decode($json, true);
     }
 
     /**
@@ -518,6 +509,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function getJsonResponseContent(Response $response, $statusCode)
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode);
+        self::assertNotEmpty($response->getContent());
         return self::jsonToArray($response->getContent());
     }
 

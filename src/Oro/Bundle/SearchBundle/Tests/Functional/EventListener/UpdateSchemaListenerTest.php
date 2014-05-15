@@ -12,7 +12,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     }
 
     /**
-     * @dataProvider commandOptionsProvider
+     * @dataProvider commandDataProvider
      */
     public function testCommand($commandName, array $params, $expectedContent)
     {
@@ -20,7 +20,7 @@ class UpdateSchemaListenerTest extends WebTestCase
         $this->assertContains($expectedContent, $result);
     }
 
-    public function commandOptionsProvider()
+    public function commandDataProvider()
     {
         return [
             'otherCommand' => [

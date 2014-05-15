@@ -72,7 +72,7 @@ class RestDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param  array $response
+     * @param array $response
      * @depends testGetAudits
      */
     public function testGetAudit(array $response)

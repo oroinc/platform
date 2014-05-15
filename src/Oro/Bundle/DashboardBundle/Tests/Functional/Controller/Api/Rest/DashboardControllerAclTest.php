@@ -20,10 +20,7 @@ class DashboardControllerAclTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
-        );
+        $this->initClient();
         $this->loadFixtures(array('Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData'));
 
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
@@ -31,9 +28,7 @@ class DashboardControllerAclTest extends WebTestCase
 
     public function testDelete()
     {
-        $dashboard = $this
-            ->dashboardManager
-            ->findOneDashboardModelBy(['name' => 'main']);
+        $dashboard = $this->dashboardManager->findOneDashboardModelBy(['name' => 'main']);
 
         $this->assertNotNull($dashboard);
 

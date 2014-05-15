@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\ORM\QueryBuilder;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
