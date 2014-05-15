@@ -509,7 +509,6 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function getJsonResponseContent(Response $response, $statusCode)
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode);
-        self::assertNotEmpty($response->getContent());
         return self::jsonToArray($response->getContent());
     }
 
