@@ -11,12 +11,8 @@ header {
     padding: 0;
 }
 
-header div.navbar-inner {
-    height: 41px;
-}
-
 div.navbar-inner .help {
-    padding: 10px;
+    padding: 5px;
 }
 
 div.navbar-inner .help a {

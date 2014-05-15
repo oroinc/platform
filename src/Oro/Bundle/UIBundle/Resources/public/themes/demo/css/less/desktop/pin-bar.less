@@ -1,0 +1,40 @@
+.pin-bar {
+  background-repeat: repeat-x;
+  #gradient > .vertical(@baseGradientColorEnd, @baseGradientColorStart);
+  .pin-menus {
+    #header > .icon-button();
+    .oro-dropdown-toggle[class^='icon-ellipsis'] {
+      #header > .icon-button > .icon();
+      &:hover {
+        #header > .icon-button > .icon > .hover();
+      }
+      &:active,
+      &:focus {
+        #header > .icon-button > .icon > .focus();
+      }
+    }
+  }
+}
+.list-bar{
+  li {
+    color: @headerTextColor;
+    .pin-holder {
+      #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
+      border-bottom: 1px solid @headerIconButtonColorEnd;
+      a {
+        color: @headerTextColor;
+        &.icon-remove {
+          &:before {
+            color:@headerTextColor;
+          }
+        }
+      }
+      &:hover {
+        #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
+        a {
+          color: lighten(@headerTextColor, 10%);
+        }
+      }
+    }
+  }
+}

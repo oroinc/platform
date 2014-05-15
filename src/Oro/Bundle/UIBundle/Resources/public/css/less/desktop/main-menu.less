@@ -1,3 +1,4 @@
+@menuItemFirstLevelTextColor:  #b8c8d1;
 @menuBackGroundColor:          #313a45;
 @menuItemBorderTopColor:       lighten(@menuBackGroundColor, 3%);
 @menuItemBorderBottomColor:    darken(@menuBackGroundColor, 2%);
@@ -154,7 +155,7 @@
   width: 230px;
   height: 100%;
   padding-bottom: 36px;
-  background-color: #313a45;
+  background-color: @menuBackGroundColor;
   .scroller {
     height: 100%;
     overflow: auto;
@@ -227,7 +228,7 @@
     }
     > li.accordion-group {
       a {
-        color: #b8c8d1;
+        color: @menuItemFirstLevelTextColor;
         &:hover {
           color: #fff;
         }
@@ -352,7 +353,7 @@
           i[class^=icon-] {
             font-size: 15px;
             line-height: 34px;
-            color: #b8c8d1;
+            color: @menuItemFirstLevelTextColor;
           }
         }
         &:hover {
@@ -365,7 +366,7 @@
             i[class^=icon-] {
               font-size: 18px;
               line-height: 36px;
-              color: #313a45;
+              color: @menuBackGroundColor;
             }
           }
         }
@@ -422,7 +423,7 @@
     height: 16px;
     cursor: pointer;
     font-family: 'FontAwesome';
-    color: #b8c8d1;
+    color: @menuItemFirstLevelTextColor;
     font-size: 18px;
     line-height: 16px;
     padding: 5px;
