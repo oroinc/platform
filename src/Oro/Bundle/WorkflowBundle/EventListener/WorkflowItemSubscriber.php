@@ -124,16 +124,11 @@ class WorkflowItemSubscriber implements EventSubscriber
         $currentDeepLevel = $this->deepLevel;
 
         if (!empty($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
-            while ($entityData = array_shift($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
-                $this->deepLevel++;
-
-                $this->workflowManager->startWorkflow(
-                    $entityData['workflow'],
-                    $entityData['entity']
-                );
-
-                $this->deepLevel--;
-            }
+            $this->deepLevel++;
+            $massStartData = $this->entitiesScheduledForWorkflowStart[$currentDeepLevel];
+            unset($this->entitiesScheduledForWorkflowStart[$currentDeepLevel]);
+            $this->workflowManager->massStartWorkflow($massStartData);
+            $this->deepLevel--;
         }
     }
 
