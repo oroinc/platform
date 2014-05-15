@@ -46,13 +46,13 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                     new InputOption(
                         'project-id',
                         'i',
-                        InputOption::VALUE_OPTIONAL,
-                        'API project ID, by default equal to project name'
+                        InputOption::VALUE_REQUIRED,
+                        'API project ID'
                     ),
                     new InputOption(
                         'api-key',
                         'k',
-                        InputOption::VALUE_OPTIONAL,
+                        InputOption::VALUE_REQUIRED,
                         'API key'
                     ),
                     new InputOption(

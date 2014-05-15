@@ -27,6 +27,7 @@ services:
         class:                            %oro_wamp.listener.maintenance.class%
         arguments:
             - "@oro_wamp.publisher"
+            - "@oro_security.security_facade"
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
