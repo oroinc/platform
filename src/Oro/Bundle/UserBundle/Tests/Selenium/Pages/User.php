@@ -178,8 +178,9 @@ class User extends AbstractPageEntity
 
     public function verifyTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_oro_user_user_form_tags_autocomplete']")) {
-            $this->tags = $this->test->byXpath("//div[@id='s2id_oro_user_user_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]")) {
+            $this->tags = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]//input");
             $this->tags->click();
             $this->tags->value(substr($tag, 0, (strlen($tag)-1)));
             $this->waitForAjax();
@@ -208,8 +209,9 @@ class User extends AbstractPageEntity
      */
     public function setTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_oro_user_user_form_tags_autocomplete']")) {
-            $this->tags = $this->test->byXpath("//div[@id='s2id_oro_user_user_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]")) {
+            $this->tags = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]//input");
             $this->tags->click();
             $this->tags->value($tag);
             $this->waitForAjax();

@@ -224,7 +224,7 @@ class TagsAcl extends Selenium2TestCase
             ->open(array($username))
             ->edit()
             ->assertElementNotPresent(
-                "//div[@id='s2id_oro_user_user_form_tags']//li[contains(., '{$tagName}')]" .
+                "//div[starts-with(@id,'s2id_oro_user_user_form_tags')]//li[contains(., '{$tagName}')]" .
                 "/a[@class='select2-search-choice-close']"
             );
     }
