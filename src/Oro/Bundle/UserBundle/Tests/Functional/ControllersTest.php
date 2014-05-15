@@ -142,7 +142,7 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->client->generate('oro_user_profile_view'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains('John Doe - Users - Users Management - System', $result->getContent());
+        $this->assertContains('John Doe - Users - User Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()
@@ -150,7 +150,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
         ToolsAPI::assertJsonResponse($this->client->getResponse(), 200, 'text/html; charset=UTF-8');
         $this->assertContains(
-            'John Doe - Edit - Users - Users Management - System',
+            'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
         /** @var Form $form */
@@ -167,7 +167,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
         ToolsAPI::assertJsonResponse($this->client->getResponse(), 200, 'text/html; charset=UTF-8');
         $this->assertContains(
-            'John Doe - Edit - Users - Users Management - System',
+            'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
         /** @var Form $form */

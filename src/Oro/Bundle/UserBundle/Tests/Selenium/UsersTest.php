@@ -18,7 +18,7 @@ class UsersTest extends Selenium2TestCase
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -33,7 +33,7 @@ class UsersTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $username;
     }
@@ -53,14 +53,14 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->edit()
-            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - Users - Users Management - System')
+            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - User - Users Management - System')
             ->setUsername($newUsername)
             ->setFirstName('First_' . $newUsername)
             ->setLastName('Last_' . $newUsername)
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
-            ->assertTitle('Users - Users Management - System')
+            ->assertTitle('Users - User Management - System')
             ->close();
 
         return $newUsername;
@@ -93,7 +93,7 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->delete()
-            ->assertTitle('Users - Users Management - System')
+            ->assertTitle('Users - User Management - System')
             ->assertMessage('User deleted');
 
         $login->openUsers('Oro\Bundle\UserBundle')
