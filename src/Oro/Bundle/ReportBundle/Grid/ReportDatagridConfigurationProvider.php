@@ -93,6 +93,9 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         return $this->configuration;
     }
 
+    /**
+     * @param string $className
+     */
     protected function addViewActionToParams($className)
     {
         $metadata = $this->configManager->getEntityMetadata($className);
@@ -106,42 +109,43 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $entityAlias = null;
         $doctrineMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
         $identifiers = $doctrineMetadata->getIdentifier();
-        $pkName = array_shift($identifiers);
+        $primaryKey = array_shift($identifiers);
 
         foreach ($fromPart as $piece) {
             if ($piece['table'] == $className) {
                 $entityAlias = $piece['alias'];
+                break;
             }
         }
 
-        if (!$entityAlias || $pkName === null || count($identifiers) > 1) {
+        if (!$entityAlias || $primaryKey === null || count($identifiers) > 1) {
             return;
         }
 
         $viewAction = array(
             'view' => array(
-                'type'         => 'navigate',
-                'label'        => 'View',
-                'icon'         => 'eye-open',
-                'link'         => 'view_link',
-                'rowAction'    => true
+                'type' => 'navigate',
+                'label' => 'View',
+                'icon' => 'eye-open',
+                'link' => 'view_link',
+                'rowAction' => true
             )
         );
 
-        $idName = uniqid('id_');
+        $identifier = uniqid('id_');
 
         $properties = array(
-            $idName        => array(),
+            $identifier => array(),
             'view_link' => array(
-                'type'   => 'url',
-                'route'  => $metadata->routeView,
-                'params' => array('id' => $idName)
+                'type' => 'url',
+                'route' => $metadata->routeView,
+                'params' => array('id' => $identifier)
             )
         );
 
         $this->configuration->offsetAddToArrayByPath(
             '[source][query][select]',
-            array("{$entityAlias}.{$pkName} as {$idName}")
+            array("{$entityAlias}.{$primaryKey} as {$identifier}")
         );
         $this->configuration->offsetAddToArrayByPath('[properties]', $properties);
         $this->configuration->offsetAddToArrayByPath('[actions]', $viewAction);

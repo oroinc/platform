@@ -34,7 +34,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-
         $this->functionProvider = $this->getMock(
             'Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface'
         );
@@ -171,7 +170,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     /**
      * Return created report mock
      *
-     * @param $className
+     * @param string $className
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function prepareRepository($className)
