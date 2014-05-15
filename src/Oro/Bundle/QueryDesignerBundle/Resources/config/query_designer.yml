@@ -20,7 +20,12 @@ query_designer:
             type:       datetime
             query_type: [all]
         boolean:
-            applicable: [{type: boolean}]
+            applicable: #[{type: boolean}]
+                - {type: boolean}
+#START for testing, remove before merge
+                - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country000}
+                - {entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: country111}
+#END
             type:       boolean
             query_type: [all]
         percent:

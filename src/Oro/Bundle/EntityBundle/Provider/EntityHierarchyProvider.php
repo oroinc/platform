@@ -48,7 +48,19 @@ class EntityHierarchyProvider
         return $hierarchy;
     }
 
+    /**
+     * @param string $className
+     * @return array
+     */
+    public function getHierarchyForClassName($className)
+    {
+        $hierarchy = $this->getHierarchy();
+        if (isset($hierarchy[$className])) {
+            return $hierarchy[$className];
+        }
 
+        return [];
+    }
 
     /**
      * Returns parent doctrine entities for given entity class name

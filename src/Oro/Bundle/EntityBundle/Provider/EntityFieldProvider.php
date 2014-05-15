@@ -23,54 +23,44 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
  */
 class EntityFieldProvider
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $entityConfigProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
-     * @var EntityClassResolver
-     */
-    protected $entityClassResolver;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
     /** @var EntityProvider */
     protected $entityProvider;
 
-    /**
-     * @var array
-     */
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var Translator */
+    protected $translator;
+
+    /** @var EntityHierarchyProvider */
+    protected $entityHierarchyProvider;
+
+    /** @var array */
     protected $virtualFields;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $hiddenFields;
 
     /**
      * Constructor
      *
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param ManagerRegistry     $doctrine
-     * @param Translator          $translator
-     * @param array               $virtualFields
-     * @param array               $hiddenFields
+     * @param ConfigProvider          $entityConfigProvider
+     * @param ConfigProvider          $extendConfigProvider
+     * @param EntityClassResolver     $entityClassResolver
+     * @param ManagerRegistry         $doctrine
+     * @param Translator              $translator
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param array                   $virtualFields
+     * @param array                   $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -78,16 +68,18 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
+        EntityHierarchyProvider $entityHierarchyProvider,
         $virtualFields,
         $hiddenFields
     ) {
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->extendConfigProvider = $extendConfigProvider;
-        $this->entityClassResolver  = $entityClassResolver;
-        $this->translator           = $translator;
-        $this->doctrine             = $doctrine;
-        $this->virtualFields        = $virtualFields;
-        $this->hiddenFields         = $hiddenFields;
+        $this->entityConfigProvider    = $entityConfigProvider;
+        $this->extendConfigProvider    = $extendConfigProvider;
+        $this->entityClassResolver     = $entityClassResolver;
+        $this->translator              = $translator;
+        $this->doctrine                = $doctrine;
+        $this->virtualFields           = $virtualFields;
+        $this->hiddenFields            = $hiddenFields;
+        $this->entityHierarchyProvider = $entityHierarchyProvider;
     }
 
     /**
@@ -196,8 +188,48 @@ class EntityFieldProvider
             }
 
             // add virtual fields
-            if ($withVirtualFields && isset($this->virtualFields[$className])) {
-                foreach ($this->virtualFields[$className] as $fieldName => $config) {
+            if ($withVirtualFields) {
+                $virtualFields = [];
+
+                //add regular virtual field(s) by class name
+                if (isset($this->virtualFields[$className])) {
+                    $virtualFields = array_merge(
+                        $virtualFields,
+                        $this->virtualFields[$className]
+                    );
+                }
+
+                /**
+                 * add virtual field(s) by hierarchy
+                 *
+                 * e.g. OroCRMContactBundle:ContactAddress extends OroAddressBundle:AbstractAddress
+                 * and AbstractAddress has configured virtual field (entity_virtual_fields.yml)
+                 *
+                 * oro_entity_virtual_fields:
+                 *   Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+                 *     country_virtual_field:
+                 *       entity_alias: address
+                 *       query:
+                 *         select:
+                 *           expr: country.name
+                 *           return_type: string
+                 *         join:
+                 *           left:
+                 *             - { join: address.country, alias: country }
+                 */
+                $hierarchy = $this->entityHierarchyProvider->getHierarchyForClassName($className);
+                if ($hierarchy) {
+                    foreach ($hierarchy as $hierarchyClassName) {
+                        if (isset($this->virtualFields[$hierarchyClassName])) {
+                            $virtualFields = array_merge(
+                                $virtualFields,
+                                $this->virtualFields[$hierarchyClassName]
+                            );
+                        }
+                    }
+                }
+
+                foreach ($virtualFields as $fieldName => $config) {
                     if ($this->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
