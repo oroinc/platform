@@ -19,7 +19,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         unset($this->securityFacade);

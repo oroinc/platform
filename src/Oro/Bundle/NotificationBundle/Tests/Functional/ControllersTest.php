@@ -19,7 +19,7 @@ class ControllersTest extends WebTestCase
     protected $eventCreate;
     protected $templateUpdate;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(
             array(),

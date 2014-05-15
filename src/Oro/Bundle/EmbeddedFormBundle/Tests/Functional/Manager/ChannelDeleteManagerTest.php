@@ -13,7 +13,7 @@ use Oro\Bundle\IntegrationBundle\Tests\Functional\AbstractChannelDataDeleteTest;
  */
 class ChannelDeleteManagerTest extends AbstractChannelDataDeleteTest
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->entityClassName = 'OroEmbeddedFormBundle:EmbeddedForm';

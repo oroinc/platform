@@ -26,7 +26,7 @@ class ControllersTest extends WebTestCase
         'gender' => 'Male'
     );
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(
             array(),

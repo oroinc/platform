@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient();
     }

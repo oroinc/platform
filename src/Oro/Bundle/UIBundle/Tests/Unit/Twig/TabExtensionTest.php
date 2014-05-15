@@ -34,7 +34,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->menuExtension = $this
             ->getMockBuilder('Oro\Bundle\NavigationBundle\Twig\MenuExtension')

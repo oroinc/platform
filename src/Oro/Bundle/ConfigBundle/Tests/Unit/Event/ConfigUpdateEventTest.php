@@ -29,7 +29,7 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
         ];
 
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();

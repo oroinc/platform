@@ -13,7 +13,7 @@ class SoapUsersTest extends WebTestCase
     /** Default value for role label */
     const DEFAULT_VALUE = 'USER_LABEL';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
         $this->initSoapClient();

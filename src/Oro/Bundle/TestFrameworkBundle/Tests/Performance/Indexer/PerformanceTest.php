@@ -12,7 +12,7 @@ class PerformanceTest extends WebTestCase
 
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->client = self::createClient(array("debug" => false));
         $container = $this->client->getContainer();

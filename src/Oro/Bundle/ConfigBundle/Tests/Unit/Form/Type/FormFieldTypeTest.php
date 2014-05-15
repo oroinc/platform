@@ -15,13 +15,13 @@ class FormFieldTypeTest extends TypeTestCase
     /** @var FormFieldType */
     protected $formType;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->formType = new FormFieldType();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         unset($this->formType);

@@ -16,7 +16,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrinePreRemoveListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -24,7 +24,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new DoctrinePreRemoveListener($this->cm);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->cm, $this->listener);
     }

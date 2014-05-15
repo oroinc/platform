@@ -18,7 +18,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $em;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'beginTransaction', 'commit'])
@@ -30,7 +30,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em, $this->repository);
     }

@@ -15,7 +15,7 @@ class SoapUsersACLTest extends WebTestCase
 
     const DEFAULT_USER_ID = '1';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
         $this->initSoapClient();

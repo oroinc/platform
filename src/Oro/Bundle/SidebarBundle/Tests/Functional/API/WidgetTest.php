@@ -20,7 +20,7 @@ class WidgetTest extends WebTestCase
         )
     );
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }

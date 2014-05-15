@@ -17,7 +17,7 @@ class RestApiTest extends WebTestCase
      */
     protected static $entities;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient();
     }

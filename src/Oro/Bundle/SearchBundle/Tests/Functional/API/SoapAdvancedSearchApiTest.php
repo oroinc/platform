@@ -16,7 +16,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
 
     protected static $hasLoaded = false;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
         $this->initSoapClient();

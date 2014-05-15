@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
  */
 class RestInvalidUsersTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient();
     }

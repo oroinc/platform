@@ -16,7 +16,7 @@ class RunnerTest extends WebTestCase
      */
     protected $applicationRootDir;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient();
         $this->applicationRootDir = $this->client->getKernel()->getRootDir();

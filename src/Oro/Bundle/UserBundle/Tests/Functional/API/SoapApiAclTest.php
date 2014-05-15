@@ -13,7 +13,7 @@ class SoapApiAclTest extends WebTestCase
     const TEST_ROLE = 'ROLE_SUPER_ADMIN';
     const TEST_EDIT_ROLE = 'ROLE_USER';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->markTestSkipped("API for new ACL isn't implemented");
         $this->initClient(array(), $this->generateWsseAuthHeader());

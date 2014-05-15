@@ -31,7 +31,7 @@ abstract class AbstractChannelDataDeleteTest extends WebTestCase
      */
     protected $entityClassName;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(
             array(),

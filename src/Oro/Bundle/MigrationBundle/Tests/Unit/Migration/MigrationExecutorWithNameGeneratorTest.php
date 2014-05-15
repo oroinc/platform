@@ -18,7 +18,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
     /** @var DbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

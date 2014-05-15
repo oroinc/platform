@@ -14,7 +14,7 @@ class SoapSearchApiTest extends WebTestCase
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
         $this->initSoapClient();

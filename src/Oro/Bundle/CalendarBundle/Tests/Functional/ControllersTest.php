@@ -13,7 +13,7 @@ class ControllersTest extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
     }

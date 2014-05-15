@@ -13,12 +13,12 @@ class BaseCartTest extends \PHPUnit_Framework_TestCase
     /** @var BaseCart */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new BaseCart();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }
