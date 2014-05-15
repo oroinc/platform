@@ -82,73 +82,14 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
                 $report,
                 $this->functionProvider,
                 $this->virtualFieldProvider,
-                $this->doctrine
+                $this->doctrine,
+                $this->configManager
             );
 
             $this->configuration = $builder->getConfiguration();
-
-            $this->addViewActionToParams($report->getEntity());
         }
 
         return $this->configuration;
-    }
-
-    /**
-     * @param string $className
-     */
-    protected function addViewActionToParams($className)
-    {
-        $metadata = $this->configManager->getEntityMetadata($className);
-
-        if (!$metadata || empty($metadata->routeView)) {
-            return;
-        }
-
-        $fromPart = $this->configuration->offsetGetByPath('[source][query][from]');
-
-        $entityAlias = null;
-        $doctrineMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
-        $identifiers = $doctrineMetadata->getIdentifier();
-        $primaryKey = array_shift($identifiers);
-
-        foreach ($fromPart as $piece) {
-            if ($piece['table'] == $className) {
-                $entityAlias = $piece['alias'];
-                break;
-            }
-        }
-
-        if (!$entityAlias || $primaryKey === null || count($identifiers) > 1) {
-            return;
-        }
-
-        $viewAction = array(
-            'view' => array(
-                'type' => 'navigate',
-                'label' => 'View',
-                'icon' => 'eye-open',
-                'link' => 'view_link',
-                'rowAction' => true
-            )
-        );
-
-        $identifier = uniqid('id_');
-
-        $properties = array(
-            $identifier => array(),
-            'view_link' => array(
-                'type' => 'url',
-                'route' => $metadata->routeView,
-                'params' => array('id' => $identifier)
-            )
-        );
-
-        $this->configuration->offsetAddToArrayByPath(
-            '[source][query][select]',
-            array("{$entityAlias}.{$primaryKey} as {$identifier}")
-        );
-        $this->configuration->offsetAddToArrayByPath('[properties]', $properties);
-        $this->configuration->offsetAddToArrayByPath('[actions]', $viewAction);
     }
 
     /**

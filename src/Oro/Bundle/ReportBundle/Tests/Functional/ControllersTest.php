@@ -84,9 +84,15 @@ class ControllersTest extends WebTestCase
             array(
             )
         );
+
         $result = ToolsAPI::jsonToArray($result->getContent());
         $data = $result['data'];
+
+        unset($data[0]['view_link']);
+        unset($data[0]['id']);
+
         $options = $result['options'];
+
         $this->verifyReport($reportResult, $data, $options['totalRecords']);
     }
 
@@ -134,6 +140,10 @@ class ControllersTest extends WebTestCase
         $result = ToolsAPI::jsonToArray($result->getContent());
         $data = $result['data'];
         $options = $result['options'];
+
+        unset($data[0]['view_link']);
+        unset($data[0]['id']);
+
         $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 

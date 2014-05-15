@@ -86,7 +86,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     {
         $gridName = 'oro_report_table_1';
 
-        $expectedIdName = rand();
+        $expectedIdName = 'test_id';
 
         $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
 
@@ -110,15 +110,12 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $actualProperties = $configuration->offsetGetByPath('[properties]');
         $this->assertArrayHasKey('view_link', $actualProperties);
 
-        $idGeneratedName = $actualProperties['view_link']['params']['id'];
-        $this->assertNotEmpty($idGeneratedName);
-
         $expectedProperties = array(
-            $idGeneratedName => array(),
+            $expectedIdName => null,
             'view_link'      => array(
                 'type'   => 'url',
                 'route'  => $expectedViewRoute,
-                'params' => array('id' => $idGeneratedName)
+                'params' => array($expectedIdName)
             )
         );
         $this->assertEquals($expectedProperties, $actualProperties);
@@ -126,7 +123,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $selectParts = $configuration->offsetGetByPath('[source][query][select]');
         $selectIdentifierExist = false;
         foreach ($selectParts as $selectPart) {
-            if (strpos($selectPart, ".{$expectedIdName} as {$idGeneratedName}") !== -1) {
+            if (strpos($selectPart, ".{$expectedIdName}") !== -1) {
                 $selectIdentifierExist = true;
             }
         }
@@ -136,6 +133,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             'view' => array(
                 'type'         => 'navigate',
                 'label'        => 'View',
+                'acl_resource' => 'VIEW;entity:Oro\Bundle\AddressBundle\Entity\Address',
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',
                 'rowAction'    => true
