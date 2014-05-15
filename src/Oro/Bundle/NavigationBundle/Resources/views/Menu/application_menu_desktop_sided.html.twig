@@ -47,7 +47,7 @@
 
 {% block label %}
     {%- if item.level == 1 and not item.getExtra('icon') %}
-        <i class="icon-th"></i>{{ parent() }}
+        <i class="icon-th"></i> {{ parent() }}
     {% else %}
         {{ parent() }}
     {% endif -%}
