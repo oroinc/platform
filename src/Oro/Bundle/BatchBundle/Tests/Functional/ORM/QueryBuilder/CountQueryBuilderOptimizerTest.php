@@ -9,10 +9,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- * @dbReindex
- */
 class CountQueryBuilderOptimizerTest extends WebTestCase
 {
     /**
@@ -37,7 +33,8 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
      */
     public function getCountQueryBuilderDataProvider()
     {
-        $em = self::getKernel()->getContainer()->get('doctrine.orm.entity_manager');
+        self::initClient();
+        $em = self::getContainer()->get('doctrine.orm.entity_manager');
 
         return array(
             'simple' => array(
@@ -210,19 +207,6 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
             ),
         );
-    }
-
-    /**
-     * @return \Symfony\Component\HttpKernel\KernelInterface
-     */
-    protected static function getKernel()
-    {
-        if (!static::$kernel) {
-            static::$kernel = static::createKernel(array("debug" => false));
-            static::$kernel->boot();
-        }
-
-        return static::$kernel;
     }
 
     /**
