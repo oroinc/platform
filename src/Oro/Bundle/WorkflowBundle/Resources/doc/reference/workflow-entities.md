@@ -375,7 +375,7 @@ This class is the representation of Step entity, it stores only data that be use
 step order and final flag. Also Workflow Step knows about Workflow Definition that it attached to.
 
 **Methods:**
-* **import(WorklfowStep)** - copies data from source Workflow Step to current one;
+* **import(WorkflowStep)** - copies data from source Workflow Step to current one;
 
 Workflow Transition Record
 --------------------------
@@ -396,7 +396,7 @@ Class represents entity ACL for specific attribute on specific step. It stores a
 entity class name and updatable/deletable flags. Also it has relation to Workflow Definition that uses this ACL.
 
 **Methods:**
-* **getAttributeStepKey()** - builds unique key based on attribute and step names to merge Workflow Entity Acl entites;
+* **getAttributeStepKey()** - builds unique key based on attribute and step names to merge Workflow Entity Acl entities;
 * **import(WorkflowEntityAcl)** - copies data from source Workflow Entity Acl to current one;
 
 Workflow Entity Acl Identity

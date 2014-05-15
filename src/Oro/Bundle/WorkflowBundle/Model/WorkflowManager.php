@@ -180,7 +180,7 @@ class WorkflowManager
      * Input data format:
      * array(
      *      array(
-     *          'workflow'   => <workflow identfier: string|Workflow>,
+     *          'workflow'   => <workflow identifier: string|Workflow>,
      *          'entity'     => <entity used in workflow: object>,
      *          'transition' => <start transition name: string>,     // optional
      *          'data'       => <additional workflow data : array>,  // optional

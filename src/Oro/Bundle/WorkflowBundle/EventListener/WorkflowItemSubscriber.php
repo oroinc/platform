@@ -125,8 +125,9 @@ class WorkflowItemSubscriber implements EventSubscriber
 
         if (!empty($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
             $this->deepLevel++;
-            $this->workflowManager->massStartWorkflow($this->entitiesScheduledForWorkflowStart[$currentDeepLevel]);
+            $massStartData = $this->entitiesScheduledForWorkflowStart[$currentDeepLevel];
             unset($this->entitiesScheduledForWorkflowStart[$currentDeepLevel]);
+            $this->workflowManager->massStartWorkflow($massStartData);
             $this->deepLevel--;
         }
     }

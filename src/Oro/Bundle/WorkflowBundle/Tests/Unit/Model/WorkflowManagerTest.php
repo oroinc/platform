@@ -507,7 +507,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 'source' => array(),
                 'expected' => array(),
             ),
-            'regualar data' => array(
+            'regular data' => array(
                 'source' => array(
                     array('workflow' => 'first', 'entity' => $firstEntity),
                     array('workflow' => 'second', 'entity' => $secondEntity),
