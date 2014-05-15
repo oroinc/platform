@@ -125,7 +125,6 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
             'rel_m_t_o',
             'manyToOne'
         );
-
         $selfEntityRelation = [
             'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o' => [
                 'assign'          => false,
