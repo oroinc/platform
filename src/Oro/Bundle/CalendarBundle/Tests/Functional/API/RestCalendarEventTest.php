@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,12 +12,9 @@ class RestCalendarEventTest extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
-    /** @var Client  */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     public function testGets()
@@ -30,7 +26,7 @@ class RestCalendarEventTest extends WebTestCase
             'subordinate' => false
         );
 
-        $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -52,7 +48,7 @@ class RestCalendarEventTest extends WebTestCase
             'end'      => date(DATE_RFC3339),
             'allDay'   => true
         );
-        $this->client->request('POST', $this->client->generate('oro_api_post_calendarevent'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
@@ -77,7 +73,7 @@ class RestCalendarEventTest extends WebTestCase
         );
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_calendarevent', array("id" => $id)),
+            $this->getUrl('oro_api_put_calendarevent', array("id" => $id)),
             $request
         );
 
@@ -100,7 +96,7 @@ class RestCalendarEventTest extends WebTestCase
             'end'         => date(DATE_RFC3339, strtotime('+1 day')),
             'subordinate' => true
         );
-        $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 

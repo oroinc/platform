@@ -4,7 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,14 +12,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ChannelControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -28,7 +22,7 @@ class ChannelControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_integration_channel_index'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Channels - System', $crawler->html());
@@ -36,7 +30,7 @@ class ChannelControllersTest extends WebTestCase
 
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_integration_channel_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $name = 'name' . $this->generateRandomString();
@@ -61,12 +55,9 @@ class ChannelControllersTest extends WebTestCase
      */
     public function testUpdate($name)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'channels-grid',
-            array(
-                'channels[_filter][name][value]' => $name,
-            )
+            array('channels[_filter][name][value]' => $name)
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -75,7 +66,7 @@ class ChannelControllersTest extends WebTestCase
         $channel = $result;
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_integration_channel_update', array('id' => $result['id']))
+            $this->getUrl('oro_integration_channel_update', array('id' => $result['id']))
         );
 
         /** @var Form $form */
@@ -104,7 +95,7 @@ class ChannelControllersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_integration_channel_schedule', array('id' => $channel['id']))
+            $this->getUrl('oro_integration_channel_schedule', array('id' => $channel['id']))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -121,18 +112,15 @@ class ChannelControllersTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_channel', array('id' => $channel['id']))
+            $this->getUrl('oro_api_delete_channel', array('id' => $channel['id']))
         );
 
         $response = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($response, 204);
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'channels-grid',
-            array(
-                'channels[_filter][name][value]' => $channel['name'],
-            )
+            array('channels[_filter][name][value]' => $channel['name'])
         );
 
         $result = $this->getJsonResponseContent($response, 200);

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,24 +14,12 @@ class SoapSearchApiTest extends WebTestCase
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
 
-        $this->client->createSoapClient(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
-
-        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
+        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
     }
 
     /**
@@ -53,7 +40,7 @@ class SoapSearchApiTest extends WebTestCase
             $request['max_results'] = self::DEFAULT_VALUE;
         }
 
-        $result = $this->client->getSoapClient()->search(
+        $result = $this->soapClient->search(
             $request['search'],
             $request['offset'],
             $request['max_results']

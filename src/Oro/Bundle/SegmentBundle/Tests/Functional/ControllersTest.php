@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,14 +12,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -28,7 +22,7 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_index'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_segment_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertEquals('Manage Segments - Reports &amp; Segments', $crawler->filter('#page-title')->html());
@@ -40,7 +34,7 @@ class ControllersTest extends WebTestCase
      */
     public function testCreate(array $report)
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_segment_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -60,8 +54,7 @@ class ControllersTest extends WebTestCase
      */
     public function testView(array $report, array $reportResult)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'oro_segments-grid',
             array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'],)
         );
@@ -69,20 +62,20 @@ class ControllersTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
-        $this->client->request('GET', $this->client->generate('oro_segment_view', array('id' => $id)));
+        $this->client->request('GET', $this->getUrl('oro_segment_view', array('id' => $id)));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         if ($report['oro_segment_form[type]'] == 'static') {
             $this->client->request(
                 'POST',
-                $this->client->generate('oro_api_post_segment_run', array('id' => $id))
+                $this->getUrl('oro_api_post_segment_run', array('id' => $id))
             );
             $result = $this->client->getResponse();
             $this->assertJsonResponseStatusCodeEquals($result, 204);
         }
 
-        $response = $this->getGridResponse($this->client, "oro_segment_grid_{$id}");
+        $response = $this->client->requestGrid("oro_segment_grid_{$id}");
 
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
@@ -98,8 +91,7 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate(array $report, array $reportResult)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'oro_segments-grid',
             array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'])
         );
@@ -108,7 +100,7 @@ class ControllersTest extends WebTestCase
         $result = reset($result['data']);
         $id = $result['id'];
 
-        $crawler = $this->client->request('GET', $this->client->generate('oro_segment_update', array('id' => $id)));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_segment_update', array('id' => $id)));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $report['oro_segment_form[name]'] .= '_updated';
@@ -124,13 +116,13 @@ class ControllersTest extends WebTestCase
         if ($report['oro_segment_form[type]'] == 'static') {
             $this->client->request(
                 'POST',
-                $this->client->generate('oro_api_post_segment_run', array('id' => $id))
+                $this->getUrl('oro_api_post_segment_run', array('id' => $id))
             );
             $result = $this->client->getResponse();
             $this->assertJsonResponseStatusCodeEquals($result, 204);
         }
 
-        $response = $response = $this->getGridResponse($this->client, "oro_segment_grid_{$id}");
+        $response = $response = $this->client->requestGrid("oro_segment_grid_{$id}");
 
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
@@ -148,12 +140,9 @@ class ControllersTest extends WebTestCase
      */
     public function testExport(array $report, array $reportResult, array $segmentExport)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'oro_segments-grid',
-            array(
-                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated',
-            )
+            array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -164,7 +153,7 @@ class ControllersTest extends WebTestCase
         ob_start();
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_datagrid_export_action',
                 array('gridName' =>"oro_segment_grid_{$id}", "format" => 'csv')
             )
@@ -196,12 +185,9 @@ class ControllersTest extends WebTestCase
      */
     public function testDelete(array $report)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'oro_segments-grid',
-            array(
-                'oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated',
-            )
+            array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -210,13 +196,13 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_segment', array('id' => $id))
+            $this->getUrl('oro_api_delete_segment', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 204);
 
-        $this->client->request('GET', $this->client->generate('oro_segment_update', array('id' => $id)));
+        $this->client->request('GET', $this->getUrl('oro_segment_update', array('id' => $id)));
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 404);

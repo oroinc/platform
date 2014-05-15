@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,19 +14,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersRoleTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_user_role_index'));
+        $this->client->request('GET', $this->getUrl('oro_user_role_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -35,7 +29,7 @@ class ControllersRoleTest extends WebTestCase
     public function testCreate()
     {
         /** @var Crawler $crawler */
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_role_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_role_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -52,8 +46,7 @@ class ControllersRoleTest extends WebTestCase
 
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'roles-grid',
             array('roles-grid[_filter][label][value]' => 'testRole')
         );
@@ -64,7 +57,7 @@ class ControllersRoleTest extends WebTestCase
         /** @var Crawler $crawler */
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_user_role_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_role_update', array('id' => $result['id']))
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -82,8 +75,7 @@ class ControllersRoleTest extends WebTestCase
 
     public function testGridData()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'roles-grid',
             array('roles-grid[_filter][label][value]' => 'testRoleUpdated')
         );
@@ -91,8 +83,7 @@ class ControllersRoleTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'role-users-grid',
             array(
                 'role-users-grid[_filter][has_role][value]' => 1,

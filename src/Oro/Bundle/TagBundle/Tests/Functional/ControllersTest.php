@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,27 +10,21 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_tag_index'));
+        $this->client->request('GET', $this->getUrl('oro_tag_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testIndexJson()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'tag-grid',
             array(
                 'tag-grid[_pager][_page]' => 1,
@@ -47,7 +40,7 @@ class ControllersTest extends WebTestCase
 
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_tag_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_tag_create'));
         $form = $crawler->selectButton('Save')->form();
         $form['oro_tag_tag_form[name]'] = 'tag758';
         $form['oro_tag_tag_form[owner]'] = 1;
@@ -60,8 +53,7 @@ class ControllersTest extends WebTestCase
 
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'tag-grid',
             array('tag-grid[_filter][name][value]' => 'tag758')
         );
@@ -71,7 +63,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_tag_update', array('id' => $result['id']))
+            $this->getUrl('oro_tag_update', array('id' => $result['id']))
         );
         $form = $crawler->selectButton('Save')->form();
         $form['oro_tag_tag_form[name]'] = 'tag758_updated';
@@ -82,8 +74,7 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Tag saved", $crawler->html());
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'tag-grid',
             array('tag-grid[_filter][name][value]' => 'tag758_updated')
         );
@@ -96,8 +87,7 @@ class ControllersTest extends WebTestCase
 
     public function testSearch()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'tag-grid',
             array('tag-grid[_filter][name][value]' => 'tag758_updated')
         );
@@ -105,7 +95,7 @@ class ControllersTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
-        $this->client->request('GET', $this->client->generate('oro_tag_search', array('id' => $result['id'])));
+        $this->client->request('GET', $this->getUrl('oro_tag_search', array('id' => $result['id'])));
         $result = $this->client->getResponse();
 
         $this->assertContains('Records tagged as "tag758_updated"', $result->getContent());

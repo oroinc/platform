@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,14 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class PlatformControllerTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             $this->generateBasicAuthHeader()
         );
@@ -26,7 +20,7 @@ class PlatformControllerTest extends WebTestCase
 
     public function testSystemInformation()
     {
-        $this->client->request('GET', $this->client->generate('oro_platform_system_info'));
+        $this->client->request('GET', $this->getUrl('oro_platform_system_info'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 

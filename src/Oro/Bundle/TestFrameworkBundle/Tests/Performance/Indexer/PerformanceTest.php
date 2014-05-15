@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FlexibleEntityBundle\Tests\Performance;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Indexer;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -14,7 +14,7 @@ class PerformanceTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array("debug"=>false));
+        $this->client = self::createClient(array("debug" => false));
         $container = $this->client->getContainer();
         $doctrine = $container->get('doctrine');
         $em = $doctrine->getEntityManager();

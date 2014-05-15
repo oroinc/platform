@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
 /**
@@ -12,12 +11,9 @@ use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
  */
 class RestInvalidUsersTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient();
+        $this->initClient();
     }
 
     public function testInvalidKey()
@@ -35,7 +31,7 @@ class RestInvalidUsersTest extends WebTestCase
         );
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(),
@@ -60,7 +56,7 @@ class RestInvalidUsersTest extends WebTestCase
         );
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(),

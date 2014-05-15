@@ -5,7 +5,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,11 +14,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class DashboardControllerTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     /**
      * @var EntityManager
      */
@@ -32,8 +26,8 @@ class DashboardControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client = self::createClient([], $this->generateWsseAuthHeader());
-        $this->em     = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->em     = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         $this->dashboard = new Dashboard();
         $this->dashboard->setName('dashboard');
@@ -48,7 +42,7 @@ class DashboardControllerTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard',
                 [
                     'id' => $id
@@ -60,7 +54,7 @@ class DashboardControllerTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard',
                 [
                     'id' => $id

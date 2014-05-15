@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,19 +10,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_email_emailtemplate_index'));
+        $this->client->request('GET', $this->getUrl('oro_email_emailtemplate_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -31,7 +25,7 @@ class ControllersTest extends WebTestCase
     public function testCreate()
     {
         $this->markTestIncomplete('Skipped due to issue with dynamic form loading');
-        $crawler = $this->client->request('GET', $this->client->generate('oro_email_emailtemplate_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_email_emailtemplate_create'));
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->loadHTML($crawler->html());
         $dom->getElementById('oro_email_emailtemplate');

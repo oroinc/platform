@@ -8,7 +8,6 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -18,11 +17,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class WidgetControllerTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     /**
      * @var EntityManager
      */
@@ -45,10 +39,10 @@ class WidgetControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client           = self::createClient([], $this->generateWsseAuthHeader());
-        $this->em               = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-        $this->configProvider   = $this->client->getContainer()->get('oro_dashboard.config_provider');
-        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->em               = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider   = $this->getContainer()->get('oro_dashboard.config_provider');
+        $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
         $this->em->persist($this->widget);
@@ -64,7 +58,7 @@ class WidgetControllerTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_put_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -94,7 +88,7 @@ class WidgetControllerTest extends WebTestCase
         $id         = $this->widget->getDashboard()->getId();
         $this->client->request(
             'POST',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_post_dashboard_widget_add_widget'
             ),
             array('dashboardId' => $id, 'widgetName' => $widgetName)
@@ -113,7 +107,7 @@ class WidgetControllerTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -126,7 +120,7 @@ class WidgetControllerTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -167,7 +161,7 @@ class WidgetControllerTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_put_dashboard_widget_positions',
                 [
                     'dashboardId' => $dashboard->getId(),

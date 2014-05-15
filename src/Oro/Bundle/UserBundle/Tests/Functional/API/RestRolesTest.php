@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,12 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestRolesTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -31,7 +27,7 @@ class RestRolesTest extends WebTestCase
                 "owner" => "1"
             )
         );
-        $this->client->request('POST', $this->client->generate('oro_api_post_role'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_role'), $request);
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 201);
 
@@ -47,7 +43,7 @@ class RestRolesTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_role_byname', array('name' => $request['role']['label']))
+            $this->getUrl('oro_api_get_role_byname', array('name' => $request['role']['label']))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -64,7 +60,7 @@ class RestRolesTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_roles')
+            $this->getUrl('oro_api_get_roles')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -81,7 +77,7 @@ class RestRolesTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_role', array('id' => $roleId))
+            $this->getUrl('oro_api_get_role', array('id' => $roleId))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -101,7 +97,7 @@ class RestRolesTest extends WebTestCase
         $request['role']['label'] .= '_Update';
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_role', array('id' => $roleId)),
+            $this->getUrl('oro_api_put_role', array('id' => $roleId)),
             $request
         );
         $result = $this->client->getResponse();
@@ -109,7 +105,7 @@ class RestRolesTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_role', array('id' => $roleId))
+            $this->getUrl('oro_api_get_role', array('id' => $roleId))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -126,14 +122,14 @@ class RestRolesTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_role', array('id' => $roleId))
+            $this->getUrl('oro_api_delete_role', array('id' => $roleId))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_role', array('id' => $roleId))
+            $this->getUrl('oro_api_get_role', array('id' => $roleId))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);

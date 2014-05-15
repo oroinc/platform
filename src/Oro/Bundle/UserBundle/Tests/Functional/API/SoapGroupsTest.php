@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,19 +10,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SoapGroupsTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        $this->client->createSoapClient(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
@@ -32,7 +22,7 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testCreateGroup(array $request)
     {
-        $id = $this->client->getSoapClient()->createGroup($request);
+        $id = $this->soapClient->createGroup($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
     }
@@ -42,7 +32,7 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testGetGroups()
     {
-        $groups = $this->client->getSoapClient()->getGroups();
+        $groups = $this->soapClient->getGroups();
         $groups = $this->valueToArray($groups);
         $this->assertEquals(6, count($groups['item']));
     }
@@ -56,7 +46,7 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testUpdateGroup(array $request, array $response)
     {
-        $groups = $this->client->getSoapClient()->getGroups();
+        $groups = $this->soapClient->getGroups();
         $groups = $this->valueToArray($groups);
 
         $group = array_filter(
@@ -72,10 +62,10 @@ class SoapGroupsTest extends WebTestCase
 
         $request['name'] .= '_Updated';
 
-        $result = $this->client->getSoapClient()->updateGroup($groupId, $request);
+        $result = $this->soapClient->updateGroup($groupId, $request);
         $this->assertEquals($response['return'], $result);
 
-        $group = $this->client->getSoapClient()->getGroup($groupId);
+        $group = $this->soapClient->getGroup($groupId);
         $group = $this->valueToArray($group);
         $this->assertEquals($request['name'], $group['name']);
     }
@@ -85,19 +75,19 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testDeleteGroups()
     {
-        $groups = $this->client->getSoapClient()->getGroups();
+        $groups = $this->soapClient->getGroups();
         $groups = $this->valueToArray($groups);
         $this->assertEquals(6, count($groups['item']));
 
         foreach ($groups['item'] as $k => $group) {
             if ($k > 1) {
                 //do not delete default groups
-                $result = $this->client->getSoapClient()->deleteGroup($group['id']);
+                $result = $this->soapClient->deleteGroup($group['id']);
                 $this->assertTrue($result);
             }
         }
 
-        $groups = $this->client->getSoapClient()->getGroups();
+        $groups = $this->soapClient->getGroups();
         $groups = $this->valueToArray($groups);
         $this->assertEquals(2, count($groups['item']));
     }

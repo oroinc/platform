@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
@@ -11,12 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 class RestApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -26,7 +22,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_countries')
+            $this->getUrl('oro_api_get_countries')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -43,7 +39,7 @@ class RestApiTest extends WebTestCase
         foreach ($countries as $country) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
+                $this->getUrl('oro_api_get_country', array('id' => $country['iso2code']))
             );
 
             $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -56,7 +52,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_region'),
+            $this->getUrl('oro_api_get_region'),
             array('id' => 'US-LA')
         );
 
@@ -69,7 +65,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_country_get_regions', array('country' => 'US'))
+            $this->getUrl('oro_api_country_get_regions', array('country' => 'US'))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -77,7 +73,7 @@ class RestApiTest extends WebTestCase
         foreach ($result as $region) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_region'),
+                $this->getUrl('oro_api_get_region'),
                 array('id' => $region['combinedCode']),
                 array(),
                 $this->generateWsseAuthHeader()

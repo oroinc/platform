@@ -4,7 +4,6 @@ namespace Oro\Bundle\WindowsBundle\Tests\Functional\API;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,18 +13,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class RestApiTest extends WebTestCase
 {
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * @var array
      */
     protected static $entity;
 
     public function setUp()
     {
-        $this->client = self::createClient();
+        $this->initClient();
     }
 
     /**
@@ -42,7 +36,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_windows'),
+            $this->getUrl('oro_api_post_windows'),
             self::$entity,
             array(),
             $this->generateWsseAuthHeader()
@@ -74,7 +68,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
             $this->generateWsseAuthHeader()
@@ -101,7 +95,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_windows'),
+            $this->getUrl('oro_api_get_windows'),
             array(),
             array(),
             $this->generateWsseAuthHeader()
@@ -129,7 +123,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
             $this->generateWsseAuthHeader()
@@ -153,7 +147,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
             $this->generateWsseAuthHeader()
@@ -167,7 +161,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
             $this->generateWsseAuthHeader()
@@ -189,10 +183,10 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty(self::$entity);
 
         $requests = array(
-            'GET'    => $this->client->generate('oro_api_get_windows'),
-            'POST'   => $this->client->generate('oro_api_post_windows'),
-            'PUT'    => $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
-            'DELETE' => $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            'GET'    => $this->getUrl('oro_api_get_windows'),
+            'POST'   => $this->getUrl('oro_api_post_windows'),
+            'PUT'    => $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            'DELETE' => $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
         );
 
         foreach ($requests as $requestType => $url) {
@@ -217,8 +211,8 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty(self::$entity);
 
         $requests = array(
-            'POST' => $this->client->generate('oro_api_post_windows'),
-            'PUT'  => $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            'POST' => $this->getUrl('oro_api_post_windows'),
+            'PUT'  => $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
         );
 
         foreach ($requests as $requestType => $url) {

@@ -20,9 +20,9 @@ class FeatureContext extends BehatWebContext
     {
         /** @var Client $client */
         $client = self::getClientInstance();
-        $header = \Oro\Bundle\TestFrameworkBundle\Test\$this->generateBasicHeader($user, $password);
+        $header = \Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::generateBasicAuthHeader($user, $password);
         //open default route
-        $client->request('GET', $client->generate('oro_default'), array(), array(), $header);
+        $client->request('GET', $this->getUrl('oro_default'), array(), array(), $header);
         WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains('Dashboard', $client->getCrawler()->html());
     }
@@ -34,7 +34,7 @@ class FeatureContext extends BehatWebContext
     {
         $client = self::getClientInstance();
         $route = 'oro_' . str_replace(' ', '_', strtolower($dialog));
-        $client->request('GET', $client->generate($route));
+        $client->request('GET', $this->getUrl($route));
         WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains(
             'Create User - Users - Users Management - System',

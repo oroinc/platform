@@ -2,13 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
@@ -17,11 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 class Client extends BaseClient
 {
     const LOCAL_URL = 'http://localhost';
-
-    /**
-     * @var SoapClient
-     */
-    static protected $soapClient;
 
     /**
      * @var PDOConnection
@@ -42,27 +33,6 @@ class Client extends BaseClient
      * @var boolean[]
      */
     protected $loadedFixtures;
-
-    /**
-     * Destructor
-     */
-    public function __destruct()
-    {
-        $this->setSoapClient(null);
-    }
-
-    /**
-     * Generates a URL or path for a specific route based on the given parameters.
-     *
-     * @param string $name
-     * @param array $parameters
-     * @param bool $absolute
-     * @return string
-     */
-    public function generate($name, $parameters = array(), $absolute = false)
-    {
-        return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
-    }
 
     /**
      * {@inheritdoc}
@@ -89,55 +59,45 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $wsdl
-     * @param array $options
-     * @param bool $new
-     * @return SoapClient
-     * @throws \Exception
+     * @param array|string $gridParameters
+     * @param array $filter
+     * @return Response
      */
-    public function createSoapClient($wsdl = null, array $options = null, $new = false)
+    public function requestGrid($gridParameters, $filter = array())
     {
-        if (!self::$soapClient || $new) {
-            if (is_null($wsdl)) {
-                throw new \InvalidArgumentException('wsdl should not be NULL');
-            }
-
-            $this->request('GET', $wsdl);
-            $status = $this->getResponse()->getStatusCode();
-            $statusText = Response::$statusTexts[$status];
-            if ($status >= 400) {
-                throw new \Exception($statusText, $status);
-            }
-
-            $wsdl = $this->getResponse()->getContent();
-            //save to file
-            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, "w");
-            fwrite($fl, $wsdl);
-            fclose($fl);
-
-            self::$soapClient = new SoapClient($file, $options, $this);
-
-            unlink($file);
+        if (is_string($gridParameters)) {
+            $gridParameters = array('gridName' => $gridParameters);
         }
 
-        return self::$soapClient;
+        //transform parameters to nested array
+        $parameters = array();
+        foreach ($filter as $param => $value) {
+            $param .= '=' . $value;
+            parse_str($param, $output);
+            $parameters = array_merge_recursive($parameters, $output);
+        }
+
+        $gridParameters = array_merge_recursive($gridParameters, $parameters);
+
+        $this->request(
+            'GET',
+            $this->getUrl('oro_datagrid_index', $gridParameters)
+        );
+
+        return $this->getResponse();
     }
 
     /**
-     * @return SoapClient
+     * Generates a URL or path for a specific route based on the given parameters.
+     *
+     * @param string $name
+     * @param array $parameters
+     * @param bool $absolute
+     * @return string
      */
-    public function getSoapClient()
+    protected function getUrl($name, $parameters = array(), $absolute = false)
     {
-        return self::$soapClient;
-    }
-
-    /**
-     * @param SoapClient|null $value
-     */
-    public function setSoapClient(SoapClient $value = null)
-    {
-        self::$soapClient = $value;
+        return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
     }
 
     /**
@@ -160,58 +120,6 @@ class Client extends BaseClient
             $this->kernel->terminate($request, $response);
         }
         return $response;
-    }
-
-    /**
-     * @param string $folder
-     * @param array $filter
-     */
-    public function appendFixtures($folder, $filter = null)
-    {
-        $loader = new Loader();
-        $loader->loadFromDirectory($folder);
-        $fixtures = array_values($loader->getFixtures());
-
-        //filter fixtures by className
-        if (!is_null($filter)) {
-            $fixturesCount = count($fixtures);
-            for ($i = 0; $i < $fixturesCount; $i++) {
-                $fixture = $fixtures[$i];
-                foreach ($filter as $flt) {
-                    if (!strpos(get_class($fixture), $flt)) {
-                        unset($fixtures[$i]);
-                    }
-                }
-            }
-        }
-
-        //init fixture container
-        foreach ($fixtures as $fixture) {
-            if ($fixture instanceof ContainerAwareInterface) {
-                $fixture->setContainer($this->getContainer());
-            }
-        }
-
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $executor = new ORMExecutor($em, new ORMPurger($em));
-        $executor->execute($fixtures, true);
-    }
-
-    /**
-     * @param string $folder
-     * @param array|null $filter
-     */
-    public function appendFixturesOnce($folder, array $filter = null)
-    {
-        $key = $folder;
-        if ($filter) {
-            $key .= ':' . implode(':', $filter);
-        }
-        if (isset($this->loadedFixtures[$key])) {
-            return;
-        }
-        $this->loadedFixtures[$key] = true;
-        $this->appendFixtures($folder, $filter);
     }
 
     /**

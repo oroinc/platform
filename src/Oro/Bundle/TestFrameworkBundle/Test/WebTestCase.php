@@ -2,10 +2,19 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
+
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
@@ -29,17 +38,37 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var bool[]
      */
-    static private $dbIsolation;
+    private static $dbIsolation;
 
     /**
      * @var bool[]
      */
-    static private $dbReindex;
+    private static $dbReindex;
 
     /**
      * @var Client
      */
-    static protected $internalClient;
+    private static $clientInstance;
+
+    /**
+     * @var Client
+     */
+    private static $soapClientInstance;
+
+    /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
+     * @var SoapClient
+     */
+    protected $soapClient;
+
+    /**
+     * @var array
+     */
+    private static $loadedFixtures = array();
 
     protected function tearDown()
     {
@@ -52,6 +81,18 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
+    public static function tearDownAfterClass()
+    {
+        if (self::$clientInstance) {
+            if (self::getDbIsolationSetting()) {
+                self::$clientInstance->rollbackTransaction();
+            }
+            self::$clientInstance = null;
+            self::$soapClientInstance = null;
+            self::$loadedFixtures = array();
+        }
+    }
+
     /**
      * Creates a Client.
      *
@@ -59,41 +100,189 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $server  An array of server parameters
      * @return Client A Client instance
      */
-    protected static function createClient(array $options = array(), array $server = array())
+    protected function initClient(array $options = array(), array $server = array())
     {
-        if (!self::$internalClient) {
+        if (!self::$clientInstance) {
             /** @var Client $client */
-            $client = self::$internalClient = parent::createClient($options, $server);
+            $client = self::$clientInstance = static::createClient($options, $server);
 
             if (self::getDbIsolationSetting()) {
                 //workaround MyISAM search tables are not on transaction
                 if (self::getDbReindexSetting()) {
-                    $kernel = $client->getKernel();
-                    $application = new Application($kernel);
-                    $application->setAutoExit(false);
-                    $options = array('command' => 'oro:search:reindex');
-                    $options['--env'] = "test";
-                    $options['--quiet'] = null;
-                    $application->run(new ArrayInput($options));
+                    self::runCommand(
+                        'oro:search:reindex',
+                        array(
+                            '--quiet' => null
+                        )
+                    );
                 }
 
                 $client->startTransaction();
             }
         } else {
-            self::$internalClient->setServerParameters($server);
+            self::$clientInstance->setServerParameters($server);
         }
 
-        return self::$internalClient;
+        $this->client = self::$clientInstance;
     }
 
-    public static function tearDownAfterClass()
+
+
+    /**
+     * @param string $wsdl
+     * @param array $options
+     * @param bool $new
+     * @return SoapClient
+     * @throws \Exception
+     */
+    protected function initSoapClient($wsdl = null, array $options = array(), $new = false)
     {
-        if (self::$internalClient) {
-            if (self::getDbIsolationSetting()) {
-                self::$internalClient->rollbackTransaction();
+        if (!self::$soapClientInstance || $new) {
+
+            if ($wsdl === null) {
+                $wsdl = "http://localhost/api/soap";
             }
-            self::$internalClient->setSoapClient(null);
-            self::$internalClient = null;
+
+            $options = array_merge(
+                array(
+                    'location' => 'http://localhost/api/soap',
+                    'soap_version' => SOAP_1_2
+                ),
+                $options
+            );
+
+            if (is_null($wsdl)) {
+                throw new \InvalidArgumentException('wsdl should not be NULL');
+            }
+
+            $client = $this->getClientInstance();
+            $client->request('GET', $wsdl);
+            $status = $client->getResponse()->getStatusCode();
+            $statusText = Response::$statusTexts[$status];
+            if ($status >= 400) {
+                throw new \Exception($statusText, $status);
+            }
+
+            $wsdl = $client->getResponse()->getContent();
+            //save to file
+            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
+            $fl = fopen($file, "w");
+            fwrite($fl, $wsdl);
+            fclose($fl);
+
+            self::$soapClientInstance = new SoapClient($file, $options, $client);
+
+            unlink($file);
+        }
+
+        $this->soapClient = self::$soapClientInstance;
+    }
+
+    /**
+     * Builds up the environment to run the given command.
+     *
+     * @param string $name
+     * @param array $params
+     *
+     * @return string
+     */
+    protected static function runCommand($name, array $params = array())
+    {
+        array_unshift($params, $name);
+
+        $kernel = self::getContainer()->get('kernel');
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $input = new ArrayInput($params);
+        $input->setInteractive(false);
+
+        $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');
+        $output = new StreamOutput($fp);
+
+        $application->run($input, $output);
+
+        rewind($fp);
+        return stream_get_contents($fp);
+    }
+
+    /**
+     * @param array $classNames
+     * @param bool $force
+     */
+    protected function loadFixtures(array $classNames, $force = false)
+    {
+        if (!$force) {
+            $classNames = array_filter(
+                $classNames,
+                function ($value) {
+                    return !in_array($value, self::$loadedFixtures);
+                }
+            );
+
+            if (!$classNames) {
+                return;
+            }
+        }
+
+        self::$loadedFixtures = array_merge(self::$loadedFixtures, $classNames);
+
+        $loader = $this->getFixtureLoader($classNames);
+        $fixtures = array_values($loader->getFixtures());
+
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $executor = new ORMExecutor($em, new ORMPurger($em));
+        $executor->execute($fixtures, true);
+        $this->postFixtureLoad();
+    }
+
+    /**
+     * Callback function to be executed after fixture load.
+     */
+    protected function postFixtureLoad()
+    {
+
+    }
+
+    /**
+     * Retrieve Doctrine DataFixtures loader.
+     *
+     * @param array $classNames
+     * @return DataFixturesLoader
+     */
+    private function getFixtureLoader(array $classNames)
+    {
+        $loader = new DataFixturesLoader($this->getContainer());
+
+        foreach ($classNames as $className) {
+            $this->loadFixtureClass($loader, $className);
+        }
+
+        return $loader;
+    }
+
+    /**
+     * Load a data fixture class.
+     *
+     * @param DataFixturesLoader $loader
+     * @param string $className
+     */
+    private function loadFixtureClass(DataFixturesLoader $loader, $className)
+    {
+        $fixture = new $className();
+
+        if ($loader->hasFixture($fixture)) {
+            unset($fixture);
+            return;
+        }
+
+        $loader->addFixture($fixture);
+
+        if ($fixture instanceof DependentFixtureInterface) {
+            foreach ($fixture->getDependencies() as $dependency) {
+                $this->loadFixtureClass($loader, $dependency);
+            }
         }
     }
 
@@ -102,7 +291,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return bool
      */
-    protected static function getDbIsolationSetting()
+    private static function getDbIsolationSetting()
     {
         $calledClass = get_called_class();
         if (!isset(self::$dbIsolation[$calledClass])) {
@@ -117,7 +306,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return bool
      */
-    protected static function getDbReindexSetting()
+    private static function getDbReindexSetting()
     {
         $calledClass = get_called_class();
         if (!isset(self::$dbReindex[$calledClass])) {
@@ -132,7 +321,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $annotationName
      * @return bool
      */
-    protected static function isClassHasAnnotation($className, $annotationName)
+    private static function isClassHasAnnotation($className, $annotationName)
     {
         $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
         return isset($annotations['class'][$annotationName]);
@@ -144,42 +333,11 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function getClientInstance()
     {
-        if (!self::$internalClient) {
+        if (!self::$clientInstance) {
             throw new \BadMethodCallException('Client instance is not initialized.');
         }
 
-        return self::$internalClient;
-    }
-
-    /**
-     * Attempts to guess the kernel location.
-     *
-     * When the Kernel is located, the file is required.
-     *
-     * @return string The Kernel class name
-     * @throws \RuntimeException
-     */
-    protected static function getKernelClass()
-    {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
-
-        $finder = new Finder();
-        $finder->name('AppKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException(
-                'Either set KERNEL_DIR in your phpunit.xml according to ' .
-                'http://symfony.com/doc/current/book/testing.html#your-first-functional-test ' .
-                'or override the WebTestCase::createKernel() method.'
-            );
-        }
-
-        $file = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
+        return self::$clientInstance;
     }
 
     /**
@@ -228,32 +386,16 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @param Client $client
-     * @param array|string $gridParameters
-     * @param array $filter
-     * @return Response
+     * Generates a URL or path for a specific route based on the given parameters.
+     *
+     * @param string $name
+     * @param array $parameters
+     * @param bool $absolute
+     * @return string
      */
-    public static function getGridResponse(Client $client, $gridParameters, $filter = array())
+    protected function getUrl($name, $parameters = array(), $absolute = false)
     {
-        if (is_string($gridParameters)) {
-            $gridParameters = array('gridName' => $gridParameters);
-        }
-
-        //transform parameters to nested array
-        $parameters = array();
-        foreach ($filter as $param => $value) {
-            $param .= '=' . $value;
-            parse_str($param, $output);
-            $parameters = array_merge_recursive($parameters, $output);
-        }
-
-        $gridParameters = array_merge_recursive($gridParameters, $parameters);
-        $client->request(
-            'GET',
-            $client->generate('oro_datagrid_index', $gridParameters)
-        );
-
-        return $client->getResponse();
+        return self::getContainer()->get('router')->generate($name, $parameters, $absolute);
     }
 
     /**
@@ -322,6 +464,16 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function jsonToArray($json)
     {
         return json_decode($json, true);
+    }
+
+    /**
+     * Get an instance of the dependency injection container.
+     *
+     * @return ContainerInterface
+     */
+    protected static function getContainer()
+    {
+        return static::getClientInstance()->getContainer();
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReportBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,14 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -29,7 +23,7 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_index'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_report_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertEquals('Manage Custom Reports - Reports &amp; Segments', $crawler->filter('#page-title')->html());
@@ -41,7 +35,7 @@ class ControllersTest extends WebTestCase
      */
     public function testCreate($report)
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_report_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -61,23 +55,19 @@ class ControllersTest extends WebTestCase
      */
     public function testView(array $report, array $reportResult)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'reports-grid',
-            array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'],
-            )
+            array('reports-grid[_filter][name][value]' => $report['oro_report_form[name]'],)
         );
 
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
-        $this->client->request('GET', $this->client->generate('oro_report_view', array('id' => $id)));
+        $this->client->request('GET', $this->getUrl('oro_report_view', array('id' => $id)));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             "oro_report_table_{$id}",
             array()
         );
@@ -96,19 +86,16 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate(array $report, array $reportResult)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'reports-grid',
-            array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'],
-            )
+            array('reports-grid[_filter][name][value]' => $report['oro_report_form[name]'])
         );
 
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
 
-        $crawler = $this->client->request('GET', $this->client->generate('oro_report_update', array('id' => $id)));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_report_update', array('id' => $id)));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $report['oro_report_form[name]'] .= '_updated';
@@ -121,8 +108,7 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Report saved", $crawler->html());
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             "oro_report_table_{$id}",
             array()
         );
@@ -143,12 +129,9 @@ class ControllersTest extends WebTestCase
      */
     public function testExport(array $report, array $reportResult)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'reports-grid',
-            array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated',
-            )
+            array('reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -159,7 +142,7 @@ class ControllersTest extends WebTestCase
         ob_start();
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_datagrid_export_action',
                 array('gridName' =>"oro_report_table_{$id}", "format" => 'csv')
             )
@@ -196,12 +179,9 @@ class ControllersTest extends WebTestCase
      */
     public function testDelete(array $report)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'reports-grid',
-            array(
-                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated',
-            )
+            array('reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -210,13 +190,13 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_report', array('id' => $id))
+            $this->getUrl('oro_api_delete_report', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 204);
 
-        $this->client->request('GET', $this->client->generate('oro_report_update', array('id' => $id)));
+        $this->client->request('GET', $this->getUrl('oro_report_update', array('id' => $id)));
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 404);

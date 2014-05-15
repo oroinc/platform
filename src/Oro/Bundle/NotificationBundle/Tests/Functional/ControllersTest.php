@@ -5,7 +5,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -20,14 +19,9 @@ class ControllersTest extends WebTestCase
     protected $eventCreate;
     protected $templateUpdate;
 
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -35,7 +29,7 @@ class ControllersTest extends WebTestCase
 
     protected function prepareData()
     {
-        $notificationManager = $this->client->getContainer()->get('doctrine');
+        $notificationManager = $this->getContainer()->get('doctrine');
         $this->eventUpdate  = $notificationManager
             ->getRepository('OroNotificationBundle:Event')
             ->findOneBy(array('name' => 'oro.notification.event.entity_post_update'));
@@ -51,7 +45,7 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_notification_emailnotification_index'));
+        $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -61,7 +55,7 @@ class ControllersTest extends WebTestCase
      */
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_notification_emailnotification_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_create'));
 
         // prepare data for next tests
         $this->prepareData();
@@ -90,8 +84,7 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'email-notification-grid',
             array(
                 'email-notification-grid[_pager][_page]' => 1,
@@ -104,7 +97,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_notification_emailnotification_update', array('id' => $result['id']))
+            $this->getUrl('oro_notification_emailnotification_update', array('id' => $result['id']))
         );
 
         // prepare data for next tests
@@ -134,12 +127,11 @@ class ControllersTest extends WebTestCase
      */
     public function testDelete()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'email-notification-grid',
             array(
                 'email-notification-grid[_pager][_page]' => 1,
-                'email-notification-grid[_pager][_per_page]' => 1
+                'email-notification-grid[_pager][_per_page]' => 1,
             )
         );
 
@@ -148,7 +140,7 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_emailnotication', array('id' => $result['id']))
+            $this->getUrl('oro_api_delete_emailnotication', array('id' => $result['id']))
         );
 
         $result = $this->client->getResponse();

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,13 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestDataAuditApiTest extends WebTestCase
 {
-
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -42,7 +37,7 @@ class RestDataAuditApiTest extends WebTestCase
             )
         );
 
-        $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 201);
 
@@ -58,7 +53,7 @@ class RestDataAuditApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_audits')
+            $this->getUrl('oro_api_get_audits')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -85,7 +80,7 @@ class RestDataAuditApiTest extends WebTestCase
         foreach ($response as $audit) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_audit', array('id' => $audit['id']))
+                $this->getUrl('oro_api_get_audit', array('id' => $audit['id']))
             );
 
             $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

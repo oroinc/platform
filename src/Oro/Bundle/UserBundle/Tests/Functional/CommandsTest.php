@@ -8,7 +8,6 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Console\Application;
 
 use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -18,14 +17,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CommandsTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient();
+        $this->initClient();
     }
 
     public function testGenerateWsse()
@@ -64,7 +58,7 @@ class CommandsTest extends WebTestCase
         $request = $this->prepareData();
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(

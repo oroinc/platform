@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -16,18 +15,13 @@ class RestUsersACLTest extends WebTestCase
 
     const DEFAULT_USER_ID = '1';
 
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)
         );
-        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
+        $this->loadFixtures(array('Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData'));
     }
 
     public function testCreateUser()
@@ -46,7 +40,7 @@ class RestUsersACLTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)
@@ -60,7 +54,7 @@ class RestUsersACLTest extends WebTestCase
         //get user id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_users'),
+            $this->getUrl('oro_api_get_users'),
             array('limit' => 100),
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)
@@ -74,7 +68,7 @@ class RestUsersACLTest extends WebTestCase
         //open user by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
+            $this->getUrl('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
             array(),
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)
@@ -98,7 +92,7 @@ class RestUsersACLTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
+            $this->getUrl('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
             $request,
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)
@@ -111,7 +105,7 @@ class RestUsersACLTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID)),
+            $this->getUrl('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID)),
             array(),
             array(),
             $this->generateWsseAuthHeader(self::USER_NAME, self::USER_PASSWORD)

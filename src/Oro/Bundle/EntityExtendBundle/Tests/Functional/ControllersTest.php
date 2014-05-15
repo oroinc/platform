@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,26 +10,21 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_entityconfig_index'));
+        $this->client->request('GET', $this->getUrl('oro_entityconfig_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_entityextend_entity_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_entityextend_entity_create'));
         $form = $crawler->selectButton('Save')->form();
         $form['oro_entity_config_type[model][className]'] = 'testExtendedEntity';
         $form['oro_entity_config_type[entity][label]'] = 'test entity label';
@@ -56,7 +50,7 @@ class ControllersTest extends WebTestCase
     {
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_entityconfig_update', array('id' => $id))
+            $this->getUrl('oro_entityconfig_update', array('id' => $id))
         );
 
         $form = $crawler->selectButton('Save')->form();
@@ -79,7 +73,7 @@ class ControllersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_entityconfig_view', array('id' => $id))
+            $this->getUrl('oro_entityconfig_view', array('id' => $id))
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);

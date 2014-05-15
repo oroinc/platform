@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -15,26 +14,21 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_user_index'));
+        $this->client->request('GET', $this->getUrl('oro_user_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = 1;
         $form['oro_user_user_form[username]'] = 'testUser1';
@@ -63,8 +57,7 @@ class ControllersTest extends WebTestCase
 
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'users-grid',
             array('users-grid[_filter][username][value]' => 'testUser1')
         );
@@ -74,7 +67,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_user_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_update', array('id' => $result['id']))
         );
 
         $form = $crawler->selectButton('Save and Close')->form();
@@ -97,8 +90,7 @@ class ControllersTest extends WebTestCase
 
     public function testApiGen()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'users-grid',
             array('users-grid[_filter][username][value]' => 'testUser1')
         );
@@ -108,7 +100,7 @@ class ControllersTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_user_apigen', array('id' => $result['id'])),
+            $this->getUrl('oro_user_apigen', array('id' => $result['id'])),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
@@ -130,7 +122,7 @@ class ControllersTest extends WebTestCase
 
     public function testViewProfile()
     {
-        $this->client->request('GET', $this->client->generate('oro_user_profile_view'));
+        $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('John Doe - Users - Users Management - System', $result->getContent());
@@ -138,7 +130,7 @@ class ControllersTest extends WebTestCase
 
     public function testUpdateProfile()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
             'John Doe - Edit - Users - Users Management - System',
@@ -155,7 +147,7 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
 
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_profile_update'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
             'John Doe - Edit - Users - Users Management - System',

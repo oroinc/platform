@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,14 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SidebarTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -28,7 +22,7 @@ class SidebarTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 204);
@@ -43,7 +37,7 @@ class SidebarTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_sidebars'),
+            $this->getUrl('oro_api_post_sidebars'),
             array(),
             array(),
             array(),
@@ -55,7 +49,7 @@ class SidebarTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -71,7 +65,7 @@ class SidebarTest extends WebTestCase
         // get sidebar id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -80,7 +74,7 @@ class SidebarTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
+            $this->getUrl('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
             array(),
             array(),
             array(),
@@ -92,7 +86,7 @@ class SidebarTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);

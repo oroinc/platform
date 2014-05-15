@@ -4,7 +4,6 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Functional\API;
 
 use Symfony\Component\BrowserKit\Response;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,11 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestApiTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     /**
      * @var array
      */
@@ -36,7 +30,7 @@ class RestApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -48,7 +42,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_businessunit'),
+            $this->getUrl('oro_api_post_businessunit'),
             $this->fixtureData
         );
 
@@ -70,7 +64,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunits')
+            $this->getUrl('oro_api_get_businessunits')
         );
 
         $responseData = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -102,7 +96,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
         $responseData = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -132,7 +126,7 @@ class RestApiTest extends WebTestCase
         $requestData['business_unit']['name'] = $requestData['business_unit']['name'] . '_updated';
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_businessunit', array('id' => $id)),
+            $this->getUrl('oro_api_put_businessunit', array('id' => $id)),
             $requestData
         );
 
@@ -141,7 +135,7 @@ class RestApiTest extends WebTestCase
         // open address by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -158,7 +152,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_delete_businessunit', array('id' => $id))
         );
 
         /** @var $result Response */
@@ -167,7 +161,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
         $result = $this->client->getResponse();

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,19 +10,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SoapApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        $this->client->createSoapClient(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
@@ -31,7 +21,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetCountries()
     {
-        $result = $this->client->getSoapClient()->getCountries();
+        $result = $this->soapClient->getCountries();
         $result = $this->valueToArray($result);
         return array_slice($result['item'], 0, 5);
     }
@@ -43,7 +33,7 @@ class SoapApiTest extends WebTestCase
     public function testGetCountry(array $countries)
     {
         foreach ($countries as $country) {
-            $result = $this->client->getSoapClient()->getCountry($country['iso2Code']);
+            $result = $this->soapClient->getCountry($country['iso2Code']);
             $result = $this->valueToArray($result);
             $this->assertEquals($country, $result);
         }
@@ -54,7 +44,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetRegions()
     {
-        $result = $this->client->getSoapClient()->getRegions();
+        $result = $this->soapClient->getRegions();
         $result = $this->valueToArray($result);
         return array_slice($result['item'], 0, 5);
     }
@@ -66,7 +56,7 @@ class SoapApiTest extends WebTestCase
     public function testGetRegion(array $regions)
     {
         foreach ($regions as $region) {
-            $result = $this->client->getSoapClient()->getRegion($region['combinedCode']);
+            $result = $this->soapClient->getRegion($region['combinedCode']);
             $result = $this->valueToArray($result);
             $this->assertEquals($region, $result);
         }
@@ -77,12 +67,12 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetCountryRegion()
     {
-        $result = $this->client->getSoapClient()->getRegionByCountry('US');
+        $result = $this->soapClient->getRegionByCountry('US');
         $result = $this->valueToArray($result);
 
         $region = current($result['item']);
 
-        $expectedResult = $this->client->getSoapClient()->getRegion($region['combinedCode']);
+        $expectedResult = $this->soapClient->getRegion($region['combinedCode']);
         $expectedResult = $this->valueToArray($expectedResult);
         $this->assertEquals($expectedResult, $region);
     }

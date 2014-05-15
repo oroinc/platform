@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -21,13 +20,9 @@ class WidgetTest extends WebTestCase
         )
     );
 
-    /** @var Client  */
-    protected $client;
-
     public function setUp()
     {
-        // TODO: Implement position tests
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -38,7 +33,7 @@ class WidgetTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEmpty($result);
@@ -52,7 +47,7 @@ class WidgetTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_sidebarwidgets'),
+            $this->getUrl('oro_api_post_sidebarwidgets'),
             array(),
             array(),
             array(),
@@ -64,7 +59,7 @@ class WidgetTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -80,7 +75,7 @@ class WidgetTest extends WebTestCase
         // get sidebar id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -89,7 +84,7 @@ class WidgetTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_sidebarwidgets', array('widgetId' =>  $position['id'])),
+            $this->getUrl('oro_api_put_sidebarwidgets', array('widgetId' =>  $position['id'])),
             array(),
             array(),
             array(),
@@ -101,7 +96,7 @@ class WidgetTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -118,7 +113,7 @@ class WidgetTest extends WebTestCase
         // get sidebar widget id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
 
         $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -127,14 +122,14 @@ class WidgetTest extends WebTestCase
         // delete sidebar widget by id
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_sidebarwidgets', array('widgetId' => $position['id']))
+            $this->getUrl('oro_api_delete_sidebarwidgets', array('widgetId' => $position['id']))
         );
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // get sidebar widget
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+            $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

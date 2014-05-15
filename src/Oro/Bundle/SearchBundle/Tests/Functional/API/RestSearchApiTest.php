@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
@@ -14,15 +13,10 @@ class RestSearchApiTest extends WebTestCase
 {
     protected static $hasLoaded = false;
 
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
-        $this->client->appendFixturesOnce(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
     }
 
     /**
@@ -41,7 +35,7 @@ class RestSearchApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_search'),
+            $this->getUrl('oro_api_get_search'),
             $request
         );
 

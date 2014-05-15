@@ -4,7 +4,6 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -13,14 +12,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
 
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -28,7 +23,7 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_business_unit_index'));
+        $this->client->request('GET', $this->getUrl('oro_business_unit_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -50,7 +45,7 @@ class ControllersTest extends WebTestCase
                 "owner" => "1"
             )
         );
-        $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $result['request'] = $request;
@@ -61,7 +56,7 @@ class ControllersTest extends WebTestCase
     public function testCreate()
     {
         $user = $this->getUser();
-        $crawler = $this->client->request('GET', $this->client->generate('oro_business_unit_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_business_unit_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_business_unit_form[name]'] = 'testBU';
@@ -88,12 +83,9 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'business-unit-grid',
-            array(
-                'business-unit-grid[_filter][name][value]' => 'testBU'
-            )
+            array('business-unit-grid[_filter][name][value]' => 'testBU')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -101,7 +93,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_business_unit_update', array('id' => $result['id']))
+            $this->getUrl('oro_business_unit_update', array('id' => $result['id']))
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -116,12 +108,9 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Business Unit saved", $crawler->html());
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'business-unit-grid',
-            array(
-                'business-unit-grid[_filter][name][value]' => 'testBU_Updated'
-            )
+            array('business-unit-grid[_filter][name][value]' => 'testBU_Updated')
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -139,7 +128,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_business_unit_view', array('id' => $id))
+            $this->getUrl('oro_business_unit_view', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
@@ -155,12 +144,9 @@ class ControllersTest extends WebTestCase
      */
     public function testViewUsers($id, $user)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'bu-view-users-grid',
-            array(
-                'bu-view-users-grid[business_unit_id]' => $id
-            )
+            array('bu-view-users-grid[business_unit_id]' => $id)
         );
 
         $result = $this->getJsonResponseContent($response, 200);

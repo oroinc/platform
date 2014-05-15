@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -11,14 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestGroupsTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -35,7 +29,7 @@ class RestGroupsTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_group'),
+            $this->getUrl('oro_api_post_group'),
             $request
         );
         $result = $this->client->getResponse();
@@ -53,7 +47,7 @@ class RestGroupsTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_groups')
+            $this->getUrl('oro_api_get_groups')
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -81,7 +75,7 @@ class RestGroupsTest extends WebTestCase
         $request['group']['name'] .= '_updated';
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_group', array('id' => $group['id'])),
+            $this->getUrl('oro_api_put_group', array('id' => $group['id'])),
             $request
         );
         $result = $this->client->getResponse();
@@ -89,7 +83,7 @@ class RestGroupsTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -108,14 +102,14 @@ class RestGroupsTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_delete_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);

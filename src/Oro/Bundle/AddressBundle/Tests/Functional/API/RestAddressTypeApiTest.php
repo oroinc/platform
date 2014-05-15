@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -10,12 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class RestAddressTypeApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -23,7 +19,7 @@ class RestAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
-        $this->client->request('GET', $this->client->generate('oro_api_get_addresstypes'));
+        $this->client->request('GET', $this->getUrl('oro_api_get_addresstypes'));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -41,7 +37,7 @@ class RestAddressTypeApiTest extends WebTestCase
         foreach ($expected as $addressType) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_addresstype', array('name' => $addressType['name']))
+                $this->getUrl('oro_api_get_addresstype', array('name' => $addressType['name']))
             );
 
             $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

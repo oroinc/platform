@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAudit\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -26,14 +25,10 @@ class ControllersTest extends WebTestCase
         'company' => 'company',
         'gender' => 'Male'
     );
-    /**
-     * @var Client
-     */
-    protected $client;
 
     public function setUp()
     {
-        $this->client = self::createClient(
+        $this->initClient(
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
@@ -41,7 +36,7 @@ class ControllersTest extends WebTestCase
 
     public function prepareFixture()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = $this->userData['enabled'];
         $form['oro_user_user_form[username]'] = $this->userData['username'];
@@ -65,7 +60,7 @@ class ControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_dataaudit_index'));
+        $this->client->request('GET', $this->getUrl('oro_dataaudit_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -77,8 +72,7 @@ class ControllersTest extends WebTestCase
     {
         $this->prepareFixture();
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'audit-grid',
             array(
                 'audit-grid[_filter][objectName][type]' => 1,
@@ -99,8 +93,7 @@ class ControllersTest extends WebTestCase
      */
     public function testAuditHistory($result)
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'audit-history-grid',
             array(
                 'audit-history-grid[object_class]' => str_replace('\\', '_', $result['objectClass']),

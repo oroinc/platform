@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,19 +14,14 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersGroupTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     public function setUp()
     {
-        $this->client = self::createClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_user_group_index'));
+        $this->client->request('GET', $this->getUrl('oro_user_group_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
@@ -35,7 +29,7 @@ class ControllersGroupTest extends WebTestCase
     public function testCreate()
     {
         /** @var Crawler $crawler */
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_group_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_group_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -52,8 +46,7 @@ class ControllersGroupTest extends WebTestCase
 
     public function testUpdate()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'groups-grid',
             array('groups-grid[_filter][name][value]' => 'testGroup')
         );
@@ -64,7 +57,7 @@ class ControllersGroupTest extends WebTestCase
         /** @var Crawler $crawler */
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_user_group_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_group_update', array('id' => $result['id']))
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -82,8 +75,7 @@ class ControllersGroupTest extends WebTestCase
 
     public function testGridData()
     {
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'groups-grid',
             array('groups-grid[_filter][name][value]' => 'testGroupUpdated')
         );
@@ -91,8 +83,7 @@ class ControllersGroupTest extends WebTestCase
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
-        $response = $this->getGridResponse(
-            $this->client,
+        $response = $this->client->requestGrid(
             'group-users-grid',
             array(
                 'group-users-grid[_filter][has_group][value]' => 1,
