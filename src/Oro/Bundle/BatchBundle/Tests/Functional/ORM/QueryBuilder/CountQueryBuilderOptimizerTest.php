@@ -29,6 +29,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function getCountQueryBuilderDataProvider()
