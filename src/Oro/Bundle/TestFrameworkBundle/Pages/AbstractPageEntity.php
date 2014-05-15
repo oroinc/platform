@@ -70,8 +70,9 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function verifyTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']")) {
-            $tagsPath = $this->test->byXpath("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
+            $tagsPath = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value(substr($tag, 0, (strlen($tag)-1)));
             $this->waitForAjax();
@@ -102,8 +103,9 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function setTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']")) {
-            $tagsPath = $this->test->byXpath("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
+            $tagsPath = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value($tag);
             $this->waitForAjax();
