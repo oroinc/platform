@@ -4,7 +4,12 @@
         var dialog = null;
 
         sync.subscribe('oro/maintenance', function (response) {
-            if (response.isOn) {
+            var userId = null;
+            {% if app.user is not null %}
+                userId = {{ app.user.id|raw }};
+            {% endif %}
+
+            if (response.isOn && (!userId || parseInt(userId) != parseInt(response.userId))) {
                 var regExp = new RegExp('\n', 'g');
                 if (dialog) {
                     dialog.close();

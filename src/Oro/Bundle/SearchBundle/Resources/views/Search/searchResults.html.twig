@@ -23,9 +23,8 @@
                 {% for alias, type in groupedResults %}
                     {% set selected = alias == from %}
                     {% if type.class %}
-                        {% set entityConfig = oro_entity_config(type.class) %}
-                        {% set label = entityConfig.plural_label|default('')|trans({}, 'config') %}
-                        {% set iconClass = entityConfig.icon|default('') %}
+                        {% set label = type.label %}
+                        {% set iconClass = type.icon %}
                     {% else %}
                         {% set label = 'oro.search.result.all'|trans %}
                         {% set iconClass = 'icon-search' %}
