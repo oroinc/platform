@@ -93,7 +93,7 @@ class ReverseSyncProcessor
      *
      * @return LoggerStrategy
      */
-    protected function getLoggerStrategy()
+    public function getLoggerStrategy()
     {
         return $this->logger;
     }
