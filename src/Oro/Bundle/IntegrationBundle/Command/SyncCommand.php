@@ -49,6 +49,12 @@ class SyncCommand extends AbstractSyncCronCommand
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given connector name'
             )
+            ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Run sync in force mode, might not be supported by some channel/connector types'
+            )
             ->addArgument(
                 'connector-parameters',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
@@ -115,12 +121,13 @@ class SyncCommand extends AbstractSyncCronCommand
      * Get connector additional parameters array from the input
      *
      * @param InputInterface $input
+     *
      * @return array key - parameter name, value - parameter value
      * @throws \LogicException
      */
     protected function getConnectorParameters(InputInterface $input)
     {
-        $result              = [];
+        $result              = ['force' => $input->getOption('force')];
         $connectorParameters = $input->getArgument('connector-parameters');
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {

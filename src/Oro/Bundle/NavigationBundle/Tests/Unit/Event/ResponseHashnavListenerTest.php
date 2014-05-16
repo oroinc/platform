@@ -25,8 +25,19 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $response;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $templating;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $event;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $securityContext;
 
     public function setUp()
@@ -47,8 +58,9 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->response));
 
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->templating = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->listener = new ResponseHashnavListener($this->securityContext, $this->templating);
+        $this->templating      = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $this->kernel          = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->listener        = $this->getListener(false);
     }
 
     public function testPlainRequest()
@@ -79,7 +91,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
                 self::TEMPLATE,
                 array(
                     'full_redirect' => true,
-                    'location' => self::TEST_URL
+                    'location'      => self::TEST_URL
                 )
             )
             ->will($this->returnValue(new Response()));
@@ -93,6 +105,42 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
         $this->serverErrorHandle();
     }
 
+    public function testFullRedirectProducedInProdEnv()
+    {
+        $expected = array('full_redirect' => 1, 'location' => self::TEST_URL);
+        $this->response->headers->add(array('location' => self::TEST_URL));
+        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $this->response->setStatusCode(503);
+        $this->templating
+            ->expects($this->once())
+            ->method('renderResponse')
+            ->with('OroNavigationBundle:HashNav:redirect.html.twig', $expected)
+            ->will($this->returnValue($response));
+
+        $this->event->expects($this->once())->method('setResponse')->with($response);
+        $this->listener->onResponse($this->event);
+    }
+
+    public function testFullRedirectNotProducedInDevEnv()
+    {
+        $listener = $this->getListener(true);
+        $this->response->headers->add(array('location' => self::TEST_URL));
+        $this->response->setStatusCode(503);
+        $this->templating->expects($this->never())->method('renderResponse');
+
+        $this->event->expects($this->never())->method('setResponse');
+        $listener->onResponse($this->event);
+    }
+
+    /**
+     * @param bool $isDebug
+     * @return ResponseHashnavListener
+     */
+    protected function getListener($isDebug)
+    {
+        return new ResponseHashnavListener($this->securityContext, $this->templating, $isDebug);
+    }
+
     private function serverErrorHandle()
     {
         $this->event->expects($this->once())
@@ -104,7 +152,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
                 self::TEMPLATE,
                 array(
                     'full_redirect' => true,
-                    'location' => self::TEST_URL
+                    'location'      => self::TEST_URL
                 )
             )
             ->will($this->returnValue(new Response()));

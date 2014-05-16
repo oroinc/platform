@@ -27,8 +27,7 @@
         <tr>
             <td class="search-entity-types-column">
                 {% for alias, type in groupedResults %}
-                    {% set config = oro_config_entity(type.class) %}
-                    {% set selected, label, iconClass = alias == from, config.name|trans(), config.icon_class %}
+                    {% set selected, label, iconClass = alias == from, type.label, type.icon %}
 
                     {% if alias == '' %}
                         {% set label, iconClass = 'All', 'icon-search' %}
