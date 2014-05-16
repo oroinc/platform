@@ -17,9 +17,6 @@ class ConfigurationPass implements CompilerPassInterface
     const MANAGER_SERVICE_ID = 'oro_query_designer.query_designer.manager';
     const TAG_NAME           = 'oro_filter.extension.orm_filter.filter';
 
-    const PROVIDER_STORAGE_TAG   = 'oro_query_designer.entity_data_provider.storage';
-    const PROVIDER_EXTENSION_TAG = 'oro_query_designer.provider_extension';
-
     /**
      * {@inheritDoc}
      */
@@ -52,27 +49,9 @@ class ConfigurationPass implements CompilerPassInterface
                 $filterTypes[] = $attr['type'];
             }
 
-            $this->addEntityProviderExtensions($container);
-
             $processor = new Processor();
             $config    = $processor->processConfiguration(new Configuration($filterTypes), $configs);
             $managerDef->replaceArgument(0, $config);
-        }
-    }
-
-    /**
-     * Add entity provider extensions to extension storage
-     * that will be injected in providers
-     *
-     * @param ContainerBuilder $container
-     */
-    protected function addEntityProviderExtensions(ContainerBuilder $container)
-    {
-        $providerExtRef = $container->getDefinition(self::PROVIDER_STORAGE_TAG);
-
-        $providerExtensions = $container->findTaggedServiceIds(self::PROVIDER_EXTENSION_TAG);
-        foreach ($providerExtensions as $extension) {
-            $providerExtRef->addMethodCall('addProviderExtension', [$extension]);
         }
     }
 

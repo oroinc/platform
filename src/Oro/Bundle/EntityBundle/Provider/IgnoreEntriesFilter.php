@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension;
+namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 

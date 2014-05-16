@@ -17,7 +17,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension\EntityFieldProviderExtension;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -78,7 +77,7 @@ class EntityFieldProvider
         $this->doctrine             = $doctrine;
         $this->virtualFields        = $virtualFields;
         $this->hiddenFields         = $hiddenFields;
-        $this->providerExtension    = $providerExtension
+        $this->providerExtension    = $providerExtension;
     }
 
     /**
