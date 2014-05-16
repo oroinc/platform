@@ -68,7 +68,7 @@ This will export your data to your store based on channel definition.
 
 **oro_integration.reader.entity.by_id** - service reads from entity by ID.
 
-**oro_integration.processor.reverse** - service is processing each record.
+**processor.reverse** - service which processing each record.
 
 **oro_integration.writer.reverse** - service is writing collection of entities.
 
@@ -83,6 +83,13 @@ This will export your data to your store based on channel definition.
                 class: Oro\Bundle\BatchBundle\Step\ItemStep
                 services:
                     reader:    oro_integration.reader.entity.by_id
-                    processor: oro_integration.processor.reverse
+                    processor: processor.reverse
                     writer:    oro_integration.writer.reverse
                 parameters: ~
+
+Processor can be initialized in your Bundle in service.yaml:
+####Example:
+    processor.reverse:
+        class: %processor.reverse.class%
+
+Where processor.reverse.class - should implements Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface

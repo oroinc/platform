@@ -4,12 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ReverseSyncProcessor
 {
@@ -70,7 +69,7 @@ class ReverseSyncProcessor
             }
 
         } catch (\Exception $e) {
-            return $this->logError($e, $channel, $connector);
+            return $this->logger->error($e->getMessage());
         }
 
         $configuration = [
@@ -84,7 +83,7 @@ class ReverseSyncProcessor
                 ),
         ];
 
-        $this->processExport($realConnector->getTwoWayJobName(), $configuration);
+        $this->processExport($realConnector->getExportJobName(), $configuration);
 
         return $this;
     }
@@ -94,7 +93,7 @@ class ReverseSyncProcessor
      *
      * @return LoggerStrategy
      */
-    public function getLoggerStrategy()
+    protected function getLoggerStrategy()
     {
         return $this->logger;
     }
@@ -123,27 +122,5 @@ class ReverseSyncProcessor
     protected function getRealConnector(Channel $channel, $connector)
     {
         return clone $this->registry->getConnectorType($channel->getType(), $connector);
-    }
-
-    /**
-     * log and continue
-     *
-     * @param \Exception $e
-     * @param Channel    $channel
-     * @param            $connector
-     *
-     * @return $this
-     */
-    protected function logError(\Exception $e, Channel $channel, $connector)
-    {
-        $this->logger->error($e->getMessage());
-        $status = new Status();
-        $status->setCode(Status::STATUS_FAILED)
-            ->setMessage($e->getMessage())
-            ->setConnector($connector);
-
-        $this->em->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($channel, false);
-        return $this;
     }
 }
