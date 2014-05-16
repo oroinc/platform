@@ -13,7 +13,7 @@ class ImapEmailOriginTest extends \PHPUnit_Framework_TestCase
     /** @var ImapEmailOrigin */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new ImapEmailOrigin();
     }

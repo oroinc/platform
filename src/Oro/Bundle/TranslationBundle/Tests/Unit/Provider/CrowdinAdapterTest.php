@@ -15,7 +15,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $request;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
         $this->request = $this->getMock('Oro\Bundle\TranslationBundle\Provider\ApiRequestInterface');
@@ -25,7 +25,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
         $this->adapter->setLogger($this->logger);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->logger, $this->request, $this->adapter);
     }

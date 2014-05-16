@@ -13,7 +13,7 @@ class ImapEmailFolderTest extends \PHPUnit_Framework_TestCase
     /** @var ImapEmailFolder */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new ImapEmailFolder();
     }

@@ -3,25 +3,17 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestInvalidUsersTest extends WebTestCase
 {
-
-    const USER_NAME = 'user_wo_permissions';
-    const USER_PASSWORD = 'no_key';
-
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient();
+        $this->initClient();
     }
 
     public function testInvalidKey()
@@ -39,14 +31,14 @@ class RestInvalidUsersTest extends WebTestCase
         );
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, self::USER_PASSWORD)
+            $this->generateWsseAuthHeader()
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 401);
+        $this->assertJsonResponseStatusCodeEquals($result, 401);
     }
 
     public function testInvalidUser()
@@ -64,13 +56,13 @@ class RestInvalidUsersTest extends WebTestCase
         );
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, ToolsAPI::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 401);
+        $this->assertJsonResponseStatusCodeEquals($result, 401);
     }
 }

@@ -17,7 +17,7 @@ class OptionSetTest extends \PHPUnit_Framework_TestCase
      */
     protected $optionRelation;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->optionSet      = new OptionSet();
         $this->optionRelation = new OptionSetRelation();

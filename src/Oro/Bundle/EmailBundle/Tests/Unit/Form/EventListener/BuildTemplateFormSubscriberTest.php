@@ -22,7 +22,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * SetUp test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

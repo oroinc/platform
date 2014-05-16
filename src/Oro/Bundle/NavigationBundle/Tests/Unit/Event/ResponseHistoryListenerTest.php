@@ -52,7 +52,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $serializedTitle;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');

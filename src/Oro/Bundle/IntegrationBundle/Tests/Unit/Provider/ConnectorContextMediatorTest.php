@@ -42,7 +42,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
         $this->contextMediator = new ConnectorContextMediator(new ServiceLink($container, $proxiedServiceID), $em);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->repo, $this->registry, $this->contextMediator);
     }
