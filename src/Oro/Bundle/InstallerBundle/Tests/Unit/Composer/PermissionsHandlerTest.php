@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
-use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
 use Symfony\Component\Filesystem\Filesystem;
+
+use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
 
 class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +30,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->directory = sys_get_temp_dir() . time();
+        $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . time();
 
         $fs = new Filesystem();
         $fs->mkdir($this->directory);
@@ -38,10 +39,16 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->setProcess($this->process);
     }
 
+    protected function tearDown()
+    {
+        $fs = new Filesystem();
+        $fs->remove($this->directory);
+    }
+
     public function testSetPermissionsSetfacl()
     {
         $this->process
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('isSuccessful')
             ->will($this->returnValue(true));
 
@@ -86,12 +93,12 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSetPermissionsChmod()
     {
         $this->process
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('isSuccessful')
             ->will($this->returnValue(true));
 
         $this->process
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('setCommandLine')
             ->with(
                 $this->callback(
@@ -126,7 +133,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSetPermissions()
     {
         $this->process
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('isSuccessful')
             ->will($this->returnValue(false));
 
@@ -138,11 +145,5 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
         $result = $this->handler->setPermissions($this->directory);
 
         $this->assertFalse($result);
-    }
-
-    protected function tearDown()
-    {
-        $fs = new Filesystem();
-        $fs->remove($this->directory);
     }
 }

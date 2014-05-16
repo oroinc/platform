@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Composer;
 
-use InvalidArgumentException;
-
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -12,7 +10,7 @@ class PermissionsHandler
     const SETFACL  = 'setfacl -R -m u:"%s":rwX %s';
     const SETFACLD = 'setfacl -dR -m u:"%s":rwX %s';
     const CHMOD    = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
-    const PS_AUX   = "ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d' ' -f1";
+    const PS_AUX   = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
 
     const USER_COMMAND = '`whoami`';
 
@@ -59,7 +57,7 @@ class PermissionsHandler
     public function setPermissionsSetfacl($path)
     {
         if (!is_dir($path)) {
-            throw new InvalidArgumentException($path);
+            throw new \InvalidArgumentException($path);
         }
 
         if ($httpdUser = $this->getHttpdUser()) {
@@ -77,7 +75,7 @@ class PermissionsHandler
     public function setPermissionsChmod($path)
     {
         if (!is_dir($path)) {
-            throw new InvalidArgumentException($path);
+            throw new \InvalidArgumentException($path);
         }
 
         if ($httpdUser = $this->getHttpdUser()) {
@@ -113,4 +111,4 @@ class PermissionsHandler
 
         return trim($this->process->getOutput());
     }
-} 
+}
