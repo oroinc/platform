@@ -23,8 +23,8 @@ query_designer:
             applicable: #[{type: boolean}]
                 - {type: boolean}
 #START for testing, remove before merge
-                - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country000}
-                - {entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: country111}
+                - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country_virtual}
+                - {entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: region_hierarchy}
 #END
             type:       boolean
             query_type: [all]

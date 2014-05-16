@@ -45,7 +45,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         $this->config                  = ConfigurationObject::create($config);
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->translator              = $translator;
-        $this->virtualFields           = $virtualFields;
+        $this->virtualFields           = $this->processVirtualFields($virtualFields);
     }
 
     /**
@@ -67,7 +67,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
             'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
-            'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
+            //'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
         ];
     }
 
@@ -269,5 +269,30 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return false;
+    }
+
+    /**
+     * Merge virtual fields by hierarchy
+     *
+     * @param array $virtualFields
+     * @return array
+     */
+    protected function processVirtualFields($virtualFields = [])
+    {
+        foreach ($virtualFields as $className => $fields) {
+            $hierarchy = $this->entityHierarchyProvider->getHierarchyForClassName($className);
+            if ($hierarchy) {
+                foreach ($hierarchy as $hierarchyClassName) {
+                    if (isset($virtualFields[$hierarchyClassName])) {
+                        $virtualFields[$className] = array_merge(
+                            $fields,
+                            $virtualFields[$hierarchyClassName]
+                        );
+                    }
+                }
+            }
+        }
+
+        return $virtualFields;
     }
 }

@@ -5,25 +5,23 @@
 oro_entity_virtual_fields:
     OroCRM\Bundle\ContactBundle\Entity\ContactAddress:
         country_virtual:
-            entity_alias: address
             query:
                 select:
                     expr:         country.name
                     return_type:  string
                 join:
                     left:
-                        - { join: address.country, alias: country }
+                        - { join: entity.country, alias: country }
 
     Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-        country_hierarchy:
-            entity_alias: address
+        region_hierarchy:
             query:
                 select:
-                    expr:         country.name
+                    expr:         region.name
                     return_type:  string
                 join:
                     left:
-                        - { join: address.country, alias: country }
+                        - { join: entity.region, alias: region }
 #        region:
 #            query:
 #                select:

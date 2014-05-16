@@ -41,7 +41,7 @@ class EntityFieldProvider
     /** @var Translator */
     protected $translator;
 
-    /** @var EntityHierarchyProvider */
+    /** @ var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
 
     /** @var array */
@@ -191,7 +191,9 @@ class EntityFieldProvider
             if ($withVirtualFields) {
                 $virtualFields = [];
 
-                //add regular virtual field(s) by class name
+                /**
+                 * add regular virtual fields by class name
+                 */
                 if (isset($this->virtualFields[$className])) {
                     $virtualFields = array_merge(
                         $virtualFields,
@@ -200,32 +202,29 @@ class EntityFieldProvider
                 }
 
                 /**
-                 * add virtual field(s) by hierarchy
+                 * add virtual fields by hierarchy
                  *
                  * e.g. OroCRMContactBundle:ContactAddress extends OroAddressBundle:AbstractAddress
-                 * and AbstractAddress has configured virtual field (entity_virtual_fields.yml)
+                 * and AbstractAddress has configured virtual field in entity_virtual_fields.yml
                  *
                  * oro_entity_virtual_fields:
                  *   Oro\Bundle\AddressBundle\Entity\AbstractAddress:
                  *     country_virtual_field:
-                 *       entity_alias: address
                  *       query:
                  *         select:
                  *           expr: country.name
                  *           return_type: string
                  *         join:
                  *           left:
-                 *             - { join: address.country, alias: country }
+                 *             - { join: entity.country, alias: country }
                  */
                 $hierarchy = $this->entityHierarchyProvider->getHierarchyForClassName($className);
-                if ($hierarchy) {
-                    foreach ($hierarchy as $hierarchyClassName) {
-                        if (isset($this->virtualFields[$hierarchyClassName])) {
-                            $virtualFields = array_merge(
-                                $virtualFields,
-                                $this->virtualFields[$hierarchyClassName]
-                            );
-                        }
+                foreach ($hierarchy as $hierarchyClassName) {
+                    if (isset($this->virtualFields[$hierarchyClassName])) {
+                        $virtualFields = array_merge(
+                            $virtualFields,
+                            $this->virtualFields[$hierarchyClassName]
+                        );
                     }
                 }
 
