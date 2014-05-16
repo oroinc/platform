@@ -137,6 +137,8 @@ abstract class WebTestCase extends BaseWebTestCase
         if (count($results)) {
             $file = current($results);
             $class = $file->getBasename('.php');
+
+            require_once $file;
         } else {
             $class = parent::getKernelClass();
         }
