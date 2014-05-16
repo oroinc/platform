@@ -88,8 +88,8 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
                     function (Job $job) use ($that, $testId, $testConnectorType) {
                         $expectedArgs = [
                             '--channel=' . $testId,
-                            sprintf('--connector=\'testConnectorType\'', $testConnectorType),
-                            '--params=\'a:0:{}\'',
+                            sprintf('--connector=testConnectorType', $testConnectorType),
+                            '--params=a:0:{}',
                         ];
 
                         $that->assertEquals($expectedArgs, $job->getArgs());
