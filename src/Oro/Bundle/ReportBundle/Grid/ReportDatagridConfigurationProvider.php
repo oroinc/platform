@@ -57,7 +57,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $this->functionProvider     = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
         $this->doctrine             = $doctrine;
-        $this->configManager = $configManager;
+        $this->configManager        = $configManager;
     }
 
     /**

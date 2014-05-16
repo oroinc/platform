@@ -88,8 +88,10 @@ class ControllersTest extends WebTestCase
         $result = ToolsAPI::jsonToArray($result->getContent());
         $data = $result['data'];
 
-        unset($data[0]['view_link']);
-        unset($data[0]['id']);
+        for ($i = 0; $i < count($data); $i++) {
+            $reportResult[$i]['id'] = $data[$i]['id'];
+            $reportResult[$i]['view_link'] = $this->client->generate('oro_user_view', array('id' => $data[$i]['id']));
+        }
 
         $options = $result['options'];
 
@@ -141,8 +143,10 @@ class ControllersTest extends WebTestCase
         $data = $result['data'];
         $options = $result['options'];
 
-        unset($data[0]['view_link']);
-        unset($data[0]['id']);
+        for ($i = 0; $i < count($data); $i++) {
+            $reportResult[$i]['id'] = $data[$i]['id'];
+            $reportResult[$i]['view_link'] = $this->client->generate('oro_user_view', array('id' => $data[$i]['id']));
+        }
 
         $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }

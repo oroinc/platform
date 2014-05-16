@@ -27,6 +27,14 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
      */
     protected $configManager;
 
+    /**
+     * @param string                        $gridName
+     * @param AbstractQueryDesigner         $source
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param ConfigManager                 $configManager
+     */
     public function __construct(
         $gridName,
         AbstractQueryDesigner $source,
