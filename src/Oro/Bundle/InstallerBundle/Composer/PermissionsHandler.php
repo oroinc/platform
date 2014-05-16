@@ -9,8 +9,10 @@ use Symfony\Component\Process\Process;
 
 class PermissionsHandler
 {
-    const SETFACL = 'setfacl -dR -m u:"%s":rwX %s';
-    const CHMOD   = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
+    const SETFACL  = 'setfacl -R -m u:"%s":rwX %s';
+    const SETFACLD = 'setfacl -dR -m u:"%s":rwX %s';
+    const CHMOD    = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
+    const PS_AUX   = "ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d' ' -f1";
 
     const USER_COMMAND = '`whoami`';
 
@@ -18,6 +20,14 @@ class PermissionsHandler
      * @var Process
      */
     protected $process;
+
+    /**
+     * @param Process $process
+     */
+    public function setProcess(Process $process)
+    {
+        $this->process = $process;
+    }
 
     /**
      * @param string $directory
@@ -54,8 +64,10 @@ class PermissionsHandler
 
         if ($httpdUser = $this->getHttpdUser()) {
             $this->runProcess(sprintf(self::SETFACL, $httpdUser, $path));
+            $this->runProcess(sprintf(self::SETFACLD, $httpdUser, $path));
         }
         $this->runProcess(sprintf(self::SETFACL, self::USER_COMMAND, $path));
+        $this->runProcess(sprintf(self::SETFACLD, self::USER_COMMAND, $path));
     }
 
     /**
@@ -79,9 +91,7 @@ class PermissionsHandler
      */
     protected function getHttpdUser()
     {
-        return $this->runProcess(
-            "ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d' ' -f1"
-        );
+        return $this->runProcess(self::PS_AUX);
     }
 
     /**
