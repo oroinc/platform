@@ -318,6 +318,8 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $actualWorkflow->getTransitionManager()->getTransitions()->toArray(),
             'Unexpected transitions'
         );
+
+        $this->assertEquals(!empty($startStep), $actualWorkflow->getStepManager()->hasStartStep());
     }
 
     /**
