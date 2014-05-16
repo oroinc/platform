@@ -3,35 +3,28 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_entityconfig_index'));
+        $this->client->request('GET', $this->getUrl('oro_entityconfig_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_entityextend_entity_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_entityextend_entity_create'));
         $form = $crawler->selectButton('Save')->form();
         $form['oro_entity_config_type[model][className]'] = 'testExtendedEntity';
         $form['oro_entity_config_type[entity][label]'] = 'test entity label';
@@ -41,7 +34,7 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Entity saved", $crawler->html());
         preg_match('/\/view\/(\d+)/', $this->client->getHistory()->current()->getUri(), $matches);
         $this->assertCount(2, $matches);
@@ -57,7 +50,7 @@ class ControllersTest extends WebTestCase
     {
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_entityconfig_update', array('id' => $id))
+            $this->getUrl('oro_entityconfig_update', array('id' => $id))
         );
 
         $form = $crawler->selectButton('Save')->form();
@@ -67,7 +60,7 @@ class ControllersTest extends WebTestCase
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Entity saved", $crawler->html());
 
         return $id;
@@ -80,10 +73,10 @@ class ControllersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_entityconfig_view', array('id' => $id))
+            $this->getUrl('oro_entityconfig_view', array('id' => $id))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, '');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('test entity label updated', $result->getContent());
 
     }

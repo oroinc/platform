@@ -34,7 +34,7 @@ class ResponseHashnavListener
     public function __construct(
         SecurityContextInterface $security,
         EngineInterface $templating,
-        $isDebug
+        $isDebug = false
     ) {
         $this->security   = $security;
         $this->templating = $templating;

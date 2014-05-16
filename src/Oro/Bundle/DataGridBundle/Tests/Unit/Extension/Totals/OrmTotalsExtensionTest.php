@@ -49,7 +49,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
      */
     protected $aclHelper;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()

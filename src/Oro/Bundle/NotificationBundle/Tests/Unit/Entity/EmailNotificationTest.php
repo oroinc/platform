@@ -12,7 +12,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new EmailNotification();
 
@@ -20,7 +20,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->entity->getId());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }

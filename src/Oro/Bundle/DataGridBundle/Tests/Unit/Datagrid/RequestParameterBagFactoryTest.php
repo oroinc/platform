@@ -16,7 +16,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $request;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()

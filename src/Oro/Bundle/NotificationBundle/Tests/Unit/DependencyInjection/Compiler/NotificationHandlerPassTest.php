@@ -15,12 +15,12 @@ class NotificationHandlerPassTest extends \PHPUnit_Framework_TestCase
      */
     private $compiler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->compiler = new NotificationHandlerPass();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->compiler);
     }
