@@ -47,9 +47,6 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
-    /** @var EntityFieldProviderExtension */
-    protected $providerExtension;
-
     /**
      * @param ConfigProvider               $entityConfigProvider
      * @param ConfigProvider               $extendConfigProvider
@@ -58,7 +55,6 @@ class EntityFieldProvider
      * @param Translator                   $translator
      * @param array                        $virtualFields
      * @param array                        $hiddenFields
-     * @param EntityFieldProviderExtension $providerExtension
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -67,8 +63,7 @@ class EntityFieldProvider
         ManagerRegistry $doctrine,
         Translator $translator,
         $virtualFields,
-        $hiddenFields,
-        EntityFieldProviderExtension $providerExtension
+        $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
@@ -77,7 +72,6 @@ class EntityFieldProvider
         $this->doctrine             = $doctrine;
         $this->virtualFields        = $virtualFields;
         $this->hiddenFields         = $hiddenFields;
-        $this->providerExtension    = $providerExtension;
     }
 
     /**
@@ -220,7 +214,7 @@ class EntityFieldProvider
             return true;
         }
 
-        return $this->providerExtension->isIgnoredField($metadata, $fieldName);
+        return false;
     }
 
     /**
@@ -402,7 +396,7 @@ class EntityFieldProvider
             }
         }
 
-        return $this->providerExtension->isIgnoredRelation($metadata, $associationName);
+        return false;
     }
 
     /**

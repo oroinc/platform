@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -265,5 +266,22 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return false;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param $fieldName
+     */
+    public function isIgnored(ClassMetadata $metadata, $fieldName)
+    {
+
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExcludeRules()
+    {
+        return $this->config->offsetGet('exclude');
     }
 }

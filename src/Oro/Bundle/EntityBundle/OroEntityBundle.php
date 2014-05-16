@@ -25,7 +25,6 @@ class OroEntityBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
-        $container->addCompilerPass(new ConfigurationPass());
     }
 
     /**
