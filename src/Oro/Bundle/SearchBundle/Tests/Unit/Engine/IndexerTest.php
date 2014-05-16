@@ -88,7 +88,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         ),
     );
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

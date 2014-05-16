@@ -43,7 +43,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $listener;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->eventMock = $this
             ->getMockBuilder('Symfony\Component\Console\Event\ConsoleTerminateEvent')

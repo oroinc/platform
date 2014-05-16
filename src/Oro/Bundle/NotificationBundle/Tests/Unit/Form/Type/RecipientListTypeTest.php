@@ -25,7 +25,7 @@ class RecipientListTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new RecipientListType($this->entityManager);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
         unset($this->entityManager);

@@ -25,7 +25,7 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
      */
     protected $tokenParser;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->stream = $this->getMockBuilder('Twig_TokenStream')
             ->disableOriginalConstructor()

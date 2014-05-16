@@ -15,7 +15,7 @@ class OrmTranslationResourceTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metaCache;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->locale    = 'uk';
         $this->metaCache = $this->getMockBuilder(
