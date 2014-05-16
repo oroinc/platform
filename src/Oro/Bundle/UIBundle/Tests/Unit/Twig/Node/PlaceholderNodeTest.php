@@ -35,7 +35,7 @@ class PlaceholderNodeTest extends \PHPUnit_Framework_TestCase
      */
     protected $node;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->compiler = $this->getMockBuilder('Twig_Compiler')
             ->disableOriginalConstructor()

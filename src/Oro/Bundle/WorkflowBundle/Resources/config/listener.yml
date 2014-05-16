@@ -1,6 +1,5 @@
 parameters:
     oro_workflow.listener.subscriber.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeSubscriber
-    oro_workflow.listener.subscriber.workflow_step.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowStepSubscriber
     oro_workflow.listener.subscriber.workflow_item.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemSubscriber
 
 services:

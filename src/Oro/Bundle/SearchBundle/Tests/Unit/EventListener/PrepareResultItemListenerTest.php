@@ -44,7 +44,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()

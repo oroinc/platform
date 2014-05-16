@@ -60,7 +60,7 @@ class SegmentFilterTest extends OrmTestCase
     /** @var SegmentFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -151,7 +151,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('segment', ['entity' => '']);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->formFactory, $this->dynamicSegmentQueryBuilder, $this->filter);
     }

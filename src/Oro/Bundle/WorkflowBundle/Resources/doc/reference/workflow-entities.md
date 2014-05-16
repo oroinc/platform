@@ -97,9 +97,7 @@ objects by their names or managed entities.
 **Methods:**
 * **getWorkflow(workflowName)** - extracts Workflow object by it's name;
 * **getActiveWorkflowByEntityClass(entityClass)** - returns active Workflow that is applicable to passed entity class;
-* **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class;
-* **getWorkflowsByEntityClass(entityClass, workflowName)** - returns list of Workflow objects applicable
-to specified entity class. It may return only one Workflow object if specify workflowName as second parameter;
+* **hasActiveWorkflowByEntityClass(entityClass)** - check is there an active workflow for entity class.
 
 Step
 ----
@@ -319,17 +317,6 @@ steps (all steps for current definition and start step in particular). Also has 
 * **getEntityAclByAttributeStep(attributeStep)** - returns ACL rules for related entity by attribute step if any;
 * **import(WorkflowDefinition)** - import data from passed workflow definition into the current;
 * **getObjectIdentifier()** - returns a unique identifier for this domain object;
-
-Workflow Definition Repository
-------------------------------
-
-**Class:**
-Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository
-
-**Methods:**
-* **findByEntityClass(entityClass, workflowName)** - returns available workflow definitions for entity class. Also has
-possibility to get single workflow definition if specify workflowName as second parameter;
-* **findAllWithStartStep()** - returns list of workflow definition, where start step has been defined;
 
 Workflow Item
 -------------

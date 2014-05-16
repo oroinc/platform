@@ -61,7 +61,7 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
         $this->template = new EmailTemplate();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->variablesConstraint);
         unset($this->twig);

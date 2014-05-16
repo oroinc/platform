@@ -16,7 +16,7 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
     protected $pml;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->pm  = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Manager\PackageManager')
             ->disableOriginalConstructor()->getMock();
@@ -27,7 +27,7 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->pm));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->pm);
     }

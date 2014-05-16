@@ -48,7 +48,7 @@ services:
     oro_workflow.form.type.workflow_select:
         class: %oro_workflow.form.type.workflow_select.class%
         arguments:
-            - @oro_workflow.registry
+            - @doctrine
         tags:
             - { name: form.type, alias: oro_workflow_select }
 

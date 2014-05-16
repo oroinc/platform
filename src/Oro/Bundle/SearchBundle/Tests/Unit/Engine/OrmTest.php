@@ -24,7 +24,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
     private $mapper;
     private $dispatcher;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()

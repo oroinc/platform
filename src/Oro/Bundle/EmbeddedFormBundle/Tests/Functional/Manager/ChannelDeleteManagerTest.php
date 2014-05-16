@@ -9,11 +9,11 @@ use Oro\Bundle\IntegrationBundle\Tests\Functional\AbstractChannelDataDeleteTest;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ChannelDeleteManagerTest extends AbstractChannelDataDeleteTest
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->entityClassName = 'OroEmbeddedFormBundle:EmbeddedForm';

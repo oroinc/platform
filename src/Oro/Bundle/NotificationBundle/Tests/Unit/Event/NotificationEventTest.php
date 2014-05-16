@@ -16,7 +16,7 @@ class NotificationEventTest extends \PHPUnit_Framework_TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new \stdClass();
         $this->event = new NotificationEvent($this->entity);

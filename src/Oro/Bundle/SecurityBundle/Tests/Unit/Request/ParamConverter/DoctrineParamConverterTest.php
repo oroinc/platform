@@ -29,7 +29,7 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
 
     protected $entityClassResolver;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ManagerRegistry')) {
             $this->markTestSkipped();
