@@ -4,5 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 interface TwoWaySyncConnectorInterface
 {
-    public function getTwoWayJobName();
+    /**
+     * @return string
+     */
+    public function getExportJobName();
 }
