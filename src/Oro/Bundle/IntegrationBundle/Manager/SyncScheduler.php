@@ -36,7 +36,7 @@ class SyncScheduler
      * Schedules backward sync job
      *
      * @param Channel $channel
-     * @param string $connectorType
+     * @param string  $connectorType
      * @param array   $params
      *
      * @throws \LogicException
@@ -51,8 +51,8 @@ class SyncScheduler
 
         $args = [
             '--channel=' . $channel->getId(),
-            '--connector=' . escapeshellarg($connectorType),
-            '--params=' . escapeshellarg(serialize($params))
+            '--connector=' . $connectorType,
+            '--params=' . serialize($params)
         ];
         $job  = new Job(self::JOB_NAME, $args);
         $this->em->persist($job);
