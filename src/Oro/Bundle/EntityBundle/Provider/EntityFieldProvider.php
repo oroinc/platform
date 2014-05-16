@@ -17,7 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension\AbstractProviderExtension;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension\EntityFieldProviderExtension;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -48,18 +48,18 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
-    /** @var AbstractProviderExtension */
+    /** @var EntityFieldProviderExtension */
     protected $providerExtension;
 
     /**
-     * @param ConfigProvider            $entityConfigProvider
-     * @param ConfigProvider            $extendConfigProvider
-     * @param EntityClassResolver       $entityClassResolver
-     * @param ManagerRegistry           $doctrine
-     * @param Translator                $translator
-     * @param array                     $virtualFields
-     * @param array                     $hiddenFields
-     * @param AbstractProviderExtension $providerExtension
+     * @param ConfigProvider               $entityConfigProvider
+     * @param ConfigProvider               $extendConfigProvider
+     * @param EntityClassResolver          $entityClassResolver
+     * @param ManagerRegistry              $doctrine
+     * @param Translator                   $translator
+     * @param array                        $virtualFields
+     * @param array                        $hiddenFields
+     * @param EntityFieldProviderExtension $providerExtension
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -69,7 +69,7 @@ class EntityFieldProvider
         Translator $translator,
         $virtualFields,
         $hiddenFields,
-        AbstractProviderExtension $providerExtension
+        EntityFieldProviderExtension $providerExtension
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;

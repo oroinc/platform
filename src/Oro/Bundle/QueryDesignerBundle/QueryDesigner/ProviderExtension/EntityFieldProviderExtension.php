@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-abstract class AbstractProviderExtension
+abstract class EntityFieldProviderExtension
 {
     /**
      * Checks if the given field should be ignored
@@ -14,7 +14,10 @@ abstract class AbstractProviderExtension
      *
      * @return bool
      */
-    abstract public function isIgnoredField(ClassMetadata $metadata, $fieldName);
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    {
+        // will be implemented in children
+    }
 
     /**
      * Checks if the given relation should be ignored
@@ -24,5 +27,8 @@ abstract class AbstractProviderExtension
      *
      * @return bool
      */
-    abstract public function isIgnoredRelation(ClassMetadata $metadata, $associationName);
+    public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
+    {
+        // will be implemented in children
+    }
 } 

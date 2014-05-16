@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 
-class IgnoreEntriesFilter extends AbstractProviderExtension
+class IgnoreEntriesFilter extends EntityFieldProviderExtension
 {
     /** @var QueryDesignerManager */
     protected $queryManager;

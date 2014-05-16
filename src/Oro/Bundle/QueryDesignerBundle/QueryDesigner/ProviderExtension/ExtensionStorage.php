@@ -4,9 +4,9 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner\ProviderExtension;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-class ExtensionStorage extends AbstractProviderExtension
+class ExtensionStorage extends EntityFieldProviderExtension
 {
-    /** @var AbstractProviderExtension[]|array */
+    /** @var EntityFieldProviderExtension[]|array */
     protected $providerExtensions = [];
 
     /**
@@ -46,15 +46,15 @@ class ExtensionStorage extends AbstractProviderExtension
     }
 
     /**
-     * @param AbstractProviderExtension $provider
+     * @param EntityFieldProviderExtension $provider
      */
-    public function addProviderExtension(AbstractProviderExtension $provider)
+    public function addProviderExtension(EntityFieldProviderExtension $provider)
     {
         $this->providerExtensions[] = $provider;
     }
 
     /**
-     * @return array|AbstractProviderExtension[]
+     * @return array|EntityFieldProviderExtension[]
      */
     public function getProviderExtensions()
     {
