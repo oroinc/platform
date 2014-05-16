@@ -68,9 +68,12 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
         $repo = $em->getRepository('OroImapBundle:ImapEmail');
         $query = $repo->createQueryBuilder('e')
             ->select('e.uid')
-            ->where('e.email = ?1')
+            ->innerJoin('e.imapFolder', 'if')
+            ->where('e.email = ?1 AND if.folder = ?2')
             ->setParameter(1, $email)
+            ->setParameter(2, $folder)
             ->getQuery();
+
         /** @var ImapEmail $imapEmail */
         $imapEmail = $query->getSingleResult();
 

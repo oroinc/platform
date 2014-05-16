@@ -9,6 +9,7 @@ use Doctrine\ORM\Query;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -115,7 +116,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $sqb->closeParenthesis();
 
                 // load emails using this search query
-                $this->loadEmails($folder, $sqb->get());
+                $this->loadEmails($imapFolder, $sqb->get());
             }
         }
     }
@@ -299,10 +300,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Loads emails from an email server and save them into the database
      *
-     * @param EmailFolder $folder
-     * @param SearchQuery $searchQuery
+     * @param ImapEmailFolder $folder
+     * @param SearchQuery     $searchQuery
      */
-    protected function loadEmails(EmailFolder $folder, SearchQuery $searchQuery)
+    protected function loadEmails(ImapEmailFolder $folder, SearchQuery $searchQuery)
     {
         $this->log->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
         $folder->setSynchronizedAt(new \DateTime('now', new \DateTimeZone('UTC')));
@@ -334,10 +335,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Saves emails into the database
      *
-     * @param Email[]     $emails
-     * @param EmailFolder $folder
+     * @param Email[]         $emails
+     * @param ImapEmailFolder $imapFolder
      */
-    protected function saveEmails(array $emails, EmailFolder $folder)
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
     {
         $this->emailEntityBuilder->removeEmails();
 
@@ -349,30 +350,30 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails
         );
 
+        $folder = $imapFolder->getFolder();
         $repo         = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $query        = $repo->createQueryBuilder('e')
+        $imapDataRows = $repo->createQueryBuilder('e')
             ->select('e.uid, se.id')
             ->innerJoin('e.email', 'se')
             ->innerJoin('se.folders', 'sf')
             ->where('sf.id = :folderId AND e.uid IN (:uids)')
             ->setParameter('folderId', $folder->getId())
             ->setParameter('uids', $uids)
-            ->getQuery();
-
-        $result = $query->getResult();
+            ->getQuery()
+            ->getResult();
 
         $existingUids = array_map(
             function ($el) {
                 return $el['uid'];
             },
-            $result
+            $imapDataRows
         );
 
         $existingEmailIds = array_map(
             function ($el) {
                 return $el['id'];
             },
-            $result
+            $imapDataRows
         );
 
         $newImapIds = [];
@@ -398,7 +399,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $email->setXMessageId($src->getXMessageId());
                 $email->setXThreadId($src->getXThreadId());
 
-                $newImapIds[$src->getMessageId()] = $src->getId()->getUid();
+                if (!isset($newImapIds[$src->getMessageId()])) {
+                    $newImapIds[$src->getMessageId()] = [];
+                }
+                $uid = $src->getId()->getUid();
+                $newImapIds[$src->getMessageId()][$uid] = $uid;
 
                 $this->log->notice(sprintf('The "%s" email was persisted.', $src->getSubject()));
             } else {
@@ -413,24 +418,52 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         $this->emailEntityBuilder->getBatch()->persist($this->em);
+        $this->linkEmailsToImapEmails($emails, $newImapIds, $existingEmailIds, $imapFolder);
+        $this->em->flush();
+    }
 
-        /** @var Email[] $oEmails */
-        $oEmails = $this->emailEntityBuilder->getBatch()->getEmails();
-        foreach ($oEmails as $email) {
-            if ($email->getId() || in_array($email->getId(), $existingEmailIds)) {
+    /**
+     * @param Email[]|array   $emails
+     * @param array           $newImapIds
+     * @param array           $existingEmailIds
+     * @param ImapEmailFolder $imapFolder
+     */
+    protected function linkEmailsToImapEmails(
+        array $emails,
+        array $newImapIds,
+        array $existingEmailIds,
+        ImapEmailFolder $imapFolder
+    ) {
+        /** @var EmailEntity[] $oEmails */
+        $oEmails = $this->getEmailsByMessageId(
+            $this->emailEntityBuilder->getBatch()->getEmails()
+        );
+
+        foreach ($emails as $emailDTO) {
+            if (empty($newImapIds[$emailDTO->getMessageId()])) {
+                // email was skipped
                 continue;
             }
 
-            $uid = $newImapIds[$email->getMessageId()];
+            /** @var EmailEntity $email */
+            $email = $oEmails[$emailDTO->getMessageId()];
+            if (in_array($email->getId(), $existingEmailIds)) {
+                continue;
+            }
 
-            $imapEmail = new ImapEmail();
-            $imapEmail
-                ->setUid($uid)
-                ->setEmail($email);
+            /** @var int $newImapIdArray */
+            $newImapIdArray = $newImapIds[$emailDTO->getMessageId()];
 
-            $this->em->persist($imapEmail);
+            foreach ($newImapIdArray as $newImapId) {
+                $imapEmail = new ImapEmail();
+                $imapEmail
+                    ->setUid($newImapId)
+                    ->setEmail($email)
+                    ->setImapFolder($imapFolder);
+
+                $this->em->persist($imapEmail);
+            }
         }
-
-        $this->em->flush();
     }
+
 }
