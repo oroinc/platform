@@ -300,12 +300,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Loads emails from an email server and save them into the database
      *
-     * @param ImapEmailFolder $folder
+     * @param ImapEmailFolder $imapFolder
      * @param SearchQuery     $searchQuery
      */
-    protected function loadEmails(ImapEmailFolder $folder, SearchQuery $searchQuery)
+    protected function loadEmails(ImapEmailFolder $imapFolder, SearchQuery $searchQuery)
     {
         $this->log->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
+
+        $folder = $imapFolder->getFolder();
         $folder->setSynchronizedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $emails = $this->manager->getEmails($searchQuery);
 
@@ -316,14 +318,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
-                $this->saveEmails($batch, $folder);
+                $this->saveEmails($batch, $imapFolder);
                 $needFolderFlush = false;
                 $count           = 0;
                 $batch           = array();
             }
         }
         if ($count > 0) {
-            $this->saveEmails($batch, $folder);
+            $this->saveEmails($batch, $imapFolder);
             $needFolderFlush = false;
         }
 
