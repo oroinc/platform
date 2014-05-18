@@ -62,7 +62,7 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'active'|trans,
+        'class': 'active',
         'subblocks': [
             {
                 'title': '',
@@ -115,13 +115,21 @@
                 </div>
             {% endif %}
         {% endmacro %}
+
+        {% set hasGroups = form.groups is defined %}
+        {% set title = hasGroups ? 'oro.user.groups.label'|trans : '' %}
+
+        {% if form.roles is defined %}
+            {% set title = title ~ (title is empty ? '' : ' and ') ~ 'oro.user.roles.label'|trans %}
+        {% endif %}
+
         {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'oro.user.groups.label'|trans ~ ' ' ~ 'and' ~ ' ' ~ 'oro.user.roles.label'|trans,
+            'title': title,
             'subblocks': [
                 {
                     'title': '',
                     'data': [
-                        form.groups is defined ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
+                         hasGroups ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
                         _self.userRoles(form)
                     ]
                 }
@@ -143,18 +151,20 @@
         }] ) %}
     {% endif %}
 
-    {% set dataBlocks = dataBlocks|merge( [{
-        'title': 'oro.user.business_units.label'|trans,
-        'subblocks': [
-            {
-                'title': '',
-                'useSpan': false,
-                'data': [
-                    form_row(form.businessUnits)
-                ]
-            }
-        ]
-    }] ) %}
+    {% if form.businessUnits is defined %}
+        {% set dataBlocks = dataBlocks|merge( [{
+            'title': 'oro.user.business_units.label'|trans,
+            'subblocks': [
+                {
+                    'title': '',
+                    'useSpan': false,
+                    'data': [
+                        form_row(form.businessUnits)
+                    ]
+                }
+            ]
+        }] ) %}
+    {% endif %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': 'oro.user.imap_configuration.label'|trans,
