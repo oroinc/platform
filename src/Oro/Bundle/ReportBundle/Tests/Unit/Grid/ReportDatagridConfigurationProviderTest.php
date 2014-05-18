@@ -77,9 +77,81 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $gridName = 'oro_report_table_1';
         $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
         $this->prepareMetadata($entity);
-        $this->prepareRepository($entity);
+        $this->prepareRepository($entity, array('columns' => array('column' => array('name'=>'street'))));
         $configuration = $this->target->getConfiguration($gridName);
-        $this->assertEmpty($configuration->offsetGetByPath('[action]'));
+        $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
+    }
+
+    public function testGetConfigurationDoesNotAddActionIfDefinitionHaveGroupingNotByIdentifier()
+    {
+        $gridName = 'oro_report_table_1';
+        $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
+
+        $definition = array(
+            'columns' => array('column' => array('name'=>'street')),
+            'grouping_columns' => array(
+                array('name'=>'street', "oro_report_form[grouping][columnNames]" => "street")
+            )
+        );
+
+        $metadata = $this->prepareMetadata($entity);
+
+        //only stub
+        $metadata->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue(array('id')));
+
+        $this->prepareRepository($entity, $definition);
+
+        $expectedViewRoute = 'oro_sample_view';
+        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($entity)
+            ->will($this->returnValue($entityMetadata));
+
+        $configuration = $this->target->getConfiguration($gridName);
+        $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
+    }
+
+    public function testGetConfigurationDoesNotAddActionIfDefinitionHaveAggregationFunction()
+    {
+        $gridName = 'oro_report_table_1';
+        $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
+
+        $definition = array(
+            'columns' => array(
+                'column' => array(
+                    'name' => 'street',
+                    "func" => array(
+                        "name"       => "Sum",
+                        "group_type" => "aggregates",
+                        "group_name" => "number",
+                    )
+                )
+            )
+        );
+
+        $metadata = $this->prepareMetadata($entity);
+
+        //only stub
+        $metadata->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue(array('id')));
+
+        $this->prepareRepository($entity, $definition);
+
+        $expectedViewRoute = 'oro_sample_view';
+        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($entity)
+            ->will($this->returnValue($entityMetadata));
+
+        $configuration = $this->target->getConfiguration($gridName);
+        $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
     }
 
     public function testGetConfigurationAddAction()
@@ -90,17 +162,31 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
         $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
 
-        $entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expectedViewRoute = 'oro_sample_view';
+        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+
         $metadata = $this->prepareMetadata($entity);
         $metadata->expects($this->once())
             ->method('getIdentifier')
             ->will($this->returnValue(array($expectedIdName)));
-        $expectedViewRoute = 'oro_sample_view';
-        $entityMetadata->routeView = $expectedViewRoute;
 
-        $this->prepareRepository($entity);
+        $definition = array(
+            'columns' => array(
+                'column' => array(
+                    'name' => 'street',
+                    "func" => array(
+                        "name"       => "Sum",
+                        "group_type" => "aggregates",
+                        "group_name" => "number",
+                    )
+                )
+            ),
+            'grouping_columns' => array(
+                array('name'=>$expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName)
+            )
+        );
+
+        $this->prepareRepository($entity, $definition);
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
             ->with($entity)
@@ -169,13 +255,16 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      * Return created report mock
      *
      * @param string $className
+     * @param array  $definition
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function prepareRepository($className)
+    protected function prepareRepository($className, array $definition)
     {
         $report = $this->getMock('Oro\Bundle\ReportBundle\Entity\Report');
-        $definition = json_encode(array('columns' => array('1'=>1)));
-        $report->expects($this->once())
+        $definition = json_encode($definition);
+
+        //only stub because of calls time depend on DatagridConfigurationBuilder realisation
+        $report->expects($this->any())
             ->method('getDefinition')
             ->will($this->returnValue($definition));
         $report->expects($this->exactly(2))
@@ -193,5 +282,21 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->will($this->returnValue($repository));
 
         return $report;
+    }
+
+    /**
+     * @param string $viewRoute
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEntityMetadata($viewRoute)
+    {
+        $entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityMetadata->routeView = $viewRoute;
+
+        return $entityMetadata;
     }
 }

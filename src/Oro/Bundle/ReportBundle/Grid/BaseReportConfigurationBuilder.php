@@ -13,9 +13,9 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
 class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
 {
     /**
-     * @var string
+     * @var AbstractQueryDesigner
      */
-    protected $className;
+    protected $source;
 
     /**
      * @var ManagerRegistry
@@ -45,7 +45,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
     ) {
         parent::__construct($gridName, $source, $functionProvider, $virtualFieldProvider, $doctrine);
 
-        $this->className = $source->getEntity();
+        $this->source = $source;
         $this->doctrine = $doctrine;
         $this->configManager = $configManager;
     }
@@ -57,7 +57,8 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
     {
         $configuration = parent::getConfiguration();
 
-        $metadata = $this->configManager->getEntityMetadata($this->className);
+        $className = $this->source->getEntity();
+        $metadata = $this->configManager->getEntityMetadata($className);
 
         if (!$metadata || empty($metadata->routeView)) {
             return $configuration;
@@ -66,19 +67,19 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $fromPart = $configuration->offsetGetByPath('[source][query][from]');
 
         $entityAlias = null;
-        $doctrineMetadata = $this->doctrine->getManagerForClass($this->className)
-            ->getClassMetadata($this->className);
+        $doctrineMetadata = $this->doctrine->getManagerForClass($className)
+            ->getClassMetadata($className);
         $identifiers = $doctrineMetadata->getIdentifier();
         $primaryKey = array_shift($identifiers);
 
         foreach ($fromPart as $piece) {
-            if ($piece['table'] == $this->className) {
+            if ($piece['table'] == $className) {
                 $entityAlias = $piece['alias'];
                 break;
             }
         }
 
-        if (!$entityAlias || $primaryKey === null || count($identifiers) > 1) {
+        if (!$entityAlias || !$primaryKey || count($identifiers) > 1 || !$this->isActionSupported($primaryKey)) {
             return $configuration;
         }
 
@@ -86,7 +87,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             'view' => array(
                 'type'         => 'navigate',
                 'label'        => 'View',
-                'acl_resource' => 'VIEW;entity:' . $this->className,
+                'acl_resource' => 'VIEW;entity:' . $className,
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',
                 'rowAction'    => true
@@ -110,5 +111,37 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $configuration->offsetAddToArrayByPath('[actions]', $viewAction);
 
         return $configuration;
+    }
+
+    /**
+     * @param string $primaryKey
+     * @return bool
+     */
+    protected function isActionSupported($primaryKey)
+    {
+        $definition = json_decode($this->source->getDefinition(), true);
+        $columnDefinition = $definition['columns'];
+
+        $groupingColumns = !empty($definition['grouping_columns']) ? $definition['grouping_columns'] : array();
+
+        if (count($groupingColumns) > 0) {
+            foreach ($groupingColumns as $column) {
+                if ($column['name'] == $primaryKey) {
+                    return true;
+                }
+            }
+
+            return false;
+        } else {
+            foreach ($columnDefinition as $column) {
+                if (!empty($column['func'])
+                    && !empty($column['func']['group_type'])
+                    && $column['func']['group_type'] == 'aggregates') {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
