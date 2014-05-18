@@ -9,12 +9,12 @@ class JobStatisticParameterPassTest extends \PHPUnit_Framework_TestCase
     /** @var JobStatisticParameterPass */
     protected $pass;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->pass = new JobStatisticParameterPass();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->pass);
     }

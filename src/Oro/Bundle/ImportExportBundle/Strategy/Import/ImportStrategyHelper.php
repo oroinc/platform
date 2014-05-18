@@ -98,11 +98,13 @@ class ImportStrategyHelper
      * Validate entity, returns list of errors or null
      *
      * @param object $entity
+     * @param null   $groups
+     *
      * @return array|null
      */
-    public function validateEntity($entity)
+    public function validateEntity($entity, $groups = null)
     {
-        $violations = $this->validator->validate($entity);
+        $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
             $errors = array();
             /** @var ConstraintViolationInterface $violation */

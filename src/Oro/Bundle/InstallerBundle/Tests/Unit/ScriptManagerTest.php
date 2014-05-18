@@ -15,7 +15,7 @@ class ScriptManagerTest extends \PHPUnit_Framework_TestCase
 
     protected $kernel;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->disableOriginalConstructor()

@@ -24,7 +24,7 @@ class TitleNodeTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->node = $this->getMock('Twig_Node');
         $this->compiler = $this->getMockBuilder('Twig_Compiler')

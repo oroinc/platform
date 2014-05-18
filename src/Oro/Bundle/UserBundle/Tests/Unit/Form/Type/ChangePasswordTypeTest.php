@@ -13,7 +13,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     /** @var  ChangePasswordType */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

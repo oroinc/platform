@@ -41,7 +41,7 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $config;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->metadataRegistry = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
             ->disableOriginalConstructor()
