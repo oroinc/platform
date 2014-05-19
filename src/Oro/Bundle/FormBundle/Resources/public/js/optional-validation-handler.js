@@ -1,6 +1,6 @@
 /*global define*/
 define(['jquery'], function($){
-
+    'use strict';
     /**
      * @export  oroform/js/optional-validation-handler
      * @class   oroform.optionalValidationHandler
@@ -11,13 +11,12 @@ define(['jquery'], function($){
          * @returns {boolean}
          */
         hasNotEmptyInput: function(group){
-            var elements = group.find();
             var elementsSelector = 'input[type!="checkbox"][type!="radio"][type!="button"][data-required]'+
                 'input[type="radio"][data-required]:checked,' +
                 ' input[type="checkbox"][data-required]:checked';
             var checkedElements = group.find(elementsSelector);
-            for (var i=0; i < elements.length; i++) {
-                if (!this.isValueEmpty($(elements[i]).val())) {
+            for (var i=0; i < checkedElements.length; i++) {
+                if (!this.isValueEmpty($(checkedElements[i]).val())) {
                     return true;
                 }
             }
