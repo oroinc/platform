@@ -16,14 +16,14 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->compiler  = new SystemConfigurationPass();
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->compiler);
         unset($this->container);

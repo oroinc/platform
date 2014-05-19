@@ -26,7 +26,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $handler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

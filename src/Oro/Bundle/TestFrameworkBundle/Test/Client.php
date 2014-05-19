@@ -2,74 +2,40 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\TerminableInterface;
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 
 class Client extends BaseClient
 {
     const LOCAL_URL = 'http://localhost';
 
-    /** @var  SoapClient */
-    static protected $soapClient;
+    /**
+     * @var PDOConnection
+     */
+    protected $pdoConnection;
 
     /**
-     * @var \Symfony\Component\Routing\RouterInterface
+     * @var KernelInterface
      */
-    protected $router = null;
+    protected $kernel;
 
-    /** @var \Doctrine\DBAL\Driver\PDOConnection shared PDO connection */
-    static protected $pdoConnection = null;
-
+    /**
+     * @var boolean
+     */
     protected $hasPerformedRequest;
 
     /**
-     * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
-     * @param array $server
-     * @param null $history
-     * @param null $cookieJar
+     * @var boolean[]
      */
-    public function __construct($kernel, array $server = array(), $history = null, $cookieJar = null)
-    {
-        parent::__construct($kernel, $server, $history, $cookieJar);
-        $this->router = $this->getContainer()->get('router');
-    }
-
-    public function __destruct()
-    {
-        $this->setSoapClient(null);
-    }
+    protected $loadedFixtures;
 
     /**
-     * @param null|SoapClient $value
-     */
-    public function setSoapClient($value)
-    {
-        self::$soapClient = $value;
-    }
-    /**
-     * @param $name
-     * @param array $parameters
-     * @param bool $absolute
-     * @return string
-     */
-    public function generate($name, $parameters = array(), $absolute = false)
-    {
-        return $this->router->generate($name, $parameters, $absolute);
-    }
-
-    /**
-     * @param string $method
-     * @param string $uri
-     * @param array $parameters
-     * @param array $files
-     * @param array $server
-     * @param null $content
-     * @param bool $changeHistory
-     * @return \Symfony\Component\DomCrawler\Crawler
+     * {@inheritdoc}
      */
     public function request(
         $method,
@@ -83,69 +49,59 @@ class Client extends BaseClient
         if (strpos($uri, 'http://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
+
         if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
-        //generate new WSSE header
-            parent::setServerParameters(ToolsAPI::generateWsseHeader());
+            //generate new WSSE header
+            parent::setServerParameters(WebTestCase::generateWsseAuthHeader());
         }
 
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
     /**
-     * @param null $wsdl
-     * @param array $options
-     * @param bool $new
-     * @throws \Exception
+     * @param array|string $gridParameters
+     * @param array $filter
+     * @return Response
      */
-    public function soap($wsdl = null, array $options = null, $new = false)
+    public function requestGrid($gridParameters, $filter = array())
     {
-        if (!self::$soapClient || $new) {
-            if (is_null($wsdl)) {
-                throw new \Exception('wsdl should not be NULL');
-            }
-
-            $this->request('GET', $wsdl);
-            $status = $this->getResponse()->getStatusCode();
-            $statusText = Response::$statusTexts[$status];
-            if ($status >= 400) {
-                throw new \Exception($statusText, $status);
-            }
-
-            $wsdl = $this->getResponse()->getContent();
-            //save to file
-            $file=tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, "w");
-            fwrite($fl, $wsdl);
-            fclose($fl);
-
-            self::$soapClient = new SoapClient($file, $options, $this);
-
-            unlink($file);
+        if (is_string($gridParameters)) {
+            $gridParameters = array('gridName' => $gridParameters);
         }
+
+        //transform parameters to nested array
+        $parameters = array();
+        foreach ($filter as $param => $value) {
+            $param .= '=' . $value;
+            parse_str($param, $output);
+            $parameters = array_merge_recursive($parameters, $output);
+        }
+
+        $gridParameters = array_merge_recursive($gridParameters, $parameters);
+
+        $this->request(
+            'GET',
+            $this->getUrl('oro_datagrid_index', $gridParameters)
+        );
+
+        return $this->getResponse();
     }
 
     /**
-     * @return SoapClient
-     */
-    public function getSoap()
-    {
-        return self::$soapClient;
-    }
-
-    /**
-     * @param array $server
+     * Generates a URL or path for a specific route based on the given parameters.
      *
-     * @return $this
+     * @param string $name
+     * @param array $parameters
+     * @param bool $absolute
+     * @return string
      */
-    public function setServerParameters(array $server)
+    protected function getUrl($name, $parameters = array(), $absolute = false)
     {
-        parent::setServerParameters($server);
-        return $this;
+        return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * {@inheritdoc}
      */
     protected function doRequest($request)
     {
@@ -156,11 +112,7 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
-        if (self::$pdoConnection) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->createConnection(self::$pdoConnection);
-            $this->getContainer()->set('doctrine.dbal.default_connection', $connection);
-        }
+        $this->refreshDoctrineConnection();
 
         $response = $this->kernel->handle($request);
 
@@ -171,98 +123,60 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $folder
-     * @param array $filter
+     * Refresh doctrine connection services
      */
-    public function appendFixtures($folder, $filter = null)
+    protected function refreshDoctrineConnection()
     {
-        $loader = new \Doctrine\Common\DataFixtures\Loader;
-        $loader->loadFromDirectory($folder);
-        $fixtures = array_values($loader->getFixtures());
-
-        //filter fixtures by className
-        if (!is_null($filter)) {
-            $fixturesCount = count($fixtures);
-            for ($i = 0; $i < $fixturesCount; $i++) {
-                $fixture = $fixtures[$i];
-                foreach ($filter as $flt) {
-                    if (!strpos(get_class($fixture), $flt)) {
-                        unset($fixtures[$i]);
-                    }
-                }
-            }
+        if (!$this->pdoConnection) {
+            return;
         }
 
-        //init fixture container
-        foreach ($fixtures as $fixture) {
-            if (method_exists($fixture, 'setContainer')) {
-                $fixture->setContainer($this->getContainer());
-            }
-        }
+        /** @var \Doctrine\DBAL\Connection $oldConnection */
+        $oldConnection = $this->getContainer()->get('doctrine.dbal.default_connection');
 
-        $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger(
-            $this->getContainer()->get('doctrine.orm.entity_manager')
-        );
-        $executor = new \Doctrine\Common\DataFixtures\Executor\ORMExecutor(
-            $this->getContainer()->get('doctrine.orm.entity_manager'),
-            $purger
-        );
-        $executor->execute($fixtures, true);
-    }
-
-    public function startTransaction()
-    {
-        self::$pdoConnection = $this->getContainer()->get('doctrine.dbal.default_connection')->getWrappedConnection();
-        self::$pdoConnection->beginTransaction();
-    }
-
-    /**
-     * @return PDOConnection|null
-     */
-    public static function getPdoConnection()
-    {
-        return self::$pdoConnection;
-    }
-
-    /**
-     * @param PDOConnection $pdoConnection
-     * @return Connection
-     */
-    public function createConnection($pdoConnection)
-    {
-        /** @var \Doctrine\DBAL\Connection $conn */
-        $dbalConnection =  $this->getContainer()->get('doctrine.dbal.default_connection');
-
-        $connection =  $this->getContainer()->get('doctrine.dbal.connection_factory')
+        $newConnection =  $this->getContainer()->get('doctrine.dbal.connection_factory')
             ->createConnection(
-                array_merge($dbalConnection->getParams(), array('pdo' => $pdoConnection)),
-                $dbalConnection->getConfiguration(),
-                $dbalConnection->getEventManager()
+                array_merge($oldConnection->getParams(), array('pdo' => $this->pdoConnection)),
+                $oldConnection->getConfiguration(),
+                $oldConnection->getEventManager()
             );
+
+        $this->getContainer()->set('doctrine.dbal.default_connection', $newConnection);
 
         //increment transaction level
         $reflection = new \ReflectionProperty('Doctrine\DBAL\Connection', '_transactionNestingLevel');
         $reflection->setAccessible(true);
-        $reflection->setValue($connection, $dbalConnection->getTransactionNestingLevel()+1);
+        $reflection->setValue($newConnection, $oldConnection->getTransactionNestingLevel() + 1);
 
-        $dbalConnection = null;
-
-        return $connection;
+        //update connection of entity manager
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        if ($entityManager->getConnection() !== $newConnection) {
+            $reflection = new \ReflectionProperty('Doctrine\ORM\EntityManager', 'conn');
+            $reflection->setAccessible(true);
+            $reflection->setValue($entityManager, $newConnection);
+        }
     }
 
     /**
-     * @return integer
+     * Start transaction
      */
-    public static function getTransactionLevel()
+    public function startTransaction()
     {
-        return self::$pdoConnection->getTransactionNestingLevel();
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.dbal.default_connection');
+        $this->pdoConnection = $connection->getWrappedConnection();
+        $this->pdoConnection->beginTransaction();
+
+        $this->refreshDoctrineConnection();
     }
 
+    /**
+     * Rollback transaction
+     */
     public function rollbackTransaction()
     {
-        if (!is_null(self::$pdoConnection)) {
-            self::$pdoConnection->rollback();
-            self::$pdoConnection = null;
+        if ($this->pdoConnection) {
+            $this->pdoConnection->rollBack();
         }
     }
 }

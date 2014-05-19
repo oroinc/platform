@@ -19,7 +19,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $platform;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
             ->disableOriginalConstructor()

@@ -31,7 +31,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $this->request = $request = $this->getMock('Symfony\Component\HttpFoundation\Request');

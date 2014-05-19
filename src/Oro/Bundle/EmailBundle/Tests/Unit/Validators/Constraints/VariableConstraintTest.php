@@ -11,12 +11,12 @@ class VariableConstraintTest extends \PHPUnit_Framework_TestCase
     /** @var VariablesConstraint */
     protected $constraint;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->constraint = new VariablesConstraint();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->constraint);
     }
