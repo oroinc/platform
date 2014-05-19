@@ -12,7 +12,7 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $titleService;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->titleService = $this->getMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
     }

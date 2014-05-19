@@ -11,7 +11,7 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
      */
     protected $kernel;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->kernel = $this->getMockForAbstractClass(
             'Oro\Bundle\DistributionBundle\OroKernel',

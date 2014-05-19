@@ -3,24 +3,18 @@
 namespace Oro\Bundle\SidebarBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SidebarTest extends WebTestCase
 {
-    /** @var Client  */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
-    /**
     /**
      * @dataProvider positionsPostProvider
      */
@@ -28,10 +22,10 @@ class SidebarTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 
@@ -43,25 +37,22 @@ class SidebarTest extends WebTestCase
     {
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_sidebars'),
+            $this->getUrl('oro_api_post_sidebars'),
             array(),
             array(),
             array(),
             json_encode($position)
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $this->assertGreaterThan(0, $result['id']);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
-        $actualResult = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($actualResult, 200);
-        $actualResult = ToolsAPI::jsonToArray($actualResult->getContent());
+        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEquals(array_merge($result, $position), $actualResult);
     }
 
@@ -74,18 +65,16 @@ class SidebarTest extends WebTestCase
         // get sidebar id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
-        $actualResult = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($actualResult, 200);
-        $actualResult = ToolsAPI::jsonToArray($actualResult->getContent());
+        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $position = array_merge(array('id' => $actualResult['id']), $position);
         $this->assertNotEquals($position, $actualResult);
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
+            $this->getUrl('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
             array(),
             array(),
             array(),
@@ -93,16 +82,14 @@ class SidebarTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_sidebars', array('position' => $position['position']))
+            $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
 
-        $actualResult = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($actualResult, 200);
-        $actualResult = ToolsAPI::jsonToArray($actualResult->getContent());
+        $actualResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEquals($position, $actualResult);
     }
@@ -129,22 +116,26 @@ class SidebarTest extends WebTestCase
                 'left-minimized' => array(
                     'position' => 'SIDEBAR_LEFT',
                     'state' => 'SIDEBAR_MINIMIZED'
-                )),
+                )
+            ),
             array(
                 'left-maximized' => array(
                     'position' => 'SIDEBAR_LEFT',
                     'state' => 'SIDEBAR_MAXIMIZED'
-                )),
+                )
+            ),
             array(
                 'right-minimized' => array(
                     'position' => 'SIDEBAR_RIGHT',
                     'state' => 'SIDEBAR_MINIMIZED'
-                )),
+                )
+            ),
             array(
                 'right-maximized' => array(
                     'position' => 'SIDEBAR_RIGHT',
                     'state' => 'SIDEBAR_MAXIMIZED'
-                )),
+                )
+            ),
         );
     }
 }

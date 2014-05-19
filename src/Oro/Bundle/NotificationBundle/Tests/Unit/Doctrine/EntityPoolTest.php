@@ -16,7 +16,7 @@ class EntityPoolTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityPool;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\\ORM\\EntityManager')
             ->disableOriginalConstructor()

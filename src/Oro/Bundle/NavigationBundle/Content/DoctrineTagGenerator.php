@@ -4,9 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Content;
 
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -25,6 +25,10 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     /** @var EntityManager */
     protected $em;
 
+    /**
+     * @param EntityManager       $em
+     * @param EntityClassResolver $resolver
+     */
     public function __construct(EntityManager $em, EntityClassResolver $resolver)
     {
         $this->uow      = $em->getUnitOfWork();
@@ -44,9 +48,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
         }
 
         $class = false;
-        if (is_object($data)) {
-            $class = ClassUtils::getClass($data);
-        } elseif (is_string($data)) {
+        if (is_object($data) || is_string($data)) {
             $class = ClassUtils::getRealClass($data);
         }
 
@@ -60,40 +62,47 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     {
         $cacheKey = $this->getCacheIdentifier($data);
         if (!isset($this->generatedTags[$cacheKey])) {
-            $tags = [];
 
             if ($data instanceof FormInterface) {
-                $data = $data->getData();
-
-                return $this->generate($data, $includeCollectionTag, $processNestedData);
+                return $this->generate($data->getData(), $includeCollectionTag, $processNestedData);
             }
 
-            if (is_object($data)) {
-                $tag = $this->convertToTag(ClassUtils::getClass($data));
-                // tag only in case if it's not a new object
-                if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW
-                    && !$this->uow->isScheduledForInsert($data)
-                ) {
-                    $tags[] = implode('_', array_merge([$tag], $this->uow->getEntityIdentifier($data)));
-
-                    if ($processNestedData) {
-                        $tags = array_merge($tags, $this->collectNestedDataTags($data));
-                    }
-                }
-
-                $class = ClassUtils::getClass($data);
-            } elseif (is_string($data)) {
-                $class = ClassUtils::getRealClass($data);
-            }
-
-            if ($includeCollectionTag) {
-                $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
-            }
-
-            $this->generatedTags[$cacheKey] = $tags;
+            $this->generatedTags[$cacheKey] = $this->getTags($data, $includeCollectionTag, $processNestedData);
         }
 
         return $this->generatedTags[$cacheKey];
+    }
+
+    /**
+     * @param mixed $data
+     * @param bool $includeCollectionTag
+     * @param bool $processNestedData
+     * @return array
+     */
+    protected function getTags($data, $includeCollectionTag, $processNestedData)
+    {
+        $tags = [];
+
+        $class = ClassUtils::getRealClass($data);
+
+        if (is_object($data)) {
+            // tag only in case if it's not a new object
+            if ($this->isNewEntity($data)) {
+                $identifier = $this->uow->getEntityIdentifier($data);
+                $tag = $this->convertToTag($class);
+                $tags[] = implode('_', array_merge([$tag], $identifier));
+
+                if ($processNestedData) {
+                    $tags = array_merge($tags, $this->collectNestedDataTags($data));
+                }
+            }
+        }
+
+        if ($includeCollectionTag && $class !== null) {
+            $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
+        }
+
+        return $tags;
     }
 
     /**
@@ -105,7 +114,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     {
         $tags = [];
 
-        $metadata = $this->em->getClassMetadata(ClassUtils::getClass($data));
+        $metadata = $this->em->getClassMetadata(ClassUtils::getRealClass($data));
         foreach ($metadata->getAssociationMappings() as $field => $assoc) {
             $value = $metadata->reflFields[$field]->getValue($data);
             if (null !== $value) {
@@ -143,5 +152,18 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     protected function getCacheIdentifier($data)
     {
         return is_string($data) ? $this->convertToTag($data) : spl_object_hash($data);
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    protected function isNewEntity($entity)
+    {
+        $entityState = $this->uow->getEntityState($entity);
+
+        return $entityState !== UnitOfWork::STATE_NEW
+            && $entityState !== UnitOfWork::STATE_DETACHED
+            && !$this->uow->isScheduledForInsert($entity);
     }
 }

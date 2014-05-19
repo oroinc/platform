@@ -17,7 +17,7 @@ class SoapClient extends BasicSoapClient
      */
     public function __construct($wsdl, $options, &$client)
     {
-        $this->client =  $client;
+        $this->client = $client;
         parent::__construct($wsdl, $options);
 
     }

@@ -26,7 +26,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $connection;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->kernel          = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->disableOriginalConstructor()
