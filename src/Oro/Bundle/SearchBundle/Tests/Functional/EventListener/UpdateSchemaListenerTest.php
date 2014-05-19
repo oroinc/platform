@@ -41,7 +41,7 @@ class UpdateSchemaListenerTest extends WebTestCase
             'commandWithForceOption' => [
                 'commandName'     => 'doctrine:schema:update',
                 'params'          => ['--force' => true],
-                'expectedContent' => 'Schema update and create index completed'
+                'expectedContent' => 'Schema update and create index completed. 1 index entities were added'
             ]
         ];
     }
