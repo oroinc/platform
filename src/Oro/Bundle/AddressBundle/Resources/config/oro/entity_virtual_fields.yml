@@ -25,7 +25,7 @@ oro_entity_virtual_fields:
         countryIso3Code:
             query:
                 select:
-                    expr:         country.iso3Code as countryIso3Code
+                    expr:         country.iso3Code
                     return_type:  string
                 left:
                     inner:

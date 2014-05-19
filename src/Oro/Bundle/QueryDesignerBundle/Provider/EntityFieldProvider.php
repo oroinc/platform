@@ -18,6 +18,9 @@ class EntityFieldProvider extends ParentEntityFieldProvider
     /** @var QueryDesignerManager */
     protected $queryDesignerManager;
 
+    /** @var string */
+    protected $queryType;
+
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
@@ -44,6 +47,14 @@ class EntityFieldProvider extends ParentEntityFieldProvider
     }
 
     /**
+     * @param string $queryType
+     */
+    public function setQueryType($queryType)
+    {
+        $this->queryType = $queryType;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
@@ -51,7 +62,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredField($metadata, $fieldName);
 
         if (!$result) {
-            $result = $this->queryDesignerManager->isIgnoredField($metadata, $fieldName);
+            $result = $this->queryDesignerManager->isIgnoredField($metadata, $fieldName, $this->queryType);
         }
 
         return $result;
@@ -65,7 +76,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredRelation($metadata, $associationName);
 
         if (!$result) {
-            $result = $this->queryDesignerManager->isIgnoredAssosiation($metadata, $associationName);
+            $result = $this->queryDesignerManager->isIgnoredAssosiation($metadata, $associationName, $this->queryType);
         }
 
         return $result;

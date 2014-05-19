@@ -37,6 +37,9 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      * @QueryParam(
      *      name="with-unidirectional", requirements="(1)|(0)",
      *      description="Indicates whether Unidirectional association fields should be returned.")
+     * @QueryParam(
+     *      name="query-type", requirements="([\w+])",
+     *      description="Query type, e.g. report, segment, etc.")
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
@@ -50,6 +53,11 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
+        $queryType          = $this->getRequest()->query->get('query-type');
+
+        // set query type for exclude-related logic
+        $this->get('oro_query_designer.entity_field_provider')
+            ->setQueryType($queryType);
 
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
@@ -59,7 +67,8 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
             $result = $provider->getFields(
                 $withVirtualFields,
                 $withUnidirectional,
-                $withRelations
+                $withRelations,
+                $queryType
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
