@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -270,11 +271,60 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
 
     /**
      * @param ClassMetadata $metadata
-     * @param $fieldName
+     * @param string $fieldName
+     *
+     * @return bool
      */
-    public function isIgnored(ClassMetadata $metadata, $fieldName)
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
+        return false;
+        $excludeRules = $this->getExcludeRules();
 
+        foreach ($excludeRules as $rule) {
+            $entity    = empty($rule['entity']) ? false : $rule['entity'];
+            $queryType = empty($rule['query_type']) ? false : $rule['query_type'];
+            $field     = empty($rule['field']) ? false : $rule['field'];
+            $type      = empty($rule['type']) ? false : $rule['type'];
+
+            // exclude entity
+            if ($entity && !$field && $metadata->getReflectionClass()->getName() == $entity) {
+                return true;
+            }
+
+            // exclude entity's field
+            if (
+                $entity
+                && $field
+                && $metadata->getReflectionClass()->getName() == $entity
+                && $field == $fieldName
+            ) {
+                return true;
+            }
+
+            // exclude by type
+            if ($metadata->getTypeOfField($fieldName) === $type) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param string $associationName
+     *
+     * @return bool
+     */
+    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName)
+    {
+        return false;
+
+//        $excludeRules = $this->getExcludeRules();
+//
+//        foreach ($excludeRules as $rule) {
+//            $metadata->getA
+//        }
     }
 
     /**

@@ -57,7 +57,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredField($metadata, $fieldName);
 
         if (!$result) {
-            $result = $this->queryDesignerManager->isIgnored($metadata->getReflectionClass()->getName(), $fieldName)
+            $result = $this->queryDesignerManager->isIgnoredField($metadata, $fieldName);
         }
 
         return $result;
@@ -69,6 +69,10 @@ class EntityFieldProvider extends ParentEntityFieldProvider
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         $result = parent::isIgnoredRelation($metadata, $associationName);
+
+        if (!$result) {
+            $result = $this->queryDesignerManager->isIgnoredAssosiation($metadata, $associationName);
+        }
 
         return $result;
     }

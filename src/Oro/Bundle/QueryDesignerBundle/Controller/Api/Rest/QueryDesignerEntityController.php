@@ -52,7 +52,7 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
 
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_query_designer.entity_field_provider');
+        $provider = $this->get('oro_query_designer.entity_field_list_provider');
 
         $statusCode = Codes::HTTP_OK;
         try {
