@@ -271,11 +271,12 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
 
     /**
      * @param ClassMetadata $metadata
-     * @param string $fieldName
+     * @param string        $fieldName
+     * @param string        $queryType
      *
      * @return bool
      */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName, $queryType)
     {
         $excludeRules = $this->getExcludeRules();
 
@@ -294,9 +295,12 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
                 && $metadata->getReflectionClass()->getName() == $entity
                 && $field == $fieldName;
 
+            // exclude by type
             $isExcludeByType = $metadata->getTypeOfField($fieldName) === $type;
 
-            if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType) {
+            $isExcludeByQueryType = $queryType === $queryType;
+
+            if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType || $isExcludeByQueryType) {
                 return true;
             }
         }
@@ -306,23 +310,29 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
 
     /**
      * @param ClassMetadata $metadata
-     * @param string $associationName
+     * @param string        $associationName
+     * @param string        $queryType
      *
      * @return bool
      */
-    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName)
+    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $queryType)
     {
         $excludeRules = $this->getExcludeRules();
 
         foreach ($excludeRules as $rule) {
             $entity    = empty($rule['entity']) ? false : $rule['entity'];
             $field     = empty($rule['field']) ? false : $rule['field'];
+            $queryType = empty($rule['query_type']) ? false : $rule['query_type'];
 
             if (
                 $entity &&
                 $entity === $metadata->getReflectionClass()->getName() &&
                 $field === $associationName
             ) {
+                return true;
+            }
+
+            if ($queryType === $queryType) {
                 return true;
             }
         }
