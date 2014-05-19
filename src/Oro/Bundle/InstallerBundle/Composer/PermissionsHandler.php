@@ -73,9 +73,10 @@ class PermissionsHandler
             throw new \InvalidArgumentException($path);
         }
 
-        $user = $this->getUser();
-        foreach (self::getSetfaclModes() as $mode) {
-            $this->runProcess(sprintf(self::SETFACL, $mode, $user, $user, $path));
+        foreach ($this->getUsers() as $user) {
+            foreach (self::getSetfaclModes() as $mode) {
+                $this->runProcess(sprintf(self::SETFACL, $mode, $user, $user, $path));
+            }
         }
     }
 
@@ -89,16 +90,23 @@ class PermissionsHandler
             throw new \InvalidArgumentException($path);
         }
 
-        $user = $this->getUser();
-        $this->runProcess(sprintf(self::CHMOD, $user, $path));
+        foreach ($this->getUsers() as $user) {
+            $this->runProcess(sprintf(self::CHMOD, $user, $path));
+        }
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getUser()
+    protected function getUsers()
     {
-        return $this->runProcess(self::PS_AUX) ? : self::USER;
+        $users = [self::USER];
+
+        if ($webServerUser = $this->runProcess(self::PS_AUX)) {
+            $users[] = $webServerUser;
+        }
+
+        return $users;
     }
 
     /**
