@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 
 class FulltextIndexManager
 {
