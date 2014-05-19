@@ -7,25 +7,15 @@ use Symfony\Component\Process\Process;
 
 class PermissionsHandler
 {
-    const SETFACL              = 'setfacl -%sR -m "u:%s:rwX,g:%s:rwX" %s';
-    const SETFACL_MODE_NONE    = '';
-    const SETFACL_MODE_DEFAULT = 'd';
-
-    const CHMOD  = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
-    const PS_AUX = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
+    const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rwX,d:g:{group}:rwX" {path}';
+    const CHMOD   = 'chmod +a "{user} allow delete,write,append,file_inherit,directory_inherit" {path}';
+    const PS_AUX  = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
 
     const USER = '`whoami`';
 
-    /**
-     * @return array
-     */
-    public static function getSetfaclModes()
-    {
-        return [
-            self::SETFACL_MODE_NONE,
-            self::SETFACL_MODE_NONE
-        ];
-    }
+    const VAR_PATH  = '{path}';
+    const VAR_USER  = '{user}';
+    const VAR_GROUP = '{group}';
 
     /**
      * @var Process
@@ -74,9 +64,9 @@ class PermissionsHandler
         }
 
         foreach ($this->getUsers() as $user) {
-            foreach (self::getSetfaclModes() as $mode) {
-                $this->runProcess(sprintf(self::SETFACL, $mode, $user, $user, $path));
-            }
+            $this->runProcess(
+                str_replace([self::VAR_USER, self::VAR_GROUP, self::VAR_PATH], [$user, $user, $path], self::SETFACL)
+            );
         }
     }
 
@@ -91,7 +81,9 @@ class PermissionsHandler
         }
 
         foreach ($this->getUsers() as $user) {
-            $this->runProcess(sprintf(self::CHMOD, $user, $path));
+            $this->runProcess(
+                str_replace([self::VAR_USER, self::VAR_PATH], [$user, $path], self::CHMOD)
+            );
         }
     }
 
