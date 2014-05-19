@@ -124,6 +124,29 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected static function getKernelClass()
+    {
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+
+        $finder = new Finder();
+        $finder->name('AppKernel.php')->depth(0)->in($dir);
+        $results = iterator_to_array($finder);
+
+        if (count($results)) {
+            $file = current($results);
+            $class = $file->getBasename('.php');
+
+            require_once $file;
+        } else {
+            $class = parent::getKernelClass();
+        }
+
+        return $class;
+    }
+
+    /**
      * Get value of dbIsolation option from annotation of called class
      *
      * @return bool
