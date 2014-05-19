@@ -50,7 +50,8 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!empty($data->getType()) && $this->hasTwoWaySyncConnectors($data->getType())) {
+        $type = $data->getType();
+        if (!empty($type) && $this->hasTwoWaySyncConnectors($type)) {
             $modifier = $this->getModifierClosure();
             $modifier($form);
         }
