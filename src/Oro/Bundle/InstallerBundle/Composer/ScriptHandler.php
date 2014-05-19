@@ -33,9 +33,19 @@ class ScriptHandler extends SensioScriptHandler
      */
     public static function setPermissions(CommandEvent $event)
     {
+        $options = self::getOptions($event);
+
+        $webDir = isset($options['symfony-web-dir']) ?
+            $options['symfony-web-dir'] : 'web';
+
+        $parametersFile = isset($options['incenteev-parameters']['file']) ?
+            $options['incenteev-parameters']['file'] : 'app/config/parameters.yml';
+
         $directories = [
             'app/cache',
             'app/logs',
+            $webDir,
+            $parametersFile
         ];
 
         $permissionHandler = new PermissionsHandler();

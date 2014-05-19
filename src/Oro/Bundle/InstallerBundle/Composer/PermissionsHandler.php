@@ -56,7 +56,7 @@ class PermissionsHandler
      */
     public function setPermissionsSetfacl($path)
     {
-        if (!is_dir($path)) {
+        if (!file_exists($path)) {
             throw new \InvalidArgumentException($path);
         }
 
@@ -74,7 +74,7 @@ class PermissionsHandler
      */
     public function setPermissionsChmod($path)
     {
-        if (!is_dir($path)) {
+        if (!file_exists($path)) {
             throw new \InvalidArgumentException($path);
         }
 
