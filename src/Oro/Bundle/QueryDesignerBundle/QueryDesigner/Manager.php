@@ -295,6 +295,22 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             }
         }
 
+        $hierarchy = $this->entityHierarchyProvider->getHierarchy();
+        foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
+            foreach ($virtualFields as $className => $fields) {
+                if (in_array($className, $hierarchyParents)) {
+                    if (!isset($virtualFields[$hierarchyClassName])) {
+                        $virtualFields[$hierarchyClassName] = [];
+                    }
+                    $virtualFields[$hierarchyClassName] = array_merge(
+                        $virtualFields[$hierarchyClassName],
+                        $fields
+                    );
+                }
+            }
+        }
+
+
         return $virtualFields;
     }
 
@@ -347,8 +363,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             $entity    = empty($rule['entity']) ? false : $rule['entity'];
             $field     = empty($rule['field']) ? false : $rule['field'];
 
-            if (
-                $entity &&
+            if ($entity &&
                 $entity === $metadata->getReflectionClass()->getName() &&
                 $field === $associationName
             ) {
