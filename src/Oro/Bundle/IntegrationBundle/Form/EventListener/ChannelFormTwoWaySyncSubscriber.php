@@ -122,14 +122,14 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     {
         return function ($form) {
             // commented until two way sync will finished
-            /*$form->add(
+            $form->add(
                 'isTwoWaySyncEnabled',
                 'checkbox',
                 [
                     'label'    => 'oro.integration.channel.is_two_way_sync_enabled.label',
                     'required' => false,
                 ]
-            );*/
+            );
             $form->add(
                 'syncPriority',
                 'choice',
