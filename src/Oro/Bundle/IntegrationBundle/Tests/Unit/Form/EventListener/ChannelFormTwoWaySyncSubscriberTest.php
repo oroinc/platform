@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -61,6 +63,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
+        $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
     public function testPreSetWithoutTwoWay()
@@ -71,7 +74,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->typesRegistry->expects($this->once())
             ->method('getRegisteredConnectorsTypes')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue(new ArrayCollection()));
 
         $this->formMock->expects($this->never())
             ->method('add')
@@ -93,11 +96,11 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->will($this->returnValue('test'));
 
-        $this->typesRegistry->expects($this->exactly(2))
+        $this->typesRegistry->expects($this->any())
             ->method('getRegisteredConnectorsTypes')
-            ->will($this->returnValue([$this->connector]));
+            ->will($this->returnValue(new ArrayCollection([$this->connector])));
 
-        $this->formMock->expects($this->once())
+        $this->formMock->expects($this->exactly(2))
             ->method('add')
             ->will($this->returnValue($this->formMock));
 
