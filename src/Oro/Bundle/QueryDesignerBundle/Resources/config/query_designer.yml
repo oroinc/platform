@@ -37,5 +37,5 @@ query_designer:
             query_type: [all]
 
     exclude:
-        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: country}
-        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: region}
+        - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country}
+        - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: region}
