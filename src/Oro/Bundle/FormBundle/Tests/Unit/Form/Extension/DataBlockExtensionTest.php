@@ -16,7 +16,7 @@ class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
 
     private $options = array('block' => 1, 'subblock' => 1, 'block_config' => 1, 'tooltip' => 1);
 
-    public function setUp()
+    protected function setUp()
     {
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();

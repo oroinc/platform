@@ -25,7 +25,7 @@ class AddressManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup testing environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 

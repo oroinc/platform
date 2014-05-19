@@ -6,7 +6,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Behat\Behat\Console\Command\BehatCommand;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 abstract class BehatTestCase extends WebTestCase
 {

@@ -23,13 +23,13 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
     /** @var DataGridTagListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->generator = $this->getMock('Oro\Bundle\NavigationBundle\Content\TagGeneratorChain');
         $this->listener  = new DataGridTagListener($this->generator);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->generator, $this->listener);
     }

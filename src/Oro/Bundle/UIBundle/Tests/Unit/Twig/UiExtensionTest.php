@@ -11,7 +11,7 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->extension = new UiExtension(array(), 'test_class');
     }

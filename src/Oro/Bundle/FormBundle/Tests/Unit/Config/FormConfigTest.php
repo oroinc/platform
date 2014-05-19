@@ -30,13 +30,13 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         )
     );
 
-    public function setUp()
+    protected function setUp()
     {
         $this->reportingLevel = error_reporting(E_ALL);
         $this->formConfig = new FormConfig();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         error_reporting($this->reportingLevel);
     }

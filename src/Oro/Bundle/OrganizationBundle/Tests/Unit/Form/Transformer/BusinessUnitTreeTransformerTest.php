@@ -16,7 +16,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected $buManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->buManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
             ->disableOriginalConstructor()

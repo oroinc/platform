@@ -20,7 +20,7 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -31,7 +31,7 @@ class SegmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new SegmentManager($this->em);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em, $this->repository, $this->manager);
     }

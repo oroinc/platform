@@ -14,7 +14,7 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
 
     /** @var WebSocket */
     protected $socket;
-    public function setUp()
+    protected function setUp()
     {
         $this->socket = $this->getMock('WebSocket', array('sendData'), array(), '', false);
 

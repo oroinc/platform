@@ -12,14 +12,14 @@ class FormTypeTest extends \PHPUnit_Framework_TestCase
     /** @var FormType */
     protected $form;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->disableOriginalConstructor()->getMock();
         $this->form       = new FormType($this->subscriber);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->subscriber);
         unset($this->form);
