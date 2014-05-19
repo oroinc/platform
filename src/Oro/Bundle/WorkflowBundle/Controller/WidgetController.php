@@ -291,7 +291,7 @@ class WidgetController extends Controller
         }
 
         // extra case to show start transition
-        if (empty($transitionsData) && $workflow->getDefinition()->getStartStep()) {
+        if (empty($transitionsData) && $workflow->getStepManager()->hasStartStep()) {
             $defaultStartTransition = $workflow->getTransitionManager()->getDefaultStartTransition();
             if ($defaultStartTransition) {
                 $startTransitionData = $this->getStartTransitionData($workflow, $defaultStartTransition, $entity);

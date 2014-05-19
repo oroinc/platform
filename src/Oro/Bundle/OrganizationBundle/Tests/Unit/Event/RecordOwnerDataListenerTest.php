@@ -31,7 +31,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
 
     private $listenerArguments;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');

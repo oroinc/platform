@@ -2,20 +2,17 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\BrowserKit\Response;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SoapApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
+    /**
+     * @var array
+     */
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
@@ -28,25 +25,20 @@ class SoapApiTest extends WebTestCase
         )
     );
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
-        $this->client->soap(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
      * Test POST
+     *
      * @return string
      */
     public function testCreate()
     {
-        $id = $this->client->getSoap()->createBusinessUnit($this->fixtureData['business_unit']);
+        $id = $this->soapClient->createBusinessUnit($this->fixtureData['business_unit']);
         $this->assertGreaterThan(0, $id);
 
         return $id;

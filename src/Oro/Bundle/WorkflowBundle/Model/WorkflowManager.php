@@ -133,7 +133,7 @@ class WorkflowManager
             $em->flush();
 
             $activeWorkflow = $this->getApplicableWorkflow($entity);
-            if ($activeWorkflow->getDefinition()->getStartStep()) {
+            if ($activeWorkflow->getStepManager()->hasStartStep()) {
                 $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
             }
 

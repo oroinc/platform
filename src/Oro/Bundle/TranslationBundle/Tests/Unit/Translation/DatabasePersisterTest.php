@@ -35,7 +35,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $testLocale = 'en';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -58,7 +58,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $reflection->setValue($this->persister, 2);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em, $this->persister, $this->repo);
     }

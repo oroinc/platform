@@ -31,7 +31,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test obj and mock
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -52,7 +52,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * Tear down
      */
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em, $this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
     }
