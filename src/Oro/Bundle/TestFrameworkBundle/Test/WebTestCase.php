@@ -111,7 +111,7 @@ abstract class WebTestCase extends BaseWebTestCase
             if (self::getDbIsolationSetting()) {
                 //This is a workaround for MyISAM search tables that are not transactionanl
                 if (self::getDbReindexSetting()) {
-                    self::getContainer()->get('oro_search.search.engine')->reindex();
+                    self::getContainer()->get('oro_search.fulltext_index_manager')->createIndexes();
                 }
 
                 $client->startTransaction();
