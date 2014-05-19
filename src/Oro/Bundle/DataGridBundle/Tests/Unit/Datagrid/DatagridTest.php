@@ -17,7 +17,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $parameters;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->acceptor = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Acceptor')
             ->disableOriginalConstructor()->getMock();
@@ -27,7 +27,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
         $this->grid = new Datagrid(self::TEST_NAME, $this->acceptor, $this->parameters);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->acceptor);
         unset($this->grid);

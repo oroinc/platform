@@ -133,7 +133,7 @@ class WorkflowManager
             $em->flush();
 
             $activeWorkflow = $this->getApplicableWorkflow($entity);
-            if ($activeWorkflow->getDefinition()->getStartStep()) {
+            if ($activeWorkflow->getStepManager()->hasStartStep()) {
                 $activeWorkflowItem = $this->startWorkflow($activeWorkflow->getName(), $entity);
             }
 
@@ -172,6 +172,51 @@ class WorkflowManager
         }
 
         return $workflowItem;
+    }
+
+    /**
+     * Start several workflows in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflow'   => <workflow identifier: string|Workflow>,
+     *          'entity'     => <entity used in workflow: object>,
+     *          'transition' => <start transition name: string>,     // optional
+     *          'data'       => <additional workflow data : array>,  // optional
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massStartWorkflow(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            foreach ($data as $row) {
+                if (empty($row['workflow']) || empty($row['entity'])) {
+                    continue;
+                }
+
+                $workflow = $this->getWorkflow($row['workflow']);
+                $entity = $row['entity'];
+                $transition = !empty($row['transition']) ? $row['transition'] : null;
+                $data = !empty($row['data']) ? $row['data'] : array();
+
+                $workflowItem = $workflow->start($entity, $data, $transition);
+                $em->persist($workflowItem);
+            }
+
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
     }
 
     /**

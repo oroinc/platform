@@ -2,23 +2,17 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\BrowserKit\Response;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -28,13 +22,11 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_countries')
+            $this->getUrl('oro_api_get_countries')
         );
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         return array_slice($result, 0, 5);
     }
 
@@ -47,12 +39,11 @@ class RestApiTest extends WebTestCase
         foreach ($countries as $country) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
+                $this->getUrl('oro_api_get_country', array('id' => $country['iso2code']))
             );
-            /** @var $result Response */
-            $result = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($result, 200);
-            $result = ToolsAPI::jsonToArray($result->getContent());
+
+            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             $this->assertEquals($country, $result);
         }
     }
@@ -61,13 +52,12 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_region'),
+            $this->getUrl('oro_api_get_region'),
             array('id' => 'US-LA')
         );
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals('US-LA', $result['combinedCode']);
     }
 
@@ -75,24 +65,22 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_country_get_regions', array('country' => 'US'))
+            $this->getUrl('oro_api_country_get_regions', array('country' => 'US'))
         );
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         foreach ($result as $region) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_region'),
+                $this->getUrl('oro_api_get_region'),
                 array('id' => $region['combinedCode']),
                 array(),
-                ToolsAPI::generateWsseHeader()
+                $this->generateWsseAuthHeader()
             );
-            /** @var $result Response */
-            $expectedResult = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($expectedResult, 200);
-            $expectedResult = ToolsAPI::jsonToArray($expectedResult->getContent());
+
+            $expectedResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             $this->assertEquals($expectedResult, $region);
         }
     }

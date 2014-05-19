@@ -20,7 +20,7 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $compiler;
 
-    public function setUp()
+    protected function setUp()
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

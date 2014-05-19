@@ -67,7 +67,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');

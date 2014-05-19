@@ -13,7 +13,7 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test env
      */
-    public function setUp()
+    protected function setUp()
     {
         $buildAddressFormListener = $this->getMockBuilder(
             'Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber'

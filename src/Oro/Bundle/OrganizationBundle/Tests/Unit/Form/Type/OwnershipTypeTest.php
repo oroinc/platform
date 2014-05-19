@@ -15,7 +15,7 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -25,7 +25,7 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new OwnershipType($this->translator);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->translator);
         unset($this->type);

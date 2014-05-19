@@ -17,7 +17,7 @@ class TagTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new TagType();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
     }
