@@ -62,20 +62,19 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
                             $argument,
                             [
                                 PermissionsHandler::PS_AUX,
-                                sprintf(
-                                    PermissionsHandler::SETFACL,
-                                    PermissionsHandler::SETFACL_MODE_NONE,
-                                    PermissionsHandler::USER,
-                                    PermissionsHandler::USER,
-                                    $this->directory
-                                ),
-                                sprintf(
-                                    PermissionsHandler::SETFACL,
-                                    PermissionsHandler::SETFACL_MODE_NONE,
-                                    PermissionsHandler::USER,
-                                    PermissionsHandler::USER,
-                                    $this->directory
-                                ),
+                                str_replace(
+                                    [
+                                        PermissionsHandler::VAR_USER,
+                                        PermissionsHandler::VAR_GROUP,
+                                        PermissionsHandler::VAR_PATH
+                                    ],
+                                    [
+                                        PermissionsHandler::USER,
+                                        PermissionsHandler::USER,
+                                        $this->directory
+                                    ],
+                                    PermissionsHandler::SETFACL
+                                )
                             ]
                         );
                     }
@@ -111,11 +110,11 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
                             $argument,
                             [
                                 PermissionsHandler::PS_AUX,
-                                sprintf(
-                                    PermissionsHandler::CHMOD,
-                                    PermissionsHandler::USER,
-                                    $this->directory
-                                ),
+                                str_replace(
+                                    [PermissionsHandler::VAR_USER, PermissionsHandler::VAR_PATH],
+                                    [PermissionsHandler::USER, $this->directory],
+                                    PermissionsHandler::CHMOD
+                                )
                             ]
                         );
                     }
@@ -123,7 +122,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->process
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('setCommandLine');
 
         $this->process
