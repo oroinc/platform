@@ -64,13 +64,37 @@ class ScriptHandler extends SensioScriptHandler
 
         if ($withoutPermissionsList) {
             $withoutPermissions = implode(' ', $withoutPermissionsList);
+
+            $user         = $permissionHandler->getUser();
+            $chmodCommand = sprintf(PermissionsHandler::CHMOD, $user, $withoutPermissions);
             $event->getIO()->write(
-                sprintf('Permissions for "%s" directories were not set', $withoutPermissions)
+                sprintf(
+                    'Please run "sudo %s" manually from console if your system supports chmod with ACL',
+                    $chmodCommand
+                )
             );
 
-            $commandToRun = sprintf(PermissionsHandler::CHMOD, PermissionsHandler::USER_COMMAND, $withoutPermissions);
+            $setfaclCommand        = sprintf(
+                PermissionsHandler::SETFACL,
+                PermissionsHandler::SETFACL_MODE_NONE,
+                $user,
+                $user,
+                $withoutPermissions
+            );
+            $setfaclDefaultCommand = sprintf(
+                PermissionsHandler::SETFACL,
+                PermissionsHandler::SETFACL_MODE_DEFAULT,
+                $user,
+                $user,
+                $withoutPermissions
+            );
+
             $event->getIO()->write(
-                sprintf('Please run "sudo %s" manually from console', $commandToRun)
+                sprintf(
+                    'Please run "sudo %s" and "sudo %s" manually from console if your system supports set',
+                    $setfaclCommand,
+                    $setfaclDefaultCommand
+                )
             );
         }
     }

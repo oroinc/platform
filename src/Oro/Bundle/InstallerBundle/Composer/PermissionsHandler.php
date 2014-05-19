@@ -7,12 +7,25 @@ use Symfony\Component\Process\Process;
 
 class PermissionsHandler
 {
-    const SETFACL  = 'setfacl -R -m u:"%s":rwX %s';
-    const SETFACLD = 'setfacl -dR -m u:"%s":rwX %s';
-    const CHMOD    = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
-    const PS_AUX   = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
+    const SETFACL              = 'setfacl -%sR -m "u:%s:rwX,g:%s:rwX" %s';
+    const SETFACL_MODE_NONE    = '';
+    const SETFACL_MODE_DEFAULT = 'd';
 
-    const USER_COMMAND = '`whoami`';
+    const CHMOD  = 'chmod +a "%s allow delete,write,append,file_inherit,directory_inherit" %s';
+    const PS_AUX = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
+
+    const USER = '`whoami`';
+
+    /**
+     * @return array
+     */
+    public static function getSetfaclModes()
+    {
+        return [
+            self::SETFACL_MODE_NONE,
+            self::SETFACL_MODE_NONE
+        ];
+    }
 
     /**
      * @var Process
@@ -60,12 +73,10 @@ class PermissionsHandler
             throw new \InvalidArgumentException($path);
         }
 
-        if ($httpdUser = $this->getHttpdUser()) {
-            $this->runProcess(sprintf(self::SETFACL, $httpdUser, $path));
-            $this->runProcess(sprintf(self::SETFACLD, $httpdUser, $path));
+        $user = $this->getUser();
+        foreach (self::getSetfaclModes() as $mode) {
+            $this->runProcess(sprintf(self::SETFACL, $mode, $user, $user, $path));
         }
-        $this->runProcess(sprintf(self::SETFACL, self::USER_COMMAND, $path));
-        $this->runProcess(sprintf(self::SETFACLD, self::USER_COMMAND, $path));
     }
 
     /**
@@ -78,18 +89,16 @@ class PermissionsHandler
             throw new \InvalidArgumentException($path);
         }
 
-        if ($httpdUser = $this->getHttpdUser()) {
-            $this->runProcess(sprintf(self::CHMOD, $httpdUser, $path));
-        }
-        $this->runProcess(sprintf(self::CHMOD, self::USER_COMMAND, $path));
+        $user = $this->getUser();
+        $this->runProcess(sprintf(self::CHMOD, $user, $path));
     }
 
     /**
      * @return string
      */
-    protected function getHttpdUser()
+    public function getUser()
     {
-        return $this->runProcess(self::PS_AUX);
+        return $this->runProcess(self::PS_AUX) ? : self::USER;
     }
 
     /**

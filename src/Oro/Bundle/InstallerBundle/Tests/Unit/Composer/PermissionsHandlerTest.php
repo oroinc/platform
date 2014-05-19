@@ -64,12 +64,16 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
                                 PermissionsHandler::PS_AUX,
                                 sprintf(
                                     PermissionsHandler::SETFACL,
-                                    PermissionsHandler::USER_COMMAND,
+                                    PermissionsHandler::SETFACL_MODE_NONE,
+                                    PermissionsHandler::USER,
+                                    PermissionsHandler::USER,
                                     $this->directory
                                 ),
                                 sprintf(
-                                    PermissionsHandler::SETFACLD,
-                                    PermissionsHandler::USER_COMMAND,
+                                    PermissionsHandler::SETFACL,
+                                    PermissionsHandler::SETFACL_MODE_NONE,
+                                    PermissionsHandler::USER,
+                                    PermissionsHandler::USER,
                                     $this->directory
                                 ),
                             ]
@@ -79,13 +83,13 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->process
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(3))
             ->method('setCommandLine');
 
         $this->process
             ->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER_COMMAND));
+            ->will($this->returnValue(PermissionsHandler::USER));
 
         $this->handler->setPermissionsSetfacl($this->directory);
     }
@@ -109,7 +113,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
                                 PermissionsHandler::PS_AUX,
                                 sprintf(
                                     PermissionsHandler::CHMOD,
-                                    PermissionsHandler::USER_COMMAND,
+                                    PermissionsHandler::USER,
                                     $this->directory
                                 ),
                             ]
@@ -119,13 +123,13 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->process
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('setCommandLine');
 
         $this->process
             ->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER_COMMAND));
+            ->will($this->returnValue(PermissionsHandler::USER));
 
         $this->handler->setPermissionsChmod($this->directory);
     }
@@ -140,7 +144,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->process
             ->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER_COMMAND));
+            ->will($this->returnValue(PermissionsHandler::USER));
 
         $result = $this->handler->setPermissions($this->directory);
 
