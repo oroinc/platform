@@ -1,6 +1,7 @@
 /*global define, console*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', 'jquery.validate'
-    ], function ($, _, __, tools) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
+    './optional-validation-handler', 'jquery.validate'
+    ], function ($, _, __, tools, validationHandler) {
     'use strict';
 
     /**
@@ -134,6 +135,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         } else {
             func.apply(this, _.rest(arguments));
         }
+    });
+
+    /**
+     * change asterisk for optional validation group field
+     */
+    $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init){
+        console.log($(this.currentForm));
+        validationHandler.initialize($(this.currentForm));
+        init.apply(this, arguments);
     });
 
     /**

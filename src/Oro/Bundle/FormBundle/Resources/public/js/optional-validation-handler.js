@@ -81,17 +81,18 @@ define(['jquery'], function($){
         /**
          * @constructor
          */
-        initialize: function(){
-            var groups = $('[data-validation-optional-group]');
+        initialize: function(formElement){
+            var groups = formElement.find('[data-validation-optional-group]');
             var self = this;
             var labels = groups.find('label[data-required]');
 
             labels.find('em').hide().html('*');
             labels.addClass('required');
-            groups.find('input').bind('change', function(){
+
+            groups.on('change', 'input', function(){
                 self.inputHandler($(this))
             });
-            groups.find('select').bind('change', function(){
+            groups.on('change', 'select', function(){
                 self.selectHandler($(this));
             });
 

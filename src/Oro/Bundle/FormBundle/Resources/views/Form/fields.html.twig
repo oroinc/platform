@@ -451,10 +451,9 @@
 
 {% block oro_form_js_validation %}
 <script type="text/javascript">
-    require(['jquery', 'oroform/js/optional-validation-handler', 'jquery.validate'],
+    require(['jquery', 'jquery.validate'],
     function ($, validationHandler) {
         var options = {{ js_options ? js_options|json_encode|raw : '{}' }};
-        validationHandler.initialize();
         $('#{{ form.vars.name }}').validate(options);
     });
 </script>
