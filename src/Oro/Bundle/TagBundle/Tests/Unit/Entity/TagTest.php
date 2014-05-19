@@ -14,7 +14,7 @@ class TagTest extends \PHPUnit_Framework_TestCase
      */
     protected $tag;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->tag = new Tag();
 

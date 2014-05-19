@@ -272,11 +272,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setRelatedEntity(get_class($entity));
 
-        if ($withStartStep) {
-            $workflowDefinition->addStep($workflowStep);
-            $workflowDefinition->setStartStep($workflowStep);
-        }
-
         $workflowItem->setDefinition($workflowDefinition);
 
         $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
@@ -289,8 +284,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $workflow->setName($workflowName);
 
+        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager->expects($this->any())->method('hasStartStep')
+            ->will($this->returnValue($withStartStep));
+
         $activeWorkflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array(new EntityConnector(), $aclManager, null, null, null))
+            ->setConstructorArgs(array(new EntityConnector(), $aclManager, $stepManager, null, null))
             ->setMethods(array('start'))
             ->getMock();
         $activeWorkflow->setName($activeWorkflowName);
@@ -470,9 +469,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $entityManager->expects($this->once())->method('beginTransaction');
 
-        $workflowMap = array();
-        $workflowItems = array();
-        foreach ($expected as $row) {
+        foreach ($expected as $iteration => $row) {
             $workflowName = $row['workflow'];
             $workflow = $this->createWorkflow($workflowName);
             $workflowItem = $this->createWorkflowItem($workflowName);
@@ -480,16 +477,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $workflow->expects($this->once())->method('start')->with($row['entity'], $row['data'], $row['transition'])
                 ->will($this->returnValue($workflowItem));
 
-            $workflowMap[] = array($workflowName, $workflow);
-            $workflowItems[] = $workflowItem;
-        }
+            $this->workflowRegistry->expects($this->at($iteration))->method('getWorkflow')->with($workflowName)
+                ->will($this->returnValue($workflow));
 
-        foreach ($workflowItems as $index => $workflowItem) {
-            $entityManager->expects($this->at($index + 1))->method('persist')->with($workflowItem);
+            $entityManager->expects($this->at($iteration + 1))->method('persist')->with($workflowItem);
         }
-
-        $this->workflowRegistry->expects($this->any())->method('getWorkflow')->with($this->isType('string'))
-            ->will($this->returnValueMap($workflowMap));
 
         $entityManager->expects($this->once())->method('flush');
         $entityManager->expects($this->once())->method('commit');

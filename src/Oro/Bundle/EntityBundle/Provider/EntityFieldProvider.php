@@ -35,11 +35,11 @@ class EntityFieldProvider
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
     /** @var Translator */
     protected $translator;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @ var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
@@ -251,6 +251,7 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $fieldName
+     *
      * @return bool
      */
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
@@ -429,6 +430,7 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $associationName
+     *
      * @return bool
      */
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)

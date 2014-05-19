@@ -49,7 +49,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->engine    = $this

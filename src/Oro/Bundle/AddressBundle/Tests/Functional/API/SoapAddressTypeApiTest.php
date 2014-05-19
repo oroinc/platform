@@ -2,28 +2,17 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
  */
 class SoapAddressTypeApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
-        $this->client->soap(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
@@ -31,8 +20,8 @@ class SoapAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
-        $result = $this->client->getSoap()->getAddressTypes();
-        $result = ToolsAPI::classToArray($result);
+        $result = $this->soapClient->getAddressTypes();
+        $result = $this->valueToArray($result);
         if (is_array(reset($result['item']))) {
             $actualData = $result['item'];
         } else {
@@ -49,11 +38,11 @@ class SoapAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressType($expected)
     {
-        foreach ($expected as $addrType) {
-            $result = $this->client->getSoap()->getAddressType($addrType['name']);
-            $result = ToolsAPI::classToArray($result);
+        foreach ($expected as $addressType) {
+            $result = $this->soapClient->getAddressType($addressType['name']);
+            $result = $this->valueToArray($result);
             $this->assertNotEmpty($result);
-            $this->assertEquals($addrType, $result);
+            $this->assertEquals($addressType, $result);
         }
     }
 }

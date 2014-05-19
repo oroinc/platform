@@ -4,6 +4,8 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Component\Translation\Translator;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -294,5 +296,74 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return $virtualFields;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    {
+        $excludeRules = $this->getExcludeRules();
+
+        foreach ($excludeRules as $rule) {
+            $entity    = empty($rule['entity']) ? false : $rule['entity'];
+            $queryType = empty($rule['query_type']) ? false : $rule['query_type'];
+            $field     = empty($rule['field']) ? false : $rule['field'];
+            $type      = empty($rule['type']) ? false : $rule['type'];
+
+            // exclude entity
+            $isExcludeEntity = $entity && !$field && $metadata->getReflectionClass()->getName() === $entity;
+
+            // exclude entity's field
+            $isExcludeEntityField = $entity
+                && $field
+                && $metadata->getReflectionClass()->getName() == $entity
+                && $field == $fieldName;
+
+            $isExcludeByType = $metadata->getTypeOfField($fieldName) === $type;
+
+            if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param string $associationName
+     *
+     * @return bool
+     */
+    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName)
+    {
+        $excludeRules = $this->getExcludeRules();
+
+        foreach ($excludeRules as $rule) {
+            $entity    = empty($rule['entity']) ? false : $rule['entity'];
+            $field     = empty($rule['field']) ? false : $rule['field'];
+
+            if (
+                $entity &&
+                $entity === $metadata->getReflectionClass()->getName() &&
+                $field === $associationName
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExcludeRules()
+    {
+        return $this->config->offsetGet('exclude');
     }
 }

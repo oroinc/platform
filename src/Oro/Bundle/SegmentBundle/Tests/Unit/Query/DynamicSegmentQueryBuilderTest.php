@@ -49,7 +49,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             ->getFormFactory();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->formFactory);
     }

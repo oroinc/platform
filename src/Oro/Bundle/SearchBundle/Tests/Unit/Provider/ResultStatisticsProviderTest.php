@@ -32,7 +32,7 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $search;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
             ->disableOriginalConstructor()

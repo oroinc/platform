@@ -19,7 +19,7 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()
@@ -28,7 +28,7 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new TagExtension($this->manager);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->manager);
         unset($this->extension);

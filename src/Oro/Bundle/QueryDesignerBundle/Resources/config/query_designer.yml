@@ -35,3 +35,7 @@ query_designer:
             applicable: [{type: percent}]
             type:       percent
             query_type: [all]
+
+    exclude:
+        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: country}
+        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: region}
