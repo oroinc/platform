@@ -102,8 +102,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
          * TODO
          */
         _matchApplicable: function (applicable, criteria) {
+            var hierarchy = this.options.hierarchy[criteria.entity];
             return _.find(applicable, function (item) {
                 return _.every(item, function (value, key) {
+                    if (key == 'entity' && hierarchy.length) {
+                        return _.indexOf(hierarchy, criteria[key]);
+                    }
                     return criteria[key] === value;
                 });
             });

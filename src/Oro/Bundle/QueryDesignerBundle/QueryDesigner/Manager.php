@@ -67,7 +67,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
             'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
-            //'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
+            'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
         ];
     }
 

@@ -22,13 +22,6 @@ oro_entity_virtual_fields:
                 join:
                     left:
                         - { join: entity.region, alias: region }
-#        region:
-#            query:
-#                select:
-#                    - region.name
-#                join:
-#                    left:
-#                        - { join: entity.regions, alias: region }
 
 # DO NOT FORGET to create virtual fields for
 #  - Country->ISO2_code

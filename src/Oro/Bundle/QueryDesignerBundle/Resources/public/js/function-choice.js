@@ -113,6 +113,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         _matchApplicable: function (applicable, criteria) {
             return _.find(applicable, function (item) {
                 return _.every(item, function (value, key) {
+
                     return criteria[key] === value;
                 });
             });
