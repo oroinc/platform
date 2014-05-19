@@ -327,9 +327,7 @@ class Configuration implements ConfigurationInterface
                     // field type
                     ->scalarNode('type')->end()
                     ->scalarNode('entity')->end()
-                    ->arrayNode('fields')
-                        ->prototype('scalar')->end()
-                    ->end()
+                    ->scalarNode('field')->end()
                     ->arrayNode('query_type')
                         ->prototype('scalar')->end()
                     ->end()

@@ -1,6 +1,6 @@
 oro_entity_virtual_fields:
     Oro\Bundle\AddressBundle\Entity\Address:
-        country:
+        countryName:
             query:
                 select:
                     expr:         country.name
@@ -8,10 +8,38 @@ oro_entity_virtual_fields:
                 join:
                     inner:
                         - { join: entity.country, alias: country }
-        region:
+
+        countryIso2Code:
+            query:
+                select:
+                    expr:         country.iso2Code
+                    return_type:  string
+                join:
+                    inner:
+                        - { join: entity.country, alias: country }
+
+        countryIso3Code:
+            query:
+                select:
+                    expr:         country.iso3Code as countryIso3Code
+                    return_type:  string
+                join:
+                    inner:
+                        - { join: entity.country, alias: country }
+
+        regionName:
             query:
                 select:
                     expr:         region.name
+                    return_type:  string
+                join:
+                    inner:
+                        - { join: entity.region, alias: region }
+
+        regionCode:
+            query:
+                select:
+                    expr:         region.code
                     return_type:  string
                 join:
                     inner:

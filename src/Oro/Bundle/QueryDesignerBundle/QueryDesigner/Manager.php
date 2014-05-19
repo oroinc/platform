@@ -277,7 +277,6 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        return false;
         $excludeRules = $this->getExcludeRules();
 
         foreach ($excludeRules as $rule) {
@@ -287,22 +286,17 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             $type      = empty($rule['type']) ? false : $rule['type'];
 
             // exclude entity
-            if ($entity && !$field && $metadata->getReflectionClass()->getName() == $entity) {
-                return true;
-            }
+            $isExcludeEntity = $entity && !$field && $metadata->getReflectionClass()->getName() === $entity;
 
             // exclude entity's field
-            if (
-                $entity
+            $isExcludeEntityField = $entity
                 && $field
                 && $metadata->getReflectionClass()->getName() == $entity
-                && $field == $fieldName
-            ) {
-                return true;
-            }
+                && $field == $fieldName;
 
-            // exclude by type
-            if ($metadata->getTypeOfField($fieldName) === $type) {
+            $isExcludeByType = $metadata->getTypeOfField($fieldName) === $type;
+
+            if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType) {
                 return true;
             }
         }
@@ -318,13 +312,22 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName)
     {
-        return false;
+        $excludeRules = $this->getExcludeRules();
 
-//        $excludeRules = $this->getExcludeRules();
-//
-//        foreach ($excludeRules as $rule) {
-//            $metadata->getA
-//        }
+        foreach ($excludeRules as $rule) {
+            $entity    = empty($rule['entity']) ? false : $rule['entity'];
+            $field     = empty($rule['field']) ? false : $rule['field'];
+
+            if (
+                $entity &&
+                $entity === $metadata->getReflectionClass()->getName() &&
+                $field === $associationName
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -29,5 +29,5 @@ query_designer:
             query_type: [all]
 
     exclude:
-        - {entity: OroAddressBundle:Country}
-        - {entity: OroAddressBundle:Region}
+        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: country}
+        - {entity: Oro\Bundle\AddressBundle\Entity\Address, field: region}
