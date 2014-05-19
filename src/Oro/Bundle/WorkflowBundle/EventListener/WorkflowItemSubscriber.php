@@ -86,7 +86,8 @@ class WorkflowItemSubscriber implements EventSubscriber
     {
         $entity = $args->getEntity();
         $activeWorkflow = $this->workflowManager->getApplicableWorkflow($entity);
-        if ($activeWorkflow && $activeWorkflow->getDefinition()->getStartStep()) {
+
+        if ($activeWorkflow && $activeWorkflow->getStepManager()->hasStartStep()) {
             $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = array(
                 'entity' => $entity,
                 'workflow' => $activeWorkflow
@@ -124,16 +125,11 @@ class WorkflowItemSubscriber implements EventSubscriber
         $currentDeepLevel = $this->deepLevel;
 
         if (!empty($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
-            while ($entityData = array_shift($this->entitiesScheduledForWorkflowStart[$currentDeepLevel])) {
-                $this->deepLevel++;
-
-                $this->workflowManager->startWorkflow(
-                    $entityData['workflow'],
-                    $entityData['entity']
-                );
-
-                $this->deepLevel--;
-            }
+            $this->deepLevel++;
+            $massStartData = $this->entitiesScheduledForWorkflowStart[$currentDeepLevel];
+            unset($this->entitiesScheduledForWorkflowStart[$currentDeepLevel]);
+            $this->workflowManager->massStartWorkflow($massStartData);
+            $this->deepLevel--;
         }
     }
 

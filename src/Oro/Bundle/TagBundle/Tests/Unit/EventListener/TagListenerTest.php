@@ -18,14 +18,14 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $resource;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->resource = $this->getMock('Oro\Bundle\TagBundle\Entity\Taggable');
         $this->resource->expects($this->once())->method('getTaggableId')
             ->will($this->returnValue(self::TEST_ID));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->listener);
         unset($this->resource);

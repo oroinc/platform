@@ -21,7 +21,7 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $securityProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -30,10 +30,26 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->provider = new SearchProvider($this->entityManager, $this->mapper, $this->securityProvider);
+        $indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = new SearchProvider(
+            $this->entityManager,
+            $this->mapper,
+            $this->securityProvider,
+            $indexer,
+            $configManager,
+            $translator
+        );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entityManager);
         unset($this->mapper);

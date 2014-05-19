@@ -17,13 +17,13 @@ class ContentTagsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->service   = $this->getMock('Oro\Bundle\NavigationBundle\Content\TagGeneratorChain');
         $this->extension = new ContentTagsExtension($this->service);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->service, $this->extension);
     }

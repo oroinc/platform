@@ -3,21 +3,16 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestUsersTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -39,11 +34,11 @@ class RestUsersTest extends WebTestCase
         );
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
     }
@@ -60,12 +55,12 @@ class RestUsersTest extends WebTestCase
         //get user id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_users'),
+            $this->getUrl('oro_api_get_users'),
             array('limit' => 100)
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $userId = $this->assertEqualsUser($request, $result);
 
         //update user
@@ -73,21 +68,19 @@ class RestUsersTest extends WebTestCase
         unset($request['user']['plainPassword']);
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_user', array('id' => $userId)),
+            $this->getUrl('oro_api_put_user', array('id' => $userId)),
             $request
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         //open user by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user', array('id' => $userId))
+            $this->getUrl('oro_api_get_user', array('id' => $userId))
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
 
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         //compare result
         $this->assertEquals($request['user']['username'], $result['username']);
 
@@ -131,7 +124,7 @@ class RestUsersTest extends WebTestCase
         //get user
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_get_user_filter',
                 array(
                     'username' => $request['user']['username'],
@@ -139,9 +132,9 @@ class RestUsersTest extends WebTestCase
                 )
             )
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals($request['user']['firstName'], $result['firstName']);
         $this->assertEquals($request['user']['lastName'], $result['lastName']);
     }
@@ -150,12 +143,12 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_get_user_filter'
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 400);
+        $this->assertJsonResponseStatusCodeEquals($result, 400);
     }
 
     /**
@@ -167,38 +160,38 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_user', array('id' => $userId))
+            $this->getUrl('oro_api_delete_user', array('id' => $userId))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user', array('id' => $userId))
+            $this->getUrl('oro_api_get_user', array('id' => $userId))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     public function testSelfDeleteUser()
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_user', array('id' => 1))
+            $this->getUrl('oro_api_delete_user', array('id' => 1))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
     }
 
     public function testGetUserRoles()
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user_roles', array('id' => 1))
+            $this->getUrl('oro_api_get_user_roles', array('id' => 1))
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals('Administrator', reset($result)['label']);
     }
 
@@ -206,21 +199,21 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user_roles', array('id' => 0))
+            $this->getUrl('oro_api_get_user_roles', array('id' => 0))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     public function testGetUserGroups()
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user_groups', array('id' => 1))
+            $this->getUrl('oro_api_get_user_groups', array('id' => 1))
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals('Administrators', reset($result)['name']);
     }
 
@@ -228,9 +221,9 @@ class RestUsersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user_groups', array('id' => 0))
+            $this->getUrl('oro_api_get_user_groups', array('id' => 0))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 }

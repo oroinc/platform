@@ -203,7 +203,6 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
         ];
 
         return [
-            'relationConfigFieldId'       => $relationConfigFieldId,
             'relationTargetConfigFieldId' => $relationTargetConfigFieldId,
             'relationConfig'              => $relationConfig
         ];

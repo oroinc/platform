@@ -13,7 +13,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 
 class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');

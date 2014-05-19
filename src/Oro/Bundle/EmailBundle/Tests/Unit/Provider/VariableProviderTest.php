@@ -24,7 +24,7 @@ class VariableProviderTest extends \PHPUnit_Framework_TestCase
     /** @var VariablesProvider */
     protected $provider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
@@ -43,7 +43,7 @@ class VariableProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new VariablesProvider($this->securityContext, $this->configProvider);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->securityContext);
         unset($this->configProvider);
