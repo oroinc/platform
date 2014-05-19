@@ -138,10 +138,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     });
 
     /**
-     * change asterisk for optional validation group field
+     * change asterisk for optional validation group fields
      */
     $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init){
-        console.log($(this.currentForm));
         validationHandler.initialize($(this.currentForm));
         init.apply(this, arguments);
     });
