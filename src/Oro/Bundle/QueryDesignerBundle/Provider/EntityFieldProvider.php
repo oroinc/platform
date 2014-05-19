@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider as ParentEntityFieldProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 
 class EntityFieldProvider extends ParentEntityFieldProvider
 {
@@ -23,6 +24,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
+        EntityHierarchyProvider $entityHierarchyProvider,
         $virtualFields,
         $hiddenFields,
         QueryDesignerManager $qdManager
@@ -33,6 +35,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
             $entityClassResolver,
             $doctrine,
             $translator,
+            $entityHierarchyProvider,
             $virtualFields,
             $hiddenFields
         );
