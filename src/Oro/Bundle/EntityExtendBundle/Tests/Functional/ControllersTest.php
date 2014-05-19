@@ -27,7 +27,7 @@ class ControllersTest extends WebTestCase
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_entityextend_entity_create'));
         $form = $crawler->selectButton('Save')->form();
-        $form['oro_entity_config_type[model][className]'] = 'testExtendedEntity1';
+        $form['oro_entity_config_type[model][className]'] = 'testExtendedEntity';
         $form['oro_entity_config_type[entity][label]'] = 'test entity label';
         $form['oro_entity_config_type[entity][plural_label]'] = 'test entity plural label';
         $form['oro_entity_config_type[entity][description]'] = 'test entity description';
