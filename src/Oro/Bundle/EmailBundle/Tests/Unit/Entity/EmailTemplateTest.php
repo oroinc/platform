@@ -13,7 +13,7 @@ class EmailTemplateTest extends \PHPUnit_Framework_TestCase
      */
     protected $emailTemplate;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->emailTemplate = new EmailTemplate('update_entity.html.twig', "@subject = sdfdsf\n abc");
 
@@ -22,7 +22,7 @@ class EmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('html', $this->emailTemplate->getType());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->emailTemplate);
     }

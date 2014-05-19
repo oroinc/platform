@@ -3,17 +3,19 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\TestFrameworkBundle\Test\FunctionalTestCase;
+
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities;
 
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
 /**
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
-class WorkflowItemRepositoryTest extends FunctionalTestCase
+class WorkflowItemRepositoryTest extends WebTestCase
 {
     /**
      * @var WorkflowItemRepository
@@ -22,21 +24,14 @@ class WorkflowItemRepositoryTest extends FunctionalTestCase
 
     protected function setUp()
     {
-        parent::setUp();
+        $this->initClient();
+        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities'));
 
         $this->repository = $this->getContainer()->get('doctrine')->getRepository('OroWorkflowBundle:WorkflowItem');
     }
 
     public function testResetWorkflowData()
     {
-        // load two workflow definitions and create 20 entities with workflow items for each
-        $this->loadFixtures(
-            array(
-                'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions',
-                'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowAwareEntities',
-            )
-        );
-
         // assert input state
         // - no entities without workflow items
         // - 20 entities with NO_START_STEP workflow item

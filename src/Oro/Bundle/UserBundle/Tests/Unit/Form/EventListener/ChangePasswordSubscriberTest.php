@@ -18,7 +18,7 @@ class ChangePasswordSubscriberTest extends FormIntegrationTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $token;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

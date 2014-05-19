@@ -2,27 +2,24 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestApiTest extends WebTestCase
 {
     /**
-     * @var Client
+     * @var array
      */
-    protected $client;
-
     protected static $entity;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient();
+        $this->initClient();
     }
 
     /**
@@ -39,16 +36,16 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_windows'),
+            $this->getUrl('oro_api_post_windows'),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -71,16 +68,16 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -98,16 +95,16 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_windows'),
+            $this->getUrl('oro_api_get_windows'),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
 
         $resultJson = json_decode($result->getContent(), true);
 
@@ -126,16 +123,16 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 
@@ -150,30 +147,30 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
 
         $this->client->restart();
 
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            $this->generateWsseAuthHeader()
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     /**
@@ -186,10 +183,10 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty(self::$entity);
 
         $requests = array(
-            'GET'    => $this->client->generate('oro_api_get_windows'),
-            'POST'   => $this->client->generate('oro_api_post_windows'),
-            'PUT'    => $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
-            'DELETE' => $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
+            'GET'    => $this->getUrl('oro_api_get_windows'),
+            'POST'   => $this->getUrl('oro_api_post_windows'),
+            'PUT'    => $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            'DELETE' => $this->getUrl('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
         );
 
         foreach ($requests as $requestType => $url) {
@@ -214,8 +211,8 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty(self::$entity);
 
         $requests = array(
-            'POST' => $this->client->generate('oro_api_post_windows'),
-            'PUT'  => $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
+            'POST' => $this->getUrl('oro_api_post_windows'),
+            'PUT'  => $this->getUrl('oro_api_put_windows', array('windowId' => self::$entity['id'])),
         );
 
         foreach ($requests as $requestType => $url) {
@@ -224,13 +221,13 @@ class RestApiTest extends WebTestCase
                 $url,
                 array(),
                 array(),
-                ToolsAPI::generateWsseHeader()
+                $this->generateWsseAuthHeader()
             );
 
             /** @var $response Response */
             $response = $this->client->getResponse();
 
-            ToolsAPI::assertJsonResponse($response, 400);
+            $this->assertJsonResponseStatusCodeEquals($response, 400);
 
             $responseJson = json_decode($response->getContent(), true);
 

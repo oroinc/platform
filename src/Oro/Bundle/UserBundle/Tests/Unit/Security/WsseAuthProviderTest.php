@@ -27,7 +27,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /** @var WsseAuthProvider */
     protected $provider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->encoder      = new MessageDigestPasswordEncoder('sha1', true, 1);
@@ -36,7 +36,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new WsseAuthProvider($this->userProvider, $this->encoder, $cache);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->userProvider, $this->encoder, $this->provider);
     }

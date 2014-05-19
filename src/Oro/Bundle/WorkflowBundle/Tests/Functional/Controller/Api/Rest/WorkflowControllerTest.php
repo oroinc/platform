@@ -5,33 +5,21 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class WorkflowControllerTest extends WebTestCase
 {
     /**
-     * @var bool
-     */
-    static protected $fixturesLoaded = false;
-
-    /**
      * @var string
      */
     protected $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
-
-    /**
-     * @var Client
-     */
-    protected $client;
 
     /**
      * @var EntityManager
@@ -40,16 +28,8 @@ class WorkflowControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
-        if (!self::$fixturesLoaded) {
-            $prev = '..' . DIRECTORY_SEPARATOR;
-            $path = __DIR__ . DIRECTORY_SEPARATOR . $prev . $prev . $prev . 'DataFixtures';
-            $this->client->appendFixtures($path, array('LoadWorkflowDefinitions'));
-            self::$fixturesLoaded = true;
-        }
-
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions'));
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass($this->entityClass);
     }
 
@@ -91,7 +71,7 @@ class WorkflowControllerTest extends WebTestCase
         // performing delete workflow item using API
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_workflow_delete',
                 array('workflowItemId' => $entity->getWorkflowItem()->getId())
             )
@@ -99,7 +79,7 @@ class WorkflowControllerTest extends WebTestCase
 
         // check is deleting workflow item has been performed successfully
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->entityManager->refresh($entity);
         if ($finalDefinitionHasStartStep) {
@@ -133,13 +113,14 @@ class WorkflowControllerTest extends WebTestCase
         // deactivate workflow for entity
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_workflow_api_rest_workflow_deactivate',
                 array('entityClass' => $this->entityClass)
             )
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, null);
 
@@ -150,13 +131,14 @@ class WorkflowControllerTest extends WebTestCase
         // activate other workflow through API
         $this->client->request(
             'GET',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_workflow_api_rest_workflow_activate',
                 array('workflowDefinition' => LoadWorkflowDefinitions::NO_START_STEP)
             )
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertActivationResult($result);
         $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::NO_START_STEP);
 

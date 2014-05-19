@@ -13,12 +13,12 @@ class BaseOrderItemTest extends \PHPUnit_Framework_TestCase
     /** @var BaseOrderItem */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new BaseOrderItem();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }
