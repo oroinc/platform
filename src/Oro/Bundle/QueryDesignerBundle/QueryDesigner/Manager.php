@@ -276,7 +276,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      *
      * @return bool
      */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName, $queryType)
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName, $queryType = '')
     {
         $excludeRules = $this->getExcludeRules();
 
@@ -315,7 +315,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      *
      * @return bool
      */
-    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $queryType)
+    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $queryType = '')
     {
         $excludeRules = $this->getExcludeRules();
 

@@ -53,7 +53,7 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $queryType          = ('1' == $this->getRequest()->query->get('query-type'));
+        $queryType          = $this->getRequest()->query->get('query-type');
 
         // set query type for exclude-related logic
         $this->get('oro_query_designer.entity_field_provider')
