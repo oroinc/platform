@@ -1,5 +1,5 @@
 oro_entity_virtual_fields:
-    Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+    Oro\Bundle\AddressBundle\Entity\Address:
         country:
             query:
                 select:
