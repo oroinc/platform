@@ -19,7 +19,7 @@ class MySQLDatabaseTest extends \PHPUnit_Framework_TestCase
     protected $dump;
     protected $restore;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->classInstance = new MySQLDatabase($this->db, $this->user, $this->pass, $this->tables);
 

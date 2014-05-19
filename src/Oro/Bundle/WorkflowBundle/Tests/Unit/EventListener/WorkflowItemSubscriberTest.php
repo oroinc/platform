@@ -221,18 +221,17 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->will($this->returnValue($entity));
 
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getStartStep');
+        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager->expects($this->any())->method('hasStartStep')
+            ->will($this->returnValue(false));
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $workflow->expects($this->any())
+            ->method('getStepManager')
+            ->will($this->returnValue($stepManager));
+
         $this->workflowManager->expects($this->atLeastOnce())
             ->method('getApplicableWorkflow')
             ->with($entity)
@@ -319,22 +318,16 @@ class WorkflowItemSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getEntity')
             ->will($this->returnValue($entity));
 
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->once())
-            ->method('getStartStep')
-            ->will($this->returnValue($step));
+        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager->expects($this->any())->method('hasStartStep')
+            ->will($this->returnValue(true));
 
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $workflow->expects($this->any())
+            ->method('getStepManager')
+            ->will($this->returnValue($stepManager));
 
         return array($event, $workflow);
     }

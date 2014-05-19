@@ -14,7 +14,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      */
     private $result;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');

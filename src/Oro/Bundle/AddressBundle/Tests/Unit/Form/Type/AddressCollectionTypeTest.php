@@ -13,7 +13,7 @@ class AddressCollectionTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test env
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->type = new AddressCollectionType();
     }

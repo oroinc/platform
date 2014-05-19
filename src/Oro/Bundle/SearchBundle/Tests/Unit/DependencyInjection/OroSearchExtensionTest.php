@@ -14,7 +14,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ContainerBuilder */
     private $container;
 
-    public function setUp()
+    protected function setUp()
     {
         $bundle = new TestBundle();
         CumulativeResourceManager::getInstance()

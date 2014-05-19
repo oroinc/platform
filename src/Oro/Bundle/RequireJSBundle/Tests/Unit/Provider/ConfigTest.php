@@ -11,7 +11,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     protected $configProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         $parameters = array(
             'oro_require_js' => array(

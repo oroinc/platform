@@ -15,13 +15,13 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var Mcrypt */
     protected $encryptor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->encryptor = new Mcrypt('someKey');
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         unset($this->encryptor);

@@ -53,7 +53,7 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler = new SegmentHandler($this->form, $this->request, $this->manager);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->form, $this->request, $this->manager, $this->handler, $this->entity);
     }

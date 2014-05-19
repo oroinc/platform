@@ -9,12 +9,12 @@ class CurlRequestTest extends \PHPUnit_Framework_TestCase
     /** @var CurlRequest */
     protected $request;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->request = new CurlRequest();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->request);
     }

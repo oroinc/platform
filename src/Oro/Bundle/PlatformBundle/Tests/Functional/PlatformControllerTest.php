@@ -3,34 +3,26 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\DomCrawler\Form;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class PlatformControllerTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->initClient(
             array(),
-            ToolsAPI::generateBasicHeader()
+            $this->generateBasicAuthHeader()
         );
     }
 
     public function testSystemInformation()
     {
-        $this->client->request('GET', $this->client->generate('oro_platform_system_info'));
+        $this->client->request('GET', $this->getUrl('oro_platform_system_info'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $content = $result->getContent();
         $this->assertContains('Oro Packages', $content);
