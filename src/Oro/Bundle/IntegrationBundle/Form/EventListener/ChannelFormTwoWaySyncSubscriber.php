@@ -121,7 +121,6 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
     protected function getModifierClosure()
     {
         return function ($form) {
-            // commented until two way sync will finished
             $form->add(
                 'isTwoWaySyncEnabled',
                 'checkbox',
