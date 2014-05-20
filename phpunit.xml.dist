@@ -15,7 +15,7 @@
 >
     <testsuites>
         <testsuite name="Project Unit Tests">
-            <directory suffix="Test.php">src/Oro/Bundle/QueryDesignerBundle/Tests/Unit</directory>
+            <directory suffix="Test.php">src/Oro/Bundle/*Bundle/Tests/Unit</directory>
         </testsuite>
     </testsuites>
 
