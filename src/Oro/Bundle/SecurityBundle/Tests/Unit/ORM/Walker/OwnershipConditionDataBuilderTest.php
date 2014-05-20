@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataPr
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 
-class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
+class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
     const ORGANIZATION = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
@@ -154,7 +154,6 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
         $accessLevel,
         $ownerType,
         $targetEntityClassName,
-        $targetTableAlias,
         $expectedConstraint
     ) {
         $this->buildTestTree();
@@ -219,177 +218,213 @@ class OwnershipFilterBuilderTest extends \PHPUnit_Framework_TestCase
     public static function buildFilterConstraintProvider()
     {
         return array(
-            array('', false, AccessLevel::NONE_LEVEL, null, self::TEST_ENTITY, '', []),
-            array('', false, AccessLevel::NONE_LEVEL, null, self::TEST_ENTITY, 't', []),
-            array('', true, AccessLevel::NONE_LEVEL, null, '\stdClass', '', []),
-            array('user4', true, AccessLevel::SYSTEM_LEVEL, null, self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::SYSTEM_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::SYSTEM_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::SYSTEM_LEVEL, 'USER', self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::GLOBAL_LEVEL, null, self::TEST_ENTITY, '', []),
-            array(
+            'for the TEST entity without userId, grant, ownerType; with NONE ACL' => array(
+                '', false, AccessLevel::NONE_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the stdClass entity without userId, grant, ownerType; with NONE ACL' => array(
+                '', false, AccessLevel::NONE_LEVEL, null, '\stdClass', []
+            ),
+            'for the stdClass entity without userId, ownerType; with grant and NONE ACL' => array(
+                '', true, AccessLevel::NONE_LEVEL, null, '\stdClass', []
+            ),
+            'for the TEST entity without ownerType; with SYSTEM ACL, userId, grant' => array(
+                'user4', true, AccessLevel::SYSTEM_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with SYSTEM ACL, userId, grant and ORGANIZATION ownerType' => array(
+                'user4', true, AccessLevel::SYSTEM_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with SYSTEM ACL, userId, grant and BUSINESS_UNIT ownerType' => array(
+                'user4', true, AccessLevel::SYSTEM_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with SYSTEM ACL, userId, grant and USER ownerType' => array(
+                'user4', true, AccessLevel::SYSTEM_LEVEL, 'USER', self::TEST_ENTITY, []
+            ),
+            'for the TEST entity without ownerType; with GLOBAL ACL, userId, grant' => array(
+                'user4', true, AccessLevel::GLOBAL_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with GLOBAL ACL, userId, grant and ORGANIZATION ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'ORGANIZATION',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('org3', 'org4'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the TEST entity with GLOBAL ACL, userId, grant and BUSINESS_UNIT ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('bu3', 'bu31', 'bu3a', 'bu3a1', 'bu4', 'bu41', 'bu411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the TEST entity with GLOBAL ACL, userId, grant and USER ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('user3', 'user31', 'user4', 'user41', 'user411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the ORGANIZATION entity without ownerType; with GLOBAL ACL, userId, grant' => array(
                 'user4',
                 true,
                 AccessLevel::GLOBAL_LEVEL,
                 null,
                 self::ORGANIZATION,
-                '',
                 array(
                     'id',
                     array('org3', 'org4'),
                     PathExpression::TYPE_STATE_FIELD
                 )
             ),
-            array('user4', true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::DEEP_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, '', null),
-            array(
+            'for the TEST entity without ownerType; with DEEP ACL, userId, grant' => array(
+                'user4', true, AccessLevel::DEEP_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with DEEP ACL, userId, grant and ORGANIZATION ownerType' => array(
+                'user4', true, AccessLevel::DEEP_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+            ),
+            'for the TEST entity with DEEP ACL, userId, grant and BUSINESS_UNIT ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::DEEP_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the TEST entity with DEEP ACL, userId, grant and USER ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::DEEP_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('user3', 'user4', 'user31', 'user41', 'user411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the BUSINESS entity without ownerType; with DEEP ACL, userId, grant' => array(
                 'user4',
                 true,
                 AccessLevel::DEEP_LEVEL,
                 null,
                 self::BUSINESS_UNIT,
-                '',
                 array(
                     'id',
                     array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
                     PathExpression::TYPE_STATE_FIELD
                 )
             ),
-            array('user4', true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::LOCAL_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, '', null),
-            array(
+            'for the TEST entity without ownerType; with LOCAL ACL, userId, grant' => array(
+                'user4', true, AccessLevel::LOCAL_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with LOCAL ACL, userId, grant and ORGANIZATION ownerType' => array(
+                'user4', true, AccessLevel::LOCAL_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+            ),
+            'for the TEST entity with LOCAL ACL, userId, grant and BUSINESS_UNIT ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 'BUSINESS_UNIT',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('bu3', 'bu4'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the TEST entity with LOCAL ACL, userId, grant and USER ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     array('user3', 'user4'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the BUSINESS entity without ownerType; with LOCAL ACL, userId, grant' => array(
                 'user4',
                 true,
                 AccessLevel::LOCAL_LEVEL,
                 null,
                 self::BUSINESS_UNIT,
-                '',
                 array(
                     'id',
                     array('bu3', 'bu4'),
                     PathExpression::TYPE_STATE_FIELD
                 )
             ),
-            array('user4', true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, '', []),
-            array('user4', true, AccessLevel::BASIC_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, '', null),
-            array('user4', true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, '', null),
-            array(
+            'for the TEST entity without ownerType; with BASIC ACL, userId, grant' => array(
+                'user4', true, AccessLevel::BASIC_LEVEL, null, self::TEST_ENTITY, []
+            ),
+            'for the TEST entity with BASIC ACL, userId, grant and ORGANIZATION ownerType' => array(
+                'user4', true, AccessLevel::BASIC_LEVEL, 'ORGANIZATION', self::TEST_ENTITY, null
+            ),
+            'for the TEST entity with BASIC ACL, userId, grant and BUSINESS_UNIT ownerType' => array(
+                'user4', true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'for the TEST entity with BASIC ACL, userId, grant and USER ownerType' => array(
                 'user4',
                 true,
                 AccessLevel::BASIC_LEVEL,
                 'USER',
                 self::TEST_ENTITY,
-                '',
                 array(
                     'owner',
                     'user4',
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                 )
             ),
-            array(
+            'for the USER entity without ownerType; with BASIC ACL, userId, grant' => array(
                 'user4',
                 true,
                 AccessLevel::BASIC_LEVEL,
                 null,
                 self::USER,
-                '',
                 array(
                     'id',
                     'user4',
                     PathExpression::TYPE_STATE_FIELD
                 )
-            )
+            ),
+            'TEST entity with BASIC ACL, userId without related BU, grant and BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::BASIC_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'TEST entity with LOCAL ACL, userId without related BU, grant and BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'BUSINESS entity with LOCAL ACL, userId without related BU, grant, BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::BUSINESS_UNIT, null
+            ),
+            'USER entity with LOCAL ACL, userId without related BU, grant, BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::LOCAL_LEVEL, 'BUSINESS_UNIT', self::USER, null
+            ),
+            'TEST entity with DEEP ACL, userId without related BU, grant and BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::DEEP_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'TEST entity with GLOBAL ACL, userId without related BU, grant and BUSINESS_UNIT ownerType' => array(
+                'user1', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
         );
     }
 }

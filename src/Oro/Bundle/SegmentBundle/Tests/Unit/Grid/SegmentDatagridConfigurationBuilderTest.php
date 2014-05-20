@@ -39,7 +39,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $result   = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition('route');
 
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -118,7 +118,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                         'type'         => 'navigate',
                         'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
                         'label'        => 'View',
-                        'icon'         => 'user',
+                        'icon'         => 'eye-open',
                         'link'         => 'view_link',
                         'rowAction'    => true,
                     ],

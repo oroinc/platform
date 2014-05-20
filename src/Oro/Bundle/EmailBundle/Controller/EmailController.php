@@ -44,6 +44,25 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/widget/info/{id}", name="oro_email_widget_info", requirements={"id"="\d+"})
+     * @Acl(
+     *      id="oro_email_view",
+     *      type="entity",
+     *      class="OroEmailBundle:Email",
+     *      permission="VIEW"
+     * )
+     * @Template
+     */
+    public function infoAction(Email $entity)
+    {
+        $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+
+        return array(
+            'entity' => $entity
+        );
+    }
+
+    /**
      * @Route("/create")
      * @Acl(
      *      id="oro_email_create",
