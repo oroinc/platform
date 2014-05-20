@@ -1,13 +1,13 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+/* global define */
+define(['jquery', 'underscore', 'backbone', 'oro/translator'],
+function($, _, Backbone, __) {
     'use strict';
 
     /**
      * Loading mask widget
      *
-     * @export  oroui/js/loading-mask
-     * @class   oroui.LoadingMask
+     * @export  oro/loading-mask
+     * @class   oro.LoadingMask
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -22,7 +22,7 @@ define(['jquery', 'underscore', 'backbone'
         className: 'loading-mask',
 
         /** @property {String} */
-        loadingHint: 'Loading...',
+        loadingHint: __('Loading...'),
 
         /** @property */
         template:_.template(
