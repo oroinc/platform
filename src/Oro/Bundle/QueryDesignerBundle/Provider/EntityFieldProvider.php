@@ -8,10 +8,12 @@ use Symfony\Component\Translation\Translator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider as ParentEntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 
 class EntityFieldProvider extends ParentEntityFieldProvider
 {
@@ -27,8 +29,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        EntityHierarchyProvider $entityHierarchyProvider,
-        $virtualFields,
+        VirtualFieldProvider $virtualFieldProvider,
         $hiddenFields,
         QueryDesignerManager $qdManager
     ) {
@@ -38,8 +39,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
             $entityClassResolver,
             $doctrine,
             $translator,
-            $entityHierarchyProvider,
-            $virtualFields,
+            $virtualFieldProvider,
             $hiddenFields
         );
 
@@ -81,4 +81,4 @@ class EntityFieldProvider extends ParentEntityFieldProvider
 
         return $result;
     }
-} 
+}

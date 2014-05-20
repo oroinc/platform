@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
@@ -41,9 +42,6 @@ class EntityFieldProvider
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @ var EntityHierarchyProvider */
-    protected $entityHierarchyProvider;
-
     /** @var array */
     protected $virtualFields;
 
@@ -53,14 +51,13 @@ class EntityFieldProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider          $entityConfigProvider
-     * @param ConfigProvider          $extendConfigProvider
-     * @param EntityClassResolver     $entityClassResolver
-     * @param ManagerRegistry         $doctrine
-     * @param Translator              $translator
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $virtualFields
-     * @param array                   $hiddenFields
+     * @param ConfigProvider       $entityConfigProvider
+     * @param ConfigProvider       $extendConfigProvider
+     * @param EntityClassResolver  $entityClassResolver
+     * @param ManagerRegistry      $doctrine
+     * @param Translator           $translator
+     * @param VirtualFieldProvider $virtualFieldProvider
+     * @param array                $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -68,18 +65,16 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        EntityHierarchyProvider $entityHierarchyProvider,
-        $virtualFields,
+        VirtualFieldProvider $virtualFieldProvider,
         $hiddenFields
     ) {
-        $this->entityConfigProvider    = $entityConfigProvider;
-        $this->extendConfigProvider    = $extendConfigProvider;
-        $this->entityClassResolver     = $entityClassResolver;
-        $this->translator              = $translator;
-        $this->doctrine                = $doctrine;
-        $this->virtualFields           = $virtualFields;
-        $this->hiddenFields            = $hiddenFields;
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
+        $this->entityClassResolver  = $entityClassResolver;
+        $this->translator           = $translator;
+        $this->doctrine             = $doctrine;
+        $this->virtualFields        = $virtualFieldProvider->getVirtualFields();
+        $this->hiddenFields         = $hiddenFields;
     }
 
     /**
@@ -188,47 +183,8 @@ class EntityFieldProvider
             }
 
             // add virtual fields
-            if ($withVirtualFields) {
-                $virtualFields = [];
-
-                /**
-                 * add regular virtual fields by class name
-                 */
-                if (isset($this->virtualFields[$className])) {
-                    $virtualFields = array_merge(
-                        $virtualFields,
-                        $this->virtualFields[$className]
-                    );
-                }
-
-                /**
-                 * add virtual fields by hierarchy
-                 *
-                 * e.g. OroCRMContactBundle:ContactAddress extends OroAddressBundle:AbstractAddress
-                 * and AbstractAddress has configured virtual field in entity_virtual_fields.yml
-                 *
-                 * oro_entity_virtual_fields:
-                 *   Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-                 *     country_virtual_field:
-                 *       query:
-                 *         select:
-                 *           expr: country.name
-                 *           return_type: string
-                 *         join:
-                 *           left:
-                 *             - { join: entity.country, alias: country }
-                 */
-                $hierarchy = $this->entityHierarchyProvider->getHierarchyForClassName($className);
-                foreach ($hierarchy as $hierarchyClassName) {
-                    if (isset($this->virtualFields[$hierarchyClassName])) {
-                        $virtualFields = array_merge(
-                            $virtualFields,
-                            $this->virtualFields[$hierarchyClassName]
-                        );
-                    }
-                }
-
-                foreach ($virtualFields as $fieldName => $config) {
+            if ($withVirtualFields && isset($this->virtualFields[$className])) {
+                foreach ($this->virtualFields[$className] as $fieldName => $config) {
                     if ($this->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
@@ -314,7 +270,7 @@ class EntityFieldProvider
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
-                        continue;
+                    continue;
                 }
 
                 $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);

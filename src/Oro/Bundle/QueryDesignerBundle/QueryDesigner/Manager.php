@@ -6,6 +6,7 @@ use Symfony\Component\Translation\Translator;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -21,10 +22,10 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /** @var Translator */
     protected $translator;
 
-    /** @var  EntityHierarchyProvider */
-    protected $entityHierarchyProvider;
+    /** @var VirtualFieldProvider */
+    protected $virtualFieldProvider;
 
-    /** @var array */
+    /** @var array  */
     protected $virtualFields;
 
     /**
@@ -34,20 +35,20 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      * @param ConfigurationResolver   $resolver
      * @param EntityHierarchyProvider $entityHierarchyProvider
      * @param Translator              $translator
-     * @param array                   $virtualFields
+     * @param VirtualFieldProvider    $virtualFieldProvider
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
         EntityHierarchyProvider $entityHierarchyProvider,
         Translator $translator,
-        $virtualFields
+        VirtualFieldProvider $virtualFieldProvider
     ) {
         $resolver->resolve($config);
         $this->config                  = ConfigurationObject::create($config);
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->translator              = $translator;
-        $this->virtualFields           = $this->processVirtualFields($virtualFields);
+        $this->virtualFields           = $virtualFieldProvider->getVirtualFieldsWithHierarchy();
     }
 
     /**
@@ -271,47 +272,6 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return false;
-    }
-
-    /**
-     * Merge virtual fields by hierarchy
-     *
-     * @param array $virtualFields
-     * @return array
-     */
-    protected function processVirtualFields($virtualFields = [])
-    {
-        foreach ($virtualFields as $className => $fields) {
-            $hierarchy = $this->entityHierarchyProvider->getHierarchyForClassName($className);
-            if ($hierarchy) {
-                foreach ($hierarchy as $hierarchyClassName) {
-                    if (isset($virtualFields[$hierarchyClassName])) {
-                        $virtualFields[$className] = array_merge(
-                            $fields,
-                            $virtualFields[$hierarchyClassName]
-                        );
-                    }
-                }
-            }
-        }
-
-        $hierarchy = $this->entityHierarchyProvider->getHierarchy();
-        foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
-            foreach ($virtualFields as $className => $fields) {
-                if (in_array($className, $hierarchyParents)) {
-                    if (!isset($virtualFields[$hierarchyClassName])) {
-                        $virtualFields[$hierarchyClassName] = [];
-                    }
-                    $virtualFields[$hierarchyClassName] = array_merge(
-                        $virtualFields[$hierarchyClassName],
-                        $fields
-                    );
-                }
-            }
-        }
-
-
-        return $virtualFields;
     }
 
     /**
