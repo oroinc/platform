@@ -122,10 +122,8 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $definition = json_decode($this->source->getDefinition(), true);
         $columnDefinition = $definition['columns'];
 
-        $groupingColumns = !empty($definition['grouping_columns']) ? $definition['grouping_columns'] : array();
-
-        if (count($groupingColumns) > 0) {
-            foreach ($groupingColumns as $column) {
+        if (!empty($definition['grouping_columns'])) {
+            foreach ($definition['grouping_columns'] as $column) {
                 if ($column['name'] == $primaryKey) {
                     return true;
                 }
@@ -134,9 +132,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             return false;
         } else {
             foreach ($columnDefinition as $column) {
-                if (!empty($column['func'])
-                    && !empty($column['func']['group_type'])
-                    && $column['func']['group_type'] == 'aggregates') {
+                if (!empty($column['func']['group_type']) && $column['func']['group_type'] == 'aggregates') {
                     return false;
                 }
             }
