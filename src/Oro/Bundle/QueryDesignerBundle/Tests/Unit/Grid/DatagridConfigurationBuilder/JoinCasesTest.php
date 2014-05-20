@@ -331,4 +331,4 @@ class JoinCasesTest extends OrmQueryConverterTest
 
         $this->assertEquals($expected, $result);
     }
-} 
+}

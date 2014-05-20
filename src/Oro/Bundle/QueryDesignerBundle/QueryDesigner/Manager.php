@@ -363,7 +363,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         // set default false
         array_walk_recursive(
             $result,
-            function(&$value) {
+            function (&$value) {
                 $value = empty($value) ? false : $value;
             }
         );
