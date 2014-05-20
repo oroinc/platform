@@ -295,7 +295,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             $fieldType = $metadata->getTypeOfField($fieldName);
 
             // exclude entity
-            $isExcludeEntity = !$field && $className === $entity && $queryType === $ruleQueryType;
+            $isExcludeEntity = !$field && $className === $entity;
 
             // exclude entity's field
             $isExcludeEntityField = $className === $entity && $field === $fieldName && $queryType === $ruleQueryType;
