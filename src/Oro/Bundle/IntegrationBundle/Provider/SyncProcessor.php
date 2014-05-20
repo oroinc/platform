@@ -65,7 +65,7 @@ class SyncProcessor
         } else {
             $connectors = $channel->getConnectors();
             foreach ((array)$connectors as $connector) {
-                $this->processChannelConnector($channel, $connector);
+                $this->processChannelConnector($channel, $connector, $parameters);
             }
         }
     }
@@ -142,50 +142,44 @@ class SyncProcessor
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
-        $counts           = [];
-        $counts['errors'] = count($jobResult->getFailureExceptions());
+        $counts = [];
         if ($context) {
-            $counts['process'] = 0;
+            $counts['process'] = $counts['warnings'] = 0;
             $counts['read']    = $context->getReadCount();
             $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['replace'] = $context->getReplaceCount();
             $counts['process'] += $counts['update'] = $context->getUpdateCount();
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
-            $counts['process'] -= $counts['error_entries'] = $context->getErrorEntriesCount();
-            $counts['errors'] += count($context->getErrors());
         }
 
-        $errorsAndExceptions = [];
-        if (!empty($counts['errors'])) {
-            $errorsAndExceptions = array_slice(
-                array_merge(
-                    $jobResult->getFailureExceptions(),
-                    $context ? $context->getErrors() : []
-                ),
-                0,
-                100
-            );
-        }
-        $isSuccess = $jobResult->isSuccessful() && empty($counts['errors']);
+        $exceptions = $jobResult->getFailureExceptions();
+        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
         $status->setConnector($connector);
         if (!$isSuccess) {
             $this->logger->error('Errors were occurred:');
-            $exceptions = implode(PHP_EOL, $errorsAndExceptions);
+            $exceptions = implode(PHP_EOL, $exceptions);
             $this->logger->error(
                 $exceptions,
                 ['exceptions' => $jobResult->getFailureExceptions()]
             );
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
+            if ($context->getErrors()) {
+                $this->logger->warning('Some entities were skipped due to warnings:');
+                foreach ($context->getErrors() as $error) {
+                    $this->logger->warning($error);
+                }
+            }
+
             $message = sprintf(
-                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
+                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
                 $counts['read'],
                 $counts['process'],
                 $counts['update'],
                 $counts['add'],
-                $counts['delete']
+                $counts['delete'],
+                $context->getErrorEntriesCount()
             );
             $this->logger->info($message);
 

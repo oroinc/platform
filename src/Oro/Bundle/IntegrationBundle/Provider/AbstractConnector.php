@@ -76,6 +76,16 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     }
 
     /**
+     * Returns whether connector supports force sync or no
+     *
+     * @return bool
+     */
+    protected function supportsForceSync()
+    {
+        return false;
+    }
+
+    /**
      * Return source iterator to read from
      *
      * @return \Iterator

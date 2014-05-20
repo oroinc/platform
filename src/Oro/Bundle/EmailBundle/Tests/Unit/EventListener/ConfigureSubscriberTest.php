@@ -19,7 +19,7 @@ class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
             ->disableOriginalConstructor()->getMock();
@@ -27,7 +27,7 @@ class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber = new ConfigSubscriber($this->cache, self::TEST_CACHE_KEY);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->cache);
         unset($this->subscriber);

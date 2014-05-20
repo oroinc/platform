@@ -24,7 +24,7 @@ class CleanupCommandTest extends OrmTestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $emMock;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->command = new CleanupCommand();
 
@@ -35,7 +35,7 @@ class CleanupCommandTest extends OrmTestCase
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->container, $this->command, $this->emMock);
     }

@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -52,7 +51,8 @@ class UserController extends Controller
         return $this->update(
             $this->getUser(),
             'oro_user_profile_update',
-            array('route' => 'oro_user_profile_view')
+            array('route' => 'oro_user_profile_view'),
+            'oro_user_profile_view'
         );
     }
 
@@ -131,12 +131,13 @@ class UserController extends Controller
     }
 
     /**
-     * @param User $entity
+     * @param User   $entity
      * @param string $updateRoute
-     * @param array $viewRoute
-     * @return array
+     * @param array  $viewRoute
+     * @param string $cancelRoute
+     * @return mixed
      */
-    protected function update(User $entity, $updateRoute = '', $viewRoute = array())
+    protected function update(User $entity, $updateRoute = '', $viewRoute = array(), $cancelRoute = 'oro_user_index')
     {
         if ($this->get('oro_user.form.handler.user')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -163,6 +164,7 @@ class UserController extends Controller
             'entity'        => $entity,
             'form'          => $this->get('oro_user.form.user')->createView(),
             'editRoute'     => $updateRoute,
+            'cancelRoute'   => $cancelRoute,
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' =>

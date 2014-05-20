@@ -11,7 +11,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
     /** @var DateFilterUtility */
     protected $utility;
 
-    public function setUp()
+    protected function setUp()
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -24,7 +24,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
         $this->utility = new DateFilterUtility($localeSettings);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->utility);
     }

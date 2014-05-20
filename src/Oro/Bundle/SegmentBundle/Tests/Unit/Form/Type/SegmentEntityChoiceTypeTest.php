@@ -13,7 +13,7 @@ class SegmentEntityChoiceTypeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityProviderMock;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityProviderMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityProvider')
             ->disableOriginalConstructor()

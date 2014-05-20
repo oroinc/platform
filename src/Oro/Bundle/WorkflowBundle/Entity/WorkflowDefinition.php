@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
+ * @ORM\Entity
  * @Config(
  *  routeName="oro_workflow_definition_index",
  *  routeView="oro_workflow_definition_update",

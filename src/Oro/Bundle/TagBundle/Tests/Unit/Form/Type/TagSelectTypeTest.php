@@ -22,7 +22,7 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $subscriber;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->transformer = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\Transformer\TagTransformer')
             ->disableOriginalConstructor()
@@ -35,7 +35,7 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new TagSelectType($this->subscriber, $this->transformer);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->transformer);
         unset($this->subscriber);

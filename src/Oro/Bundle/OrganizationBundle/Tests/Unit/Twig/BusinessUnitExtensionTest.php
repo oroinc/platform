@@ -17,7 +17,7 @@ class BusinessUnitExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->manager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
             ->disableOriginalConstructor()->getMock();

@@ -13,7 +13,7 @@ class MoneyTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!Type::hasType(MoneyType::TYPE)) {
             Type::addType(MoneyType::TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\MoneyType');

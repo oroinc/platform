@@ -20,7 +20,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->assetsConfiguration = $this->getMockBuilder('Oro\Bundle\AsseticBundle\AssetsConfiguration')
             ->disableOriginalConstructor()
