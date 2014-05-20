@@ -107,20 +107,33 @@
         }] ) %}
     {% endif %}
 
-    {% if form.groups is defined or form.roles is defined %}
-        {% macro userRoles(form) %}
-            {% if form.roles is defined %}
+    {% set hasGroups = form.groups is defined %}
+    {% set hasRoles = form.roles is defined %}
+    {% if hasGroups or hasRoles %}
+        {% set userGroups %}
+            {% if hasGroups %}
+                {{ form_row(form.groups, {attr: { class: 'horizontal' } }) }}
+            {% endif %}
+        {% endset %}
+
+        {% set userRoles %}
+            {% if hasRoles %}
                 <div class="form-horizontal" id="roles-list">
                     {{ form_row(form.roles, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
-        {% endmacro %}
+        {% endset %}
 
-        {% set hasGroups = form.groups is defined %}
-        {% set title = hasGroups ? 'oro.user.groups.label'|trans : '' %}
-
-        {% if form.roles is defined %}
-            {% set title = title ~ (title is empty ? '' : ' and ') ~ 'oro.user.roles.label'|trans %}
+        {% set title = '' %}
+        {% if hasGroups and hasRoles %}
+            {% set title = '%groups% and %roles%'|trans({
+                '%groups%' : 'oro.user.groups.label'|trans,
+                '%roles%' : 'oro.user.roles.label'|trans
+            }) %}
+        {% elseif hasGroups %}
+            {% set title = 'oro.user.groups.label'|trans %}
+        {% elseif hasRoles %}
+            {% set title = 'oro.user.roles.label'|trans %}
         {% endif %}
 
         {% set dataBlocks = dataBlocks|merge( [{
@@ -128,10 +141,7 @@
             'subblocks': [
                 {
                     'title': '',
-                    'data': [
-                         hasGroups ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
-                        _self.userRoles(form)
-                    ]
+                    'data': [userGroups, userRoles]
                 }
             ]
         }] ) %}
