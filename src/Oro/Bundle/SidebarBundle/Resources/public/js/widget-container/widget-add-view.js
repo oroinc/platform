@@ -11,7 +11,6 @@ define(function (require) {
     var WidgetContainerModel = require('./model');
 
     var Modal = require('oroui/js/modal');
-    var DialogWidget = require('oro/dialog-widget');
     var constants = require('../constants');
 
     /**
@@ -19,7 +18,7 @@ define(function (require) {
      * @class   orosidebar.widgetContainer.WidgetAddView
      * @extends oro.Modal
      */
-    var WidgetAddView = Modal.extend({
+    return Modal.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal',
 
@@ -84,6 +83,4 @@ define(function (require) {
             });
         }
     });
-
-    return WidgetAddView;
 });

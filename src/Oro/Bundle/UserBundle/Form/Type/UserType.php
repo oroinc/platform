@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Form\Type\EmailType;
 
 class UserType extends AbstractType
 {
@@ -24,20 +24,25 @@ class UserType extends AbstractType
     protected $security;
 
     /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
      * @var bool
      */
     protected $isMyProfilePage;
 
     /**
      * @param SecurityContextInterface $security Security context
-     * @param Request                  $request  Request
+     * @param SecurityFacade           $securityFacade
+     * @param Request                  $request Request
      */
-    public function __construct(
-        SecurityContextInterface $security,
-        Request $request
-    ) {
+    public function __construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request)
+    {
+        $this->security       = $security;
+        $this->securityFacade = $securityFacade;
 
-        $this->security = $security;
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {
             $this->isMyProfilePage = true;
         } else {
@@ -61,29 +66,34 @@ class UserType extends AbstractType
             new UserSubscriber($builder->getFormFactory(), $this->security)
         );
         $this->setDefaultUserFields($builder);
-        $builder
-            ->add(
-                'roles',
-                'entity',
-                array(
-                    'property_path' => 'rolesCollection',
-                    'label'         => 'oro.user.roles.label',
-                    'class'         => 'OroUserBundle:Role',
-                    'property'      => 'label',
-                    'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('r')
-                            ->where('r.role <> :anon')
-                            ->setParameter('anon', User::ROLE_ANONYMOUS)
-                            ->orderBy('r.label');
-                    },
-                    'multiple'      => true,
-                    'expanded'      => true,
-                    'required'      => !$this->isMyProfilePage,
-                    'read_only'     => $this->isMyProfilePage,
-                    'disabled'      => $this->isMyProfilePage,
-                )
-            )
-            ->add(
+
+        if ($this->securityFacade->isGranted('oro_user_role_view')) {
+            $builder
+                ->add(
+                    'roles',
+                    'entity',
+                    array(
+                        'property_path' => 'rolesCollection',
+                        'label'         => 'oro.user.roles.label',
+                        'class'         => 'OroUserBundle:Role',
+                        'property'      => 'label',
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('r')
+                                ->where('r.role <> :anon')
+                                ->setParameter('anon', User::ROLE_ANONYMOUS)
+                                ->orderBy('r.label');
+                        },
+                        'multiple'      => true,
+                        'expanded'      => true,
+                        'required'      => !$this->isMyProfilePage,
+                        'read_only'     => $this->isMyProfilePage,
+                        'disabled'      => $this->isMyProfilePage,
+                    )
+                );
+        }
+
+        if ($this->securityFacade->isGranted('oro_user_group_view')) {
+            $builder->add(
                 'groups',
                 'entity',
                 array(
@@ -96,8 +106,11 @@ class UserType extends AbstractType
                     'read_only' => $this->isMyProfilePage,
                     'disabled'  => $this->isMyProfilePage
                 )
-            )
-            ->add(
+            );
+        }
+
+        if ($this->securityFacade->isGranted('oro_business_unit_view')) {
+            $builder->add(
                 'businessUnits',
                 'oro_business_unit_tree',
                 array(
@@ -106,7 +119,10 @@ class UserType extends AbstractType
                     'required' => false,
                     'label'    => 'oro.user.business_units.label'
                 )
-            )
+            );
+        }
+
+        $builder
             ->add(
                 'plainPassword',
                 'repeated',

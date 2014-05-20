@@ -32,17 +32,12 @@ class AddFulltextIndexesCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $config = $connection->getParams();
+        $manager = $this->getContainer()->get('oro_search.fulltext_index_manager');
+        $dialog  = $this->getDialogHelper();
+        $dialog->writeSection($output, 'Creating indexes for string index table');
+        $result = $manager->createIndexes();
 
-        $configClasses = $this->getContainer()->getParameter('oro_search.engine_orm');
-        if (isset($configClasses[$config['driver']])) {
-            $className = $configClasses[$config['driver']];
-            $dialog = $this->getDialogHelper();
-
-            $dialog->writeSection($output, 'Creating indexes for string index table');
-            $connection->query($className::getPlainSql());
-
+        if ($result) {
             $dialog->writeSection($output, 'Completed.');
         }
     }
