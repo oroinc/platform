@@ -17,7 +17,7 @@ The all available configuration options you can find in [Configuration.php](../.
 Filters configuration
 ---------------------
 This section describes how you can configure the list of filters are shown on the result page, for instance on report result grid, and intended to filter resulting data.
-The configuration of [default filters](../../config/query_designer.yml) describes filters for general data types, such as `string`, `integer`, `money`, `percent` and etc. For instance, take a look on configuration of a filter used to filter textual data:
+The configuration of [default filters](../../config/query_designer.yml) describes filters for general data types, such as `string`, `integer`, `money`, `percent` etc. For instance, take a look on configuration of a filter used to filter textual data:
 ``` yaml
 query_designer:
     filters:
