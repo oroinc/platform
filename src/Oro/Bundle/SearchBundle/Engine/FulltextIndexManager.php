@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Connection;
 
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
+
 class FulltextIndexManager
 {
     /**
@@ -32,13 +34,9 @@ class FulltextIndexManager
      */
     public function createIndexes()
     {
-        $config = $this->connection->getParams();
-
-        if (isset($this->configClasses[$config['driver']])) {
-            $className = $this->configClasses[$config['driver']];
-
+        if ($query = $this->getQuery()) {
             try {
-                $this->connection->query($className::getPlainSql());
+                $this->connection->query($query);
 
                 return true;
             } catch (DBALException $exception) {
@@ -47,5 +45,22 @@ class FulltextIndexManager
         }
 
         return false;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getQuery()
+    {
+        $config = $this->connection->getParams();
+
+        if (isset($this->configClasses[$config['driver']])) {
+            /** @var PdoMysql $className */
+            $className = $this->configClasses[$config['driver']];
+
+            return $className::getPlainSql();
+        }
+
+        return null;
     }
 }

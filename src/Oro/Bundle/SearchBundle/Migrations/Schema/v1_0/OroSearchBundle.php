@@ -118,6 +118,8 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         // add search fulltext index query
         $indexManager = $this->container->get('oro_search.fulltext_index_manager');
-        $indexManager->createIndexes();
+        if ($query = $indexManager->getQuery()) {
+            $queries->addQuery($query);
+        }
     }
 }
