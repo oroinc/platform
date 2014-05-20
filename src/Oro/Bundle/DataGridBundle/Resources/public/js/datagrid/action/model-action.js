@@ -86,12 +86,12 @@ define(['underscore', './abstract-action'
          * @protected
          */
         addUrlParameter: function (url, parameterName, parameterValue) {
-            var urlhash, sourceUrl, replaceDuplicates = true;
+            var urlHash, sourceUrl, replaceDuplicates = true;
             if (url.indexOf('#') > 0) {
                 var cl = url.indexOf('#');
-                urlhash = url.substring(url.indexOf('#'), url.length);
+                urlHash = url.substring(url.indexOf('#'), url.length);
             } else {
-                urlhash = '';
+                urlHash = '';
                 cl = url.length;
             }
             sourceUrl = url.substring(0,cl);
@@ -121,7 +121,7 @@ define(['underscore', './abstract-action'
                 newQueryString += "&";
             }
             newQueryString += parameterName + "=" + (parameterValue ? parameterValue : '');
-            return urlParts[0] + newQueryString + urlhash;
+            return urlParts[0] + newQueryString + urlHash;
         }
     });
 });
