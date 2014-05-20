@@ -37,7 +37,7 @@ function($, _, __, Modal, Navigation, Messenger) {
             $.ajax({
                 url:  element.data('url'),
                 type: 'DELETE',
-                success: function(responce) {
+                success: function(response) {
                     if (navigation) {
                         navigation.loadPage(true);
                     } else {

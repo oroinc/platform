@@ -1,0 +1,17 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+
+<div class="widget-content form-horizontal box-content row-fluid">
+    <div class="responsive-block">
+    {{ UI.attibuteRow('oro.email.sent_at.label', entity.sentAt|oro_format_datetime) }}
+        {{ UI.attibuteRow('oro.email.from_name.label', EA.email_address(entity.fromEmailAddress, entity.fromName)) }}
+        {{ UI.attibuteRow('To'|trans, EA.recipient_email_addresses(entity.recipients('to'))) }}
+        {{ UI.attibuteRow('Cc'|trans, EA.recipient_email_addresses(entity.recipients('cc'))) }}
+        {{ UI.attibuteRow('Bcc'|trans, EA.recipient_email_addresses(entity.recipients('bcc'))) }}
+        {{ UI.attibuteRow('oro.email.subject.label', entity.subject) }}
+        {% if entity.emailBody.hasAttachments %}
+            {{ UI.attibuteRow('Attachments', EA.attachments(entity.emailBody.attachments)) }}
+        {% endif %}
+        {{ EA.body(entity.emailBody) }}
+    </div>
+</div>

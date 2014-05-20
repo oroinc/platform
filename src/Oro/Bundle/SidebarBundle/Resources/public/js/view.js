@@ -4,8 +4,6 @@
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _jqueryUI = require('jquery-ui');
     var _ = require('underscore');
     var Backbone = require('backbone');
 
@@ -32,7 +30,7 @@ define(function (require) {
      * @class   orosidebar.View
      * @extends Backbone.View
      */
-    var SidebarView = Backbone.View.extend({
+    return Backbone.View.extend({
         template: _.template(sidebarTemplate),
 
         events: {
@@ -206,8 +204,6 @@ define(function (require) {
         },
 
         onClickAdd: function (e) {
-            var view = this;
-
             e.stopPropagation();
             e.preventDefault();
 
@@ -230,32 +226,24 @@ define(function (require) {
             var view = this;
 
             this.getWidgets().each(function (widget) {
-                var widgetView = new WidgetContainerView({
+                view.widgetViews[widget.cid] = new WidgetContainerView({
                     model: widget
                 });
 
-                view.widgetViews[widget.cid] = widgetView;
-
-                var iconView = new IconView({
+                view.iconViews[widget.cid] = new IconView({
                     model: widget
                 });
-
-                view.iconViews[widget.cid] = iconView;
             });
         },
 
         onWidgetAdded: function (widget) {
-            var widgetView = new WidgetContainerView({
+            this.widgetViews[widget.cid] = new WidgetContainerView({
                 model: widget
             });
 
-            this.widgetViews[widget.cid] = widgetView;
-
-            var iconView = new IconView({
+            this.iconViews[widget.cid] = new IconView({
                 model: widget
             });
-
-            this.iconViews[widget.cid] = iconView;
         },
 
         onWidgetRemoved: function (widget) {
@@ -391,6 +379,4 @@ define(function (require) {
             widgetSetupView.open();
         }
     });
-
-    return SidebarView;
 });
