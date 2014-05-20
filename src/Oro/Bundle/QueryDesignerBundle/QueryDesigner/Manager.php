@@ -22,8 +22,8 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /** @var Translator */
     protected $translator;
 
-    /** @var VirtualFieldProvider */
-    protected $virtualFieldProvider;
+    /** @var EntityHierarchyProvider  */
+    protected $entityHierarchyProvider;
 
     /** @var array  */
     protected $virtualFields;
@@ -48,7 +48,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         $this->config                  = ConfigurationObject::create($config);
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->translator              = $translator;
-        $this->virtualFields           = $virtualFieldProvider->getVirtualFieldsWithHierarchy();
+        $this->virtualFields           = $virtualFieldProvider->getVirtualFields();
     }
 
     /**
