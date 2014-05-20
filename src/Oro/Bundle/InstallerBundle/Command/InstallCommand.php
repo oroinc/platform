@@ -165,6 +165,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand(
                 'oro:migration:load',
                 array(
+                    '--force' => true,
                     '--process-isolation' => true,
                 )
             )
