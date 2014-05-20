@@ -5,9 +5,6 @@ query_designer:
     filters:
         string:
             applicable: [{type: string}, {type: text}]
-#                - {type: string}
-#                - {type: text}
-#                - { entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress,   field: region_hierarchy }
             type:       string
             query_type: [all]
         number:
@@ -24,11 +21,6 @@ query_designer:
             query_type: [all]
         boolean:
             applicable: [{type: boolean}]
-#START for testing, remove before merge
-#                - {type: boolean}
-#                - { entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country_virtual  }
-#                - { entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress,   field: region_hierarchy }
-#END
             type:       boolean
             query_type: [all]
         percent:
