@@ -284,25 +284,26 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     public function isIgnoredField(ClassMetadata $metadata, $fieldName, $queryType = '')
     {
         $excludeRules = $this->getExcludeRules();
+        $className    = $metadata->getReflectionClass()->getName();
 
         foreach ($excludeRules as $rule) {
-            $entity    = empty($rule['entity']) ? false : $rule['entity'];
-            $field     = empty($rule['field']) ? false : $rule['field'];
-            $type      = empty($rule['type']) ? false : $rule['type'];
-            $ruleQueryType = empty($rule['query_type']) ? false : $rule['query_type'];
+            $entity        = $rule['entity'];
+            $field         = $rule['field'];
+            $type          = $rule['type'];
+            $ruleQueryType = $rule['query_type'];
+
+            $fieldType = $metadata->getTypeOfField($fieldName);
 
             // exclude entity
-            $isExcludeEntity = $entity && !$field && $metadata->getReflectionClass()->getName() === $entity;
+            $isExcludeEntity = $className === $entity;
 
             // exclude entity's field
-            $isExcludeEntityField = $entity
-                && $field
-                && $metadata->getReflectionClass()->getName() == $entity
-                && $field == $fieldName;
+            $isExcludeEntityField = $className === $entity && $field === $fieldName;
 
             // exclude by type
-            $isExcludeByType = $metadata->getTypeOfField($fieldName) === $type;
+            $isExcludeByType = $fieldType === $type;
 
+            // exclude by query type
             $isExcludeByQueryType = $ruleQueryType === $queryType;
 
             if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType || $isExcludeByQueryType) {
@@ -323,16 +324,14 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $queryType = '')
     {
         $excludeRules = $this->getExcludeRules();
+        $className    = $metadata->getReflectionClass()->getName();
 
         foreach ($excludeRules as $rule) {
-            $entity    = empty($rule['entity']) ? false : $rule['entity'];
-            $field     = empty($rule['field']) ? false : $rule['field'];
-            $ruleQueryType = empty($rule['query_type']) ? false : $rule['query_type'];
+            $entity        = $rule['entity'];
+            $field         = $rule['field'];
+            $ruleQueryType = $rule['query_type'];
 
-            if ($entity &&
-                $entity === $metadata->getReflectionClass()->getName() &&
-                $field === $associationName
-            ) {
+            if ($entity === $className && $field === $associationName) {
                 return true;
             }
 
@@ -349,6 +348,26 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     protected function getExcludeRules()
     {
-        return $this->config->offsetGet('exclude');
+        $result = $this->config->offsetGet('exclude');
+
+        // ensure keys exists
+        $keys = ['entity', 'field', 'query_type', 'type'];
+        foreach ($keys as $key) {
+            foreach ($result as $i => $item) {
+                if (!isset($item[$key])) {
+                    $result[$i][$key] = false;
+                }
+            }
+        }
+
+        // set default false
+        array_walk_recursive(
+            $result,
+            function(&$value) {
+                $value = empty($value) ? false : $value;
+            }
+        );
+
+        return $result;
     }
 }
