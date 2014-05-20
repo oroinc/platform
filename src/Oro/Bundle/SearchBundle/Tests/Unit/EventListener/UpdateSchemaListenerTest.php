@@ -9,7 +9,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $searchEngine;
+    protected $indexManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -66,12 +66,12 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->searchEngine = $this
-            ->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Orm')
+        $this->indexManager = $this
+            ->getMockBuilder('Oro\Bundle\SearchBundle\Engine\FulltextIndexManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new UpdateSchemaDoctrineListener($this->searchEngine);
+        $this->listener = new UpdateSchemaDoctrineListener($this->indexManager);
     }
 
     public function testNotRelatedCommand()
@@ -83,9 +83,9 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getCommand')
             ->will($this->returnValue($command));
 
-        $this->searchEngine
+        $this->indexManager
             ->expects($this->never())
-            ->method('reindex');
+            ->method('createIndexes');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }
@@ -103,9 +103,9 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
 
-        $this->searchEngine
+        $this->indexManager
             ->expects($this->never())
-            ->method('reindex');
+            ->method('createIndexes');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }
@@ -123,9 +123,9 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
 
-        $this->searchEngine
+        $this->indexManager
             ->expects($this->once())
-            ->method('reindex');
+            ->method('createIndexes');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }

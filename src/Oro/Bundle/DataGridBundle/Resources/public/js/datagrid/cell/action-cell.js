@@ -53,7 +53,7 @@ define(['jquery', 'underscore', 'backgrid'
         },
 
         /**
-         * Initilize cell actions and launchers
+         * Initialize cell actions and launchers
          */
         initialize: function() {
             Backgrid.Cell.prototype.initialize.apply(this, arguments);
