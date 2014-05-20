@@ -110,6 +110,10 @@ class ReportController extends Controller
         return array();
     }
 
+    /**
+     * @param Report $entity
+     * @return array
+     */
     protected function update(Report $entity)
     {
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
