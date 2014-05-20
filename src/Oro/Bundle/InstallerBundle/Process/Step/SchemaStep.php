@@ -23,7 +23,7 @@ class SchemaStep extends AbstractStep
             case 'schema-drop':
                 return $this->handleAjaxAction(
                     'doctrine:schema:drop',
-                    array('--force' => true, '--full-database' => true)
+                    array('--force' => true, '--full-database' => $context->getStorage()->get('fullDatabase', false))
                 );
             case 'schema-update':
                 return $this->handleAjaxAction('oro:migration:load');
