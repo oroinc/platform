@@ -734,6 +734,8 @@ abstract class AbstractQueryConverter
      * @param array  $query
      * @param string $joinType
      * @param        $parentJoinId
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
     {

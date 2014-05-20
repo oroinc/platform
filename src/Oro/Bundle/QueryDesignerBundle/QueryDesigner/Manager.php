@@ -11,6 +11,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
 {
     /** @var ConfigurationObject */
