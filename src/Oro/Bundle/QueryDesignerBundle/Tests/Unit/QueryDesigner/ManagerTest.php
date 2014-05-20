@@ -6,10 +6,110 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Manager */
-    protected $manager;
+    public function testIsIgnoredField()
+    {
+        $metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldName = 'testField';
+        $className = 'Test\Entity';
 
-    public function setUp()
+        $manager = $this->getManager(
+            [
+                'exclude' => [
+                    ['type'       => 'integer'],
+                    ['query_type' => 'segment'],
+                    ['entity'     => $className, $fieldName],
+                    ['entity'     => 'Never\Existing\EntityNeverChecked'],
+            ]
+            ]
+        );
+
+        $reflectionClassMock = $this->getMockBuilder('\ReflectionClass')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $reflectionClassMock->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($className));
+
+        $metadata->expects($this->once())
+            ->method('getReflectionClass')
+            ->will($this->returnValue($reflectionClassMock));
+
+        $metadata->expects($this->at(1))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('string'));
+
+        $metadata->expects($this->at(2))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('integer'));
+
+        $metadata->expects($this->at(2))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('boolean'));
+
+        $result = $manager->isIgnoredField($metadata, $fieldName, 'report');
+        $this->assertTrue($result);
+    }
+
+    public function testIsIgnoredAssosiation()
+    {
+        $metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldName = 'testRelation';
+        $className = 'Test\Entity';
+
+        $manager = $this->getManager(
+            [
+                'exclude' => [
+                    ['type'       => 'integer'],
+                    ['query_type' => 'segment'],
+                    ['entity'     => $className, $fieldName],
+                    ['entity'     => 'Never\Existing\EntityNeverChecked'],
+                ]
+            ]
+        );
+
+        $reflectionClassMock = $this->getMockBuilder('\ReflectionClass')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $reflectionClassMock->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($className));
+
+        $metadata->expects($this->once())
+            ->method('getReflectionClass')
+            ->will($this->returnValue($reflectionClassMock));
+
+        $metadata->expects($this->at(1))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('string'));
+
+        $metadata->expects($this->at(2))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('integer'));
+
+        $metadata->expects($this->at(2))
+            ->method('getTypeOfField')
+            ->with($fieldName)
+            ->will($this->returnValue('boolean'));
+
+        $result = $manager->isIgnoredField($metadata, $fieldName, 'report');
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @param $config
+     *
+     * @return Manager
+     */
+    protected function getManager($config)
     {
         $resolverMock = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver')
             ->disableOriginalConstructor()
@@ -29,28 +129,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $virtualFieldsProvider->expects($this->once())
-            ->method('getVirtualFieldsWithHierarchy')
+            ->method('getVirtualFields')
             ->will($this->returnValue([]));
 
-        $this->manager = new Manager(
-            [
-                'exclude' => []
-            ],
+        return new Manager(
+            $config,
             $resolverMock,
             $hierarchyProviderMock,
             $translator,
             $virtualFieldsProvider
         );
-    }
-
-    public function testIsIgnoredField()
-    {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldName = 'test';
-
-        $result = $this->manager->isIgnoredField($metadata, $fieldName, 'report');
-        $this->assertFalse($result);
     }
 } 
