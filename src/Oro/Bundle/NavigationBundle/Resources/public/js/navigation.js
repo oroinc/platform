@@ -60,7 +60,7 @@ define(function (require) {
          * menuDropdowns - Selector for 3 dots menu and user dropdowns
          * pinbarHelp - Selector for pinbars help link
          * historyTab - Selector for history 3 dots menu tab
-         * mostViwedTab - Selector for most viewed 3 dots menu tab
+         * mostViewedTab - Selector for most viewed 3 dots menu tab
          * flashMessages - Selector for system messages block
          * menu - Selector for system main menu
          * breadcrumb - Selector for breadcrumb block
@@ -309,7 +309,7 @@ define(function (require) {
             /**
              * Processing links in 3 dots menu after item is added (e.g. favourites)
              */
-            mediator.bind("navigaion_item:added", function (item) {
+            mediator.bind("navigation_item:added", function (item) {
                 this.processClicks(item.find(this.selectors.links));
             }, this);
 
@@ -814,8 +814,17 @@ define(function (require) {
                 this.updateDebugToolbar(XMLHttpRequest);
             }
 
-            this.handleResponse(XMLHttpRequest.responseText);
-            this.addErrorClass();
+            var options = {
+                stopPageProcessing: false
+            };
+
+            mediator.trigger('navigation:page_load:error', XMLHttpRequest, options);
+
+            if (!options.stopPageProcessing) {
+                this.handleResponse(XMLHttpRequest.responseText);
+                this.addErrorClass();
+            }
+
             this.hideLoading();
         },
 
@@ -844,7 +853,7 @@ define(function (require) {
         /**
          * View / hide pins div and set titles
          *
-         * @param showPinButton
+         * @param data
          */
         processPinButton: function(data) {
             if (data.showPinButton) {
@@ -1144,7 +1153,7 @@ define(function (require) {
     /**
      * Register Pinbar view instance
      *
-     * @param {Object} pinbarView
+     * @param {Object} instance pinbarView
      */
     Navigation.registerPinbarView = function (instance) {
         pinbarView = instance;
