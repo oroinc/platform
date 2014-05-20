@@ -34,33 +34,32 @@ class FulltextIndexManager
      */
     public function createIndexes()
     {
-        if ($query = $this->getQuery()) {
-            try {
-                $this->connection->query($query);
+        try {
+            $this->connection->query($this->getQuery());
 
-                return true;
-            } catch (DBALException $exception) {
-                return false;
-            }
+            return true;
+        } catch (DBALException $exception) {
         }
 
         return false;
     }
 
     /**
-     * @return string|null
+     * @throws \RuntimeException
+     * @return string
      */
     public function getQuery()
     {
         $config = $this->connection->getParams();
+        $driver = $config['driver'];
 
-        if (isset($this->configClasses[$config['driver']])) {
-            /** @var PdoMysql $className */
-            $className = $this->configClasses[$config['driver']];
-
-            return $className::getPlainSql();
+        if (!isset($this->configClasses[$driver])) {
+            throw new \RuntimeException('Driver "%s" not found');
         }
 
-        return null;
+        /** @var PdoMysql $className */
+        $className = $this->configClasses[$driver];
+
+        return $className::getPlainSql();
     }
 }

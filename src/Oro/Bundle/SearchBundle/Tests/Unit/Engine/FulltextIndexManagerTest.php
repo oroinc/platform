@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,7 +44,8 @@ class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->connection
             ->expects($this->once())
-            ->method('query');
+            ->method('query')
+            ->with(PdoMysql::getPlainSql());
 
         $this->indexManager->createIndexes();
     }
