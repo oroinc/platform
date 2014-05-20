@@ -7,7 +7,7 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
-class VirtualColumnsTest extends OrmQueryConverterTest
+class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -83,7 +83,7 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                 'query'        => [
                     'select' => [
                         't2.name as c1',
-                        't3.iso2Code as c2',
+                        't2.iso2Code as c2',
                     ],
                     'from'   => [
                         ['table' => $en, 'alias' => 't1']
@@ -93,11 +93,7 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                             [
                                 'join'  => 't1.country',
                                 'alias' => 't2'
-                            ],
-                            [
-                                'join'  => 't1.country',
-                                'alias' => 't3',
-                            ],
+                            ]
                         ]
                     ]
                 ],
