@@ -158,14 +158,19 @@ class InstallCommand extends ContainerAwareCommand
 
         $input->setInteractive(false);
 
+        $schemaDropOptions = array(
+            '--force' => true,
+            '--process-isolation' => true,
+        );
+
+        if ($input->getOption('full-database')) {
+            $schemaDropOptions['--full-database'] = true;
+        }
+
         $commandExecutor
             ->runCommand(
                 'doctrine:schema:drop',
-                array(
-                    '--force' => true,
-                    '--full-database' => $input->hasOption('full-database'),
-                    '--process-isolation' => true,
-                )
+                $schemaDropOptions
             )
             ->runCommand('oro:entity-config:clear')
             ->runCommand('oro:entity-extend:clear')

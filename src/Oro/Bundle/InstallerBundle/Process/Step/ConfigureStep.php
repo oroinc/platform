@@ -34,8 +34,8 @@ class ConfigureStep extends AbstractStep
             $context->getStorage()->set(
                 'fullDatabase',
                 $form->has('database') &&
-                    $form->get('database')->has('oro_installer_database_drop_full') &&
-                    $form->get('database')->get('oro_installer_database_drop_full')->getData()
+                $form->get('database')->has('oro_installer_database_drop_full') &&
+                $form->get('database')->get('oro_installer_database_drop_full')->getData()
             );
 
             $this->get('oro_installer.yaml_persister')->dump($data);

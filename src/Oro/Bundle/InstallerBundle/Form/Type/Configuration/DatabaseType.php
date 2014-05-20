@@ -64,9 +64,9 @@ class DatabaseType extends AbstractType
                 'oro_installer_database_drop_full',
                 'checkbox',
                 array(
-                    'label'      => 'form.configuration.database.drop_full',
-                    'required'   => false,
-                    'empty_data' => false,
+                    'label'    => 'form.configuration.database.drop_full',
+                    'required' => false,
+                    'data'     => false,
                 )
             );
     }
