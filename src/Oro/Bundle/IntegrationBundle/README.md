@@ -10,12 +10,10 @@ General purpose is to allow developers to create integration bundles and provide
 - [Transport definition](#transport-definition)
 - [Connector definition](#connector-definition)
 
-
-
 ##Channel type definition
-**Channel types** - allows to define channel configuration. Example: Magento channel type that allows to define API
-credentials.
-**Channel** - and instance of configured channel type with enabled connectors. Attributes: name, settings.
+
+**Channel type** - type of application/service to connect.
+**Channel** - and instance of configured channel type with enabled connectors.
 
 Responsibility of channel is to split on groups transport/connectors by third party application type.
 To define you own channel type developer should create class that will implement
@@ -31,6 +29,7 @@ that will contains `type` key, it's should be unique.
 ```
 
 ##Transport definition
+
 Responsibility of **transport** is communicate connector and channel, it should perform read/write operations to third
 party systems.
 To define you own transport developer should create class that will implement
@@ -47,8 +46,9 @@ could be used.
 ```
 
 ##Connector definition
-**Channel connector** that is responsible to bring data in and define compatible channel types. Examples: Magento
-customers data connector, Magento catalog data connector for PIM, Magento catalog data connector for CRM etc..
+
+**Channel connector** is responsible to bring data in and define compatible channel types. Examples: Magento
+customers data connector, Magento catalog data connector.
 
 To define you own connector developer should create class that will implement
 `Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface` and register it as service with `oro_integration.connector`
@@ -68,11 +68,8 @@ This will export your data to your store based on channel definition.
 
 **oro_integration.reader.entity.by_id** - service reads from entity by ID.
 
-**processor.reverse** - service which processing each record.
-
-**oro_integration.writer.reverse** - service is writing collection of entities.
-
 ####Example:
+``` yaml
     #batch_job.yml
     example_export:
         title: "Entity export"
@@ -83,13 +80,21 @@ This will export your data to your store based on channel definition.
                 class: Oro\Bundle\BatchBundle\Step\ItemStep
                 services:
                     reader:    oro_integration.reader.entity.by_id
-                    processor: processor.reverse
-                    writer:    oro_integration.writer.reverse
+                    processor: YOUR_PROCESSOR                       # service which processing each record. Could prepare changeset for writer
+                    writer:    YOUR_REVERSE_WRITER                  # service that are responsible for data push to remote instance
                 parameters: ~
+```
 
-Processor can be initialized in your Bundle in service.yaml:
+Processor and writer could be initialized in your bundle in service.yaml
 ####Example:
-    processor.reverse:
-        class: %processor.reverse.class%
+``` yaml
+    YOUR_PROCESSOR:
+        class: %YOUR_PROCESSOR.class%
+    YOUR_REVERSE_WRITER:
+        class: %YOUR_REVERSE_WRITER.class%
+```
 
-Where processor.reverse.class - should implements Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface
+Where `YOUR_PROCESSOR.class` - should implements Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface
+and `YOUR_REVERSE_WRITER.class` - should implements Oro\Bundle\ImportExportBundle\Processor\WriterInterface
+
+Implementation of those classes are very platform specific
