@@ -9,6 +9,7 @@
         });
 
         sync(new Wamp({
+            secure: {{ app.request.headers.get('X-Forwarded-Proto') == 'https' ? 'true' : 'false' }},
             host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
             port: {{ ws.port }},
             maxRetries: 3,
