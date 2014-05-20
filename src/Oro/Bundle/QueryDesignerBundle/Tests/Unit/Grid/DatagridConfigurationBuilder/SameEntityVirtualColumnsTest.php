@@ -14,8 +14,6 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
      */
     public function testVirtualColumns()
     {
-        $this->markTestSkipped('Alex pelase fix it:)');
-
         $en                    = 'Acme\Entity\TestEntity';
         $definition            = [
             'columns' => [
