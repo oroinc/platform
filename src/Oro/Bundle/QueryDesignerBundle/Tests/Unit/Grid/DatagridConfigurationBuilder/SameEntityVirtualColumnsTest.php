@@ -14,8 +14,6 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
      */
     public function testVirtualColumns()
     {
-        $this->markTestSkipped('Alex pelase fix it:)');
-
         $en                    = 'Acme\Entity\TestEntity';
         $definition            = [
             'columns' => [
@@ -85,7 +83,7 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
                 'query'        => [
                     'select' => [
                         't2.name as c1',
-                        't3.iso2Code as c2',
+                        't2.iso2Code as c2',
                     ],
                     'from'   => [
                         ['table' => $en, 'alias' => 't1']
@@ -95,11 +93,7 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
                             [
                                 'join'  => 't1.country',
                                 'alias' => 't2'
-                            ],
-                            [
-                                'join'  => 't1.country',
-                                'alias' => 't3',
-                            ],
+                            ]
                         ]
                     ]
                 ],
