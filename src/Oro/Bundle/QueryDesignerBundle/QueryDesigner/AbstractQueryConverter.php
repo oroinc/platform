@@ -641,9 +641,10 @@ abstract class AbstractQueryConverter
         ];
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner');
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left');
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner', $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left', $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
+
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
             }
@@ -693,7 +694,7 @@ abstract class AbstractQueryConverter
         }
 
         $delimiterPos = strpos($item['join'], '.');
-        if (false === $delimiterPos) {
+        if (false !== $delimiterPos) {
             $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
@@ -711,6 +712,7 @@ abstract class AbstractQueryConverter
         }
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
+            //$joinId                      = $item['joinId'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
                 $item['join'],
                 $parentJoinId,
@@ -731,8 +733,9 @@ abstract class AbstractQueryConverter
      * @param array  $aliases
      * @param array  $query
      * @param string $joinType
+     * @param        $parentJoinId
      */
-    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType)
+    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
     {
         if (isset($query['join'][$joinType])) {
             foreach ($query['join'][$joinType] as $item) {
@@ -751,6 +754,19 @@ abstract class AbstractQueryConverter
                     $aliases[$alias] = $this->generateTableAlias();
                 }
                 $item['alias'] = $aliases[$alias];
+
+                $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
+                    $item['join'],
+                    $parentJoinId,
+                    $item['type'],
+                    isset($item['conditionType']) ? $item['conditionType'] : null,
+                    isset($item['condition']) ? $item['condition'] : null
+                );
+
+                if (isset($this->tableAliases[$itemJoinId])) {
+                    $item['alias']   = $this->tableAliases[$itemJoinId];
+                    $aliases[$alias] = $this->tableAliases[$itemJoinId];
+                }
 
                 $joins[] = $item;
             }
