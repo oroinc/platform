@@ -39,6 +39,13 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Determines whether sample data need to be loaded or not'
+            )
+            ->addOption(
+                'full-database',
+                null,
+                InputOption::VALUE_NONE,
+                'Instead of using the Class Metadata to detect the database table schema,
+                    drop ALL assets that the database contains.'
             );
     }
 
@@ -156,7 +163,7 @@ class InstallCommand extends ContainerAwareCommand
                 'doctrine:schema:drop',
                 array(
                     '--force' => true,
-                    '--full-database' => true,
+                    '--full-database' => $input->hasOption('full-database'),
                     '--process-isolation' => true,
                 )
             )
