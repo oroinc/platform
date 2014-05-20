@@ -77,7 +77,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityHierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
+        $virtualFieldsProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -87,8 +87,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityClassResolver,
             $this->doctrine,
             $translator,
-            $entityHierarchyProvider,
-            [],
+            $virtualFieldsProvider,
             []
         );
         $this->fieldProvider->setEntityProvider($this->entityProvider);
