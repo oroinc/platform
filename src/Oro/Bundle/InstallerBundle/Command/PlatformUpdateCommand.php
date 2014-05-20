@@ -35,7 +35,6 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
-
             $commandExecutor = new CommandExecutor(
                 $input->hasOption('env') ? $input->getOption('env') : null,
                 $output,
@@ -57,7 +56,6 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 ->runCommand('oro:localization:dump')
                 ->runCommand('oro:translation:dump')
                 ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
-
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'

@@ -2,17 +2,13 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Doctrine\DBAL\Connection;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
 class LoadMigrationsCommand extends ContainerAwareCommand
@@ -92,6 +88,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
             );
+            $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
         }
