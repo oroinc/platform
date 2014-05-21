@@ -195,6 +195,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => array(new Constraints\NotBlank()),
                 'expectedAttributes' => array(
+                    'data-required'   => 1,
                     'data-validation' => '{"NotBlank":{"message":"This value should not be blank."}}'
                 )
             ),
@@ -214,8 +215,9 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
-                        '"NotBlank":{"message":"This value should not be blank."}'.
-                        '}'
+                        '"NotBlank":{"message":"This value should not be blank."}' .
+                        '}',
+                    'data-required'   => 1
                 )
             ),
             'merge_with_json_string' => array(
@@ -232,15 +234,16 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"NotBlank":{"message":"This value should not be blank."}'.
-                        '}'
+                        '"NotBlank":{"message":"This value should not be blank."}' .
+                        '}',
+                    'data-required'   => 1
                 )
             ),
             'override_invalid_value' => array(
                 'view' => $this->createView(
                     array(
                         'attr' => array(
-                            'data-validation' => '{"NotNull":}'
+                            'data-validation' => '{"NotNull":}',
                         )
                     )
                 ),
@@ -250,7 +253,8 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expectedAttributes' => array(
                     'data-validation' =>
-                        '{"NotBlank":{"message":"This value should not be blank."}}'
+                        '{"NotBlank":{"message":"This value should not be blank."}}',
+                    'data-required'   => 1
                 )
             ),
         );

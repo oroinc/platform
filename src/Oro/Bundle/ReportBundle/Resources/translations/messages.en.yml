@@ -44,18 +44,19 @@ oro:
             filters:                Filters
             choose_report_type:     Choose a report type...
 
+        chart_options.label: Chart Options
+        created_at.label:    Created at
+        definition.label:    Definition
+        description.label:   Description
+        entity.label:        Entity
         entity_label:        Report
-        entity_plural_label: Reports
         entity_description:  Represent Report
-        id.label:           Id
-        type.label:         Report type
-        owner.label:        Owner
-        name.label:         Name
-        entity.label:       Entity
-        description.label:  Description
-        definition.label:   Definition
-        created_at.label:   Created at
-        updated_at.label:   Updated at
+        entity_plural_label: Reports
+        id.label:            Id
+        name.label:          Name
+        owner.label:         Owner
+        type.label:          Report type
+        updated_at.label:    Updated at
 
         reporttype:
             entity_label:        Report Type
