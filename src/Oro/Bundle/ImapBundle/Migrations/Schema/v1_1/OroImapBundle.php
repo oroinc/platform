@@ -19,7 +19,7 @@ class OroImapBundle implements Migration
         $table->dropIndex('UNIQ_17E00D83A832C1C9');
         $table->addIndex(['email_id'], 'IDX_17E00D83A832C1C9');
 
-        $table->addColumn('imap_folder_id', 'integer', ['notnull' => false]);
+        $table->addColumn('imap_folder_id', 'integer', ['notnull' => true]);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_folder_imap'),
             ['imap_folder_id'],

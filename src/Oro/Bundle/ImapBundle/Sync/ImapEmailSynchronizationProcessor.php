@@ -467,5 +467,4 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             }
         }
     }
-
 }
