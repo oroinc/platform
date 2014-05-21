@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
@@ -50,11 +50,10 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->isNotEmpty($data->getType())) {
-            if (true === $this->hasTwoWaySync($data->getType())) {
-                $modifier = $this->getModifierClosure();
-                $modifier($form);
-            }
+        $type = $data->getType();
+        if (!empty($type) && $this->hasTwoWaySyncConnectors($type)) {
+            $modifier = $this->getModifierClosure();
+            $modifier($form);
         }
     }
 
@@ -70,66 +69,45 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->isNotEmpty($data['type'])) {
-            if (true === $this->hasTwoWaySync($data['type'])) {
-                $modifier = $this->getModifierClosure();
-                $modifier($form);
-            }
+        if (!empty($data['type']) && $this->hasTwoWaySyncConnectors($data['type'])) {
+            $modifier = $this->getModifierClosure();
+            $modifier($form);
         }
     }
 
     /**
-     * @param $data
+     * Checks whether channel has at least on connector that supports backward sync
      *
-     * @return bool
-     */
-    private function isNotEmpty($data)
-    {
-        return !empty($data);
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return ArrayCollection
-     */
-    private function getRegisteredConnectorsTypes($type)
-    {
-        return $this->registry->getRegisteredConnectorsTypes($type);
-    }
-
-    /**
      * @param string $type
      *
      * @return bool
      */
-    private function hasTwoWaySync($type)
+    protected function hasTwoWaySyncConnectors($type)
     {
-        $connectorsTypes = $this->getRegisteredConnectorsTypes($type);
-
-        foreach ($connectorsTypes as $type) {
-            if ($type instanceof TwoWaySyncConnectorInterface) {
-                return true;
+        $connectors = $this->registry->getRegisteredConnectorsTypes(
+            $type,
+            function (ConnectorInterface $connector) {
+                return $connector instanceof TwoWaySyncConnectorInterface;
             }
-        }
-        return false;
+        );
+
+        return !$connectors->isEmpty();
     }
 
     /**
-     * @return callable
+     * @return \Closure
      */
     protected function getModifierClosure()
     {
-        return function ($form) {
-            // commented until two way sync will finished
-            /*$form->add(
+        return function (FormInterface $form) {
+            $form->add(
                 'isTwoWaySyncEnabled',
                 'checkbox',
                 [
                     'label'    => 'oro.integration.channel.is_two_way_sync_enabled.label',
                     'required' => false,
                 ]
-            );*/
+            );
             $form->add(
                 'syncPriority',
                 'choice',

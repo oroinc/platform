@@ -1,64 +1,59 @@
 <?php
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
 
 class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Oro\Bundle\IntegrationBundle\Manager\TypesRegistry */
+    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $typesRegistry;
 
-    /** @var AddressCountryAndRegionSubscriber */
+    /** @var ChannelFormTwoWaySyncSubscriber */
     protected $subscriber;
 
-    /** @var \Symfony\Component\Form\FormEvent */
+    /** @var FormEvent|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventMock;
 
-    /** @var \Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface */
+    /** @var TwoWaySyncConnectorInterface */
     protected $connector;
 
-    /** @var \Symfony\Component\Form\Test\FormInterface */
+    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $formMock;
 
-    /** @var \Oro\Bundle\IntegrationBundle\Entity\Channel */
+    /** @var Channel|\PHPUnit_Framework_MockObject_MockObject */
     protected $data;
 
-    /**
-     * SetUp test environment
-     */
     public function setUp()
     {
         $this->typesRegistry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
+        $this->eventMock     = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
+            ->disableOriginalConstructor()->getMock();
+        $this->formMock      = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $this->data          = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->connector     = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface');
 
         $this->subscriber = new ChannelFormTwoWaySyncSubscriber($this->typesRegistry);
-
-        $this->eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->connector = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->data = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
     }
 
     public function tearDown()
     {
         unset(
             $this->typesRegistry,
-            $this->subscriber,
             $this->eventMock,
             $this->connector,
             $this->formMock,
-            $this->data
+            $this->data,
+            $this->subscriber
         );
     }
 
@@ -68,6 +63,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $result);
+        $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
     public function testPreSetWithoutTwoWay()
@@ -78,7 +74,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->typesRegistry->expects($this->once())
             ->method('getRegisteredConnectorsTypes')
-            ->will($this->returnValue([]));
+            ->will($this->returnValue(new ArrayCollection()));
 
         $this->formMock->expects($this->never())
             ->method('add')
@@ -91,7 +87,7 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($this->data));
 
-        $this->assertNull($this->subscriber->preSet($this->eventMock));
+        $this->subscriber->preSet($this->eventMock);
     }
 
     public function testPreSetWithTwoWay()
@@ -100,11 +96,11 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->will($this->returnValue('test'));
 
-        $this->typesRegistry->expects($this->once())
+        $this->typesRegistry->expects($this->any())
             ->method('getRegisteredConnectorsTypes')
-            ->will($this->returnValue([$this->connector]));
+            ->will($this->returnValue(new ArrayCollection([$this->connector])));
 
-        $this->formMock->expects($this->once())
+        $this->formMock->expects($this->exactly(2))
             ->method('add')
             ->will($this->returnValue($this->formMock));
 
@@ -115,6 +111,6 @@ class ChannelFormTwoWaySyncSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($this->data));
 
-        $this->assertNull($this->subscriber->preSet($this->eventMock));
+        $this->subscriber->preSet($this->eventMock);
     }
 }
