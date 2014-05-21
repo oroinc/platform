@@ -6,7 +6,7 @@ use Symfony\Component\Translation\Translator;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -14,7 +14,7 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
+class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -34,18 +34,18 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /**
      * Constructor
      *
-     * @param array                   $config
-     * @param ConfigurationResolver   $resolver
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param Translator              $translator
-     * @param VirtualFieldProvider    $virtualFieldProvider
+     * @param array                         $config
+     * @param ConfigurationResolver         $resolver
+     * @param EntityHierarchyProvider       $entityHierarchyProvider
+     * @param Translator                    $translator
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
         EntityHierarchyProvider $entityHierarchyProvider,
         Translator $translator,
-        VirtualFieldProvider $virtualFieldProvider
+        VirtualFieldProviderInterface $virtualFieldProvider
     ) {
         $resolver->resolve($config);
         $this->config                  = ConfigurationObject::create($config);
@@ -134,22 +134,6 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isVirtualField($className, $fieldName)
-    {
-        return isset($this->virtualFields[$className][$fieldName]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualFieldQuery($className, $fieldName)
-    {
-        return $this->virtualFields[$className][$fieldName]['query'];
     }
 
     /**

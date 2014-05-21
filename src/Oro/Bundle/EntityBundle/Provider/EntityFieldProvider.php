@@ -51,13 +51,13 @@ class EntityFieldProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider       $entityConfigProvider
-     * @param ConfigProvider       $extendConfigProvider
-     * @param EntityClassResolver  $entityClassResolver
-     * @param ManagerRegistry      $doctrine
-     * @param Translator           $translator
-     * @param VirtualFieldProvider $virtualFieldProvider
-     * @param array                $hiddenFields
+     * @param ConfigProvider                $entityConfigProvider
+     * @param ConfigProvider                $extendConfigProvider
+     * @param EntityClassResolver           $entityClassResolver
+     * @param ManagerRegistry               $doctrine
+     * @param Translator                    $translator
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param array                         $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -65,7 +65,7 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        VirtualFieldProvider $virtualFieldProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;

@@ -12,7 +12,7 @@ services:
         class: %oro_report.datagrid.configuration.provider.class%
         arguments:
             - @oro_query_designer.query_designer.manager
-            - @oro_query_designer.query_designer.manager
+            - @oro_entity.virtual_field_provider.chain
             - @doctrine
             - @oro_entity_config.config_manager
         tags:

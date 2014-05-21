@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Provider;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -9,7 +10,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider as ParentEntityFieldProvider;
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -29,7 +29,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        VirtualFieldProvider $virtualFieldProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         $hiddenFields,
         QueryDesignerManager $qdManager
     ) {

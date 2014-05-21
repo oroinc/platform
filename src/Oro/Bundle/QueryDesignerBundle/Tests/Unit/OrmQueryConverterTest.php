@@ -9,7 +9,7 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
     {
-        $provider = $this->getMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface');
+        $provider = $this->getMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
         $provider->expects($this->any())
             ->method('isVirtualField')
             ->will(

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-class VirtualFieldProvider
+class VirtualFieldProvider implements VirtualFieldProviderInterface
 {
     /** @var  EntityHierarchyProvider */
     protected $entityHierarchyProvider;
@@ -63,5 +63,25 @@ class VirtualFieldProvider
         }
 
         return $virtualFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtualField($className, $fieldName)
+    {
+        $virtualFields = $this->getVirtualFields();
+
+        return isset($virtualFields[$className][$fieldName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualFieldQuery($className, $fieldName)
+    {
+        $virtualFields = $this->getVirtualFields();
+
+        return $virtualFields[$className][$fieldName]['query'];
     }
 }

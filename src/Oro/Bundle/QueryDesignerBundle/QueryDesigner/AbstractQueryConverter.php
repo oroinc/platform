@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -712,7 +713,6 @@ abstract class AbstractQueryConverter
         }
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
-            //$joinId                      = $item['joinId'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
                 $item['join'],
                 $parentJoinId,

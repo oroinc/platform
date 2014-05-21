@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
+namespace Oro\Bundle\EntityBundle\Provider;
 
 interface VirtualFieldProviderInterface
 {
@@ -21,4 +21,12 @@ interface VirtualFieldProviderInterface
      * @return array
      */
     public function getVirtualFieldQuery($className, $fieldName);
+
+
+    /**
+     *
+     *
+     * @return array
+     */
+    public function getVirtualFields();
 }
