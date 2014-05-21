@@ -87,9 +87,27 @@ class ChannelController extends Controller
             $error = $e->getMessage();
         }
 
-        $status = $error === false ? Codes::HTTP_OK : Codes::HTTP_BAD_REQUEST;
+        $status  = Codes::HTTP_OK;
+        $success = true;
 
-        return new JsonResponse(['job_id' => $job->getId()], $status);
+        if ($error !== false) {
+            $status  = Codes::HTTP_BAD_REQUEST;
+            $success = false;
+        }
+
+        return new JsonResponse(
+            [
+                'successful' => $success,
+                'job_id'     => $job->getId(),
+                'message'    => sprintf(
+                    '%s <a href="%s" class="job-view-link">%s</a>',
+                    $this->get('translator')->trans('oro.integration.sync'),
+                    $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
+                    $this->get('translator')->trans('oro.integration.progress')
+                )
+            ],
+            $status
+        );
     }
 
     /**
