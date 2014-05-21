@@ -23,10 +23,10 @@ interface VirtualFieldProviderInterface
     public function getVirtualFieldQuery($className, $fieldName);
 
     /**
-     * Get virtual fields for given class
+     * Gets virtual field names for given class
      *
      * @param string $className
-     * @return array
+     * @return [string]
      */
     public function getVirtualFields($className);
 }
