@@ -99,10 +99,9 @@ class Processor
      *
      * @param string $email
      * @param string $originName
-     * @param bool $flushNew
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $flushNew = false)
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
         $emailOwner = $this->emailOwnerProvider->findEmailOwner(
             $this->em,
@@ -118,7 +117,7 @@ class Processor
 
             $origin = $origins->isEmpty() ? null : $origins->first();
             if ($origin == null) {
-                $origin = $this->createUserInternalOrigin($emailOwner, $flushNew);
+                $origin = $this->createUserInternalOrigin($emailOwner);
             }
         } else {
             $origin = $this->em
@@ -131,10 +130,9 @@ class Processor
 
     /**
      * @param User $emailOwner
-     * @param bool $flush
      * @return InternalEmailOrigin
      */
-    protected function createUserInternalOrigin(User $emailOwner, $flush = false)
+    protected function createUserInternalOrigin(User $emailOwner)
     {
         $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
 
@@ -152,10 +150,7 @@ class Processor
         $emailOwner->addEmailOrigin($origin);
 
         $this->em->persist($origin);
-
-        if ($flush) {
-            $this->em->flush($origin);
-        }
+        $this->em->persist($emailOwner);
 
         return $origin;
     }
