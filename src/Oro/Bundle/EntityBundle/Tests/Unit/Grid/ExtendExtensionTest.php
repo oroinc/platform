@@ -32,6 +32,41 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Class 'fake class' does not exist
+     */
+    public function testVisitDatasourceThrowAnException()
+    {
+        $entityName = 'fake class';
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->will($this->throwException(new \Exception('Class \'' . $entityName . '\' does not exist')));
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($entityManager));
+
+        $this->datagridConfig->expects($this->once())
+            ->method('offsetGetByPath')
+            ->with(ExtendExtension::EXTEND_ENTITY_CONFIG_PATH)
+            ->will($this->returnValue($entityName));
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $dataSource = new OrmDatasource($entityManager, $eventDispatcher);
+
+        $extendExtension = new ExtendExtension($this->configManager);
+        $extendExtension->visitDatasource($this->datagridConfig, $dataSource);
+    }
+
+    /**
      * @dataProvider visitDatasourceDataProvider
      * @param $entityName
      * @param $hasConfig
@@ -39,7 +74,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testVisitDatasource($entityName, $hasConfig, $fieldIds)
     {
-        $alias     = 'c';
+        $alias      = 'c';
         $countField = count($fieldIds);
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
@@ -50,24 +85,18 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if ($entityName == self::EXTEND_ENTITY_SHORT) {
-            $metadata->expects($this->once())
-                ->method('getName')
-                ->will($this->returnValue(self::EXTEND_ENTITY_FULL));
+        $metadata->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue(self::EXTEND_ENTITY_FULL));
 
-            $entityManager->expects($this->once())
-                ->method('getClassMetadata')
-                ->with($entityName)
-                ->will($this->returnValue($metadata));
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->will($this->returnValue($metadata));
 
-            $this->configManager->expects($this->once())
-                ->method('getEntityManager')
-                ->will($this->returnValue($entityManager));
-        } else {
-            $metadata->expects($this->never())->method('getName');
-            $entityManager->expects($this->never())->method('getClassMetadata');
-            $this->configManager->expects($this->never())->method('getEntityManager');
-        }
+        $this->configManager->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($entityManager));
 
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
