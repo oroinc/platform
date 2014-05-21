@@ -151,7 +151,7 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdateSchema($id)
     {
-        $this->markTestSkipped('ddasd');
+        $this->markTestSkipped('Skipped due to Update Schema does not work in test environment');
         $this->client->request(
             'GET',
             $this->getUrl("oro_entityextend_update", array('id' => $id))

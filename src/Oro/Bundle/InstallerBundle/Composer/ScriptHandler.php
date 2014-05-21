@@ -49,16 +49,13 @@ class ScriptHandler extends SensioScriptHandler
         ];
 
         $permissionHandler = new PermissionsHandler();
-        $filesystem        = new Filesystem();
 
         $withoutPermissionsList = [];
         foreach ($directories as $directory) {
-            if ($filesystem->exists($directory)) {
-                $isPermissionSet = $permissionHandler->setPermissions($directory);
+            $isPermissionSet = $permissionHandler->setPermissions($directory);
 
-                if (!$isPermissionSet) {
-                    $withoutPermissionsList[] = $directory;
-                }
+            if (!$isPermissionSet) {
+                $withoutPermissionsList[] = $directory;
             }
         }
 

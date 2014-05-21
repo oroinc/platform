@@ -74,6 +74,12 @@ class ControllersTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
+
+        for ($i = 0; $i < count($data); $i++) {
+            $reportResult[$i]['id'] = $data[$i]['id'];
+            $reportResult[$i]['view_link'] = $this->getUrl('oro_user_view', array('id' => $data[$i]['id']));
+        }
+
         $options = $result['options'];
         $this->assertReportRecordsEquals($reportResult, $data, $options['totalRecords']);
     }
@@ -117,6 +123,12 @@ class ControllersTest extends WebTestCase
 
         $data = $result['data'];
         $options = $result['options'];
+
+        for ($i = 0; $i < count($data); $i++) {
+            $reportResult[$i]['id'] = $data[$i]['id'];
+            $reportResult[$i]['view_link'] = $this->getUrl('oro_user_view', array('id' => $data[$i]['id']));
+        }
+
         $this->assertReportRecordsEquals($reportResult, $data, (int)$options['totalRecords']);
     }
 
