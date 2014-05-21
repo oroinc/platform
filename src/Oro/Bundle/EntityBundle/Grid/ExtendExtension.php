@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Grid;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
@@ -126,7 +125,7 @@ class ExtendExtension extends AbstractExtension
 
             /** @var From $fromPart */
             foreach ($fromParts as $fromPart) {
-                if ($fromPart->getFrom() == $entityName) {
+                if ($this->prepareEntityName($fromPart->getFrom()) == $entityName) {
                     $alias = $fromPart->getAlias();
                 }
             }
@@ -173,18 +172,23 @@ class ExtendExtension extends AbstractExtension
     }
 
     /**
+     * Convert entityName to the full format
+     *
+     * @param  string $entityName
+     * @return string
+     */
+    protected function prepareEntityName($entityName)
+    {
+        return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
+    }
+
+    /**
      * @param DatagridConfiguration $config
-     * @throws \Exception when class was not found by $entityName
      * @return string extended entity class name
      */
     protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
     {
-        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
-        try {
-            return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
-        } catch (MappingException $error) {
-            throw $error;
-        }
+        return $this->prepareEntityName($config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH));
     }
 
     /**
