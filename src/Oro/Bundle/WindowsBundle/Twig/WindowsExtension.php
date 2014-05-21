@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\WindowsBundle\Twig;
 
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Twig_Environment;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
 class WindowsExtension extends \Twig_Extension
@@ -57,6 +59,14 @@ class WindowsExtension extends \Twig_Extension
                     'is_safe' => array('html'),
                     'needs_environment' => true
                 )
+            ),
+            'oro_window_render_fragment' => new \Twig_Function_Method(
+                $this,
+                'renderFragment',
+                array(
+                    'is_safe' => array('html'),
+                    'needs_environment' => true
+                )
             )
         );
     }
@@ -65,35 +75,76 @@ class WindowsExtension extends \Twig_Extension
      * Renders a menu with the specified renderer.
      *
      * @param \Twig_Environment $environment
-     * @param array $options
      *
      * @return string
      */
-    public function render(Twig_Environment $environment, array $options = array())
+    public function render(\Twig_Environment $environment)
     {
         if (!($user = $this->getUser()) || $this->rendered) {
             return '';
         }
         $this->rendered = true;
 
-        $states = array();
-        $windowsList = $this->em->getRepository('OroWindowsBundle:WindowsState')->findBy(array('user' => $user));
-        /** @var $windowState WindowsState */
-        foreach ($windowsList as $windowState) {
+        $windowStates = array();
+        $removeWindowStates = array();
+        $userWindowStates = $this->em->getRepository('OroWindowsBundle:WindowsState')->findBy(array('user' => $user));
+        /** @var WindowsState $windowState */
+        foreach ($userWindowStates as $windowState) {
             $data = $windowState->getData();
-            if (!$data) {
+            if (empty($data) || !isset($data['cleanUrl'])) {
                 $this->em->remove($windowState);
-                $this->em->flush();
-            } elseif (array_key_exists('cleanUrl', $data) && array_key_exists('type', $data)) {
-                $data['cleanUrl'] = $this->getUrlWithContainer($data['cleanUrl'], $data['type']);
-                $states[$windowState->getId()] = $data;
+                $removeWindowStates[] = $windowState;
+            } else {
+                $windowStates[] = $windowState;
             }
         }
 
+        if ($removeWindowStates) {
+            $this->em->flush($removeWindowStates);
+        }
+
         return $environment->render(
-            "OroWindowsBundle::states.html.twig",
-            array("states" => $states)
+            'OroWindowsBundle::states.html.twig',
+            array('windowStates' => $windowStates)
         );
+    }
+
+    /**
+     * Renders a menu with the specified renderer.
+     *
+     * @param \Twig_Environment $environment
+     * @param WindowsState $windowState
+     *
+     * @return string
+     */
+    public function renderFragment(\Twig_Environment $environment, WindowsState $windowState)
+    {
+        $result = '';
+        $windowState->setRenderedSuccessfully(false);
+        $data = $windowState->getData();
+
+        if (isset($data['cleanUrl'])) {
+            if (isset($data['type'])) {
+                $uri = $this->getUrlWithContainer($data['cleanUrl'], $data['type']);
+            } else {
+                $uri = $data['cleanUrl'];
+            }
+        } else {
+            return $result;
+        }
+
+        try {
+            /** @var HttpKernelExtension $httpKernelExtension */
+            $httpKernelExtension = $environment->getExtension('http_kernel');
+            $result = $httpKernelExtension->renderFragment($uri);
+            $windowState->setRenderedSuccessfully(true);
+            return $result;
+        } catch (NotFoundHttpException $e) {
+            $this->em->remove($windowState);
+            $this->em->flush($windowState);
+        }
+
+        return $result;
     }
 
     /**
@@ -105,7 +156,7 @@ class WindowsExtension extends \Twig_Extension
      */
     public function getUser()
     {
-        /** @var $token TokenInterface */
+        /** @var TokenInterface $token */
         if (null === $token = $this->securityContext->getToken()) {
             return null;
         }
