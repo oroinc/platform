@@ -53,18 +53,18 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         return $foundProvider->getVirtualFieldQuery($className, $fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getVirtualFields($className)
     {
+        $result = [];
         foreach ($this->providers as $provider) {
             $virtualFields = $provider->getVirtualFields($className);
             if (!empty($virtualFields)) {
-                return $virtualFields;
+                foreach ($virtualFields as $fieldName) {
+                    $result[$fieldName] = true;
+                }
             }
         }
 
-        return [];
+        return array_keys($result);
     }
 }

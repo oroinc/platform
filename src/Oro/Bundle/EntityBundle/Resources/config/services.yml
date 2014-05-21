@@ -104,7 +104,7 @@ services:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
         tags:
-            - { name: oro_entity.virtual_field_provider, order: 10 }
+            - { name: oro_entity.virtual_field_provider }
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
