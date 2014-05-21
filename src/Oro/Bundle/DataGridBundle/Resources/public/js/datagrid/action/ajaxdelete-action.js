@@ -1,6 +1,6 @@
 /*global define*/
-define(['./model-action', 'oroui/js/delete-confirmation', 'orotranslation/js/translator'
-    ], function (ModelAction, DeleteConfirmation, __) {
+define(['./model-action', 'oroui/js/delete-confirmation'
+    ], function (ModelAction, DeleteConfirmation) {
     'use strict';
 
     /**
