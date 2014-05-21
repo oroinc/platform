@@ -11,8 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
 /**
  * Class ReverseSyncCommand
@@ -20,21 +20,13 @@ use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
  *
  * @package Oro\Bundle\IntegrationBundle\Command
  */
-class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInterface
+class ReverseSyncCommand extends ContainerAwareCommand
 {
-    const SYNC_PROCESSOR = 'oro_integration.reverse_sync.processor';
-    const COMMAND_NAME = 'oro:integration:reverse:sync';
-    const CHANNEL_ARG_NAME = 'channel';
-    const CONNECTOR_ARG_NAME = 'connector';
+    const SYNC_PROCESSOR      = 'oro_integration.reverse_sync.processor';
+    const COMMAND_NAME        = 'oro:integration:reverse:sync';
+    const CHANNEL_ARG_NAME    = 'channel';
+    const CONNECTOR_ARG_NAME  = 'connector';
     const PARAMETERS_ARG_NAME = 'params';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultDefinition()
-    {
-        return '*/5 * * * *';
-    }
 
     /**
      * {@inheritdoc}
@@ -43,8 +35,8 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->addOption(self::CHANNEL_ARG_NAME, null, InputOption::VALUE_REQUIRED, 'Channel id')
-            ->addOption(self::CONNECTOR_ARG_NAME, null, InputOption::VALUE_REQUIRED, 'Connector type')
+            ->addOption(self::CHANNEL_ARG_NAME, 'c', InputOption::VALUE_REQUIRED, 'Channel id')
+            ->addOption(self::CONNECTOR_ARG_NAME, 'con', InputOption::VALUE_REQUIRED, 'Connector type')
             ->addOption(self::PARAMETERS_ARG_NAME, null, InputOption::VALUE_REQUIRED, 'Parameters');
     }
 
@@ -59,20 +51,9 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
         $convertedParams = unserialize(stripslashes($params));
         $logger          = new OutputLogger($output);
         $processor       = $this->getService(self::SYNC_PROCESSOR);
-        $repository      = $this->getService('doctrine.orm.entity_manager')
+        /** @var ChannelRepository $repository */
+        $repository = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
-
-        if (empty($channelId)) {
-            throw new \InvalidArgumentException('Channel id option is required.');
-        }
-
-        if (empty($connectorType)) {
-            throw new \InvalidArgumentException('Connector type option is required.');
-        }
-
-        if (empty($params)) {
-            throw new \InvalidArgumentException('Parameters option is required.');
-        }
 
         if (!is_array($convertedParams)) {
             throw new \InvalidArgumentException('Parameters option must be serialized string.');
@@ -91,13 +72,12 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
             return 0;
         }
 
-        $channel = $repository->getOrLoadById($channelId);
-
-        if (empty($channel)) {
-            throw new \InvalidArgumentException('Channel with given ID not found');
-        }
-
         try {
+            $channel = $repository->getOrLoadById($channelId);
+            if (empty($channel)) {
+                throw new \InvalidArgumentException('Channel with given ID not found');
+            }
+
             $logger->notice(
                 sprintf(
                     'Run sync for "%s" channel and "%s" connector.',
@@ -129,7 +109,7 @@ class ReverseSyncCommand extends ContainerAwareCommand implements CronCommandInt
     }
 
     /**
-     * @param int $channelId
+     * @param int    $channelId
      * @param string $connectorTypeType
      * @param string $params
      *
