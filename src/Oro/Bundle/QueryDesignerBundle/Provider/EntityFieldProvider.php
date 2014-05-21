@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider as ParentEntityFieldProvider;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;

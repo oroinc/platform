@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;

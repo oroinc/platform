@@ -8,24 +8,57 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
     protected $entityHierarchyProvider;
 
     /** @var array */
+    protected $configurationVirtualFields = [];
+
+    /** @var  array */
     protected $virtualFields;
 
     /**
      * Constructor
      *
      * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $virtualFields
+     * @param array                   $configurationVirtualFields
      */
     public function __construct(
         EntityHierarchyProvider $entityHierarchyProvider,
-        $virtualFields
+        $configurationVirtualFields
     ) {
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->virtualFields           = $virtualFields;
+        $this->entityHierarchyProvider    = $entityHierarchyProvider;
+        $this->configurationVirtualFields = $configurationVirtualFields;
     }
 
     /**
-     * Return virtual fields by hierarchy
+     * {@inheritDoc}
+     */
+    public function getVirtualFields($className)
+    {
+        $this->ensureVirtualFieldsInitialized();
+
+        return isset($this->virtualFields[$className]) ? array_keys($this->virtualFields[$className]) : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtualField($className, $fieldName)
+    {
+        $this->ensureVirtualFieldsInitialized();
+
+        return isset($this->virtualFields[$className][$fieldName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualFieldQuery($className, $fieldName)
+    {
+        $this->ensureVirtualFieldsInitialized();
+
+        return $this->virtualFields[$className][$fieldName]['query'];
+    }
+
+    /**
+     * Ensure virtual fields are initialized
      *
      * e.g. OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress
      * and AbstractAddress has configured virtual field in entity_virtual_fields.yml
@@ -41,47 +74,34 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
      *           left:
      *             - { join: entity.country, alias: country }
      *
-     * @return array
+     * So, result for OroSomeBundle:SomeEntity will be:
+     * OroSomeBundle:SomeEntity:
+     *      ...
+     *      own virtual fields
+     *      ...
+     *      country_virtual_field
      */
-    public function getVirtualFields()
+    protected function ensureVirtualFieldsInitialized()
     {
-        $virtualFields = $this->virtualFields;
+        if ($this->virtualFields === null) {
+            $virtualFields = $this->configurationVirtualFields;
 
-        $hierarchy = $this->entityHierarchyProvider->getHierarchy();
-        foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
-            foreach ($virtualFields as $className => $fields) {
-                if (in_array($className, $hierarchyParents)) {
-                    if (!isset($virtualFields[$hierarchyClassName])) {
-                        $virtualFields[$hierarchyClassName] = [];
+            $hierarchy = $this->entityHierarchyProvider->getHierarchy();
+            foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
+                foreach ($virtualFields as $className => $fields) {
+                    if (in_array($className, $hierarchyParents)) {
+                        if (!isset($virtualFields[$hierarchyClassName])) {
+                            $virtualFields[$hierarchyClassName] = [];
+                        }
+                        $virtualFields[$hierarchyClassName] = array_merge(
+                            $virtualFields[$hierarchyClassName],
+                            $fields
+                        );
                     }
-                    $virtualFields[$hierarchyClassName] = array_merge(
-                        $virtualFields[$hierarchyClassName],
-                        $fields
-                    );
                 }
             }
+
+            $this->virtualFields = $virtualFields;
         }
-
-        return $virtualFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isVirtualField($className, $fieldName)
-    {
-        $virtualFields = $this->getVirtualFields();
-
-        return isset($virtualFields[$className][$fieldName]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualFieldQuery($className, $fieldName)
-    {
-        $virtualFields = $this->getVirtualFields();
-
-        return $virtualFields[$className][$fieldName]['query'];
     }
 }

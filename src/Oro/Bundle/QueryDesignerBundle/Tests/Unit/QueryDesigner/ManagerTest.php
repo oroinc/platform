@@ -125,19 +125,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $virtualFieldsProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $virtualFieldsProvider->expects($this->once())
-            ->method('getVirtualFields')
-            ->will($this->returnValue([]));
-
         return new Manager(
             $config,
             $resolverMock,
             $hierarchyProviderMock,
-            $translator,
-            $virtualFieldsProvider
+            $translator
         );
     }
 }
