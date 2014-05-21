@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use JMS\Serializer\Annotation\Exclude;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -48,6 +49,9 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
+    /** @var ExcludeFieldProvider */
+    protected $excludeFieldProvider;
+
     /**
      * Constructor
      *
@@ -66,7 +70,8 @@ class EntityFieldProvider
         ManagerRegistry $doctrine,
         Translator $translator,
         VirtualFieldProvider $virtualFieldProvider,
-        $hiddenFields
+        $hiddenFields,
+        ExcludeFieldProvider $excludeFieldProvider
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
@@ -75,6 +80,7 @@ class EntityFieldProvider
         $this->doctrine             = $doctrine;
         $this->virtualFields        = $virtualFieldProvider->getVirtualFields();
         $this->hiddenFields         = $hiddenFields;
+        $this->excludeFieldProvider = $excludeFieldProvider;
     }
 
     /**
@@ -217,7 +223,7 @@ class EntityFieldProvider
             return true;
         }
 
-        return false;
+        return $this->excludeFieldProvider->isIgnoreField($metadata, $fieldName);
     }
 
     /**
@@ -399,7 +405,7 @@ class EntityFieldProvider
             }
         }
 
-        return false;
+        return $this->excludeFieldProvider->isIgnoredAssosiation($metadata, $associationName);
     }
 
     /**

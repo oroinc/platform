@@ -28,18 +28,19 @@ class VirtualFieldProvider
      * Return virtual fields by hierarchy
      *
      * e.g. OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress
-     * and AbstractAddress has configured virtual field in entity_virtual_fields.yml
+     * and AbstractAddress has configured virtual field in entity.yml
      *
-     * oro_entity_virtual_fields:
-     *   Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-     *     country_virtual_field:
-     *       query:
-     *         select:
-     *           expr: country.name
-     *           return_type: string
-     *         join:
-     *           left:
-     *             - { join: entity.country, alias: country }
+     * oro_entity:
+     *   virtual_fields:
+     *     Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+     *       country_virtual_field:
+     *         query:
+     *           select:
+     *             expr: country.name
+     *             return_type: string
+     *           join:
+     *             left:
+     *               - { join: entity.country, alias: country }
      *
      * @return array
      */

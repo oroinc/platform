@@ -17,7 +17,7 @@ class OroEntityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->loadVirtualFieldConfigs($container);
+        $this->loadEntityConfigs($container);
         $this->loadHiddenFieldConfigs($container);
 
         $configuration = new Configuration();
@@ -30,27 +30,36 @@ class OroEntityExtension extends Extension
     }
 
     /**
-     * Loads configuration of entity virtual fields
+     * Loads configuration of entity
      *
      * @param ContainerBuilder $container
      */
-    protected function loadVirtualFieldConfigs(ContainerBuilder $container)
+    protected function loadEntityConfigs(ContainerBuilder $container)
     {
-        $virtualFieldConfigs = [];
+        $configs = [];
 
         $configLoader = new CumulativeConfigLoader(
-            'oro_entity_virtual_fields',
-            new YamlCumulativeFileLoader('Resources/config/oro/entity_virtual_fields.yml')
+            'oro_entity',
+            new YamlCumulativeFileLoader('Resources/config/oro/entity.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $virtualFieldConfigs = array_merge(
-                $virtualFieldConfigs,
-                $resource->data['oro_entity_virtual_fields']
+            $configs = array_merge(
+                $configs,
+                $resource->data['oro_entity']
             );
         }
 
-        $container->setParameter('oro_entity.virtual_fields', $virtualFieldConfigs);
+        $virtualFieldsConfig = isset($virtualFieldsConfig['virtual_fields']) ?
+            $virtualFieldsConfig['virtual_fields'] :
+            [];
+
+        $exclude = isset($virtualFieldsConfig['exclude']) ?
+            $virtualFieldsConfig['exclude'] :
+            [];
+
+        $container->setParameter('oro_entity.virtual_fields', $virtualFieldsConfig);
+        $container->setParameter('oro_entity.exclude', $exclude);
     }
 
     /**

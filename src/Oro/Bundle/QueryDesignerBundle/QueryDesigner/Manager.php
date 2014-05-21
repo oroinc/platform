@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -278,78 +279,9 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     }
 
     /**
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     * @param string        $queryType
-     *
-     * @return bool
-     */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName, $queryType = '')
-    {
-        $excludeRules = $this->getExcludeRules();
-        $className    = $metadata->getReflectionClass()->getName();
-
-        foreach ($excludeRules as $rule) {
-            $entity        = $rule['entity'];
-            $field         = $rule['field'];
-            $type          = $rule['type'];
-            $ruleQueryType = $rule['query_type'];
-
-            $fieldType = $metadata->getTypeOfField($fieldName);
-
-            // exclude entity
-            $isExcludeEntity = !$field && $className === $entity;
-
-            // exclude entity's field
-            $isExcludeEntityField = $className === $entity && $field === $fieldName && $queryType === $ruleQueryType;
-
-            // exclude by type
-            $isExcludeByType = $fieldType === $type;
-
-            // exclude by query type
-            $isExcludeByQueryType = $ruleQueryType === $queryType;
-
-            if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType || $isExcludeByQueryType) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $associationName
-     * @param string        $queryType
-     *
-     * @return bool
-     */
-    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $queryType = '')
-    {
-        $excludeRules = $this->getExcludeRules();
-        $className    = $metadata->getReflectionClass()->getName();
-
-        foreach ($excludeRules as $rule) {
-            $entity        = $rule['entity'];
-            $field         = $rule['field'];
-            $ruleQueryType = $rule['query_type'];
-
-            if ($entity === $className && $field === $associationName) {
-                return true;
-            }
-
-            if ($ruleQueryType === $queryType) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @return array
      */
-    protected function getExcludeRules()
+    public function getExcludeRules()
     {
         $result = $this->config->offsetGet('exclude');
 

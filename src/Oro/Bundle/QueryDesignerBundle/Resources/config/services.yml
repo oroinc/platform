@@ -44,6 +44,7 @@ services:
             - @oro_entity.virtual_field_provider
             - %oro_entity.hidden_fields%
             - @oro_query_designer.query_designer.manager
+            - @oro_entity.exclude_field_provider
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
 

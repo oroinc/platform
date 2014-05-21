@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Provider;
 
+use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -23,6 +24,9 @@ class EntityFieldProvider extends ParentEntityFieldProvider
     /** @var string */
     protected $queryType;
 
+    /** @var ExcludeFieldProvider */
+    protected $excludeFieldProvider;
+
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
@@ -31,7 +35,8 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         Translator $translator,
         VirtualFieldProvider $virtualFieldProvider,
         $hiddenFields,
-        QueryDesignerManager $qdManager
+        QueryDesignerManager $qdManager,
+        ExcludeFieldProvider $excludeFieldProvider
     ) {
         parent::__construct(
             $entityConfigProvider,
@@ -40,10 +45,12 @@ class EntityFieldProvider extends ParentEntityFieldProvider
             $doctrine,
             $translator,
             $virtualFieldProvider,
-            $hiddenFields
+            $hiddenFields,
+            $excludeFieldProvider
         );
 
         $this->queryDesignerManager = $qdManager;
+        $this->excludeFieldProvider = $excludeFieldProvider;
     }
 
     /**
@@ -62,7 +69,17 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredField($metadata, $fieldName);
 
         if (!$result) {
-            $result = $this->queryDesignerManager->isIgnoredField($metadata, $fieldName, $this->queryType);
+            $excludeRules = $this->queryDesignerManager->getExcludeRules();
+
+            $result = $this->excludeFieldProvider->isIgnoreField($metadata, $fieldName, $excludeRules);
+        }
+
+        if (!$result) {
+            foreach ($excludeRules as $rule) {
+                if ($rule['query_type'] === $this->queryType) {
+                    return true;
+                }
+            }
         }
 
         return $result;
@@ -76,7 +93,7 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredRelation($metadata, $associationName);
 
         if (!$result) {
-            $result = $this->queryDesignerManager->isIgnoredAssosiation($metadata, $associationName, $this->queryType);
+            $result = $this->isIgnoredField($metadata, $associationName);
         }
 
         return $result;
