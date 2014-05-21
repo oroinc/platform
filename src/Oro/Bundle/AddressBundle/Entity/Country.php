@@ -20,7 +20,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * })
  * @ORM\Entity
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "grouping"={"groups"={"dictionary"}},
+ *          "dictionary"={"default_field_name"="name"}
+ *      }
+ * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class Country implements Translatable

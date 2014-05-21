@@ -185,3 +185,17 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          'Show on view'
+
+    grouping:
+        entity:
+            items:
+                # it allows to group entities. An entity can be included in several groups
+                groups: # array
+                    options: []
+
+    dictionary:
+        entity:
+            items:
+                # specify the name of default field for an entity is inclided in 'dictionary' group
+                default_field_name: # string
+                    options: []
