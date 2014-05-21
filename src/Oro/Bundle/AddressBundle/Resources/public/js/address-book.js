@@ -1,8 +1,24 @@
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oro/dialog-widget',
-    'oroaddress/js/mapservice/googlemaps', 'oroaddress/js/address/view', 'oroaddress/js/address/collection'
-    ], function (_, Backbone, __, mediator, messenger, DialogWidget,
-     Googlemaps, AddressView, AddressCollection) {
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'oroui/js/mediator', 'oroui/js/messenger',
+    'oro/dialog-widget',
+    'oroaddress/js/mapservice/googlemaps',
+    'oroaddress/js/address/view',
+    'oroaddress/js/address/collection'
+], function (
+    _,
+    Backbone,
+    __,
+    mediator,
+    messenger,
+    DialogWidget,
+    Googlemaps,
+    AddressView,
+    AddressCollection
+) {
     'use strict';
 
     var $ = Backbone.$;
@@ -37,14 +53,30 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.listenTo(this.getCollection(), 'reset', this.addAll);
             this.listenTo(this.getCollection(), 'remove', this.onAddressRemove);
 
-            this.$adressesContainer = $('<div class="map-address-list"/>').appendTo(this.$el);
-            this.$mapContainerFrame = $('<div class="map-visual-frame"/>').appendTo(this.$el);
-            var noDataMessage = '<div class="no-data"><span>' + this.noDataMessage + '</span></div>';
-            this.$noDataContainer = $(noDataMessage).appendTo(this.$el);
+            this._initMainContainers();
+
             this.mapView = new this.options.mapView({
                 'mapOptions': this.options.mapOptions,
                 'el': this.$mapContainerFrame
             });
+        },
+
+        _initMainContainers: function() {
+            this.$noDataContainer   = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
+            this.$adressesContainer = $('<div class="map-address-list"/>');
+            this.$mapContainerFrame = $('<div class="map-visual-frame"/>');
+
+            if (!this.$el.find('.map-address-list').length) {
+                this.$el.append(this.$adressesContainer);
+            }
+
+            if (!this.$el.find('.map-visual-frame').length) {
+                this.$el.append(this.$mapContainerFrame);
+            }
+
+            if (!this.$el.find('.no-data').length) {
+                this.$el.append(this.$noDataContainer);
+            }
         },
 
         _getUrl: function (optionsKey) {
@@ -112,11 +144,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
         },
 
         addAddress: function (address) {
-            var addressView = new AddressView({
-                model: address
-            });
-            addressView.on('edit', _.bind(this.editAddress, this));
-            this.$adressesContainer.append(addressView.render().$el);
+            if (!this.$el.find('#address-book-' + address.id).length) {
+                var addressView = new AddressView({
+                    model: address
+                });
+                addressView.on('edit', _.bind(this.editAddress, this));
+                this.$adressesContainer.append(addressView.render().$el);
+            }
         },
 
         editAddress: function (addressView, address) {
