@@ -174,17 +174,12 @@ class ExtendExtension extends AbstractExtension
 
     /**
      * @param DatagridConfiguration $config
-     * @throws \Exception when class was not found by $entityName
      * @return string extended entity class name
      */
     protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
     {
         $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
-        try {
-            return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
-        } catch (MappingException $error) {
-            throw $error;
-        }
+        return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
     }
 
     /**
