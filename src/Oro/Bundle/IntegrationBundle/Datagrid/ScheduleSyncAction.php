@@ -16,4 +16,4 @@ class ScheduleSyncAction extends AjaxAction
 
         return $options;
     }
-} 
+}
