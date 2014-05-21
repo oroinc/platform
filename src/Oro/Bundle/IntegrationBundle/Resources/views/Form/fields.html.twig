@@ -14,15 +14,11 @@
     {% endif %}
 
     {% if (form.isTwoWaySyncEnabled is defined) %}
-        <div {% if form.syncPriority.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
-            {{ form_row(form.isTwoWaySyncEnabled) }}
-        </div>
+        {{ form_row(form.isTwoWaySyncEnabled) }}
     {% endif %}
 
     {% if (form.syncPriority is defined) %}
-        <div {% if form.syncPriority.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
-            {{ form_row(form.syncPriority) }}
-        </div>
+        {{ form_row(form.syncPriority) }}
     {% endif %}
 
     {% if (form.connectors is defined) %}
