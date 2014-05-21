@@ -6,12 +6,12 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;

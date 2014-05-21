@@ -28,9 +28,6 @@ class Manager implements FunctionProviderInterface
     /** @var EntityHierarchyProvider  */
     protected $entityHierarchyProvider;
 
-    /** @var array  */
-    protected $virtualFields;
-
     /**
      * Constructor
      *
@@ -38,20 +35,17 @@ class Manager implements FunctionProviderInterface
      * @param ConfigurationResolver         $resolver
      * @param EntityHierarchyProvider       $entityHierarchyProvider
      * @param Translator                    $translator
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
         EntityHierarchyProvider $entityHierarchyProvider,
-        Translator $translator,
-        VirtualFieldProviderInterface $virtualFieldProvider
+        Translator $translator
     ) {
         $resolver->resolve($config);
         $this->config                  = ConfigurationObject::create($config);
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->translator              = $translator;
-        $this->virtualFields           = $virtualFieldProvider->getVirtualFields();
     }
 
     /**

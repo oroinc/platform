@@ -13,7 +13,6 @@ services:
             - @oro_query_designer.config.resolver
             - @oro_entity.entity_hierarchy_provider
             - @translator
-            - @oro_entity.virtual_field_provider.chain
 
     oro_query_designer.query_designer.restriction_builder:
         class: %oro_query_designer.query_designer.restriction_builder.class%
