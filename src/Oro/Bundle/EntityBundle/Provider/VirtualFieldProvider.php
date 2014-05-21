@@ -23,8 +23,8 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
         EntityHierarchyProvider $entityHierarchyProvider,
         $configurationVirtualFields
     ) {
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->configuredVirtualFields = $configurationVirtualFields;
+        $this->entityHierarchyProvider    = $entityHierarchyProvider;
+        $this->configurationVirtualFields = $configurationVirtualFields;
     }
 
     /**
@@ -84,7 +84,7 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
     protected function ensureVirtualFieldsInitialized()
     {
         if ($this->virtualFields === null) {
-            $virtualFields = $this->configuredVirtualFields;
+            $virtualFields = $this->configurationVirtualFields;
 
             $hierarchy = $this->entityHierarchyProvider->getHierarchy();
             foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
