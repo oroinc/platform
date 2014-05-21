@@ -3,12 +3,17 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Inflector\Inflector;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * Implements VirtualFieldProviderInterface for relations to the dictionaries
+ */
 class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
 {
     /** @var ConfigProvider */
@@ -89,15 +94,22 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 if ($metadata->isSingleValuedAssociation($associationName)
                     && isset($this->dictionaries[$targetClassName])
                 ) {
-                    $defaultFieldName = $this->dictionaries[$targetClassName];
+                    $defaultFieldName = $this->dictionaries[$targetClassName][0];
                     $targetMetadata   = $em->getClassMetadata($targetClassName);
-                    $fieldName        = sprintf('%s_%s', $associationName, $defaultFieldName);
+                    $fieldName        = Inflector::tableize(
+                        sprintf('%s_%s', $associationName, $defaultFieldName)
+                    );
+                    $label            = $this->dictionaries[$targetClassName][1]
+                        ? $fieldName
+                        : Inflector::tableize($associationName);
+                    $label            = ConfigHelper::getTranslationKey('label', $className, $label);
 
                     $this->virtualFields[$className][$fieldName] = [
                         'query' => [
                             'select' => [
                                 'expr'        => sprintf('target.%s', $defaultFieldName),
-                                'return_type' => $targetMetadata->getTypeOfField($defaultFieldName)
+                                'return_type' => $targetMetadata->getTypeOfField($defaultFieldName),
+                                'label'       => $label
                             ],
                             'join'   => [
                                 'left' => [
@@ -127,9 +139,13 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 if (!empty($groups) && in_array('dictionary', $groups)) {
                     $className = $config->getId()->getClassName();
                     if ($this->dictionaryConfigProvider->hasConfig($className)) {
-                        $defaultFieldName = $this->dictionaryConfigProvider->getConfig($className);
+                        $dictionaryConfig = $this->dictionaryConfigProvider->getConfig($className);
+                        $defaultFieldName = $dictionaryConfig->get('default_field_name');
                         if (!empty($defaultFieldName)) {
-                            $this->dictionaries[$className] = $defaultFieldName;
+                            $this->dictionaries[$className] = [
+                                $defaultFieldName,
+                                $dictionaryConfig->get('is_combined_label_name') ? : false
+                            ];
                         }
                     }
                 }

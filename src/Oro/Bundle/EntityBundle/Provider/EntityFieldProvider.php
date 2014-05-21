@@ -191,11 +191,14 @@ class EntityFieldProvider
                         continue;
                     }
 
+                    $fieldLabel = isset($virtualFieldsQuery['select']['label'])
+                        ? $virtualFieldsQuery['select']['label']
+                        : ConfigHelper::getTranslationKey('label', $className, $fieldName);
                     $this->addField(
                         $result,
                         $fieldName,
                         $virtualFieldsQuery['select']['return_type'],
-                        ConfigHelper::getTranslationKey('label', $className, $fieldName),
+                        $fieldLabel,
                         false,
                         $translate
                     );

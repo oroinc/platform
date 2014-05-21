@@ -14,6 +14,7 @@ parameters:
 
     oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider
+    oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
 
 services:
     oro_entity.listener.navigation_listener:
@@ -104,7 +105,16 @@ services:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
         tags:
-            - { name: oro_entity.virtual_field_provider, order: 10 }
+            - { name: oro_entity.virtual_field_provider }
+
+    oro_entity.virtual_field_provider.dictionary:
+        class: %oro_entity.virtual_field_provider.dictionary.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+            - @oro_entity_config.provider.dictionary
+            - @doctrine
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

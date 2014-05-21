@@ -199,3 +199,8 @@ oro_entity_config:
                 # specify the name of default field for an entity is inclided in 'dictionary' group
                 default_field_name: # string
                     options: []
+                # specify if the default field name should be included in the label name
+                # an example of the detault label name: oro.address.country.label
+                # an example of the label name if this attribure is TRUE: oro.address.country_name.label
+                is_combined_label_name: # boolean
+                    options: []
