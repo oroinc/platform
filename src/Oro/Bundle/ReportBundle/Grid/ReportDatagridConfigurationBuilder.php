@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
+
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;

@@ -36,9 +36,3 @@ oro:
                 field_condition:   Field Condition
                 conditions_group:  Conditions Group
             choose_entity_field: Choose a field...
-#        virtual_fields:
-#            countryName: Country
-#            countryIso2Code: Country ISO2 Code
-#            countryIso3Code: Country ISO3 Code
-#            regionName: Region
-#            regionCode: Region ISO code
