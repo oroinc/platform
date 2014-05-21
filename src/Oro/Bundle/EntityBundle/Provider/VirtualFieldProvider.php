@@ -70,7 +70,9 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function isVirtualField($className, $fieldName)
     {
-        return isset($this->virtualFields[$className][$fieldName]);
+        $virtualFields = $this->getVirtualFields();
+
+        return isset($virtualFields[$className][$fieldName]);
     }
 
     /**
@@ -78,6 +80,8 @@ class VirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        return $this->virtualFields[$className][$fieldName]['query'];
+        $virtualFields = $this->getVirtualFields();
+
+        return $virtualFields[$className][$fieldName]['query'];
     }
 }

@@ -713,7 +713,6 @@ abstract class AbstractQueryConverter
         }
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
-            //$joinId                      = $item['joinId'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
                 $item['join'],
                 $parentJoinId,

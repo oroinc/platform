@@ -90,7 +90,7 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @translator
-            - @oro_entity.virtual_field_provider
+            - @oro_entity.virtual_field_provider.chain
             - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
