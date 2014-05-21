@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ConfigurationPass implements CompilerPassInterface
+class VirtualFieldConfigurationPass implements CompilerPassInterface
 {
     const CHAIN_PROVIDER_SERVICE_ID = 'oro_entity.virtual_field_provider.chain';
     const PROVIDER_TAG_NAME         = 'oro_entity.virtual_field_provider';

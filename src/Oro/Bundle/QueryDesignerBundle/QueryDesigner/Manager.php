@@ -6,7 +6,7 @@ use Symfony\Component\Translation\Translator;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -28,33 +28,29 @@ class Manager implements FunctionProviderInterface
     /** @var EntityHierarchyProvider  */
     protected $entityHierarchyProvider;
 
-    /** @var ChainVirtualFieldProvider */
-    protected $virtualFieldProvider;
-
     /** @var array  */
     protected $virtualFields;
 
     /**
      * Constructor
      *
-     * @param array                     $config
-     * @param ConfigurationResolver     $resolver
-     * @param EntityHierarchyProvider   $entityHierarchyProvider
-     * @param Translator                $translator
-     * @param ChainVirtualFieldProvider $virtualFieldProvider
+     * @param array                         $config
+     * @param ConfigurationResolver         $resolver
+     * @param EntityHierarchyProvider       $entityHierarchyProvider
+     * @param Translator                    $translator
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
         EntityHierarchyProvider $entityHierarchyProvider,
         Translator $translator,
-        ChainVirtualFieldProvider $virtualFieldProvider
+        VirtualFieldProviderInterface $virtualFieldProvider
     ) {
         $resolver->resolve($config);
         $this->config                  = ConfigurationObject::create($config);
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->translator              = $translator;
-        $this->virtualFieldProvider    = $virtualFieldProvider;
         $this->virtualFields           = $virtualFieldProvider->getVirtualFields();
     }
 

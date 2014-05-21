@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -188,8 +189,19 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 )
             );
 
+        $entityHierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $virtualFieldProvider = new VirtualFieldProvider($entityHierarchyProvider, []);
+
         $doctrine = $doctrine ? : $this->getDoctrine();
-        $builder  = new DynamicSegmentQueryBuilder(new RestrictionBuilder($manager), $manager, $doctrine);
+        $builder  = new DynamicSegmentQueryBuilder(
+            new RestrictionBuilder($manager),
+            $manager,
+            $virtualFieldProvider,
+            $doctrine
+        );
 
         return $builder;
     }

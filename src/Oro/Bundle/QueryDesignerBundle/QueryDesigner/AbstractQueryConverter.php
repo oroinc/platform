@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 

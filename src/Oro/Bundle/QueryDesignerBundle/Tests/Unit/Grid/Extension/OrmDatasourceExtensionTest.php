@@ -84,6 +84,8 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      */
     public function testVisitDatasource()
     {
+        $this->markTestSkipped();
+
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['user.id', 'user.name as user_name', 'user.status as user_status'])
             ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'user')

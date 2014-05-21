@@ -24,7 +24,13 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function isVirtualField($className, $fieldName)
     {
-        // TODO: Implement isVirtualField() method.
+        foreach ($this->providers as $provider) {
+            if ($provider->isVirtualField($className, $fieldName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -32,7 +38,19 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
-        // TODO: Implement getVirtualFieldQuery() method.
+        $foundProvider = null;
+        foreach ($this->providers as $provider) {
+            if ($provider->isVirtualField($className, $fieldName)) {
+                $foundProvider = $provider;
+                break;
+            }
+        }
+
+        if ($foundProvider === null) {
+            return null;
+        }
+
+        return $foundProvider->getVirtualFieldQuery($className, $fieldName);
     }
 
     /**
@@ -42,23 +60,13 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function getVirtualFields()
     {
-        // TODO: Implement getVirtualFields() method.
-    }
-
-    public function getConfiguration($gridName)
-    {
-        $foundProvider = null;
         foreach ($this->providers as $provider) {
-            if ($provider->isApplicable($gridName)) {
-                $foundProvider = $provider;
-                break;
+            $virtualFields = $provider->getVirtualFields();
+            if (!empty($virtualFields)) {
+                return $virtualFields;
             }
         }
 
-        if ($foundProvider === null) {
-            throw new \RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
-        }
-
-        return $foundProvider->getConfiguration($gridName);
+        return [];
     }
 }
