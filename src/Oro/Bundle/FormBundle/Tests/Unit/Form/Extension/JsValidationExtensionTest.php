@@ -156,6 +156,8 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD)
+     *
      * @return array
      */
     public function finishViewAddDataValidationAttributeDataProvider()
