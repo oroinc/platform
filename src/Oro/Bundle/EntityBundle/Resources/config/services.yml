@@ -8,6 +8,8 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
+    oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
+    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
 
@@ -86,10 +88,16 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @translator
-            - %oro_entity.virtual_fields%
+            - @oro_entity.virtual_field_provider
             - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
+
+    oro_entity.virtual_field_provider:
+        class: %oro_entity.virtual_field_provider.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - %oro_entity.virtual_fields%
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
@@ -100,6 +108,13 @@ services:
         arguments:
             - @oro_entity.entity_field_provider
             - @oro_entity.entity_provider
+
+    oro_entity.entity_hierarchy_provider:
+        class: %oro_entity.entity_hierarchy_provider.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_entity_config.provider.entity
 
     oro_entiy.twig.extension.class_name:
         class: %oro_entity.twig.extension.class_name.class%

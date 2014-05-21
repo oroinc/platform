@@ -9,7 +9,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
      */
     $.widget('oroentity.fieldsLoader', {
         options: {
-            router: 'oro_api_fields_entity',
+            router: 'oro_api_querydesigner_fields_entity',
             routingParams: {
                 'with-entity-details': 1,
                 'with-unidirectional': 1,

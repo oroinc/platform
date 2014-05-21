@@ -13,6 +13,7 @@ use Oro\Bundle\EntityBundle\Entity\Type\MoneyType;
 use Oro\Bundle\EntityBundle\Entity\Type\PercentType;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ConfigurationPass;
 
 class OroEntityBundle extends Bundle
 {

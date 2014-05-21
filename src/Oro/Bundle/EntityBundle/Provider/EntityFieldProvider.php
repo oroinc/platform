@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
@@ -23,54 +24,40 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
  */
 class EntityFieldProvider
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $entityConfigProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
-     * @var EntityClassResolver
-     */
-    protected $entityClassResolver;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
     /** @var EntityProvider */
     protected $entityProvider;
 
-    /**
-     * @var array
-     */
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var Translator */
+    protected $translator;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var array */
     protected $virtualFields;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $hiddenFields;
 
     /**
      * Constructor
      *
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param ManagerRegistry     $doctrine
-     * @param Translator          $translator
-     * @param array               $virtualFields
-     * @param array               $hiddenFields
+     * @param ConfigProvider       $entityConfigProvider
+     * @param ConfigProvider       $extendConfigProvider
+     * @param EntityClassResolver  $entityClassResolver
+     * @param ManagerRegistry      $doctrine
+     * @param Translator           $translator
+     * @param VirtualFieldProvider $virtualFieldProvider
+     * @param array                $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -78,7 +65,7 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        $virtualFields,
+        VirtualFieldProvider $virtualFieldProvider,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
@@ -86,7 +73,7 @@ class EntityFieldProvider
         $this->entityClassResolver  = $entityClassResolver;
         $this->translator           = $translator;
         $this->doctrine             = $doctrine;
-        $this->virtualFields        = $virtualFields;
+        $this->virtualFields        = $virtualFieldProvider->getVirtualFields();
         $this->hiddenFields         = $hiddenFields;
     }
 
@@ -220,6 +207,7 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $fieldName
+     *
      * @return bool
      */
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
@@ -282,7 +270,7 @@ class EntityFieldProvider
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
-                        continue;
+                    continue;
                 }
 
                 $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
@@ -398,6 +386,7 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $associationName
+     *
      * @return bool
      */
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)

@@ -27,9 +27,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ]
             ],
             'filters'          => [],
-            'grouping_columns' => [
-                ['name' => 'column1']
-            ],
+            'grouping_columns' => [['name' => 'column1']],
         ];
         $doctrine         = $this->getDoctrine(
             [
