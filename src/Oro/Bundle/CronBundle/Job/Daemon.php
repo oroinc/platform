@@ -3,7 +3,8 @@
 namespace Oro\Bundle\CronBundle\Job;
 
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\PhpExecutableFinder;
+
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class Daemon
 {
