@@ -72,7 +72,7 @@ class WindowsExtension extends \Twig_Extension
     }
 
     /**
-     * Renders a menu with the specified renderer.
+     * Renders windows restore html block
      *
      * @param \Twig_Environment $environment
      *
@@ -110,7 +110,7 @@ class WindowsExtension extends \Twig_Extension
     }
 
     /**
-     * Renders a menu with the specified renderer.
+     * Renders fragment by window state.
      *
      * @param \Twig_Environment $environment
      * @param WindowsState $windowState
