@@ -30,7 +30,7 @@ oro_entity_virtual_fields:
         region_name:
             query:
                 select:
-                    expr:         region.name
+                    expr:         COALESCE(entity.regionText, region.name)
                     return_type:  string
                 join:
                     left:
