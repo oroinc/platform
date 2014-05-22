@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Grid;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -43,7 +45,7 @@ class ExtendExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
+        $entityName = $this->getExtendedEntityNameByConfig($config);
 
         $entityProvider = $this->cm->getProvider('entity');
         $fields         = $this->getDynamicFields($entityName);
@@ -113,15 +115,16 @@ class ExtendExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
+        $entityName = $this->getExtendedEntityNameByConfig($config);
 
         $fields = $this->getDynamicFields($entityName);
         if ($datasource instanceof OrmDatasource && !empty($fields)) {
             /** @var QueryBuilder $qb */
             $qb        = $datasource->getQueryBuilder();
             $fromParts = $qb->getDQLPart('from');
+            $alias     = false;
 
-            $alias = false;
+            /** @var From $fromPart */
             foreach ($fromParts as $fromPart) {
                 if ($fromPart->getFrom() == $entityName) {
                     $alias = $fromPart->getAlias();
@@ -167,6 +170,16 @@ class ExtendExtension extends AbstractExtension
     public function getPriority()
     {
         return 250;
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return string extended entity class name
+     */
+    protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
+    {
+        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
+        return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
     }
 
     /**
