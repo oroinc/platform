@@ -22,8 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
  * @Config(
  *      defaultValues={
- *          "grouping"={"groups"={"dictionary"}},
- *          "dictionary"={"default_field_name"="name", "is_combined_label_name"=true}
+ *          "grouping"={"groups"={"dictionary"}}
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")

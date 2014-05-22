@@ -23,7 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      defaultValues={
  *          "grouping"={"groups"={"dictionary"}},
- *          "dictionary"={"default_field_name"="name", "is_combined_label_name"=true}
+ *          "dictionary"={"virtual_fields"={"iso2Code", "iso3Code", "name"}}
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")

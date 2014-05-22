@@ -17,8 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
  * @Config(
  *      defaultValues={
- *          "grouping"={"groups"={"dictionary"}},
- *          "dictionary"={"default_field_name"="label"}
+ *          "grouping"={"groups"={"dictionary"}}
  *      }
  * )
  */
