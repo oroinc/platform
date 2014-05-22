@@ -6,6 +6,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
