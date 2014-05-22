@@ -50,7 +50,7 @@ This will add an additional condition to the `applicable` attribute of the exist
 
 Grouping configuration
 ----------------------
-Currently the configuration of the groping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/query_designer.yml) the following data types are not available for grouping: `text`, `array`, `object`. Here is an example of groping configuration:
+Currently the configuration of the grouping columns has only one attribute. It is `exclude` attribute. Using this attribute you can specify which fields cannot be used in `GROUP BY` SQL clause. By [default](../../config/query_designer.yml) the following data types are not available for grouping: `text`, `array`, `object`. Here is an example of grouping configuration:
 ``` yaml
 query_designer:
     grouping:
