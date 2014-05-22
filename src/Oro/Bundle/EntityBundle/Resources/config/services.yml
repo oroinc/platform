@@ -9,9 +9,11 @@ parameters:
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
-    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+
+    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
+    oro_entity.virtual_field_provider.config.class:                Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
 
 services:
     oro_entity.listener.navigation_listener:
@@ -95,9 +97,14 @@ services:
 
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
+
+    oro_entity.virtual_field_provider.config:
+        class: %oro_entity.virtual_field_provider.config.class%
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
+        tags:
+            - { name: oro_entity.virtual_field_provider }
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

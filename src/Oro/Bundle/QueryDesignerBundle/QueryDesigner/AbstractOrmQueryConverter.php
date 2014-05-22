@@ -3,8 +3,8 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {

@@ -42,8 +42,8 @@ class EntityFieldProvider
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var array */
-    protected $virtualFields;
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
 
     /** @var array */
     protected $hiddenFields;
@@ -51,13 +51,13 @@ class EntityFieldProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider       $entityConfigProvider
-     * @param ConfigProvider       $extendConfigProvider
-     * @param EntityClassResolver  $entityClassResolver
-     * @param ManagerRegistry      $doctrine
-     * @param Translator           $translator
-     * @param VirtualFieldProvider $virtualFieldProvider
-     * @param array                $hiddenFields
+     * @param ConfigProvider                $entityConfigProvider
+     * @param ConfigProvider                $extendConfigProvider
+     * @param EntityClassResolver           $entityClassResolver
+     * @param ManagerRegistry               $doctrine
+     * @param Translator                    $translator
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param array                         $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -65,7 +65,7 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        VirtualFieldProvider $virtualFieldProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
@@ -73,7 +73,7 @@ class EntityFieldProvider
         $this->entityClassResolver  = $entityClassResolver;
         $this->translator           = $translator;
         $this->doctrine             = $doctrine;
-        $this->virtualFields        = $virtualFieldProvider->getVirtualFields();
+        $this->virtualFieldProvider = $virtualFieldProvider;
         $this->hiddenFields         = $hiddenFields;
     }
 
@@ -183,8 +183,10 @@ class EntityFieldProvider
             }
 
             // add virtual fields
-            if ($withVirtualFields && isset($this->virtualFields[$className])) {
-                foreach ($this->virtualFields[$className] as $fieldName => $config) {
+            if ($withVirtualFields) {
+                $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
+                foreach ($virtualFields as $fieldName) {
+                    $virtualFieldsQuery = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
                     if ($this->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
@@ -192,7 +194,7 @@ class EntityFieldProvider
                     $this->addField(
                         $result,
                         $fieldName,
-                        $config['query']['select']['return_type'],
+                        $virtualFieldsQuery['select']['return_type'],
                         ConfigHelper::getTranslationKey('label', $className, $fieldName),
                         false,
                         $translate
