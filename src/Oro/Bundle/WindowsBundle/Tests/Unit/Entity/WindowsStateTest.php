@@ -6,6 +6,15 @@ use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
 class WindowsStateTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var WindowsState
+     */
+    protected $windowState;
+
+    protected function setUp()
+    {
+        $this->windowState = new WindowsState();
+    }
 
     /**
      * Test getters and setters
@@ -16,11 +25,17 @@ class WindowsStateTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSet($property, $value)
     {
-        $state = new WindowsState();
         $setMethod = 'set' . ucfirst($property);
         $getMethod = 'get' . ucfirst($property);
-        $state->$setMethod($value);
-        $this->assertEquals($value, $state->$getMethod());
+        $this->windowState->$setMethod($value);
+        $this->assertEquals($value, $this->windowState->$getMethod());
+    }
+
+    public function testIsRenderedSuccessfully()
+    {
+        $this->assertFalse($this->windowState->isRenderedSuccessfully());
+        $this->windowState->setRenderedSuccessfully(true);
+        $this->assertTrue($this->windowState->isRenderedSuccessfully());
     }
 
     public function propertiesDataProvider()
@@ -38,28 +53,25 @@ class WindowsStateTest extends \PHPUnit_Framework_TestCase
 
     public function testGetJsonData()
     {
-        $state = new WindowsState();
         $data = array('test' => true);
-        $state->setData($data);
-        $this->assertEquals($data, $state->getData());
-        $this->assertEquals(json_encode($data), $state->getJsonData());
+        $this->windowState->setData($data);
+        $this->assertEquals($data, $this->windowState->getData());
+        $this->assertEquals(json_encode($data), $this->windowState->getJsonData());
     }
 
     public function testDoPrePersist()
     {
-        $item = new WindowsState();
-        $item->doPrePersist();
+        $this->windowState->doPrePersist();
 
-        $this->assertInstanceOf('DateTime', $item->getCreatedAt());
-        $this->assertInstanceOf('DateTime', $item->getUpdatedAt());
-        $this->assertEquals($item->getCreatedAt(), $item->getUpdatedAt());
+        $this->assertInstanceOf('DateTime', $this->windowState->getCreatedAt());
+        $this->assertInstanceOf('DateTime', $this->windowState->getUpdatedAt());
+        $this->assertEquals($this->windowState->getCreatedAt(), $this->windowState->getUpdatedAt());
     }
 
     public function testDoPreUpdate()
     {
-        $item = new WindowsState();
-        $item->doPreUpdate();
+        $this->windowState->doPreUpdate();
 
-        $this->assertInstanceOf('DateTime', $item->getUpdatedAt());
+        $this->assertInstanceOf('DateTime', $this->windowState->getUpdatedAt());
     }
 }
