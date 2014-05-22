@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class VirtualFieldConfigurationPass implements CompilerPassInterface
 {
-    const CHAIN_PROVIDER_SERVICE_ID = 'oro_entity.virtual_field_provider.chain';
+    const CHAIN_PROVIDER_SERVICE_ID = 'oro_entity.virtual_field_provider';
     const PROVIDER_TAG_NAME         = 'oro_entity.virtual_field_provider';
 
     /**

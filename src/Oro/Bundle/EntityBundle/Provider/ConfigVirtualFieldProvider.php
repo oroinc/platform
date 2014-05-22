@@ -6,7 +6,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
  * Provides configuration for virtual fields based on entity hierarchy.
  * For instance virtual fields configured for some abstract class will be added to all inherited classes.
  */
-class VirtualFieldProvider implements VirtualFieldProviderInterface
+class ConfigVirtualFieldProvider implements VirtualFieldProviderInterface
 {
     /** @var  EntityHierarchyProvider */
     protected $entityHierarchyProvider;
