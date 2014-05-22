@@ -70,16 +70,11 @@ class EntityFieldProvider extends ParentEntityFieldProvider
 
         if (!$result) {
             $excludeRules = $this->queryDesignerManager->getExcludeRules();
-
             $result = $this->excludeFieldProvider->isIgnoreField($metadata, $fieldName, $excludeRules);
         }
 
         if (!$result) {
-            foreach ($excludeRules as $rule) {
-                if ($rule['query_type'] === $this->queryType) {
-                    return true;
-                }
-            }
+            $result = $this->isQueryTypeMatched($excludeRules);
         }
 
         return $result;
@@ -93,9 +88,30 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         $result = parent::isIgnoredRelation($metadata, $associationName);
 
         if (!$result) {
-            $result = $this->isIgnoredField($metadata, $associationName);
+            $excludeRules = $this->queryDesignerManager->getExcludeRules();
+            $result = $this->excludeFieldProvider->isIgnoredRelation($metadata, $associationName, $excludeRules);
+        }
+
+        if (!$result) {
+            $result = $this->isQueryTypeMatched($excludeRules);
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $excludeRules
+     *
+     * @return bool
+     */
+    protected function isQueryTypeMatched(array $excludeRules)
+    {
+        foreach ($excludeRules as $rule) {
+            if (isset($rule['query_type']) && $rule['query_type'] === $this->queryType) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

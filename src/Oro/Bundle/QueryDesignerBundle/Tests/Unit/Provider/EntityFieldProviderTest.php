@@ -145,7 +145,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $fieldName = 'default_test';
 
         $this->excludeFieldProvider->expects($this->once())
-            ->method('isIgnoredAssosiation')
+            ->method('isIgnoredRelation')
             ->with($metadata, $fieldName)
             ->will($this->returnValue(true));
 
