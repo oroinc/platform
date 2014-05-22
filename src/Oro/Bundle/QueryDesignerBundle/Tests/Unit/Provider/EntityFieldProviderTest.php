@@ -59,9 +59,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $doctrine,
             $translator,
             $virtualFieldsProvider,
+            $this->excludeFieldProvider,
             [],
-            $this->qdManager,
-            $this->excludeFieldProvider
+            $this->qdManager
         );
         $this->provider->setQueryType('report');
     }

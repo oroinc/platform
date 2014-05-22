@@ -45,8 +45,8 @@ class EntityFieldProvider extends ParentEntityFieldProvider
             $doctrine,
             $translator,
             $virtualFieldProvider,
-            $hiddenFields,
-            $excludeFieldProvider
+            $excludeFieldProvider,
+            $hiddenFields
         );
 
         $this->excludeFieldProvider = $excludeFieldProvider;
