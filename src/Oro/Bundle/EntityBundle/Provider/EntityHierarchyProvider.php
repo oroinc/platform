@@ -3,92 +3,93 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * This class allows to get parent entities/mapped superclasses for any configurable entity
+ */
 class EntityHierarchyProvider
 {
-    /** @var  EntityManager */
-    protected $entityManager;
-
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
+    /** @var array */
+    protected $hierarchy;
 
-    public function __construct(
-        EntityManager $entityManager,
-        EntityClassResolver $entityClassResolver,
-        ConfigProvider $entityConfigProvider
-    ) {
-        $this->entityManager        = $entityManager;
-        $this->entityClassResolver  = $entityClassResolver;
+    /**
+     * @param ConfigProvider $entityConfigProvider
+     */
+    public function __construct(ConfigProvider $entityConfigProvider)
+    {
         $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**
+     * Gets the hierarchy for all entities who has at least one parent entity/mapped superclass
+     *
      * @return array
      */
     public function getHierarchy()
     {
-        $hierarchy = [];
+        $this->ensureHierarchyInitialized();
 
-        /** ConfigIdInterface[] */
-        $entities = $this->entityConfigProvider->getIds();
-        foreach ($entities as $entity) {
-            $className = $entity->getClassName();
-            if ($parents = $this->getParents($className)) {
-                $hierarchy[$className] = $parents;
-            }
-        }
-
-        return $hierarchy;
+        return $this->hierarchy;
     }
 
     /**
-     * @param string $className
+     * Gets parent entities/mapped superclasses for the given entity
      *
+     * @param string $className
      * @return array
      */
     public function getHierarchyForClassName($className)
     {
-        $hierarchy = $this->getHierarchy();
-        if (isset($hierarchy[$className])) {
-            return $hierarchy[$className];
-        }
+        $this->ensureHierarchyInitialized();
 
-        return [];
+        return isset($this->hierarchy[$className])
+            ? $this->hierarchy[$className]
+            : [];
     }
 
     /**
-     * Returns parent doctrine entities for given entity class name
-     *
-     * @param string $className
-     * @param array  $parents
-     *
-     * @return array
+     * Makes sure the class hierarchy was loaded
      */
-    protected function getParents($className, $parents = [])
+    protected function ensureHierarchyInitialized()
     {
-        $reflection = new \ReflectionClass($className);
-        $parentClass = $reflection->getParentClass();
-        if ($parentClass && $this->entityClassResolver->isEntity($parentClass->getName())) {
-            /** @var ClassMetadata $metadata */
-            $metadata = $this->entityManager->getClassMetadata($parentClass->getName());
-            if ($metadata->isMappedSuperclass) {
-                $parents = $this->getParents(
-                    $parentClass->getName(),
-                    $parents = array_merge(
-                        $parents,
-                        [$parentClass->getName()]
-                    )
-                );
+        if (null === $this->hierarchy) {
+            $this->hierarchy = [];
+
+            $em       = $this->entityConfigProvider->getConfigManager()->getEntityManager();
+            $entities = $this->entityConfigProvider->getIds();
+            foreach ($entities as $entity) {
+                $className = $entity->getClassName();
+                $parents   = [];
+                $this->loadParents($parents, $className, $em);
+                if ($parents) {
+                    $this->hierarchy[$className] = $parents;
+                }
             }
         }
+    }
 
-        return $parents;
+    /**
+     * Finds parent doctrine entities for given entity class name
+     *
+     * @param array         $result
+     * @param string        $className
+     * @param EntityManager $em
+     */
+    protected function loadParents(array &$result, $className, EntityManager $em)
+    {
+        $reflection  = new \ReflectionClass($className);
+        $parentClass = $reflection->getParentClass();
+        if ($parentClass) {
+            $parentClassName = $parentClass->getName();
+            if (!$em->getMetadataFactory()->isTransient($parentClassName)) {
+                $result[] = $parentClassName;
+            }
+            $this->loadParents($result, $parentClassName, $em);
+        }
     }
 }
