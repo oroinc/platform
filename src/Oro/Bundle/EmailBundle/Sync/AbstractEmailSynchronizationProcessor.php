@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -89,5 +90,22 @@ abstract class AbstractEmailSynchronizationProcessor
         $this->log->notice(sprintf('Loaded %d email address(es).', count($emailAddresses)));
 
         return $emailAddresses;
+    }
+
+    /**
+     * @param EmailEntity[]|array $emails
+     *
+     * @return array
+     */
+    protected function getEmailsByMessageId(array $emails)
+    {
+        $result = [];
+
+        /** @var EmailEntity $email */
+        foreach ($emails as $email) {
+            $result[$email->getMessageId()] = $email;
+        }
+
+        return $result;
     }
 }

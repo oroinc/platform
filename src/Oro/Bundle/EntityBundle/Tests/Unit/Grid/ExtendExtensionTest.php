@@ -68,11 +68,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider visitDatasourceDataProvider
-     * @param $entityName
+     * @param $extendedEntityName
+     * @param $fromEntityName
      * @param $hasConfig
      * @param $fieldIds
      */
-    public function testVisitDatasource($entityName, $hasConfig, $fieldIds)
+    public function testVisitDatasource($extendedEntityName, $fromEntityName, $hasConfig, $fieldIds)
     {
         $alias      = 'c';
         $countField = count($fieldIds);
@@ -85,16 +86,29 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadata->expects($this->once())
+        if ($hasConfig) {
+            $callCount = 2;
+            $entityManager->expects($this->at(0))
+                ->method('getClassMetadata')
+                ->with($extendedEntityName)
+                ->will($this->returnValue($metadata));
+            $entityManager->expects($this->at(1))
+                ->method('getClassMetadata')
+                ->with($fromEntityName)
+                ->will($this->returnValue($metadata));
+        } else {
+            $callCount = 1;
+            $entityManager->expects($this->once())
+                ->method('getClassMetadata')
+                ->with($extendedEntityName)
+                ->will($this->returnValue($metadata));
+        }
+
+        $metadata->expects($this->exactly($callCount))
             ->method('getName')
             ->will($this->returnValue(self::EXTEND_ENTITY_FULL));
 
-        $entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($entityName)
-            ->will($this->returnValue($metadata));
-
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->exactly($callCount))
             ->method('getEntityManager')
             ->will($this->returnValue($entityManager));
 
@@ -115,7 +129,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($alias));
             $from->expects($this->once())
                 ->method('getFrom')
-                ->will($this->returnValue(self::EXTEND_ENTITY_FULL));
+                ->will($this->returnValue($fromEntityName));
 
             $queryBuilder->expects($this->once())
                 ->method('getDQLPart')
@@ -143,7 +157,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $this->datagridConfig->expects($this->once())
             ->method('offsetGetByPath')
             ->with(ExtendExtension::EXTEND_ENTITY_CONFIG_PATH)
-            ->will($this->returnValue($entityName));
+            ->will($this->returnValue($extendedEntityName));
 
         $extendExtension = new ExtendExtension($this->configManager);
         $extendExtension->visitDatasource($this->datagridConfig, $dataSource);
@@ -155,35 +169,65 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function visitDatasourceDataProvider()
     {
         return array(
-            'config has not entity name; short name; one field' => array(
-                'entityName'      => self::EXTEND_ENTITY_SHORT,
-                'hasConfig'       => false,
-                'dynamicFieldIds' => $this->generateFieldIds()
+            'config has not entity name; EXTENDED short name; FROM short name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_SHORT,
+                'fromEntityName'     => self::EXTEND_ENTITY_SHORT,
+                'hasConfig'          => false,
+                'dynamicFieldIds'    => $this->generateFieldIds()
             ),
-            'config has entity name; short name; one field' => array(
-                'entityName'      => self::EXTEND_ENTITY_SHORT,
-                'hasConfig'       => true,
-                'dynamicFieldIds' => $this->generateFieldIds()
+            'config has entity name; EXTENDED short name; FROM short name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_SHORT,
+                'fromEntityName'     => self::EXTEND_ENTITY_SHORT,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds()
             ),
-            'config has not entity name; full name: one field' => array(
-                'entityName'      => self::EXTEND_ENTITY_FULL,
-                'hasConfig'       => false,
-                'dynamicFieldIds' => $this->generateFieldIds()
+            'config has entity name; EXTENDED short name; FROM full name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_SHORT,
+                'fromEntityName'     => self::EXTEND_ENTITY_FULL,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds()
             ),
-            'config has entity name; full name; one field' => array(
-                'entityName'      => self::EXTEND_ENTITY_FULL,
-                'hasConfig'       => true,
-                'dynamicFieldIds' => $this->generateFieldIds()
+            'config has not entity name; EXTENDED full name; FROM full name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_FULL,
+                'hasConfig'          => false,
+                'dynamicFieldIds'    => $this->generateFieldIds()
             ),
-            'config has entity name; full name: five field' => array(
-                'entityName'      => self::EXTEND_ENTITY_FULL,
-                'hasConfig'       => true,
-                'dynamicFieldIds' => $this->generateFieldIds(5)
+            'config has entity name; EXTENDED full name; FROM full name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_FULL,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds()
             ),
-            'config has entity name; shot name: five field' => array(
-                'entityName'      => self::EXTEND_ENTITY_FULL,
-                'hasConfig'       => true,
-                'dynamicFieldIds' => $this->generateFieldIds(5)
+            'config has entity name; EXTENDED full name; FROM short name; one field' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_SHORT,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds()
+            ),
+            'config has entity name; EXTENDED full name; FROM full name; five fields' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_FULL,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds(5)
+            ),
+            'config has entity name; EXTENDED full name; FROM short name; five fields' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_SHORT,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds(5)
+            ),
+            'config has entity name; EXTENDED shot name; FROM short name; five fields' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_SHORT,
+                'fromEntityName'     => self::EXTEND_ENTITY_SHORT,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds(5)
+            ),
+            'config has entity name; EXTENDED shot name; FROM full name; five fields' => array(
+                'extendedEntityName' => self::EXTEND_ENTITY_FULL,
+                'fromEntityName'     => self::EXTEND_ENTITY_FULL,
+                'hasConfig'          => true,
+                'dynamicFieldIds'    => $this->generateFieldIds(5)
             ),
         );
     }
