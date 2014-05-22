@@ -36,28 +36,29 @@ class OroEntityExtension extends Extension
      */
     protected function loadEntityConfigs(ContainerBuilder $container)
     {
-        $configs = [];
+        $virtualFieldsConfig = $exclude = [];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_entity',
             new YamlCumulativeFileLoader('Resources/config/oro/entity.yml')
         );
         $resources    = $configLoader->load($container);
+
         foreach ($resources as $resource) {
-            $configs = array_merge(
-                $configs,
-                $resource->data['oro_entity']
-            );
+            if (!empty($resource->data['oro_entity']['virtual_fields'])) {
+                $virtualFieldsConfig =  array_merge(
+                    $virtualFieldsConfig,
+                    $resource->data['oro_entity']['virtual_fields']
+                );
+            }
+
+            if (!empty($resource->data['oro_entity']['exclude'])) {
+                $exclude =  array_merge(
+                    $exclude,
+                    $resource->data['oro_entity']['exclude']
+                );
+            }
         }
-
-        $virtualFieldsConfig = isset($virtualFieldsConfig['virtual_fields']) ?
-            $virtualFieldsConfig['virtual_fields'] :
-            [];
-
-        $exclude = isset($virtualFieldsConfig['exclude']) ?
-            $virtualFieldsConfig['exclude'] :
-            [];
-
         $container->setParameter('oro_entity.virtual_fields', $virtualFieldsConfig);
         $container->setParameter('oro_entity.exclude', $exclude);
     }

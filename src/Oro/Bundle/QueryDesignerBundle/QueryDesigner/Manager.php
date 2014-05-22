@@ -283,26 +283,6 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      */
     public function getExcludeRules()
     {
-        $result = $this->config->offsetGet('exclude');
-
-        // ensure keys exists
-        $keys = ['entity', 'field', 'query_type', 'type'];
-        foreach ($keys as $key) {
-            foreach ($result as $i => $item) {
-                if (!isset($item[$key])) {
-                    $result[$i][$key] = false;
-                }
-            }
-        }
-
-        // set default false
-        array_walk_recursive(
-            $result,
-            function (&$value) {
-                $value = empty($value) ? false : $value;
-            }
-        );
-
-        return $result;
+        return $this->config->offsetGet('exclude');
     }
 }
