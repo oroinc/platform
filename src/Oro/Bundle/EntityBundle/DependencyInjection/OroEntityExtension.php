@@ -17,7 +17,7 @@ class OroEntityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->loadVirtualFieldConfigs($container);
+        $this->loadEntityConfigs($container);
         $this->loadHiddenFieldConfigs($container);
 
         $configuration = new Configuration();
@@ -30,27 +30,37 @@ class OroEntityExtension extends Extension
     }
 
     /**
-     * Loads configuration of entity virtual fields
+     * Loads configuration of entity
      *
      * @param ContainerBuilder $container
      */
-    protected function loadVirtualFieldConfigs(ContainerBuilder $container)
+    protected function loadEntityConfigs(ContainerBuilder $container)
     {
-        $virtualFieldConfigs = [];
+        $virtualFieldsConfig = $excludeFieldsConfig = [];
 
         $configLoader = new CumulativeConfigLoader(
-            'oro_entity_virtual_fields',
-            new YamlCumulativeFileLoader('Resources/config/oro/entity_virtual_fields.yml')
+            'oro_entity',
+            new YamlCumulativeFileLoader('Resources/config/oro/entity.yml')
         );
         $resources    = $configLoader->load($container);
-        foreach ($resources as $resource) {
-            $virtualFieldConfigs = array_merge(
-                $virtualFieldConfigs,
-                $resource->data['oro_entity_virtual_fields']
-            );
-        }
 
-        $container->setParameter('oro_entity.virtual_fields', $virtualFieldConfigs);
+        foreach ($resources as $resource) {
+            if (!empty($resource->data['oro_entity']['virtual_fields'])) {
+                $virtualFieldsConfig =  array_merge(
+                    $virtualFieldsConfig,
+                    $resource->data['oro_entity']['virtual_fields']
+                );
+            }
+
+            if (!empty($resource->data['oro_entity']['exclude'])) {
+                $excludeFieldsConfig =  array_merge(
+                    $excludeFieldsConfig,
+                    $resource->data['oro_entity']['exclude']
+                );
+            }
+        }
+        $container->setParameter('oro_entity.virtual_fields', $virtualFieldsConfig);
+        $container->setParameter('oro_entity.exclude', $excludeFieldsConfig);
     }
 
     /**
