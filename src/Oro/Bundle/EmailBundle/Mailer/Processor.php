@@ -49,11 +49,10 @@ class Processor
      * Process email model sending.
      *
      * @param Email  $model
-     * @param string $originName
      * @return \Oro\Bundle\EmailBundle\Entity\Email
      * @throws \Swift_SwiftException
      */
-    public function process(Email $model, $originName = InternalEmailOrigin::BAP)
+    public function process(Email $model)
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
