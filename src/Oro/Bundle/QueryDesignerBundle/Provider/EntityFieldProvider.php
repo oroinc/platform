@@ -35,8 +35,8 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         Translator $translator,
         VirtualFieldProviderInterface $virtualFieldProvider,
         $hiddenFields,
-        QueryDesignerManager $qdManager,
-        ExcludeFieldProvider $excludeFieldProvider
+        ExcludeFieldProvider $excludeFieldProvider,
+        QueryDesignerManager $qdManager
     ) {
         parent::__construct(
             $entityConfigProvider,
@@ -49,8 +49,8 @@ class EntityFieldProvider extends ParentEntityFieldProvider
             $excludeFieldProvider
         );
 
-        $this->queryDesignerManager = $qdManager;
         $this->excludeFieldProvider = $excludeFieldProvider;
+        $this->queryDesignerManager = $qdManager;
     }
 
     /**

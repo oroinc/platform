@@ -15,6 +15,7 @@ parameters:
 
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.config.class:                Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
+    oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
 
 services:
     oro_entity.listener.navigation_listener:
@@ -114,6 +115,15 @@ services:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.exclude%
             - @oro_entity.orm.entity_class_resolver
+
+    oro_entity.virtual_field_provider.dictionary:
+        class: %oro_entity.virtual_field_provider.dictionary.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+            - @oro_entity_config.provider.dictionary
+            - @doctrine
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
