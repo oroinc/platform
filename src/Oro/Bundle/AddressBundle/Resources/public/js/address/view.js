@@ -24,6 +24,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
         },
 
         initialize: function () {
+            this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($("#template-addressbook-item").html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
@@ -41,7 +42,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             }
         },
 
-        edit: function (e) {
+        edit: function () {
             this.trigger('edit', this, this.model);
         },
 
