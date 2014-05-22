@@ -12,7 +12,7 @@ class VirtualFieldConfigurationPass implements CompilerPassInterface
     const PROVIDER_TAG_NAME         = 'oro_entity.virtual_field_provider';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
