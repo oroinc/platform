@@ -50,6 +50,7 @@ class EntityHierarchyProvider
 
     /**
      * @param string $className
+     *
      * @return array
      */
     public function getHierarchyForClassName($className)
@@ -65,8 +66,9 @@ class EntityHierarchyProvider
     /**
      * Returns parent doctrine entities for given entity class name
      *
-     * @param       $className
-     * @param array $parents
+     * @param string $className
+     * @param array  $parents
+     *
      * @return array
      */
     protected function getParents($className, $parents = [])

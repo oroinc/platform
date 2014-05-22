@@ -1,0 +1,3 @@
+oro_entity:
+    exclude:
+        - { entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: regionText }

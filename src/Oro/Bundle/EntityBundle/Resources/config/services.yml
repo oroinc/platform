@@ -11,6 +11,7 @@ parameters:
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.exclude_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider
 
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.config.class:                Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
@@ -92,6 +93,7 @@ services:
             - @doctrine
             - @translator
             - @oro_entity.virtual_field_provider
+            - @oro_entity.exclude_field_provider
             - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
@@ -106,6 +108,12 @@ services:
             - %oro_entity.virtual_fields%
         tags:
             - { name: oro_entity.virtual_field_provider }
+
+    oro_entity.exclude_field_provider:
+        class: %oro_entity.exclude_field_provider.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - %oro_entity.exclude%
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
