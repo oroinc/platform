@@ -40,7 +40,7 @@ oro:
             remote_wins.label: Remote wins
             local_wins.label: Local wins
 
-        sync: A sync job has been added to the queue. <a href="%s" class="job-view-link">%s</a>
+        sync: A sync job has been added to the queue. job_view_link
         sync_error: Failed to add sync job to the queue. Error: %s.
         progress: Check progress.
 
