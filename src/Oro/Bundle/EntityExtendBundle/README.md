@@ -136,15 +136,16 @@ Warming up the cache
 --------------------
 To save entity extend configuration stored in the database to the application cache, the following command can be used:
 ```bash
-php app/console oro:entity-extend:dump
+php app/console oro:entity-extend:cache:warmup
 ```
 
 Clearing up the cache
 ---------------------
 The following command removes all data related to entity extend functionality from the application cache:
 ```bash
-php app/console oro:entity-extend:clear
+php app/console oro:entity-extend:cache:clear --no-warmup
 ```
+To reload all cached data just run this command without `--no-warmup` option.
 
 Backing up entity data
 ----------------------
