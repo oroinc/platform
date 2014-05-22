@@ -184,6 +184,7 @@ class ExtendExtension extends AbstractExtension
 
     /**
      * @param DatagridConfiguration $config
+     * @throws \Exception when class was not found by $entityName
      * @return string extended entity class name
      */
     protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
