@@ -36,7 +36,7 @@ class OroEntityExtension extends Extension
      */
     protected function loadEntityConfigs(ContainerBuilder $container)
     {
-        $virtualFieldsConfig = $exclude = [];
+        $virtualFieldsConfig = $excludeFieldsConfig = [];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_entity',
@@ -53,14 +53,14 @@ class OroEntityExtension extends Extension
             }
 
             if (!empty($resource->data['oro_entity']['exclude'])) {
-                $exclude =  array_merge(
-                    $exclude,
+                $excludeFieldsConfig =  array_merge(
+                    $excludeFieldsConfig,
                     $resource->data['oro_entity']['exclude']
                 );
             }
         }
         $container->setParameter('oro_entity.virtual_fields', $virtualFieldsConfig);
-        $container->setParameter('oro_entity.exclude', $exclude);
+        $container->setParameter('oro_entity.exclude', $excludeFieldsConfig);
     }
 
     /**

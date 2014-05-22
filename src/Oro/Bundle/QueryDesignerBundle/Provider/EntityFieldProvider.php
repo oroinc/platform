@@ -34,8 +34,8 @@ class EntityFieldProvider extends ParentEntityFieldProvider
         ManagerRegistry $doctrine,
         Translator $translator,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        $hiddenFields,
         ExcludeFieldProvider $excludeFieldProvider,
+        $hiddenFields,
         QueryDesignerManager $qdManager
     ) {
         parent::__construct(

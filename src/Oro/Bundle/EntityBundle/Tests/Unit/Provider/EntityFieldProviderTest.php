@@ -83,8 +83,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrine,
             $translator,
             $virtualFieldsProvider,
-            [],
-            $this->excludeFieldProvider
+            $this->excludeFieldProvider,
+            []
         );
         $this->provider->setEntityProvider($entityProvider);
     }

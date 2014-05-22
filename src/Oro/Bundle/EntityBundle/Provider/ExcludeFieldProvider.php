@@ -4,12 +4,8 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
 /**
  * Provide exclude logic to filter fields based on entity exclude rules
- *
- * @package Oro\Bundle\EntityBundle
  */
 class ExcludeFieldProvider
 {
@@ -19,17 +15,12 @@ class ExcludeFieldProvider
     /** @var array */
     protected $excludeRules = [];
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
     public function __construct(
         EntityHierarchyProvider $entityHierarchyProvider,
-        $excludeRules,
-        EntityClassResolver $entityClassResolver
+        $excludeRules
     ) {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->excludeRules            = $excludeRules;
-        $this->entityClassResolver     = $entityClassResolver;
     }
 
     /**
@@ -40,7 +31,6 @@ class ExcludeFieldProvider
      */
     protected function isEntityMatched($entityName, $expectedClassName)
     {
-        $expectedClassName = $this->entityClassResolver->getEntityClass($expectedClassName);
         $parents = $this->entityHierarchyProvider->getHierarchyForClassName($entityName);
 
         if ($expectedClassName === $entityName || in_array($expectedClassName, $parents)) {

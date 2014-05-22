@@ -50,8 +50,6 @@ class ConfigController extends Controller
      */
     public function indexAction(Request $request)
     {
-    $a = $this->get('oro_entity.exclude_field_provider');
-    die();
         $actions       = [];
         $modules       = [];
         $configManager = $this->get('oro_entity_config.config_manager');
