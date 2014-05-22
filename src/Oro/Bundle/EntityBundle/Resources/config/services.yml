@@ -106,6 +106,7 @@ services:
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.exclude%
+            - @oro_entity.orm.entity_class_resolver
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

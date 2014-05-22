@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+
 /**
  * Provide exclude logic to filter fields based on entity exclude rules
  *
@@ -17,12 +19,35 @@ class ExcludeFieldProvider
     /** @var array */
     protected $excludeRules = [];
 
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
     public function __construct(
         EntityHierarchyProvider $entityHierarchyProvider,
-        $excludeRules
+        $excludeRules,
+        EntityClassResolver $entityClassResolver
     ) {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->excludeRules = $excludeRules;
+        $this->excludeRules            = $excludeRules;
+        $this->entityClassResolver     = $entityClassResolver;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $expectedClassName
+     *
+     * @return bool
+     */
+    protected function isEntityMatched($entityName, $expectedClassName)
+    {
+        $expectedClassName = $this->entityClassResolver->getEntityClass($expectedClassName);
+        $parents = $this->entityHierarchyProvider->getHierarchyForClassName($entityName);
+
+        if (in_array($expectedClassName, $parents)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -35,9 +60,11 @@ class ExcludeFieldProvider
      */
     public function isRuleApplied($rule, $className, $fieldName, $fieldType)
     {
-        $isExcludeEntity      = !$rule['field'] && $className === $rule['entity'];
+        $isExcludeEntity      = !$rule['field'] && $this->isEntityMatched($className, $rule['entity']);
+
         $isExcludeEntityField = $className === $rule['entity']
             && $rule['field'] === $fieldName;
+
         $isExcludeByType      = $fieldType === $rule['type'];
 
         if ($isExcludeEntity || $isExcludeEntityField || $isExcludeByType) {
@@ -81,4 +108,4 @@ class ExcludeFieldProvider
     {
         return $this->isIgnoreField($metadata, $associationName, $extraRules);
     }
-} 
+}
