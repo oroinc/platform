@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -33,6 +34,9 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var EntityFieldProvider */
     private $fieldProvider;
+
+    /** @var ExcludeFieldProvider */
+    private $excludeFieldProvider;
 
     protected function setUp()
     {
@@ -81,6 +85,10 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->excludeFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->fieldProvider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
@@ -88,7 +96,8 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrine,
             $translator,
             $virtualFieldsProvider,
-            []
+            [],
+            $this->excludeFieldProvider
         );
         $this->fieldProvider->setEntityProvider($this->entityProvider);
 

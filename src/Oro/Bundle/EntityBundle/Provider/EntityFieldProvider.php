@@ -221,7 +221,7 @@ class EntityFieldProvider
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
-        if (isset($this->hiddenFields[$metadata->name][$fieldName])) {
+        if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
             return true;
         }
 

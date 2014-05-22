@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 use Oro\Bundle\QueryDesignerBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\Tests\Util\ReflectionUtil;
@@ -13,6 +14,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
     protected $qdManager;
+
+    /** @var ExcludeFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $excludeFieldProvider;
 
     public function setUp()
     {
@@ -44,6 +48,10 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->excludeFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->provider = new EntityFieldProvider(
             $configProvider,
             $configProvider,
@@ -52,24 +60,80 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $translator,
             $virtualFieldsProvider,
             [],
-            $this->qdManager
+            $this->qdManager,
+            $this->excludeFieldProvider
         );
         $this->provider->setQueryType('report');
     }
 
-    public function testIsIgnoredField()
+    public function testIsIgnoredFieldTrue()
     {
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $fieldName = 'test';
 
-        $this->qdManager->expects($this->once())
-            ->method('isIgnoredField')
-            ->with($metadata, $fieldName, 'report')
+        $metadata->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('Entity\Fake'));
+
+        $this->excludeFieldProvider->expects($this->at(0))
+            ->method('isIgnoreField')
+            ->will($this->returnValue(false));
+
+        $this->excludeFieldProvider->expects($this->at(1))
+            ->method('isIgnoreField')
             ->will($this->returnValue(true));
 
-        $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredField', [$metadata, $fieldName]);
+        $this->qdManager->expects($this->once())
+            ->method('getExcludeRules')
+            ->will($this->returnValue([]));
+
+        $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredField', [$metadata, 'fakeField']);
+        $this->assertTrue($result);
+    }
+
+
+    public function testIsIgnoredFieldQueryType()
+    {
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $metadata->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('Entity\Fake'));
+
+        $this->excludeFieldProvider->expects($this->at(0))
+            ->method('isIgnoreField')
+            ->will($this->returnValue(false));
+
+        $this->excludeFieldProvider->expects($this->at(1))
+            ->method('isIgnoreField')
+            ->will($this->returnValue(false));
+
+        $this->qdManager->expects($this->once())
+            ->method('getExcludeRules')
+            ->will($this->returnValue([['query_type' => 'report']]));
+
+        $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredField', [$metadata, 'fakeField']);
+        $this->assertTrue($result);
+    }
+
+    public function testIsIgnoredFieldFalse()
+    {
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $metadata->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('Entity\Fake'));
+
+        $this->excludeFieldProvider->expects($this->once())
+            ->method('isIgnoreField')
+            ->will($this->returnValue(true));
+
+        $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredField', [$metadata, 'fakeField']);
         $this->assertTrue($result);
     }
 
@@ -78,11 +142,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $fieldName = 'test';
+        $fieldName = 'default_test';
 
-        $this->qdManager->expects($this->once())
+        $this->excludeFieldProvider->expects($this->once())
             ->method('isIgnoredAssosiation')
-            ->with($metadata, $fieldName, 'report')
+            ->with($metadata, $fieldName)
             ->will($this->returnValue(true));
 
         $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredRelation', [$metadata, $fieldName]);

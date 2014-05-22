@@ -58,7 +58,7 @@ class ExcludeFieldProvider
      *
      * @return bool
      */
-    public function isRuleApplied($rule, $className, $fieldName, $fieldType)
+    protected function isRuleApplied($rule, $className, $fieldName, $fieldType)
     {
         $isEntityMatched = $this->isEntityMatched($className, $rule['entity']);
         $isExcludeEntity = false === $rule['field'] && $isEntityMatched;
