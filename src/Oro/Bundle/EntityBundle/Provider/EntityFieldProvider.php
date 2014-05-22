@@ -410,7 +410,7 @@ class EntityFieldProvider
             }
         }
 
-        return $this->excludeFieldProvider->isIgnoredAssosiation($metadata, $associationName);
+        return $this->excludeFieldProvider->isIgnoredRelation($metadata, $associationName);
     }
 
     /**

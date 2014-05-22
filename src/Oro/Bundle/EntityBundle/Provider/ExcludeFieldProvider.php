@@ -92,7 +92,7 @@ class ExcludeFieldProvider
      *
      * @return bool
      */
-    public function isIgnoredAssosiation(ClassMetadata $metadata, $associationName, $extraRules = [])
+    public function isIgnoredRelation(ClassMetadata $metadata, $associationName, $extraRules = [])
     {
         return $this->isIgnoreField($metadata, $associationName, $extraRules);
     }
