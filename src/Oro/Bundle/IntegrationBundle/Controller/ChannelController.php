@@ -78,36 +78,36 @@ class ChannelController extends Controller
     {
         $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v']);
 
-        $error = false;
+        $status  = Codes::HTTP_OK;
+        $success = true;
+        $message = '';
+
         try {
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($job);
             $em->flush($job);
+
+            $message = sprintf(
+                $this->get('translator')->trans('oro.integration.sync'),
+                $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
+                $this->get('translator')->trans('oro.integration.progress')
+            );
         } catch (\Exception $e) {
-            $error = $e->getMessage();
-        }
-
-        $status  = Codes::HTTP_OK;
-        $success = true;
-
-        if ($error !== false) {
             $status  = Codes::HTTP_BAD_REQUEST;
             $success = false;
+            $message = sprintf($this->get('translator')->trans('oro.integration.sync_error'), $e->getMessage());
         }
 
-        return new JsonResponse(
-            [
-                'successful' => $success,
-                'job_id'     => $job->getId(),
-                'message'    => sprintf(
-                    '%s <a href="%s" class="job-view-link">%s</a>',
-                    $this->get('translator')->trans('oro.integration.sync'),
-                    $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
-                    $this->get('translator')->trans('oro.integration.progress')
-                )
-            ],
-            $status
-        );
+        $response = [
+            'successful' => $success,
+            'message'    => $message,
+        ];
+
+        if ($success) {
+            $response['job_id'] = $job->getId();
+        }
+
+        return new JsonResponse($response, $status);
     }
 
     /**

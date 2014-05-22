@@ -28,7 +28,7 @@ define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/transla
             }
             
             var navigation = Navigation.getInstance();
-            if (navigation) {
+            if (navigation && data.successful) {
                 navigation.processClicks($('.job-view-link'));
             }
 
