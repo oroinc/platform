@@ -90,14 +90,14 @@ class EmailTemplateController extends Controller
      * @param bool|int $emailTemplateId
      * @return array
      */
-    public function previewAction($emailTemplateId = false)
+    public function previewAction($id = false)
     {
-        if (!$emailTemplateId) {
+        if (!$id) {
             $emailTemplate = new EmailTemplate();
         } else {
             /** @var EntityManager $em */
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($emailTemplateId);
+            $emailTemplate = $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($id);
         }
 
         /** @var FormInterface $form */
