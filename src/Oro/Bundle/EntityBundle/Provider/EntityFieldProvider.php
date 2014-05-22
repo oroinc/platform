@@ -186,16 +186,19 @@ class EntityFieldProvider
             if ($withVirtualFields) {
                 $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
                 foreach ($virtualFields as $fieldName) {
-                    $virtualFieldsQuery = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
                     if ($this->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
 
+                    $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+                    $fieldLabel = isset($query['select']['label'])
+                        ? $query['select']['label']
+                        : ConfigHelper::getTranslationKey('label', $className, $fieldName);
                     $this->addField(
                         $result,
                         $fieldName,
-                        $virtualFieldsQuery['select']['return_type'],
-                        ConfigHelper::getTranslationKey('label', $className, $fieldName),
+                        $query['select']['return_type'],
+                        $fieldLabel,
                         false,
                         $translate
                     );
