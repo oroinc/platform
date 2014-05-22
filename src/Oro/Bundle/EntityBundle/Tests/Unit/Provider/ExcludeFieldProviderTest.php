@@ -2,69 +2,67 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 
 class ExcludeFieldProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EntityHierarchyProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $hierarchyProviderMock;
-
     /** @var ExcludeFieldProvider */
     protected $provider;
 
     public function setUp()
     {
-        $this->hierarchyProviderMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
+        $hierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $hierarchyProvider->expects($this->any())
+            ->method('getHierarchyForClassName')
+            ->with('Test\Entity\Address')
+            ->will($this->returnValue(['Test\Entity\AbstractAddress']));
 
         $this->provider = new ExcludeFieldProvider(
-            $this->hierarchyProviderMock,
+            $hierarchyProvider,
             [
-                ['entity' => 'Oro\Bundle\AddressBundle\Entity\Address', 'field' => 'fakeField']
+                ['entity' => 'Test\Entity\Address', 'field' => 'field1'],
+                ['entity' => 'Test\Entity\AbstractAddress', 'field' => 'field2'],
+                ['type' => 'date']
             ]
         );
     }
 
-    public function testIsIgnoredFieldTrue()
+    public function testIsIgnoredField()
     {
-        $metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadata->expects($this->at(0))
+        $metadata->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('Oro\Bundle\AddressBundle\Entity\Address'));
+            ->will($this->returnValue('Test\Entity\Address'));
 
-        $metadata->expects($this->at(1))
+        $metadata->expects($this->any())
             ->method('getTypeOfField')
-            ->will($this->returnValue('integer'));
-
-        $metadata->expects($this->at(2))
-            ->method('getTypeOfField')
-            ->will($this->returnValue('string'));
-
-        $this->hierarchyProviderMock->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
-            ->with('Oro\Bundle\AddressBundle\Entity\Address')
             ->will(
-                $this->returnValue(
+                $this->returnValueMap(
                     [
-                        'Oro\Bundle\AddressBundle\Entity\AbstractAddress',
-                        'Oro\Bundle\AddressBundle\Entity\Address',
+                        ['field1', 'integer'],
+                        ['field2', 'string'],
+                        ['field3', 'date'],
+                        ['field4', 'text'],
                     ]
                 )
             );
 
-        $result = $this->provider->isIgnoreField(
-            $metadata,
-            'regionText',
-            [
-                ['entity' => 'Oro\Bundle\AddressBundle\Entity\AbstractAddress', 'field' => 'regionText'],
-            ]
+        $this->assertTrue(
+            $this->provider->isIgnoreField($metadata, 'field1')
         );
-
-        $this->assertTrue($result);
+        $this->assertTrue(
+            $this->provider->isIgnoreField($metadata, 'field2')
+        );
+        $this->assertTrue(
+            $this->provider->isIgnoreField($metadata, 'field3')
+        );
+        $this->assertFalse(
+            $this->provider->isIgnoreField($metadata, 'field4')
+        );
     }
 }

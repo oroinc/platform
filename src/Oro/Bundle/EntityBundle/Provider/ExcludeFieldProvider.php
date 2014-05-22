@@ -15,12 +15,51 @@ class ExcludeFieldProvider
     /** @var array */
     protected $excludeRules = [];
 
+    /**
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param array                   $excludeRules
+     */
     public function __construct(
         EntityHierarchyProvider $entityHierarchyProvider,
         $excludeRules
     ) {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->excludeRules            = $excludeRules;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
+     * @param array         $extraRules
+     *
+     * @return bool
+     */
+    public function isIgnoreField(ClassMetadata $metadata, $fieldName, $extraRules = [])
+    {
+        $excludeRules = array_merge($this->excludeRules, $extraRules);
+        $className    = $metadata->getName();
+
+        foreach ($excludeRules as $rule) {
+            $fieldType = $metadata->getTypeOfField($fieldName);
+
+            if ($this->isRuleApplied($rule, $className, $fieldName, $fieldType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param string        $associationName
+     * @param array         $extraRules
+     *
+     * @return bool
+     */
+    public function isIgnoredRelation(ClassMetadata $metadata, $associationName, $extraRules = [])
+    {
+        return $this->isIgnoreField($metadata, $associationName, $extraRules);
     }
 
     /**
@@ -60,40 +99,5 @@ class ExcludeFieldProvider
         }
 
         return false;
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     * @param               $fieldName
-     * @param array         $extraRules
-     *
-     * @return bool
-     */
-    public function isIgnoreField(ClassMetadata $metadata, $fieldName, $extraRules = [])
-    {
-        $excludeRules = array_merge($this->excludeRules, $extraRules);
-        $className    = $metadata->getName();
-
-        foreach ($excludeRules as $rule) {
-            $fieldType = $metadata->getTypeOfField($fieldName);
-
-            if ($this->isRuleApplied($rule, $className, $fieldName, $fieldType)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $associationName
-     * @param array         $extraRules
-     *
-     * @return bool
-     */
-    public function isIgnoredRelation(ClassMetadata $metadata, $associationName, $extraRules = [])
-    {
-        return $this->isIgnoreField($metadata, $associationName, $extraRules);
     }
 }
