@@ -36,31 +36,31 @@ class OroEntityExtension extends Extension
      */
     protected function loadEntityConfigs(ContainerBuilder $container)
     {
-        $virtualFieldsConfig = $excludeFieldsConfig = [];
-
         $configLoader = new CumulativeConfigLoader(
             'oro_entity',
             new YamlCumulativeFileLoader('Resources/config/oro/entity.yml')
         );
         $resources    = $configLoader->load($container);
 
+        $virtualFields = [];
+        $exclusions    = [];
         foreach ($resources as $resource) {
             if (!empty($resource->data['oro_entity']['virtual_fields'])) {
-                $virtualFieldsConfig =  array_merge(
-                    $virtualFieldsConfig,
+                $virtualFields = array_merge(
+                    $virtualFields,
                     $resource->data['oro_entity']['virtual_fields']
                 );
             }
-
-            if (!empty($resource->data['oro_entity']['exclude'])) {
-                $excludeFieldsConfig =  array_merge(
-                    $excludeFieldsConfig,
-                    $resource->data['oro_entity']['exclude']
+            if (!empty($resource->data['oro_entity']['exclusions'])) {
+                $exclusions = array_merge(
+                    $exclusions,
+                    $resource->data['oro_entity']['exclusions']
                 );
             }
         }
-        $container->setParameter('oro_entity.virtual_fields', $virtualFieldsConfig);
-        $container->setParameter('oro_entity.exclude', $excludeFieldsConfig);
+
+        $container->setParameter('oro_entity.virtual_fields', $virtualFields);
+        $container->setParameter('oro_entity.exclusions', $exclusions);
     }
 
     /**

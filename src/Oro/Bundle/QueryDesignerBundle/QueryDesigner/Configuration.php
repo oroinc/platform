@@ -31,35 +31,10 @@ class Configuration implements ConfigurationInterface
         $builder->root(self::ROOT_NODE_NAME)
             ->children()
                 ->append($this->getFiltersConfigTree())
-                ->arrayNode('grouping')
-                    ->ignoreExtraKeys()
-                    ->children()
-                        ->arrayNode('exclude')
-                            ->prototype('array')
-                                ->children()
-                                    // field type
-                                    ->scalarNode('type')
-                                        ->cannotBeEmpty()
-                                    ->end()
-                                    // entity name
-                                    ->scalarNode('entity')
-                                        ->cannotBeEmpty()
-                                    ->end()
-                                    // field name
-                                    ->scalarNode('field')
-                                        ->cannotBeEmpty()
-                                    ->end()
-                                    // primary key
-                                    ->booleanNode('identifier')
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                ->append($this->getGroupingConfigTree())
                 ->append($this->getConvertersConfigTree())
                 ->append($this->getAggregatorsConfigTree())
-                ->append($this->getExcludeConfigTree())
+                ->append($this->getExclusionsConfigTree())
             ->end();
 
         return $builder;
@@ -120,6 +95,45 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+
+        return $node;
+    }
+
+    /**
+     * Grouping configuration tree
+     *
+     * @return NodeDefinition
+     */
+    protected function getGroupingConfigTree()
+    {
+        $builder = new TreeBuilder();
+        $node    = $builder->root('grouping');
+
+        $node->ignoreExtraKeys()
+            ->children()
+                ->arrayNode('exclude')
+                    ->prototype('array')
+                        ->children()
+                            // field type
+                            ->scalarNode('type')
+                                ->cannotBeEmpty()
+                            ->end()
+                            // entity name
+                            ->scalarNode('entity')
+                                ->cannotBeEmpty()
+                            ->end()
+                            // field name
+                            ->scalarNode('field')
+                                ->cannotBeEmpty()
+                            ->end()
+                            // primary key
+                            ->booleanNode('identifier')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
 
         return $node;
     }
@@ -317,10 +331,15 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    protected function getExcludeConfigTree()
+    /**
+     * Exclusions configuration tree
+     *
+     * @return NodeDefinition
+     */
+    protected function getExclusionsConfigTree()
     {
         $builder = new TreeBuilder();
-        $node    = $builder->root('exclude');
+        $node    = $builder->root('exclusions');
 
         $node->prototype('array')
                 ->children()

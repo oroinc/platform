@@ -4,17 +4,10 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Component\Translation\Translator;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
-use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
@@ -26,16 +19,16 @@ class Manager implements FunctionProviderInterface
     /** @var Translator */
     protected $translator;
 
-    /** @var EntityHierarchyProvider  */
+    /** @var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
 
     /**
      * Constructor
      *
-     * @param array                         $config
-     * @param ConfigurationResolver         $resolver
-     * @param EntityHierarchyProvider       $entityHierarchyProvider
-     * @param Translator                    $translator
+     * @param array                   $config
+     * @param ConfigurationResolver   $resolver
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param Translator              $translator
      */
     public function __construct(
         array $config,
@@ -87,7 +80,7 @@ class Manager implements FunctionProviderInterface
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name A filter name
+     * @param string $name   A filter name
      * @param array  $params An additional parameters of a new filter
      * @throws \RuntimeException if a filter with the given name does not exist
      * @return FilterInterface
@@ -241,7 +234,7 @@ class Manager implements FunctionProviderInterface
     /**
      * Checks if an item can be used for the given query type
      *
-     * @param array  $item An item to check
+     * @param array  $item      An item to check
      * @param string $queryType The query type
      * @return bool true if the item can be used for the given query type; otherwise, false.
      */
@@ -257,10 +250,12 @@ class Manager implements FunctionProviderInterface
     }
 
     /**
+     * Gets a set of rules describes which entities or entity fields should be excluded
+     *
      * @return array
      */
     public function getExcludeRules()
     {
-        return $this->config->offsetGet('exclude');
+        return $this->config->offsetGet('exclusions');
     }
 }

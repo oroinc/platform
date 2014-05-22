@@ -27,7 +27,3 @@ query_designer:
             applicable: [{type: percent}]
             type:       percent
             query_type: [all]
-
-    exclude:
-        - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: country}
-        - {entity: OroCRM\Bundle\ContactBundle\Entity\ContactAddress, field: region}

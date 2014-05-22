@@ -1,5 +1,5 @@
 oro_entity:
-    exclude:
+    exclusions:
         - { entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: regionText }
 
     virtual_fields:

@@ -113,7 +113,7 @@ services:
         class: %oro_entity.exclude_field_provider.class%
         arguments:
             - @oro_entity.entity_hierarchy_provider
-            - %oro_entity.exclude%
+            - %oro_entity.exclusions%
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%

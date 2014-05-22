@@ -166,9 +166,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'query_type' => ['type1']
                 ]
             ],
-            'exclude' => [
-
-            ],
+            'exclusions' => [],
         ];
 
         $this->assertEquals($expected, $result);
