@@ -20,7 +20,7 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isVirtualField($className, $fieldName)
     {
@@ -34,7 +34,7 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getVirtualFieldQuery($className, $fieldName)
     {
@@ -47,12 +47,21 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         }
 
         if ($foundProvider === null) {
-            return null;
+            throw new \RuntimeException(
+                sprintf(
+                    'A query for field "%s" in class "%s" was not found.',
+                    $fieldName,
+                    $className
+                )
+            );
         }
 
         return $foundProvider->getVirtualFieldQuery($className, $fieldName);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getVirtualFields($className)
     {
         $result = [];
