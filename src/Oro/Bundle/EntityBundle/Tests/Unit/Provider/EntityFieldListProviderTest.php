@@ -77,7 +77,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $virtualFieldsProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualFieldProvider')
+        $virtualFieldsProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
