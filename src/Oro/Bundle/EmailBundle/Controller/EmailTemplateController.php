@@ -87,7 +87,7 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
-     * @param bool|int $emailTemplateId
+     * @param bool|int $id
      * @return array
      */
     public function previewAction($id = false)
