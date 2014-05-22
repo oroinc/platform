@@ -77,7 +77,7 @@ define(function (require) {
             loadingMask:         '.hash-loading-mask',
             searchDropdown:      '#search-div',
             menuDropdowns:       '.pin-menus.dropdown, .nav .dropdown',
-            pinbarHelp:          '.pin-bar-empty',
+            pinbarHelp:          '.pin-bar-empty a',
             historyTab:          '#history-content',
             mostViewedTab:       '#mostviewed-content',
             flashMessages:       '#flash-messages',

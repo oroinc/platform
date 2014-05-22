@@ -2,7 +2,7 @@
 .pin-bar {
   float: right;
   position: relative;
-  z-index: 990;
+//  z-index: 990;
   .pin-menus {
     float:right;
     position: relative;
@@ -209,6 +209,15 @@
         #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
         a {
           color: lighten(@headerTextColor, 10%);
+          &.icon-remove {
+            color: transparent;
+            &:before {
+              color:@headerTextColor;
+            }
+            &:hover:before {
+              color: lighten(@headerTextColor, 10%);
+            }
+          }
         }
       }
     }

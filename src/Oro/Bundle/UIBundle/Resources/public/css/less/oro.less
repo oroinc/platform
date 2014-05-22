@@ -177,6 +177,18 @@ body .select2-container {
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
   background:none;
 }
+// fix for FF (broken corner)
+.navbar .nav > li > .dropdown-menu:after {
+  left: 9px;
+  border-right-width: 7px;
+  border-bottom-width: 7px;
+  border-left-width: 7px;
+}
+.navbar .pull-right > li > .dropdown-menu:after,
+.navbar .nav > li > .dropdown-menu.pull-right:after {
+  left: auto;
+  right: 12px;
+}
 
 // Bootstrap - Table
 .table thead th { padding-top:2px; padding-bottom:2px; }
