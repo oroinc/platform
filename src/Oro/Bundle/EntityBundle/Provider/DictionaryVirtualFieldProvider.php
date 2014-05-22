@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -145,7 +146,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $configs            = $this->groupingConfigProvider->getConfigs();
             foreach ($configs as $config) {
                 $groups = $config->get('groups');
-                if (!empty($groups) && in_array('dictionary', $groups)) {
+                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
                     $className  = $config->getId()->getClassName();
                     $metadata   = $this->getManagerForClass($className)->getClassMetadata($className);
                     $fieldNames = null;

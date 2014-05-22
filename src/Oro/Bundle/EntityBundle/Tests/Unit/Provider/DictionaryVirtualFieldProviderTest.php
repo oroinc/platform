@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\MappingException;
 
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -302,7 +303,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $dict1GrpCfg = $this->createEntityConfig(
             'grouping',
             'Acme\TestBundle\Entity\Dictionary1',
-            ['groups' => ['dictionary']]
+            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
         );
         $dict1Cfg    = $this->createEntityConfig(
             'dictionary',
@@ -313,7 +314,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $dict2GrpCfg = $this->createEntityConfig(
             'grouping',
             'Acme\TestBundle\Entity\Dictionary2',
-            ['groups' => ['dictionary']]
+            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
         );
         $dict2Cfg    = $this->createEntityConfig(
             'dictionary',
@@ -324,14 +325,14 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $dict3GrpCfg = $this->createEntityConfig(
             'grouping',
             'Acme\TestBundle\Entity\Dictionary3',
-            ['groups' => ['dictionary']]
+            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
         );
         $dict3Cfg    = $this->createEntityConfig('dictionary', 'Acme\TestBundle\Entity\Dictionary3');
 
         $dict4GrpCfg = $this->createEntityConfig(
             'grouping',
             'Acme\TestBundle\Entity\Dictionary4',
-            ['groups' => ['dictionary']]
+            ['groups' => [GroupingScope::GROUP_DICTIONARY]]
         );
         $dict4Cfg    = $this->createEntityConfig('dictionary', 'Acme\TestBundle\Entity\Dictionary4');
 
