@@ -96,7 +96,7 @@ class ChannelController extends Controller
             );
 
             $response['message'] = str_replace(
-                'job_view_link',
+                '{{ job_view_link }}',
                 $jobViewLink,
                 $this->get('translator')->trans('oro.integration.sync')
             );
