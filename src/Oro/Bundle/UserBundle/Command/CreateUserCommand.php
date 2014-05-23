@@ -95,7 +95,7 @@ class CreateUserCommand extends ContainerAwareCommand
                 ->addBusinessUnit($businessUnit);
         }
 
-        $properties = ['name', 'email', 'firstname', 'lastname', 'plain-password'];
+        $properties = ['name', 'email', 'firstname', 'lastname', 'plain-password', 'username'];
 
         foreach ($properties as $property) {
             if (!empty($options[$property])) {
