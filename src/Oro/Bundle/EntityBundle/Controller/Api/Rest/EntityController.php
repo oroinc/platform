@@ -59,7 +59,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      description="Indicates whether Unidirectional association fields should be returned.")
      * @QueryParam(
      *      name="with-exclusions", requirements="(1)|(0)",
-     *      description="Indicates whether exclusion logic should be a applied to fields.")
+     *      description="Indicates whether exclusion logic should be a applied.")
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
