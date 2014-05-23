@@ -43,7 +43,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
      * @QueryParam(
      *      name="with-exclusions", requirements="(1)|(0)",
-     *      description="Indicates whether exclusion logic should be a applied.")
+     *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entity fields",
      *      resource=true
