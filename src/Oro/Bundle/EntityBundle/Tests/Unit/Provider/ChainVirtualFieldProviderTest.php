@@ -23,10 +23,10 @@ class ChainVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->setMockClassName('LowPriorityVirtualFieldProvider')
             ->getMock();
 
-        $this->chainProvider->addProvider($highPriorityProvider, -10);
         $this->chainProvider->addProvider($lowPriorityProvider);
+        $this->chainProvider->addProvider($highPriorityProvider, -10);
 
-        $this->providers = [$lowPriorityProvider, $highPriorityProvider];
+        $this->providers = [$highPriorityProvider, $lowPriorityProvider];
     }
 
     public function testIsVirtualFieldByLowPriorityProvider()

@@ -34,14 +34,14 @@ services:
     oro_query_designer.exclusion_provider:
         class: %oro_entity.exclusion_provider.chain.class%
         calls:
-            - [addProvider, [@oro_entity.exclusion_provider.dictionary]]
             - [addProvider, [@oro_entity.exclusion_provider]]
+            - [addProvider, [@oro_entity.exclusion_provider.dictionary]]
 
     oro_query_designer.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.chain.class%
         calls:
-            - [addProvider, [@oro_entity.virtual_field_provider.dictionary]]
             - [addProvider, [@oro_entity.virtual_field_provider]]
+            - [addProvider, [@oro_entity.virtual_field_provider.dictionary, 100]]
 
     oro_query_designer.entity_provider:
         class: %oro_entity.entity_provider.class%

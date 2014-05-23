@@ -23,10 +23,10 @@ class ChainExclusionProviderTest extends \PHPUnit_Framework_TestCase
             ->setMockClassName('LowPriorityExclusionProvider')
             ->getMock();
 
-        $this->chainProvider->addProvider($highPriorityProvider, -10);
+        $this->chainProvider->addProvider($highPriorityProvider);
         $this->chainProvider->addProvider($lowPriorityProvider);
 
-        $this->providers = [$lowPriorityProvider, $highPriorityProvider];
+        $this->providers = [$highPriorityProvider, $lowPriorityProvider];
     }
 
     public function testIsIgnoredEntityByLowPriorityProvider()

@@ -92,10 +92,10 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
      *
      * @return VirtualFieldProviderInterface[]
      */
-    public function getProviders()
+    protected function getProviders()
     {
         if (null === $this->sorted) {
-            krsort($this->providers);
+            ksort($this->providers);
             $this->sorted = !empty($this->providers)
                 ? call_user_func_array('array_merge', $this->providers)
                 : [];
