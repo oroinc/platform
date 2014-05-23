@@ -48,6 +48,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * @param {String} id
+         */
         initializeListeners: function (id) {
             var self = this;
             mediator.on('items-manager:table:add:' + self.options.fieldsTableIdentifier, function (collection) {
@@ -65,6 +68,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * @param {Array} collection
+         */
         updateCollection: function (collection) {
             var entity = $(this.options.fieldsLoaderSelector).fieldsLoader('getEntityName');
             var data = $(this.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
@@ -72,6 +78,9 @@ define(function (require) {
             this.items = collection.toJSON();
         },
 
+        /**
+         * @param {String} id
+         */
         validateSelect2: function (id) {
             var self = this;
             var childSelector = _.template(this.options.childTemplate, {id: id});
@@ -86,6 +95,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * @param {String} id
+         */
         initSelect2: function (id) {
             var childSelector = _.template(this.options.childTemplate, {id: id});
             var self = this;
@@ -109,6 +121,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * @param {Array} exclude
+         */
         data: function (exclude) {
             var data, util, optionsTemplate;
             util = this.util;
