@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'oroui/js/mediator', './model-action'
-    ], function (_, mediator, ModelAction) {
+define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action'
+    ], function (_, __, messenger, mediator, ModelAction) {
     'use strict';
 
     /**
@@ -56,6 +56,12 @@ define(['underscore', 'oroui/js/mediator', './model-action'
          * @private
          */
         _preExecuteSubscriber: function (action, options) {
+            mediator.once('navigation:page_load:error', function(xmlHttp, options) {
+                if (403 == xmlHttp.status) {
+                    options.stopPageProcessing = true;
+                    messenger.notificationFlashMessage('error', __('You do not have permission to perform this action.'));
+                }
+            });
             mediator.trigger('grid_action:navigateAction:preExecute', action, options);
         }
     });

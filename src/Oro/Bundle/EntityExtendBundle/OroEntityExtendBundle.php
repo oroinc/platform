@@ -67,14 +67,14 @@ class OroEntityExtendBundle extends Bundle
     private function ensureCacheInitialized()
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
-        if (!$this->isCommandExecuting('oro:entity-extend:dump') && !file_exists($aliasesPath)) {
+        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup') && !file_exists($aliasesPath)) {
             // We have to warm up the extend entities cache in separate process
             // to allow this process continue executing.
             // The problem is we need initialized DI contained for warming up this cache,
             // but in this moment we are exactly doing this for the current process.
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
-            $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
+            $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
             $process->setTimeout(300);
             $process->run();
         }

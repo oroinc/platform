@@ -4,9 +4,10 @@ namespace Oro\Bundle\EntityConfigBundle\Command;
 
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ClearCommand extends BaseCommand
+class CacheClearCommand extends BaseCommand
 {
     /**
      * {@inheritdoc}
@@ -14,8 +15,9 @@ class ClearCommand extends BaseCommand
     public function configure()
     {
         $this
-            ->setName('oro:entity-config:clear')
-            ->setDescription('Clears entity config cache.');
+            ->setName('oro:entity-config:cache:clear')
+            ->setDescription('Clears the entity config cache.')
+            ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.');
     }
 
     /**
@@ -23,9 +25,13 @@ class ClearCommand extends BaseCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Clear entity config cache');
+        $output->writeln('Clear the entity config cache');
 
         $this->getConfigManager()->clearCache();
         $this->getConfigManager()->clearConfigurableCache();
+
+        if (!$input->getOption('no-warmup')) {
+            // @todo: add the warming up of the entity config cache here
+        }
     }
 }

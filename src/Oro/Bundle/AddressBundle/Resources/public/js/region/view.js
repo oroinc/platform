@@ -92,9 +92,13 @@ function(_, Backbone) {
          * @param e {Object}
          */
         selectionChanged: function(e) {
-            var countryId = $(e.currentTarget).val();
-            this.collection.setCountryId(countryId);
-            this.collection.fetch();
+            if($(e.currentTarget).val()){
+                var countryId = $(e.currentTarget).val();
+                this.collection.setCountryId(countryId);
+                this.collection.fetch();
+            } else {
+                this.collection.reset([]);
+            }
         },
 
         render: function() {
