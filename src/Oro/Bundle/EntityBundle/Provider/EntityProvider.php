@@ -30,6 +30,9 @@ class EntityProvider
      */
     protected $translator;
 
+    /** @var ExclusionProviderInterface */
+    protected $exclusionProvider;
+
     /**
      * Constructor
      *
@@ -48,6 +51,16 @@ class EntityProvider
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->translator           = $translator;
+    }
+
+    /**
+     * Sets exclusion provider
+     *
+     * @param ExclusionProviderInterface $exclusionProvider
+     */
+    public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
+    {
+        $this->exclusionProvider = $exclusionProvider;
     }
 
     /**
@@ -110,6 +123,10 @@ class EntityProvider
         $configs = $this->entityConfigProvider->getConfigs();
         foreach ($configs as $config) {
             $className = $config->getId()->getClassName();
+            if ($this->isIgnoredEntity($className)) {
+                continue;
+            }
+
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
                 [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
@@ -125,6 +142,18 @@ class EntityProvider
                 );
             }
         }
+    }
+
+    /**
+     * Checks if the given entity should be ignored
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    protected function isIgnoredEntity($className)
+    {
+        return $this->exclusionProvider->isIgnoredEntity($className);
     }
 
     /**

@@ -41,11 +41,11 @@ class ExclusionProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testIsIgnoredEntity($metadata, $expected)
+    public function testIsIgnoredEntity($className, $expected)
     {
         $this->assertEquals(
             $expected,
-            $this->provider->isIgnoredEntity($metadata)
+            $this->provider->isIgnoredEntity($className)
         );
     }
 
@@ -73,12 +73,9 @@ class ExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function entityProvider()
     {
-        $entity1 = $this->getEntityMetadata('Test\Entity\Entity1');
-        $entity2 = $this->getEntityMetadata('Test\Entity\Entity3');
-
         return [
-            [$entity1, false],
-            [$entity2, true],
+            ['Test\Entity\Entity1', false],
+            ['Test\Entity\Entity3', true],
         ];
     }
 

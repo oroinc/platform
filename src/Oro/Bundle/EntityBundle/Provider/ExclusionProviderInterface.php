@@ -12,11 +12,11 @@ interface ExclusionProviderInterface
     /**
      * Checks if the given entity should be ignored
      *
-     * @param ClassMetadata $metadata
+     * @param string $className
      *
      * @return bool
      */
-    public function isIgnoredEntity(ClassMetadata $metadata);
+    public function isIgnoredEntity($className);
 
     /**
      * Checks if the given field should be ignored

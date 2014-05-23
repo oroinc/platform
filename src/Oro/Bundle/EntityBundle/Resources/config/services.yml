@@ -78,6 +78,8 @@ services:
             - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
             - @translator
+        calls:
+            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
 
     oro_entity.entity_provider:
         class: %oro_entity.entity_provider.class%
@@ -91,11 +93,11 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @translator
-            - @oro_entity.virtual_field_provider
-            - @oro_entity.exclusion_provider
             - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
+            - [setVirtualFieldProvider, [@oro_entity.virtual_field_provider]]
+            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
 
     oro_entity.exclusion_provider:
         class: %oro_entity.exclusion_provider.class%

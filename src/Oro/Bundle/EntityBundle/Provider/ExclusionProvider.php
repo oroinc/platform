@@ -30,9 +30,9 @@ class ExclusionProvider implements ExclusionProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function isIgnoredEntity(ClassMetadata $metadata)
+    public function isIgnoredEntity($className)
     {
-        return $this->isMatched($this->getEntityProperties($metadata));
+        return $this->isMatched($this->getEntityProperties($className));
     }
 
     /**
@@ -54,13 +54,13 @@ class ExclusionProvider implements ExclusionProviderInterface
     /**
      * Returns properties for entity object
      *
-     * @param ClassMetadata $metadata
+     * @param string $className
      * @return array
      */
-    protected function getEntityProperties(ClassMetadata $metadata)
+    protected function getEntityProperties($className)
     {
         return [
-            'entity' => $metadata->getName()
+            'entity' => $className
         ];
     }
 

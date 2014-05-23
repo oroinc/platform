@@ -59,8 +59,6 @@ class EntityFieldProvider
      * @param EntityClassResolver           $entityClassResolver
      * @param ManagerRegistry               $doctrine
      * @param Translator                    $translator
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ExclusionProviderInterface    $exclusionProvider
      * @param array                         $hiddenFields
      */
     public function __construct(
@@ -69,18 +67,14 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        VirtualFieldProviderInterface $virtualFieldProvider,
-        ExclusionProviderInterface $exclusionProvider,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
-        $this->translator           = $translator;
         $this->doctrine             = $doctrine;
-        $this->virtualFieldProvider = $virtualFieldProvider;
+        $this->translator           = $translator;
         $this->hiddenFields         = $hiddenFields;
-        $this->exclusionProvider    = $exclusionProvider;
     }
 
     /**
@@ -91,6 +85,26 @@ class EntityFieldProvider
     public function setEntityProvider(EntityProvider $entityProvider)
     {
         $this->entityProvider = $entityProvider;
+    }
+
+    /**
+     * Sets virtual field provider
+     *
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     */
+    public function setVirtualFieldProvider(VirtualFieldProviderInterface $virtualFieldProvider)
+    {
+        $this->virtualFieldProvider = $virtualFieldProvider;
+    }
+
+    /**
+     * Sets exclusion provider
+     *
+     * @param ExclusionProviderInterface $exclusionProvider
+     */
+    public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
+    {
+        $this->exclusionProvider = $exclusionProvider;
     }
 
     /**

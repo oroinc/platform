@@ -57,12 +57,15 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
+        $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+
         $entityProvider = new EntityProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
             $translator
         );
+        $entityProvider->setExclusionProvider($this->exclusionProvider);
 
         $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -72,19 +75,17 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
-
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
             $this->doctrine,
             $translator,
-            $virtualFieldsProvider,
-            $this->exclusionProvider,
             []
         );
         $this->provider->setEntityProvider($entityProvider);
+        $this->provider->setVirtualFieldProvider($virtualFieldsProvider);
+        $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
     public function testGetFieldsNoEntityConfig()
