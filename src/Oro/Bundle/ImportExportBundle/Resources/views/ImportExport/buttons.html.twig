@@ -3,7 +3,7 @@
     <a type="button"
         class="btn import-btn icons-holder-text no-hash"
         href="{{ path('oro_importexport_import_form', {'entity': entityClass}) }}">
-        <i class="icon-signin hide-text">{{ 'Import'|trans }}</i>{{ 'Import'|trans }}
+        <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
     </a>
     {% endif %}
 
@@ -11,7 +11,7 @@
     <a type="button"
        class="btn export-btn icons-holder-text no-hash"
        href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-        <i class="icon-signout hide-text">{{ 'Export'|trans }}</i>{{ 'Export'|trans }}
+        <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
     </a>
     {% endif %}
 </div>
@@ -24,7 +24,7 @@
 
             var widget = new DialogWidget({
                 'url': this.href,
-                'title': {{ imortTitle|default('Import'|trans)|json_encode|raw }},
+                'title': {{ imortTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
                 'stateEnabled': false,
                 'incrementalPosition': false,
                 'dialogOptions': {
