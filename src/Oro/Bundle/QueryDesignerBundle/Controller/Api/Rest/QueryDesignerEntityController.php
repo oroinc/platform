@@ -43,7 +43,7 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
 
         $statusCode = Codes::HTTP_OK;
         try {
-            $result = $provider->getFields(true, true, true);
+            $result = $provider->getFields(true, true);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

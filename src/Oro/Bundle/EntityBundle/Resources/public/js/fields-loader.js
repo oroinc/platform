@@ -9,12 +9,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
      */
     $.widget('oroentity.fieldsLoader', {
         options: {
-            router: 'oro_api_querydesigner_fields_entity',
-            routingParams: {
-                'with-entity-details': 1,
-                'with-unidirectional': 1,
-                'with-relations':      1
-            },
+            router: null,
+            routingParams: {},
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog
             confirm: null,
@@ -29,11 +25,6 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             });
         },
 
-        generateURL: function (entityName) {
-            var opts = $.extend({}, this.options.routingParams, {entityName: entityName.replace(/\\/g, "_")});
-            return routing.generate(this.options.router, opts);
-        },
-
         _onChange: function (e) {
             var oldVal, confirm = this.options.confirm;
             if (confirm && this.options.requireConfirm()) {
@@ -46,9 +37,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         },
 
         loadFields: function () {
-            var entityName = this.getEntityName();
             $.ajax({
-                url: this.generateURL(entityName),
+                url: routing.generate(this.options.router, this.options.routingParams),
                 success: $.proxy(this._onLoaded, this),
                 error: this._onError,
                 beforeSend: $.proxy(this._trigger, this, 'start'),
