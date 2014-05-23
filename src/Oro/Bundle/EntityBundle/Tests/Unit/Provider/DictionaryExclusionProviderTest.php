@@ -35,9 +35,7 @@ class DictionaryExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsIgnoredField()
     {
-        $this->assertFalse(
-            $this->dictionaryExclusionProvider->isIgnoredField($this->metadata, 'testField')
-        );
+        $this->assertFalse($this->dictionaryExclusionProvider->isIgnoredField($this->metadata, 'testField'));
     }
 
     public function testIsIgnoredRelationFalse()
@@ -48,25 +46,19 @@ class DictionaryExclusionProviderTest extends \PHPUnit_Framework_TestCase
             ->with('testClass')
             ->will($this->returnValue(false));
 
-        $this->assertFalse(
-            $this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass')
-        );
+        $this->assertFalse($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
     }
 
     public function testIsIgnoredRelationWithoutGroupsFalse()
     {
         $this->mockMetadata('testClass', 'parentClass');
-        $this->assertFalse(
-            $this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass')
-        );
+        $this->assertFalse($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
     }
 
     public function testIsIgnoredRelationTrue()
     {
         $this->mockMetadata('testClass', 'parentClass', ['dictionary', 'activity', 'etc']);
-        $this->assertTrue(
-            $this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass')
-        );
+        $this->assertTrue($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
     }
 
     protected function mockMetadata($entityClass, $parentClass, $groups = [])
