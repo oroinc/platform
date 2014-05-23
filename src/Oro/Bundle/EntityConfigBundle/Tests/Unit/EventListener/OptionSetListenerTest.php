@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener;
 
 class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var OptionSetListener
      */
@@ -19,10 +18,10 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostPersistNotThrowAnExceptionIfClassConfigNotExist()
     {
-        $expectedClassName = 'test_class'.uniqid();
+        $expectedClassName = 'test_class' . uniqid();
 
-        $entity = $this->getMock('StdClass', array(), array(), $expectedClassName);
-        $entityManager = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
+        $entity         = $this->getMock('StdClass', array(), array(), $expectedClassName);
+        $entityManager  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -44,10 +43,10 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostPersistNotThrowAnErrorIfSchemaRelationsNotExist()
     {
-        $expectedClassName = 'test_class'.uniqid();
+        $expectedClassName = 'test_class' . uniqid();
 
-        $entity = $this->getMock('StdClass', array(), array(), $expectedClassName);
-        $entityManager = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
+        $entity         = $this->getMock('StdClass', array(), array(), $expectedClassName);
+        $entityManager  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -76,11 +75,11 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostPersist()
     {
-        $expectedClassName = 'test_class'.uniqid();
-        $entityId = 42;
-        $thirdFieldName = 'thirdFieldName';
+        $expectedClassName = 'test_class' . uniqid();
+        $entityId          = 42;
+        $thirdFieldName    = 'thirdFieldName';
 
-        $thirdFieldGetter = 'get'.ucfirst($thirdFieldName);
+        $thirdFieldGetter = 'get' . ucfirst($thirdFieldName);
 
         $entity = $this->getMockBuilder('StdClass')
             ->disableOriginalConstructor()
@@ -112,9 +111,9 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
         $entityManager->expects($this->once())->method('persist');
 
-        $fieldName = 'testFieldName';
+        $fieldName       = 'testFieldName';
         $secondFieldName = 'secondTestField';
-        $schema = array('relation' => array($fieldName, $secondFieldName, $thirdFieldName));
+        $schema          = array('relation' => array($fieldName, $secondFieldName, $thirdFieldName));
 
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -164,8 +163,8 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param null|\PHPUnit_Framework_MockObject_MockObject   $idInterface
-     * @param string $type
+     * @param null|\PHPUnit_Framework_MockObject_MockObject $idInterface
+     * @param string                                        $type
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getFieldConfig($idInterface = null, $type = 'optionSet')

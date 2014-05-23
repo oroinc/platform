@@ -52,8 +52,8 @@ class OptionSetListener
             }
             /** @var ConfigInterface $fieldConfig */
             $fieldConfig = $configProvider->getConfig($className, $fieldName);
-            $setData = $this->getEntityFieldData($fieldConfig, $fieldName, $entity);
-            if (!$setData) {
+            $options     = $this->getEntityFieldData($fieldConfig, $fieldName, $entity);
+            if (!$options) {
                 continue;
             }
 
@@ -65,11 +65,11 @@ class OptionSetListener
             /**
              * in case of single select field type, should wrap value in array
              */
-            if ($setData && !is_array($setData)) {
-                $setData = [$setData];
+            if (!is_array($options)) {
+                $options = [$options];
             }
 
-            foreach ($setData as $option) {
+            foreach ($options as $option) {
                 $optionSetRelation = new OptionSetRelation();
                 $optionSetRelation->setData(
                     null,
@@ -86,8 +86,8 @@ class OptionSetListener
 
     /**
      * @param ConfigInterface $fieldConfig
-     * @param string $fieldName
-     * @param object $entity
+     * @param string          $fieldName
+     * @param object          $entity
      * @return null|mixed
      */
     protected function getEntityFieldData(ConfigInterface $fieldConfig, $fieldName, $entity)
