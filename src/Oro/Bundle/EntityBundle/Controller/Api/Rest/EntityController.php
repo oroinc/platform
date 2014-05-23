@@ -59,10 +59,10 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
-     *      name="with-unidirectional", requirements="(1)|(0)",
+     *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, default="0",
      *      description="Indicates whether Unidirectional association fields should be returned.")
      * @QueryParam(
-     *      name="with-exclusions", requirements="(1)|(0)",
+     *      name="with-exclusions", requirements="(1)|(0)", nullable=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entities with fields",
