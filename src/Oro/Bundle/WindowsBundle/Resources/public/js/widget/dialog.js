@@ -38,6 +38,8 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
             this.options.dialogOptions = this.options.dialogOptions || {};
             this.options.dialogOptions.title = this.options.dialogOptions.title || this.options.title;
             this.options.dialogOptions.limitTo = this.options.dialogOptions.limitTo || '#container';
+            this.options.dialogOptions.minWidth = this.options.dialogOptions.minWidth || 300;
+            this.options.dialogOptions.minHeight = this.options.dialogOptions.minHeight || 150;
 
             if (this.options.stateEnabled) {
                 this._initModel(this.options);
@@ -191,6 +193,11 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
             this.loadingElement = this.$el.closest('.ui-dialog');
             AbstractWidget.prototype.show.apply(this);
             this.widget.dialog('adjustContentSize');
+
+            if (this.actions) {
+                var minHeight = this.options.dialogOptions.minHeight + this.widget.dialog('actionsContainer').height();
+                this.widget.dialog('widget').css('min-height', minHeight);
+            }
         },
 
         _initAdjustHeight: function(content) {
