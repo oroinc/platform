@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProvider;
 use Oro\Bundle\QueryDesignerBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\Tests\Util\ReflectionUtil;
@@ -15,8 +15,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
     protected $qdManager;
 
-    /** @var ExcludeFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $excludeFieldProvider;
+    /** @var ExclusionProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $exclusionProvider;
 
     public function setUp()
     {
@@ -28,7 +28,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('hasConfig')
             ->will($this->returnValue(false));
 
-        $entityClassResolver  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -48,7 +48,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->excludeFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider')
+        $this->exclusionProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExclusionProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -59,7 +59,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $doctrine,
             $translator,
             $virtualFieldsProvider,
-            $this->excludeFieldProvider,
+            $this->exclusionProvider,
             [],
             $this->qdManager
         );
@@ -76,12 +76,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Entity\Fake'));
 
-        $this->excludeFieldProvider->expects($this->at(0))
-            ->method('isIgnoreField')
+        $this->exclusionProvider->expects($this->at(0))
+            ->method('isIgnoredField')
             ->will($this->returnValue(false));
 
-        $this->excludeFieldProvider->expects($this->at(1))
-            ->method('isIgnoreField')
+        $this->exclusionProvider->expects($this->at(1))
+            ->method('isIgnoredField')
             ->will($this->returnValue(true));
 
         $this->qdManager->expects($this->once())
@@ -103,12 +103,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Entity\Fake'));
 
-        $this->excludeFieldProvider->expects($this->at(0))
-            ->method('isIgnoreField')
+        $this->exclusionProvider->expects($this->at(0))
+            ->method('isIgnoredField')
             ->will($this->returnValue(false));
 
-        $this->excludeFieldProvider->expects($this->at(1))
-            ->method('isIgnoreField')
+        $this->exclusionProvider->expects($this->at(1))
+            ->method('isIgnoredField')
             ->will($this->returnValue(false));
 
         $this->qdManager->expects($this->once())
@@ -129,8 +129,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Entity\Fake'));
 
-        $this->excludeFieldProvider->expects($this->once())
-            ->method('isIgnoreField')
+        $this->exclusionProvider->expects($this->once())
+            ->method('isIgnoredField')
             ->will($this->returnValue(true));
 
         $result = ReflectionUtil::callProtectedMethod($this->provider, 'isIgnoredField', [$metadata, 'fakeField']);
@@ -139,12 +139,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsIgnoredRelation()
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
         $fieldName = 'default_test';
 
-        $this->excludeFieldProvider->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredRelation')
             ->with($metadata, $fieldName)
             ->will($this->returnValue(true));

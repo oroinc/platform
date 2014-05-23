@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -26,8 +26,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     /** @var EntityFieldProvider */
     private $provider;
 
-    /** @var ExcludeFieldProvider */
-    private $excludeFieldProvider;
+    /** @var ExclusionProvider */
+    private $exclusionProvider;
 
     protected function setUp()
     {
@@ -72,7 +72,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->excludeFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExcludeFieldProvider')
+        $this->exclusionProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ExclusionProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -83,7 +83,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrine,
             $translator,
             $virtualFieldsProvider,
-            $this->excludeFieldProvider,
+            $this->exclusionProvider,
             []
         );
         $this->provider->setEntityProvider($entityProvider);
