@@ -194,10 +194,14 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
             AbstractWidget.prototype.show.apply(this);
             this.widget.dialog('adjustContentSize');
 
-            if (this.actions) {
-                var minHeight = this.options.dialogOptions.minHeight + this.widget.dialog('actionsContainer').height();
-                this.widget.dialog('widget').css('min-height', minHeight);
-            }
+            this._fixDialogMinHeight(true);
+            this.widget.on("dialogmaximize dialogrestore", _.bind(function() {
+                this._fixDialogMinHeight(true);
+            }, this));
+            this.widget.on("dialogminimize", _.bind(function() {
+                this._fixDialogMinHeight(false);
+            }, this));
+
             this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
         },
 
@@ -208,6 +212,15 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
                 scrollableContent.css('overflow', 'auto');
                 this.widget.on("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
+            }
+        },
+
+        _fixDialogMinHeight: function(isEnabled) {
+            if (isEnabled) {
+                var minHeight = this.options.dialogOptions.minHeight + this.widget.dialog('actionsContainer').height();
+                this.widget.dialog('widget').css('min-height', minHeight);
+            } else {
+                this.widget.dialog('widget').css('min-height', 0);
             }
         },
 
