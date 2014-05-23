@@ -27,6 +27,12 @@ class EntityFieldProvider
     /** @var EntityProvider */
     protected $entityProvider;
 
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
+
+    /** @var ExclusionProviderInterface */
+    protected $exclusionProvider;
+
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
@@ -42,14 +48,8 @@ class EntityFieldProvider
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var VirtualFieldProviderInterface */
-    protected $virtualFieldProvider;
-
     /** @var array */
     protected $hiddenFields;
-
-    /** @var ExclusionProviderInterface */
-    protected $exclusionProvider;
 
     /**
      * Constructor
