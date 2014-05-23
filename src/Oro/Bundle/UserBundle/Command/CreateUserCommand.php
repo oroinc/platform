@@ -34,13 +34,13 @@ class CreateUserCommand extends ContainerAwareCommand
         $this
             ->setName('oro:user:create')
             ->setDescription('Create user.')
-            ->addOption('role', null, InputOption::VALUE_REQUIRED, 'User role')
-            ->addOption('business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit')
-            ->addOption('username', null, InputOption::VALUE_REQUIRED, 'User name')
-            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'User email')
-            ->addOption('firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
-            ->addOption('lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('plain-password', null, InputOption::VALUE_REQUIRED, 'User password');
+            ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'User role')
+            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit')
+            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name')
+            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email')
+            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
+            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password');
     }
 
     /**
@@ -69,10 +69,10 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function updateUser(User $user, $options)
     {
-        if (!empty($options['role'])) {
+        if (!empty($options['user-role'])) {
             $role = $this->getEntityManager()
                 ->getRepository('OroUserBundle:Role')
-                ->findOneBy(array('role' => $options['role']));
+                ->findOneBy(array('role' => $options['user-role']));
 
             if (!$role) {
                 throw new InvalidArgumentException('Invalid Role');
@@ -81,10 +81,10 @@ class CreateUserCommand extends ContainerAwareCommand
             $user->addRole($role);
         }
 
-        if (!empty($options['business-unit'])) {
+        if (!empty($options['user-business-unit'])) {
             $businessUnit = $this->getEntityManager()
                 ->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->findOneBy(array('name' => $options['business-unit']));
+                ->findOneBy(array('name' => $options['user-business-unit']));
 
             if (!$businessUnit) {
                 throw new InvalidArgumentException('Invalid Business Unit');
@@ -95,11 +95,18 @@ class CreateUserCommand extends ContainerAwareCommand
                 ->addBusinessUnit($businessUnit);
         }
 
-        $properties = ['name', 'email', 'firstname', 'lastname', 'plain-password', 'username'];
+        if (!empty($options['user-name'])) {
+            $user->setUsername($options['user-name']);
+        }
 
+        if (!empty($options['user-password'])) {
+            $user->setPlainPassword($options['user-password']);
+        }
+
+        $properties = ['email', 'firstname', 'lastname'];
         foreach ($properties as $property) {
-            if (!empty($options[$property])) {
-                $user->{'set' . str_replace('-', '', $property)}($options[$property]);
+            if (!empty($options['user-' . $property])) {
+                $user->{'set' . str_replace('-', '', $property)}($options['user-' . $property]);
             }
         }
 
