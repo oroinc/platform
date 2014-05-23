@@ -21,6 +21,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * TODO: passing parameter $withExclusions into getFields method should be refactored
  */
 class EntityFieldProvider
 {
@@ -115,6 +116,7 @@ class EntityFieldProvider
      * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
      * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
+     * @param bool   $withExclusions     Indicates whether exclusion logic should be applied.
      * @param bool   $translate          Flag means that label, plural label should be translated
      *
      * @return array of fields sorted by field label (relations follows fields)
@@ -139,19 +141,21 @@ class EntityFieldProvider
         $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
+        $withExclusions = true,
         $translate = true
     ) {
         $result    = [];
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
 
-        $this->addFields($result, $className, $em, $withVirtualFields, $translate);
+        $this->addFields($result, $className, $em, $withVirtualFields, $withExclusions, $translate);
         if ($withRelations) {
             $this->addRelations(
                 $result,
                 $className,
                 $em,
                 $withEntityDetails,
+                $withExclusions,
                 $translate
             );
 
@@ -161,6 +165,7 @@ class EntityFieldProvider
                     $className,
                     $em,
                     $withEntityDetails,
+                    $withExclusions,
                     $translate
                 );
             }
@@ -177,10 +182,17 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withVirtualFields
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
-    protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
-    {
+    protected function addFields(
+        array &$result,
+        $className,
+        EntityManager $em,
+        $withVirtualFields,
+        $withExclusions,
+        $translate
+    ) {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
@@ -188,6 +200,10 @@ class EntityFieldProvider
             // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
                 if ($this->isIgnoredField($metadata, $fieldName)) {
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
 
@@ -207,6 +223,10 @@ class EntityFieldProvider
                 $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
                 foreach ($virtualFields as $fieldName) {
                     if ($this->isIgnoredField($metadata, $fieldName)) {
+                        continue;
+                    }
+
+                    if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
 
@@ -242,7 +262,7 @@ class EntityFieldProvider
             return true;
         }
 
-        return $this->exclusionProvider->isIgnoredField($metadata, $fieldName);
+        return false;
     }
 
     /**
@@ -275,6 +295,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
     protected function addRelations(
@@ -282,6 +303,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withExclusions,
         $translate
     ) {
         // only configurable entities are supported
@@ -295,6 +317,10 @@ class EntityFieldProvider
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
 
@@ -323,6 +349,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
     protected function addUnidirectionalRelations(
@@ -330,6 +357,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withExclusions,
         $translate
     ) {
         $relations = $this->getUnidirectionalRelations($em, $className);
@@ -340,6 +368,10 @@ class EntityFieldProvider
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
             if ($this->isIgnoredRelation($classMetadata, $fieldName)) {
+                continue;
+            }
+
+            if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($classMetadata, $fieldName)) {
                 continue;
             }
 
@@ -424,7 +456,7 @@ class EntityFieldProvider
             }
         }
 
-        return $this->exclusionProvider->isIgnoredRelation($metadata, $associationName);
+        return false;
     }
 
     /**
