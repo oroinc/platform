@@ -28,7 +28,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      * Get entities.
      *
      * @QueryParam(
-     *      name="with-exclusions", requirements="(1)|(0)",
+     *      name="with-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
      *
      * @ApiDoc(
