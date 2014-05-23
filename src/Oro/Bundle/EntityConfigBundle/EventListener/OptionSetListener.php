@@ -95,12 +95,12 @@ class OptionSetListener
         $getterName = Inflector::camelize('get_' . $fieldName);
         if ($fieldConfig->getId()->getFieldType() != 'optionSet'
             || !method_exists($entity, $getterName)
-            || !$setData = $entity->$getterName()
+            || !$options = $entity->$getterName()
         ) {
             return null;
         }
 
-        return $setData;
+        return $options;
     }
 
     /**
