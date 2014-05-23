@@ -200,7 +200,7 @@ class JobExecutor
      */
     protected function getJobInstanceRepository()
     {
-        return $this->entityManager->getRepository('OroBatchBundle:JobInstance');
+        return $this->entityManager->getRepository('AkeneoBatchBundle:JobInstance');
     }
 
     /**
