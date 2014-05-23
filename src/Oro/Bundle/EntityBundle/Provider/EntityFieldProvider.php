@@ -199,7 +199,11 @@ class EntityFieldProvider
 
             // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
-                if ($withExclusions && $this->isIgnoredField($metadata, $fieldName)) {
+                if ($this->isIgnoredField($metadata, $fieldName)) {
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
 
@@ -218,7 +222,11 @@ class EntityFieldProvider
             if ($withVirtualFields) {
                 $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
                 foreach ($virtualFields as $fieldName) {
-                    if ($withExclusions && $this->isIgnoredField($metadata, $fieldName)) {
+                    if ($this->isIgnoredField($metadata, $fieldName)) {
+                        continue;
+                    }
+
+                    if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
 
@@ -254,7 +262,7 @@ class EntityFieldProvider
             return true;
         }
 
-        return $this->exclusionProvider->isIgnoredField($metadata, $fieldName);
+        return false;
     }
 
     /**
@@ -308,7 +316,11 @@ class EntityFieldProvider
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                if ($this->isIgnoredRelation($metadata, $associationName, $withExclusions)) {
+                if ($this->isIgnoredRelation($metadata, $associationName)) {
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
 
@@ -355,7 +367,11 @@ class EntityFieldProvider
             $classMetadata    = $em->getClassMetadata($relatedClassName);
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
-            if ($this->isIgnoredRelation($classMetadata, $fieldName, $withExclusions)) {
+            if ($this->isIgnoredRelation($classMetadata, $fieldName)) {
+                continue;
+            }
+
+            if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($classMetadata, $fieldName)) {
                 continue;
             }
 
@@ -427,11 +443,10 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $associationName
-     * @param bool          $withExclusions
      *
      * @return bool
      */
-    protected function isIgnoredRelation(ClassMetadata $metadata, $associationName, $withExclusions)
+    protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         // skip 'default_' extend field
         if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
@@ -441,10 +456,7 @@ class EntityFieldProvider
             }
         }
 
-        return
-            $withExclusions
-                ? $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)
-                : false;
+        return false;
     }
 
     /**
