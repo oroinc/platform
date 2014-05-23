@@ -10,7 +10,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerP
 
 class OroPlatformBundle extends Bundle
 {
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1';
 
     /**
      * {@inheritdoc}
