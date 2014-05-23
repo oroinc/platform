@@ -62,7 +62,7 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'active'|trans,
+        'class': 'active',
         'subblocks': [
             {
                 'title': '',
@@ -107,23 +107,41 @@
         }] ) %}
     {% endif %}
 
-    {% if form.groups is defined or form.roles is defined %}
-        {% macro userRoles(form) %}
-            {% if form.roles is defined %}
+    {% set hasGroups = form.groups is defined %}
+    {% set hasRoles = form.roles is defined %}
+    {% if hasGroups or hasRoles %}
+        {% set userGroups %}
+            {% if hasGroups %}
+                {{ form_row(form.groups, {attr: { class: 'horizontal' } }) }}
+            {% endif %}
+        {% endset %}
+
+        {% set userRoles %}
+            {% if hasRoles %}
                 <div class="form-horizontal" id="roles-list">
                     {{ form_row(form.roles, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
-        {% endmacro %}
+        {% endset %}
+
+        {% set title = '' %}
+        {% if hasGroups and hasRoles %}
+            {% set title = '%groups% and %roles%'|trans({
+                '%groups%' : 'oro.user.groups.label'|trans,
+                '%roles%' : 'oro.user.roles.label'|trans
+            }) %}
+        {% elseif hasGroups %}
+            {% set title = 'oro.user.groups.label'|trans %}
+        {% elseif hasRoles %}
+            {% set title = 'oro.user.roles.label'|trans %}
+        {% endif %}
+
         {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'oro.user.groups.label'|trans ~ ' ' ~ 'and' ~ ' ' ~ 'oro.user.roles.label'|trans,
+            'title': title,
             'subblocks': [
                 {
                     'title': '',
-                    'data': [
-                        form.groups is defined ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
-                        _self.userRoles(form)
-                    ]
+                    'data': [userGroups, userRoles]
                 }
             ]
         }] ) %}
@@ -143,18 +161,20 @@
         }] ) %}
     {% endif %}
 
-    {% set dataBlocks = dataBlocks|merge( [{
-        'title': 'oro.user.business_units.label'|trans,
-        'subblocks': [
-            {
-                'title': '',
-                'useSpan': false,
-                'data': [
-                    form_row(form.businessUnits)
-                ]
-            }
-        ]
-    }] ) %}
+    {% if form.businessUnits is defined %}
+        {% set dataBlocks = dataBlocks|merge( [{
+            'title': 'oro.user.business_units.label'|trans,
+            'subblocks': [
+                {
+                    'title': '',
+                    'useSpan': false,
+                    'data': [
+                        form_row(form.businessUnits)
+                    ]
+                }
+            ]
+        }] ) %}
+    {% endif %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': 'oro.user.imap_configuration.label'|trans,

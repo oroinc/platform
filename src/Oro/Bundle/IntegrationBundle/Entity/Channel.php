@@ -66,6 +66,22 @@ class Channel
     protected $connectors;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_two_way_sync_enabled", type="boolean", nullable=true)
+     * @Oro\Versioned()
+     */
+    protected $isTwoWaySyncEnabled;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="sync_priority", type="string", length=255, nullable=true)
+     * @Oro\Versioned()
+     */
+    protected $syncPriority;
+
+    /**
      * @var Status[]|ArrayCollection
      *
      * Cascade persisting is not used due to lots of detach/merge
@@ -79,6 +95,7 @@ class Channel
     public function __construct()
     {
         $this->statuses = new ArrayCollection();
+        $this->isTwoWaySyncEnabled = false;
     }
 
     /**
@@ -218,5 +235,43 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
+    }
+
+    /**
+     * @param string $syncPriority
+     *
+     * @return $this
+     */
+    public function setSyncPriority($syncPriority)
+    {
+        $this->syncPriority = $syncPriority;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSyncPriority()
+    {
+        return $this->syncPriority;
+    }
+
+    /**
+     * @param boolean $isTwoWaySyncEnabled
+     *
+     * @return $this
+     */
+    public function setIsTwoWaySyncEnabled($isTwoWaySyncEnabled)
+    {
+        $this->isTwoWaySyncEnabled = $isTwoWaySyncEnabled;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsTwoWaySyncEnabled()
+    {
+        return $this->isTwoWaySyncEnabled;
     }
 }

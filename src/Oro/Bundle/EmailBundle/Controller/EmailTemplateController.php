@@ -87,17 +87,17 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
-     * @param bool|int $emailTemplateId
+     * @param bool|int $id
      * @return array
      */
-    public function previewAction($emailTemplateId = false)
+    public function previewAction($id = false)
     {
-        if (!$emailTemplateId) {
+        if (!$id) {
             $emailTemplate = new EmailTemplate();
         } else {
             /** @var EntityManager $em */
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($emailTemplateId);
+            $emailTemplate = $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($id);
         }
 
         /** @var FormInterface $form */

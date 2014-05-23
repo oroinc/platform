@@ -38,16 +38,10 @@ class PermissionsHandler
     {
         try {
             $this->setPermissionsSetfacl($directory);
+            $this->setPermissionsChmod($directory);
 
             return true;
-        } catch (ProcessFailedException $setfaclException) {
-        }
-
-        try {
-            self::setPermissionsChmod($directory);
-
-            return true;
-        } catch (ProcessFailedException $chmodException) {
+        } catch (ProcessFailedException $exception) {
         }
 
         return false;

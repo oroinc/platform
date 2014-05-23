@@ -42,7 +42,7 @@ define([
                 url: this.getLink(),
                 wait: true,
                 error: function() {
-                    var messageText = __('You do not have permission to this action.');
+                    var messageText = __('You do not have permission to perform this action.');
                     messenger.notificationFlashMessage('error', messageText);
                 },
                 success: function() {

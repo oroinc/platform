@@ -6,21 +6,21 @@ use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
 
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
-use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
+use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 
 class UpdateSchemaDoctrineListener
 {
     /**
-     * @var AbstractEngine
+     * @var FulltextIndexManager
      */
-    protected $searchEngine;
+    protected $fulltextIndexManager;
 
     /**
-     * @param AbstractEngine $searchEngine
+     * @param FulltextIndexManager $fulltextIndexManager
      */
-    public function __construct(AbstractEngine $searchEngine)
+    public function __construct(FulltextIndexManager $fulltextIndexManager)
     {
-        $this->searchEngine = $searchEngine;
+        $this->fulltextIndexManager = $fulltextIndexManager;
     }
 
     /**
@@ -33,11 +33,12 @@ class UpdateSchemaDoctrineListener
             $input  = $event->getInput();
 
             if ($input->getOption('force')) {
-                $count = $this->searchEngine->reindex();
+                $result = $this->fulltextIndexManager->createIndexes();
 
-                $output->writeln(
-                    sprintf('Schema update and create index completed. %d index entities were added', $count)
-                );
+                $output->writeln('Schema update and create index completed.');
+                if ($result) {
+                    $output->writeln('Indexes were created.');
+                }
             }
         }
     }
