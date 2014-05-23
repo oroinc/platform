@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Twig;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Twig_Environment;
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
 
 class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
@@ -16,19 +15,19 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
     protected $extension;
 
     /**
-     * @var Twig_Environment $environment
+     * @var \PHPUnit_Framework_MockObject_MockObject $environment
      */
     protected $environment;
 
     /**
-     * @var SecurityContextInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityContext;
 
     /**
-     * @var EntityManager
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $em;
+    protected $entityManager;
 
     protected function setUp()
     {
@@ -37,10 +36,10 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
             ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new WindowsExtension($this->securityContext, $this->em);
+        $this->extension = new WindowsExtension($this->securityContext, $this->entityManager);
     }
 
     public function testGetFunctions()
@@ -61,80 +60,264 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->extension->render($this->environment));
     }
 
-    /**
-     * @dataProvider renderDataProvider
-     * @param string $widgetUrl
-     * @param string $widgetType
-     * @param string $expectedWidgetUrl
-     */
-    public function testRender($widgetUrl, $widgetType, $expectedWidgetUrl)
+    public function testRender()
     {
-        $user = $this->getMock('stdClass');
-
         $token = $this->getMockBuilder('stdClass')
             ->setMethods(array('getUser'))
             ->getMock();
-        $token->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($user));
+
         $this->securityContext->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $normalStateData = array('cleanUrl' => $widgetUrl, 'type' => $widgetType);
-        $normalState = $this->getStateMock(1, $normalStateData);
-        $badState = $this->getStateMock(2, null);
-        $states = array($normalState, $badState);
+        $user = $this->getMock('stdClass');
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $windowStateFoo = $this->createWindowState(array('cleanUrl' => 'foo'));
+        $windowStateBar = $this->createWindowState(array('cleanUrl' => 'foo'));
+
+        $userWindowStates = array($windowStateFoo, $windowStateBar);
+
         $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->once())
             ->method('findBy')
             ->with(array('user' => $user))
-            ->will($this->returnValue($states));
-        $this->em->expects($this->once())
+            ->will($this->returnValue($userWindowStates));
+
+        $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->with('OroWindowsBundle:WindowsState')
             ->will($this->returnValue($repository));
 
-        $this->em->expects($this->once())
-            ->method('remove')
-            ->with($badState);
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->entityManager->expects($this->never())->method('remove');
+        $this->entityManager->expects($this->never())->method('flush');
 
-        $output = 'RENDERED';
-        $expectedStates = array('cleanUrl' => $expectedWidgetUrl, 'type' => $widgetType);
+        $expectedOutput = 'RENDERED';
         $this->environment->expects($this->once())
             ->method('render')
-            ->with("OroWindowsBundle::states.html.twig", array("states" => array(1 => $expectedStates)))
-            ->will($this->returnValue($output));
+            ->with(
+                'OroWindowsBundle::states.html.twig',
+                array('windowStates' => array($windowStateFoo, $windowStateBar))
+            )
+            ->will($this->returnValue($expectedOutput));
 
-        $this->assertEquals($output, $this->extension->render($this->environment));
+        $this->assertEquals($expectedOutput, $this->extension->render($this->environment));
+    }
+
+    public function testRenderWithRemoveInvalidStates()
+    {
+        $token = $this->getMockBuilder('stdClass')
+            ->setMethods(array('getUser'))
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $user = $this->getMock('stdClass');
+
+        $token->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($user));
+
+        $normalWindowState = $this->createWindowState(array('cleanUrl' => 'foo'));
+        $badWindowState = $this->createWindowState(array('url' => 'foo'));
+        $emptyWindowState = $this->createWindowState();
+
+        $userWindowStates = array($normalWindowState, $badWindowState, $emptyWindowState);
+
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->with(array('user' => $user))
+            ->will($this->returnValue($userWindowStates));
+
+        $this->entityManager->expects($this->at(0))
+            ->method('getRepository')
+            ->with('OroWindowsBundle:WindowsState')
+            ->will($this->returnValue($repository));
+
+        $this->entityManager->expects($this->at(1))
+            ->method('remove')
+            ->with($badWindowState);
+
+        $this->entityManager->expects($this->at(2))
+            ->method('remove')
+            ->with($emptyWindowState);
+
+        $this->entityManager->expects($this->at(3))
+            ->method('flush')
+            ->with(array($badWindowState, $emptyWindowState));
+
+        $expectedOutput = 'RENDERED';
+        $this->environment->expects($this->once())
+            ->method('render')
+            ->with(
+                'OroWindowsBundle::states.html.twig',
+                array('windowStates' => array($normalWindowState))
+            )
+            ->will($this->returnValue($expectedOutput));
+
+        $this->assertEquals($expectedOutput, $this->extension->render($this->environment));
+    }
+
+    public function testRenderWithoutUser()
+    {
+        $token = $this->getMockBuilder('stdClass')
+            ->setMethods(array('getUser'))
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $this->entityManager->expects($this->never())->method($this->anything());
+
+        $this->assertEquals('', $this->extension->render($this->environment));
+    }
+
+    public function testRenderWithoutToken()
+    {
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null));
+
+        $this->entityManager->expects($this->never())->method($this->anything());
+
+        $this->assertEquals('', $this->extension->render($this->environment));
+    }
+
+    /**
+     * @param string $cleanUrl
+     * @param string $type
+     * @param string $expectedUrl
+     * @dataProvider renderFragmentDataProvider
+     */
+    public function testRenderFragment($cleanUrl, $type, $expectedUrl)
+    {
+        $windowState = $this->createWindowState(array('cleanUrl' => $cleanUrl, 'type' => $type));
+
+        $httpKernelExtension = $this->getHttpKernelExtensionMock();
+
+        $this->environment->expects($this->once())
+            ->method('getExtension')
+            ->with('http_kernel')
+            ->will($this->returnValue($httpKernelExtension));
+
+        $expectedOutput = 'RENDERED';
+        $httpKernelExtension->expects($this->once())
+            ->method('renderFragment')
+            ->with($expectedUrl)
+            ->will($this->returnValue($expectedOutput));
+
+        $this->entityManager->expects($this->never())->method($this->anything());
+
+        $this->assertEquals($expectedOutput, $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertTrue($windowState->isRenderedSuccessfully());
     }
 
     /**
      * @return array
      */
-    public function renderDataProvider()
+    public function renderFragmentDataProvider()
     {
         return array(
-            'url_without_parameters'
-                => array('/user/create', 'test', '/user/create?_widgetContainer=test'),
-            'url_with_parameters'
-                => array('/user/create?id=1', 'test', '/user/create?id=1&_widgetContainer=test'),
-            'url_with_parameters_and_fragment'
-                => array('/user/create?id=1#group=date', 'test', '/user/create?id=1&_widgetContainer=test#group=date'),
+            'url_without_parameters' => array(
+                'widgetUrl'         => '/user/create',
+                'widgetType'        => 'test',
+                'expectedWidgetUrl' => '/user/create?_widgetContainer=test'
+            ),
+            'url_with_parameters' => array(
+                'widgetUrl'         => '/user/create?id=1',
+                'widgetType'        => 'test',
+                'expectedWidgetUrl' => '/user/create?id=1&_widgetContainer=test'
+            ),
+            'url_with_parameters_and_fragment' => array(
+                'widgetUrl'         => '/user/create?id=1#group=date',
+                'widgetType'        => 'test',
+                'expectedWidgetUrl' => '/user/create?id=1&_widgetContainer=test#group=date'
+            ),
         );
     }
 
-    protected function getStateMock($id, $data)
+    public function testRenderFragmentWithNotFoundHttpException()
     {
-        $state = $this->getMock('Oro\Bundle\WindowsBundle\Entity\WindowsState');
-        $state->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($data));
-        $state->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($id));
+        $cleanUrl = '/foo/bar';
+        $windowState = $this->createWindowState(array('cleanUrl' => $cleanUrl));
+
+        $httpKernelExtension = $this->getHttpKernelExtensionMock();
+
+        $this->environment->expects($this->once())
+            ->method('getExtension')
+            ->with('http_kernel')
+            ->will($this->returnValue($httpKernelExtension));
+
+        $httpKernelExtension->expects($this->once())
+            ->method('renderFragment')
+            ->with($cleanUrl)
+            ->will($this->throwException(new NotFoundHttpException()));
+
+        $this->entityManager->expects($this->at(0))
+            ->method('remove')
+            ->with($windowState);
+
+        $this->entityManager->expects($this->at(1))
+            ->method('flush')
+            ->with($windowState);
+
+        $this->assertEquals('', $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertFalse($windowState->isRenderedSuccessfully());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage This is exception was not caught.
+     */
+    public function testRenderFragmentWithGenericException()
+    {
+        $cleanUrl = '/foo/bar';
+        $windowState = $this->createWindowState(array('cleanUrl' => $cleanUrl));
+
+        $httpKernelExtension = $this->getHttpKernelExtensionMock();
+
+        $this->environment->expects($this->once())
+            ->method('getExtension')
+            ->with('http_kernel')
+            ->will($this->returnValue($httpKernelExtension));
+
+        $httpKernelExtension->expects($this->once())
+            ->method('renderFragment')
+            ->with($cleanUrl)
+            ->will($this->throwException(new \Exception('This is exception was not caught.')));
+
+        $this->extension->renderFragment($this->environment, $windowState);
+    }
+
+    public function testRenderFragmentWithEmptyCleanUrl()
+    {
+        $windowState = $this->createWindowState();
+
+        $this->environment->expects($this->never())->method($this->anything());
+        $this->entityManager->expects($this->never())->method($this->anything());
+
+        $this->assertEquals('', $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertFalse($windowState->isRenderedSuccessfully());
+    }
+
+    protected function createWindowState($data = null)
+    {
+        $state = new WindowsState();
+        $state->setData($data);
         return $state;
+    }
+
+    protected function getHttpKernelExtensionMock()
+    {
+        return $this->getMockBuilder('Symfony\Bridge\Twig\Extension\HttpKernelExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }
