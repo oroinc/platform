@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\ExclusionProvider;
+use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 
-class ExclusionProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ExclusionProvider */
+    /** @var ConfigExclusionProvider */
     protected $provider;
 
     public function setUp()
@@ -26,7 +26,7 @@ class ExclusionProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->provider = new ExclusionProvider(
+        $this->provider = new ConfigExclusionProvider(
             $hierarchyProvider,
             [
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],

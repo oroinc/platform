@@ -13,7 +13,6 @@ use Oro\Bundle\EntityBundle\Entity\Type\MoneyType;
 use Oro\Bundle\EntityBundle\Entity\Type\PercentType;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldConfigurationPass;
 
 class OroEntityBundle extends Bundle
 {
@@ -25,7 +24,6 @@ class OroEntityBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
-        $container->addCompilerPass(new VirtualFieldConfigurationPass());
     }
 
     /**

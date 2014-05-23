@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
- * Implements VirtualFieldProviderInterface for relations to the dictionaries
+ * Implements VirtualFieldProviderInterface for relations to dictionary entities
  */
 class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
 {

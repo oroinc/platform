@@ -5,18 +5,25 @@ namespace Oro\Bundle\EntityBundle\Provider;
 class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
 {
     /**
-     * @var VirtualFieldProviderInterface[]
+     * @var array[]
      */
     protected $providers = [];
+
+    /**
+     * @var VirtualFieldProviderInterface[]
+     */
+    protected $sorted;
 
     /**
      * Registers the given provider in the chain
      *
      * @param VirtualFieldProviderInterface $provider
+     * @param integer                       $priority
      */
-    public function addProvider(VirtualFieldProviderInterface $provider)
+    public function addProvider(VirtualFieldProviderInterface $provider, $priority = 0)
     {
-        $this->providers[] = $provider;
+        $this->providers[$priority][] = $provider;
+        $this->sorted                 = null;
     }
 
     /**
@@ -24,7 +31,8 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     public function isVirtualField($className, $fieldName)
     {
-        foreach ($this->providers as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->isVirtualField($className, $fieldName)) {
                 return true;
             }
@@ -39,7 +47,8 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
     public function getVirtualFieldQuery($className, $fieldName)
     {
         $foundProvider = null;
-        foreach ($this->providers as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->isVirtualField($className, $fieldName)) {
                 $foundProvider = $provider;
                 break;
@@ -65,7 +74,8 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
     public function getVirtualFields($className)
     {
         $result = [];
-        foreach ($this->providers as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             $virtualFields = $provider->getVirtualFields($className);
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {
@@ -75,5 +85,22 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         }
 
         return array_keys($result);
+    }
+
+    /**
+     * Sorts the internal list of providers by priority.
+     *
+     * @return VirtualFieldProviderInterface[]
+     */
+    public function getProviders()
+    {
+        if (null === $this->sorted) {
+            krsort($this->providers);
+            $this->sorted = !empty($this->providers)
+                ? call_user_func_array('array_merge', $this->providers)
+                : [];
+        }
+
+        return $this->sorted;
     }
 }

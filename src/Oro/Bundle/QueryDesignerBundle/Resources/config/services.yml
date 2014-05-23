@@ -32,12 +32,34 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    oro_query_designer.exclusion_provider:
+        class: %oro_entity.exclusion_provider.chain.class%
+        calls:
+            - [addProvider, [@oro_entity.exclusion_provider.dictionary]]
+            - [addProvider, [@oro_entity.exclusion_provider]]
+
+    oro_query_designer.virtual_field_provider:
+        class: %oro_entity.virtual_field_provider.chain.class%
+        calls:
+            - [addProvider, [@oro_entity.virtual_field_provider.dictionary]]
+            - [addProvider, [@oro_entity.virtual_field_provider]]
+
+    oro_query_designer.entity_provider:
+        class: %oro_entity.entity_provider.class%
+        parent: oro_entity.entity_provider.abstract
+        calls:
+            - [setExclusionProvider, [@oro_query_designer.exclusion_provider]]
+
     oro_query_designer.entity_field_provider:
         class: %oro_query_designer.entity_field_provider.class%
         parent: oro_entity.entity_field_provider.abstract
+        calls:
+            - [setEntityProvider, [@oro_query_designer.entity_provider]]
+            - [setVirtualFieldProvider, [@oro_query_designer.virtual_field_provider]]
+            - [setExclusionProvider, [@oro_query_designer.exclusion_provider]]
 
     oro_query_designer.entity_field_list_provider:
         class: %oro_entity.entity_field_list_provider.class%
         arguments:
             - @oro_query_designer.entity_field_provider
-            - @oro_entity.entity_provider
+            - @oro_query_designer.entity_provider

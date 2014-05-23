@@ -11,9 +11,11 @@ parameters:
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
-    oro_entity.exclusion_provider.class:                           Oro\Bundle\EntityBundle\Provider\ExclusionProvider
-    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
-    oro_entity.virtual_field_provider.config.class:                Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
+    oro_entity.exclusion_provider.class:                           Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+    oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+    oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
+    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
+    oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
 
 services:
@@ -105,16 +107,16 @@ services:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.exclusions%
 
+    oro_entity.exclusion_provider.dictionary:
+        class: %oro_entity.exclusion_provider.dictionary.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
-
-    oro_entity.virtual_field_provider.config:
-        class: %oro_entity.virtual_field_provider.config.class%
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
-        tags:
-            - { name: oro_entity.virtual_field_provider }
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
@@ -122,8 +124,6 @@ services:
             - @oro_entity_config.provider.grouping
             - @oro_entity_config.provider.dictionary
             - @doctrine
-        tags:
-            - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

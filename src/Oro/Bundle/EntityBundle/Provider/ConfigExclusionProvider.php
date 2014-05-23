@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Provide exclude logic to filter entities and fields based on exclude rules
  */
-class ExclusionProvider implements ExclusionProviderInterface
+class ConfigExclusionProvider implements ExclusionProviderInterface
 {
     /** @var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
