@@ -864,7 +864,7 @@ abstract class AbstractQueryConverter
     protected function checkTableAliasInSelect($selectExpr, $alias)
     {
         $pos = strpos($selectExpr, $alias);
-        if (false !== $pos) {
+        while (false !== $pos) {
             if (0 === $pos) {
                 $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                 if ('.' === $nextChar) {
@@ -872,13 +872,14 @@ abstract class AbstractQueryConverter
                 }
             } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
                 $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '('])) {
+                if (in_array($prevChar, [' ', '(', ','])) {
                     $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                     if ('.' === $nextChar) {
                         return $pos;
                     }
                 }
             }
+            $pos = strpos($selectExpr, $alias, $pos + strlen($alias));
         }
 
         return false;
