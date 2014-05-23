@@ -20,15 +20,15 @@ class UpdateUserCommand extends CreateUserCommand
             ->setName('oro:user:update')
             ->setDescription('Update user.')
             ->addArgument(
-                'username',
+                'user-name',
                 InputArgument::OPTIONAL,
                 'Username of user to update'
             )
-            ->addOption('username', null, InputOption::VALUE_REQUIRED, 'User name')
-            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'User email')
-            ->addOption('firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
-            ->addOption('lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('plain-password', null, InputOption::VALUE_REQUIRED, 'User password');
+            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name')
+            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email')
+            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
+            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password');
     }
 
     /**
@@ -36,7 +36,7 @@ class UpdateUserCommand extends CreateUserCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $username = $input->getArgument('username');
+        $username = $input->getArgument('user-name');
         $user     = $this->getUserManager()->findUserByUsername($username);
         $options  = $input->getOptions();
 
