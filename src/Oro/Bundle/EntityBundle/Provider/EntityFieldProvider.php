@@ -116,7 +116,7 @@ class EntityFieldProvider
      * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
      * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
-     * @param bool   $withExclusions     Indicates whether exclusion logic should be a applied to fields.
+     * @param bool   $withExclusions     Indicates whether exclusion logic should be applied.
      * @param bool   $translate          Flag means that label, plural label should be translated
      *
      * @return array of fields sorted by field label (relations follows fields)

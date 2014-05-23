@@ -12,7 +12,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\Rest\Util\Codes;
 
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -28,6 +27,10 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
     /**
      * Get entities.
      *
+     * @QueryParam(
+     *      name="with-exclusions", requirements="(1)|(0)",
+     *      description="Indicates whether exclusion logic should be applied.")
+     *
      * @ApiDoc(
      *      description="Get entities",
      *      resource=true
@@ -37,13 +40,14 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      */
     public function cgetAction()
     {
+        $withExclusions     = ('1' == $this->getRequest()->query->get('with-exclusions'));
+
         /** @var EntityProvider $provider */
         $provider = $this->get('oro_entity.entity_provider');
-        $result = $provider->getEntities(false);
+        $result = $provider->getEntities(false, $withExclusions);
 
         return $this->handleView($this->view($result, Codes::HTTP_OK));
     }
-
 
     /**
      * Get entities with fields
