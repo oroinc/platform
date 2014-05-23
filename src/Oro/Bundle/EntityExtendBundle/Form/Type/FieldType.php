@@ -18,6 +18,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
+    const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
+
     protected $types = [
         'string'     => 'oro.entity_extend.form.data_type.string',
         'integer'    => 'oro.entity_extend.form.data_type.integer',
@@ -85,9 +87,10 @@ class FieldType extends AbstractType
 
         $entityProvider = $this->configManager->getProvider('entity');
         $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfig   = $extendProvider->getConfig($options['class_name']);
 
-        $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
+            $originalFieldNames = array();
             $types     = [];
             $relations = $entityConfig->get('relation');
             foreach ($relations as $relationKey => $relation) {
@@ -102,14 +105,16 @@ class FieldType extends AbstractType
 
                 $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-				$fieldName   = $fieldId ? $fieldId->getFieldName() : '';
-                
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
+
                 $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
                 if (strlen($fieldName) > $maxFieldNameLength) {
-                    $fieldName = 'relation_' . substr(sha1($fieldName), 0, 6);
+                    $cutFieldName = substr($fieldName, 0, $maxFieldNameLength);
+                    $originalFieldNames[$cutFieldName] = $fieldName;
+                    $fieldName = $cutFieldName;
                 }
-			    
-				$key         = $relationKey . '||' . $fieldName;
+
+                $key         = $relationKey . '||' . $fieldName;
                 $types[$key] = sprintf(
                     '%s (%s) %s',
                     $this->translator->trans('Relation'),
@@ -119,6 +124,7 @@ class FieldType extends AbstractType
             }
 
             $this->types = array_merge($this->types, $types);
+            $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
 
         $builder->add(
