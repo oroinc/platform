@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class DumpCommand extends ContainerAwareCommand
+class CacheWarmupCommand extends ContainerAwareCommand
 {
     /**
      * Console command configuration
@@ -16,8 +16,8 @@ class DumpCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:dump')
-            ->setDescription('Dump extended entities configuration to the cache.');
+            ->setName('oro:entity-extend:cache:warmup')
+            ->setDescription('Warms up the extended entity cache.');
     }
 
     /**
@@ -28,11 +28,10 @@ class DumpCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getDescription());
+        $output->writeln('Dump the configuration of extended entities to the cache');
 
         /** @var ExtendConfigDumper $dumper */
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-
         $dumper->dump();
     }
 }

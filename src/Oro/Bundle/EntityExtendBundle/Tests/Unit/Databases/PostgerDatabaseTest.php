@@ -19,7 +19,7 @@ class PostgresDatabaseTest extends \PHPUnit_Framework_TestCase
     protected $dump;
     protected $restore;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->classInstance = new PostgresDatabase($this->db, $this->user, $this->pass, $this->tables);
 

@@ -1,3 +1,7 @@
+Add another email: Add another email
+Additional: Additional
+"%groups% and %roles%": "%groups% and %roles%"
+
 oro.user.form.choose_user: Choose a user...
 oro.user.form.choose_gender: Choose a gender...
 oro.user.gender.male: Male
@@ -119,38 +123,38 @@ oro:
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
-        entity_label:        User
-        entity_plural_label: Users
-        entity_description:  Represent user profile
-        id.label:          Id
-        username.label:    Username
-        email.label:       Primary Email
-        name_prefix.label: Name prefix
-        first_name.label:  First name
-        middle_name.label: Middle name
-        last_name.label:   Last name
-        name_suffix.label: Name suffix
-        birthday.label:    Birthday
-        image.label:       Avatar
-        enabled.label:     Status
-        salt.label:        Salt
-        password.label:    Password
-        last_login.label:  Last logged in
-        login_count.label: Login count
-        created_at.label:  Created
-        updated_at.label:  Updated
-        owner.label:       Owner
-        roles.label:       Roles
-        groups.label:      Groups
-        api.label:         API key
-
-        statuses.label:    Statuses
-        emails.label:      Emails
-        current_status.label: Current status
-        business_units.label: Business Units
-        confirmation_token.label: Confirmation token
+        api.label:                   API key
+        birthday.label:              Birthday
+        business_units.label:        Business Units
+        confirmation_token.label:    Confirmation token
+        created_at.label:            Created
+        current_status.label:        Current status
+        groups.label:                Groups
+        email.label:                 Primary Email
+        email_origins.label:         Email Origins
+        emails.label:                Emails
+        enabled.label:               Status
+        entity_description:          Represent user profile
+        entity_label:                User
+        entity_plural_label:         Users
+        first_name.label:            First name
+        id.label:                    Id
+        image.label:                 Avatar
+        imap_configuration.label:    Email synchronization settings
+        last_login.label:            Last logged in
+        last_name.label:             Last name
+        login_count.label:           Login count
+        middle_name.label:           Middle name
+        name_prefix.label:           Name prefix
+        name_suffix.label:           Name suffix
+        owner.label:                 Owner
+        password.label:              Password
         password_requested_at.label: Password requested at
-        imap_configuration.label: Email synchronization settings
+        roles.label:                 Roles
+        salt.label:                  Salt
+        statuses.label:              Statuses
+        updated_at.label:            Updated
+        username.label:              Username
         #
         # Oro/Bundle/UserBundle/Entity/Group
         #

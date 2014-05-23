@@ -20,7 +20,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->doctrine = $this->getDoctrine(
             [self::TEST_ENTITY => []],
@@ -38,7 +38,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->provider, $this->doctrine, $this->configManager);
     }

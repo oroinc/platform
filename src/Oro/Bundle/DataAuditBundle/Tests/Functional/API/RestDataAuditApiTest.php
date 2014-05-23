@@ -3,22 +3,16 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestDataAuditApiTest extends WebTestCase
 {
-
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -43,28 +37,28 @@ class RestDataAuditApiTest extends WebTestCase
             )
         );
 
-        $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
     }
 
     /**
-     * @param $response
+     * @param array $response
      * @return array
      * @depends testPreconditions
      */
-    public function testGetAudits($response)
+    public function testGetAudits(array $response)
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_audits')
+            $this->getUrl('oro_api_get_audits')
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $resultActual = reset($result);
+
         $this->assertEquals('create', $resultActual['action']);
         $this->assertEquals('Oro\Bundle\UserBundle\Entity\User', $resultActual['object_class']);
         $this->assertEquals($response['user']['username'], $resultActual['object_name']);
@@ -78,21 +72,22 @@ class RestDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param  array $response
+     * @param array $response
      * @depends testGetAudits
      */
-    public function testGetAudit($response)
+    public function testGetAudit(array $response)
     {
         foreach ($response as $audit) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_audit', array('id' => $audit['id']))
+                $this->getUrl('oro_api_get_audit', array('id' => $audit['id']))
             );
-            $result = $this->client->getResponse();
-            ToolsAPI::assertJsonResponse($result, 200);
-            $result = ToolsAPI::jsonToArray($result->getContent());
+
+            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
             unset($result['loggedAt']);
             unset($audit['loggedAt']);
+
             $this->assertEquals($audit, $result);
         }
     }

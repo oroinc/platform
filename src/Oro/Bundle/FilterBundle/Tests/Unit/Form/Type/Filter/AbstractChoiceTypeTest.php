@@ -22,7 +22,7 @@ class AbstractChoiceTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $instance;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -35,7 +35,7 @@ class AbstractChoiceTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->translator);
         unset($this->instance);

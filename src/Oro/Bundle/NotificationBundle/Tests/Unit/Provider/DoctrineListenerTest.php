@@ -23,7 +23,7 @@ class DoctrineListenerTest extends TestCase
      */
     protected $eventDispatcher;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityPool = $this->getMock('Oro\Bundle\NotificationBundle\Doctrine\EntityPool');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

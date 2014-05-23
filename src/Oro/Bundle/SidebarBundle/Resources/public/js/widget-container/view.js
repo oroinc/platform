@@ -12,7 +12,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
      * @class   orosidebar.widgetContainer.View
      * @extends Backbone.View
      */
-    var WidgetView = Backbone.View.extend({
+    return Backbone.View.extend({
         templateMin: _.template(widgetMinTemplate),
         templateMax: _.template(widgetMaxTemplate),
 
@@ -109,6 +109,4 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             Backbone.trigger('closeWidget', this.model.cid);
         }
     });
-
-    return WidgetView;
 });

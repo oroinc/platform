@@ -63,6 +63,10 @@
                     var formAction = form.attr('action');
 
                     form.one('submit', function(e) {
+                        if (!e.result) {
+                            return;
+                        }
+
                         var loader;
                         var confirmModal = new Modal({
                             title: __('Preview'),
@@ -181,8 +185,11 @@
         {% set address = _self.email_address(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
         {%- if address|length > 0 -%}
             {% set addresses = addresses|merge([address]) %}
+        {% else %}
+            {% set addresses = addresses|merge([recipient.emailAddress.email]) %}
         {%- endif %}
     {%- endfor -%}
+
     {% for address in addresses -%}
         {{ address }}
         {%- if not loop.last %}; {% endif %}

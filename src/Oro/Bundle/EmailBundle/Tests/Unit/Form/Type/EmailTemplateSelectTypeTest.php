@@ -16,12 +16,12 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test env
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->type = new EmailTemplateSelectType();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
     }

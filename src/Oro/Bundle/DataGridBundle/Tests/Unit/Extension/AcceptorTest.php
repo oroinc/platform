@@ -15,14 +15,14 @@ class AcceptorTest extends \PHPUnit_Framework_TestCase
     /** @var Acceptor */
     protected $acceptor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->config   = DatagridConfiguration::create([]);
         $this->acceptor = new Acceptor();
         $this->acceptor->setConfig($this->config);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->config);
         unset($this->acceptor);

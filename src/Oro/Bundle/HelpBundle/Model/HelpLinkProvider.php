@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\HelpBundle\Model;
 
-use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\HelpBundle\Annotation\Help;
+use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 
 class HelpLinkProvider
 {
@@ -20,6 +19,11 @@ class HelpLinkProvider
      * @var ControllerNameParser
      */
     protected $parser;
+
+    /**
+     * @var VersionHelper
+     */
+    protected $helper;
 
     /**
      * @var array
@@ -58,10 +62,12 @@ class HelpLinkProvider
 
     /**
      * @param ControllerNameParser $parser
+     * @param VersionHelper $helper
      */
-    public function __construct(ControllerNameParser $parser)
+    public function __construct(ControllerNameParser $parser, VersionHelper $helper)
     {
         $this->parser = $parser;
+        $this->helper = $helper;
     }
 
     public function setRequest(Request $request)
@@ -143,7 +149,7 @@ class HelpLinkProvider
             $url .= "?";
         }
 
-        return $url . "v=" . OroPlatformBundle::VERSION;
+        return $url . "v=" . $this->helper->getVersion();
     }
 
     /**

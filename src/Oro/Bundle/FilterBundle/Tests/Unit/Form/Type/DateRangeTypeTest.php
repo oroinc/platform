@@ -12,7 +12,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /** @var string */
     protected $defaultLocale = 'en';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Grid;
 
+use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -43,7 +44,7 @@ class ExtendExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
+        $entityName = $this->getExtendedEntityNameByConfig($config);
 
         $entityProvider = $this->cm->getProvider('entity');
         $fields         = $this->getDynamicFields($entityName);
@@ -113,17 +114,18 @@ class ExtendExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $entityName = $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);
+        $entityName = $this->getExtendedEntityNameByConfig($config);
 
         $fields = $this->getDynamicFields($entityName);
         if ($datasource instanceof OrmDatasource && !empty($fields)) {
             /** @var QueryBuilder $qb */
             $qb        = $datasource->getQueryBuilder();
             $fromParts = $qb->getDQLPart('from');
+            $alias     = false;
 
-            $alias = false;
+            /** @var From $fromPart */
             foreach ($fromParts as $fromPart) {
-                if ($fromPart->getFrom() == $entityName) {
+                if ($this->prepareEntityName($fromPart->getFrom()) == $entityName) {
                     $alias = $fromPart->getAlias();
                 }
             }
@@ -167,6 +169,27 @@ class ExtendExtension extends AbstractExtension
     public function getPriority()
     {
         return 250;
+    }
+
+    /**
+     * Convert entityName to the full format
+     *
+     * @param  string $entityName
+     * @return string
+     */
+    protected function prepareEntityName($entityName)
+    {
+        return $this->cm->getEntityManager()->getClassMetadata($entityName)->getName();
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @throws \Exception when class was not found by $entityName
+     * @return string extended entity class name
+     */
+    protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
+    {
+        return $this->prepareEntityName($config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH));
     }
 
     /**

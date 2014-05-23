@@ -38,12 +38,8 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
-     *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
-     *      description="The maximum deep level of related entities.")
-     * @QueryParam(
-     *      name="last-deep-level-relations", requirements="(1)|(0)",
-     *      nullable=true, strict=true, default="0",
-     *      description="Indicates whether fields for the last deep level of related entities should be returned.")
+     *      name="with-unidirectional", requirements="(1)|(0)",
+     *      description="Indicates whether Unidirectional association fields should be returned.")
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
      * @ApiDoc(
      *      description="Get entity fields",
@@ -54,26 +50,23 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withVirtualFields = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
-        $deepLevel         = $this->getRequest()->query->has('deep-level')
-            ? (int)$this->getRequest()->query->get('deep-level')
-            : 0;
-        $lastDeepLevelRelations = ('1' == $this->getRequest()->query->get('last-deep-level-relations'));
+        $entityName         = str_replace('_', '\\', $entityName);
+        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
+        $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
+        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
+        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
 
-        $statusCode = Codes::HTTP_OK;
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
+
+        $statusCode = Codes::HTTP_OK;
         try {
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
                 $withVirtualFields,
                 $withEntityDetails,
-                $deepLevel,
-                $lastDeepLevelRelations
+                $withUnidirectional
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;

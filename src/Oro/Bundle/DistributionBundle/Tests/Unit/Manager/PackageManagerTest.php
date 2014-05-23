@@ -23,6 +23,7 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
+use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -872,7 +873,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->stringContains('Package oro/platform is not deletable'));
 
         $manager = $this->createPackageManager(null, null, null, null, null, $logger);
-        $manager->uninstall(['oro/platform']);
+        $manager->uninstall([OroPlatformBundle::PACKAGE_NAME]);
     }
 
     /**
@@ -892,7 +893,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->stringContains('Package oro/platform-dist is not deletable'));
 
         $manager = $this->createPackageManager(null, null, null, null, null, $logger);
-        $manager->uninstall(['oro/platform-dist']);
+        $manager->uninstall([OroPlatformBundle::PACKAGE_DIST_NAME]);
     }
 
     /**
@@ -902,8 +903,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->createPackageManager();
 
-        $this->assertFalse($manager->canBeDeleted('oro/platform'));
-        $this->assertFalse($manager->canBeDeleted('oro/platform-dist'));
+        $this->assertFalse($manager->canBeDeleted(OroPlatformBundle::PACKAGE_NAME));
+        $this->assertFalse($manager->canBeDeleted(OroPlatformBundle::PACKAGE_DIST_NAME));
     }
 
     /**

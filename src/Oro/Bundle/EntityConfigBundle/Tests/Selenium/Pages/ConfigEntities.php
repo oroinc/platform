@@ -8,9 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class ConfigEntities
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities openConfigEntities() openConfigEntities()
- * @method \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities
- *         assertTitle() assertTitle($title, $message = '')
+ * @method ConfigEntities openConfigEntities() openConfigEntities(string)
+ * @method ConfigEntities assertTitle() assertTitle($title, $message = '')
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {

@@ -17,16 +17,16 @@ class SchemaStep extends AbstractStep
                 error_reporting(E_ALL ^ E_WARNING);
                 return $this->handleAjaxAction('cache:clear', array('--no-optional-warmers' => true));
             case 'clear-config':
-                return $this->handleAjaxAction('oro:entity-config:clear');
+                return $this->handleAjaxAction('oro:entity-config:cache:clear', array('--no-warmup' => true));
             case 'clear-extend':
-                return $this->handleAjaxAction('oro:entity-extend:clear');
+                return $this->handleAjaxAction('oro:entity-extend:cache:clear', array('--no-warmup' => true));
             case 'schema-drop':
                 return $this->handleAjaxAction(
                     'doctrine:schema:drop',
-                    array('--force' => true, '--full-database' => true)
+                    array('--force' => true, '--full-database' => $context->getStorage()->get('fullDatabase', false))
                 );
             case 'schema-update':
-                return $this->handleAjaxAction('oro:migration:load');
+                return $this->handleAjaxAction('oro:migration:load', array('--force' => true));
             case 'fixtures':
                 return $this->handleAjaxAction(
                     'oro:migration:data:load',

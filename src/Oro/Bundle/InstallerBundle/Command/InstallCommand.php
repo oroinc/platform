@@ -39,6 +39,13 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Determines whether sample data need to be loaded or not'
+            )
+            ->addOption(
+                'full-database',
+                null,
+                InputOption::VALUE_NONE,
+                'Instead of using the Class Metadata to detect the database table schema,
+                    drop ALL assets that the database contains.'
             );
     }
 
@@ -151,20 +158,26 @@ class InstallCommand extends ContainerAwareCommand
 
         $input->setInteractive(false);
 
+        $schemaDropOptions = array(
+            '--force' => true,
+            '--process-isolation' => true,
+        );
+
+        if ($input->getOption('full-database')) {
+            $schemaDropOptions['--full-database'] = true;
+        }
+
         $commandExecutor
             ->runCommand(
                 'doctrine:schema:drop',
-                array(
-                    '--force' => true,
-                    '--full-database' => true,
-                    '--process-isolation' => true,
-                )
+                $schemaDropOptions
             )
-            ->runCommand('oro:entity-config:clear')
-            ->runCommand('oro:entity-extend:clear')
+            ->runCommand('oro:entity-config:cache:clear', array('--no-warmup' => true))
+            ->runCommand('oro:entity-extend:cache:clear', array('--no-warmup' => true))
             ->runCommand(
                 'oro:migration:load',
                 array(
+                    '--force' => true,
                     '--process-isolation' => true,
                 )
             )

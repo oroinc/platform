@@ -16,7 +16,7 @@ class ItemTest extends \PHPUnit_Framework_TestCase
      */
     private $item;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->item = new Item();
     }

@@ -15,7 +15,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $modelCacheProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()

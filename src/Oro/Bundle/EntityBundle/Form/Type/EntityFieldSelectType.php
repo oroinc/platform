@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
@@ -71,9 +72,8 @@ class EntityFieldSelectType extends AbstractType
             array(
                 'entity'                    => null,
                 'with_relations'            => false,
+                'with_unidirectional'       => false,
                 'with_virtual_fields'       => false,
-                'deep_level'                => 0,
-                'last_deep_level_relations' => false,
                 'empty_value'               => '',
                 'skip_load_entities'        => false,
                 'skip_load_data'            => false,
@@ -134,8 +134,7 @@ class EntityFieldSelectType extends AbstractType
                 $options['entity'],
                 $options['with_relations'],
                 $options['with_virtual_fields'],
-                $options['deep_level'],
-                $options['last_deep_level_relations']
+                $options['with_unidirectional']
             );
         $attr['data-data']   = json_encode($data);
 
@@ -148,20 +147,18 @@ class EntityFieldSelectType extends AbstractType
      * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations          Indicates whether association fields should be returned as well.
      * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
+     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
      *                                       should be returned.
      * @return array
      */
-    protected function getData($entityName, $withRelations, $withVirtualFields, $deepLevel, $lastDeepLevelRelations)
+    protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional)
     {
         $fields = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
             $withVirtualFields,
             true,
-            $deepLevel,
-            $lastDeepLevelRelations
+            $withUnidirectional
         );
 
         return $this->convertData($fields, $entityName, null);

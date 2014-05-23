@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 
 /**
@@ -32,10 +33,18 @@ class ImapEmail
     /**
      * @var Email
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Email")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Email")
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false)
      */
     protected $email;
+
+    /**
+     * @var ImapEmailFolder
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\ImapBundle\Entity\ImapEmailFolder")
+     * @ORM\JoinColumn(name="imap_folder_id", referencedColumnName="id", nullable=false)
+     */
+    protected $imapFolder;
 
     /**
      * Get id
@@ -91,5 +100,21 @@ class ImapEmail
         $this->email = $email;
 
         return $this;
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     */
+    public function setImapFolder($imapFolder)
+    {
+        $this->imapFolder = $imapFolder;
+    }
+
+    /**
+     * @return ImapEmailFolder
+     */
+    public function getImapFolder()
+    {
+        return $this->imapFolder;
     }
 }

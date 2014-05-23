@@ -5,6 +5,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
+use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
 class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +30,7 @@ class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $packages = $repository->getCanonicalPackages();
         $this->assertCount(2, $repository->getCanonicalPackages());
 
-        $this->assertEquals('oro/platform', $packages[0]->getName());
+        $this->assertEquals(OroPlatformBundle::PACKAGE_NAME, $packages[0]->getName());
         $this->assertEquals('oro/crm', $packages[1]->getName());
     }
 

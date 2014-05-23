@@ -515,7 +515,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
         render: function() {
             var loadAllowed = !this.options.elementFirst
                 || (this.options.elementFirst && !this.firstRun)
-                || this.$el.html().length == 0;
+                || (this.$el && this.$el.length && this.$el.html().length == 0);
             if (loadAllowed && this.options.url !== false) {
                 this.loadContent();
             } else {
