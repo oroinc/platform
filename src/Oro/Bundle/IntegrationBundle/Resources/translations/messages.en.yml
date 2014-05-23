@@ -11,6 +11,7 @@ oro:
             action:
                 update: Update
                 delete: Delete
+                schedule_sync: Schedule Sync
 
         controller:
             channel:
@@ -38,6 +39,10 @@ oro:
             sync_priority.label: Sync priority
             remote_wins.label: Remote wins
             local_wins.label: Local wins
+
+        sync: A sync job has been added to the queue. {{ job_view_link }}
+        sync_error: Failed to add sync job to the queue. Error: %s.
+        progress: Check progress.
 
         delete_sync_channel:
             content: "Warning: Removing the channel will delete all related data"
