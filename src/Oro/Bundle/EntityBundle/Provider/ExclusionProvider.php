@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Provide exclude logic to filter entities and fields based on exclude rules
  */
-class ExclusionProvider
+class ExclusionProvider implements ExclusionProviderInterface
 {
     /** @var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
@@ -28,11 +28,7 @@ class ExclusionProvider
     }
 
     /**
-     * Checks if the given entity should be ignored
-     *
-     * @param ClassMetadata $metadata
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isIgnoredEntity(ClassMetadata $metadata)
     {
@@ -40,29 +36,17 @@ class ExclusionProvider
     }
 
     /**
-     * Checks if the given field should be ignored
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     * @param array         $extraRules
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isIgnoredField(ClassMetadata $metadata, $fieldName, $extraRules = [])
+    public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return $this->isMatched($this->getFieldProperties($metadata, $fieldName));
     }
 
     /**
-     * Checks if the given relation should be ignored
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $associationName
-     * @param array         $extraRules
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isIgnoredRelation(ClassMetadata $metadata, $associationName, $extraRules = [])
+    public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return $this->isMatched($this->getFieldProperties($metadata, $associationName));
     }

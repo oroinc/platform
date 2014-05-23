@@ -185,13 +185,7 @@
 #}
 {% macro initJsWidgets(type, form, entities, metadata) %}
     {{ _self.query_designer_segment_template('segment-template') }}
-    {% set entityFieldsRouteParams = {
-        'with-relations': 1,
-        'with-virtual-fields': 1,
-        'with-entity-details': 1,
-        'with-unidirectional': 1,
-        'query-type': type
-    } %}
+    {% set entityFieldsRouteParams = {} %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
             'oroui/js/delete-confirmation', 'orosegment/js/segment', 'oroentity/js/fields-loader'],

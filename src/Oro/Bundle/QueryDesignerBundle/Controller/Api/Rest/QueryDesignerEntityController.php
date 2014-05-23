@@ -28,18 +28,6 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
     /**
      * Get entities with fields
      *
-     * @QueryParam(
-     *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether virtual fields should be returned as well.")
-     * @QueryParam(
-     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
-     *      description="Indicates whether association fields should be returned as well.")
-     * @QueryParam(
-     *      name="with-unidirectional", requirements="(1)|(0)",
-     *      description="Indicates whether Unidirectional association fields should be returned.")
-     * @QueryParam(
-     *      name="query-type", requirements="([\w+])",
-     *      description="Query type, e.g. report, segment, etc.")
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
@@ -50,26 +38,12 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      */
     public function fieldsAction()
     {
-        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
-        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $queryType          = $this->getRequest()->query->get('query-type');
-
-        // set query type for exclude-related logic
-        $this->get('oro_query_designer.entity_field_provider')
-            ->setQueryType($queryType);
-
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
 
         $statusCode = Codes::HTTP_OK;
         try {
-            $result = $provider->getFields(
-                $withVirtualFields,
-                $withUnidirectional,
-                $withRelations,
-                $queryType
-            );
+            $result = $provider->getFields(true, true, true);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

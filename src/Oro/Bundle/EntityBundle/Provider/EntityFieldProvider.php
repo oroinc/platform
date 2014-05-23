@@ -48,7 +48,7 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
-    /** @var ExclusionProvider */
+    /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
     /**
@@ -60,7 +60,7 @@ class EntityFieldProvider
      * @param ManagerRegistry               $doctrine
      * @param Translator                    $translator
      * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ExclusionProvider             $exclusionProvider
+     * @param ExclusionProviderInterface    $exclusionProvider
      * @param array                         $hiddenFields
      */
     public function __construct(
@@ -70,7 +70,7 @@ class EntityFieldProvider
         ManagerRegistry $doctrine,
         Translator $translator,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ExclusionProvider $exclusionProvider,
+        ExclusionProviderInterface $exclusionProvider,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;

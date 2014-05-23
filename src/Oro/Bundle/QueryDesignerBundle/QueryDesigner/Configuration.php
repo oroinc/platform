@@ -34,7 +34,6 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getGroupingConfigTree())
                 ->append($this->getConvertersConfigTree())
                 ->append($this->getAggregatorsConfigTree())
-                ->append($this->getExclusionsConfigTree())
             ->end();
 
         return $builder;
@@ -327,31 +326,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ->end();
-
-        return $node;
-    }
-
-    /**
-     * Exclusions configuration tree
-     *
-     * @return NodeDefinition
-     */
-    protected function getExclusionsConfigTree()
-    {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('exclusions');
-
-        $node->prototype('array')
-                ->children()
-                    // field type
-                    ->scalarNode('type')->end()
-                    ->scalarNode('entity')->end()
-                    ->scalarNode('field')->end()
-                    ->arrayNode('query_type')
-                        ->prototype('scalar')->end()
-                    ->end()
-                ->end()
-            ->end();
 
         return $node;
     }

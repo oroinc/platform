@@ -248,14 +248,4 @@ class Manager implements FunctionProviderInterface
 
         return false;
     }
-
-    /**
-     * Gets a set of rules describes which entities or entity fields should be excluded
-     *
-     * @return array
-     */
-    public function getExcludeRules()
-    {
-        return $this->config->offsetGet('exclusions');
-    }
 }
