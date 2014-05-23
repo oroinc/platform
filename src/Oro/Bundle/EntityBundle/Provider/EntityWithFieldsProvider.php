@@ -36,7 +36,7 @@ class EntityWithFieldsProvider
         $translate = true
     ) {
         $result   = [];
-        $entities = $this->entityProvider->getEntities();
+        $entities = $this->entityProvider->getEntities(true, $withExclusions);
         foreach ($entities as $entityData) {
             $currentClassName = $entityData['name'];
 
