@@ -275,7 +275,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->with(array('code' => $code));
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->with('OroBatchBundle:JobInstance')
+            ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
         $this->executor->getJobErrors($code);
     }
@@ -304,7 +304,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($jobInstance));
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->with('OroBatchBundle:JobInstance')
+            ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
         $this->executor->getJobErrors($code);
     }
@@ -341,7 +341,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($jobInstance));
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->with('OroBatchBundle:JobInstance')
+            ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
@@ -384,7 +384,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($jobInstance));
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->with('OroBatchBundle:JobInstance')
+            ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
 
         $this->assertEquals(array('Error 1'), $this->executor->getJobFailureExceptions($code));
