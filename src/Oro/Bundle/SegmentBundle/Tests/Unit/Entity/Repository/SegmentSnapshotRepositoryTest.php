@@ -42,12 +42,12 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
         $segment = $this->getSegment();
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()->setMethods(['getResult'])
+            ->disableOriginalConstructor()->setMethods(['execute'])
             ->getMockForAbstractClass();
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(['delete', 'where', 'setParameter', 'getQuery'])
+            ->setMethods(['delete', 'where', 'setParameter', 'getQuery', 'execute'])
             ->getMock();
         $queryBuilder->expects($this->once())->method('delete')->with(self::ENTITY_NAME, 'snp')
             ->will($this->returnSelf());
@@ -93,54 +93,17 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
     public function testRemoveByEntity()
     {
         $entity = $this->createEntities();
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()->setMethods(['execute'])
+            ->getMockForAbstractClass();
+
         $queryBuilder = $this->mockGetSnapshotDeleteQueryBuilderByEntitiesFunction($entity);
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects($this->exactly(2))
             ->method('getQuery')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnSelf());
+            ->will($this->returnValue($query));
         $this->repository->removeByEntity(reset($entity));
     }
-
-    /**
-     * @dataProvider massRemoveByEntitiesProvider
-     * @param $entities
-     * @param $batchSize
-     */
-    /*public function testMassRemoveByEntities($entities, $batchSize)
-    {
-        if (empty($entities)) {
-            $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $queryBuilder->expects($this->never())
-                ->method('getQuery')
-                ->will($this->returnSelf());
-            $queryBuilder->expects($this->never())
-                ->method('getResult')
-                ->will($this->returnSelf());
-        } else {
-            $actualBatchSize = $batchSize ? $batchSize : SegmentSnapshotRepository::DELETE_BATCH_SIZE;
-            $callCount = ceil(count($entities) / $actualBatchSize);
-            $queryBuilder = $this->mockGetSnapshotDeleteQueryBuilderByEntitiesFunction($entities, $callCount);
-            $queryBuilder->expects($this->exactly($callCount))
-                ->method('getQuery')
-                ->will($this->returnSelf());
-            $queryBuilder->expects($this->exactly($callCount))
-                ->method('getResult')
-                ->will($this->returnSelf());
-        }
-
-        $this->em->expects($this->once())
-            ->method('beginTransaction')
-            ->will($this->returnSelf());
-        $this->em->expects($this->once())
-            ->method('commit')
-            ->will($this->returnSelf());
-
-        $this->repository->massRemoveByEntities($entities, $batchSize);
-    }*/
 
     protected function createEntities($count = 1)
     {
@@ -156,51 +119,66 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
     protected function mockGetSnapshotDeleteQueryBuilderByEntitiesFunction(array $entities, $callCount = 1)
     {
+        $result = array();
+        /** @var StubEntity $entity */
+        foreach ($entities as $entity) {
+            $result[] = array(
+                'entity' => get_class($entity),
+                'id'     => $entity->getId()
+            );
+        }
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()->setMethods(array('getResult', 'execute'))
+            ->getMockForAbstractClass();
+        $query->expects($this->exactly($callCount))
+            ->method('getResult')
+            ->will($this->returnValue($result));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('delete', 'select', 'from', 'where', 'orWhere', 'setParameter', 'getQuery', 'getResult'))
+            ->setMethods(array('delete', 'select', 'from', 'orWhere', 'setParameter', 'getQuery'))
             ->getMock();
+
+        $this->em->expects($this->exactly($callCount * 2))
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($queryBuilder));
+
         $queryBuilder->expects($this->exactly($callCount))
             ->method('delete')
             ->with(self::ENTITY_NAME, 'snp')
             ->will($this->returnSelf());
-        $callCount *= count($entities);
         $queryBuilder->expects($this->exactly($callCount))
             ->method('select')
             ->will($this->returnSelf());
         $queryBuilder->expects($this->exactly($callCount))
             ->method('from')
             ->will($this->returnSelf());
-        $queryBuilder->expects($this->exactly($callCount))
-            ->method('where')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->exactly($callCount))
+        $queryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        $callCount *= count($entities);
+
+        $queryBuilder->expects($this->exactly($callCount * 2))
             ->method('orWhere')
             ->will($this->returnSelf());
-        $queryBuilder->expects($this->exactly($callCount*2))
+        $queryBuilder->expects($this->exactly($callCount * 3))
             ->method('setParameter')
             ->will($this->returnSelf());
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
-            ->setMethods(array('getIdentifier', 'getFieldValue'))
+            ->setMethods(array('getIdentifierValues'))
             ->getMock();
         $metadata->expects($this->exactly($callCount))
-            ->method('getIdentifier')
-            ->will($this->returnValue(array('id')));
-        $metadata->expects($this->exactly($callCount))
-            ->method('getFieldValue')
+            ->method('getIdentifierValues')
             ->will($this->returnCallback(
                 function (StubEntity $currentEntity) {
-                    return $currentEntity->getId();
+                    return array($currentEntity->getId());
                 }
             ));
 
-        $this->em->expects($this->any())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
-        $this->em->expects($this->any())
+        $this->em->expects($this->exactly($callCount))
             ->method('getClassMetadata')
             ->will($this->returnValue($metadata));
 

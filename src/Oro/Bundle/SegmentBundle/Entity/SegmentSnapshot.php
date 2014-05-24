@@ -16,10 +16,10 @@ use Doctrine\ORM\Mapping as ORM;
 class SegmentSnapshot
 {
     /**
-     * @var string
+     * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="string", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;

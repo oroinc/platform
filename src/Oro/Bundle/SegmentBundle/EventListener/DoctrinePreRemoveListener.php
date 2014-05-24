@@ -31,7 +31,7 @@ class DoctrinePreRemoveListener
         $entity = $args->getEntity();
 
         if ($this->cm->hasConfig(ClassUtils::getClass($entity))) {
-            $this->deleteEntities[] = $entity;
+            $this->deleteEntities[] = clone $entity; // needed for saving ID after flush
         }
     }
 
@@ -43,6 +43,7 @@ class DoctrinePreRemoveListener
         if ($this->deleteEntities) {
             $em = $args->getEntityManager();
             $em->getRepository('OroSegmentBundle:SegmentSnapshot')->massRemoveByEntities($this->deleteEntities);
+            $this->deleteEntities = array();
         }
     }
 }

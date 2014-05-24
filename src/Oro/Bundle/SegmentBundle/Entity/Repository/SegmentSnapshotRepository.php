@@ -22,7 +22,7 @@ class SegmentSnapshotRepository extends EntityRepository
         try {
             foreach ($entityBatches as $entityBatch) {
                 $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities($entityBatch);
-                $deleteQB->getQuery()->getResult();
+                $deleteQB->getQuery()->execute();
             }
             $entityManager->commit();
         } catch (\Exception $e) {
@@ -43,7 +43,7 @@ class SegmentSnapshotRepository extends EntityRepository
             ->where('snp.segment = :segment')
             ->setParameter('segment', $segment);
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->execute();
     }
 
     /**
@@ -58,7 +58,7 @@ class SegmentSnapshotRepository extends EntityRepository
     {
         $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities(array($entity));
 
-        return $deleteQB->getQuery()->getResult();
+        return $deleteQB->getQuery()->execute();
     }
 
     /**
@@ -69,29 +69,44 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     protected function getSnapshotDeleteQueryBuilderByEntities(array $entities)
     {
+        $deleteParams  = array();
         $entityManager = $this->getEntityManager();
+
+        $segmentQB = $entityManager->createQueryBuilder();
+        $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
+
+        foreach ($entities as $key => $entity) {
+            $className = ClassUtils::getClass($entity);
+            $metadata  = $entityManager->getClassMetadata($className);
+            $entityIds = $metadata->getIdentifierValues($entity);
+            $deleteParams[$className] = array(
+                'entityId'   => reset($entityIds),
+                'segmentIds' => array()
+            );
+
+            $segmentQB
+                ->orWhere('s.entity = :className' . $key)
+                ->setParameter('className' . $key, $className);
+        }
+
+        $result = $segmentQB->getQuery()->getResult();
+
         $deleteQB = $entityManager->createQueryBuilder();
         $deleteQB->delete($this->getEntityName(), 'snp');
 
-        foreach ($entities as $key => $entity) {
-            $className   = ClassUtils::getClass($entity);
-            $metadata    = $entityManager->getClassMetadata($className);
-            $identifiers = $metadata->getIdentifier();
-            $tableAlias  = 's' . $key;
+        foreach ($result as $row) {
+            $deleteParams[$row['entity']]['segmentIds'][] = $row['id'];
+        }
 
-            if (!empty($identifiers)) {
-                $entityId  = $metadata->getFieldValue($entity, reset($identifiers));
-                $segmentQB = $entityManager->createQueryBuilder();
-
-                $segmentQB->select($tableAlias . '.id')
-                    ->from('OroSegmentBundle:Segment', $tableAlias)
-                    ->where($tableAlias . '.entity = :entityName' . $key);
-
-                $deleteQB
-                    ->orWhere('snp.segment IN (' . $segmentQB->getDQL() . ') AND snp.entityId = :entityId')
-                    ->setParameter('entityName' . $key, $className)
-                    ->setParameter('entityId', $entityId);
-            }
+        foreach ($deleteParams as $params) {
+            $suffix = $params['entityId'];
+            $deleteQB
+                ->orWhere(
+                    'snp.segment IN (:segmentIds' . $suffix . ') AND
+                     snp.entityId = :entityId' . $suffix
+                )
+                ->setParameter('segmentIds' . $suffix, implode(',', $params['segmentIds']))
+                ->setParameter('entityId' . $suffix, $params['entityId']);
         }
 
         return $deleteQB;
