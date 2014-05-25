@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
             this.options.dialogOptions = this.options.dialogOptions || {};
             this.options.dialogOptions.title = this.options.dialogOptions.title || this.options.title;
             this.options.dialogOptions.limitTo = this.options.dialogOptions.limitTo || '#container';
-            this.options.dialogOptions.minWidth = this.options.dialogOptions.minWidth || 300;
+            this.options.dialogOptions.minWidth = this.options.dialogOptions.minWidth || 375;
             this.options.dialogOptions.minHeight = this.options.dialogOptions.minHeight || 150;
 
             if (this.options.stateEnabled) {
