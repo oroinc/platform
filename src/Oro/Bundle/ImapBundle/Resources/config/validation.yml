@@ -11,7 +11,7 @@ Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin:
                 type: integer
         ssl:
             - Choice:
-                choices:  [ssl, tsl]
+                choices:  [ssl, tls]
         user:
             - NotBlank:     ~
             - Type:
