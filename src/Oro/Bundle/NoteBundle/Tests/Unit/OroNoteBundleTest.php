@@ -3,7 +3,7 @@ namespace Oro\Bundle\NoteBundle\Tests\Unit;
 
 use Oro\Bundle\NoteBundle\OroNoteBundle;
 
-class OroNavigationBundleTest extends \PHPUnit_Framework_TestCase
+class OroNoteBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {
