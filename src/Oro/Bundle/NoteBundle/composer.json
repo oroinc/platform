@@ -1,0 +1,22 @@
+{
+    "name": "oro/note-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Note Bundle",
+    "keywords": ["BAP", "UI", "Note"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.1.*",
+        "oro/entity-config-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\NoteBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/NoteBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
