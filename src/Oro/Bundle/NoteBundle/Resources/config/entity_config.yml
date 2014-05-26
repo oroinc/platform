@@ -4,8 +4,8 @@ oro_entity_config:
             items:
                 enabled:
                     options:
-                        enable_only:        true
-                        schema_update:      true
+                        #enable_only:        true
+                        #schema_update:      true
                         priority:           250
                         default_value:      'No'
                         auditable:          false
@@ -14,7 +14,8 @@ oro_entity_config:
                         options:
                             block:          other
                             required:       true
-                            label:          oro.note.entity_config.enabled.note_label
+                            label:          'Can add notes'
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             empty_data:     'No'
+                            tooltip:        'After you enable this option it cannot be disabled.'
