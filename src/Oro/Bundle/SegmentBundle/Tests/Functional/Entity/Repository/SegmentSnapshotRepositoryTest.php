@@ -4,6 +4,8 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Repository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
@@ -26,13 +28,10 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
         /** @var SegmentSnapshotRepository $segmentSnapshotRepository */
         $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
-        /** @var EntityRepository $entityRepository */
-        $entityRepository = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
 
-        $entity = $entityRepository->createQueryBuilder('entity')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleResult();
+        $entities = $this->getEntities($registry, 1, true);
+        $entity = reset($entities);
+
         $expectedCondition = $this->getExpectedResult($registry, array($entity));
 
         $segmentSnapshotRepository->removeByEntity($entity);
@@ -42,21 +41,17 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider massRemoveByEntitiesProvider
-     * @param $count
+     * @param integer $count
+     * @param boolean $withSegmentSnapshot
      */
-    public function testMassRemoveByEntities($count)
+    public function testMassRemoveByEntities($count, $withSegmentSnapshot)
     {
         /** @var Registry $registry */
         $registry = $this->getContainer()->get('doctrine');
         /** @var SegmentSnapshotRepository $segmentSnapshotRepository */
         $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
-        /** @var EntityRepository $entityRepository */
-        $entityRepository = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
 
-        $entities = $entityRepository->createQueryBuilder('entity')
-            ->setMaxResults($count)
-            ->getQuery()
-            ->getResult();
+        $entities = $this->getEntities($registry, $count, $withSegmentSnapshot);
 
         $expectedCondition = $this->getExpectedResult($registry, $entities);
 
@@ -71,11 +66,21 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
     public function massRemoveByEntitiesProvider()
     {
         return array(
-            'one entity' => array(
-                'count' => 1
+            'one entity with related segment snapshot' => array(
+                'count'               => 1,
+                'withSegmentSnapshot' => true
             ),
-            'two entity' => array(
-                'count' => 2
+            'one entity without related segment snapshot' => array(
+                'count'               => 1,
+                'withSegmentSnapshot' => false
+            ),
+            'two entity with related segment snapshot' => array(
+                'count'               => 2,
+                'withSegmentSnapshot' => true
+            ),
+            'two entity without related segment snapshot' => array(
+                'count'               => 2,
+                'withSegmentSnapshot' => false
             )
         );
     }
@@ -98,20 +103,20 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
             $className = ClassUtils::getClass($entity);
             $metadata  = $registry->getManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
-            $expectedCondition[$className] = array(
-                'entityId'   => reset($entityIds),
-                'segmentIds' => array()
-            );
 
-            $segmentQB
-                ->orWhere('s.entity = :className' . $key)
-                ->setParameter('className' . $key, $className);
+            if (!isset($deleteParams[$className])) {
+                $segmentQB
+                    ->orWhere('s.entity = :className' . $key)
+                    ->setParameter('className' . $key, $className);
+            }
+
+            $expectedCondition[$className]['entityIds'][] = reset($entityIds);
         }
 
-        $result = $segmentQB->getQuery()->getResult();
+        $segments = $segmentQB->getQuery()->getResult();
 
-        foreach ($result as $row) {
-            $expectedCondition[$row['entity']]['segmentIds'][] = $row['id'];
+        foreach ($segments as $segment) {
+            $expectedCondition[$segment['entity']]['segmentIds'][] = $segment['id'];
         }
 
         return $expectedCondition;
@@ -126,18 +131,43 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         $selectQB = $segmentSnapshotRepository->createQueryBuilder('snp');
 
         foreach ($expectedCondition as $params) {
-            $suffix = $params['entityId'];
+            $suffix = implode('_', $params['entityIds']);
             $selectQB->select('snp.id')
-                ->orWhere(
-                    'snp.segment IN (:segmentIds' . $suffix . ') AND
-                     snp.entityId = :entityId' . $suffix
-                )
+                ->orWhere($selectQB->expr()->andX(
+                    $selectQB->expr()->in('snp.segment', ':segmentIds' . $suffix),
+                    $selectQB->expr()->in('snp.entityId', ':entityIds' . $suffix)
+                ))
                 ->setParameter('segmentIds' . $suffix, implode(',', $params['segmentIds']))
-                ->setParameter('entityId' . $suffix, $params['entityId']);
+                ->setParameter('entityIds' . $suffix, $params['entityIds']);
         }
 
         $entities = $selectQB->getQuery()->getResult();
 
         $this->assertEmpty($entities);
+    }
+
+    /**
+     * @param Registry $registry
+     * @param int $count
+     * @param boolean $withSegmentSnapshot
+     * @return array
+     */
+    protected function getEntities($registry, $count, $withSegmentSnapshot)
+    {
+        /** @var EntityRepository $entityRepository */
+        $entityRepository = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $entityRepository->createQueryBuilder('entity');
+
+        if ($withSegmentSnapshot) {
+            $queryBuilder
+                ->innerJoin('OroSegmentBundle:SegmentSnapshot', 'snp', Join::WITH, 'snp.entityId = entity.id');
+        } else {
+            $queryBuilder
+                ->leftJoin('OroSegmentBundle:SegmentSnapshot', 'snp')
+                ->where($queryBuilder->expr()->isNull('snp.entityId'));
+        }
+
+        return $queryBuilder->setMaxResults($count)->getQuery()->getResult();
     }
 }

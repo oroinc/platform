@@ -63,7 +63,7 @@ class LoadSegmentData extends AbstractFixture
             $entity->setCreatedAt(new \DateTime('now'));
             $entity->setDefinition(json_encode($definition));
             $entity->setDescription('description_' . $i);
-            $entity->setEntity('Oro\Bundle\TestFrameworkBundle\Entity\Item');
+            $entity->setEntity('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
             $entity->setLastRun(new \DateTime('now'));
             $entity->setName('segment_' . $i);
             $entity->setOwner($owner);

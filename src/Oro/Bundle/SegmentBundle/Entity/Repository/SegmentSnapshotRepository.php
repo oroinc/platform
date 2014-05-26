@@ -22,7 +22,10 @@ class SegmentSnapshotRepository extends EntityRepository
         try {
             foreach ($entityBatches as $entityBatch) {
                 $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities($entityBatch);
-                $deleteQB->getQuery()->execute();
+
+                if ($deleteQB) {
+                    $deleteQB->getQuery()->execute();
+                }
             }
             $entityManager->commit();
         } catch (\Exception $e) {
@@ -58,17 +61,22 @@ class SegmentSnapshotRepository extends EntityRepository
     {
         $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities(array($entity));
 
-        return $deleteQB->getQuery()->execute();
+        return $deleteQB ? $deleteQB->getQuery()->execute() : array();
     }
 
     /**
      * Returns DELETE query builder with conditions for deleting from snapshot table by entity
      *
      * @param array $entities
-     * @return QueryBuilder
+     * @throws \InvalidArgumentException
+     * @return QueryBuilder|null
      */
     protected function getSnapshotDeleteQueryBuilderByEntities(array $entities)
     {
+        if (empty($entities)) {
+            throw new \InvalidArgumentException('List of entity can not be empty');
+        }
+
         $deleteParams  = array();
         $entityManager = $this->getEntityManager();
 
@@ -79,37 +87,44 @@ class SegmentSnapshotRepository extends EntityRepository
             $className = ClassUtils::getClass($entity);
             $metadata  = $entityManager->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
-            $deleteParams[$className] = array(
-                'entityId'   => reset($entityIds),
-                'segmentIds' => array()
-            );
 
-            $segmentQB
-                ->orWhere('s.entity = :className' . $key)
-                ->setParameter('className' . $key, $className);
+            if (!isset($deleteParams[$className])) {
+                $segmentQB
+                    ->orWhere('s.entity = :className' . $key)
+                    ->setParameter('className' . $key, $className);
+            }
+
+            $deleteParams[$className]['entityIds'][] = reset($entityIds);
         }
 
-        $result = $segmentQB->getQuery()->getResult();
+        $segments = $segmentQB->getQuery()->getResult();
 
         $deleteQB = $entityManager->createQueryBuilder();
         $deleteQB->delete($this->getEntityName(), 'snp');
 
-        foreach ($result as $row) {
-            $deleteParams[$row['entity']]['segmentIds'][] = $row['id'];
+        foreach ($segments as $segment) {
+            $deleteParams[$segment['entity']]['segmentIds'][] = $segment['id'];
         }
+
+        $returnQueryBuilder = false;
 
         foreach ($deleteParams as $params) {
-            $suffix = $params['entityId'];
+            if (empty($params['segmentIds'])) {
+                continue;
+            }
+
+            $suffix = implode('_', $params['entityIds']);
             $deleteQB
-                ->orWhere(
-                    'snp.segment IN (:segmentIds' . $suffix . ') AND
-                     snp.entityId = :entityId' . $suffix
-                )
+                ->orWhere($deleteQB->expr()->andX(
+                    $deleteQB->expr()->in('snp.segment', ':segmentIds' . $suffix),
+                    $deleteQB->expr()->in('snp.entityId', ':entityIds' . $suffix)
+                ))
                 ->setParameter('segmentIds' . $suffix, implode(',', $params['segmentIds']))
-                ->setParameter('entityId' . $suffix, $params['entityId']);
+                ->setParameter('entityIds' . $suffix, $params['entityIds']);
+            $returnQueryBuilder = true;
         }
 
-        return $deleteQB;
+        return $returnQueryBuilder ? $deleteQB : null;
     }
 
     /**

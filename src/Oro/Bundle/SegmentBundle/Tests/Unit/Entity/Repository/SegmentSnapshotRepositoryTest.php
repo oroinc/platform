@@ -136,9 +136,23 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('delete', 'select', 'from', 'orWhere', 'setParameter', 'getQuery'))
+            ->setMethods(array('delete', 'select', 'from', 'orWhere', 'setParameter', 'getQuery', 'expr'))
             ->getMock();
 
+        $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
+            ->disableOriginalConstructor()
+            ->setMethods(array('in', 'andX'))
+            ->getMock();
+        $expr->expects($this->exactly($callCount))
+            ->method('andX')
+            ->will($this->returnSelf());
+        $expr->expects($this->exactly($callCount * 2))
+            ->method('in')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->exactly($callCount * 3))
+            ->method('expr')
+            ->will($this->returnValue($expr));
         $this->em->expects($this->exactly($callCount * 2))
             ->method('createQueryBuilder')
             ->will($this->returnValue($queryBuilder));
@@ -183,30 +197,5 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
             ->will($this->returnValue($metadata));
 
         return $queryBuilder;
-    }
-
-    /**
-     * @return array
-     */
-    public function massRemoveByEntitiesProvider()
-    {
-        return [
-            'no entities' => array(
-                'entities'  => array(),
-                'batchSize' => null
-            ),
-            'one entity' => array(
-                'entities'  => $this->createEntities(),
-                'batchSize' => null
-            ),
-            'many entity with default batch size' => array(
-                'entities'  => $this->createEntities(10),
-                'batchSize' => null
-            ),
-            'many entity with custom batch size' => array(
-                'entities'  => $this->createEntities(SegmentSnapshotRepository::DELETE_BATCH_SIZE),
-                'batchSize' => (int)(SegmentSnapshotRepository::DELETE_BATCH_SIZE / 2)
-            ),
-        ];
     }
 }
