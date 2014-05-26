@@ -87,9 +87,9 @@ class SyncCommand extends AbstractSyncCronCommand
         $logger              = new OutputLogger($output);
         $processor           = $this->getService(self::SYNC_PROCESSOR);
         $processor->getLoggerStrategy()->setLogger($logger);
-//
-//        $this->getContainer()->get('doctrine.orm.entity_manager')
-//            ->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($channelId)) {
             $logger->warning('Job already running. Terminating....');
