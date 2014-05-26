@@ -1,2 +1,4 @@
 oro:
-    note: ~
+    note:
+        entity_config:
+            enabled.note_label: Can add notes
