@@ -5,6 +5,6 @@ services:
     oro_note.subscriber.note_lifecycle_subscriber:
         class: %oro_note.subscriber.note_lifecycle_subscriber.class%
         arguments:
-            - @service_container
+            - @oro_security.security_facade.link
         tags:
             - { name: doctrine.event_subscriber }

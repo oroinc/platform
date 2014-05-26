@@ -11,28 +11,38 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /** @var NoteLifecycleSubscriber */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
     protected function setUp()
     {
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->setMethods(array('get'))
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(['getLoggedUser'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
 
-        $this->subscriber = new NoteLifecycleSubscriber($this->container);
+        $securityFacadeLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacadeLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->securityFacade));
+
+        $this->subscriber = new NoteLifecycleSubscriber($securityFacadeLink);
     }
 
     protected function tearDown()
     {
-        unset($this->container);
+        unset($this->securityFacade);
         unset($this->subscriber);
     }
 
@@ -231,32 +241,9 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockSecurityContext($mockToken = false, $mockUser = false, $user = null)
     {
-        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
-            ->setMethods(array('getToken'))
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        if ($mockToken) {
-            $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-                ->setMethods(array('getUser'))
-                ->disableOriginalConstructor()
-                ->getMockForAbstractClass();
-
-            if ($mockUser) {
-                $token->expects($this->any())
-                    ->method('getUser')
-                    ->will($this->returnValue($user));
-            }
-
-            $securityContext->expects($this->any())
-                ->method('getToken')
-                ->will($this->returnValue($token));
-        }
-
-        $this->container->expects($this->any())
-            ->method('get')
-            ->with('security.context')
-            ->will($this->returnValue($securityContext));
+        $this->securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
     }
 
     public function testGetSubscribedEvents()

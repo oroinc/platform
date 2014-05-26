@@ -8,7 +8,7 @@ oro:
         message:
             label:   Message
         owner:
-            label:   Owner
+            label:   Created By
         created_at:
             label:   Created At
         updated_at:

@@ -8,31 +8,21 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class NoteLifecycleSubscriber implements EventSubscriber
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    /** @var ServiceLink */
+    protected $securityFacadeLink;
 
     /**
-     * @var SecurityContextInterface
+     * @param ServiceLink $securityFacadeLink
      */
-    protected $securityContext;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ServiceLink $securityFacadeLink)
     {
-        // can't inject security context directly because of circular dependency for Doctrine entity manager
-        $this->container = $container;
+        $this->securityFacadeLink = $securityFacadeLink;
     }
 
     /**
@@ -119,12 +109,7 @@ class NoteLifecycleSubscriber implements EventSubscriber
      */
     protected function getUser(EntityManager $entityManager)
     {
-        $token = $this->getSecurityContext()->getToken();
-        if (!$token) {
-            return null;
-        }
-
-        $user = $token->getUser();
+        $user = $this->securityFacadeLink->getService()->getLoggedUser();
         if (!$user) {
             return null;
         }
@@ -134,17 +119,5 @@ class NoteLifecycleSubscriber implements EventSubscriber
         }
 
         return $user;
-    }
-
-    /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        if (!$this->securityContext) {
-            $this->securityContext = $this->container->get('security.context');
-        }
-
-        return $this->securityContext;
     }
 }

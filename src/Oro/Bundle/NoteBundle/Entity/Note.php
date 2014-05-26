@@ -5,6 +5,7 @@ namespace Oro\Bundle\NoteBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -25,7 +26,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *  }
  * )
  */
-class Note
+class Note extends ExtendNote
 {
     /**
      * @var integer
@@ -159,5 +160,25 @@ class Note
     public function getUpdatedBy()
     {
         return $this->updatedBy;
+    }
+
+    /**
+     * @param User $owningUser
+     *
+     * @return Note
+     */
+    public function setOwner($owningUser)
+    {
+        $this->owner = $owningUser;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 }

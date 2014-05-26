@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class NoteTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,8 +23,10 @@ class NoteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($now, $note->getUpdatedAt());
         $this->assertEquals('test', $note->getMessage());
 
-        $user = new \stdClass();
-        $note->setUpdatedBy($user);
-        $this->assertEquals($user, $note->getUpdatedBy());
+        $user = new User();
+        $note->setUpdatedBy($user)
+             ->setOwner($user);
+        $this->assertSame($user, $note->getUpdatedBy());
+        $this->assertEquals($user, $note->getOwner());
     }
 }
