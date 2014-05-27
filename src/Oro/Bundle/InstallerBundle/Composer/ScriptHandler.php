@@ -60,11 +60,11 @@ class ScriptHandler extends SensioScriptHandler
         }
 
         if ($withoutPermissionsList) {
-            $withoutPermissions = implode(' ', $withoutPermissionsList);
+            $withoutPermissions = implode(',', $withoutPermissionsList);
 
             $event->getIO()->write(
                 sprintf(
-                    'Check permissions for %s, see %s for more',
+                    'Note: check permissions for %s, see %s for more',
                     $withoutPermissions,
                     'http://symfony.com/doc/current/book/installation.html#configuration-and-setup'
                 )
