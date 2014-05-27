@@ -33,7 +33,11 @@ class NoteLifecycleSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return [Events::prePersist, Events::preUpdate];
+        return [
+            // @codingStandardsIgnoreStart
+            Events::prePersist, Events::preUpdate
+            // @codingStandardsIgnoreEnd
+        ];
     }
 
     /**

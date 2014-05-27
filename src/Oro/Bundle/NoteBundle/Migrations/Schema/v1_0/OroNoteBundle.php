@@ -31,16 +31,14 @@ class OroNoteBundle implements Migration
             $schema->getTable('oro_user'),
             ['user_owner_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null],
-            'FK_BA066CE19EB185F9'
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['updated_by_user_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null],
-            'FK_BA066CE12793CC5E'
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }
