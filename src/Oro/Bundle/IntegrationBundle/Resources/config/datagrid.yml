@@ -52,7 +52,13 @@ datagrid:
                 icon:         edit
                 label:        oro.integration.datagrid.action.update
                 rowAction:    true
-            deleteSyncChannel:
+            schedule:
+                type:         schedule-sync
+                link:         schedule_link
+                acl_resource: oro_integration_channel_update
+                icon:         refresh
+                label:        oro.integration.datagrid.action.schedule_sync
+            delete:
                 type:         delete
                 link:         delete_link
                 acl_resource: oro_integration_channel_delete
@@ -63,12 +69,5 @@ datagrid:
                     confirm_ok:      oro.integration.delete_sync_channel_window.button_ok
                     confirm_title:   oro.integration.delete_sync_channel_window.title
                     success:         oro.integration.delete_sync_channel_window.success
-            schedule:
-                type:         schedule-sync
-                link:         schedule_link
-                acl_resource: oro_integration_channel_update
-                icon:         refresh
-                label:        oro.integration.datagrid.action.schedule_sync
-
         options:
             entityHint: channel
