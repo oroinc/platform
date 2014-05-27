@@ -6,12 +6,15 @@ use Symfony\Component\Form\AbstractType;
 
 class NoteEnabledChoiceType extends AbstractType
 {
+    const NAME   = 'note_choice';
+    const PARENT = 'choice';
+
     /**
      * @inheritdoc
      */
     public function getName()
     {
-        return 'note_choice';
+        return self::NAME;
     }
 
     /**
@@ -19,6 +22,6 @@ class NoteEnabledChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return self::PARENT;
     }
 }

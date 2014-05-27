@@ -31,7 +31,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class NoteExtension extends AbstractTypeExtension
 {
-    const SCOPE                = 'note';
+    const EXTENDED_TYPE        = 'note_choice';
+
+    const CONFIG_SCOPE         = 'note';
     const ATTR_ENABLED         = 'enabled';
     const NOTE_RELATION_PREFIX = 'assoc_note_';
     const NOTE_ENTITY_CLASS    = 'Oro\Bundle\NoteBundle\Entity\Note';
@@ -47,7 +49,7 @@ class NoteExtension extends AbstractTypeExtension
      */
     public function __construct(ConfigManager $configManager)
     {
-        $this->noteConfigProvider   = $configManager->getProvider(self::SCOPE);
+        $this->noteConfigProvider   = $configManager->getProvider(self::CONFIG_SCOPE);
         $this->extendConfigProvider = $configManager->getProvider('extend');
     }
 
@@ -122,7 +124,7 @@ class NoteExtension extends AbstractTypeExtension
             $propertyName == self::ATTR_ENABLED
             && isset($options['config_id'])
             && $options['config_id'] instanceof EntityConfigId
-            && $options['config_id']->getScope() == self::SCOPE;
+            && $options['config_id']->getScope() == self::CONFIG_SCOPE;
     }
 
     /**
@@ -185,6 +187,6 @@ class NoteExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'note_choice';
+        return self::EXTENDED_TYPE;
     }
 }
