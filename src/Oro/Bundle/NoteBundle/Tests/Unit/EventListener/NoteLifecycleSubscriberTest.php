@@ -6,8 +6,6 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -28,7 +26,8 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $securityFacadeLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->setMethods(['getService'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -48,17 +47,16 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param object $entity
-     * @param bool   $mockToken
      * @param bool   $mockUser
      *
      * @dataProvider prePersistAndPreUpdateDataProvider
      */
-    public function testPrePersist($entity, $mockToken = false, $mockUser = false)
+    public function testPrePersist($entity, $mockUser = false)
     {
         $initialEntity = clone $entity;
 
         $user = $mockUser ? new User() : null;
-        $this->mockSecurityContext($mockToken, $mockUser, $user);
+        $this->mockSecurityContext($user);
 
         $em = $this->getEntityManagerMock();
 
@@ -84,7 +82,7 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $entity->getCreatedAt());
         $this->assertInstanceOf('\DateTime', $entity->getUpdatedAt());
 
-        if ($mockToken && $mockUser) {
+        if ($mockUser) {
             $this->assertEquals($user, $entity->getUpdatedBy());
         } else {
             $this->assertNull($entity->getUpdatedBy());
@@ -93,15 +91,14 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param object $entity
-     * @param bool $mockToken
-     * @param bool $mockUser
-     * @param bool $detachedUser
-     * @param bool $reloadUser
+     * @param bool   $mockUser
+     * @param bool   $detachedUser
+     * @param bool   $reloadUser
+     *
      * @dataProvider prePersistAndPreUpdateDataProvider
      */
     public function testPreUpdate(
         $entity,
-        $mockToken = false,
         $mockUser = false,
         $detachedUser = null,
         $reloadUser = null
@@ -122,7 +119,7 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
             $newUser->setFirstName('newUser');
         }
 
-        $this->mockSecurityContext($mockToken, $mockUser, $newUser);
+        $this->mockSecurityContext($newUser);
 
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->setMethods(['propertyChanged', 'getEntityState'])
@@ -164,7 +161,7 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertInstanceOf('\DateTime', $entity->getUpdatedAt());
-        if ($mockToken && $mockUser) {
+        if ($mockUser) {
             $this->assertEquals($newUser, $entity->getUpdatedBy());
         } else {
             $this->assertNull($entity->getUpdatedBy());
@@ -179,29 +176,16 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
         return [
             'not applied'     => [
                 'entity'    => new \DateTime('now'),
-                'mockToken' => false,
-                'mockUser'  => false,
-            ],
-            'no token'        => [
-                'entity'    => new Note(),
-                'mockToken' => false,
-                'mockUser'  => false,
-            ],
-            'no user'         => [
-                'entity'    => new Note(),
-                'mockToken' => true,
                 'mockUser'  => false,
             ],
             'with a user'     => [
                 'entity'       => new Note(),
-                'mockToken'    => true,
                 'mockUser'     => true,
                 'detachedUser' => false,
                 'reloadUser'   => false,
             ],
             'with a detached' => [
                 'entity'       => new Note(),
-                'mockToken'    => true,
                 'mockUser'     => true,
                 'detachedUser' => true,
                 'reloadUser'   => true,
@@ -235,11 +219,9 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool      $mockToken
-     * @param bool      $mockUser
      * @param User|null $user
      */
-    protected function mockSecurityContext($mockToken = false, $mockUser = false, $user = null)
+    protected function mockSecurityContext($user = null)
     {
         $this->securityFacade->expects($this->any())
             ->method('getLoggedUser')

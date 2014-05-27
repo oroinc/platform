@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Entity;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -85,7 +87,7 @@ class Note extends ExtendNote
     /**
      * @param \Datetime $createdAt
      *
-     * @return $this
+     * @return Note
      */
     public function setCreatedAt($createdAt)
     {
@@ -105,7 +107,7 @@ class Note extends ExtendNote
     /**
      * @param string $message
      *
-     * @return $this
+     * @return Note
      */
     public function setMessage($message)
     {
@@ -125,7 +127,7 @@ class Note extends ExtendNote
     /**
      * @param \Datetime $updatedAt
      *
-     * @return $this
+     * @return Note
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -143,11 +145,11 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param User $updatedBy
+     * @param UserInterface $updatedBy
      *
-     * @return $this
+     * @return Note
      */
-    public function setUpdatedBy($updatedBy)
+    public function setUpdatedBy(UserInterface $updatedBy)
     {
         $this->updatedBy = $updatedBy;
 
@@ -155,7 +157,7 @@ class Note extends ExtendNote
     }
 
     /**
-     * @return User
+     * @return UserInterface
      */
     public function getUpdatedBy()
     {
@@ -163,11 +165,11 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param User $owningUser
+     * @param UserInterface $owningUser
      *
      * @return Note
      */
-    public function setOwner($owningUser)
+    public function setOwner(UserInterface $owningUser)
     {
         $this->owner = $owningUser;
 
@@ -175,7 +177,7 @@ class Note extends ExtendNote
     }
 
     /**
-     * @return User
+     * @return UserInterface
      */
     public function getOwner()
     {

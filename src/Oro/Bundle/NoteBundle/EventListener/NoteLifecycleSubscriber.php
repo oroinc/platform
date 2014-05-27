@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\NoteBundle\EventListener;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -30,7 +33,7 @@ class NoteLifecycleSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return ['prePersist', 'preUpdate'];
+        return [Events::prePersist, Events::preUpdate];
     }
 
     /**
@@ -73,23 +76,23 @@ class NoteLifecycleSubscriber implements EventSubscriber
     }
 
     /**
-     * @param Note          $contact
+     * @param Note          $note
      * @param EntityManager $entityManager
      * @param bool          $update
      */
-    protected function setUpdatedProperties(Note $contact, EntityManager $entityManager, $update = false)
+    protected function setUpdatedProperties(Note $note, EntityManager $entityManager, $update = false)
     {
         $newUpdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $newUpdatedBy = $this->getUser($entityManager);
 
         $unitOfWork = $entityManager->getUnitOfWork();
-        if ($update) {
-            $unitOfWork->propertyChanged($contact, 'updatedAt', $contact->getUpdatedAt(), $newUpdatedAt);
-            $unitOfWork->propertyChanged($contact, 'updatedBy', $contact->getUpdatedBy(), $newUpdatedBy);
+        if ($update && $newUpdatedBy != $note->getUpdatedBy()) {
+            $unitOfWork->propertyChanged($note, 'updatedAt', $note->getUpdatedAt(), $newUpdatedAt);
+            $unitOfWork->propertyChanged($note, 'updatedBy', $note->getUpdatedBy(), $newUpdatedBy);
         }
 
-        $contact->setUpdatedAt($newUpdatedAt);
-        $contact->setUpdatedBy($newUpdatedBy);
+        $note->setUpdatedAt($newUpdatedAt);
+        $note->setUpdatedBy($newUpdatedBy);
     }
 
     /**
@@ -105,16 +108,12 @@ class NoteLifecycleSubscriber implements EventSubscriber
     /**
      * @param EntityManager $entityManager
      *
-     * @return User|null
+     * @return UserInterface|null
      */
     protected function getUser(EntityManager $entityManager)
     {
         $user = $this->securityFacadeLink->getService()->getLoggedUser();
-        if (!$user) {
-            return null;
-        }
-
-        if ($entityManager->getUnitOfWork()->getEntityState($user) == UnitOfWork::STATE_DETACHED) {
+        if ($user && $entityManager->getUnitOfWork()->getEntityState($user) == UnitOfWork::STATE_DETACHED) {
             $user = $entityManager->find('OroUserBundle:User', $user->getId());
         }
 
