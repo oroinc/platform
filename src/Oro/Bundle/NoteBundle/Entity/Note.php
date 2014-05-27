@@ -145,11 +145,14 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param UserInterface $updatedBy
+     * Not using type hint due to the fact that entity setter can be called when no logged user available
+     * So $updatedBy will be null
+     *
+     * @param UserInterface|null $updatedBy
      *
      * @return Note
      */
-    public function setUpdatedBy(UserInterface $updatedBy)
+    public function setUpdatedBy($updatedBy)
     {
         $this->updatedBy = $updatedBy;
 
@@ -165,11 +168,11 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param UserInterface $owningUser
+     * @param UserInterface|null $owningUser
      *
      * @return Note
      */
-    public function setOwner(UserInterface $owningUser)
+    public function setOwner($owningUser)
     {
         $this->owner = $owningUser;
 
