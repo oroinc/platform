@@ -25,9 +25,9 @@ class SegmentSnapshot
     protected $id;
 
     /**
-     * @var int
+     * @var string
      *
-     * @ORM\Column(name="entity_id", type="integer", nullable=false)
+     * @ORM\Column(name="entity_id", type="string", nullable=false)
      */
     protected $entityId;
 
