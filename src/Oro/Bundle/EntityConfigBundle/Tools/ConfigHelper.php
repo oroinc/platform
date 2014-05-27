@@ -26,7 +26,7 @@ class ConfigHelper
 
     /**
      * Returns translation key (placeholder) by entity class name, field name and property code
-     * example:
+     * examples (for default scope which is 'entity'):
      *      [vendor].[bundle].[entity].[field].[config property]
      *      oro.user.group.name.label
      *
@@ -36,6 +36,16 @@ class ConfigHelper
      *      if NO fieldName -> add prefix 'entity_'
      *      oro.user.entity_label
      *      oro.user.group.entity_label
+     * examples (for other scopes, for instance 'test'):
+     *      [vendor].[bundle].[entity].[field].[scope]_[config property]
+     *      oro.user.group.name.test_label
+     *
+     *      if [entity] == [bundle] -> skip it
+     *      oro.user.first_name.test_label
+     *
+     *      if NO fieldName -> add prefix 'entity_'
+     *      oro.user.entity_test_label
+     *      oro.user.group.entity_test_label
      *
      * @param string $scope
      * @param string $propertyName property key: label, description, plural_label, etc.
