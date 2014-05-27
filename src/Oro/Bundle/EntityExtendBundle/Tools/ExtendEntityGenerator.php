@@ -13,7 +13,7 @@ use CG\Generator\Writer;
 
 use Doctrine\Common\Inflector\Inflector;
 
-class Generator
+class ExtendEntityGenerator
 {
     /** @var string */
     protected $cacheDir;
@@ -24,21 +24,41 @@ class Generator
     /** @var Writer */
     protected $writer = null;
 
-    /** @var array|GeneratorExtension[] */
+    /** @var array|ExtendEntityGeneratorExtension[] */
     protected $extensions = [];
 
-    /** @var array|GeneratorExtension[] */
+    /** @var array|ExtendEntityGeneratorExtension[] */
     protected $supportedExtensions = [];
 
     /**
      * @param string $cacheDir
-     * @param array  $extensions
      */
-    public function __construct($cacheDir, $extensions = [])
+    public function __construct($cacheDir)
     {
-        $this->cacheDir = $cacheDir;
+        $this->cacheDir       = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
-        $this->extensions = $extensions;
+    }
+
+    /**
+     * @param ExtendEntityGeneratorExtension $extension
+     * @param int                            $priority
+     */
+    public function addExtension(ExtendEntityGeneratorExtension $extension, $priority = 0)
+    {
+        if (!isset($this->extensions[$priority])) {
+            $this->extensions[$priority] = [];
+        }
+
+        $this->extensions[$priority][] = $extension;
+    }
+
+    /**
+     * Sort extensions based on priority
+     */
+    protected function sortExtensions()
+    {
+        krsort($this->extensions);
+        $this->extensions = call_user_func_array('array_merge', [$this->extensions]);
     }
 
     /**
@@ -48,6 +68,8 @@ class Generator
      */
     public function generate(array $config)
     {
+        $this->sortExtensions();
+
         // filter supported extensions and pre-process configuration
         foreach ($this->extensions as $extension) {
             if (!$extension->supports($config)) {
@@ -60,14 +82,14 @@ class Generator
 
         $aliases = [];
         foreach ($config as $item) {
-            // $item can be modified in any extension in preProcessEntityConfiguration method
+            $this->generateClass($item);
+
+            // $item can be modified in any extension in preProcessEntityConfiguration or generate methods
             $classNameArray = explode('\\', $item['entity']);
             file_put_contents(
                 $this->entityCacheDir . '/' . array_pop($classNameArray) . '.orm.yml',
                 Yaml::dump($item['doctrine'], 5)
             );
-
-            $this->generateClass($item);
 
             if ($item['type'] == 'Extend') {
                 $aliases[$item['entity']] = $item['parent'];
@@ -113,13 +135,20 @@ class Generator
             $extension->generate($item, $class);
         }
 
+        // write php class
         $classArray = explode('\\', $item['entity']);
         $className  = array_pop($classArray);
+        $filePath   = $this->entityCacheDir . '/' . $className . '.php';
 
-        $filePath = $this->entityCacheDir . '/' . $className . '.php';
-        $strategy = new DefaultGeneratorStrategy();
-
+        $strategy   = new DefaultGeneratorStrategy();
         file_put_contents($filePath, "<?php\n\n" . $strategy->generate($class));
+
+        // write yaml metadata, $item can be modified in any extension
+        // in preProcessEntityConfiguration or generate methods
+        file_put_contents(
+            $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
+            Yaml::dump($item['doctrine'], 5)
+        );
     }
 
     /**

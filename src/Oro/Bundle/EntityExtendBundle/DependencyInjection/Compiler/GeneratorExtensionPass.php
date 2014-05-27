@@ -8,24 +8,28 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class GeneratorExtensionPass implements CompilerPassInterface
 {
-    const DUMPER_NAME = 'oro_entity_extend.tools.dumper';
-    const GENERATOR_TAG = 'oro_entity_extend.generator_extension';
+    const GENERATOR_NAME = 'oro_entity_extend.entity_generator';
+    const GENERATOR_TAG  = 'oro_entity_extend.generator_extension';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::DUMPER_NAME)) {
+        if (!$container->hasDefinition(self::GENERATOR_NAME)) {
             return;
         }
 
-        $dumperDefinition = $container->getDefinition(self::DUMPER_NAME);
+        $generatorDefinition = $container->getDefinition(self::GENERATOR_NAME);
         $taggedServices = $container->findTaggedServiceIds(self::GENERATOR_TAG);
 
         foreach ($taggedServices as $id => $tagAttributes) {
             $params = [new Reference($id)];
-            $dumperDefinition->addMethodCall('addGeneratorExtension', $params);
+            if (!empty($tagAttributes['priority'])) {
+                $params[] = (int) $tagAttributes['priority'];
+            }
+
+            $generatorDefinition->addMethodCall('addExtension', $params);
         }
     }
 }

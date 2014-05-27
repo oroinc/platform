@@ -4,9 +4,9 @@ namespace Oro\Bundle\NoteBundle\Tools;
 
 use CG\Generator\PhpClass;
 
-use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
 
-class NoteExtendGenerator implements GeneratorExtension
+class NoteExtendGenerator implements ExtendEntityGeneratorExtension
 {
     /**
      * {@inheritdoc}
@@ -27,7 +27,7 @@ class NoteExtendGenerator implements GeneratorExtension
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, PhpClass $class)
+    public function generate(array &$config, PhpClass $class)
     {
         // TODO: generate unidirectional relations to entities that use notes
     }

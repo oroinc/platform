@@ -13,4 +13,4 @@ services:
     oro_note.entity_extend.generator_extension:
         class: %oro_note.entity_extend.generator_extension.class%
         tags:
-            - { name: oro_entity_extend.generator_extension }
+            - { name: oro_entity_extend.generator_extension, priority: 1 }

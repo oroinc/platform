@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use CG\Generator\PhpClass;
 
-interface GeneratorExtension
+interface ExtendEntityGeneratorExtension
 {
     /**
      * Check if generator extension can be applied based on configuration
@@ -30,5 +30,5 @@ interface GeneratorExtension
      *
      * @return void
      */
-    public function generate(array $config, PhpClass $class);
+    public function generate(array &$config, PhpClass $class);
 }
