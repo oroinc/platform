@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Table(name="oro_note")
  * @Config(
  *  defaultValues={
- *      "entity"={"icon"="icon-note"},
+ *      "entity"={"icon"="icon-comment"},
  *      "ownership"={
  *          "owner_type"="USER",
  *          "owner_field_name"="owner",
