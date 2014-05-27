@@ -4,8 +4,6 @@ oro_entity_config:
             items:
                 enabled:
                     options:
-                        #enable_only:        true
-                        #schema_update:      true
                         priority:           250
                         default_value:      'No'
                         auditable:          false

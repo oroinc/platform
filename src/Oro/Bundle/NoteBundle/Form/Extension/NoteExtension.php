@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Extension;
 
+use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -28,11 +30,16 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 class NoteExtension extends AbstractTypeExtension
 {
-    const SCOPE        = 'note';
-    const ATTR_ENABLED = 'enabled';
+    const SCOPE                = 'note';
+    const ATTR_ENABLED         = 'enabled';
+    const NOTE_RELATION_PREFIX = 'assoc_note_';
+    const NOTE_ENTITY_CLASS    = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var ConfigProvider */
     protected $noteConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
 
     /** @var ConfigProvider */
     protected $entityConfigProvider;
@@ -121,7 +128,33 @@ class NoteExtension extends AbstractTypeExtension
      */
     protected function isNoteRelationExists(ConfigIdInterface $configId)
     {
-        //$this->entityConfigProvider->getConfigById($configId)
+        $config = $this->extendConfigProvider->getConfigById($configId);
+        $relations = $config->get('relation');
+
+        /**
+         * assoc_note_[entity name]
+         * e.g. "assoc_note_user", "assoc_note_calendar_event"
+         */
+        $relationFieldName =
+            self::NOTE_RELATION_PREFIX .
+            Inflector::tableize(ExtendHelper::getShortClassName($configId->getClassName()));
+
+        /**
+         * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|assoc_note_user"
+         */
+        $relationKey = ExtendHelper::buildRelationKey(
+            self::NOTE_ENTITY_CLASS,
+            $relationFieldName,
+            'manyToOne',
+            $configId->getClassName()
+        );
+
+        if ($relations
+            && isset($relations[$relationKey])
+            && $relations[$relationKey]['assign'] == true
+        ) {
+            return true;
+        }
 
         return false;
     }
