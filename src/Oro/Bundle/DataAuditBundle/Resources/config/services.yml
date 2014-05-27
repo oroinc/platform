@@ -2,7 +2,7 @@ parameters:
     oro_dataaudit.metadata.metadata_factory.class:  Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory
     oro_dataaudit.metadata.annotation_driver.class: Oro\Bundle\DataAuditBundle\Metadata\Driver\AnnotationDriver
 
-    oro_dataaudit.listener.entity_subscriber.class: Oro\Bundle\DataAuditBundle\EventListener\EntitySubscriber
+    oro_dataaudit.listener.entity_listener.class: Oro\Bundle\DataAuditBundle\EventListener\EntityListener
     oro_dataaudit.listener.kernel_listener.class:   Oro\Bundle\DataAuditBundle\EventListener\KernelListener
 
     oro_dataaudit.loggable.loggable_manager.class:  Oro\Bundle\DataAuditBundle\Loggable\LoggableManager
@@ -31,13 +31,15 @@ services:
         arguments:                                  [@annotation_reader]
         public:                                     false
 
-    oro_dataaudit.listener.entity_subscriber:
-        class:                                      %oro_dataaudit.listener.entity_subscriber.class%
+    oro_dataaudit.listener.entity_listener:
+        class:                                      %oro_dataaudit.listener.entity_listener.class%
         arguments:
             - @oro_dataaudit.loggable.loggable_manager
             - @oro_dataaudit.metadata.metadata_factory
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
+            - { name: doctrine.event_listener, event: postPersist }
 
     oro_dataaudit.listener.kernel_listener:
         class:                                      %oro_dataaudit.listener.kernel_listener.class%
