@@ -97,7 +97,15 @@ class GridController extends Controller
         $request = $this->getRequest();
         $format  = $request->query->get('format');
 
-        $context = new ExportContext(['gridName' => $gridName]);
+        $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
+        $parameters = $parametersFactory->createParameters($gridName);
+
+        $context = new ExportContext(
+            array(
+                'gridName' => $gridName,
+                'gridParameters' => $parameters
+            )
+        );
 
         // prepare export executor
         $executor = new StepExecutor();
