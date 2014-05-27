@@ -914,10 +914,8 @@ class ConfigManager
         $scope = $provider->getScope();
 
         // try to get default values from an annotation
-        if ($metadata) {
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
@@ -963,10 +961,8 @@ class ConfigManager
         $scope = $provider->getScope();
 
         // try to get default values from an annotation
-        if ($metadata) {
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
