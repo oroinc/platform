@@ -49,10 +49,10 @@ abstract class AbstractTypedAddress extends AbstractAddress implements PrimaryIt
     }
 
     /**
-     * @param ArrayCollection $types
+     * @param Collection $types
      * @return AbstractTypedAddress
      */
-    public function setTypes(ArrayCollection $types)
+    public function setTypes(Collection $types)
     {
         $this->types = $types;
 
