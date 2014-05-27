@@ -131,7 +131,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         $selectQB = $segmentSnapshotRepository->createQueryBuilder('snp');
 
         foreach ($expectedCondition as $params) {
-            $suffix = $params['entityIds'] . uniqid();
+            $suffix = uniqid();
             $selectQB->select('snp.id')
                 ->orWhere($selectQB->expr()->andX(
                     $selectQB->expr()->in('snp.segment', ':segmentIds' . $suffix),
