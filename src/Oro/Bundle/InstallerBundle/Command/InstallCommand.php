@@ -15,7 +15,7 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
-class InstallCommand extends ContainerAwareCommand
+class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
 {
     /**
      * {@inheritdoc}
