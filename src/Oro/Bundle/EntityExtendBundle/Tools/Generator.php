@@ -15,20 +15,17 @@ use Doctrine\Common\Inflector\Inflector;
 
 class Generator
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $entityCacheDir;
 
-    /**
-     * @var Writer
-     */
+    /** @var Writer */
     protected $writer = null;
+
+    /** @var array|GeneratorExtension[] */
+    protected $extensions = [];
 
     /**
      * @param string $cacheDir
@@ -40,21 +37,43 @@ class Generator
     }
 
     /**
+     * @param GeneratorExtension $extension
+     */
+    public function addExtension(GeneratorExtension $extension)
+    {
+        $this->extensions[] = $extension;
+    }
+
+    /**
      * Generates extended entities
      *
      * @param array $config
      */
     public function generate(array $config)
     {
-        $aliases = array();
-        foreach ($config as $item) {
-            $this->generateYaml($item);
-            $this->generateClass($item);
-            if ($item['type'] == 'Extend') {
-                $aliases[$item['entity']] = $item['parent'];
+        $aliases = [];
+
+        $isGenerated = false;
+        foreach ($this->extensions as $extension) {
+            if (!$extension->isApplied($config)) {
+                continue;
             }
+
+            $isGenerated = $extension->generate($config, $isGenerated);
         }
-        file_put_contents(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir), Yaml::dump($aliases));
+
+        if (!$isGenerated) {
+            foreach ($config as $item) {
+                $this->generateYaml($item);
+                $this->generateClass($item);
+
+                if ($item['type'] == 'Extend') {
+                    $aliases[$item['entity']] = $item['parent'];
+                }
+            }
+
+            file_put_contents(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir), Yaml::dump($aliases));
+        }
     }
 
     protected function generateYaml($item)
