@@ -12,6 +12,11 @@ class SegmentSnapshotRepository extends EntityRepository
 {
     const DELETE_BATCH_SIZE = 20;
 
+    /**
+     * @param array $entities
+     * @param int|null $batchSize
+     * @throws \Exception
+     */
     public function massRemoveByEntities($entities, $batchSize = null)
     {
         $batchSize     = $batchSize ? $batchSize : self::DELETE_BATCH_SIZE;

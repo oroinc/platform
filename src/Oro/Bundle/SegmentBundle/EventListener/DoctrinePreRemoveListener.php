@@ -16,6 +16,9 @@ class DoctrinePreRemoveListener
     /** @var array */
     protected $deleteEntities;
 
+    /**
+     * @param ConfigManager $cm
+     */
     public function __construct(ConfigManager $cm)
     {
         $this->cm = $cm;
@@ -29,9 +32,9 @@ class DoctrinePreRemoveListener
     public function preRemove(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
+        $className = ClassUtils::getClass($entity);
 
-        if ($this->cm->hasConfig(ClassUtils::getClass($entity))) {
-            $className = ClassUtils::getClass($entity);
+        if ($this->cm->hasConfig($className)) {
             $metadata  = $args->getEntityManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
             $this->deleteEntities[] = array(
