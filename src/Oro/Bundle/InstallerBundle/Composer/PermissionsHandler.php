@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Composer;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -53,8 +54,9 @@ class PermissionsHandler
      */
     public function setPermissionsSetfacl($path)
     {
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException($path);
+        $fs = new Filesystem();
+        if (!$fs->exists($path)) {
+            $fs->mkdir($path);
         }
 
         foreach ($this->getUsers() as $user) {
@@ -70,8 +72,9 @@ class PermissionsHandler
      */
     public function setPermissionsChmod($path)
     {
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException($path);
+        $fs = new Filesystem();
+        if (!$fs->exists($path)) {
+            $fs->mkdir($path);
         }
 
         foreach ($this->getUsers() as $user) {

@@ -3,7 +3,8 @@
 namespace Oro\Bundle\CronBundle\Job;
 
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\PhpExecutableFinder;
+
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class Daemon
 {
@@ -36,6 +37,11 @@ class Daemon
     protected $phpExec;
 
     /**
+     * @var int
+     */
+    protected $pid;
+
+    /**
      *
      * @param string $rootDir
      * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
@@ -44,17 +50,18 @@ class Daemon
     public function __construct($rootDir, $maxJobs = 5, $env = 'prod')
     {
         $this->rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR);
-        $this->maxJobs = (int) $maxJobs;
+        $this->maxJobs = (int)$maxJobs;
         $this->env     = $env;
     }
 
     /**
      * Run daemon in background
      *
+     * @param string $outputFile
      * @throws \RuntimeException
-     * @return int|null          The process id if running successfully, null otherwise
+     * @return int|null The process id if running successfully, null otherwise
      */
-    public function run()
+    public function run($outputFile = '/dev/null')
     {
         if ($this->getPid()) {
             throw new \RuntimeException('Daemon process already started');
@@ -69,9 +76,11 @@ class Daemon
             return $this->getPid();
         }
 
-        $process = $this->getQueueRunProcess();
-
-        $process->run();
+        $this->pid = shell_exec(sprintf(
+            '%s > %s 2>&1 & echo $!',
+            $this->getQueueRunCmd(),
+            $outputFile
+        ));
 
         return $this->getPid();
     }
@@ -104,18 +113,26 @@ class Daemon
      */
     public function getPid()
     {
-        return $this->findProcessPid(
-            sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
-        );
+        if (!$this->pid) {
+            $this->pid = $this->findProcessPid(
+                sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
+            );
+        }
+
+        return $this->pid;
     }
 
+    /**
+     * @param string $searchTerm
+     * @return int|null
+     */
     protected function findProcessPid($searchTerm)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $cmd = 'WMIC path win32_process get Processid,Commandline | findstr %s | findstr /V findstr';
+            $cmd          = 'WMIC path win32_process get Processid,Commandline | findstr %s | findstr /V findstr';
             $searchRegExp = '/\s+(\d+)\s*$/Usm';
         } else {
-            $cmd = 'ps ax | grep %s | grep -v grep';
+            $cmd          = 'ps ax | grep %s | grep -v grep';
             $searchRegExp = '/^\s*(\d+)\s+/Usm';
         }
         $cmd = sprintf($cmd, escapeshellarg($searchTerm));
@@ -127,7 +144,7 @@ class Daemon
         if (!empty($output)) {
             preg_match($searchRegExp, $output, $matches);
             if (count($matches) > 1 && !empty($matches[1])) {
-                return (int) $matches[1];
+                return (int)$matches[1];
             }
         }
 
@@ -135,19 +152,9 @@ class Daemon
     }
 
     /**
-     * Instantiate "ps" *nix command to catch running job queue
-     *
-     * @return Process
-     */
-    protected function getQueueRunProcess()
-    {
-        return new Process($this->getQueueRunCmd());
-    }
-
-    /**
      * Instantiate "kill" (*nix) / "taskkill" (Windows) command to terminate job queue
      *
-     * @param  int     $pid Process id to kill
+     * @param  int $pid Process id to kill
      * @return Process
      */
     protected function getQueueStopProcess($pid)
@@ -177,10 +184,6 @@ class Daemon
             max($this->maxJobs, 1),
             escapeshellarg($this->env)
         );
-        
-        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $runCommand = "nohup {$runCommand} > /dev/null 2>&1 &";
-        }
 
         return $runCommand;
     }
