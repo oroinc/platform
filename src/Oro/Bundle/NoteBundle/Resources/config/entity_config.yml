@@ -10,7 +10,7 @@ oro_entity_config:
                         default_value:      'No'
                         auditable:          false
                     form:
-                        type:               choice
+                        type:               note_choice
                         options:
                             block:          other
                             required:       true
