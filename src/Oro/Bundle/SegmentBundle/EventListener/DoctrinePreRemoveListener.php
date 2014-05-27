@@ -31,7 +31,13 @@ class DoctrinePreRemoveListener
         $entity = $args->getEntity();
 
         if ($this->cm->hasConfig(ClassUtils::getClass($entity))) {
-            $this->deleteEntities[] = clone $entity; // needed for saving ID after flush
+            $className = ClassUtils::getClass($entity);
+            $metadata  = $args->getEntityManager()->getClassMetadata($className);
+            $entityIds = $metadata->getIdentifierValues($entity);
+            $this->deleteEntities[] = array(
+                'id'     => reset($entityIds),
+                'entity' => $entity
+            );
         }
     }
 

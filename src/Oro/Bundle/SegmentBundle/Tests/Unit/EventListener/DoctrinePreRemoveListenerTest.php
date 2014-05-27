@@ -46,6 +46,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
         $entity = new StubEntity();
         $args   = new LifecycleEventArgs($entity, $this->entityManager);
 
+        $this->mockMetadata($entityIsConfigurable ? 1 : 0);
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->will($this->returnValue($entityIsConfigurable));
@@ -71,13 +72,15 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPostFlush($entities)
     {
+        $this->mockMetadata(count($entities));
         $this->configManager->expects($this->exactly(count($entities)))
             ->method('hasConfig')
             ->will($this->returnValue(true));
 
         foreach ($entities as $entity) {
-            $args = new LifecycleEventArgs($entity, $this->entityManager);
+            $args = new LifecycleEventArgs($entity['entity'], $this->entityManager);
             $this->listener->preRemove($args);
+
         }
 
         $repository = $this->getMockBuilder('Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository')
@@ -114,9 +117,31 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
         $entities = array();
         for ($i = 0; $i < $count; $i++) {
             $entity = new StubEntity();
+            $entity->setId($i);
             $entity->setName('name-' . $i);
-            $entities[] = $entity;
+            $entities[] = array(
+                'id'     => $i,
+                'entity' => $entity
+            );
         }
         return $entities;
+    }
+
+    protected function mockMetadata($callCount)
+    {
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getIdentifierValues'))
+            ->getMock();
+        $metadata->expects($this->exactly($callCount))
+            ->method('getIdentifierValues')
+            ->will($this->returnCallback(
+                function (StubEntity $currentEntity) {
+                    return array($currentEntity->getId());
+                }
+            ));
+        $this->entityManager->expects($this->exactly($callCount))
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metadata));
     }
 }
