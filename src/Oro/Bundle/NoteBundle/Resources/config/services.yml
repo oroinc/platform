@@ -1,5 +1,6 @@
 parameters:
     oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
+    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendGenerator
 
 services:
     oro_note.subscriber.note_lifecycle_subscriber:
@@ -8,3 +9,8 @@ services:
             - @oro_security.security_facade.link
         tags:
             - { name: doctrine.event_subscriber }
+
+    oro_note.entity_extend.generator_extension:
+        class: %oro_note.entity_extend.generator_extension.class%
+        tags:
+            - { name: oro_entity_extend.generator_extension }

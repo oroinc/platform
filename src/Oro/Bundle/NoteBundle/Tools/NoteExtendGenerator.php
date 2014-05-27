@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Tools;
 
+use CG\Generator\PhpClass;
+
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtension;
 
 class NoteExtendGenerator implements GeneratorExtension
@@ -9,16 +11,24 @@ class NoteExtendGenerator implements GeneratorExtension
     /**
      * {@inheritdoc}
      */
-    public function isApplied(array $config)
+    public function supports(array $config)
     {
-        //
+        // TODO: check if there's at least one entity using notes
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array &$config)
+    public function preProcessEntityConfiguration(array &$config)
     {
-        //
+        // can change config here
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(array $config, PhpClass $class)
+    {
+        // TODO: generate unidirectional relations to entities that use notes
     }
 }

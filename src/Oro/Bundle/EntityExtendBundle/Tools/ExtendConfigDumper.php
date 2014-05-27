@@ -26,6 +26,9 @@ class ExtendConfigDumper
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var array */
+    protected $generatorExtensions = [];
+
     /**
      * @param OroEntityManager                $em
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
@@ -39,6 +42,14 @@ class ExtendConfigDumper
         $this->nameGenerator = $nameGenerator;
         $this->em            = $em;
         $this->cacheDir      = $cacheDir;
+    }
+
+    /**
+     * @param GeneratorExtension $extension
+     */
+    public function addGeneratorExtension(GeneratorExtension $extension)
+    {
+        $this->generatorExtensions[] = $extension;
     }
 
     /**
@@ -74,7 +85,7 @@ class ExtendConfigDumper
             }
         }
 
-        $generator = new Generator($this->cacheDir);
+        $generator = new Generator($this->cacheDir, $this->generatorExtensions);
         $generator->generate($schemas);
     }
 

@@ -27,21 +27,18 @@ class Generator
     /** @var array|GeneratorExtension[] */
     protected $extensions = [];
 
+    /** @var array|GeneratorExtension[] */
+    protected $supportedExtensions = [];
+
     /**
      * @param string $cacheDir
+     * @param array  $extensions
      */
-    public function __construct($cacheDir)
+    public function __construct($cacheDir, $extensions = [])
     {
         $this->cacheDir = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
-    }
-
-    /**
-     * @param GeneratorExtension $extension
-     */
-    public function addExtension(GeneratorExtension $extension)
-    {
-        $this->extensions[] = $extension;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -51,41 +48,43 @@ class Generator
      */
     public function generate(array $config)
     {
-        $aliases = [];
-
-        $isGenerated = false;
+        // filter supported extensions and pre-process configuration
         foreach ($this->extensions as $extension) {
-            if (!$extension->isApplied($config)) {
+            if (!$extension->supports($config)) {
                 continue;
             }
 
-            $isGenerated = $extension->generate($config, $isGenerated);
+            $this->supportedExtensions = $extension;
+            $extension->preProcessEntityConfiguration($config);
         }
 
-        if (!$isGenerated) {
-            foreach ($config as $item) {
-                $this->generateYaml($item);
-                $this->generateClass($item);
+        $aliases = [];
+        foreach ($config as $item) {
+            // $item can be modified in any extension in preProcessEntityConfiguration method
+            $classNameArray = explode('\\', $item['entity']);
+            file_put_contents(
+                $this->entityCacheDir . '/' . array_pop($classNameArray) . '.orm.yml',
+                Yaml::dump($item['doctrine'], 5)
+            );
 
-                if ($item['type'] == 'Extend') {
-                    $aliases[$item['entity']] = $item['parent'];
-                }
+            $this->generateClass($item);
+
+            if ($item['type'] == 'Extend') {
+                $aliases[$item['entity']] = $item['parent'];
             }
-
-            file_put_contents(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir), Yaml::dump($aliases));
         }
-    }
 
-    protected function generateYaml($item)
-    {
-        $classNameArray = explode('\\', $item['entity']);
+        // dump aliases
         file_put_contents(
-            $this->entityCacheDir . '/' . array_pop($classNameArray) . '.orm.yml',
-            Yaml::dump($item['doctrine'], 5)
+            ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
+            Yaml::dump($aliases)
         );
     }
 
-    protected function generateClass($item)
+    /**
+     * @param array $item
+     */
+    protected function generateClass(array $item)
     {
         $this->writer = new Writer();
 
@@ -99,47 +98,61 @@ class Generator
             $class->setProperty(PhpProperty::create('id')->setVisibility('protected'));
             $class->setMethod($this->generateClassMethod('getId', 'return $this->id;'));
 
-            /**
-             * TODO
-             * custom entity instance as manyToOne relation
-             * find the way to show it on view
-             * we should mark some field as title
-             */
-            $toString = array();
-            foreach ($item['property'] as $propKey => $propValue) {
-                if ($item['doctrine'][$item['entity']]['fields'][$propKey]['type'] == 'string') {
-                    $toString[] = '$this->get' . ucfirst(Inflector::camelize($propValue)) . '()';
-                }
-            }
-
-            $toStringBody = 'return (string) $this->getId();';
-            if (count($toString) > 0) {
-                $toStringBody = 'return (string)' . implode(' . ', $toString) . ';';
-            }
-            $class->setMethod($this->generateClassMethod('__toString', $toStringBody));
+            $this->generateToStringMethod($item, $class);
         }
 
-        $class->setInterfaceNames(array('Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface'));
+        $class->setInterfaceNames(['Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface']);
 
-        $this->generateClassMethods($item, $class);
+        $this->generateProperties('property', $item, $class);
+        $this->generateProperties('relation', $item, $class);
+        $this->generateProperties('default', $item, $class);
+        $this->generateCollectionMethods($item, $class);
+
+        // allow extensions to add
+        foreach ($this->supportedExtensions as $extension) {
+            $extension->generate($item, $class);
+        }
 
         $classArray = explode('\\', $item['entity']);
         $className  = array_pop($classArray);
 
         $filePath = $this->entityCacheDir . '/' . $className . '.php';
         $strategy = new DefaultGeneratorStrategy();
+
         file_put_contents($filePath, "<?php\n\n" . $strategy->generate($class));
     }
 
     /**
-     * @param $config
-     * @param $class
+     * TODO: custom entity instance as manyToOne relation find the way to show it on view
+     * we should mark some field as title
      *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @param array    $config
+     * @param PhpClass $class
      */
-    protected function generateClassMethods($config, &$class)
+    protected function generateToStringMethod(array $config, PhpClass $class)
     {
-        foreach ($config['property'] as $property => $method) {
+        $toString = [];
+        foreach ($config['property'] as $propKey => $propValue) {
+            if ($config['doctrine'][$config['entity']]['fields'][$propKey]['type'] == 'string') {
+                $toString[] = '$this->get' . ucfirst(Inflector::camelize($propValue)) . '()';
+            }
+        }
+
+        $toStringBody = 'return (string) $this->getId();';
+        if (count($toString) > 0) {
+            $toStringBody = 'return (string)' . implode(' . ', $toString) . ';';
+        }
+        $class->setMethod($this->generateClassMethod('__toString', $toStringBody));
+    }
+
+    /**
+     * @param string   $propertyType property or relation
+     * @param array    $config
+     * @param PhpClass $class
+     */
+    protected function generateProperties($propertyType, array $config, PhpClass $class)
+    {
+        foreach ($config[$propertyType] as $property => $method) {
             $class
                 ->setProperty(PhpProperty::create($property)->setVisibility('protected'))
                 ->setMethod(
@@ -152,47 +165,18 @@ class Generator
                     $this->generateClassMethod(
                         'set' . ucfirst(Inflector::camelize($method)),
                         '$this->' . $property . ' = $value; return $this;',
-                        array('value')
+                        ['value']
                     )
                 );
         }
+    }
 
-        foreach ($config['relation'] as $relation => $method) {
-            $class
-                ->setProperty(PhpProperty::create($relation)->setVisibility('protected'))
-                ->setMethod(
-                    $this->generateClassMethod(
-                        'get' . ucfirst(Inflector::camelize($method)),
-                        'return $this->' . $relation . ';'
-                    )
-                )
-                ->setMethod(
-                    $this->generateClassMethod(
-                        'set' . ucfirst(Inflector::camelize($method)),
-                        '$this->' . $relation . ' = $value; return $this;',
-                        array('value')
-                    )
-                );
-        }
-
-        foreach ($config['default'] as $default => $method) {
-            $class
-                ->setProperty(PhpProperty::create($default)->setVisibility('protected'))
-                ->setMethod(
-                    $this->generateClassMethod(
-                        'get' . ucfirst(Inflector::camelize($method)),
-                        'return $this->' . $default . ';'
-                    )
-                )
-                ->setMethod(
-                    $this->generateClassMethod(
-                        'set' . ucfirst(Inflector::camelize($method)),
-                        '$this->' . $default . ' = $value; return $this;',
-                        array('value')
-                    )
-                );
-        }
-
+    /**
+     * @param array    $config
+     * @param PhpClass $class
+     */
+    protected function generateCollectionMethods(array $config, PhpClass $class)
+    {
         foreach ($config['addremove'] as $addremove => $method) {
             $class
                 ->setMethod(
@@ -218,19 +202,20 @@ class Generator
                         . ucfirst(Inflector::camelize($method['target']))
                         .'(' . ($method['is_target_addremove'] ? '$this' : 'null') . ');
                         }',
-                        array('value')
+                        ['value']
                     )
                 );
         }
     }
 
     /**
-     * @param       $methodName
-     * @param       $methodBody
-     * @param array $methodArgs
-     * @return $this
+     * @param string $methodName
+     * @param string $methodBody
+     * @param array  $methodArgs
+     *
+     * @return PhpMethod
      */
-    protected function generateClassMethod($methodName, $methodBody, $methodArgs = array())
+    protected function generateClassMethod($methodName, $methodBody, $methodArgs = [])
     {
         $this->writer->reset();
         $method = PhpMethod::create($methodName)->setBody(
