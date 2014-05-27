@@ -33,7 +33,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
                         'Export performed successfully, {{ count }} entities were exported.',
                         {'count': data.readsCount}
                     );
-                    var resultFileLink = '<a href="' + data.url + '" target="_blank">' +
+                    var resultFileLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
                         __('Download result file') + '</a>';
                     message += ' ' + resultFileLink;
                     messageType = 'success';
@@ -46,7 +46,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
                     'Export operation fails, {{ count }} error(s) found.',
                     {'count': data.errorsCount}
                 );
-                var errorLogLink = '<a href="' + data.url + '" target="_blank">' +
+                var errorLogLink = '<a href="' + data.url + '" class="no-hash" target="_blank">' +
                     __('Download error log') + '</a>';
                 message += ' ' + errorLogLink;
                 messageType = 'error';
