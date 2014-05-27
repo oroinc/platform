@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Extension;
 
-use Doctrine\Common\Inflector\Inflector;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -11,12 +9,15 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+use Doctrine\Common\Inflector\Inflector;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  *  Form extension to communicate with ConfigScopeType
@@ -40,9 +41,6 @@ class NoteExtension extends AbstractTypeExtension
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
 
     /**
      * @param ConfigManager $configManager
@@ -98,9 +96,13 @@ class NoteExtension extends AbstractTypeExtension
 
             /**
              * Disable field on editAction if it enabled and relation exists
+             *      OR it's Note entity
              */
-            if ($noteConfig->get(self::ATTR_ENABLED) == true
-                && $this->isNoteRelationExists($entityConfigId)
+            if ($entityConfigId->getClassName() == self::NOTE_ENTITY_CLASS
+                || (
+                    $noteConfig->get(self::ATTR_ENABLED) == true
+                    && $this->isNoteRelationExists($entityConfigId)
+                )
             ) {
                 $options['disabled'] = true;
                 $this->appendClassAttr($view->vars, 'disabled-choice');
@@ -124,36 +126,46 @@ class NoteExtension extends AbstractTypeExtension
     }
 
     /**
-     * TODO: check for relation existence
+     * Check for note relation existence
+     *
+     * @param ConfigIdInterface $configId
+     *
+     * @return bool
      */
     protected function isNoteRelationExists(ConfigIdInterface $configId)
     {
-        $config = $this->extendConfigProvider->getConfigById($configId);
+        $config    = $this->extendConfigProvider->getConfigById($configId);
         $relations = $config->get('relation');
+        if ($relations) {
+            /**
+             * assoc_note_[entity name]
+             * e.g. "assoc_note_user", "assoc_note_calendar_event"
+             */
+            $relationFieldName =
+                self::NOTE_RELATION_PREFIX .
+                Inflector::tableize(ExtendHelper::getShortClassName($configId->getClassName()));
 
-        /**
-         * assoc_note_[entity name]
-         * e.g. "assoc_note_user", "assoc_note_calendar_event"
-         */
-        $relationFieldName =
-            self::NOTE_RELATION_PREFIX .
-            Inflector::tableize(ExtendHelper::getShortClassName($configId->getClassName()));
+            /**
+             * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|assoc_note_user"
+             */
+            $relationKey = ExtendHelper::buildRelationKey(
+                self::NOTE_ENTITY_CLASS,
+                $relationFieldName,
+                'manyToOne',
+                $configId->getClassName()
+            );
 
-        /**
-         * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|assoc_note_user"
-         */
-        $relationKey = ExtendHelper::buildRelationKey(
-            self::NOTE_ENTITY_CLASS,
-            $relationFieldName,
-            'manyToOne',
-            $configId->getClassName()
-        );
-
-        if ($relations
-            && isset($relations[$relationKey])
-            && $relations[$relationKey]['assign'] == true
-        ) {
-            return true;
+            if (isset($relations[$relationKey])) {
+                $relation = $relations[$relationKey];
+                if ($relation['assign'] == false
+                    && $relation['owner'] == false
+                    && $relation['target_field_id']
+                    && $this->extendConfigProvider->getConfig($relation['target_field_id']->getClassName())
+                        ->get('relation')[$relationKey]['assign'] == true
+                ) {
+                    return true;
+                }
+            }
         }
 
         return false;
