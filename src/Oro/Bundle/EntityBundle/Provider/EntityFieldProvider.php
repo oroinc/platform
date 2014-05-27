@@ -206,7 +206,7 @@ class EntityFieldProvider
                         $result,
                         $fieldName,
                         $config['query']['select']['return_type'],
-                        ConfigHelper::getTranslationKey('label', $className, $fieldName),
+                        ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName),
                         false,
                         $translate
                     );
