@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\EventListener;
 
 use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
-use Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageSubscriber;
+use Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageListener;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
+class UploadedImageListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var string
@@ -43,12 +43,7 @@ class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidKernelRoot()
     {
-        new UploadedImageSubscriber('/a' . mt_rand() . 'sbsdf' . mt_rand());
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertInternalType('array', $this->getSubscriber()->getSubscribedEvents());
+        new UploadedImageListener('/a' . mt_rand() . 'sbsdf' . mt_rand());
     }
 
     public function testPostRemove()
@@ -63,6 +58,11 @@ class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertFileNotExists($this->getImagePath($entity));
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entity
+     * @param string $fileName
+     * @param string $uploadDir
+     */
     protected function assertImageRemoveConditions($entity, $fileName, $uploadDir)
     {
         $entity->expects($this->atLeastOnce())
@@ -84,6 +84,9 @@ class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->getSubscriber()->prePersist($this->getEvent($entity));
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entity
+     */
     protected function assertImageUpdate($entity)
     {
         $imageFile = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
@@ -170,6 +173,10 @@ class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($this->getUploadRootDir() . DIRECTORY_SEPARATOR . $uploadDir);
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entity
+     * @param string $uploadDir
+     */
     public function assertImageUploadPreconditions($entity, $uploadDir)
     {
         $fileName = md5(time()) . '.jpg';
@@ -262,6 +269,6 @@ class UploadedImageSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function getSubscriber()
     {
-        return new UploadedImageSubscriber($this->tmpRootPath . DIRECTORY_SEPARATOR . 'app');
+        return new UploadedImageListener($this->tmpRootPath . DIRECTORY_SEPARATOR . 'app');
     }
 }

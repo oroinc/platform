@@ -17,7 +17,7 @@ parameters:
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
-    oro_navigation.event.doctrine_tag_subscriber.class:        Oro\Bundle\NavigationBundle\Event\DoctrineTagEventSubscriber
+    oro_navigation.event.doctrine_tag_listener.class:        Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener
 
     oro_navigation.menu.matcher.voter.request:                 Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
@@ -183,8 +183,8 @@ services:
             - @oro_navigation.title_service
         lazy: true
 
-    oro_navigation.event.doctrine_tag_subscriber:
-        class: %oro_navigation.event.doctrine_tag_subscriber.class%
+    oro_navigation.event.doctrine_tag_listener:
+        class: %oro_navigation.event.doctrine_tag_listener.class%
         arguments:
             - @oro_navigation.content.topic_sender
             - %installed%
@@ -199,7 +199,8 @@ services:
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDatetime']]
             - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\PageState']]
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: postFlush, connection: default }
 
     oro_navigation.content.topic_sender:
         class: %oro_navigation.content.topic_sender.class%

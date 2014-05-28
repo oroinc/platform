@@ -3,15 +3,12 @@
 namespace Oro\Bundle\ReminderBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 
-class ReminderSubscriber implements EventSubscriber
+class ReminderListener
 {
     /**
      * @var ContainerInterface
@@ -24,18 +21,6 @@ class ReminderSubscriber implements EventSubscriber
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            // @codingStandardsIgnoreStart
-            Events::postLoad
-            // @codingStandardsIgnoreEnd
-        );
     }
 
     /**
