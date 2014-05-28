@@ -60,16 +60,7 @@ class OroUIExtension extends Extension
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             if (isset($resource->data['placeholders'])) {
-                // make sure 'items' attribute exists for each newly loaded placeholder
-                // it is required for correct merging of placeholders
-                // if we do not do this the newly loaded placeholder without 'items' attribute removes
-                // already loaded items
-                $placeholderNames = array_keys($resource->data['placeholders']);
-                foreach ($placeholderNames as $placeholderName) {
-                    if (!isset($resource->data['placeholders'][$placeholderName]['items'])) {
-                        $resource->data['placeholders'][$placeholderName]['items'] = array();
-                    }
-                }
+                $this->ensurePlaceholdersCompleted($resource->data['placeholders']);
                 $placeholders = array_replace_recursive($placeholders, $resource->data['placeholders']);
             }
             if (isset($resource->data['items'])) {
@@ -107,6 +98,27 @@ class OroUIExtension extends Extension
                         );
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Makes sure the placeholder's array does not contains gaps
+     *
+     * For example 'items' attribute should exist for each placeholder even if there are no any items there
+     *
+     * it is required for correct merging of placeholders
+     * if we do not do this the newly loaded placeholder without 'items' attribute removes
+     * already loaded items
+     *
+     * @param array $placeholders
+     */
+    protected function ensurePlaceholdersCompleted(&$placeholders)
+    {
+        $names = array_keys($placeholders);
+        foreach ($names as $name) {
+            if (!isset($placeholders[$name]['items'])) {
+                $placeholders[$name]['items'] = array();
             }
         }
     }
