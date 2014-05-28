@@ -110,7 +110,12 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         $this->context = $context;
 
         if ($context->hasOption('gridName')) {
-            $this->grid = $this->gridManagerLink->getService()->getDatagrid($context->getOption('gridName'));
+            $this->grid = $this->gridManagerLink
+                ->getService()
+                ->getDatagrid(
+                    $context->getOption('gridName'),
+                    $context->getOption('gridParameters')
+                );
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export reader must contain "gridName".'
