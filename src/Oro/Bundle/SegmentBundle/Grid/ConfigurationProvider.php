@@ -4,11 +4,12 @@ namespace Oro\Bundle\SegmentBundle\Grid;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigurationProvider implements ConfigurationProviderInterface
