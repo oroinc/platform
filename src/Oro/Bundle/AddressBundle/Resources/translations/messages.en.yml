@@ -28,6 +28,12 @@ oro:
         street2.label:       Street 2
         updated.label:       Updated at
 
+        country_name.label:      Country name
+        country_iso2_code.label: Country ISO2 code
+        country_iso3_code.label: Country ISO3 code
+        region_name.label:       State name
+        region_code.label:       State ISO code
+
         form:
             choose_country: "Choose a country..."
             choose_region:  "Choose a state..."
@@ -40,6 +46,11 @@ oro:
             country.label:       Country
             combined_code.label: Combined code
             code.label:          Code
+
+            country_name.label:      Country name
+            country_iso2_code.label: Country ISO2 code
+            country_iso3_code.label: Country ISO3 code
+
         country:
             entity_label:         Country
             entity_plural_label:  Countries

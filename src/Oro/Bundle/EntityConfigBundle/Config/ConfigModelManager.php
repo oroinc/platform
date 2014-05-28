@@ -5,12 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
@@ -299,17 +297,6 @@ class ConfigModelManager
         }
 
         return $result;
-    }
-
-    /**
-     * @param ConfigIdInterface $configId
-     * @return AbstractConfigModel
-     */
-    public function getModelByConfigId(ConfigIdInterface $configId)
-    {
-        return $configId instanceof FieldConfigId
-            ? $this->getFieldModel($configId->getClassName(), $configId->getFieldName())
-            : $this->getEntityModel($configId->getClassName());
     }
 
     /**

@@ -18,9 +18,9 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTranslationKeyProvider
      */
-    public function testGetTranslationKey($expected, $propertyName, $className, $fieldName)
+    public function testGetTranslationKey($expected, $scope, $propertyName, $className, $fieldName)
     {
-        $result = ConfigHelper::getTranslationKey($propertyName, $className, $fieldName);
+        $result = ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }
 
@@ -48,10 +48,62 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     public function getTranslationKeyProvider()
     {
         return [
-            ['oro.somesomeclass.entity_label', 'label', 'Oro\SomeBundle\SomeClass', null],
-            ['oro.somesomeclass.entity_plural_label', 'plural_label', 'Oro\SomeBundle\SomeClass', null],
-            ['oro.somesomeclass.some_field.label', 'label', 'Oro\SomeBundle\SomeClass', 'someField'],
-            ['oro.somesomeclass.some_field.plural_label', 'plural_label', 'Oro\SomeBundle\SomeClass', 'someField'],
+            [
+                'oro.somesomeclass.entity_label',
+                'entity',
+                'label',
+                'Oro\SomeBundle\SomeClass',
+                null
+            ],
+            [
+                'oro.somesomeclass.entity_test_label',
+                'test',
+                'label',
+                'Oro\SomeBundle\SomeClass',
+                null
+            ],
+            [
+                'oro.somesomeclass.entity_plural_label',
+                'entity',
+                'plural_label',
+                'Oro\SomeBundle\SomeClass',
+                null
+            ],
+            [
+                'oro.somesomeclass.entity_test_plural_label',
+                'test',
+                'plural_label',
+                'Oro\SomeBundle\SomeClass',
+                null
+            ],
+            [
+                'oro.somesomeclass.some_field.label',
+                'entity',
+                'label',
+                'Oro\SomeBundle\SomeClass',
+                'someField'
+            ],
+            [
+                'oro.somesomeclass.some_field.test_label',
+                'test',
+                'label',
+                'Oro\SomeBundle\SomeClass',
+                'someField'
+            ],
+            [
+                'oro.somesomeclass.some_field.plural_label',
+                'entity',
+                'plural_label',
+                'Oro\SomeBundle\SomeClass',
+                'someField'
+            ],
+            [
+                'oro.somesomeclass.some_field.test_plural_label',
+                'test',
+                'plural_label',
+                'Oro\SomeBundle\SomeClass',
+                'someField'
+            ],
         ];
     }
 

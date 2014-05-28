@@ -185,12 +185,7 @@
 #}
 {% macro initJsWidgets(type, form, entities, metadata) %}
     {{ _self.query_designer_segment_template('segment-template') }}
-    {% set entityFieldsRouteParams = {
-        'with-relations': 1,
-        'with-virtual-fields': 1,
-        'with-entity-details': 1,
-        'with-unidirectional': 1
-    } %}
+    {% set entityFieldsRouteParams = {} %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
             'oroui/js/delete-confirmation', 'orosegment/js/segment', 'oroentity/js/fields-loader'],
@@ -207,7 +202,7 @@
 
                     $entityChoice
                         .fieldsLoader({
-                            router: 'oro_api_fields_entity',
+                            router: 'oro_api_querydesigner_fields_entity',
                             routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
                             confirm: confirm,
                             requireConfirm: function () {
@@ -229,7 +224,7 @@
                         .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
 
                     {% if not form.entity.vars.value is empty %}
-                    {% set fieldsData = render(path('oro_api_fields_entity', {
+                    {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', {
                             'entityName': form.entity.vars.value|replace({'\\': '_'})
                         }|merge(entityFieldsRouteParams))) %};
                     $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
