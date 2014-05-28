@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -17,7 +18,6 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritDoc}
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -36,82 +36,7 @@ class Configuration implements ConfigurationInterface
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                 ->children()
-                    ->arrayNode('items')
-                        ->useAttributeAsKey('name')
-                        ->prototype('array')
-                        ->children()
-                            ->booleanNode('remove')
-                                ->validate()
-                                    ->ifTrue(
-                                        function ($v) {
-                                            return isset($v) && !$v;
-                                        }
-                                    )
-                                    ->thenUnset()
-                                ->end()
-                            ->end()
-                            ->integerNode('order')->defaultValue(0)->end()
-                            ->scalarNode('action')->end()
-                            ->scalarNode('template')->end()
-                            ->arrayNode('attribute_instance_of')
-                                ->prototype('scalar')->cannotBeEmpty()->end()
-                                ->validate()
-                                    ->ifTrue(
-                                        function ($v) {
-                                            return 2 !== count($v);
-                                        }
-                                    )
-                                    ->thenInvalid(
-                                        'The "attribute_instance_of" attribute must contain exactly 2 items. %s'
-                                    )
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->validate()
-                            ->ifTrue(
-                                function ($v) {
-                                    return (isset($v['remove']) && $v['remove'])
-                                        || (empty($v['action']) && empty($v['template']));
-                                }
-                            )
-                            ->thenUnset()
-                        ->end()
-                        ->validate()
-                            ->ifTrue(
-                                function ($v) {
-                                    return !empty($v['action']) && !empty($v['template']);
-                                }
-                            )
-                            ->thenInvalid('Only one either "action" or "template" attribute can be defined. %s')
-                        ->end()
-                        ->validate()
-                            ->always(
-                                function ($v) {
-                                    if (empty($v['attribute_instance_of'])) {
-                                        unset($v['attribute_instance_of']);
-                                    };
-                                    return $v;
-                                }
-                            )
-                        ->end()
-                    ->end()
-                    ->validate()
-                        ->always(
-                            function ($v) {
-                                uasort(
-                                    $v,
-                                    function ($a, $b) {
-                                        if ($a['order'] === $b['order']) {
-                                            return 0;
-                                        }
-
-                                        return ($a['order'] < $b['order']) ? -1 : 1;
-                                    }
-                                );
-                                return $v;
-                            }
-                        )
-                    ->end()
+                    ->append($this->getPlaceholderItemsConfigTree())
                 ->end()
             ->end()
         ->end();
@@ -131,5 +56,116 @@ class Configuration implements ConfigurationInterface
         );
 
         return $treeBuilder;
+    }
+
+    /**
+     * Builds the configuration tree for placeholder items
+     *
+     * @return NodeDefinition
+     */
+    protected function getPlaceholderItemsConfigTree()
+    {
+        $builder = new TreeBuilder();
+        $node    = $builder->root('items');
+
+        $node
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+            ->children()
+                ->booleanNode('remove')
+                    ->validate()
+                        // keep the 'remove' attribute only if its value is TRUE
+                        ->ifTrue(
+                            function ($v) {
+                                return isset($v) && !$v;
+                            }
+                        )
+                        ->thenUnset()
+                    ->end()
+                ->end()
+                ->integerNode('order')->defaultValue(0)->end()
+                ->scalarNode('action')->end()
+                ->scalarNode('template')->end()
+                ->arrayNode('attribute_instance_of')
+                    ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->validate()
+                        // the array must contain exactly 2 items
+                        // the first item is an attribute name
+                        // the second item is the class name
+                        ->ifTrue(
+                            function ($v) {
+                                return 2 !== count($v);
+                            }
+                        )
+                        ->thenInvalid(
+                            'The "attribute_instance_of" attribute must contain exactly 2 items. %s'
+                        )
+                    ->end()
+                ->end()
+            ->end()
+            ->validate()
+                // remove all items with remove=TRUE or if neither 'action' nor 'template' attribute is not specified
+                ->ifTrue(
+                    function ($v) {
+                        return (isset($v['remove']) && $v['remove'])
+                            || (empty($v['action']) && empty($v['template']));
+                    }
+                )
+                ->thenUnset()
+            ->end()
+            ->validate()
+                // both 'action' and 'template' attributes should not be specified
+                ->ifTrue(
+                    function ($v) {
+                        return !empty($v['action']) && !empty($v['template']);
+                    }
+                )
+                ->thenInvalid('Only one either "action" or "template" attribute can be defined. %s')
+            ->end()
+            ->validate()
+                // remove empty 'attribute_instance_of' attributes
+                ->always(
+                    function ($v) {
+                        if (empty($v['attribute_instance_of'])) {
+                            unset($v['attribute_instance_of']);
+                        };
+                        return $v;
+                    }
+                )
+            ->end();
+
+        // sort items by 'order' attribute
+        $node
+            ->validate()
+                ->always(
+                    function ($v) {
+                        return $this->sortPlaceholderItems($v);
+                    }
+                )
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Sorts the given items by 'order' attribute
+     *
+     * @param array $items
+     * @return mixed
+     */
+    protected function sortPlaceholderItems($items)
+    {
+        uasort(
+            $items,
+            function ($a, $b) {
+                if ($a['order'] === $b['order']) {
+                    return 0;
+                }
+
+                return ($a['order'] < $b['order']) ? -1 : 1;
+            }
+        );
+
+        return $items;
     }
 }
