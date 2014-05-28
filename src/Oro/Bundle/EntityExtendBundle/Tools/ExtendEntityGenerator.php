@@ -84,13 +84,6 @@ class ExtendEntityGenerator
         foreach ($config as $item) {
             $this->generateClass($item);
 
-            // $item can be modified in any extension in preProcessEntityConfiguration or generate methods
-            $classNameArray = explode('\\', $item['entity']);
-            file_put_contents(
-                $this->entityCacheDir . '/' . array_pop($classNameArray) . '.orm.yml',
-                Yaml::dump($item['doctrine'], 5)
-            );
-
             if ($item['type'] == 'Extend') {
                 $aliases[$item['entity']] = $item['parent'];
             }
