@@ -1,0 +1,19 @@
+oro_entity_config:
+    note:
+        entity:
+            items:
+                enabled:
+                    options:
+                        priority:           250
+                        default_value:      'No'
+                        auditable:          false
+                    form:
+                        type:               note_choice
+                        options:
+                            block:          other
+                            required:       true
+                            label:          'Can add notes'
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            empty_data:     'No'
+                            tooltip:        'After you enable this option it cannot be disabled.'

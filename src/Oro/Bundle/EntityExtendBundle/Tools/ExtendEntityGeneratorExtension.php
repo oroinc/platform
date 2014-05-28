@@ -13,27 +13,27 @@ interface ExtendEntityGeneratorExtension
      * Check if generator extension supports configuration pre-processing or can generate code
      *
      * @param string $actionType pre-process or generate
-     * @param array  $config     whole configuration when actionType is pre-process,
-     *                           entity configuration when actionType is generate
+     * @param array  $schemas    whole schemas when actionType is pre-process,
+     *                           entity schema when actionType is generate
      *
      * @return bool
      */
-    public function supports($actionType, array $config);
+    public function supports($actionType, array $schemas);
 
     /**
      * Apply extension to entity configuration before it will be generated as PHP, YAML files
      *
-     * @param array $config
+     * @param array $schemas
      *
      * @return void
      */
-    public function preProcessEntityConfiguration(array &$config);
+    public function preProcessEntityConfiguration(array &$schemas);
 
     /**
-     * @param array    $config
+     * @param array    $schema
      * @param PhpClass $class
      *
      * @return void
      */
-    public function generate(array &$config, PhpClass $class);
+    public function generate(array &$schema, PhpClass $class);
 }

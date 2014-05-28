@@ -6,23 +6,17 @@ use Symfony\Component\Yaml\Yaml;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
-use CG\Generator\Writer;
 
 use Doctrine\Common\Inflector\Inflector;
 
-class ExtendEntityGenerator
+class ExtendEntityGenerator extends BaseGenerator
 {
     /** @var string */
     protected $cacheDir;
 
     /** @var string */
     protected $entityCacheDir;
-
-    /** @var Writer */
-    protected $writer = null;
 
     /** @var array|ExtendEntityGeneratorExtension[] */
     protected $extensions = [];
@@ -32,6 +26,7 @@ class ExtendEntityGenerator
      */
     public function __construct($cacheDir)
     {
+        parent::__construct();
         $this->cacheDir       = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
     }
@@ -55,7 +50,7 @@ class ExtendEntityGenerator
     protected function sortExtensions()
     {
         krsort($this->extensions);
-        $this->extensions = call_user_func_array('array_merge', [$this->extensions]);
+        $this->extensions = call_user_func_array('array_merge', $this->extensions);
     }
 
     /**
@@ -97,8 +92,6 @@ class ExtendEntityGenerator
      */
     protected function generateClass(array $item)
     {
-        $this->writer = new Writer();
-
         $class = PhpClass::create($item['entity']);
 
         if ($item['type'] == 'Extend') {
@@ -147,7 +140,7 @@ class ExtendEntityGenerator
      * TODO: custom entity instance as manyToOne relation find the way to show it on view
      * we should mark some field as title
      *
-     * @param array    $config
+     * @param array    $config entity config
      * @param PhpClass $class
      */
     protected function generateToStringMethod(array $config, PhpClass $class)
@@ -229,26 +222,4 @@ class ExtendEntityGenerator
         }
     }
 
-    /**
-     * @param string $methodName
-     * @param string $methodBody
-     * @param array  $methodArgs
-     *
-     * @return PhpMethod
-     */
-    protected function generateClassMethod($methodName, $methodBody, $methodArgs = [])
-    {
-        $this->writer->reset();
-        $method = PhpMethod::create($methodName)->setBody(
-            $this->writer->write($methodBody)->getContent()
-        );
-
-        if (count($methodArgs)) {
-            foreach ($methodArgs as $arg) {
-                $method->addParameter(PhpParameter::create($arg));
-            }
-        }
-
-        return $method;
-    }
 }
