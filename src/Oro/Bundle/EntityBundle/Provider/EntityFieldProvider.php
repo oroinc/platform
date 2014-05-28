@@ -16,61 +16,51 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * TODO: passing parameter $withExclusions into getFields method should be refactored
  */
 class EntityFieldProvider
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $entityConfigProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
-     * @var EntityClassResolver
-     */
-    protected $entityClassResolver;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
     /** @var EntityProvider */
     protected $entityProvider;
 
-    /**
-     * @var array
-     */
-    protected $virtualFields;
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
 
-    /**
-     * @var array
-     */
+    /** @var ExclusionProviderInterface */
+    protected $exclusionProvider;
+
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var Translator */
+    protected $translator;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var array */
     protected $hiddenFields;
 
     /**
      * Constructor
      *
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param ManagerRegistry     $doctrine
-     * @param Translator          $translator
-     * @param array               $virtualFields
-     * @param array               $hiddenFields
+     * @param ConfigProvider                $entityConfigProvider
+     * @param ConfigProvider                $extendConfigProvider
+     * @param EntityClassResolver           $entityClassResolver
+     * @param ManagerRegistry               $doctrine
+     * @param Translator                    $translator
+     * @param array                         $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -78,15 +68,13 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         Translator $translator,
-        $virtualFields,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
-        $this->translator           = $translator;
         $this->doctrine             = $doctrine;
-        $this->virtualFields        = $virtualFields;
+        $this->translator           = $translator;
         $this->hiddenFields         = $hiddenFields;
     }
 
@@ -101,14 +89,35 @@ class EntityFieldProvider
     }
 
     /**
+     * Sets virtual field provider
+     *
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     */
+    public function setVirtualFieldProvider(VirtualFieldProviderInterface $virtualFieldProvider)
+    {
+        $this->virtualFieldProvider = $virtualFieldProvider;
+    }
+
+    /**
+     * Sets exclusion provider
+     *
+     * @param ExclusionProviderInterface $exclusionProvider
+     */
+    public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
+    {
+        $this->exclusionProvider = $exclusionProvider;
+    }
+
+    /**
      * Returns fields for the given entity
      *
-     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
-     * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
-     * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
-     * @param bool   $translate              Flag means that label, plural label should be translated
+     * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations      Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
+     * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
+     * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
+     * @param bool   $withExclusions     Indicates whether exclusion logic should be applied.
+     * @param bool   $translate          Flag means that label, plural label should be translated
      *
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
@@ -132,19 +141,21 @@ class EntityFieldProvider
         $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
+        $withExclusions = true,
         $translate = true
     ) {
         $result    = [];
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
 
-        $this->addFields($result, $className, $em, $withVirtualFields, $translate);
+        $this->addFields($result, $className, $em, $withVirtualFields, $withExclusions, $translate);
         if ($withRelations) {
             $this->addRelations(
                 $result,
                 $className,
                 $em,
                 $withEntityDetails,
+                $withExclusions,
                 $translate
             );
 
@@ -154,6 +165,7 @@ class EntityFieldProvider
                     $className,
                     $em,
                     $withEntityDetails,
+                    $withExclusions,
                     $translate
                 );
             }
@@ -170,10 +182,17 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withVirtualFields
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
-    protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
-    {
+    protected function addFields(
+        array &$result,
+        $className,
+        EntityManager $em,
+        $withVirtualFields,
+        $withExclusions,
+        $translate
+    ) {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
@@ -181,6 +200,10 @@ class EntityFieldProvider
             // add regular fields
             foreach ($metadata->getFieldNames() as $fieldName) {
                 if ($this->isIgnoredField($metadata, $fieldName)) {
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
 
@@ -196,17 +219,26 @@ class EntityFieldProvider
             }
 
             // add virtual fields
-            if ($withVirtualFields && isset($this->virtualFields[$className])) {
-                foreach ($this->virtualFields[$className] as $fieldName => $config) {
+            if ($withVirtualFields) {
+                $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
+                foreach ($virtualFields as $fieldName) {
                     if ($this->isIgnoredField($metadata, $fieldName)) {
                         continue;
                     }
 
+                    if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+                        continue;
+                    }
+
+                    $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+                    $fieldLabel = isset($query['select']['label'])
+                        ? $query['select']['label']
+                        : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
                     $this->addField(
                         $result,
                         $fieldName,
-                        $config['query']['select']['return_type'],
-                        ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName),
+                        $query['select']['return_type'],
+                        $fieldLabel,
                         false,
                         $translate
                     );
@@ -220,12 +252,13 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $fieldName
+     *
      * @return bool
      */
     protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
-        if (isset($this->hiddenFields[$metadata->name][$fieldName])) {
+        if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
             return true;
         }
 
@@ -262,6 +295,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
     protected function addRelations(
@@ -269,6 +303,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withExclusions,
         $translate
     ) {
         // only configurable entities are supported
@@ -282,7 +317,11 @@ class EntityFieldProvider
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
-                        continue;
+                    continue;
+                }
+
+                if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
+                    continue;
                 }
 
                 $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
@@ -310,6 +349,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
+     * @param bool          $withExclusions
      * @param bool          $translate
      */
     protected function addUnidirectionalRelations(
@@ -317,6 +357,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
+        $withExclusions,
         $translate
     ) {
         $relations = $this->getUnidirectionalRelations($em, $className);
@@ -327,6 +368,10 @@ class EntityFieldProvider
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
             if ($this->isIgnoredRelation($classMetadata, $fieldName)) {
+                continue;
+            }
+
+            if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($classMetadata, $fieldName)) {
                 continue;
             }
 
@@ -398,6 +443,7 @@ class EntityFieldProvider
      *
      * @param ClassMetadata $metadata
      * @param string        $associationName
+     *
      * @return bool
      */
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
