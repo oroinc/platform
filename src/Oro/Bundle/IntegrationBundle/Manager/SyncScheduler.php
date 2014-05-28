@@ -55,7 +55,9 @@ class SyncScheduler
             '--params=' . serialize($params)
         ];
         $job  = new Job(self::JOB_NAME, $args);
-        $this->em->persist($job);
-        $this->em->flush($job);
+        $uow = $this->em->getUnitOfWork();
+        $uow->persist($job);
+        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
+        $uow->computeChangeSet($jobMeta, $job);
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -81,7 +82,21 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->typesRegistry->addConnectorType($testConnectorType, $testChannelType, new TestTwoWayConnector());
 
         $that = $this;
-        $this->em->expects($this->once())->method('persist')
+        /**
+         * $uow = $this->em->getUnitOfWork();
+        $uow->persist($job);
+        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
+        $uow->computeChangeSet($jobMeta, $job);
+         */
+        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()->getMock();
+        $this->em->expects($this->once())->method('getUnitOfWork')->will($this->returnValue($uow));
+        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
+            ->disableOriginalConstructor()->getMock();
+        $metadataFactory->expects($this->once())->method('getMetadataFor')
+            ->will($this->returnValue(new ClassMetadata('testEntity')));
+        $this->em->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
+        $uow->expects($this->once())->method('persist')
             ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
             ->will(
                 $this->returnCallback(
@@ -96,8 +111,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->em->expects($this->once())->method('flush')
-            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'));
+        $uow->expects($this->once())->method('computeChangeSet');
 
         $this->scheduler->schedule($channel, $testConnectorType);
     }
