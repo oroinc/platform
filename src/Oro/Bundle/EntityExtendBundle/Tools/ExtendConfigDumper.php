@@ -26,19 +26,25 @@ class ExtendConfigDumper
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var ExtendEntityGenerator */
+    protected $extendEntityGenerator;
+
     /**
      * @param OroEntityManager                $em
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param string                          $cacheDir
+     * @param ExtendEntityGenerator           $extendEntityGenerator
      */
     public function __construct(
         OroEntityManager $em,
         ExtendDbIdentifierNameGenerator $nameGenerator,
+        ExtendEntityGenerator  $extendEntityGenerator,
         $cacheDir
     ) {
-        $this->nameGenerator = $nameGenerator;
-        $this->em            = $em;
-        $this->cacheDir      = $cacheDir;
+        $this->nameGenerator         = $nameGenerator;
+        $this->em                    = $em;
+        $this->extendEntityGenerator = $extendEntityGenerator;
+        $this->cacheDir              = $cacheDir;
     }
 
     /**
@@ -74,8 +80,7 @@ class ExtendConfigDumper
             }
         }
 
-        $generator = new Generator($this->cacheDir);
-        $generator->generate($schemas);
+        $this->extendEntityGenerator->generate($schemas);
     }
 
     public function clear()
