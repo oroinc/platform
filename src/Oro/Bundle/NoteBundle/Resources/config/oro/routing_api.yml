@@ -1,0 +1,3 @@
+oro_note_api:
+    resource:     "@OroNoteBundle/Controller/Api/Rest/NoteController.php"
+    type:         rest

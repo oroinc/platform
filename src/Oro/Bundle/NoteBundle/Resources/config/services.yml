@@ -1,6 +1,10 @@
 parameters:
     oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
 
+    #entity
+    oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
+    oro_note.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+
 services:
     oro_note.subscriber.note_lifecycle_subscriber:
         class: %oro_note.subscriber.note_lifecycle_subscriber.class%
@@ -8,3 +12,9 @@ services:
             - @oro_security.security_facade.link
         tags:
             - { name: doctrine.event_subscriber }
+
+    oro_note.manager.api:
+        class: %oro_note.manager.api.class%
+        arguments:
+            - %oro_note.entity.class%
+            - @doctrine.orm.entity_manager
