@@ -118,7 +118,12 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                                 'select' => [
                                     'expr'        => sprintf('target.%s', $fieldName),
                                     'return_type' => $fieldType,
-                                    'label'       => ConfigHelper::getTranslationKey('label', $className, $label)
+                                    'label'       => ConfigHelper::getTranslationKey(
+                                            'entity',
+                                            'label',
+                                            $className,
+                                            $label
+                                        )
                                 ],
                                 'join'   => [
                                     'left' => [
