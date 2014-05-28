@@ -31,7 +31,7 @@ class FieldProvider extends EntityFieldProvider
      */
     protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
     {
-        parent::addFields($result, $className, $em, $withVirtualFields, $translate);
+        parent::addFields($result, $className, $em, $withVirtualFields, false, $translate);
 
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
