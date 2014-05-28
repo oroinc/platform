@@ -11,7 +11,7 @@ class NoteExtendGenerator implements ExtendEntityGeneratorExtension
     /**
      * {@inheritdoc}
      */
-    public function supports(array $config)
+    public function supports($actionType, array $config)
     {
         // TODO: check if there's at least one entity using notes
     }

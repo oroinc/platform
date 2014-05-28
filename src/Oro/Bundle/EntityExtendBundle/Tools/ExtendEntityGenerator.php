@@ -27,9 +27,6 @@ class ExtendEntityGenerator
     /** @var array|ExtendEntityGeneratorExtension[] */
     protected $extensions = [];
 
-    /** @var array|ExtendEntityGeneratorExtension[] */
-    protected $supportedExtensions = [];
-
     /**
      * @param string $cacheDir
      */
@@ -72,11 +69,10 @@ class ExtendEntityGenerator
 
         // filter supported extensions and pre-process configuration
         foreach ($this->extensions as $extension) {
-            if (!$extension->supports($config)) {
+            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $config)) {
                 continue;
             }
 
-            $this->supportedExtensions = $extension;
             $extension->preProcessEntityConfiguration($config);
         }
 
@@ -123,8 +119,11 @@ class ExtendEntityGenerator
         $this->generateProperties('default', $item, $class);
         $this->generateCollectionMethods($item, $class);
 
-        // allow extensions to add
-        foreach ($this->supportedExtensions as $extension) {
+        foreach ($this->extensions as $extension) {
+            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_GENERATE, $item)) {
+                continue;
+            }
+
             $extension->generate($item, $class);
         }
 

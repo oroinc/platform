@@ -6,14 +6,19 @@ use CG\Generator\PhpClass;
 
 interface ExtendEntityGeneratorExtension
 {
+    const ACTION_PRE_PROCESS = 'pre-process';
+    const ACTION_GENERATE    = 'generate';
+
     /**
-     * Check if generator extension can be applied based on configuration
+     * Check if generator extension supports configuration pre-processing or can generate code
      *
-     * @param array $config
+     * @param string $actionType pre-process or generate
+     * @param array  $config     whole configuration when actionType is pre-process,
+     *                           entity configuration when actionType is generate
      *
      * @return bool
      */
-    public function supports(array $config);
+    public function supports($actionType, array $config);
 
     /**
      * Apply extension to entity configuration before it will be generated as PHP, YAML files
