@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -36,12 +37,80 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                 ->children()
                     ->arrayNode('items')
-                    ->prototype('array')
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
                         ->children()
-                            ->booleanNode('remove')->defaultValue(false)->end()
-                            ->scalarNode('placeholder')->end()
-                            ->scalarNode('order')->end()
+                            ->booleanNode('remove')
+                                ->validate()
+                                    ->ifTrue(
+                                        function ($v) {
+                                            return isset($v) && !$v;
+                                        }
+                                    )
+                                    ->thenUnset()
+                                ->end()
+                            ->end()
+                            ->integerNode('order')->defaultValue(0)->end()
+                            ->scalarNode('action')->end()
+                            ->scalarNode('template')->end()
+                            ->arrayNode('attribute_instance_of')
+                                ->prototype('scalar')->cannotBeEmpty()->end()
+                                ->validate()
+                                    ->ifTrue(
+                                        function ($v) {
+                                            return 2 !== count($v);
+                                        }
+                                    )
+                                    ->thenInvalid(
+                                        'The "attribute_instance_of" attribute must contain exactly 2 items. %s'
+                                    )
+                                ->end()
+                            ->end()
                         ->end()
+                        ->validate()
+                            ->ifTrue(
+                                function ($v) {
+                                    return (isset($v['remove']) && $v['remove'])
+                                        || (empty($v['action']) && empty($v['template']));
+                                }
+                            )
+                            ->thenUnset()
+                        ->end()
+                        ->validate()
+                            ->ifTrue(
+                                function ($v) {
+                                    return !empty($v['action']) && !empty($v['template']);
+                                }
+                            )
+                            ->thenInvalid('Only one either "action" or "template" attribute can be defined. %s')
+                        ->end()
+                        ->validate()
+                            ->always(
+                                function ($v) {
+                                    if (empty($v['attribute_instance_of'])) {
+                                        unset($v['attribute_instance_of']);
+                                    };
+                                    return $v;
+                                }
+                            )
+                        ->end()
+                    ->end()
+                    ->validate()
+                        ->always(
+                            function ($v) {
+                                uasort(
+                                    $v,
+                                    function ($a, $b) {
+                                        if ($a['order'] === $b['order']) {
+                                            return 0;
+                                        }
+
+                                        return ($a['order'] < $b['order']) ? -1 : 1;
+                                    }
+                                );
+                                return $v;
+                            }
+                        )
                     ->end()
                 ->end()
             ->end()
