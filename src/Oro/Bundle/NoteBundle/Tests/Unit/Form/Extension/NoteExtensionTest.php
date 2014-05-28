@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Form\Extension;
 
+use Symfony\Component\Form\FormView;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\NoteBundle\Form\Extension\NoteExtension;
-use Symfony\Component\Form\FormView;
 
 class NoteExtensionTest extends \PHPUnit_Framework_TestCase
 {
