@@ -10,7 +10,7 @@ use CG\Generator\PhpProperty;
 
 use Doctrine\Common\Inflector\Inflector;
 
-class ExtendEntityGenerator extends BaseGenerator
+class ExtendEntityGenerator
 {
     /** @var string */
     protected $cacheDir;
@@ -24,14 +24,17 @@ class ExtendEntityGenerator extends BaseGenerator
     /** @var array|ExtendEntityGeneratorExtension[]|null */
     protected $sortedExtensions = null;
 
+    /** @var ClassBuilder */
+    protected $classBuilder;
+
     /**
      * @param string $cacheDir
      */
     public function __construct($cacheDir)
     {
-        parent::__construct();
         $this->cacheDir       = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
+        $this->classBuilder   = new ClassBuilder();
     }
 
     /**
@@ -56,7 +59,7 @@ class ExtendEntityGenerator extends BaseGenerator
     {
         if (empty($this->sortedExtensions)) {
             krsort($this->extensions);
-            $this->extensions = call_user_func_array('array_merge', $this->extensions);
+            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
 
         return $this->sortedExtensions;
@@ -107,7 +110,7 @@ class ExtendEntityGenerator extends BaseGenerator
             }
         } else {
             $class->setProperty(PhpProperty::create('id')->setVisibility('protected'));
-            $class->setMethod($this->generateClassMethod('getId', 'return $this->id;'));
+            $class->setMethod($this->classBuilder->generateClassMethod('getId', 'return $this->id;'));
 
             $this->generateToStringMethod($item, $class);
         }
@@ -163,7 +166,7 @@ class ExtendEntityGenerator extends BaseGenerator
         if (count($toString) > 0) {
             $toStringBody = 'return (string)' . implode(' . ', $toString) . ';';
         }
-        $class->setMethod($this->generateClassMethod('__toString', $toStringBody));
+        $class->setMethod($this->classBuilder->generateClassMethod('__toString', $toStringBody));
     }
 
     /**
@@ -177,13 +180,13 @@ class ExtendEntityGenerator extends BaseGenerator
             $class
                 ->setProperty(PhpProperty::create($property)->setVisibility('protected'))
                 ->setMethod(
-                    $this->generateClassMethod(
+                    $this->classBuilder->generateClassMethod(
                         'get' . ucfirst(Inflector::camelize($method)),
                         'return $this->' . $property . ';'
                     )
                 )
                 ->setMethod(
-                    $this->generateClassMethod(
+                    $this->classBuilder->generateClassMethod(
                         'set' . ucfirst(Inflector::camelize($method)),
                         '$this->' . $property . ' = $value; return $this;',
                         ['value']
@@ -201,7 +204,7 @@ class ExtendEntityGenerator extends BaseGenerator
         foreach ($config['addremove'] as $addremove => $method) {
             $class
                 ->setMethod(
-                    $this->generateClassMethod(
+                    $this->classBuilder->generateClassMethod(
                         'add' . ucfirst(Inflector::camelize($method['self'])),
                         'if (!$this->' . $addremove . ') {
                             $this->' . $addremove . ' = new \Doctrine\Common\Collections\ArrayCollection();
@@ -215,7 +218,7 @@ class ExtendEntityGenerator extends BaseGenerator
                     )
                 )
                 ->setMethod(
-                    $this->generateClassMethod(
+                    $this->classBuilder->generateClassMethod(
                         'remove' . ucfirst(Inflector::camelize($method['self'])),
                         'if ($this->' . $addremove . ' && $this->' . $addremove . '->contains($value)) {
                             $this->' . $addremove . '->removeElement($value);

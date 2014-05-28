@@ -6,10 +6,9 @@ use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\BaseGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
 
-class NoteExtendGenerator extends BaseGenerator implements ExtendEntityGeneratorExtension
+class NoteExtendGenerator implements ExtendEntityGeneratorExtension
 {
     const NOTE_CONFIG_SCOPE = 'note';
 
@@ -18,8 +17,6 @@ class NoteExtendGenerator extends BaseGenerator implements ExtendEntityGenerator
 
     public function __construct(ConfigManager $configManager)
     {
-        parent::__construct();
-
         $this->noteConfigProvider = $configManager->getProvider(self::NOTE_CONFIG_SCOPE);
     }
 
@@ -28,7 +25,22 @@ class NoteExtendGenerator extends BaseGenerator implements ExtendEntityGenerator
      */
     public function supports($actionType, array $schemas)
     {
+        if ($actionType == ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS) {
+            $this->getEntityConfigWithNotesEnabled();
+        }
+
+
         return true;
+    }
+
+    protected function getEntityConfigWithNotesEnabled()
+    {
+        $configs = $this->noteConfigProvider->getConfigs();
+
+        //$withNotes = [];
+        foreach ($configs as $config) {
+            //
+        }
     }
 
     /**

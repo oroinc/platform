@@ -6,7 +6,7 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Generator\Writer;
 
-abstract class BaseGenerator
+class ClassBuilder
 {
     /** @var Writer */
     protected $writer;
@@ -23,7 +23,7 @@ abstract class BaseGenerator
      *
      * @return PhpMethod
      */
-    protected function generateClassMethod($methodName, $methodBody, $methodArgs = [])
+    public function generateClassMethod($methodName, $methodBody, $methodArgs = [])
     {
         $this->writer->reset();
 
