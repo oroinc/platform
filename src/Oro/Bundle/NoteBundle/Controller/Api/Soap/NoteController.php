@@ -93,7 +93,7 @@ class NoteController extends SoapController
      */
     public function getFormHandler()
     {
-        //return $this->container->get('oro_note.form.handler.note_api');
+        return $this->container->get('oro_note.form.handler.note_api');
     }
 
     /**

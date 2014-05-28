@@ -17,29 +17,14 @@ class NoteSoap extends Note implements SoapEntityInterface
     protected $id;
 
     /**
-     * @Soap\ComplexType("int", nillable=true)
-     */
-    protected $owner;
-
-    /**
-     * @Soap\ComplexType("string", nillable=true)
+     * @Soap\ComplexType("string", nillable=false)
      */
     protected $message;
 
     /**
-     * @Soap\ComplexType("int", nillable=true)
+     * @Soap\ComplexType("Oro\Bundle\NoteBundle\Entity\EntityId")
      */
-    protected $updatedBy;
-
-    /**
-     * @Soap\ComplexType("dateTime", nillable=true)
-     */
-    protected $createdAt;
-
-    /**
-     * @Soap\ComplexType("dateTime", nillable=true)
-     */
-    protected $updatedAt;
+    protected $entityId;
 
     /**
      * @param Note $note
@@ -47,11 +32,13 @@ class NoteSoap extends Note implements SoapEntityInterface
     public function soapInit($note)
     {
         $this->id        = $note->id;
-        $this->owner     = $this->getEntityId($note->owner);
+        //$this->owner     = $this->getEntityId($note->owner);
         $this->message   = $note->message;
-        $this->updatedBy = $this->getEntityId($note->updatedBy);
-        $this->createdAt = $note->createdAt;
-        $this->updatedAt = $note->updatedAt;
+        //$this->entityId  = $note->
+        //$this->updatedBy = $this->getEntityId($note->updatedBy);
+
+        //$this->createdAt = $note->createdAt;
+        //$this->updatedAt = $note->updatedAt;
     }
 
     /**
