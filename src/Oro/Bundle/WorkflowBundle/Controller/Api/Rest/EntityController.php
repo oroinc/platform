@@ -21,29 +21,22 @@ class EntityController extends FOSRestController
 {
     /**
      * @Rest\Get(
-     *      "/api/rest/{version}/workflowentity/{entityName}",
+     *      "/api/rest/{version}/workflowentity",
      *      requirements={"version"="latest|v1"},
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Get entity with fields", resource=true)
      * @AclAncestor("oro_workflow")
      *
-     * @param string $entityName
      * @return Response
      */
-    public function getAction($entityName)
+    public function getAction()
     {
-        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
-
         $statusCode = Codes::HTTP_OK;
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_workflow.field_list_provider');
+        $provider = $this->get('oro_workflow.entity_field_list_provider');
         try {
-            $result = $provider->getFields(
-                false,
-                false,
-                $withRelations
-            );
+            $result = $provider->getFields();
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

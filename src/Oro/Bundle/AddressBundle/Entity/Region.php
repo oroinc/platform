@@ -20,7 +20,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "grouping"={"groups"={"dictionary"}}
+ *      }
+ * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class Region implements Translatable

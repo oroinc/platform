@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager implements FunctionProviderInterface, VirtualFieldProviderInterface
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+
+class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -14,34 +16,30 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /** @var FilterInterface[] */
     protected $filters = [];
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var array
-     */
-    protected $virtualFields;
+    /** @var EntityHierarchyProvider */
+    protected $entityHierarchyProvider;
 
     /**
      * Constructor
      *
-     * @param array                 $config
-     * @param ConfigurationResolver $resolver
-     * @param Translator            $translator
-     * @param array                 $virtualFields
+     * @param array                   $config
+     * @param ConfigurationResolver   $resolver
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param Translator              $translator
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
-        Translator $translator,
-        $virtualFields
+        EntityHierarchyProvider $entityHierarchyProvider,
+        Translator $translator
     ) {
         $resolver->resolve($config);
-        $this->config        = ConfigurationObject::create($config);
-        $this->translator    = $translator;
-        $this->virtualFields = $virtualFields;
+        $this->config                  = ConfigurationObject::create($config);
+        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->translator              = $translator;
     }
 
     /**
@@ -62,7 +60,8 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
             'filters'    => $filtersMetadata,
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
-            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType)
+            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
+            'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
         ];
     }
 
@@ -81,7 +80,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name A filter name
+     * @param string $name   A filter name
      * @param array  $params An additional parameters of a new filter
      * @throws \RuntimeException if a filter with the given name does not exist
      * @return FilterInterface
@@ -123,22 +122,6 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isVirtualField($className, $fieldName)
-    {
-        return isset($this->virtualFields[$className][$fieldName]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualFieldQuery($className, $fieldName)
-    {
-        return $this->virtualFields[$className][$fieldName]['query'];
     }
 
     /**
@@ -251,7 +234,7 @@ class Manager implements FunctionProviderInterface, VirtualFieldProviderInterfac
     /**
      * Checks if an item can be used for the given query type
      *
-     * @param array  $item An item to check
+     * @param array  $item      An item to check
      * @param string $queryType The query type
      * @return bool true if the item can be used for the given query type; otherwise, false.
      */
