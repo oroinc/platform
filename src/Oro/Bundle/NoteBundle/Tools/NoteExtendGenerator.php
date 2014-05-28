@@ -36,7 +36,7 @@ class NoteExtendGenerator extends BaseGenerator implements ExtendEntityGenerator
      */
     public function preProcessEntityConfiguration(array &$schemas)
     {
-        
+
     }
 
     /**

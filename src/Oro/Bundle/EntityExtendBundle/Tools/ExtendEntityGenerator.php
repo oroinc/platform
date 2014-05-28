@@ -21,6 +21,9 @@ class ExtendEntityGenerator extends BaseGenerator
     /** @var array|ExtendEntityGeneratorExtension[] */
     protected $extensions = [];
 
+    /** @var array|ExtendEntityGeneratorExtension[]|null */
+    protected $sortedExtensions = null;
+
     /**
      * @param string $cacheDir
      */
@@ -45,12 +48,18 @@ class ExtendEntityGenerator extends BaseGenerator
     }
 
     /**
-     * Sort extensions based on priority
+     * Return sorted extensions
+     *
+     * @return array|ExtendEntityGeneratorExtension[]
      */
-    protected function sortExtensions()
+    protected function getExtensions()
     {
-        krsort($this->extensions);
-        $this->extensions = call_user_func_array('array_merge', $this->extensions);
+        if (empty($this->sortedExtensions)) {
+            krsort($this->extensions);
+            $this->extensions = call_user_func_array('array_merge', $this->extensions);
+        }
+
+        return $this->sortedExtensions;
     }
 
     /**
@@ -60,10 +69,8 @@ class ExtendEntityGenerator extends BaseGenerator
      */
     public function generate(array $config)
     {
-        $this->sortExtensions();
-
         // filter supported extensions and pre-process configuration
-        foreach ($this->extensions as $extension) {
+        foreach ($this->getExtensions() as $extension) {
             if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $config)) {
                 continue;
             }
@@ -112,7 +119,7 @@ class ExtendEntityGenerator extends BaseGenerator
         $this->generateProperties('default', $item, $class);
         $this->generateCollectionMethods($item, $class);
 
-        foreach ($this->extensions as $extension) {
+        foreach ($this->getExtensions() as $extension) {
             if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_GENERATE, $item)) {
                 continue;
             }
