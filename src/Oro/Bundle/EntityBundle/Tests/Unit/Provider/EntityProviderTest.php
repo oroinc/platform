@@ -53,12 +53,16 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnArgument(0));
+
+        $exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+
         $this->provider = new EntityProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
             $translator
         );
+        $this->provider->setExclusionProvider($exclusionProvider);
     }
 
     public function testGetEntity()
