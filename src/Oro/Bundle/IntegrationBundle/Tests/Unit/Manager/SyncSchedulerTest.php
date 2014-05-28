@@ -82,12 +82,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->typesRegistry->addConnectorType($testConnectorType, $testChannelType, new TestTwoWayConnector());
 
         $that = $this;
-        /**
-         * $uow = $this->em->getUnitOfWork();
-        $uow->persist($job);
-        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
-        $uow->computeChangeSet($jobMeta, $job);
-         */
+
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
         $this->em->expects($this->once())->method('getUnitOfWork')->will($this->returnValue($uow));
@@ -113,6 +108,6 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
             );
         $uow->expects($this->once())->method('computeChangeSet');
 
-        $this->scheduler->schedule($channel, $testConnectorType);
+        $this->scheduler->schedule($channel, $testConnectorType, [], false);
     }
 }

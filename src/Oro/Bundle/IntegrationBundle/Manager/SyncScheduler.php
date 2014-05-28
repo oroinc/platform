@@ -38,10 +38,11 @@ class SyncScheduler
      * @param Channel $channel
      * @param string  $connectorType
      * @param array   $params
+     * @param bool    $useFlush
      *
      * @throws \LogicException
      */
-    public function schedule(Channel $channel, $connectorType, $params = [])
+    public function schedule(Channel $channel, $connectorType, $params = [], $useFlush = true)
     {
         $connector = $this->typesRegistry->getConnectorType($channel->getType(), $connectorType);
 
@@ -55,9 +56,15 @@ class SyncScheduler
             '--params=' . serialize($params)
         ];
         $job  = new Job(self::JOB_NAME, $args);
-        $uow = $this->em->getUnitOfWork();
-        $uow->persist($job);
-        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
-        $uow->computeChangeSet($jobMeta, $job);
+
+        if ($useFlush) {
+            $this->em->persist($job);
+            $this->em->flush();
+        } else {
+            $uow = $this->em->getUnitOfWork();
+            $uow->persist($job);
+            $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
+            $uow->computeChangeSet($jobMeta, $job);
+        }
     }
 }
