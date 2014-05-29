@@ -112,13 +112,14 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                         $label            = $isCombinedLabelName
                             ? $virtualFieldName
                             : Inflector::tableize($associationName);
+                        $label            = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
 
                         $this->virtualFields[$className][$virtualFieldName] = [
                             'query' => [
                                 'select' => [
                                     'expr'        => sprintf('target.%s', $fieldName),
                                     'return_type' => $fieldType,
-                                    'label'       => ConfigHelper::getTranslationKey('label', $className, $label)
+                                    'label'       => $label
                                 ],
                                 'join'   => [
                                     'left' => [

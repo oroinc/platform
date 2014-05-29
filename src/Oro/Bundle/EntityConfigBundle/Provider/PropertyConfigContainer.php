@@ -74,7 +74,7 @@ class PropertyConfigContainer
 
     /**
      * @param string|ConfigIdInterface $type
-     * @param null                     $fieldType
+     * @param string|null              $fieldType
      * @return array
      */
     public function getDefaultValues($type = self::TYPE_ENTITY, $fieldType = null)
@@ -96,7 +96,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getNotAuditableValues($type = self::TYPE_ENTITY)
@@ -116,7 +116,7 @@ class PropertyConfigContainer
     /**
      * Get translatable property's codes
      *
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getTranslatableValues($type = self::TYPE_FIELD)
@@ -134,7 +134,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getIndexedValues($type = self::TYPE_ENTITY)
@@ -152,8 +152,8 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
-     * @param null   $fieldType
+     * @param string|ConfigIdInterface $type
+     * @param string|null              $fieldType
      * @return bool
      */
     public function hasForm($type = self::TYPE_ENTITY, $fieldType = null)
@@ -164,8 +164,8 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
-     * @param null   $fieldType
+     * @param string|ConfigIdInterface $type
+     * @param string|null              $fieldType
      * @return bool
      */
     public function getFormItems($type = self::TYPE_ENTITY, $fieldType = null)
@@ -192,7 +192,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getFormConfig($type = self::TYPE_ENTITY)
@@ -208,7 +208,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getFormBlockConfig($type = self::TYPE_ENTITY)
@@ -227,7 +227,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getGridActions($type = self::TYPE_ENTITY)
@@ -243,7 +243,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getUpdateActionFilter($type = self::TYPE_ENTITY)
@@ -259,7 +259,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getLayoutActions($type = self::TYPE_ENTITY)
@@ -275,7 +275,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getRequiredPropertyValues($type = self::TYPE_ENTITY)
@@ -310,7 +310,7 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getRequireJsModules($type = self::TYPE_ENTITY)
