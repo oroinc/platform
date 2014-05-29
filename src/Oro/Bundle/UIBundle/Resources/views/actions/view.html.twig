@@ -102,37 +102,19 @@
             {% if data is defined and data.dataBlocks is defined %}
                 {% set dataBlocks = data.dataBlocks %}
 
-                {%- set communicationsData -%}
-                    {% placeholder view_content_data_communications with {entity: entity} %}
-                {%- endset -%}
+                {% placeholder view_content_data with {entity: entity} set contentDataBlocks %}
 
-                {% if communicationsData is not empty %}
+                {% for contentDataBlock in contentDataBlocks %}
                     {% set dataBlocks = dataBlocks|merge([{
-                        'title': 'Communications'|trans,
+                        'title': contentDataBlock.label|trans,
                         'subblocks': [
                             {
                                 'spanClass': 'empty',
-                                'data': [communicationsData]
+                                'data': contentDataBlock.items
                             }
                         ]
                     }]) %}
-                {% endif %}
-
-                {%- set additionalInformationData -%}
-                    {% placeholder view_content_data_additional_information with {entity: entity} %}
-                {%- endset -%}
-
-                {% if additionalInformationData is not empty %}
-                    {% set dataBlocks = dataBlocks|merge([{
-                        'title': 'Additional Information'|trans,
-                        'subblocks': [
-                            {
-                                'spanClass': 'empty',
-                                'data': [additionalInformationData]
-                            }
-                        ]
-                    }]) %}
-                {% endif %}
+                {% endfor %}
 
                 {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {% endif %}

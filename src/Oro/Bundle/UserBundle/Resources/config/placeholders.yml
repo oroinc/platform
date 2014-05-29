@@ -4,9 +4,10 @@ placeholders:
             menu_user:
                 order: 100
 
-    view_content_data_communications:
+    view_content_data:
         items:
-            oro_user_emails: ~
+            oro_user_emails:
+                block: communications
 
 items:
     menu_user:

@@ -1,5 +1,6 @@
 parameters:
     oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
+    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendGenerator
 
     #entity
     oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
@@ -17,6 +18,7 @@ services:
             - @oro_security.security_facade.link
         tags:
             - { name: doctrine.event_subscriber }
+
 
     # !!!
     # FORMS  move to form.yml
@@ -54,4 +56,12 @@ services:
             - @oro_note.form.api
             - @request
             - @doctrine.orm.entity_manager
+
+
+    oro_note.entity_extend.generator_extension:
+        class: %oro_note.entity_extend.generator_extension.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.generator_extension, priority: 1 }
 

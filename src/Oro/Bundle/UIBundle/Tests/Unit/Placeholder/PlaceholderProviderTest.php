@@ -6,8 +6,6 @@ use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
 class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 {
-    const PLACEHOLDER_NAME = 'placeholder_name';
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -19,9 +17,20 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     protected $placeholders = array(
-        self::PLACEHOLDER_NAME => array(
+        'test_placeholder' => array(
             'items' => array(
-                array('template' => 'foo')
+                'item1' => array('template' => 'template1'),
+                'item2' => array('template' => 'template2')
+            )
+        ),
+        'test_placeholder_with_blocks' => array(
+            'items' => array(
+                'item1' => array('template' => 'template1', 'block' => 'block1'),
+                'item2' => array('template' => 'template2', 'block' => 'block2')
+            ),
+            'blocks' => array(
+                'block1' => array('label' => 'Block 1'),
+                'block2' => array('label' => 'Block 2'),
             )
         )
     );
@@ -34,20 +43,46 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPlaceholderItems()
     {
+        $placeholderName = 'test_placeholder';
+
         $variables = array('foo' => 'bar');
 
-        $expectedResult = $this->placeholders[self::PLACEHOLDER_NAME]['items'];
-        $expectedResult['items'][0]['template'] = 'filtered';
+        $items = $this->placeholders[$placeholderName]['items'];
 
-        $this->provider->getPlaceholderItems(self::PLACEHOLDER_NAME, $variables);
+        $filteredItems = $items;
+        unset($filteredItems['item1']);
+        $filteredItems = array_values($filteredItems);
+
         $this->filter->expects($this->once())
             ->method('filter')
-            ->with($this->placeholders[self::PLACEHOLDER_NAME]['items'])
-            ->will($this->returnValue($expectedResult));
+            ->with(array_values($items), $variables)
+            ->will($this->returnValue($filteredItems));
 
         $this->assertEquals(
-            $expectedResult,
-            $this->provider->getPlaceholderItems(self::PLACEHOLDER_NAME, $variables)
+            $filteredItems,
+            $this->provider->getPlaceholderItems($placeholderName, $variables)
+        );
+    }
+
+    public function testGetPlaceholderBlocks()
+    {
+        $placeholderName = 'test_placeholder_with_blocks';
+
+        $variables = array('foo' => 'bar');
+
+        $blocks = $this->placeholders[$placeholderName]['blocks'];
+
+        $filteredBlocks = $blocks;
+        unset($filteredBlocks['block1']);
+
+        $this->filter->expects($this->once())
+            ->method('filter')
+            ->with($blocks, $variables)
+            ->will($this->returnValue($filteredBlocks));
+
+        $this->assertEquals(
+            $filteredBlocks,
+            $this->provider->getPlaceholderBlocks($placeholderName, $variables)
         );
     }
 }
