@@ -12,7 +12,9 @@ class LazyServicesCompilerPass implements CompilerPassInterface
     /**
      * @var array
      */
-    protected $lazyServicesTags = array();
+    protected $lazyServicesTags = array(
+        'doctrine.event_listener'
+    );
 
     /**
      * {@inheritdoc}
