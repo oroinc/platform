@@ -3,21 +3,19 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
 
 class ChannelType extends AbstractType
 {
-    const NAME            = 'oro_integration_channel_form';
+    const NAME = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
     /** @var TypesRegistry */
@@ -39,6 +37,7 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
+        $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityContext));
 
         $builder->add(
             self::TYPE_FIELD_NAME,
@@ -84,18 +83,6 @@ class ChannelType extends AbstractType
                 'label'    => 'oro.integration.channel.default_user_owner.label'
             ]
         );
-
-        $currentUser = $this->getCurrentUser();
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            function (FormEvent $event) use ($currentUser) {
-                $data = $event->getData();
-
-                if ($data && !$data->getId() && !$data->getDefaultUserOwner() || null === $data) {
-                    $event->getForm()->get('defaultUserOwner')->setData($currentUser);
-                }
-            }
-        );
     }
 
     /**
@@ -110,17 +97,6 @@ class ChannelType extends AbstractType
                 'cascade_validation' => true
             ]
         );
-    }
-
-    /**
-     * Returns current logged in user
-     *
-     * @return User|null
-     */
-    protected function getCurrentUser()
-    {
-        return $this->securityContext->getToken() && !is_string($this->securityContext->getToken()->getUser())
-            ? $this->securityContext->getToken()->getUser() : null;
     }
 
     /**

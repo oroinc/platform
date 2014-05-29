@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -12,23 +13,24 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     /** @var ChannelType */
     protected $type;
 
-    /** @var TypesRegistry */
+    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var  FormBuilder */
+    /** @var  FormBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $builder;
+
+    /** @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContext;
 
     public function setUp()
     {
         $this->registry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->type = new ChannelType($this->registry);
-
+            ->disableOriginalConstructor()->getMock();
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
+        $this->type = new ChannelType($this->registry, $this->securityContext);
     }
 
     public function tearDown()
@@ -40,7 +42,15 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->expects($this->at(0))
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Symfony\Component\EventDispatcher\EventSubscriberInterface'));
+            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber'));
+        $this->builder->expects($this->at(1))
+            ->method('addEventSubscriber')
+            ->with(
+                $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber')
+            );
+        $this->builder->expects($this->at(2))
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
 
         $this->type->buildForm($this->builder, array());
     }
