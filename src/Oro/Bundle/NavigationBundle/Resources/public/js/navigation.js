@@ -485,7 +485,6 @@ define(function (require) {
             }
 
             var useCache = this.useCache;
-            console.log('loadPage', pageUrl);
             $.ajax({
                 url: pageUrl,
                 headers: this.headerObject,
