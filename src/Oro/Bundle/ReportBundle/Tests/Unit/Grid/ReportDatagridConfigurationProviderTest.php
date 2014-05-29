@@ -39,7 +39,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         );
 
         $this->virtualFieldProvider = $this->getMock(
-            'Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface'
+            'Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface'
         );
 
         $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')

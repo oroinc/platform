@@ -185,3 +185,18 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          'Show on view'
+
+    grouping:
+        entity:
+            items:
+                # it allows to group entities. An entity can be included in several groups
+                groups: # array
+                    options: []
+
+    dictionary:
+        entity:
+            items:
+                # specify the list of fields for which the virtual fields can be created
+                # if non specified the virtual fields are created for all fields, except identiier ones
+                virtual_fields: # array
+                    options: []

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -641,9 +642,10 @@ abstract class AbstractQueryConverter
         ];
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner');
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left');
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner', $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left', $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
+
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
             }
@@ -693,7 +695,7 @@ abstract class AbstractQueryConverter
         }
 
         $delimiterPos = strpos($item['join'], '.');
-        if (false === $delimiterPos) {
+        if (false !== $delimiterPos) {
             $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
@@ -731,8 +733,11 @@ abstract class AbstractQueryConverter
      * @param array  $aliases
      * @param array  $query
      * @param string $joinType
+     * @param        $parentJoinId
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType)
+    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
     {
         if (isset($query['join'][$joinType])) {
             foreach ($query['join'][$joinType] as $item) {
@@ -751,6 +756,19 @@ abstract class AbstractQueryConverter
                     $aliases[$alias] = $this->generateTableAlias();
                 }
                 $item['alias'] = $aliases[$alias];
+
+                $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
+                    $item['join'],
+                    $parentJoinId,
+                    $item['type'],
+                    isset($item['conditionType']) ? $item['conditionType'] : null,
+                    isset($item['condition']) ? $item['condition'] : null
+                );
+
+                if (isset($this->tableAliases[$itemJoinId])) {
+                    $item['alias']   = $this->tableAliases[$itemJoinId];
+                    $aliases[$alias] = $this->tableAliases[$itemJoinId];
+                }
 
                 $joins[] = $item;
             }
@@ -846,7 +864,7 @@ abstract class AbstractQueryConverter
     protected function checkTableAliasInSelect($selectExpr, $alias)
     {
         $pos = strpos($selectExpr, $alias);
-        if (false !== $pos) {
+        while (false !== $pos) {
             if (0 === $pos) {
                 $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                 if ('.' === $nextChar) {
@@ -854,13 +872,14 @@ abstract class AbstractQueryConverter
                 }
             } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
                 $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '('])) {
+                if (in_array($prevChar, [' ', '(', ','])) {
                     $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                     if ('.' === $nextChar) {
                         return $pos;
                     }
                 }
             }
+            $pos = strpos($selectExpr, $alias, $pos + strlen($alias));
         }
 
         return false;
