@@ -15,7 +15,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @ORM\Table(name="oro_address_type")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "grouping"={"groups"={"dictionary"}}
+ *      }
+ * )
  */
 class AddressType implements Translatable
 {

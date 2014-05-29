@@ -194,7 +194,8 @@ define(function (require) {
         $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
         $.extend(true, $fieldCondition.data('options'), {
             fieldChoice: fieldChoiceOptions,
-            filters: metadata.filters
+            filters: metadata.filters,
+            hierarchy: metadata.hierarchy
         });
 
         $segmentCondition = $(options.criteriaList).find('[data-criteria=condition-segment]');
