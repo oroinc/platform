@@ -3,10 +3,14 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
@@ -19,9 +23,13 @@ class ChannelType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    public function __construct(TypesRegistry $registry)
+    /** @var SecurityContextInterface */
+    protected $securityContext;
+
+    public function __construct(TypesRegistry $registry, SecurityContextInterface $securityContext)
     {
-        $this->registry = $registry;
+        $this->registry        = $registry;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -67,6 +75,27 @@ class ChannelType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'defaultUserOwner',
+            'oro_user_select',
+            [
+                'required' => true,
+                'label'    => 'oro.integration.channel.default_user_owner.label'
+            ]
+        );
+
+        $currentUser = $this->getCurrentUser();
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event) use ($currentUser) {
+                $data = $event->getData();
+
+                if ($data && !$data->getId() && !$data->getDefaultUserOwner() || null === $data) {
+                    $event->getForm()->get('defaultUserOwner')->setData($currentUser);
+                }
+            }
+        );
     }
 
     /**
@@ -81,6 +110,17 @@ class ChannelType extends AbstractType
                 'cascade_validation' => true
             ]
         );
+    }
+
+    /**
+     * Returns current logged in user
+     *
+     * @return User|null
+     */
+    protected function getCurrentUser()
+    {
+        return $this->securityContext->getToken() && !is_string($this->securityContext->getToken()->getUser())
+            ? $this->securityContext->getToken()->getUser() : null;
     }
 
     /**

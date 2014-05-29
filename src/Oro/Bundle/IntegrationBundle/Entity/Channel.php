@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -82,6 +83,14 @@ class Channel
     protected $syncPriority;
 
     /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $defaultUserOwner;
+
+    /**
      * @var Status[]|ArrayCollection
      *
      * Cascade persisting is not used due to lots of detach/merge
@@ -94,7 +103,7 @@ class Channel
 
     public function __construct()
     {
-        $this->statuses = new ArrayCollection();
+        $this->statuses            = new ArrayCollection();
         $this->isTwoWaySyncEnabled = false;
     }
 
@@ -245,6 +254,7 @@ class Channel
     public function setSyncPriority($syncPriority)
     {
         $this->syncPriority = $syncPriority;
+
         return $this;
     }
 
@@ -264,6 +274,7 @@ class Channel
     public function setIsTwoWaySyncEnabled($isTwoWaySyncEnabled)
     {
         $this->isTwoWaySyncEnabled = $isTwoWaySyncEnabled;
+
         return $this;
     }
 
@@ -273,5 +284,22 @@ class Channel
     public function getIsTwoWaySyncEnabled()
     {
         return $this->isTwoWaySyncEnabled;
+    }
+
+    /**
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function setDefaultUserOwner(User $owner = null)
+    {
+        $this->defaultUserOwner = $owner;
+
+        return $this;
+    }
+
+    public function getDefaultUserOwner()
+    {
+        return $this->defaultUserOwner;
     }
 }

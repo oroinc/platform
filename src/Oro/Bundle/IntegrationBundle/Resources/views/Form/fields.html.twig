@@ -41,11 +41,13 @@
                         type:          [
                             {{ form.type.vars.full_name|json_encode|raw }},
                             {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
                             {{ form._token.vars.full_name|json_encode|raw }}
                         ],
                         transportType: [
                             {{ form.type.vars.full_name|json_encode|raw }},
                             {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
                             {{ form.transportType.vars.full_name|json_encode|raw }},
                             {{ form._token.vars.full_name|json_encode|raw }}
                         ]
