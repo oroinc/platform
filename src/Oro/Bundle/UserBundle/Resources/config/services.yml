@@ -157,7 +157,6 @@ services:
           - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
-        lazy: true
 
     oro_user.event_listener.user_email_grid_listener:
         class: %oro_user.event_listener.user_email_grid_listener.class%
@@ -166,7 +165,6 @@ services:
           - @oro_email.email_synchronization_manager
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-email-grid, method: onBuildAfter }
-        lazy: true
 
     oro_user.event_listener.without_from_user_email_grid_listener:
         class: %oro_user.event_listener.user_email_grid_listener.class%

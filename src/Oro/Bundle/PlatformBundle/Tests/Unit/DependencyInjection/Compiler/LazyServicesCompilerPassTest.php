@@ -8,7 +8,7 @@ class LazyServicesCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcessLazyServicesTag()
     {
-        $expectedTags = array('doctrine.event_listener');
+        $expectedTags = array();
 
         $compiler = new LazyServicesCompilerPass();
         $this->assertAttributeEquals($expectedTags, 'lazyServicesTags', $compiler);
