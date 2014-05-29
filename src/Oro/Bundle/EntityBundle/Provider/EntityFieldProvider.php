@@ -230,10 +230,13 @@ class EntityFieldProvider
                         continue;
                     }
 
-                    $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-                    $fieldLabel = isset($query['select']['label'])
-                        ? $query['select']['label']
-                        : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+                    $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+                    if (isset($query['select']['label'])) {
+                        $fieldLabel = $query['select']['label'];
+                    } else {
+                        $fieldLabel = ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+                    }
+
                     $this->addField(
                         $result,
                         $fieldName,
