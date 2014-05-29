@@ -21,6 +21,11 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
     protected $stream;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $compiler;
+
+    /**
      * @var PlaceholderTokenParser
      */
     protected $tokenParser;
@@ -38,14 +43,16 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
         $this->parser = $this->getMockBuilder('Twig_Parser')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->parser->expects($this->any())
             ->method('getStream')
             ->will($this->returnValue($this->stream));
-
         $this->parser->expects($this->any())
             ->method('getExpressionParser')
             ->will($this->returnValue($this->expressionParser));
+
+        $this->compiler = $this->getMockBuilder('Twig_Compiler')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->tokenParser = new PlaceholderTokenParser();
         $this->tokenParser->setParser($this->parser);
@@ -54,10 +61,13 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
     public function testParseSimpleNameWithoutVariables()
     {
         $expectedLine = 101;
-        $expectedNameExpression = $this->createExpressionNode();
-        $expectedVariablesExpression = new \Twig_Node_Expression_Constant(array(), $expectedLine);
 
-        $actualToken = $this->createToken();
+        $nameExpr    = $this->createExpressionNode();
+
+        $token = $this->createToken();
+        $token->expects($this->any())
+            ->method('getLine')
+            ->will($this->returnValue($expectedLine));
 
         $this->stream->expects($this->at(0))
             ->method('test')
@@ -66,11 +76,7 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
 
         $this->expressionParser->expects($this->once())
             ->method('parseExpression')
-            ->will($this->returnValue($expectedNameExpression));
-
-        $actualToken->expects($this->atLeastOnce())
-            ->method('getLine')
-            ->will($this->returnValue($expectedLine));
+            ->will($this->returnValue($nameExpr));
 
         $this->stream->expects($this->at(1))
             ->method('nextIf')
@@ -81,42 +87,53 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
             ->method('expect')
             ->with(\Twig_Token::BLOCK_END_TYPE);
 
-        $actualNode = $this->tokenParser->parse($actualToken);
-        $this->assertInstanceOf('Oro\\Bundle\\UIBundle\\Twig\\Node\\PlaceholderNode', $actualNode);
+        $actualNode = $this->tokenParser->parse($token);
+        $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
+        $this->assertEquals($expectedLine, $actualNode->getLine());
+        $this->assertEquals('placeholder', $actualNode->getNodeTag());
 
-        $this->assertAttributeEquals($expectedLine, 'lineno', $actualNode);
-        $this->assertAttributeEquals('placeholder', 'tag', $actualNode);
-        $this->assertAttributeEquals($expectedNameExpression, 'nameNode', $actualNode);
-        $this->assertAttributeEquals($expectedVariablesExpression, 'variablesNode', $actualNode);
+        $expectedExpr = new \Twig_Node_Expression_Function(
+            'placeholder',
+            new \Twig_Node(
+                array(
+                    'name'      => $nameExpr,
+                    'variables' => new \Twig_Node_Expression_Constant(array(), $expectedLine)
+                )
+            ),
+            $expectedLine
+        );
+        $this->setCompilerExpectations($actualNode, $expectedExpr);
+        $actualNode->compile($this->compiler);
     }
 
     public function testParseExpressionNameWithVariables()
     {
-        $expectedLine = 101;
-        $expectedVariablesExpression = $this->createExpressionNode();
+        $expectedLine  = 101;
+        $variablesExpr = $this->createExpressionNode();
 
-        $actualToken = $this->createToken();
+        $token = $this->createToken();
+        $token->expects($this->any())
+            ->method('getLine')
+            ->will($this->returnValue($expectedLine));
+
+        $nameToken      = $this->createToken();
+        $nameTokenValue = 'nameTokenValue';
+        $nameTokenLine  = 102;
+        $nameToken->expects($this->once())
+            ->method('getValue')
+            ->will($this->returnValue($nameTokenValue));
+        $nameToken->expects($this->once())
+            ->method('getLine')
+            ->will($this->returnValue($nameTokenLine));
 
         $this->stream->expects($this->at(0))
             ->method('test')
             ->with(\Twig_Token::NAME_TYPE)
             ->will($this->returnValue(true));
 
-        $nameToken = $this->createToken();
-
         $this->stream->expects($this->at(1))
             ->method('getCurrent')
             ->will($this->returnValue($nameToken));
-
-        $nameTokenValue = 'nameTokenValue';
-        $nameTokenLine = 102;
-        $nameToken->expects($this->once())
-            ->method('getValue')
-            ->will($this->returnValue($nameTokenValue));
-
-        $nameToken->expects($this->once())
-            ->method('getLine')
-            ->will($this->returnValue($nameTokenLine));
 
         $this->stream->expects($this->at(2))
             ->method('next');
@@ -128,23 +145,44 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
 
         $this->expressionParser->expects($this->once())
             ->method('parseExpression')
-            ->will($this->returnValue($expectedVariablesExpression));
+            ->will($this->returnValue($variablesExpr));
 
         $this->stream->expects($this->at(4))
             ->method('expect')
             ->with(\Twig_Token::BLOCK_END_TYPE);
 
-        $actualToken->expects($this->atLeastOnce())
-            ->method('getLine')
-            ->will($this->returnValue($expectedLine));
+        $actualNode = $this->tokenParser->parse($token);
+        $this->assertInstanceOf('\Twig_Node_Print', $actualNode);
+        $this->assertEquals($expectedLine, $actualNode->getLine());
+        $this->assertEquals('placeholder', $actualNode->getNodeTag());
 
-        $actualNode = $this->tokenParser->parse($actualToken);
-        $this->assertInstanceOf('Oro\\Bundle\\UIBundle\\Twig\\Node\\PlaceholderNode', $actualNode);
-
-        $this->assertAttributeEquals($expectedLine, 'lineno', $actualNode);
-        $this->assertAttributeEquals('placeholder', 'tag', $actualNode);
-        $this->assertAttributeInstanceOf('Twig_Node_Expression_Filter_Default', 'nameNode', $actualNode);
-        $this->assertAttributeEquals($expectedVariablesExpression, 'variablesNode', $actualNode);
+        $expectedNameExpr = new \Twig_Node_Expression_Filter_Default(
+            new \Twig_Node_Expression_Name($nameTokenValue, $nameTokenLine),
+            new \Twig_Node_Expression_Constant('default', $nameTokenLine),
+            new \Twig_Node(
+                array(
+                    new \Twig_Node_Expression_Constant(
+                        $nameTokenValue,
+                        $nameTokenLine
+                    )
+                ),
+                array(),
+                $nameTokenLine
+            ),
+            $nameTokenLine
+        );
+        $expectedExpr = new \Twig_Node_Expression_Function(
+            'placeholder',
+            new \Twig_Node(
+                array(
+                    'name'      => $expectedNameExpr,
+                    'variables' => $variablesExpr
+                )
+            ),
+            $expectedLine
+        );
+        $this->setCompilerExpectations($actualNode, $expectedExpr);
+        $actualNode->compile($this->compiler);
     }
 
     protected function createExpressionNode()
@@ -159,5 +197,25 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Twig_Token')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    protected function setCompilerExpectations($actualNode, $expectedExpr)
+    {
+        $this->compiler->expects($this->once())
+            ->method('addDebugInfo')
+            ->with($this->identicalTo($actualNode))
+            ->will($this->returnSelf());
+        $this->compiler->expects($this->once())
+            ->method('write')
+            ->with('echo ')
+            ->will($this->returnSelf());
+        $this->compiler->expects($this->once())
+            ->method('subcompile')
+            ->with($expectedExpr)
+            ->will($this->returnSelf());
+        $this->compiler->expects($this->once())
+            ->method('raw')
+            ->with(";\n")
+            ->will($this->returnSelf());
     }
 }
