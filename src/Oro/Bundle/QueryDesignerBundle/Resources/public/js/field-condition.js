@@ -14,7 +14,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             fieldChoiceClass: 'select',
             filters: [],
             filterContainerClass: 'active-filter'
-
         },
 
         _create: function () {
@@ -98,11 +97,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             return filterId;
         },
 
-        /**
-         * TODO
-         */
         _matchApplicable: function (applicable, criteria) {
-            var hierarchy = this.options.hierarchy[criteria.entity];
+            var hierarchy = [];
+            if (!_.isUndefined(criteria.entity)) {
+                hierarchy = this.options.hierarchy[criteria.entity];
+            }
             return _.find(applicable, function (item) {
                 return _.every(item, function (value, key) {
                     if (key == 'entity' && hierarchy.length) {
