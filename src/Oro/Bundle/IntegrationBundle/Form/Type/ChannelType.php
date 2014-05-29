@@ -15,7 +15,7 @@ use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
 
 class ChannelType extends AbstractType
 {
-    const NAME = 'oro_integration_channel_form';
+    const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
     /** @var TypesRegistry */

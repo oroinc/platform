@@ -298,6 +298,9 @@ class Channel
         return $this;
     }
 
+    /**
+     * @return User
+     */
     public function getDefaultUserOwner()
     {
         return $this->defaultUserOwner;
