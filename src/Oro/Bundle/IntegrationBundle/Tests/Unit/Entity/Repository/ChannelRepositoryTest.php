@@ -15,7 +15,7 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -26,7 +26,7 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entityManager, $this->repository);
     }

@@ -42,7 +42,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $rules;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->className = 'Oro\Bundle\NotificationBundle\Entity\EmailNotification';
@@ -67,7 +67,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->addHandler($this->handler);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->em);
         unset($this->className);

@@ -1,5 +1,6 @@
 parameters:
     oro_search.index.class:                               Oro\Bundle\SearchBundle\Engine\Indexer
+    oro_search.fulltext_index_manager.class:              Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.security_provider.class:                   Oro\Bundle\SearchBundle\Security\SecurityProvider
     oro_search.index_listener.class:                      Oro\Bundle\SearchBundle\EventListener\IndexListener
     oro_search.twig_extension.class:                      Oro\Bundle\SearchBundle\Twig\OroSearchExtension
@@ -27,6 +28,12 @@ services:
             - "@oro_search.mapper"
             - "@oro_search.security_provider"
 
+    oro_search.fulltext_index_manager:
+        class:                        %oro_search.fulltext_index_manager.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+            - %oro_search.engine_orm%
+
     oro_search.security_provider:
         class:                        %oro_search.security_provider.class%
         public:                       false
@@ -52,7 +59,10 @@ services:
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
-        arguments:                    ["@oro_search.index"]
+        arguments:
+            - @oro_search.index
+            - @oro_entity_config.config_manager
+            - @translator
         lazy: true
 
     oro_search.formatter.result_formatter:
@@ -112,5 +122,7 @@ services:
 
     oro_search.event_listener.update_schema_listener:
         class: %oro_search.event_listener.update_schema_listener.class%
+        arguments:
+            - @oro_search.fulltext_index_manager
         tags:
-          - { name: kernel.event_listener, event: console.terminate }
+            - { name: kernel.event_listener, event: console.terminate }

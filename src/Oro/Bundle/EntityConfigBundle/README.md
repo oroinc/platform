@@ -164,3 +164,10 @@ The following command can be used to update configurable entities:
 php app/console oro:entity-config:update
 ```
 Usually you need to execute this command only in 'dev' mode when new new configuration attribute or whole configuration scope is added.
+
+Clearing up the cache
+---------------------
+The following command removes all data related to configurable entities from the application cache:
+```bash
+php app/console oro:entity-config:cache:clear --no-warmup
+```

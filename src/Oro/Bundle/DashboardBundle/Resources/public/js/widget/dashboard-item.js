@@ -141,9 +141,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         _initWidgetCollapseState: function() {
             if (this.isCollapsed()) {
-                this._setCollapsed();
+                this._setCollapsed(true);
             } else {
-                this._setExpanded();
+                this._setExpanded(true);
             }
         },
 
@@ -152,18 +152,35 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         collapse: function() {
             this._setCollapsed();
-            this.trigger('collapse', this.$el, this);
-            mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
         },
 
         /**
          * Set collapsed state
+         *
+         * @param {Boolean} isInit
          */
-        _setCollapsed: function() {
+        _setCollapsed: function(isInit) {
+            if (this.widgetContentContainer.is(':animated')) {
+                return;
+            }
+
             this.state.expanded = false;
-            this.widget.addClass('collapsed');
             var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
             collapseControl.attr('title', collapseControl.data('collapsed-title')).toggleClass('collapsed');
+
+            if (isInit) {
+                this.widget.addClass('collapsed');
+                this.widgetContentContainer.slideUp('slow');
+            } else {
+                this.trigger('collapse', this.$el, this);
+                mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
+                var self = this;
+                this.widgetContentContainer.slideUp({
+                    complete: function  () {
+                        self.widget.addClass('collapsed');
+                    }
+                });
+            }
         },
 
         /**
@@ -171,18 +188,30 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         expand: function() {
             this._setExpanded();
-            this.trigger('expand', this.$el, this);
-            mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
         },
 
         /**
          * Set expanded state
+         *
+         * @param {Boolean} isInit
          */
-        _setExpanded: function() {
+        _setExpanded: function(isInit) {
+            if (this.widgetContentContainer.is(':animated')) {
+                return;
+            }
+
             this.state.expanded = true;
-            this.widget.removeClass('collapsed');
+
             var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
             collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
+
+            this.widget.removeClass('collapsed');
+
+            if (!isInit) {
+                this.trigger('expand', this.$el, this);
+                mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
+                this.widgetContentContainer.slideDown();
+            }
         },
 
         /**

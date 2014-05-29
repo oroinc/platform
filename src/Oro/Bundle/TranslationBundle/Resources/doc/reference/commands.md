@@ -13,10 +13,9 @@ Overview
 ----------
 
 These are console commands that allows to generate, download and update translations data in system with third-party translation provider service. They can be run with app/console command_name as usual.
-Two supported translation service adapters available:
+Supported translation service adapters:
 
 - Crowdin translation adapter
-- [Oro translation service proxy](https://github.com/laboro/translation-proxy)
 
 oro:translation:dump
 -------------

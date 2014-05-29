@@ -3,23 +3,16 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestGroupsTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -36,11 +29,11 @@ class RestGroupsTest extends WebTestCase
 
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_group'),
+            $this->getUrl('oro_api_post_group'),
             $request
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
     }
@@ -54,10 +47,10 @@ class RestGroupsTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_groups')
+            $this->getUrl('oro_api_get_groups')
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $group = array_filter(
             $result,
@@ -82,18 +75,19 @@ class RestGroupsTest extends WebTestCase
         $request['group']['name'] .= '_updated';
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_group', array('id' => $group['id'])),
+            $this->getUrl('oro_api_put_group', array('id' => $group['id'])),
             $request
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );
-        $result = $this->client->getResponse();
-        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertArrayHasKey('name', $result);
         $this->assertEquals($result['name'], $request['group']['name'], 'Group does not updated');
 
@@ -108,16 +102,16 @@ class RestGroupsTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_delete_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 }

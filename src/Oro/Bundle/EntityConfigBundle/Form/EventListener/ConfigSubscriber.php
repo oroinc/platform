@@ -2,26 +2,17 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {

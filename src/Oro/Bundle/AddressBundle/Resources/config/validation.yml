@@ -1,7 +1,6 @@
 Oro\Bundle\AddressBundle\Entity\AbstractAddress:
     properties:
         street:
-            - NotBlank: ~
             - Length:
                   max: 500
 
@@ -10,17 +9,19 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
                   max: 500
 
         city:
-            - NotBlank: ~
             - Length:
                   max: 255
 
         postalCode:
-            - NotBlank: ~
             - Length:
                   max: 20
 
         country:
             - NotBlank: ~
+
+        regionText:
+            - Length:
+                max: 255
 
         firstName:
             - Length:
@@ -29,10 +30,35 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
         lastName:
             - Length:
                   max: 255
+
+        namePrefix:
+            - Length:
+                  max: 255
+
+        middleName:
+            - Length:
+                  max: 255
+
+        nameSuffix:
+            - Length:
+                  max: 255
+
+        label:
+            - Length:
+                  max: 255
+
+# Prevent required values for all child of AbstractAddress
+Oro\Bundle\AddressBundle\Entity\Address:
+    properties:
+        street:
+            - NotBlank: ~
+        city:
+            - NotBlank: ~
+        postalCode:
+            - NotBlank: ~
     constraints:
         - Callback:
             methods: [isRegionValid]
-
 
 Oro\Bundle\AddressBundle\Entity\AbstractEmail:
     properties:

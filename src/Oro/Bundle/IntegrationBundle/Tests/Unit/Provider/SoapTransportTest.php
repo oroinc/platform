@@ -24,7 +24,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test entity
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->transport = $this->getMockForAbstractClass(
             'Oro\Bundle\IntegrationBundle\Provider\SOAPTransport',
@@ -50,7 +50,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
     /**
      * Tear down setup objects
      */
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->transport, $this->transportEntity, $this->soapClientMock, $this->settings);
     }

@@ -2,40 +2,34 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class ControllersRoleTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
+        $this->initClient(array(), $this->generateBasicAuthHeader());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_user_role_index'));
+        $this->client->request('GET', $this->getUrl('oro_user_role_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     public function testCreate()
     {
         /** @var Crawler $crawler */
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_role_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_role_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -46,29 +40,24 @@ class ControllersRoleTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Role saved", $crawler->html());
     }
 
     public function testUpdate()
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'roles-grid',
-            array(
-                'roles-grid[_filter][label][value]' => 'testRole'
-            )
+            array('roles-grid[_filter][label][value]' => 'testRole')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         /** @var Crawler $crawler */
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_user_role_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_role_update', array('id' => $result['id']))
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -80,27 +69,21 @@ class ControllersRoleTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Role saved", $crawler->html());
     }
 
     public function testGridData()
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'roles-grid',
-            array(
-                'roles-grid[_filter][label][value]' => 'testRoleUpdated'
-            )
+            array('roles-grid[_filter][label][value]' => 'testRoleUpdated')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'role-users-grid',
             array(
                 'role-users-grid[_filter][has_role][value]' => 1,
@@ -108,9 +91,9 @@ class ControllersRoleTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
+
         $this->assertEquals(1, $result['id']);
     }
 }

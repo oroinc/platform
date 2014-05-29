@@ -18,7 +18,7 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
     protected $em;
     protected $cache;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

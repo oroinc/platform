@@ -18,6 +18,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
+    const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
+
     protected $types = [
         'string'     => 'oro.entity_extend.form.data_type.string',
         'integer'    => 'oro.entity_extend.form.data_type.integer',
@@ -36,13 +38,19 @@ class FieldType extends AbstractType
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     ];
 
-    /** @var ConfigManager */
+    /**
+     * @var ConfigManager
+     */
     protected $configManager;
 
-    /** @var Translator */
+    /**
+     * @var Translator
+     */
     protected $translator;
 
-    /** @var ExtendDbIdentifierNameGenerator */
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
     protected $nameGenerator;
 
     /**
@@ -79,27 +87,31 @@ class FieldType extends AbstractType
 
         $entityProvider = $this->configManager->getProvider('entity');
         $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfig   = $extendProvider->getConfig($options['class_name']);
 
-        $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
+            $originalFieldNames = array();
             $types     = [];
             $relations = $entityConfig->get('relation');
             foreach ($relations as $relationKey => $relation) {
+                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
+                    continue;
+                }
+
                 /** @var FieldConfigId $fieldId */
                 $fieldId = $relation['field_id'];
                 /** @var FieldConfigId $targetFieldId */
                 $targetFieldId = $relation['target_field_id'];
 
-                if (!$this->isAvailableRelation($extendProvider, $fieldId, $targetFieldId, $relation, $relationKey)) {
-                    continue;
-                }
-
                 $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-                $fieldName   = '';
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
 
-                if ($fieldId) {
-                    $fieldName = $fieldId->getFieldName();
+                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+                if (strlen($fieldName) > $maxFieldNameLength) {
+                    $cutFieldName = substr($fieldName, 0, $maxFieldNameLength);
+                    $originalFieldNames[$cutFieldName] = $fieldName;
+                    $fieldName = $cutFieldName;
                 }
 
                 $key         = $relationKey . '||' . $fieldName;
@@ -112,6 +124,7 @@ class FieldType extends AbstractType
             }
 
             $this->types = array_merge($this->types, $types);
+            $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
 
         $builder->add(
@@ -157,8 +170,6 @@ class FieldType extends AbstractType
      * Check if reverse relation can be created
      *
      * @param ConfigProvider $extendProvider
-     * @param FieldConfigId  $fieldId
-     * @param FieldConfigId  $targetFieldId
      * @param array          $relation
      * @param string         $relationKey
      *
@@ -166,11 +177,14 @@ class FieldType extends AbstractType
      */
     protected function isAvailableRelation(
         ConfigProvider $extendProvider,
-        FieldConfigId $fieldId,
-        FieldConfigId $targetFieldId,
         array $relation,
         $relationKey
     ) {
+        /** @var FieldConfigId|false $fieldId */
+        $fieldId = $relation['field_id'];
+        /** @var FieldConfigId $targetFieldId */
+        $targetFieldId = $relation['target_field_id'];
+
         if (!$relation['assign'] || !$targetFieldId) {
             if (!$targetFieldId) {
                 return false;

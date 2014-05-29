@@ -96,3 +96,13 @@ The following variables are available in a script:
 
  - `$container` - Symfony2 DI container
  - `$commandExecutor` - An instance of [CommandExecutor](./CommandExecutor.php) class. You can use it to execute Symfony console commands
+
+## Notes ##
+If you have multiple PHP versions installed, you need to configure `ORO_PHP_PATH` variable with PHP binary path used
+by web server
+
+ - Apache2: `SetEnv ORO_PHP_PATH /usr/bin/php`
+
+ - Nginx: `fastcgi_param ORO_PHP_PATH /usr/bin/php;`
+
+ - PHP Built-in server: `/usr/bin/php app/console...`

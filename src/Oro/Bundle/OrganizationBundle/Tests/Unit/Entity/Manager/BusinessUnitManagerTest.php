@@ -16,7 +16,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $businessUnitManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->buRepo = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
             ->disableOriginalConstructor()

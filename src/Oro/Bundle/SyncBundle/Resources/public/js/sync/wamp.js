@@ -62,6 +62,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          *
          * @constructor
          * @param {Object} options to configure service
+         * @param {string} options.secure is wss protocol should be used, otherwise will be used ws protocol
          * @param {string} options.host is required
          * @param {number=} options.port default is 80
          * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
@@ -95,7 +96,8 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          */
         connect: function () {
             if (!this.session) {
-                var wsuri = 'ws://' + this.options.host + ':' + this.options.port;
+                var protocol = this.options.secure ? 'wss' : 'ws';
+                var wsuri = protocol + '://' + this.options.host + ':' + this.options.port;
                 ab.connect(wsuri, _.bind(onConnect, this), _.bind(onHangup, this), this.options);
             }
         },
