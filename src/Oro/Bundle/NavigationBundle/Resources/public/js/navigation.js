@@ -373,14 +373,18 @@ define(function (require) {
         /**
          * Routing default action
          *
-         * @param {String} page
-         * @param {String} encodedStateData
+         * @param {string} page
+         * @param {string} encodedStateData
+         * @param {string=} params
          */
-        defaultAction: function(page, encodedStateData) {
+        defaultAction: function(page, encodedStateData, params) {
             this.beforeAction();
             this.beforeDefaultAction();
             this.encodedStateData = encodedStateData;
             this.url = page;
+            if (this.url !== null && params) {
+                this.url += '?' + params
+            }
             if (!this.url) {
                 this.url = window.location.href.replace(this.baseUrl, '');
             }
@@ -481,6 +485,7 @@ define(function (require) {
             }
 
             var useCache = this.useCache;
+            console.log('loadPage', pageUrl);
             $.ajax({
                 url: pageUrl,
                 headers: this.headerObject,
