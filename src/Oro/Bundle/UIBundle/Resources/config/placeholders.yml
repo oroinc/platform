@@ -23,6 +23,13 @@ placeholders:
             ui_requirejs_config:
                 order: 10
 
+    view_content_data:
+        blocks:
+            communications:
+                label: Communications
+            additional_information:
+                label: Additional Information
+
 items:
     logo:
         template: OroUIBundle:Default:logo.html.twig

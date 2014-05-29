@@ -26,7 +26,7 @@ class PlaceholderExtension extends \Twig_Extension
     protected $kernelExtension;
 
     /**
-     * @param \Twig_Environment $environment
+     * @param \Twig_Environment   $environment
      * @param PlaceholderProvider $placeholder
      * @param HttpKernelExtension $kernelExtension
      */
@@ -35,8 +35,8 @@ class PlaceholderExtension extends \Twig_Extension
         PlaceholderProvider $placeholder,
         HttpKernelExtension $kernelExtension
     ) {
-        $this->environment = $environment;
-        $this->placeholder = $placeholder;
+        $this->environment     = $environment;
+        $this->placeholder     = $placeholder;
         $this->kernelExtension = $kernelExtension;
     }
 
@@ -49,12 +49,12 @@ class PlaceholderExtension extends \Twig_Extension
     {
         return array(
             'placeholder' => new \Twig_Function_Method(
-                $this,
-                'renderPlaceholder',
-                array(
-                    'is_safe' => array('html')
+                    $this,
+                    'renderPlaceholder',
+                    array(
+                        'is_safe' => array('html')
+                    )
                 )
-            )
         );
     }
 
@@ -62,36 +62,24 @@ class PlaceholderExtension extends \Twig_Extension
      * Render placeholder by name
      *
      * @param string $name
-     * @param array $variables
-     * @param string $delimiter
-     * @return string
-     * @throws \RuntimeException If placeholder cannot be rendered.
+     * @param array  $variables
+     * @param array  $attributes Supported attributes:
+     *                           'delimiter' => string
+     *                           'output' => 'raw' or 'string'. defaults to 'string'
+     * @return string|array
      */
-    public function renderPlaceholder($name, array $variables = array(), $delimiter = '')
+    public function renderPlaceholder($name, array $variables = array(), array $attributes = array())
     {
-        $renderedBlocks = [];
+        $output = isset($attributes['output']) ? $attributes['output'] : 'string';
 
-        $items = $this->placeholder->getPlaceholderItems($name, $variables);
-
-        foreach ($items as $block) {
-            if (isset($block['template'])) {
-                $renderedBlocks[] = $this->environment->render($block['template'], $variables);
-            } elseif (isset($block['action'])) {
-                /** @var HttpKernelExtension $kernelExtension */
-                $renderedBlocks[] = $this->kernelExtension->renderFragment(
-                    $this->kernelExtension->controller($block['action'], $variables)
-                );
-            } else {
-                throw new \RuntimeException(
-                    sprintf(
-                        'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
-                        implode('", "', $block)
-                    )
-                );
-            }
+        if ($output === 'raw') {
+            return $this->getPlaceholderData($name, $variables);
+        } else {
+            return implode(
+                isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
+                $this->getPlaceholderData($name, $variables, true)
+            );
         }
-
-        return implode($delimiter, $renderedBlocks);
     }
 
     /**
@@ -102,5 +90,71 @@ class PlaceholderExtension extends \Twig_Extension
     public function getName()
     {
         return self::EXTENSION_NAME;
+    }
+
+    /**
+     * Renders the given item.
+     *
+     * @param array $item
+     * @param array $variables
+     * @return string
+     * @throws \RuntimeException If placeholder cannot be rendered.
+     */
+    protected function renderItemContent(array $item, array $variables)
+    {
+        if (isset($item['template'])) {
+            return $this->environment->render($item['template'], $variables);
+        }
+
+        if (isset($item['action'])) {
+            /** @var HttpKernelExtension $kernelExtension */
+            return $this->kernelExtension->renderFragment(
+                $this->kernelExtension->controller($item['action'], $variables)
+            );
+        }
+
+        throw new \RuntimeException(
+            sprintf(
+                'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
+                implode('", "', $item)
+            )
+        );
+    }
+
+    /**
+     * @param string $name
+     * @param array  $variables
+     * @param bool   $ignoreBlocks
+     * @return array
+     */
+    protected function getPlaceholderData($name, $variables, $ignoreBlocks = false)
+    {
+        $result = array();
+
+        $blocks = $ignoreBlocks
+            ? array()
+            : $this->placeholder->getPlaceholderBlocks($name, $variables);
+        if (empty($blocks)) {
+            $items = $this->placeholder->getPlaceholderItems($name, $variables);
+            foreach ($items as $item) {
+                $result[] = $this->renderItemContent($item, $variables);
+            }
+        } else {
+            foreach ($blocks as $block) {
+                $resultItems = array();
+                $items       = $this->placeholder->getPlaceholderItems($name, $variables, $block['name']);
+                foreach ($items as $item) {
+                    $resultItems[] = $this->renderItemContent($item, $variables);
+                }
+                if (!empty($resultItems)) {
+                    $result[] = array(
+                        'label' => $block['label'],
+                        'items' => $resultItems
+                    );
+                }
+            }
+        }
+
+        return $result;
     }
 }

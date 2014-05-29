@@ -12,6 +12,9 @@ use Oro\Component\Config\CumulativeResourceManager;
 
 class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testLoad()
     {
         $bundle1 = new BarBundle();
@@ -30,7 +33,7 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
         $extensionConfig = array(
             array(
                 'placeholders_items' => array(
-                    'test_block' => array(
+                    'test_block'       => array(
                         'items' => array(
                             'item1'          => array(
                                 'remove' => true
@@ -49,8 +52,27 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                                 'order'    => 5
                             ),
                         )
+                    ),
+                    'test_with_blocks' => array(
+                        'items'  => array(
+                            'item1' => array(
+                                'block' => 'new_block'
+                            )
+                        ),
+                        'blocks' => array(
+                            'block2'    => array(
+                                'remove' => true
+                            ),
+                            'block3'    => array(
+                                'label' => 'Test Block 3 (renamed in app/config)',
+                                'order' => -5
+                            ),
+                            'new_block' => array(
+                                'label' => 'New Block',
+                                'order' => -100
+                            )
+                        )
                     )
-
                 )
             )
         );
@@ -58,36 +80,44 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroUIExtension();
         $extension->load($extensionConfig, $container);
 
+        $palaceholders = $container->getParameter('oro_ui.placeholders');
         $this->assertEquals(
             [
                 'test_block'       => array(
                     'items' => array(
-                        'item6'    => array(
+                        array(
+                            'name'   => 'item6',
                             'action' => 'TestBundle:Test:test6',
                             'order'  => -10
                         ),
-                        'item7'    => array(
+                        array(
+                            'name'   => 'item7',
                             'action' => 'TestBundle:Test:test7',
                             'order'  => -5
                         ),
-                        'item2'    => array(
+                        array(
+                            'name'   => 'item2',
                             'action' => 'TestBundle:Test:test2',
                             'order'  => 0
                         ),
-                        'item3'    => array(
+                        array(
+                            'name'                  => 'item3',
                             'action'                => 'TestBundle:Test:test3',
                             'order'                 => 0,
                             'attribute_instance_of' => array('entity', '%oro_user.entity.class%')
                         ),
-                        'new_item' => array(
+                        array(
+                            'name'     => 'new_item',
                             'template' => 'test_template',
                             'order'    => 5
                         ),
-                        'item4'    => array(
+                        array(
+                            'name'   => 'item4',
                             'action' => 'TestBundle:Test:test4',
                             'order'  => 15
                         ),
-                        'item5'    => array(
+                        array(
+                            'name'   => 'item5',
                             'action' => 'TestBundle:Test:test5',
                             'order'  => 20
                         ),
@@ -95,7 +125,8 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'test_merge_block' => array(
                     'items' => array(
-                        'item1' => array(
+                        array(
+                            'name'     => 'item1',
                             'template' => 'TestBundle::test.html.twig',
                             'order'    => 10
                         )
@@ -103,9 +134,48 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'empty_block'      => array(
                     'items' => array()
+                ),
+                'test_with_blocks' => array(
+                    'items'  => array(
+                        array(
+                            'name'   => 'item2',
+                            'action' => 'TestBundle:Test:test2',
+                            'order'  => 0,
+                            'block'  => 'block1'
+                        ),
+                        array(
+                            'name'   => 'item4',
+                            'action' => 'TestBundle:Test:test4',
+                            'order'  => 10,
+                            'block'  => 'block3'
+                        ),
+                        array(
+                            'name'     => 'item1',
+                            'template' => 'TestBundle::test.html.twig',
+                            'order'    => 10,
+                            'block'    => 'new_block'
+                        ),
+                    ),
+                    'blocks' => array(
+                        array(
+                            'name'  => 'new_block',
+                            'label' => 'New Block',
+                            'order' => -100
+                        ),
+                        array(
+                            'name'  => 'block3',
+                            'label' => 'Test Block 3 (renamed in app/config)',
+                            'order' => -5
+                        ),
+                        array(
+                            'name'  => 'block1',
+                            'label' => 'Test Block 1 (renamed in FooBundle)',
+                            'order' => 0
+                        ),
+                    )
                 )
             ],
-            $container->getParameter('oro_ui.placeholders')
+            $palaceholders
         );
     }
 }
