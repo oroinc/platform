@@ -14,6 +14,24 @@ placeholders:
         items:
             item1: ~
     empty_block: ~
+    test_with_blocks:
+        items:
+            item1:
+                block: block1
+            item2:
+                block: block1
+            item3:
+                block: block2
+            item4:
+                block: block3
+        blocks:
+            block1:
+                label: Test Block 1
+            block2:
+                label: Test Block 2
+                order: -10
+            block3:
+                label: Test Block 3
 
 items:
     item1:

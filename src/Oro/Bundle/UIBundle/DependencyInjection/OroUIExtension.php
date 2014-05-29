@@ -36,7 +36,6 @@ class OroUIExtension extends Extension
         $loader->load('twig.yml');
 
         $container->setParameter('oro_ui.show_pin_button_on_start_page', $config['show_pin_button_on_start_page']);
-        $container->setParameter('oro_ui.wrap_class', $config['wrap_class']);
         $container->setParameter('oro_ui.placeholders', $config['placeholders_items']);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
@@ -105,7 +104,8 @@ class OroUIExtension extends Extension
     /**
      * Makes sure the placeholder's array does not contains gaps
      *
-     * For example 'items' attribute should exist for each placeholder even if there are no any items there
+     * For example 'items' and 'blocks' attributes should exist for each placeholder
+     * even if there are no any items there
      *
      * it is required for correct merging of placeholders
      * if we do not do this the newly loaded placeholder without 'items' attribute removes
@@ -119,6 +119,9 @@ class OroUIExtension extends Extension
         foreach ($names as $name) {
             if (!isset($placeholders[$name]['items'])) {
                 $placeholders[$name]['items'] = array();
+            }
+            if (!isset($placeholders[$name]['blocks'])) {
+                $placeholders[$name]['blocks'] = array();
             }
         }
     }

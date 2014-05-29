@@ -1,2 +1,6 @@
 placeholders:
     test_merge_block: ~ # already loaded items should not be removed
+    test_with_blocks:
+        blocks:
+            block1:
+                label: Test Block 1 (renamed in FooBundle)
