@@ -104,7 +104,7 @@ class OroUIExtension extends Extension
     /**
      * Makes sure the placeholder's array does not contains gaps
      *
-     * For example 'items' and 'blocks' attributes should exist for each placeholder
+     * For example 'items' attribute should exist for each placeholder
      * even if there are no any items there
      *
      * it is required for correct merging of placeholders
@@ -119,9 +119,6 @@ class OroUIExtension extends Extension
         foreach ($names as $name) {
             if (!isset($placeholders[$name]['items'])) {
                 $placeholders[$name]['items'] = array();
-            }
-            if (!isset($placeholders[$name]['blocks'])) {
-                $placeholders[$name]['blocks'] = array();
             }
         }
     }

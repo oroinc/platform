@@ -53,26 +53,6 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                             ),
                         )
                     ),
-                    'test_with_blocks' => array(
-                        'items'  => array(
-                            'item1' => array(
-                                'block' => 'new_block'
-                            )
-                        ),
-                        'blocks' => array(
-                            'block2'    => array(
-                                'remove' => true
-                            ),
-                            'block3'    => array(
-                                'label' => 'Test Block 3 (renamed in app/config)',
-                                'order' => -5
-                            ),
-                            'new_block' => array(
-                                'label' => 'New Block',
-                                'order' => -100
-                            )
-                        )
-                    )
                 )
             )
         );
@@ -135,45 +115,6 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                 'empty_block'      => array(
                     'items' => array()
                 ),
-                'test_with_blocks' => array(
-                    'items'  => array(
-                        array(
-                            'name'   => 'item2',
-                            'action' => 'TestBundle:Test:test2',
-                            'order'  => 0,
-                            'block'  => 'block1'
-                        ),
-                        array(
-                            'name'   => 'item4',
-                            'action' => 'TestBundle:Test:test4',
-                            'order'  => 10,
-                            'block'  => 'block3'
-                        ),
-                        array(
-                            'name'     => 'item1',
-                            'template' => 'TestBundle::test.html.twig',
-                            'order'    => 10,
-                            'block'    => 'new_block'
-                        ),
-                    ),
-                    'blocks' => array(
-                        array(
-                            'name'  => 'new_block',
-                            'label' => 'New Block',
-                            'order' => -100
-                        ),
-                        array(
-                            'name'  => 'block3',
-                            'label' => 'Test Block 3 (renamed in app/config)',
-                            'order' => -5
-                        ),
-                        array(
-                            'name'  => 'block1',
-                            'label' => 'Test Block 1 (renamed in FooBundle)',
-                            'order' => 0
-                        ),
-                    )
-                )
             ],
             $palaceholders
         );

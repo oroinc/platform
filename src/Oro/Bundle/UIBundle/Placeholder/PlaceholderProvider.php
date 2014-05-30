@@ -31,40 +31,13 @@ class PlaceholderProvider
      *
      * @param string $placeholderName
      * @param array  $variables
-     * @param string $blockName
      * @return array
      */
-    public function getPlaceholderItems($placeholderName, array $variables, $blockName = null)
+    public function getPlaceholderItems($placeholderName, array $variables)
     {
-        $result = array();
-        if (isset($this->placeholders[$placeholderName]['items'])) {
-            foreach ($this->placeholders[$placeholderName]['items'] as $item) {
-                if (empty($blockName) || (isset($item['block']) && $item['block'] === $blockName)) {
-                    $result[] = $item;
-                }
-            }
-        }
-
-        foreach ($this->filters as $filter) {
-            $result = $filter->filter($result, $variables);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get blocks by placeholder name
-     *
-     * @param string $placeholderName
-     * @param array  $variables
-     * @return array
-     */
-    public function getPlaceholderBlocks($placeholderName, array $variables)
-    {
-        $result = array();
-        if (isset($this->placeholders[$placeholderName]['blocks'])) {
-            $result = $this->placeholders[$placeholderName]['blocks'];
-        }
+        $result = isset($this->placeholders[$placeholderName]['items'])
+            ? $this->placeholders[$placeholderName]['items']
+            : array();
 
         foreach ($this->filters as $filter) {
             $result = $filter->filter($result, $variables);
