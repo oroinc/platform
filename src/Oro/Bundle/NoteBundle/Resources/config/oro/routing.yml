@@ -1,0 +1,4 @@
+oro_note_bundle:
+    resource:     "@OroNoteBundle/Controller"
+    type:         annotation
+    prefix:       /
