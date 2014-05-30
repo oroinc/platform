@@ -11,3 +11,8 @@ oro:
             general: "General import/action operations"
             import:  "Import entities"
             export:  "Export entities"
+        entity_config:
+            header.label: "Import/export header"
+            identity.label: "Import/export identity field"
+            excluded.label: "Exclude from import/export"
+            full.label: "Export all relation fields"
