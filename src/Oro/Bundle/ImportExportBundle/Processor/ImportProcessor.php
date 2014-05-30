@@ -7,11 +7,10 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
-class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, SerializerAwareInterface
+class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface, EntityNameAwareInterface
 {
     /**
      * @var ContextInterface
@@ -24,14 +23,24 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
     protected $serializer;
 
     /**
-     * @var DataConverterInterface
+     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface
      */
     protected $dataConverter;
 
     /**
-     * @var StrategyInterface
+     * @var StrategyInterface|EntityNameAwareInterface|ContextAwareInterface
      */
     protected $strategy;
+
+    /**
+     * @var string
+     */
+    protected $entityName;
+
+    /**
+     * @var bool
+     */
+    protected $initialized = false;
 
     /**
      * {@inheritdoc}
@@ -94,5 +103,21 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
         }
 
         return $object ?: null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEntityName($entityName)
+    {
+        $this->entityName = $entityName;
+
+        if ($this->dataConverter && $this->dataConverter instanceof EntityNameAwareInterface) {
+            $this->dataConverter->setEntityName($this->entityName);
+        }
+
+        if ($this->strategy && $this->strategy instanceof EntityNameAwareInterface) {
+            $this->strategy->setEntityName($this->entityName);
+        }
     }
 }

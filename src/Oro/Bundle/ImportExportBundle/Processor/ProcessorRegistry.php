@@ -64,6 +64,10 @@ class ProcessorRegistry
             );
         }
 
+        if ($processor instanceof EntityNameAwareInterface) {
+            $processor->setEntityName($entityName);
+        }
+
         $this->processors[$type][$alias] = $processor;
         $this->processorsByEntity[$entityName][$type][$alias] = $processor;
     }
