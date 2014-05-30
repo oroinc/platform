@@ -1,30 +1,31 @@
 <div class="btn-group">
-    {% if resource_granted('oro_importexport_import') %}
-    <a type="button"
-        class="btn import-btn icons-holder-text no-hash"
-        href="{{ path('oro_importexport_import_form', {'entity': entityClass}) }}">
-        <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
-    </a>
+    {% if importTitle is defined and resource_granted('oro_importexport_import') %}
+        <a type="button"
+            class="btn import-btn icons-holder-text no-hash"
+            href="{{ path('oro_importexport_import_form', {'entity': entityClass}) }}">
+            <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+        </a>
     {% endif %}
 
-    {% if resource_granted('oro_importexport_export') %}
-    <a type="button"
-       class="btn export-btn icons-holder-text no-hash"
-       href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-        <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
-    </a>
+    {% if exportProcessor is defined and resource_granted('oro_importexport_export') %}
+        <a type="button"
+           class="btn export-btn icons-holder-text no-hash"
+           href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
+            <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+        </a>
     {% endif %}
 </div>
 
 <script type="text/javascript">
     require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/mediator', 'oroimportexport/js/export-handler'],
     function($, __, DialogWidget, mediator, exportHandler) {
+        {% if importTitle is defined %}
         $('.import-btn').on('click', function(e) {
             e.preventDefault();
 
             var widget = new DialogWidget({
                 'url': this.href,
-                'title': {{ imortTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
+                'title': {{ importTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
                 'stateEnabled': false,
                 'incrementalPosition': false,
                 'dialogOptions': {
@@ -45,7 +46,9 @@
             });
             {% endif %}
         });
+        {% endif %}
 
+        {% if exportProcessor is defined %}
         $('.export-btn').on('click', function(e) {
             e.preventDefault();
 
@@ -55,5 +58,6 @@
                 exportHandler.handleExportResponse(data);
             });
         });
+        {% endif %}
     });
 </script>

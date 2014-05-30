@@ -11,6 +11,17 @@ oro_entity_config:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
                             block:          other
+                # field order in result file
+                order:
+                    options: []
+                    form:
+                        type:               integer
+                        options:
+                            label:          oro.importexport.entity_config.order.label
+                            precision:      0
+                            empty_data:     ''
+                            required:       false
+                            block:          other
                 # is filed will be used to find existing entity
                 identity:
                     options: []

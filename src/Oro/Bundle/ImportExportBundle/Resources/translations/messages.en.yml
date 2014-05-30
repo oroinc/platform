@@ -13,6 +13,7 @@ oro:
             export:  "Export entities"
         entity_config:
             header.label: "Import/export header"
+            order.label: "Import/export order"
             identity.label: "Import/export identity field"
             excluded.label: "Exclude from import/export"
             full.label: "Export all relation fields"
