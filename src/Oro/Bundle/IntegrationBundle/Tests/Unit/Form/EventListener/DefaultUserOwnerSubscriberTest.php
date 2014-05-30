@@ -17,18 +17,15 @@ class DefaultUserOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $token           = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $this->user      = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $this->user     = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()->getMock();
 
-        $token->expects($this->any())
-            ->method('getUser')
+        $securityFacade->expects($this->any())
+            ->method('getLoggedUser')
             ->will($this->returnValue($this->user));
-        $securityContext->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token));
 
-        $this->subscriber = new DefaultUserOwnerSubscriber($securityContext);
+        $this->subscriber = new DefaultUserOwnerSubscriber($securityFacade);
     }
 
     public function tearDown()

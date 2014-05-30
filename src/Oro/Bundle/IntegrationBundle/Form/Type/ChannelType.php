@@ -5,9 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
@@ -21,13 +21,13 @@ class ChannelType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
-    public function __construct(TypesRegistry $registry, SecurityContextInterface $securityContext)
+    public function __construct(TypesRegistry $registry, SecurityFacade $securityFacade)
     {
-        $this->registry        = $registry;
-        $this->securityContext = $securityContext;
+        $this->registry       = $registry;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -37,7 +37,7 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
-        $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityContext));
+        $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityFacade));
 
         $builder->add(
             self::TYPE_FIELD_NAME,
