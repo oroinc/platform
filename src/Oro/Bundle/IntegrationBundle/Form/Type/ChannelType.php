@@ -7,9 +7,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
 
 class ChannelType extends AbstractType
 {
@@ -19,9 +21,13 @@ class ChannelType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    public function __construct(TypesRegistry $registry)
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    public function __construct(TypesRegistry $registry, SecurityFacade $securityFacade)
     {
-        $this->registry = $registry;
+        $this->registry       = $registry;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -31,6 +37,7 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
+        $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityFacade));
 
         $builder->add(
             self::TYPE_FIELD_NAME,
@@ -65,6 +72,15 @@ class ChannelType extends AbstractType
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
                 'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'defaultUserOwner',
+            'oro_user_select',
+            [
+                'required' => true,
+                'label'    => 'oro.integration.channel.default_user_owner.label'
             ]
         );
     }

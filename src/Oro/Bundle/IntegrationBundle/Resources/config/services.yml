@@ -41,6 +41,7 @@ services:
         class: %oro_integration.form.type.channel.class%
         arguments:
             - @oro_integration.manager.types_registry
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 

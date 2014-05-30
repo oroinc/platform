@@ -39,6 +39,7 @@ oro:
             sync_priority.label: Sync priority
             remote_wins.label: Remote wins
             local_wins.label: Local wins
+            default_user_owner.label: Default user owner
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: Failed to add sync job to the queue. Error: %s.
