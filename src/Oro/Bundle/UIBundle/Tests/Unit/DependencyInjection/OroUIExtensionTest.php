@@ -28,7 +28,7 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $container = new ContainerBuilder();
+        $container  = new ContainerBuilder();
 
         $extensionConfig = array(
             array(
@@ -83,8 +83,7 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                         array(
                             'name'                  => 'item3',
                             'action'                => 'TestBundle:Test:test3',
-                            'order'                 => 0,
-                            'attribute_instance_of' => array('entity', '%oro_user.entity.class%')
+                            'order'                 => 0
                         ),
                         array(
                             'name'     => 'new_item',
