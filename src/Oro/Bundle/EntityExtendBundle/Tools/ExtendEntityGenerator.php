@@ -22,7 +22,7 @@ class ExtendEntityGenerator
     protected $extensions = [];
 
     /** @var array|ExtendEntityGeneratorExtension[]|null */
-    protected $sortedExtensions = null;
+    protected $sortedExtensions = [];
 
     /** @var ClassBuilder */
     protected $classBuilder;
@@ -57,7 +57,7 @@ class ExtendEntityGenerator
      */
     protected function getExtensions()
     {
-        if (empty($this->sortedExtensions)) {
+        if (empty($this->sortedExtensions) && !empty($this->extensions)) {
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }

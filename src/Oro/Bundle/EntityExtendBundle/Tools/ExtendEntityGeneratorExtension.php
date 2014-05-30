@@ -35,5 +35,5 @@ interface ExtendEntityGeneratorExtension
      *
      * @return void
      */
-    public function generate(array &$schema, PhpClass $class);
+    public function generate(array $schema, PhpClass $class);
 }
