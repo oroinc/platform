@@ -26,7 +26,7 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->em               = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $this->metadataProvider =
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
@@ -84,7 +84,6 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         $user             = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $channelWithOwner = new Channel();
         $channelWithOwner->setDefaultUserOwner($user);
-
 
         return [
             'should set, user given and user owned entity'             => [$channelWithOwner, 'USER', true],
