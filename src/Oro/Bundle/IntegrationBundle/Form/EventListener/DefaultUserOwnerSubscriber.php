@@ -5,18 +5,17 @@ namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DefaultUserOwnerSubscriber implements EventSubscriberInterface
 {
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
-    public function __construct(SecurityContextInterface $securityContext)
+    public function __construct(SecurityFacade $securityFacade)
     {
-        $this->securityContext = $securityContext;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -37,18 +36,7 @@ class DefaultUserOwnerSubscriber implements EventSubscriberInterface
         $data = $event->getData();
 
         if ($data && !$data->getId() && !$data->getDefaultUserOwner() || null === $data) {
-            $event->getForm()->get('defaultUserOwner')->setData($this->getCurrentUser());
+            $event->getForm()->get('defaultUserOwner')->setData($this->securityFacade->getLoggedUser());
         }
-    }
-
-    /**
-     * Returns current logged in user
-     *
-     * @return User|null
-     */
-    protected function getCurrentUser()
-    {
-        return $this->securityContext->getToken() && !is_string($this->securityContext->getToken()->getUser())
-            ? $this->securityContext->getToken()->getUser() : null;
     }
 }

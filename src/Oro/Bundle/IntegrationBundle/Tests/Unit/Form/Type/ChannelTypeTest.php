@@ -3,8 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
@@ -19,8 +19,8 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     /** @var  FormBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $builder;
 
-    /** @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
     public function setUp()
     {
@@ -28,9 +28,10 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()->getMock();
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->type = new ChannelType($this->registry, $this->securityContext);
+        $this->type = new ChannelType($this->registry, $this->securityFacade);
     }
 
     public function tearDown()
