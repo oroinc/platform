@@ -40,7 +40,6 @@
             "jms/serializer-bundle": "0.13.0",
             "knplabs/knp-menu": "2.0.x-dev",
             "knplabs/knp-menu-bundle": "2.0.x-dev",
-            "knplabs/knp-paginator-bundle": "2.3.3",
             "kriswallsmith/assetic": "1.1.2",
             "leafo/lessphp": "0.4.0",
             "lexik/maintenance-bundle": "dev-master",
