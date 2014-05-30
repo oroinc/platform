@@ -23,7 +23,6 @@ items:
         action: TestBundle:Test:test2
     item3:
         action: TestBundle:Test:test3
-        attribute_instance_of: [entity, %oro_user.entity.class%]
     item4:
         action: TestBundle:Test:test4
         order: 10

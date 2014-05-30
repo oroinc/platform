@@ -71,7 +71,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->append($this->getRemoveAttributeConfigTree())
                 ->integerNode('order')->defaultValue(0)->end()
-                ->append($this->getInstanceOfAttributeConfigTree())
+                ->scalarNode('applicable')->end()
                 ->scalarNode('action')->end()
                 ->scalarNode('template')->end()
             ->end()
@@ -93,17 +93,6 @@ class Configuration implements ConfigurationInterface
                     }
                 )
                 ->thenInvalid('Only one either "action" or "template" attribute can be defined. %s')
-            ->end()
-            ->validate()
-                // remove empty 'attribute_instance_of' attribute
-                ->always(
-                    function ($v) {
-                        if (empty($v['attribute_instance_of'])) {
-                            unset($v['attribute_instance_of']);
-                        };
-                        return $v;
-                    }
-                )
             ->end();
 
         $this->addItemsSorting($node);
@@ -130,35 +119,6 @@ class Configuration implements ConfigurationInterface
                 }
             )
             ->thenUnset()
-            ->end();
-
-        return $node;
-    }
-
-    /**
-     * Builds the configuration tree for 'attribute_instance_of' attribute
-     *
-     * @return NodeDefinition
-     */
-    protected function getInstanceOfAttributeConfigTree()
-    {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('attribute_instance_of');
-
-        $node
-            ->prototype('scalar')->cannotBeEmpty()->end()
-            ->validate()
-                // the array must contain exactly 2 items
-                // the first item is an attribute name
-                // the second item is the class name
-                ->ifTrue(
-                    function ($v) {
-                        return 2 !== count($v);
-                    }
-                )
-                ->thenInvalid(
-                    'The "attribute_instance_of" attribute must contain exactly 2 items. %s'
-                )
             ->end();
 
         return $node;
