@@ -49,12 +49,12 @@ class PlaceholderExtension extends \Twig_Extension
     {
         return array(
             'placeholder' => new \Twig_Function_Method(
-                    $this,
-                    'renderPlaceholder',
-                    array(
-                        'is_safe' => array('html')
-                    )
+                $this,
+                'renderPlaceholder',
+                array(
+                    'is_safe' => array('html')
                 )
+            )
         );
     }
 
@@ -65,21 +65,14 @@ class PlaceholderExtension extends \Twig_Extension
      * @param array  $variables
      * @param array  $attributes Supported attributes:
      *                           'delimiter' => string
-     *                           'output' => 'raw' or 'string'. defaults to 'string'
      * @return string|array
      */
     public function renderPlaceholder($name, array $variables = array(), array $attributes = array())
     {
-        $output = isset($attributes['output']) ? $attributes['output'] : 'string';
-
-        if ($output === 'raw') {
-            return $this->getPlaceholderData($name, $variables);
-        } else {
-            return implode(
-                isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
-                $this->getPlaceholderData($name, $variables, true)
-            );
-        }
+        return implode(
+            isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
+            $this->getPlaceholderData($name, $variables, true)
+        );
     }
 
     /**
@@ -124,35 +117,15 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * @param string $name
      * @param array  $variables
-     * @param bool   $ignoreBlocks
      * @return array
      */
-    protected function getPlaceholderData($name, $variables, $ignoreBlocks = false)
+    protected function getPlaceholderData($name, $variables)
     {
         $result = array();
 
-        $blocks = $ignoreBlocks
-            ? array()
-            : $this->placeholder->getPlaceholderBlocks($name, $variables);
-        if (empty($blocks)) {
-            $items = $this->placeholder->getPlaceholderItems($name, $variables);
-            foreach ($items as $item) {
-                $result[] = $this->renderItemContent($item, $variables);
-            }
-        } else {
-            foreach ($blocks as $block) {
-                $resultItems = array();
-                $items       = $this->placeholder->getPlaceholderItems($name, $variables, $block['name']);
-                foreach ($items as $item) {
-                    $resultItems[] = $this->renderItemContent($item, $variables);
-                }
-                if (!empty($resultItems)) {
-                    $result[] = array(
-                        'label' => $block['label'],
-                        'items' => $resultItems
-                    );
-                }
-            }
+        $items = $this->placeholder->getPlaceholderItems($name, $variables);
+        foreach ($items as $item) {
+            $result[] = $this->renderItemContent($item, $variables);
         }
 
         return $result;
