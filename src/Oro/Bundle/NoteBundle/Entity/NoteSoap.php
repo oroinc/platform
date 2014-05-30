@@ -32,13 +32,27 @@ class NoteSoap extends Note implements SoapEntityInterface
     public function soapInit($note)
     {
         $this->id        = $note->id;
-        //$this->owner     = $this->getEntityId($note->owner);
         $this->message   = $note->message;
-        //$this->entityId  = $note->
-        //$this->updatedBy = $this->getEntityId($note->updatedBy);
 
-        //$this->createdAt = $note->createdAt;
-        //$this->updatedAt = $note->updatedAt;
+        $entityId = new EntityId();
+        $entityId->setEntity('Test');
+        $entityId->setId(1);
+
+        $this->entityId  = $entityId;
+        //$this->entityId  = $note->
+
+        $this->owner     = $this->getAssociationId($note->owner);
+        $this->updatedBy = $this->getAssociationId($note->updatedBy);
+        $this->createdAt = $note->createdAt;
+        $this->updatedAt = $note->updatedAt;
+    }
+
+    /**
+     * @return EntityId
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
     }
 
     /**
@@ -46,7 +60,7 @@ class NoteSoap extends Note implements SoapEntityInterface
      *
      * @return integer|null
      */
-    protected function getEntityId($entity)
+    protected function getAssociationId($entity)
     {
         if ($entity) {
             return $entity->getId();

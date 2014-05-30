@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Soap;
 
+use Oro\Bundle\NoteBundle\Entity\EntityId;
 use Symfony\Component\Form\FormInterface;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
@@ -16,13 +17,17 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 class NoteController extends SoapController
 {
     /**
-     * @Soap\Method("getNotes")
+     * @Soap\Method("getAssociatedNotes")
+     *
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
+     * @Soap\Param("entityId", phpType="Oro\Bundle\NoteBundle\Entity\EntityId")
+     *
      * @Soap\Result(phpType = "Oro\Bundle\NoteBundle\Entity\NoteSoap[]")
+     *
      * @AclAncestor("oro_note_view")
      */
-    public function cgetAction($page = 1, $limit = 10)
+    public function cgetAction($page = 1, $limit = 10, EntityId $entityId)
     {
         return $this->handleGetListRequest($page, $limit);
     }
@@ -104,6 +109,7 @@ class NoteController extends SoapController
         parent::fixFormData($data, $entity);
 
         unset($data['id']);
+        unset($data['updatedBy']);
         unset($data['createdAt']);
         unset($data['updatedAt']);
 

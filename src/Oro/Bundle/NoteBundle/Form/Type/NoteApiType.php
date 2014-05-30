@@ -15,7 +15,23 @@ class NoteApiType extends NoteType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
         $builder->addEventSubscriber(new PatchSubscriber());
+
+        /**
+         * TODO: add EventSubscriber
+         */
+        $builder->add(
+            'assoc_note_user',
+            'entity',
+            [
+                'required' => false,
+                'class'    => 'Oro\Bundle\UserBundle\Entity\User',
+                'label'    => 'oro.note.assoc_note_user.label'
+            ]
+        );
+
+        //$builder->addEventSubscriber()
     }
 
     /**

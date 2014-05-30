@@ -19,7 +19,6 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
-
     # !!!
     # FORMS  move to form.yml
     #
@@ -56,8 +55,11 @@ services:
             - @oro_note.form.api
             - @request
             - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
 
-
+    #
+    # EntityExtend Generator extension
+    #
     oro_note.entity_extend.generator_extension:
         class: %oro_note.entity_extend.generator_extension.class%
         arguments:
