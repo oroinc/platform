@@ -11,8 +11,11 @@ parameters:
     oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
 
+    # Import/export utils
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
+    oro_integration.helper.default_owener_helper.class:                   Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper
+    oro_integration.reader.entity.by_id.class:                            Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
 
@@ -22,7 +25,6 @@ parameters:
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
 
     #Reader
-    oro_importexport.reader.entity.by_id.class:                           Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
 
 services:
     oro_integration.channel.manager.api:
@@ -59,7 +61,7 @@ services:
         tags:
             - { name: oro_service_link, service: oro_integration.manager.types_registry }
 
-    # job executor
+    # Import/export utils
     oro_integration.job_executor:
         class: %oro_integration.job_executor.class%
         arguments:
@@ -69,12 +71,23 @@ services:
             - @doctrine
         lazy: true
 
-    # writer
     oro_integration.writer.persistent_batch_writer:
         class: %oro_integration.writer.persistent_batch_writer.class%
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_importexport.writer.entity_detach_fixer
+
+    oro_integration.reader.entity.by_id:
+        class: %oro_integration.reader.entity.by_id.class%
+        arguments:
+            - @oro_importexport.context_registry
+            - @doctrine
+
+    oro_integration.helper.default_owener_helper:
+        class: %oro_integration.helper.default_owener_helper.class%
+        arguments:
+            - @doctrine.orm.default_entity_manager
+            - @oro_security.owner.ownership_metadata_provider
 
     # sync processor
     oro_integration.sync.processor:
@@ -123,12 +136,6 @@ services:
             - @oro_integration.manager.types_registry
             - @oro_integration.logger.strategy
         lazy: true
-
-    oro_integration.reader.entity.by_id:
-        class: %oro_importexport.reader.entity.by_id.class%
-        arguments:
-            - @oro_importexport.context_registry
-            - @doctrine
 
     oro_integration.sync_scheduler.link:
         tags:
