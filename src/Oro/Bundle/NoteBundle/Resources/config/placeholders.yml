@@ -1,0 +1,10 @@
+placeholders:
+    view_content_data_additional_information:
+        items:
+            oro_notes:
+                order: 255
+
+items:
+    oro_notes:
+        template: OroNoteBundle:Note:associatedNotes.html.twig
+        applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)

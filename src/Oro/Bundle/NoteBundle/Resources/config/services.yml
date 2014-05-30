@@ -1,6 +1,7 @@
 parameters:
     oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
     oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteDumperExtension
+    oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
 
 services:
     oro_note.subscriber.note_lifecycle_subscriber:
@@ -16,3 +17,9 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_entity_extend.dumper_extension }
+
+    oro_note.placeholder.filter:
+        class: %oro_note.placeholder.filter.class%
+        arguments:
+            - @oro_entity_config.provider.note
+            - @oro_entity.orm.entity_class_accessor

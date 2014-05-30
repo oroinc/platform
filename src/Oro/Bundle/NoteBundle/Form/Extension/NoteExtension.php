@@ -9,8 +9,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -35,7 +33,6 @@ class NoteExtension extends AbstractTypeExtension
 
     const CONFIG_SCOPE         = 'note';
     const ATTR_ENABLED         = 'enabled';
-    const NOTE_RELATION_PREFIX = 'assoc_note_';
     const NOTE_ENTITY_CLASS    = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var ConfigProvider */
@@ -139,16 +136,10 @@ class NoteExtension extends AbstractTypeExtension
         $config    = $this->extendConfigProvider->getConfigById($configId);
         $relations = $config->get('relation');
         if ($relations) {
-            /**
-             * assoc_note_[entity name]
-             * e.g. "assoc_note_user", "assoc_note_calendar_event"
-             */
-            $relationFieldName =
-                self::NOTE_RELATION_PREFIX .
-                Inflector::tableize(ExtendHelper::getShortClassName($configId->getClassName()));
+            $relationFieldName = ExtendHelper::buildAssociationName($configId->getClassName());
 
             /**
-             * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|assoc_note_user"
+             * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user"
              */
             $relationKey = ExtendHelper::buildRelationKey(
                 self::NOTE_ENTITY_CLASS,
