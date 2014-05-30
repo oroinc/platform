@@ -28,7 +28,8 @@ function(_, __, Backbone, Confirmation) {
             }
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-row-template').html();
             this.template = _.template(template);
             this.options.data.view_id = this.cid;
