@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class NoteDumperExtension extends ConfigDumperExtension
 {
@@ -68,24 +69,28 @@ class NoteDumperExtension extends ConfigDumperExtension
         $withNotes = $this->getNotesEnabledFor();
         foreach ($withNotes as $entityName) {
             $relationName = $this->getRelationName($entityName);
-            $this->addManyToOneRelation($entityName, $relationName);
-            $this->addManyToOneRelation($noteClassName, $relationName, true);
+            $relationKey  = $this->getRelationKey($noteClassName, $entityName, $relationName);
+
+            $this->addManyToOneRelation($entityName, $relationName, $relationKey);
+            $this->addManyToOneRelation($noteClassName, $relationName, $relationKey, true);
         }
 
-        $this->extendConfigProvider->flush();
+
+        //$this->extendConfigProvider->flush();
     }
 
-    protected function addManyToOneRelation($targetEntityName, $relationName, $isOwningSide = false)
+    /**
+     * @param string $targetEntityName
+     * @param string $relationName
+     * @param string $relationKey
+     * @param bool   $isOwningSide
+     */
+    protected function addManyToOneRelation($targetEntityName, $relationName, $relationKey, $isOwningSide = false)
     {
         $noteClassName = self::NOTE_ENTITY;
         $entityConfig  = $this->extendConfigProvider->getConfig($targetEntityName);
 
-        $relations    = $entityConfig->get('relation', false, []);
-        $fieldName    = $relationName;
-        $relationType = 'manyToOne';
-        $relationKey  = sprintf('%s|%s|%s|%s', $relationType, $noteClassName, $targetEntityName, $relationName);
-
-        $fieldId = new FieldConfigId('extend', $noteClassName, $fieldName, $relationType);
+        $fieldId = new FieldConfigId('extend', $noteClassName, $relationName, 'manyToOne');
         if ($isOwningSide) {
             $assign        = true;
             $owner         = true;
@@ -99,13 +104,15 @@ class NoteDumperExtension extends ConfigDumperExtension
             // update index info
             $index = $entityConfig->get('index', false, []);
             $index[$relationName] = $relationName;
-            $entityConfig->set('index', $schema);
+            $entityConfig->set('index', $index);
         } else {
             $assign        = false;
             $owner         = false;
             $targetFieldId = $fieldId;
             $fieldId       = false;
         }
+
+        $relations    = $entityConfig->get('relation', false, []);
 
         // add relation to config
         $relations[$relationKey] = [
@@ -121,13 +128,24 @@ class NoteDumperExtension extends ConfigDumperExtension
     }
 
     /**
-     * @param string $entityName full name
+     * @param string $fromEntityClassName
+     * @param string $entityClassName
+     * @param string $relationFieldName
+     *
+     * @return string "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user"
+     */
+    protected function getRelationKey($fromEntityClassName, $entityClassName, $relationFieldName)
+    {
+        return ExtendHelper::buildRelationKey($fromEntityClassName, $relationFieldName, 'manyToOne', $entityClassName);
+    }
+
+    /**
+     * @param string $entityClassName
      *
      * @return string
      */
-    protected function getRelationName($entityName)
+    protected function getRelationName($entityClassName)
     {
-        $names = explode('\\', $entityName);
-        return strtolower(array_pop($names)) . 's';
+        return ExtendHelper::buildAssociationName($entityClassName);
     }
 }
