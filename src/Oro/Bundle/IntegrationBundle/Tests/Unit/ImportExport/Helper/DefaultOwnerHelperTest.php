@@ -13,7 +13,6 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
 {
     const USER_OWNER_FIELD_NAME  = 'owner';
     const USER_OWNER_COLUMN_NAME = 'owner';
-    const TEST_ENTITY_CLASS_NAME = 'TestOrg/TestBundle/Entity/TestEntity';
 
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -51,16 +50,14 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
 
-        $doctrineMetadata       = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+        $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()->getMock();
-        $doctrineMetadata->name = self::TEST_ENTITY_CLASS_NAME;
-
         $this->em->expects($this->any())->method('getClassMetadata')
             ->will($this->returnValue($doctrineMetadata));
 
         $ownerMetadata = new OwnershipMetadata($ownerType, self::USER_OWNER_FIELD_NAME, self::USER_OWNER_COLUMN_NAME);
         $this->metadataProvider->expects($this->any())->method('getMetadata')
-            ->with(self::TEST_ENTITY_CLASS_NAME)
+            ->with(get_class($entity))
             ->will($this->returnValue($ownerMetadata));
 
         $owner = $channel->getDefaultUserOwner();

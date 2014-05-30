@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
@@ -32,8 +33,9 @@ class DefaultOwnerHelper
     {
         $defaultUserOwner = $channel->getDefaultUserOwner();
 
-        $doctrineMetadata  = $this->em->getClassMetadata($entity);
-        $ownershipMetadata = $this->getMetadata($doctrineMetadata->name);
+        $className         = ClassUtils::getClass($entity);
+        $doctrineMetadata  = $this->em->getClassMetadata($className);
+        $ownershipMetadata = $this->getMetadata($className);
 
         if ($defaultUserOwner && $ownershipMetadata->isUserOwned()) {
             $doctrineMetadata->setFieldValue($entity, $ownershipMetadata->getOwnerFieldName(), $defaultUserOwner);
