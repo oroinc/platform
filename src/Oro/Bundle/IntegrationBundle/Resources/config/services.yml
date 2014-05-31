@@ -50,7 +50,11 @@ services:
     oro_integration.form.handler.channel:
         class:                        %oro_integration.form.handler.channel.class%
         scope:                        request
-        arguments:                    [@request, @oro_integration.form.channel, @doctrine.orm.entity_manager]
+        arguments:
+            - @request
+            - @oro_integration.form.channel
+            - @doctrine.orm.entity_manager
+            - @event_dispatcher
 
     oro_integration.manager.types_registry:
         class: %oro_integration.manager.types_registry.class%
