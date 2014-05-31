@@ -101,7 +101,7 @@ class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
      *
      * @param Channel   $entity
      * @param null|User $newOwner
-     * @param           $expectedDispatch
+     * @param bool      $expectedDispatch
      */
     public function testDefaultUserOwnerSetEventDispatching($entity, $newOwner, $expectedDispatch)
     {
