@@ -1,6 +1,7 @@
 parameters:
     oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendGenerator
+    oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
 
     #entity
     oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
@@ -67,3 +68,8 @@ services:
         tags:
             - { name: oro_entity_extend.generator_extension, priority: 1 }
 
+    oro_note.placeholder.filter:
+        class: %oro_note.placeholder.filter.class%
+        arguments:
+            - @oro_entity_config.provider.note
+            - @oro_entity.orm.entity_class_accessor

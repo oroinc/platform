@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -12,6 +14,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @Route("/note")
@@ -20,54 +23,27 @@ class NoteController extends Controller
 {
     /**
      * @Route(
-     *      ".{_format}",
-     *      name="oro_note_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
+     *      "/widget/associates_notes/{entityClass}/{entityId}",
+     *      name="oro_note_widget_associated_notes"
      * )
-     * @Acl(
-     *      id="oro_note_view",
-     *      type="entity",
-     *      class="OroNoteBundle:Note",
-     *      permission="VIEW"
-     * )
-     * @Template
-     */
-    public function indexAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/view/{id}", name="oro_note_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_note_view")
      * @Template
      */
-    public function viewAction(Note $note)
+    public function associatedNotesAction($entityClass, $entityId)
     {
-        return array('entity' => $note);
-    }
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
 
-    /**
-     * @Route("/update/{id}", name="oro_note_update", requirements={"id"="\d+"})
-     * @Template
-     * @Acl(
-     *      id="oro_note_update",
-     *      type="entity",
-     *      class="OroNoteBundle:Note",
-     *      permission="EDIT"
-     * )
-     */
-    public function updateAction(Note $note)
-    {
-        return $this->update($note);
-    }
+        $entity = null;
+        try {
+            $entity = $doctrineHelper->getEntity($entityClass, $entityId);
+        } catch (NotManageableEntityException $e) {
+            throw new BadRequestHttpException($e->getMessage(), $e);
+        }
+        if (!$entity) {
+            throw $this->createNotFoundException();
+        }
 
-    /**
-     * @param Note $note
-     * @return array
-     */
-    protected function update(Note $note)
-    {
+        return array('entity' => $entity);
     }
 }

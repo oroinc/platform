@@ -55,12 +55,12 @@ class EntityFieldProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider                $entityConfigProvider
-     * @param ConfigProvider                $extendConfigProvider
-     * @param EntityClassResolver           $entityClassResolver
-     * @param ManagerRegistry               $doctrine
-     * @param Translator                    $translator
-     * @param array                         $hiddenFields
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
+     * @param EntityClassResolver $entityClassResolver
+     * @param ManagerRegistry     $doctrine
+     * @param Translator          $translator
+     * @param array               $hiddenFields
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -220,33 +220,49 @@ class EntityFieldProvider
 
             // add virtual fields
             if ($withVirtualFields) {
-                $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
-                foreach ($virtualFields as $fieldName) {
-                    if ($this->isIgnoredField($metadata, $fieldName)) {
-                        continue;
-                    }
-
-                    if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
-                        continue;
-                    }
-
-                    $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-                    if (isset($query['select']['label'])) {
-                        $fieldLabel = $query['select']['label'];
-                    } else {
-                        $fieldLabel = ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
-                    }
-
-                    $this->addField(
-                        $result,
-                        $fieldName,
-                        $query['select']['return_type'],
-                        $fieldLabel,
-                        false,
-                        $translate
-                    );
-                }
+                $this->addVirtualFields($result, $metadata, $withExclusions, $translate);
             }
+        }
+    }
+
+    /**
+     * Adds entity virtual fields to $result
+     *
+     * @param array         $result
+     * @param ClassMetadata $metadata
+     * @param bool          $withExclusions
+     * @param bool          $translate
+     */
+    protected function addVirtualFields(
+        array &$result,
+        ClassMetadata $metadata,
+        $withExclusions,
+        $translate
+    ) {
+        $className     = $metadata->getName();
+        $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
+        foreach ($virtualFields as $fieldName) {
+            if ($this->isIgnoredField($metadata, $fieldName)) {
+                continue;
+            }
+
+            if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+                continue;
+            }
+
+            $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+            $fieldLabel = isset($query['select']['label'])
+                ? $query['select']['label']
+                : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+
+            $this->addField(
+                $result,
+                $fieldName,
+                $query['select']['return_type'],
+                $fieldLabel,
+                false,
+                $translate
+            );
         }
     }
 

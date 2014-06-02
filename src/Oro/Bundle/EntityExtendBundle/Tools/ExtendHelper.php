@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Inflector\Inflector;
+
 class ExtendHelper
 {
     /**
@@ -20,6 +22,17 @@ class ExtendHelper
             default:
                 return $type;
         }
+    }
+
+    /**
+     * @param string $targetEntityClassName
+     * @return string
+     */
+    public static function buildAssociationName($targetEntityClassName)
+    {
+        return Inflector::tableize(
+            ExtendHelper::getShortClassName($targetEntityClassName)
+        );
     }
 
     /**
@@ -55,8 +68,18 @@ class ExtendHelper
      */
     public static function getShortClassName($className)
     {
-        $parts = explode('\\', $className);
+        /*
+         * @todo: in future to prevent collisions we should do the following
+         * For ORO classes this method returns the part without the namespace.
+         * For other classes this method returns the vendor name + the part without the namespace.
+        $vendor = substr($className, 0, strpos($className, '\\'));
+        $name   = substr($className, strrpos($className, '\\') + 1);
 
-        return array_pop($parts);
+        return in_array(strtolower($vendor), ['oro', 'orocrm'], true)
+            ? $name
+            : sprintf('%s_%s', $vendor, $name);
+        */
+
+        return substr($className, strrpos($className, '\\') + 1);
     }
 }

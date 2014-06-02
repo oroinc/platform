@@ -14,24 +14,6 @@ placeholders:
         items:
             item1: ~
     empty_block: ~
-    test_with_blocks:
-        items:
-            item1:
-                block: block1
-            item2:
-                block: block1
-            item3:
-                block: block2
-            item4:
-                block: block3
-        blocks:
-            block1:
-                label: Test Block 1
-            block2:
-                label: Test Block 2
-                order: -10
-            block3:
-                label: Test Block 3
 
 items:
     item1:
@@ -41,7 +23,6 @@ items:
         action: TestBundle:Test:test2
     item3:
         action: TestBundle:Test:test3
-        attribute_instance_of: [entity, %oro_user.entity.class%]
     item4:
         action: TestBundle:Test:test4
         order: 10

@@ -47,16 +47,6 @@ class PlaceholderTokenParser extends \Twig_TokenParser
             $variables = new \Twig_Node_Expression_Constant(array(), $token->getLine());
         }
 
-        $attributes = array();
-
-        $outputVariableName = null;
-        if ($stream->nextIf(\Twig_Token::NAME_TYPE, 'set')) {
-            $outputVariableName = $stream->expect(\Twig_Token::NAME_TYPE)->getValue();
-            // 'output' => 'raw'
-            $attributes[] = new \Twig_Node_Expression_Constant('output', 0);
-            $attributes[] = new \Twig_Node_Expression_Constant('raw', 0);
-        }
-
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         // build expression to call 'placeholder' function
@@ -65,26 +55,13 @@ class PlaceholderTokenParser extends \Twig_TokenParser
             new \Twig_Node(
                 array(
                     'name'       => $name,
-                    'variables'  => $variables,
-                    'attributes' => new \Twig_Node_Expression_Array($attributes, $token->getLine())
+                    'variables'  => $variables
                 )
             ),
             $token->getLine()
         );
 
-        if (empty($outputVariableName)) {
-            $result = new \Twig_Node_Print($expr, $token->getLine(), $this->getTag());
-        } else {
-            $result = new \Twig_Node_Set(
-                false,
-                new \Twig_Node(array(new \Twig_Node_Expression_AssignName($outputVariableName, 0))),
-                new \Twig_Node(array($expr)),
-                $token->getLine(),
-                $this->getTag()
-            );
-        }
-
-        return $result;
+        return new \Twig_Node_Print($expr, $token->getLine(), $this->getTag());
     }
 
     /**

@@ -9,6 +9,11 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $resolver;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $filter;
 
     /**
@@ -19,26 +24,19 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     protected $placeholders = array(
         'test_placeholder' => array(
             'items' => array(
-                'item1' => array('template' => 'template1'),
-                'item2' => array('template' => 'template2')
-            )
-        ),
-        'test_placeholder_with_blocks' => array(
-            'items' => array(
-                'item1' => array('template' => 'template1', 'block' => 'block1'),
-                'item2' => array('template' => 'template2', 'block' => 'block2')
-            ),
-            'blocks' => array(
-                'block1' => array('label' => 'Block 1'),
-                'block2' => array('label' => 'Block 2'),
+                array('template' => 'template1'),
+                array('template' => 'template2'),
+                array('template' => 'template3'),
+                array('template' => 'template4'),
             )
         )
     );
 
     protected function setUp()
     {
-        $this->filter = $this->getMock('Oro\Bundle\UIBundle\Placeholder\Filter\PlaceholderFilterInterface');
-        $this->provider = new PlaceholderProvider($this->placeholders, array($this->filter));
+        $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->filter   = $this->getMock('Oro\Bundle\UIBundle\Placeholder\Filter\PlaceholderFilterInterface');
+        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver, array($this->filter));
     }
 
     public function testGetPlaceholderItems()
@@ -49,40 +47,37 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 
         $items = $this->placeholders[$placeholderName]['items'];
 
-        $filteredItems = $items;
-        unset($filteredItems['item1']);
-        $filteredItems = array_values($filteredItems);
+        $this->resolver->expects($this->at(0))
+            ->method('resolve')
+            ->with($items[0], $variables)
+            ->will($this->returnValue($items[0]));
+        $this->resolver->expects($this->at(1))
+            ->method('resolve')
+            ->with($items[1], $variables)
+            ->will($this->returnValue($items[1]));
+        $item3 = $items[2];
+        $item3['applicable'] = true;
+        $this->resolver->expects($this->at(2))
+            ->method('resolve')
+            ->with($items[2], $variables)
+            ->will($this->returnValue($item3));
+        $item = $items[3];
+        $item['applicable'] = false;
+        $this->resolver->expects($this->at(3))
+            ->method('resolve')
+            ->with($items[3], $variables)
+            ->will($this->returnValue($item));
 
+        $itemsToFilter = array($items[0], $items[1], $item3);
+        $filteredItems = array($items[1]);
         $this->filter->expects($this->once())
             ->method('filter')
-            ->with(array_values($items), $variables)
+            ->with($itemsToFilter, $variables)
             ->will($this->returnValue($filteredItems));
 
         $this->assertEquals(
             $filteredItems,
             $this->provider->getPlaceholderItems($placeholderName, $variables)
-        );
-    }
-
-    public function testGetPlaceholderBlocks()
-    {
-        $placeholderName = 'test_placeholder_with_blocks';
-
-        $variables = array('foo' => 'bar');
-
-        $blocks = $this->placeholders[$placeholderName]['blocks'];
-
-        $filteredBlocks = $blocks;
-        unset($filteredBlocks['block1']);
-
-        $this->filter->expects($this->once())
-            ->method('filter')
-            ->with($blocks, $variables)
-            ->will($this->returnValue($filteredBlocks));
-
-        $this->assertEquals(
-            $filteredBlocks,
-            $this->provider->getPlaceholderBlocks($placeholderName, $variables)
         );
     }
 }
