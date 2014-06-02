@@ -34,9 +34,13 @@ class NoteDumperExtension extends ConfigDumperExtension
      */
     public function supports($actionType, ConfigProvider $extendProvider, array $extendConfigs)
     {
-        $entitiesWithNotes = $this->getNotesEnabledFor();
+        if ($actionType == ConfigDumperExtension::ACTION_PRE_UPDATE) {
+            $entitiesWithNotes = $this->getNotesEnabledFor();
 
-        return !empty($entitiesWithNotes);
+            return !empty($entitiesWithNotes);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -81,8 +85,6 @@ class NoteDumperExtension extends ConfigDumperExtension
             // add relation to note, source entity side
             $this->addManyToOneRelation($noteClassName, $entityName, $relationName, $relationKey, true);
         }
-
-        //$this->extendConfigProvider->flush();
     }
 
     /**

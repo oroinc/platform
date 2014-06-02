@@ -39,7 +39,7 @@ class NoteExtensionTest extends \PHPUnit_Framework_TestCase
         $extendConfig->set(
             'relation',
             [
-                'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|assoc_note_user' => [
+                'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user' => [
                     'assign'          => false,
                     'field_id'        => false,
                     'owner'           => false,
@@ -47,7 +47,7 @@ class NoteExtensionTest extends \PHPUnit_Framework_TestCase
                     'target_field_id' => new FieldConfigId(
                         'extend',
                         'Oro\Bundle\NoteBundle\Entity\Note',
-                        'assoc_note_user',
+                        'user',
                         'manyToOne'
                     )
                 ]
@@ -99,7 +99,7 @@ class NoteExtensionTest extends \PHPUnit_Framework_TestCase
                             'relation',
                             [
                                 'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|' .
-                                'Oro\Bundle\UserBundle\Entity\User|assoc_note_user' => [
+                                'Oro\Bundle\UserBundle\Entity\User|user' => [
                                     'assign' => true
                                 ]
                             ]
@@ -134,7 +134,7 @@ class NoteExtensionTest extends \PHPUnit_Framework_TestCase
                             'relation',
                             [
                                 'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|' .
-                                'Oro\Bundle\UserBundle\Entity\User|assoc_note_user' => [
+                                'Oro\Bundle\UserBundle\Entity\User|user' => [
                                     'assign' => true
                                 ]
                             ]
@@ -169,7 +169,7 @@ class NoteExtensionTest extends \PHPUnit_Framework_TestCase
                             'relation',
                             [
                                 'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|' .
-                                'Oro\Bundle\UserBundle\Entity\User|assoc_note_user' => [
+                                'Oro\Bundle\UserBundle\Entity\User|user' => [
                                     'assign' => false
                                 ]
                             ]
