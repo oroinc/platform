@@ -27,6 +27,7 @@ define(function (require) {
         },
 
         initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetAddTemplate, {
                 'availableWidgets': options.sidebar.getAvailableWidgets()
             });

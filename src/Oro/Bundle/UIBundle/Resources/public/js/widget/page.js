@@ -40,6 +40,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
         }),
 
         initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.$replacementEl = $(this.options.replacementEl);
             this.options.container = this.$replacementEl.parent();
             this.on('adoptedFormResetClick', this.remove);

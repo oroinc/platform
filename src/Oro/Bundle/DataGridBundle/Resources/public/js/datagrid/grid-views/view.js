@@ -121,7 +121,7 @@ define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
             if (view) {
                 var viewState = _.extend({}, this.collection.initialState, view.toGridState());
                 this.collection.updateState(viewState);
-                this.collection.fetch();
+                this.collection.fetch({reset: true});
             }
 
             return this;

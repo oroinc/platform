@@ -27,7 +27,8 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
             template: null
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.template = _.template(this.options.template);
             this.listenTo(this.model, 'destroy', this.remove);
             if (this.options.defaultRequired) {
