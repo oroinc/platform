@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
