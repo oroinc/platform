@@ -78,16 +78,18 @@ class NoteApiHandler
         /** @var EntityId $association */
         $association = $note['entityId'];
         if ($association) {
-            /** @var ConfigProvider $noteProvider */
-            $noteProvider = $this->configManager->getProvider('note');
-            $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
-            if ($noteProvider->hasConfig('Oro\Bundle\NoteBundle\Entity\Note', $fieldName)) {
-                $note[$fieldName] = $association['id'];
-                unset ($note['entityId']);
-                $request->request->set('note', $note);
+            try {
+                /** @var ConfigProvider $noteProvider */
+                $noteProvider = $this->configManager->getProvider('note');
+                $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
+                if ($noteProvider->hasConfig('Oro\Bundle\NoteBundle\Entity\Note', $fieldName)) {
+                    $note[$fieldName] = $association['id'];
+                    unset ($note['entityId']);
+                    $request->request->set('note', $note);
+                }
+            } catch (\Exception $e) {
+                throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance Id not found.');
             }
-        } else {
-            throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance ID not found.');
         }
 
         return $request;
