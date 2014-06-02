@@ -1,16 +1,45 @@
 <div class="widget-content">
-    {% for note in notePager %}
-        {{ _self.render_note(note) }}
-    {% else %}
-        <p>{{ "oro.note.no_notes_exist"|trans }}</p>
-    {% endfor %}
-</div>
+    {# JS template for note view #}
+    {% include "OroNoteBundle:Note:js:note.js.twig" %}
 
-{% macro render_note(note) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div class="contact-box">
-        <div class="contact-box-row">
-            {{ note.message }}
-        </div>
-    </div>
-{% endmacro %}
+    <div class="notes" id="note-list"></div>
+
+    <script type="text/javascript">
+    require(['jquery', 'underscore', 'routing', 'oronote/js/note-list', 'oroui/js/widget-manager'],
+    function($, _, routing, NoteList, widgetManager) {
+        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget){
+            /** @type oronote.NoteList */
+            var noteList = new NoteList({
+                el: '#note-list',
+                labels: {
+                    noData: {{ "oro.note.no_notes_exist"|trans|json_encode|raw }},
+                    addDialogTitle: {{ "oro.note.add_note_title"|trans|json_encode|raw }},
+                    editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
+                    itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }}
+                },
+                listUrl: {{ path('oro_api_get_associated_notes', {
+                    'entityClass': oro_class_name(entity),
+                    'entityId': entity.id})|json_encode|raw
+                }},
+                createItemUrl: {{ path('oro_note_create', {
+                    'entityClass': oro_class_name(entity),
+                    'entityId': entity.id})|json_encode|raw
+                }},
+                updateItemUrl: function() {
+                    var note = arguments[0];
+                    return routing.generate('oro_note_update', {'id': note.get('id')});
+                }
+            });
+            widget.getAction('add_note', 'adopted', function(action) {
+                action.on('click', _.bind(noteList.addItem, noteList));
+            });
+            noteList
+                .getCollection()
+                .reset({{ render(path('oro_api_get_associated_notes', {
+                    entityClass: oro_class_name(entity),
+                    entityId: entity.id
+                })) }});
+        });
+    });
+    </script>
+</div>
