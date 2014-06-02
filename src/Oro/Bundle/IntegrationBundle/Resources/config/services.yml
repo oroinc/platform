@@ -14,7 +14,7 @@ parameters:
     # Import/export utils
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
-    oro_integration.helper.default_owener_helper.class:                   Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper
+    oro_integration.helper.default_owner_helper.class:                    Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper
     oro_integration.reader.entity.by_id.class:                            Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
@@ -87,8 +87,8 @@ services:
             - @oro_importexport.context_registry
             - @doctrine
 
-    oro_integration.helper.default_owener_helper:
-        class: %oro_integration.helper.default_owener_helper.class%
+    oro_integration.helper.default_owner_helper:
+        class: %oro_integration.helper.default_owner_helper.class%
         arguments:
             - @doctrine.orm.default_entity_manager
             - @oro_security.owner.ownership_metadata_provider
