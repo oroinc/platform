@@ -50,6 +50,6 @@ class NoteApiType extends NoteType
      */
     public function getName()
     {
-        return 'note';
+        return 'oro_note_api';
     }
 }

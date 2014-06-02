@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Soap;
 
-use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Symfony\Component\Form\FormInterface;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
@@ -11,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\NoteBundle\Entity\EntityId;
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
