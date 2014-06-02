@@ -15,7 +15,6 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -187,15 +186,6 @@ class NoteController extends RestController implements ClassResourceInterface
                     $value = $value->getId();
                 }
                 break;
-            /*case 'entityId':
-                $a = 1;
-                if ($value instanceof EntityId) {
-                    $value = [
-                        'entity' => $value->getEntity(),
-                        'id' => $value->getId()
-                    ];
-                }
-                break;*/
             default:
                 parent::transformEntityField($field, $value);
         }
