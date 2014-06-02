@@ -3,14 +3,12 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Events;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\NavigationBundle\Content\TopicSender;
 
-class DoctrineTagEventSubscriber implements EventSubscriber
+class DoctrineTagEventListener
 {
     /** @var bool */
     protected $isApplicationInstalled;
@@ -28,17 +26,6 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     {
         $this->sender                 = $sender;
         $this->isApplicationInstalled = $isApplicationInstalled;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        // Ignored code standards for doctrine constants
-        // @codingStandardsIgnoreStart
-        return [Events::onFlush, Events::postFlush];
-        // @codingStandardsIgnoreEnd
     }
 
     /**

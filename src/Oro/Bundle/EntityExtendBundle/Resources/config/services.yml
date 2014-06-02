@@ -4,7 +4,7 @@ parameters:
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
-    oro_entity_extend.listener.entity_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
+    oro_entity_extend.listener.entity_listener.class:         Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
@@ -47,12 +47,12 @@ services:
         tags:
             - { name: kernel.event_subscriber}
 
-    oro_entity_extend.listener.entity_subscriber:
-        class: %oro_entity_extend.listener.entity_subscriber.class%
+    oro_entity_extend.listener.entity_listener:
+        class: %oro_entity_extend.listener.entity_listener.class%
         arguments:
             - @oro_entity_extend.db_id_name_generator
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
 
     oro_entity_extend.db_id_name_generator:
         alias: oro_migration.db_id_name_generator
