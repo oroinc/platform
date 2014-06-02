@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Soap;
 
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Symfony\Component\Form\FormInterface;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
@@ -27,9 +28,13 @@ class NoteController extends SoapController
      *
      * @AclAncestor("oro_note_view")
      */
-    public function cgetAction($page = 1, $limit = 10, EntityId $entityId)
+    public function cgetAction(EntityId $entityId, $page = 1, $limit = 10)
     {
-        return $this->handleGetListRequest($page, $limit);
+        /** @var NoteRepository $repo */
+        $repo = $this->getManager()->getRepository();
+        $result = $repo->findAssociatedEntity($entityId, $page, $limit);
+
+        return $this->transformToSoapEntities($result);
     }
 
     /**

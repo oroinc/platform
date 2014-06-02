@@ -22,7 +22,7 @@ class NoteSoap extends Note implements SoapEntityInterface
     protected $message;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\NoteBundle\Entity\EntityId")
+     * @Soap\ComplexType("Oro\Bundle\NoteBundle\Entity\EntityId", nillable=true)
      */
     protected $entityId;
 
@@ -47,19 +47,13 @@ class NoteSoap extends Note implements SoapEntityInterface
     protected $updatedAt;
 
     /**
-     * @param Note $note
+     * @param NoteSoap $note
      */
     public function soapInit($note)
     {
         $this->id        = $note->id;
         $this->message   = $note->message;
-
-        $entityId = new EntityId();
-        $entityId->setEntity('Test');
-        $entityId->setId(1);
-
-        $this->entityId  = $entityId;
-
+        $this->entityId  = $note->entityId;
         $this->owner     = $this->getAssociationId($note->owner);
         $this->updatedBy = $this->getAssociationId($note->updatedBy);
         $this->createdAt = $note->createdAt;
@@ -67,16 +61,7 @@ class NoteSoap extends Note implements SoapEntityInterface
     }
 
     /**
-     * @return EntityId
-     */
-    public function getEntityId()
-    {
-        return $this->entityId;
-    }
-
-    /**
      * @param object $entity
-     *
      * @return integer|null
      */
     protected function getAssociationId($entity)
