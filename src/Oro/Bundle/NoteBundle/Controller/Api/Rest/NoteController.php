@@ -53,7 +53,6 @@ class NoteController extends RestController implements ClassResourceInterface
      *      resource=true
      * )
      * @AclAncestor("oro_note_view")
-     * @ Get("notes/{entityClass}/{entityId}")
      * @return Response
      */
     public function cgetAction($entityClass, $entityId)
@@ -61,11 +60,8 @@ class NoteController extends RestController implements ClassResourceInterface
         $page = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        //return $this->handleGetListRequest($page, $limit);
-
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();
-
 
         $associationId = new EntityId();
         $associationId
