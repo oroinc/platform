@@ -88,6 +88,8 @@ class ContactNormalizer implements NormalizerInterface, DenormalizerInterface, S
 
             $result[$fieldName] = $fieldValue;
         }
+
+        return $result;
     }
 
     /**
