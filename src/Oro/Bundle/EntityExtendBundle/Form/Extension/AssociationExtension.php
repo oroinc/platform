@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -124,9 +125,9 @@ class AssociationExtension extends AbstractTypeExtension
     }
 
     /**
-     * Checks if the association between the target entity at leas one owning entity exists
+     * Checks if the association between the target entity and the owning entity exists
      *
-     * @param string   $targetEntityClassName
+     * @param string $targetEntityClassName
      * @param string $owningEntityClassName
      *
      * @return bool
