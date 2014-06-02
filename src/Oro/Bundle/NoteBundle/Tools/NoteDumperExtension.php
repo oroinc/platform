@@ -5,6 +5,7 @@ namespace Oro\Bundle\NoteBundle\Tools;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -71,28 +72,124 @@ class NoteDumperExtension extends ConfigDumperExtension
             $relationName = $this->getRelationName($entityName);
             $relationKey  = $this->getRelationKey($noteClassName, $entityName, $relationName);
 
-            $this->addManyToOneRelation($entityName, $relationName, $relationKey);
-            $this->addManyToOneRelation($noteClassName, $relationName, $relationKey, true);
-        }
+            // create field
+            $this->createField($noteClassName, $relationName, 'manyToOne', $entityName, $relationKey);
 
+            // add relation to target entity side
+            $this->addManyToOneRelation($entityName, $noteClassName, $relationName, $relationKey);
+
+            // add relation to note, source entity side
+            $this->addManyToOneRelation($noteClassName, $entityName, $relationName, $relationKey, true);
+        }
 
         //$this->extendConfigProvider->flush();
     }
 
     /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
      * @param string $targetEntityName
+     * @param string $relationKey
+     */
+    protected function createField($className, $fieldName, $fieldType, $targetEntityName, $relationKey)
+    {
+        $cm = $this->extendConfigProvider->getConfigManager();
+
+        $cm->createConfigFieldModel($className, $fieldName, $fieldType);
+        $this->updateFieldConfig(
+            $cm,
+            'extend',
+            $className,
+            $fieldName,
+            [
+                'owner'         => ExtendScope::OWNER_CUSTOM,
+                'state'         => ExtendScope::STATE_NEW,
+                'is_extend'     => false,
+                'extend'        => true,
+                'is_deleted'    => false,
+                'is_inverse'    => false,
+                'target_entity' => $targetEntityName,
+                'target_field'  => 'id',
+                'relation_key'  => $relationKey,
+            ]
+        );
+
+        $classAlias = ExtendHelper::buildAssociationName($className);
+        $this->updateFieldConfig(
+            $cm,
+            'entity',
+            $className,
+            $fieldName,
+            [
+                'label'       => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
+                'description' => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
+            ]
+        );
+        $this->updateFieldConfig(
+            $cm,
+            'view',
+            $className,
+            $fieldName,
+            [
+                'is_displayable' => false
+            ]
+        );
+        $this->updateFieldConfig(
+            $cm,
+            'form',
+            $className,
+            $fieldName,
+            [
+                'is_enabled' => true
+            ]
+        );
+        $this->updateFieldConfig(
+            $cm,
+            'dataaudit',
+            $className,
+            $fieldName,
+            [
+                'auditable' => false
+            ]
+        );
+    }
+
+    protected function updateFieldConfig(
+        ConfigManager $configManager,
+        $scope,
+        $className,
+        $ownerFieldName,
+        array $values
+    ) {
+        $configProvider = $configManager->getProvider($scope);
+        $fieldConfig    = $configProvider->getConfig($className, $ownerFieldName);
+        foreach ($values as $code => $val) {
+            $fieldConfig->set($code, $val);
+        }
+        $configManager->persist($fieldConfig);
+        $configManager->calculateConfigChangeSet($fieldConfig);
+    }
+
+    /**
+     * @param string $targetEntityName
+     * @param string $sourceEntityName
      * @param string $relationName
      * @param string $relationKey
      * @param bool   $isOwningSide
      */
-    protected function addManyToOneRelation($targetEntityName, $relationName, $relationKey, $isOwningSide = false)
-    {
-        $noteClassName = self::NOTE_ENTITY;
+    protected function addManyToOneRelation(
+        $targetEntityName,
+        $sourceEntityName,
+        $relationName,
+        $relationKey,
+        $isOwningSide = false
+    ) {
         $entityConfig  = $this->extendConfigProvider->getConfig($targetEntityName);
 
-        $fieldId = new FieldConfigId('extend', $noteClassName, $relationName, 'manyToOne');
+        $fieldId = new FieldConfigId('extend', self::NOTE_ENTITY, $relationName, 'manyToOne');
         if ($isOwningSide) {
-            $assign        = true;
+            $assign        = false;
             $owner         = true;
             $targetFieldId = false;
 
@@ -103,7 +200,7 @@ class NoteDumperExtension extends ConfigDumperExtension
 
             // update index info
             $index = $entityConfig->get('index', false, []);
-            $index[$relationName] = $relationName;
+            $index[$relationName] = null;
             $entityConfig->set('index', $index);
         } else {
             $assign        = false;
@@ -119,7 +216,7 @@ class NoteDumperExtension extends ConfigDumperExtension
             'assign'          => $assign,
             'field_id'        => $fieldId,
             'owner'           => $owner,
-            'target_entity'   => $noteClassName,
+            'target_entity'   => $sourceEntityName,
             'target_field_id' => $targetFieldId
         ];
         $entityConfig->set('relation', $relations);

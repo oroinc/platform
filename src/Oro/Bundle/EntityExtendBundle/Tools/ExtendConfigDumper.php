@@ -152,13 +152,15 @@ class ExtendConfigDumper
      * @param array           $relationProperties
      * @param array           $defaultProperties
      * @param array           $properties
+     * @param array           $doctrine
      */
     protected function checkFields(
         $entityName,
         ConfigInterface $fieldConfig,
         array &$relationProperties,
         array &$defaultProperties,
-        array &$properties
+        array &$properties,
+        array &$doctrine
     ) {
         if ($fieldConfig->is('extend')) {
             $fieldName = $fieldConfig->getId()->getFieldName();
@@ -252,7 +254,14 @@ class ExtendConfigDumper
 
         $fieldConfigs = $extendProvider->getConfigs($className);
         foreach ($fieldConfigs as $fieldConfig) {
-            $this->checkFields($entityName, $fieldConfig, $relationProperties, $defaultProperties, $properties);
+            $this->checkFields(
+                $entityName,
+                $fieldConfig,
+                $relationProperties,
+                $defaultProperties,
+                $properties,
+                $doctrine
+            );
 
             $extendProvider->persist($fieldConfig);
         }
