@@ -9,9 +9,18 @@ define(['backbone'], function (Backbone) {
      */
     return Backbone.Model.extend({
         defaults: {
+            id: '',
             message: '',
             createdAt: '',
-            updatedAt: ''
+            updatedAt: '',
+            editable: false,
+            removable: false,
+            createdBy: null,
+            createdBy_id: null,
+            createdBy_viewable: false,
+            updatedBy: null,
+            updatedBy_id: null,
+            updatedBy_viewable: false
         }
     });
 });

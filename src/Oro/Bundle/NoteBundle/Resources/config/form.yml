@@ -1,6 +1,7 @@
 parameters:
     oro_note.form.type.note.class:                 Oro\Bundle\NoteBundle\Form\Type\NoteType
     oro_note.form.type.note_api.class:             Oro\Bundle\NoteBundle\Form\Type\NoteApiType
+    oro_note.form.handler.note.class:              Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
     oro_note.form.handler.note_api.class:          Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
 
 services:
@@ -15,3 +16,12 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: note }
+
+    oro_note.form.handler.note:
+        class: %oro_note.form.handler.note.class%
+        scope: request
+        arguments:
+            - @oro_note.form.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager

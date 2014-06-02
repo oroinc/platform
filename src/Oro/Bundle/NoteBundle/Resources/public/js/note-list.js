@@ -80,7 +80,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator',
             if (!this.$el.find('#' + this._buildItemIdAttribute(item.id)).length) {
                 var itemView = new NoteView({
                     template: '#template-note-item',
-                    _buildItemIdAttribute: this._buildItemIdAttribute,
+                    buildItemIdAttribute: this._buildItemIdAttribute,
                     model: item
                 });
                 itemView.on('edit', _.bind(this.editItem, this));

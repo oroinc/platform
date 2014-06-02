@@ -1,6 +1,6 @@
 /*global define, alert*/
-define([ 'underscore', 'backbone'
-    ], function (_, Backbone) {
+define([ 'underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'
+    ], function (_, Backbone, routing, dateTimeFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -43,7 +43,18 @@ define([ 'underscore', 'backbone'
         },
 
         render: function () {
-            this.$el.append(this.template(this.model));
+            var data = this.model.toJSON();
+            data['createdAt'] = dateTimeFormatter.formatDateTime(data['createdAt']);
+            data['updatedAt'] = dateTimeFormatter.formatDateTime(data['updatedAt']);
+            if (data['createdBy_id'] && data['createdBy_viewable']) {
+                data['createdBy_url'] = routing.generate('oro_user_view', {'id': data['createdBy_id']});
+            }
+            if (data['updatedBy_id'] && data['updatedBy_viewable']) {
+                data['updatedBy_url'] = routing.generate('oro_user_view', {'id': data['updatedBy_id']});
+            }
+
+            this.$el.append(this.template(data));
+
             return this;
         }
     });

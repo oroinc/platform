@@ -1,8 +1,28 @@
 <div class="widget-content">
-    {# JS template for note view #}
-    {% include "OroNoteBundle:Note:js:note.js.twig" %}
+    <script type="text/html" id="template-note-item">
+        <div class="item">
+            <div class="map-actions">
+                <% if (editable) { %><button class="btn" title="{{ 'oro.note.action.edit'|trans }}"><i class="icon-pencil hide-text">{{ 'oro.note.action.edit'|trans }}</i></button><% } %>
+                <% if (removable) { %><button class="btn" title="{{ 'oro.note.action.remove'|trans }}"><i class="icon-remove hide-text">{{ 'oro.note.action.remove'|trans }}</i></button><% } %>
+            </div>
+            <ul class="inline-decorate">
+                <% if (createdBy_url) { %>
+                    <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
+                <% } else if (createdBy) { %>
+                    <li><%= createdBy %></li>
+                <% } %>
+                <li><%= createdAt %></li>
+            </ul>
+            <div class="message clearfix"><%= _.escape(message) %></div>
+        </div>
+    </script>
 
-    <div class="notes" id="note-list"></div>
+    <div class="widget-actions">
+        {% if resource_granted(oro_note_create) %}
+            <button class="btn btn-mini btn-primary btn-uppercase" type="button" data-action-name="add_note"> + {{ 'oro.note.action.add'|trans }}</button>
+        {% endif %}
+    </div>
+    <div class="notes map-box" id="note-list"></div>
 
     <script type="text/javascript">
     require(['jquery', 'underscore', 'routing', 'oronote/js/note-list', 'oroui/js/widget-manager'],
@@ -17,25 +37,21 @@
                     editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
                     itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }}
                 },
-                listUrl: {{ path('oro_api_get_associated_notes', {
+                listUrl: {{ path('oro_note_notes', {
                     'entityClass': oro_class_name(entity),
                     'entityId': entity.id})|json_encode|raw
                 }},
                 createItemUrl: {{ path('oro_note_create', {
                     'entityClass': oro_class_name(entity),
                     'entityId': entity.id})|json_encode|raw
-                }},
-                updateItemUrl: function() {
-                    var note = arguments[0];
-                    return routing.generate('oro_note_update', {'id': note.get('id')});
-                }
+                }}
             });
             widget.getAction('add_note', 'adopted', function(action) {
                 action.on('click', _.bind(noteList.addItem, noteList));
             });
             noteList
                 .getCollection()
-                .reset({{ render(path('oro_api_get_associated_notes', {
+                .reset({{ render(path('oro_note_notes', {
                     entityClass: oro_class_name(entity),
                     entityId: entity.id
                 })) }});
