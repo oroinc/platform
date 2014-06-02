@@ -1,17 +1,11 @@
 oro:
     note:
-        entity_label:        Note
-        entity_plural_label: Notes
+        entity_label:         Note
+        entity_plural_label:  Notes
 
-        id:
-            label:   Id
-        message:
-            label:   Message
-        owner:
-            label:   Created By
-        created_at:
-            label:   Created At
-        updated_at:
-            label:   Updated At
-        updated_by:
-            label:   Updated By
+        id.label:             Id
+        message.label:        Message
+        owner.label:          Created By
+        created_at.label:     Created At
+        updated_at.label:     Updated At
+        updated_by.label:     Updated By
