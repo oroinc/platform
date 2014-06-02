@@ -59,7 +59,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadingMask: null,
         colorManager: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             // init event collection
             this.options.collection = this.options.collection || new EventCollection();
             this.options.collection.setCalendar(this.options.calendar);

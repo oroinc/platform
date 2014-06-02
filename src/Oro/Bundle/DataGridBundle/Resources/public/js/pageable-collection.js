@@ -379,7 +379,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             this.trigger('beforeFetch', this, options);
             var BBColProto = Backbone.Collection.prototype;
 
-            options = options || {};
+            options = _.defaults(options || {}, {reset: true});
 
             var state = this._checkState(this.state);
 

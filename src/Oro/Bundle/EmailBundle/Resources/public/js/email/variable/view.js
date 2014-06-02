@@ -21,6 +21,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @param options {Object}
          */
         initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.target = options.target;
 
             this.listenTo(this.model, 'sync', this.render);
