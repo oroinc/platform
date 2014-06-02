@@ -100,10 +100,16 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param array $options An array of options to pass to the createKernel class
      * @param array $server  An array of server parameters
+     * @param bool  $force If this option - true, will reset client on each initClient call
+     *
      * @return Client A Client instance
      */
-    protected function initClient(array $options = array(), array $server = array())
+    protected function initClient(array $options = array(), array $server = array(), $force = false)
     {
+        if ($force) {
+            $this->resetClient();
+        }
+
         if (!self::$clientInstance) {
             /** @var Client $client */
             $client = self::$clientInstance = static::createClient($options, $server);
@@ -121,6 +127,21 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $this->client = self::$clientInstance;
+    }
+
+    /**
+     * Reset client and rollback transaction
+     */
+    protected function resetClient()
+    {
+        if (self::$clientInstance) {
+            if (self::getDbIsolationSetting()) {
+                self::$clientInstance->rollbackTransaction();
+            }
+
+            $this->client = null;
+            self::$clientInstance = null;
+        }
     }
 
     /**
