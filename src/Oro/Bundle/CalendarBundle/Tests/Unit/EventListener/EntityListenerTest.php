@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
-use Oro\Bundle\CalendarBundle\EventListener\EntitySubscriber;
+use Oro\Bundle\CalendarBundle\EventListener\EntityListener;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
@@ -18,8 +17,8 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $uow;
 
-    /** @var EntitySubscriber */
-    protected $subscriber;
+    /** @var EntityListener */
+    protected $listener;
 
     protected function setUp()
     {
@@ -33,19 +32,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $this->subscriber = new EntitySubscriber();
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            [
-                // @codingStandardsIgnoreStart
-                Events::onFlush
-                // @codingStandardsIgnoreEnd
-            ],
-            $this->subscriber->getSubscribedEvents()
-        );
+        $this->listener = new EntityListener();
     }
 
     public function testOnFlush()
@@ -87,6 +74,6 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('computeChangeSet')
             ->with($connectionMetadata, $newConnection);
 
-        $this->subscriber->onFlush($args);
+        $this->listener->onFlush($args);
     }
 }

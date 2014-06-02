@@ -2,7 +2,7 @@ parameters:
     oro_calendar.calendar.entity.class:                          Oro\Bundle\CalendarBundle\Entity\Calendar
     oro_calendar.calendar_connection.entity.class:               Oro\Bundle\CalendarBundle\Entity\CalendarConnection
     oro_calendar.calendar_event.entity.class:                    Oro\Bundle\CalendarBundle\Entity\CalendarEvent
-    oro_calendar.listener.entity_subscriber.class:               Oro\Bundle\CalendarBundle\EventListener\EntitySubscriber
+    oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
     oro_calendar.calendar_connection.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
@@ -11,11 +11,10 @@ parameters:
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
 
 services:
-    oro_calendar.listener.entity_subscriber:
-        public: false
-        class: %oro_calendar.listener.entity_subscriber.class%
+    oro_calendar.listener.entity_listener:
+        class: %oro_calendar.listener.entity_listener.class%
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
 
     oro_calendar.calendar_connection.manager.api:
         class: %oro_calendar.calendar_connection.manager.api.class%
