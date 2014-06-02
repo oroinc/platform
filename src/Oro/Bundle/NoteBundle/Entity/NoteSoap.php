@@ -27,6 +27,26 @@ class NoteSoap extends Note implements SoapEntityInterface
     protected $entityId;
 
     /**
+     * @Soap\ComplexType("int", nillable=true)
+     */
+    protected $owner;
+
+    /**
+     * @Soap\ComplexType("int", nillable=true)
+     */
+    protected $updatedBy;
+
+    /**
+     * @Soap\ComplexType("dateTime", nillable=true)
+     */
+    protected $createdAt;
+
+    /**
+     * @Soap\ComplexType("dateTime", nillable=true)
+     */
+    protected $updatedAt;
+
+    /**
      * @param Note $note
      */
     public function soapInit($note)
@@ -39,7 +59,6 @@ class NoteSoap extends Note implements SoapEntityInterface
         $entityId->setId(1);
 
         $this->entityId  = $entityId;
-        //$this->entityId  = $note->
 
         $this->owner     = $this->getAssociationId($note->owner);
         $this->updatedBy = $this->getAssociationId($note->updatedBy);
@@ -65,7 +84,6 @@ class NoteSoap extends Note implements SoapEntityInterface
         if ($entity) {
             return $entity->getId();
         }
-
         return null;
     }
 }

@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Soap;
 
-use Oro\Bundle\NoteBundle\Entity\EntityId;
 use Symfony\Component\Form\FormInterface;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Oro\Bundle\NoteBundle\Entity\EntityId;
 
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
@@ -22,7 +23,6 @@ class NoteController extends SoapController
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
      * @Soap\Param("entityId", phpType="Oro\Bundle\NoteBundle\Entity\EntityId")
-     *
      * @Soap\Result(phpType = "Oro\Bundle\NoteBundle\Entity\NoteSoap[]")
      *
      * @AclAncestor("oro_note_view")

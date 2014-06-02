@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\NoteBundle\Form\EventListener\NoteSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -9,6 +11,14 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class NoteApiType extends NoteType
 {
+    /** @var  ConfigManager $configManager */
+    protected $configManager;
+
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -17,21 +27,7 @@ class NoteApiType extends NoteType
         parent::buildForm($builder, $options);
 
         $builder->addEventSubscriber(new PatchSubscriber());
-
-        /**
-         * TODO: add EventSubscriber
-         */
-        $builder->add(
-            'assoc_note_user',
-            'entity',
-            [
-                'required' => false,
-                'class'    => 'Oro\Bundle\UserBundle\Entity\User',
-                'label'    => 'oro.note.assoc_note_user.label'
-            ]
-        );
-
-        //$builder->addEventSubscriber()
+        $builder->addEventSubscriber(new NoteSubscriber($this->configManager));
     }
 
     /**

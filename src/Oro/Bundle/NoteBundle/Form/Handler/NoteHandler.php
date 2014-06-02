@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Handler;
 
-use BeSimple\SoapBundle\Soap\SoapRequest;
-use Doctrine\Common\Inflector\Inflector;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -11,9 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\NoteBundle\Entity\EntityId;
 use Oro\Bundle\NoteBundle\Entity\NoteSoap;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteHandler
@@ -43,9 +41,9 @@ class NoteHandler
         ObjectManager $manager,
         ConfigManager $configManager
     ) {
-        $this->form    = $form;
-        $this->request = $request;
-        $this->manager = $manager;
+        $this->form          = $form;
+        $this->request       = $request;
+        $this->manager       = $manager;
         $this->configManager = $configManager;
     }
 
@@ -64,6 +62,7 @@ class NoteHandler
             $this->form->submit($request);
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);
+
                 return true;
             }
         }
@@ -73,27 +72,22 @@ class NoteHandler
 
     protected function processRequest(Request $request)
     {
-        //$user = $request->getUser();
         /** @var NoteSoap $note */
         $note = $request->request->get('note');
 
         /** @var EntityId $association */
-        //$association = $request->request->get('note[entityId]', false , true);
         $association = $note['entityId'];
         if ($association) {
             /** @var ConfigProvider $noteProvider */
             $noteProvider = $this->configManager->getProvider('note');
-
-            $fieldName = 'assoc_note_' . Inflector::tableize(ExtendHelper::getShortClassName($association['entity']));
+            $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
             if ($noteProvider->hasConfig('Oro\Bundle\NoteBundle\Entity\Note', $fieldName)) {
-                $note[$fieldName ] = $association['id'];
+                $note[$fieldName] = $association['id'];
                 unset ($note['entityId']);
-
                 $request->request->set('note', $note);
             }
-
         } else {
-            throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance ID not specified.');
+            throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance ID not found.');
         }
 
         return $request;

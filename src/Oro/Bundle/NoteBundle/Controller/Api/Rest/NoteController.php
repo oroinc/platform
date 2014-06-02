@@ -140,7 +140,7 @@ class NoteController extends RestController implements ClassResourceInterface
      */
     public function getForm()
     {
-        //return $this->get('oro_note.form.api');
+        return $this->get('oro_note.form.api');
     }
 
     /**
@@ -148,6 +148,6 @@ class NoteController extends RestController implements ClassResourceInterface
      */
     public function getFormHandler()
     {
-        //return $this->get('oro_note.form.handler.note_api');
+        return $this->get('oro_note.form.handler.note_api');
     }
 }
