@@ -67,7 +67,7 @@ class NoteController extends RestController implements ClassResourceInterface
             ->setEntity(str_replace('_', '\\', $entityClass))
             ->setId($entityId);
 
-        $result = $repo->findAssociatedEntity($associationId, $page, $limit);
+        $result = $repo->findByAssociatedEntity($associationId, $page, $limit);
 
         $items = array();
         foreach ($result as $item) {
