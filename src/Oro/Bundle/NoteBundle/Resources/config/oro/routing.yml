@@ -2,3 +2,12 @@ oro_note_bundle:
     resource:     "@OroNoteBundle/Controller"
     type:         annotation
     prefix:       /
+
+oro_note_bundle_api:
+    resource: "@OroNoteBundle/Resources/config/oro/routing_api.yml"
+    type: rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+    defaults:
+        version:  latest

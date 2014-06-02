@@ -3,6 +3,11 @@ parameters:
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendGenerator
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
 
+    #entity
+    oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
+    #oro_note.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_note.manager.api.class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
+
 services:
     oro_note.subscriber.note_lifecycle_subscriber:
         class: %oro_note.subscriber.note_lifecycle_subscriber.class%
@@ -11,6 +16,35 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    #
+    # API
+    #
+    oro_note.manager.api:
+        class: %oro_note.manager.api.class%
+        arguments:
+            - %oro_note.entity.class%
+            - @doctrine.orm.entity_manager
+
+    oro_note.form.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - 'note'
+            - 'note'
+
+    oro_note.form.handler.note_api:
+        class: %oro_note.form.handler.note_api.class%
+        scope: request
+        arguments:
+            - @oro_note.form.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
+
+    #
+    # EntityExtend Generator extension
+    #
     oro_note.entity_extend.generator_extension:
         class: %oro_note.entity_extend.generator_extension.class%
         arguments:
@@ -18,6 +52,9 @@ services:
         tags:
             - { name: oro_entity_extend.generator_extension, priority: 1 }
 
+    #
+    # placeholder
+    #
     oro_note.placeholder.filter:
         class: %oro_note.placeholder.filter.class%
         arguments:

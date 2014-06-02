@@ -1,0 +1,2 @@
+classes:
+    - Oro\Bundle\NoteBundle\Controller\Api\Soap\NoteController

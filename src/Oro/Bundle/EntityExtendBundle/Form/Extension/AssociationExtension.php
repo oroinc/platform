@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NoteBundle\Form\Extension;
+namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -9,49 +9,46 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  *  Form extension to communicate with ConfigScopeType
- *  will fire only on attribute "enabled" in scope "note"
+ *  will fire only on an attribute which is used to enabled/disable an association
  *
  *  The goal of this extension is to check if attribute is enabled.
  *  In this case additional checking for relation existing will be applied.
  *  And if relation is not exists yet, field stays editable but entity will be marked as "Required Update".
  *  If relation already exists ("Schema Update" action was applied) field will be Read-Only.
- *
  */
-class NoteExtension extends AbstractTypeExtension
+class AssociationExtension extends AbstractTypeExtension
 {
-    const EXTENDED_TYPE        = 'note_choice';
-
-    const CONFIG_SCOPE         = 'note';
-    const ATTR_ENABLED         = 'enabled';
-    const NOTE_ENTITY_CLASS    = 'Oro\Bundle\NoteBundle\Entity\Note';
-
-    /** @var ConfigProvider */
-    protected $noteConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager       $configManager
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
     {
-        $this->noteConfigProvider   = $configManager->getProvider(self::CONFIG_SCOPE);
+        $this->configManager        = $configManager;
+        $this->entityClassResolver  = $entityClassResolver;
         $this->extendConfigProvider = $configManager->getProvider('extend');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -59,12 +56,10 @@ class NoteExtension extends AbstractTypeExtension
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) use ($options) {
                 $form = $event->getForm();
-                if ($this->isApplicable($form->getName(), $options)
-                    && $form->getData() == true
-                ) {
-                    /** @var ConfigIdInterface $entityConfigId */
-                    $entityConfigId = $options['config_id'];
-                    $entityConfig = $this->extendConfigProvider->getConfig($entityConfigId->getClassName());
+                if ($this->isApplicable($form->getName(), $options) && $form->getData() == true) {
+                    /** @var EntityConfigId $configId */
+                    $configId     = $options['config_id'];
+                    $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
                     if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
                         $entityConfig->set('state', ExtendScope::STATE_UPDATED);
 
@@ -84,25 +79,30 @@ class NoteExtension extends AbstractTypeExtension
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($this->isApplicable($form->getName(), $options)) {
-            /** @var ConfigIdInterface $entityConfigId */
-            $entityConfigId = $options['config_id'];
-            $noteConfig     = $this->noteConfigProvider->getConfigById($entityConfigId);
+            /** @var EntityConfigId $configId */
+            $configId               = $options['config_id'];
+            $className              = $configId->getClassName();
+            $entityConfig           = $this->configManager
+                ->getProvider($options['entity_config_scope'])
+                ->getConfig($className);
+            $owningEntityClassName = $this->entityClassResolver->getEntityClass($options['entity_class']);
 
             /**
-             * Disable field on editAction if it enabled and relation exists
-             *      OR it's Note entity
+             * Disable the association choice element if the association already exists
+             *      OR the editing entity is the owning side of association
              */
-            if ($entityConfigId->getClassName() == self::NOTE_ENTITY_CLASS
+            if ($className === $owningEntityClassName
                 || (
-                    $noteConfig->get(self::ATTR_ENABLED) == true
-                    && $this->isNoteRelationExists($entityConfigId)
+                    $entityConfig->is($options['entity_config_attribute_name'])
+                    && $this->isAssociationExist($className, $owningEntityClassName)
                 )
             ) {
+                // @todo: form type should be disabled correctly
                 $options['disabled'] = true;
                 $this->appendClassAttr($view->vars, 'disabled-choice');
             }
@@ -118,34 +118,35 @@ class NoteExtension extends AbstractTypeExtension
     protected function isApplicable($propertyName, $options)
     {
         return
-            $propertyName == self::ATTR_ENABLED
+            $propertyName == $options['entity_config_attribute_name']
             && isset($options['config_id'])
             && $options['config_id'] instanceof EntityConfigId
-            && $options['config_id']->getScope() == self::CONFIG_SCOPE;
+            && $options['config_id']->getScope() == $options['entity_config_scope'];
     }
 
     /**
-     * Check for note relation existence
+     * Checks if the association between the target entity and the owning entity exists
      *
-     * @param ConfigIdInterface $configId
+     * @param string $targetEntityClassName
+     * @param string $owningEntityClassName
      *
      * @return bool
      */
-    protected function isNoteRelationExists(ConfigIdInterface $configId)
+    protected function isAssociationExist($targetEntityClassName, $owningEntityClassName)
     {
-        $config    = $this->extendConfigProvider->getConfigById($configId);
+        $result    = false;
+        $config    = $this->extendConfigProvider->getConfig($targetEntityClassName);
         $relations = $config->get('relation');
         if ($relations) {
-            $relationFieldName = ExtendHelper::buildAssociationName($configId->getClassName());
-
+            $relationFieldName = ExtendHelper::buildAssociationName($targetEntityClassName);
             /**
-             * e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user"
+             * e.g. "manyToOne|Acme\Bundle\AcmeBundle\Entity\Activity|Oro\Bundle\UserBundle\Entity\User|user"
              */
             $relationKey = ExtendHelper::buildRelationKey(
-                self::NOTE_ENTITY_CLASS,
+                $owningEntityClassName,
                 $relationFieldName,
                 'manyToOne',
-                $configId->getClassName()
+                $targetEntityClassName
             );
 
             if (isset($relations[$relationKey])) {
@@ -156,12 +157,12 @@ class NoteExtension extends AbstractTypeExtension
                     && $this->extendConfigProvider->getConfig($relation['target_field_id']->getClassName())
                         ->get('relation')[$relationKey]['assign'] == true
                 ) {
-                    return true;
+                    $result = true;
                 }
             }
         }
 
-        return false;
+        return $result;
     }
 
     protected function appendClassAttr(array &$vars, $cssClass)
@@ -174,10 +175,10 @@ class NoteExtension extends AbstractTypeExtension
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getExtendedType()
     {
-        return self::EXTENDED_TYPE;
+        return AssociationChoiceType::NAME;
     }
 }
