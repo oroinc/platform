@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
+use FOS\Rest\Util\Codes;
+use Oro\Bundle\NoteBundle\Entity\EntityId;
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -11,6 +14,8 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -27,6 +32,9 @@ class NoteController extends RestController implements ClassResourceInterface
 {
     /**
      * REST GET list
+     *
+     * @param string  $entityClass
+     * @param integer $entityId
      *
      * @QueryParam(
      *      name="page",
@@ -45,14 +53,34 @@ class NoteController extends RestController implements ClassResourceInterface
      *      resource=true
      * )
      * @AclAncestor("oro_note_view")
+     * @ Get("notes/{entityClass}/{entityId}")
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction($entityClass, $entityId)
     {
         $page = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        return $this->handleGetListRequest($page, $limit);
+        //return $this->handleGetListRequest($page, $limit);
+
+        /** @var NoteRepository $repo */
+        $repo = $this->getManager()->getRepository();
+
+
+        $associationId = new EntityId();
+        $associationId
+            ->setEntity(str_replace('_', '\\', $entityClass))
+            ->setId($entityId);
+
+        $result = $repo->findAssociatedEntity($associationId, $page, $limit);
+
+        $items = array();
+        foreach ($result as $item) {
+            $items[] = $this->getPreparedItem($item);
+        }
+        unset($result);
+
+        return new Response(json_encode($items), Codes::HTTP_OK);
     }
 
     /**
@@ -149,5 +177,31 @@ class NoteController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_note.form.handler.note_api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformEntityField($field, &$value)
+    {
+        switch ($field) {
+            case 'owner':
+            case 'updatedBy':
+                if ($value) {
+                    $value = $value->getId();
+                }
+                break;
+            /*case 'entityId':
+                $a = 1;
+                if ($value instanceof EntityId) {
+                    $value = [
+                        'entity' => $value->getEntity(),
+                        'id' => $value->getId()
+                    ];
+                }
+                break;*/
+            default:
+                parent::transformEntityField($field, $value);
+        }
     }
 }

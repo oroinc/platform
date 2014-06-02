@@ -14,7 +14,7 @@ use Oro\Bundle\NoteBundle\Entity\EntityId;
 use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
-class NoteHandler
+class NoteApiHandler
 {
     /** @var FormInterface */
     protected $form;
