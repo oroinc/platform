@@ -1,3 +1,16 @@
 <div class="widget-content">
-    TODO: implement me
+    {% for note in notePager %}
+        {{ _self.render_note(note) }}
+    {% else %}
+        <p>{{ "oro.note.no_notes_exist"|trans }}</p>
+    {% endfor %}
 </div>
+
+{% macro render_note(note) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div class="contact-box">
+        <div class="contact-box-row">
+            {{ note.message }}
+        </div>
+    </div>
+{% endmacro %}

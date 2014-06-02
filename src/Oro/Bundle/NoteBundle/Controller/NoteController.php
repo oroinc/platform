@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -44,6 +46,24 @@ class NoteController extends Controller
             throw $this->createNotFoundException();
         }
 
-        return array('entity' => $entity);
+        $em = $this->getDoctrine()->getManager();
+        /** @var EntityRepository $repo */
+        $repo  = $em->getRepository('OroNoteBundle:Note');
+        $qb = $repo->createQueryBuilder('n')
+            ->select('partial n.{id, message, owner, createdAt, updatedBy, updatedAt}')
+            ->innerJoin(
+                $entityClass,
+                'e',
+                'WITH',
+                sprintf('n.%s = e', ExtendHelper::buildAssociationName($entityClass))
+            )
+            ->where('e.id = :entity_id')
+            ->orderBy('n.updatedBy', 'DESC')
+            ->setParameter('entity_id', $entity->getId());
+
+        return [
+            'entity' => $entity,
+            'notePager' => $this->get('knp_paginator')->paginate($qb, (int) 1, (int) 10)
+        ];
     }
 }
