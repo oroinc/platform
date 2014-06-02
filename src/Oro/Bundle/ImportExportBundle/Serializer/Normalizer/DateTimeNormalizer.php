@@ -112,8 +112,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @return string
      * @param array $context
+     * @return \DateTimeZone
      */
     protected function getTimezone(array $context)
     {

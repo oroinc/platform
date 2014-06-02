@@ -13,7 +13,7 @@ Adding Normalizers
 ------------------
 
 Serializer is involved both in import and export operations. It's stands on standard Symfony's serializer and uses
-it's interfaces. Responsiblity of serializer is converting entities to plain/array representation (serialization)
+it's interfaces. Responsibility of serializer is converting entities to plain/array representation (serialization)
 and vice versa converting plain/array representation to entity objects (deserialization).
 
 Serializer uses normalizers to perform converting of objects. So you need to provide normalizers for entities that
