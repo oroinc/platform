@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Query;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
@@ -21,18 +22,21 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     protected $doctrine;
 
     /**
-     * @param RestrictionBuilder $restrictionBuilder
-     * @param Manager            $manager
-     * @param ManagerRegistry    $doctrine
+     * @param RestrictionBuilder            $restrictionBuilder
+     * @param Manager                       $manager
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
      */
     public function __construct(
         RestrictionBuilder $restrictionBuilder,
         Manager $manager,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine
     ) {
-        $this->restrictionBuilder = $restrictionBuilder;
-        $this->manager            = $manager;
-        $this->doctrine           = $doctrine;
+        $this->restrictionBuilder   = $restrictionBuilder;
+        $this->manager              = $manager;
+        $this->virtualFieldProvider = $virtualFieldProvider;
+        $this->doctrine             = $doctrine;
     }
 
     /**
@@ -42,7 +46,7 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     {
         $converter = new SegmentQueryConverter(
             $this->manager,
-            $this->manager,
+            $this->virtualFieldProvider,
             $this->doctrine,
             $this->restrictionBuilder
         );

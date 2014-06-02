@@ -4,11 +4,41 @@ namespace Oro\Bundle\SegmentBundle\Entity\Repository;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentSnapshotRepository extends EntityRepository
 {
+    const DELETE_BATCH_SIZE = 20;
+
+    /**
+     * @param array $entities
+     * @param int|null $batchSize
+     * @throws \Exception
+     */
+    public function massRemoveByEntities($entities, $batchSize = null)
+    {
+        $batchSize     = $batchSize ? $batchSize : self::DELETE_BATCH_SIZE;
+        $entityBatches = array_chunk($entities, $batchSize);
+        $entityManager = $this->getEntityManager();
+
+        $entityManager->beginTransaction();
+        try {
+            foreach ($entityBatches as $entityBatch) {
+                $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities($entityBatch);
+
+                if ($deleteQB) {
+                    $deleteQB->getQuery()->execute();
+                }
+            }
+            $entityManager->commit();
+        } catch (\Exception $e) {
+            $entityManager->rollback();
+            throw $e;
+        }
+    }
+
     /**
      * @param Segment $segment
      *
@@ -21,7 +51,7 @@ class SegmentSnapshotRepository extends EntityRepository
             ->where('snp.segment = :segment')
             ->setParameter('segment', $segment);
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->execute();
     }
 
     /**
@@ -34,22 +64,84 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function removeByEntity($entity)
     {
-        $segmentQB = $this->getEntityManager()->createQueryBuilder();
-        $segmentQB->select('s.id')
-            ->from('OroSegmentBundle:Segment', 's')
-            ->where('s.entity = :entityName');
+        $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities(array($entity));
 
-        $className = ClassUtils::getClass($entity);
-        $ids       = $this->getEntityManager()->getClassMetadata($className)->getIdentifierValues($entity);
+        return $deleteQB ? $deleteQB->getQuery()->execute() : array();
+    }
 
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete($this->getEntityName(), 'snp')
-            ->andWhere('snp.entityId = :entityId')
-            ->andWhere($qb->expr()->in('snp.segment', $segmentQB->getDQL()))
-            ->setParameter('entityName', $className)
-            ->setParameter('entityId', implode('', $ids));
+    /**
+     * Returns DELETE query builder with conditions for deleting from snapshot table by entity
+     *
+     * @param array $entities
+     * @throws \InvalidArgumentException
+     * @return QueryBuilder|null
+     */
+    protected function getSnapshotDeleteQueryBuilderByEntities(array $entities)
+    {
+        if (empty($entities)) {
+            throw new \InvalidArgumentException('List of entity can not be empty');
+        }
 
-        return $qb->getQuery()->getResult();
+        $deleteParams  = array();
+        $entityManager = $this->getEntityManager();
+
+        $segmentQB = $entityManager->createQueryBuilder();
+        $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
+
+        foreach ($entities as $key => $entity) {
+            if (is_array($entity) && !empty($entity['id'])) {
+                $entityId = $entity['id'];
+                $className = ClassUtils::getClass($entity['entity']);
+            } else {
+                /** @var object $entity */
+                $className = ClassUtils::getClass($entity);
+                $metadata  = $entityManager->getClassMetadata($className);
+                $entityIds = $metadata->getIdentifierValues($entity);
+                $entityId  = reset($entityIds);
+            }
+
+            if (!isset($deleteParams[$className])) {
+                $segmentQB
+                    ->orWhere('s.entity = :className' . $key)
+                    ->setParameter('className' . $key, $className);
+            }
+
+            $deleteParams[$className]['entityIds'][] = $entityId;
+        }
+
+        $segments = $segmentQB->getQuery()->getResult();
+
+        foreach ($segments as $segment) {
+            $deleteParams[$segment['entity']]['segmentIds'][] = $segment['id'];
+        }
+
+        return $this->getDeleteQueryBuilderByParameters($deleteParams);
+    }
+
+    /**
+     * @param  array $deleteParams
+     * @return QueryBuilder|null
+     */
+    protected function getDeleteQueryBuilderByParameters($deleteParams)
+    {
+        $deleteQB = $this->getEntityManager()->createQueryBuilder();
+        $deleteQB->delete($this->getEntityName(), 'snp');
+        $returnQueryBuilder = false;
+
+        foreach ($deleteParams as $params) {
+            if (empty($params['segmentIds'])) {
+                continue;
+            }
+
+            $deleteQB
+                ->orWhere($deleteQB->expr()->andX(
+                    $deleteQB->expr()->in('snp.segment', $params['segmentIds']),
+                    $deleteQB->expr()->in('snp.entityId', $params['entityIds'])
+                ));
+            $returnQueryBuilder = true;
+        }
+
+        return $returnQueryBuilder ? $deleteQB : null;
     }
 
     /**

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -33,6 +32,9 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var EntityFieldProvider */
     private $fieldProvider;
+
+    /** @var ExclusionProviderInterface */
+    private $exclusionProvider;
 
     protected function setUp()
     {
@@ -62,6 +64,8 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
+        $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+
         $this->entityProvider = $this->getMock(
             'Oro\Bundle\EntityBundle\Provider\EntityProvider',
             ['getEntities'],
@@ -72,8 +76,13 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
                 $translator
             ]
         );
+        $this->entityProvider->setExclusionProvider($this->exclusionProvider);
 
         $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $virtualFieldsProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -83,10 +92,11 @@ class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityClassResolver,
             $this->doctrine,
             $translator,
-            [],
             []
         );
         $this->fieldProvider->setEntityProvider($this->entityProvider);
+        $this->fieldProvider->setVirtualFieldProvider($virtualFieldsProvider);
+        $this->fieldProvider->setExclusionProvider($this->exclusionProvider);
 
         $this->provider = new EntityWithFieldsProvider($this->fieldProvider, $this->entityProvider);
     }

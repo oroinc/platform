@@ -11,6 +11,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
+use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
@@ -188,8 +189,23 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 )
             );
 
+        $entityHierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityHierarchyProvider
+            ->expects($this->any())
+            ->method('getHierarchy')
+            ->will($this->returnValue([]));
+
+        $virtualFieldProvider = new ConfigVirtualFieldProvider($entityHierarchyProvider, []);
+
         $doctrine = $doctrine ? : $this->getDoctrine();
-        $builder  = new DynamicSegmentQueryBuilder(new RestrictionBuilder($manager), $manager, $doctrine);
+        $builder  = new DynamicSegmentQueryBuilder(
+            new RestrictionBuilder($manager),
+            $manager,
+            $virtualFieldProvider,
+            $doctrine
+        );
 
         return $builder;
     }
