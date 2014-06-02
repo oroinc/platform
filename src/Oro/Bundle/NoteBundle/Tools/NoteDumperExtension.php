@@ -161,11 +161,11 @@ class NoteDumperExtension extends ConfigDumperExtension
         ConfigManager $configManager,
         $scope,
         $className,
-        $ownerFieldName,
+        $fieldName,
         array $values
     ) {
         $configProvider = $configManager->getProvider($scope);
-        $fieldConfig    = $configProvider->getConfig($className, $ownerFieldName);
+        $fieldConfig    = $configProvider->getConfig($className, $fieldName);
         foreach ($values as $code => $val) {
             $fieldConfig->set($code, $val);
         }
