@@ -4,13 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
@@ -28,20 +29,20 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     protected $fieldProvider;
 
     /**
-     * @var ConfigProviderInterface
+     * @var FieldHelper
      */
-    protected $configProvider;
+    protected $fieldHelper;
 
     /**
      * @param EntityFieldProvider $fieldProvider
-     * @param ConfigProviderInterface $configProvider
+     * @param FieldHelper $fieldHelper
      */
     public function __construct(
         EntityFieldProvider $fieldProvider,
-        ConfigProviderInterface $configProvider
+        FieldHelper $fieldHelper
     ) {
         $this->fieldProvider = $fieldProvider;
-        $this->configProvider = $configProvider;
+        $this->fieldHelper = $fieldHelper;
 
         parent::__construct(array(self::FULL_MODE, self::SHORT_MODE), self::FULL_MODE);
     }
@@ -67,7 +68,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $entityName = ClassUtils::getRealClass(get_class($object));
+        $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldProvider->getFields($entityName, true);
 
         $result = array();
@@ -76,20 +77,31 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldName = $field['name'];
 
             // Do not normalize excluded fields
-            if ($this->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
                 continue;
             }
             // Do not normalize non identity fields for short mode
             if ($this->getMode($context) == self::SHORT_MODE
-                && !$this->getConfigValue($entityName, $fieldName, 'identity')) {
+                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
                 continue;
             }
 
             $fieldValue = $propertyAccessor->getValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
-                if ($this->isRelation($field)) {
-                    if ($this->getConfigValue($entityName, $fieldName, self::FULL_MODE)) {
+                $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
+
+                // Do not export relation in short mode if it does not contain identity fields
+                if (!$isFullMode
+                    && isset($field['related_entity_type'])
+                    && $this->fieldHelper->hasConfig($field['related_entity_type'])
+                    && !$this->hasIdentityFields($field['related_entity_type'])
+                ) {
+                    continue;
+                }
+
+                if ($this->fieldHelper->isRelation($field)) {
+                    if ($isFullMode) {
                         $fieldContext['mode'] = self::FULL_MODE;
                     } else {
                         $fieldContext['mode'] = self::SHORT_MODE;
@@ -106,71 +118,13 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     /**
-     * @todo - move this helper methods to separate service
-     *
-     * @param string $entityName
-     * @param string $fieldName
-     * @param string $parameter
-     * @param mixed $default
-     * @return mixed|null
-     */
-    protected function getConfigValue($entityName, $fieldName, $parameter, $default = null)
-    {
-        if (!$this->configProvider->hasConfig($entityName, $fieldName)) {
-            return $default;
-        }
-
-        $fieldConfig = $this->configProvider->getConfig($entityName, $fieldName);
-        if (!$fieldConfig->has($parameter)) {
-            return $default;
-        }
-
-        return $fieldConfig->get($parameter);
-    }
-
-    /**
-     * @todo - move this helper methods to separate service
-     *
-     * @param array $field
-     * @return bool
-     */
-    protected function isRelation(array $field)
-    {
-        return !empty($field['relation_type']) && !empty($field['related_entity_name']);
-    }
-
-    /**
-     * @todo - move this helper methods to separate service
-     *
-     * @param array $field
-     * @return bool
-     */
-    protected function isSingleRelation(array $field)
-    {
-        return $this->isRelation($field)
-        && in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
-    }
-
-    /**
-     * @todo - move this helper methods to separate service
-     *
-     * @param array $field
-     * @return bool
-     */
-    protected function isMultipleRelation(array $field)
-    {
-        return $this->isRelation($field)
-        && in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
         if (is_object($data)) {
-            $dataClass = ClassUtils::getRealClass(get_class($data));
-            return $this->configProvider->hasConfig($dataClass);
+            $dataClass = ClassUtils::getClass($data);
+            return $this->fieldHelper->hasConfig($dataClass);
         }
 
         return false;
@@ -181,6 +135,32 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function setSerializer(SerializerInterface $serializer)
     {
+        if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Serializer must implement "%s" and "%s"',
+                    'Symfony\Component\Serializer\Normalizer\NormalizerInterface',
+                    'Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
+                )
+            );
+        }
         $this->serializer = $serializer;
+    }
+
+    /**
+     * @param string $entityName
+     * @return bool
+     */
+    protected function hasIdentityFields($entityName)
+    {
+        $fields = $this->fieldProvider->getFields($entityName);
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

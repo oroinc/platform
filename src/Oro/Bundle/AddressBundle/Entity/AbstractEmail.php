@@ -8,6 +8,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\MappedSuperclass
@@ -29,6 +30,13 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=false)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $email;
 

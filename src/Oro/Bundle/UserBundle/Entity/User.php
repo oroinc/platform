@@ -85,6 +85,13 @@ class User extends ExtendUser implements
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $id;
 
@@ -95,7 +102,16 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *  defaultValues={
+     *    "dataaudit"={
+     *      "auditable"=true
+     *    },
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $username;
 
@@ -192,6 +208,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="image", type="string", length=255, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $image;
 
@@ -219,6 +242,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $salt;
 
@@ -228,6 +258,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $password;
 
@@ -244,6 +281,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="confirmation_token", type="string", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $confirmationToken;
 
@@ -251,6 +295,13 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="password_requested", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $passwordRequestedAt;
 
@@ -260,6 +311,13 @@ class User extends ExtendUser implements
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastLogin;
 
@@ -274,6 +332,13 @@ class User extends ExtendUser implements
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", cascade={"persist"})
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $owner;
 
@@ -286,7 +351,14 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getLabel")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={"auditable"=true},
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $roles;
 
@@ -306,6 +378,13 @@ class User extends ExtendUser implements
     /**
      * @ORM\OneToOne(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
      * )
      */
     protected $api;

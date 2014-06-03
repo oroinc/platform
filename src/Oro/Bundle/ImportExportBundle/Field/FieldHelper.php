@@ -41,6 +41,16 @@ class FieldHelper
     }
 
     /**
+     * @param string $className
+     * @param null|string $fieldName
+     * @return bool
+     */
+    public function hasConfig($className, $fieldName = null)
+    {
+        return $this->configProvider->hasConfig($className, $fieldName);
+    }
+
+    /**
      * @param array $field
      * @return bool
      */

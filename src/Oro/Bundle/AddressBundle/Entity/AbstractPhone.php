@@ -8,6 +8,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\MappedSuperclass
@@ -21,6 +22,13 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Soap\ComplexType("int", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 
@@ -29,6 +37,13 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="phone", type="string", length=255, nullable=false)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $phone;
 

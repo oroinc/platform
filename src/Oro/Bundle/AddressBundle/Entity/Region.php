@@ -11,6 +11,7 @@ use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Region
@@ -59,6 +60,13 @@ class Region implements Translatable
      * @ORM\Column(name="code", type="string", length=32)
      * @JMS\Type("string")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $code;
 
@@ -69,6 +77,13 @@ class Region implements Translatable
      * @Gedmo\Translatable
      * @JMS\Type("string")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $name;
 

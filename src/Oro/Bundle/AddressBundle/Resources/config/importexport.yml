@@ -8,26 +8,26 @@ parameters:
 services:
     oro_address.importexport.phone_normalizer:
         class: %oro_address.importexport.phone_normalizer.class%
-        tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+#        tags:
+#            - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_address.importexport.email_normalizer:
         class: %oro_address.importexport.email_normalizer.class%
-        tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+#        tags:
+#            - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_address.importexport.address_type_normalizer:
         class: %oro_address.importexport.address_type_normalizer.class%
-        tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+#        tags:
+#            - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_address.importexport.address_normalizer:
         class: %oro_address.importexport.address_normalizer.class%
-        tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+#        tags:
+#            - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_address.importexport.typed_address_normalizer:
         class: %oro_address.importexport.typed_address_normalizer.class%
         arguments: [@oro_address.importexport.address_normalizer]
-        tags:
-            - { name: oro_importexport.normalizer, priority: -5 }
+#        tags:
+#            - { name: oro_importexport.normalizer, priority: -5 }

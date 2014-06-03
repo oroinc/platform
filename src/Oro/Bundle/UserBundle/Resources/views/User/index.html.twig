@@ -4,6 +4,10 @@
 {% set pageTitle = 'oro.user.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
+        exportProcessor: 'oro_user'
+    } %}
+
     {% if resource_granted('oro_user_user_create') %}
         {{ UI.addButton({
             'path': path('oro_user_create'),

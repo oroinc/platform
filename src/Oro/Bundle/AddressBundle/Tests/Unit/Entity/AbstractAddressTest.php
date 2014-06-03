@@ -58,10 +58,10 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $address = $this->createAddress();
         $address->beforeSave();
 
-        $this->assertNotNull($address->getCreatedAt());
-        $this->assertNotNull($address->getUpdatedAt());
+        $this->assertNotNull($address->getCreated());
+        $this->assertNotNull($address->getUpdated());
 
-        $this->assertEquals($address->getCreatedAt(), $address->getUpdatedAt());
+        $this->assertEquals($address->getCreated(), $address->getUpdated());
     }
 
     public function testGetRegionName()

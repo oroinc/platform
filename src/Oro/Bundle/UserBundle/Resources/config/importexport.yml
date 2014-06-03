@@ -4,5 +4,17 @@ parameters:
 services:
     oro_user.importexport.user_normalizer:
         class: %oro_user.importexport.user_normalizer.class%
+#        tags:
+#            - { name: oro_importexport.normalizer }
+
+    oro_user.importexport.data_converter:
+        parent: oro_importexport.data_converter.configurable
+
+    # Export processor
+    oro_user.importexport.processor.export:
+        parent: oro_importexport.processor.export_abstract
+        calls:
+            - [setDataConverter, [@oro_user.importexport.data_converter]]
         tags:
-            - { name: oro_importexport.normalizer }
+            - { name: oro_importexport.processor, type: export, entity: %oro_user.entity.class%, alias: oro_user }
+
