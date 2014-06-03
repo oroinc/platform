@@ -10,7 +10,6 @@
         "symfony/symfony": "2.1.*",
         "friendsofsymfony/rest-bundle": "0.11.*",
         "nelmio/api-doc-bundle": "dev-master",
-        "knplabs/knp-paginator-bundle": "dev-master",
         "jms/job-queue-bundle": "dev-master",
         "jms/serializer-bundle": "0.12.*@dev",
         "oro/config": "dev-master",
