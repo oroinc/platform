@@ -5,6 +5,7 @@ namespace Oro\Bundle\NoteBundle\Tests\Unit\Tools;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigDumperExtension;
 use Oro\Bundle\NoteBundle\Tools\NoteDumperExtension;
@@ -202,12 +203,120 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity', 'entity')
             ->will($this->returnValue($fieldConfig));
 
-
-
         self::callProtectedMethod(
             $extension,
             'updateFieldConfig',
             [$cm, 'extend', 'Test\Entity', 'entity', ['test' => true]]
+        );
+    }
+
+    public function testAddManyToOneRelation()
+    {
+        $extension = $this->getMock(
+            'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
+            [],
+            [$this->configManager]
+        );
+
+        $targetEntityName = 'Test\TargetEntity';
+        $sourceEntityName = 'Test\SourceEntity';
+        $relationName     = 'entity';
+        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
+
+        // expected entity config
+        $config = new Config(new EntityConfigId('extend', $targetEntityName));
+        $config->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'field_id'        => false,
+                    'owner'           => false,
+                    'target_entity'   => $sourceEntityName,
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\NoteBundle\Entity\Note',
+                        $relationName,
+                        'manyToOne'
+                    )
+                ]
+            ]
+        );
+        $config->set(
+            'schema',
+            [
+                'relation' => [$relationKey => $relationName]
+            ]
+        );
+        $config->set(
+            'index',
+            [
+                'relation' => [$relationKey => null]
+            ]
+        );
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($targetEntityName)
+            ->will($this->returnValue($config));
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($config);
+
+        self::callProtectedMethod(
+            $extension,
+            'addManyToOneRelation',
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
+        );
+    }
+
+    public function testAddManyToOneRelationOwnerSide()
+    {
+        $extension = $this->getMock(
+            'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
+            [],
+            [$this->configManager]
+        );
+
+        $targetEntityName = 'Test\TargetEntity';
+        $sourceEntityName = 'Test\SourceEntity';
+        $relationName     = 'entity';
+        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
+
+        // expected entity config
+        $config = new Config(new EntityConfigId('extend', $targetEntityName));
+        $config->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'target_field_id' => false,
+                    'owner'           => true,
+                    'target_entity'   => $sourceEntityName,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\NoteBundle\Entity\Note',
+                        $relationName,
+                        'manyToOne'
+                    )
+                ]
+            ]
+        );
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($targetEntityName)
+            ->will($this->returnValue($config));
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($config);
+
+        self::callProtectedMethod(
+            $extension,
+            'addManyToOneRelation',
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
         );
     }
 

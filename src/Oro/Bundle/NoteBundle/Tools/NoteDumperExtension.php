@@ -190,8 +190,8 @@ class NoteDumperExtension extends ConfigDumperExtension
         $entityConfig  = $this->extendConfigProvider->getConfig($targetEntityName);
 
         $fieldId = new FieldConfigId('extend', self::NOTE_ENTITY, $relationName, 'manyToOne');
+        $assign        = false;
         if ($isOwningSide) {
-            $assign        = false;
             $owner         = true;
             $targetFieldId = false;
 
@@ -205,7 +205,6 @@ class NoteDumperExtension extends ConfigDumperExtension
             $index[$relationName] = null;
             $entityConfig->set('index', $index);
         } else {
-            $assign        = false;
             $owner         = false;
             $targetFieldId = $fieldId;
             $fieldId       = false;
