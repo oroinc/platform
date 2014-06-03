@@ -87,15 +87,16 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
 
             $fieldValue = $propertyAccessor->getValue($object, $fieldName);
             if (is_object($fieldValue)) {
+                $fieldContext = $context;
                 if ($this->isRelation($field)) {
                     if ($this->getConfigValue($entityName, $fieldName, self::FULL_MODE)) {
-                        $context['mode'] = self::FULL_MODE;
+                        $fieldContext['mode'] = self::FULL_MODE;
                     } else {
-                        $context['mode'] = self::SHORT_MODE;
+                        $fieldContext['mode'] = self::SHORT_MODE;
                     }
                 }
 
-                $fieldValue = $this->serializer->normalize($fieldValue, $format, $context);
+                $fieldValue = $this->serializer->normalize($fieldValue, $format, $fieldContext);
             }
 
             $result[$fieldName] = $fieldValue;
