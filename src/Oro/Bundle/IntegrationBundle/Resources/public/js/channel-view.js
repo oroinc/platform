@@ -29,6 +29,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
          * @param options Object
          */
         initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var requiredMissed = this.requiredOptions.filter(function (option) {
                 return _.isUndefined(options[option]);
             });

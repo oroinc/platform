@@ -69,7 +69,8 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             ]
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#transition-form-template').html();

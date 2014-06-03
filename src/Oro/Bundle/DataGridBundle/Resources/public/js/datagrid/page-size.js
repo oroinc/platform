@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'backbone'
 
         changePageSize: function (pageSize) {
             this.collection.state.pageSize = pageSize;
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
 
             return this;
         },

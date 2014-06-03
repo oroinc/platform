@@ -22,7 +22,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             calendar: null
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var templateHtml = $(this.options.formTemplateSelector).html();
             this.template = _.template(templateHtml);
 

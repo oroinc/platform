@@ -607,7 +607,7 @@ define(function (require) {
         _onRemove: function (model) {
             mediator.trigger('datagrid:removeRow:' + this.name, model);
 
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
         },
 
         /**

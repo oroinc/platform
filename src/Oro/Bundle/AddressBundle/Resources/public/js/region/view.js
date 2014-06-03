@@ -95,7 +95,7 @@ function(_, Backbone) {
             if($(e.currentTarget).val()){
                 var countryId = $(e.currentTarget).val();
                 this.collection.setCountryId(countryId);
-                this.collection.fetch();
+                this.collection.fetch({reset: true});
             } else {
                 this.collection.reset([]);
             }
