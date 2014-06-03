@@ -1,6 +1,7 @@
 parameters:
     oro_importexport.data_converter.default.class: Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter
     oro_importexport.data_converter.configurable.class: Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter
+    oro_importexport.data_converter.relation_calculator.class: Oro\Bundle\ImportExportBundle\Converter\RelationCalculator
 
 services:
     oro_importexport.data_converter.default:
@@ -10,5 +11,13 @@ services:
         class: %oro_importexport.data_converter.configurable.class%
         abstract: true
         arguments:
+            - @oro_entity.entity_field_provider
+            - @oro_importexport.field.field_helper
+            - @oro_importexport.data_converter.relation_calculator
+
+    oro_importexport.data_converter.relation_calculator:
+        class: %oro_importexport.data_converter.relation_calculator.class%
+        arguments:
+            - @doctrine
             - @oro_entity.entity_field_provider
             - @oro_importexport.field.field_helper

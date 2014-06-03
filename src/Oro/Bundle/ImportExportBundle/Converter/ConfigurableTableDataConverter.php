@@ -25,13 +25,23 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected $fieldHelper;
 
     /**
+     * @var RelationCalculator
+     */
+    protected $relationCalculator;
+
+    /**
      * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
+     * @param RelationCalculator $relationCalculator
      */
-    public function __construct(EntityFieldProvider $fieldProvider, FieldHelper $fieldHelper)
-    {
+    public function __construct(
+        EntityFieldProvider $fieldProvider,
+        FieldHelper $fieldHelper,
+        RelationCalculator $relationCalculator
+    ) {
         $this->fieldProvider = $fieldProvider;
         $this->fieldHelper = $fieldHelper;
+        $this->relationCalculator = $relationCalculator;
     }
 
     /**
@@ -73,7 +83,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $maxRelations = array();
         foreach ($multipleRelations as $entityName => $relations) {
             foreach (array_keys($relations) as $fieldName) {
-                $maxRelations[$entityName][$fieldName] = 5; // TODO Use max calculator as external service
+                $maxRelations[$entityName][$fieldName]
+                    = $this->relationCalculator->getMaxRelatedEntities($entityName, $fieldName);
             }
         }
 
@@ -139,6 +150,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
         // generate conversion rules
         $rules = array();
+        $defaultOrder = 10000;
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
@@ -149,7 +161,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
             $fieldOrder = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'order');
             if ($fieldOrder === null || $fieldOrder === '') {
-                $fieldOrder = 10000;
+                $fieldOrder = $defaultOrder;
+                $defaultOrder++;
             }
             $fieldOrder = (int)$fieldOrder;
 

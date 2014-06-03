@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +50,24 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'related_entity_name' => 'ScalarEntity',
             ),
         ),
+        'MultipleRelationEntity' => array(
+            array(
+                'name' => 'id',
+                'label' => 'ID',
+            ),
+            array(
+                'name' => 'scalarEntities',
+                'label' => 'Scalar Entities',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ),
+            array(
+                'name' => 'singleRelationEntities',
+                'label' => 'Single Relation Entities',
+                'relation_type' => 'oneToMany',
+                'related_entity_name' => 'SingleRelationEntity',
+            ),
+        ),
     );
 
     /**
@@ -85,6 +102,28 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'order' => 40,
             ),
         ),
+        'MultipleRelationEntity' => array(
+            'id' => array(
+                'order' => 10
+            ),
+            'scalarEntities' => array(
+                'order' => 20
+            ),
+            'singleRelationEntities' => array(
+                'order' => 30,
+                'full' => true,
+            ),
+        ),
+    );
+
+    /**
+     * @var array
+     */
+    protected $relations = array(
+        'MultipleRelationEntity' => array(
+            'scalarEntities' => 3,
+            'singleRelationEntities' => 1,
+        )
     );
 
     /**
@@ -96,7 +135,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     {
         $fieldProvider = $this->prepareFieldProvider();
         $fieldHelper = $this->prepareFieldHelper();
-        $this->converter = new ConfigurableTableDataConverter($fieldProvider, $fieldHelper);
+        $relationCalculator = $this->prepareRelationCalculator();
+        $this->converter = new ConfigurableTableDataConverter($fieldProvider, $fieldHelper, $relationCalculator);
     }
 
     /**
@@ -109,6 +149,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function exportDataProvider()
@@ -169,6 +210,59 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Full Scalar Entity Name' => 'qwerty',
                     'Full Scalar Created' => '2012-12-12 12:12:12',
                     'Short Scalar Entity Name' => 'asdfgh',
+                ),
+            ),
+            'empty multiple relation' => array(
+                'entityName' => 'MultipleRelationEntity',
+                'input' => array(),
+                'expected' => array(
+                    'ID' => '',
+                    'Scalar Entities 1 Entity Name' => '',
+                    'Scalar Entities 2 Entity Name' => '',
+                    'Scalar Entities 3 Entity Name' => '',
+                    'Single Relation Entities 1 ID' => '',
+                    'Single Relation Entities 1 Name' => '',
+                    'Single Relation Entities 1 Full Scalar ID' => '',
+                    'Single Relation Entities 1 Full Scalar Entity Name' => '',
+                    'Single Relation Entities 1 Full Scalar Created' => '',
+                    'Single Relation Entities 1 Short Scalar Entity Name' => '',
+                ),
+            ),
+            'full multiple relation' => array(
+                'entityName' => 'MultipleRelationEntity',
+                'input' => array(
+                    'id' => 12,
+                    'scalarEntities' => array(
+                        array('name' => 'first'),
+                        array('name' => 'second'),
+                        array('name' => 'third')
+                    ),
+                    'singleRelationEntities' => array(
+                        array(
+                            'id' => 23,
+                            'name' => 'relation',
+                            'fullScalar' => array(
+                                'id' => 43,
+                                'name' => 'qwerty',
+                                'created' => '2012-12-12 12:12:12',
+                            ),
+                            'shortScalar' => array(
+                                'name' => 'asdfgh',
+                            ),
+                        )
+                    ),
+                ),
+                'expected' => array(
+                    'ID' => '12',
+                    'Scalar Entities 1 Entity Name' => 'first',
+                    'Scalar Entities 2 Entity Name' => 'second',
+                    'Scalar Entities 3 Entity Name' => 'third',
+                    'Single Relation Entities 1 ID' => '23',
+                    'Single Relation Entities 1 Name' => 'relation',
+                    'Single Relation Entities 1 Full Scalar ID' => '43',
+                    'Single Relation Entities 1 Full Scalar Entity Name' => 'qwerty',
+                    'Single Relation Entities 1 Full Scalar Created' => '2012-12-12 12:12:12',
+                    'Single Relation Entities 1 Short Scalar Entity Name' => 'asdfgh',
                 ),
             ),
         );
@@ -238,6 +332,48 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+            'empty multiple relation' => array(
+                'entityName' => 'MultipleRelationEntity',
+                'input' => array(),
+                'expected' => array(),
+            ),
+            'full multiple relation' => array(
+                'entityName' => 'MultipleRelationEntity',
+                'input' => array(
+                    'ID' => '12',
+                    'Scalar Entities 1 Entity Name' => 'first',
+                    'Scalar Entities 2 Entity Name' => 'second',
+                    'Scalar Entities 3 Entity Name' => 'third',
+                    'Single Relation Entities 1 ID' => '23',
+                    'Single Relation Entities 1 Name' => 'relation',
+                    'Single Relation Entities 1 Full Scalar ID' => '43',
+                    'Single Relation Entities 1 Full Scalar Entity Name' => 'qwerty',
+                    'Single Relation Entities 1 Full Scalar Created' => '2012-12-12 12:12:12',
+                    'Single Relation Entities 1 Short Scalar Entity Name' => 'asdfgh',
+                ),
+                'expected' => array(
+                    'id' => '12',
+                    'scalarEntities' => array(
+                        array('name' => 'first'),
+                        array('name' => 'second'),
+                        array('name' => 'third')
+                    ),
+                    'singleRelationEntities' => array(
+                        array(
+                            'id' => '23',
+                            'name' => 'relation',
+                            'fullScalar' => array(
+                                'id' => '43',
+                                'name' => 'qwerty',
+                                'created' => '2012-12-12 12:12:12',
+                            ),
+                            'shortScalar' => array(
+                                'name' => 'asdfgh',
+                            ),
+                        )
+                    ),
+                ),
+            ),
         );
     }
 
@@ -274,7 +410,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return FieldHelper
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function prepareFieldHelper()
     {
@@ -294,5 +430,27 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
             );
 
         return $fieldHelper;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function prepareRelationCalculator()
+    {
+        $relationCalculator = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\RelationCalculator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $relationCalculator->expects($this->any())->method('getMaxRelatedEntities')
+            ->will(
+                $this->returnCallback(
+                    function ($entityName, $fieldName) {
+                        return isset($this->relations[$entityName][$fieldName])
+                            ? $this->relations[$entityName][$fieldName]
+                            : 0;
+                    }
+                )
+            );
+
+        return $relationCalculator;
     }
 }
