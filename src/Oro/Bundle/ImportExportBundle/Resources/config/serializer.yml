@@ -3,6 +3,7 @@ parameters:
     oro_importexport.serializer.dummy_encoder.class: Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder
     oro_importexport.serializer.datetime_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer
     oro_importexport.serializer.collection_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer
+    oro_importexport.serializer.configurable_entity_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer
 
 services:
     oro_importexport.serializer:
@@ -21,5 +22,13 @@ services:
 
     oro_importexport.serializer.collection_normalizer:
         class: %oro_importexport.serializer.collection_normalizer.class%
+        tags:
+            - { name: oro_importexport.normalizer, priority: -10 }
+
+    oro_importexport.serializer.configurable_entity_normalizer:
+        class: %oro_importexport.serializer.configurable_entity_normalizer.class%
+        arguments:
+            - @oro_entity.entity_field_provider
+            - @oro_entity_config.provider.importexport
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
