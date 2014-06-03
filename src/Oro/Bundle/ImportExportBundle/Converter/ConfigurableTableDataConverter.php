@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
@@ -20,18 +20,18 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected $fieldProvider;
 
     /**
-     * @var ConfigProviderInterface
+     * @var FieldHelper
      */
-    protected $configProvider;
+    protected $fieldHelper;
 
     /**
      * @param EntityFieldProvider $fieldProvider
-     * @param ConfigProviderInterface $configProvider
+     * @param FieldHelper $fieldHelper
      */
-    public function __construct(EntityFieldProvider $fieldProvider, ConfigProviderInterface $configProvider)
+    public function __construct(EntityFieldProvider $fieldProvider, FieldHelper $fieldHelper)
     {
         $this->fieldProvider = $fieldProvider;
-        $this->configProvider = $configProvider;
+        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -122,27 +122,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @param string $parameter
-     * @param mixed $default
-     * @return mixed|null
-     */
-    protected function getConfigValue($entityName, $fieldName, $parameter, $default = null)
-    {
-        if (!$this->configProvider->hasConfig($entityName, $fieldName)) {
-            return $default;
-        }
-
-        $fieldConfig = $this->configProvider->getConfig($entityName, $fieldName);
-        if (!$fieldConfig->has($parameter)) {
-            return $default;
-        }
-
-        return $fieldConfig->get($parameter);
-    }
-
-    /**
      * @param $entityName
      * @param bool $fullData
      * @param int $singleRelationDeepLevel
@@ -162,25 +141,25 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $rules = array();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if ($this->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
                 continue;
             }
 
-            $fieldHeader = $this->getConfigValue($entityName, $fieldName, 'header', $field['label']);
+            $fieldHeader = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'header', $field['label']);
 
-            $fieldOrder = $this->getConfigValue($entityName, $fieldName, 'order');
+            $fieldOrder = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'order');
             if ($fieldOrder === null || $fieldOrder === '') {
                 $fieldOrder = 10000;
             }
             $fieldOrder = (int)$fieldOrder;
 
-            if ($this->isRelation($field)) {
-                $isSingleRelation = $this->isSingleRelation($field) && $singleRelationDeepLevel > 0;
-                $isMultipleRelation = $this->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
+            if ($this->fieldHelper->isRelation($field)) {
+                $isSingleRelation = $this->fieldHelper->isSingleRelation($field) && $singleRelationDeepLevel > 0;
+                $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 
                 if ($fullData && ($isSingleRelation || $isMultipleRelation)) {
                     $relatedEntityName = $field['related_entity_name'];
-                    $fieldFullData = $this->getConfigValue($entityName, $fieldName, 'full', false);
+                    $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
                     $relationRules = $this->getEntityRules(
                         $relatedEntityName,
@@ -227,7 +206,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     }
                 }
             } else {
-                if ($fullData || $this->getConfigValue($entityName, $fieldName, 'identity')) {
+                if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
                     $rules[$fieldHeader] = array('name' => $fieldName, 'order' => $fieldOrder);
                 }
             }
@@ -271,34 +250,5 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         return $rules;
-    }
-
-    /**
-     * @param array $field
-     * @return bool
-     */
-    protected function isRelation(array $field)
-    {
-        return !empty($field['relation_type']) && !empty($field['related_entity_name']);
-    }
-
-    /**
-     * @param array $field
-     * @return bool
-     */
-    protected function isSingleRelation(array $field)
-    {
-        return $this->isRelation($field)
-            && in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
-    }
-
-    /**
-     * @param array $field
-     * @return bool
-     */
-    protected function isMultipleRelation(array $field)
-    {
-        return $this->isRelation($field)
-            && in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
     }
 }

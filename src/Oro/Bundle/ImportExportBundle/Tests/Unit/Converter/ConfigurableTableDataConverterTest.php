@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,8 +95,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $fieldProvider = $this->prepareFieldProvider();
-        $configProvider = $this->prepareConfigProvider();
-        $this->converter = new ConfigurableTableDataConverter($fieldProvider, $configProvider);
+        $fieldHelper = $this->prepareFieldHelper();
+        $this->converter = new ConfigurableTableDataConverter($fieldProvider, $fieldHelper);
     }
 
     /**
@@ -273,50 +274,25 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return FieldHelper
      */
-    protected function prepareConfigProvider()
+    protected function prepareFieldHelper()
     {
-        $configProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
-        $configProvider->expects($this->any())->method('hasConfig')
-            ->with($this->isType('string'), $this->isType('string'))
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfigValue'))
+            ->getMock();
+        $fieldHelper->expects($this->any())->method('getConfigValue')
             ->will(
                 $this->returnCallback(
-                    function ($entityName, $fieldName) {
-                        return isset($this->config[$entityName][$fieldName]);
-                    }
-                )
-            );
-        $configProvider->expects($this->any())->method('getConfig')
-            ->with($this->isType('string'), $this->isType('string'))
-            ->will(
-                $this->returnCallback(
-                    function ($entityName, $fieldName) {
-                        $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-                        $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
-                            ->will(
-                                $this->returnCallback(
-                                    function ($parameter) use ($entityName, $fieldName) {
-                                        return isset($this->config[$entityName][$fieldName][$parameter]);
-                                    }
-                                )
-                            );
-                        $entityConfig->expects($this->any())->method('get')->with($this->isType('string'))
-                            ->will(
-                                $this->returnCallback(
-                                    function ($parameter) use ($entityName, $fieldName) {
-                                        return isset($this->config[$entityName][$fieldName][$parameter])
-                                            ? $this->config[$entityName][$fieldName][$parameter]
-                                            : null;
-                                    }
-                                )
-                            );
-
-                        return $entityConfig;
+                    function ($entityName, $fieldName, $parameter, $default = null) {
+                        return isset($this->config[$entityName][$fieldName][$parameter])
+                            ? $this->config[$entityName][$fieldName][$parameter]
+                            : $default;
                     }
                 )
             );
 
-        return $configProvider;
+        return $fieldHelper;
     }
 }

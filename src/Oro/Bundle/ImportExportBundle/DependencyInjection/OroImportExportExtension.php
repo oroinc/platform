@@ -14,9 +14,6 @@ class OroImportExportExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
-
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('serializer.yml');
         $loader->load('context.yml');
@@ -29,5 +26,6 @@ class OroImportExportExtension extends Extension
         $loader->load('executor.yml');
         $loader->load('file.yml');
         $loader->load('handler.yml');
+        $loader->load('field.yml');
     }
 }
