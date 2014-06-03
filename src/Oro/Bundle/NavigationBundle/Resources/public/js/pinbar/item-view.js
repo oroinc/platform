@@ -32,7 +32,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
             'click span': 'maximize'
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.listenTo(this.model, 'destroy', this.removeItem);
             this.listenTo(this.model, 'change:display_type', this.removeItem);
             this.listenTo(this.model, 'change:remove', this.unpin);

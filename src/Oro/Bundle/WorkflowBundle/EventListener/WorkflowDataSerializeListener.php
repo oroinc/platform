@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Events;
 
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -16,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 /**
  * Performs serialization and deserialization of WorkflowItem data
  */
-class WorkflowDataSerializeSubscriber implements EventSubscriber
+class WorkflowDataSerializeListener
 {
     /**
      * @var WorkflowAwareSerializer
@@ -43,19 +41,6 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
     {
         $this->serializer = $serializer;
         $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            // @codingStandardsIgnoreStart
-            Events::onFlush,
-            Events::postLoad
-            // @codingStandardsIgnoreEnd
-        );
     }
 
     /**

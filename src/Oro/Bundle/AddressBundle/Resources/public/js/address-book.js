@@ -44,7 +44,8 @@ define([
             'class': 'map-box'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new AddressCollection();
             this.options.collection.url = this._getUrl('addressListUrl');
 

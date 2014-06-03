@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EntitySubscriber implements EventSubscriber
+class EntityListener
 {
     /**
      * @var ClassMetadata
@@ -23,18 +21,6 @@ class EntitySubscriber implements EventSubscriber
      * @var ClassMetadata
      */
     protected $calendarConnectionMetadata;
-
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
-    {
-        return [
-            // @codingStandardsIgnoreStart
-            Events::onFlush
-            // @codingStandardsIgnoreEnd
-        ];
-    }
 
     /**
      * @param OnFlushEventArgs $event

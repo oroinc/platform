@@ -94,6 +94,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          * @param {Object} options
          */
         initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.options.templateParams.allowEdit = this.options.allowEdit;
             this.options.templateParams.collapsed = options.state.expanded;
             BlockWidget.prototype.initialize.apply(this, arguments);

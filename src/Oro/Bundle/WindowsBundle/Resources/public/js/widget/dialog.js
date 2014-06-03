@@ -32,6 +32,7 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
          */
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             this.on('adoptedFormResetClick', _.bind(this.remove, this));
 

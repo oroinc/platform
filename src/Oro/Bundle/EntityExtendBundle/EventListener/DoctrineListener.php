@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
@@ -15,7 +14,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
-class DoctrineSubscriber implements EventSubscriber
+class DoctrineListener
 {
     /**
      * @var ExtendDbIdentifierNameGenerator
@@ -30,16 +29,6 @@ class DoctrineSubscriber implements EventSubscriber
     public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator = null)
     {
         $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            'loadClassMetadata'
-        );
     }
 
     /**

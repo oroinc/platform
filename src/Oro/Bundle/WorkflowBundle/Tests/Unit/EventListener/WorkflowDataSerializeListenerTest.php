@@ -7,14 +7,14 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
-use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeSubscriber;
+use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener;
 
 class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var WorkflowDataSerializeSubscriber
+     * @var WorkflowDataSerializeListener
      */
-    protected $subscriber;
+    protected $listener;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -32,15 +32,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscriber = new WorkflowDataSerializeSubscriber($this->serializer, $this->doctrineHelper);
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            array('onFlush', 'postLoad'),
-            $this->subscriber->getSubscribedEvents()
-        );
+        $this->listener = new WorkflowDataSerializeListener($this->serializer, $this->doctrineHelper);
     }
 
     public function testPostLoad()
@@ -63,7 +55,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->serializer->expects($this->never())->method('serialize');
         $this->serializer->expects($this->never())->method('deserialize');
 
-        $this->subscriber->postLoad($args);
+        $this->listener->postLoad($args);
 
         $this->assertAttributeSame($this->serializer, 'serializer', $entity);
     }
@@ -78,7 +70,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $args = new LifecycleEventArgs($entity, $em);
 
         $this->serializer->expects($this->never())->method($this->anything());
-        $this->subscriber->postLoad($args);
+        $this->listener->postLoad($args);
     }
 
     public function testOnFlush()
@@ -142,7 +134,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->serializer->expects($this->at(5))->method('serialize')
             ->with($data4, 'json')->will($this->returnValue($expectedSerializedData4));
 
-        $this->subscriber->onFlush(
+        $this->listener->onFlush(
             new OnFlushEventArgs(
                 $this->getOnFlushEntityManagerMock(
                     array(
