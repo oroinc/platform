@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
-
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
 use Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class EntitySubscriber implements EventSubscriber
+class EntityListener
 {
     /**
      * @var ExtendMetadataFactory
@@ -32,18 +29,6 @@ class EntitySubscriber implements EventSubscriber
     {
         $this->metadataFactory = $metadataFactory;
         $this->loggableManager = $loggableManager;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            'onFlush',
-            'loadClassMetadata',
-            'postPersist',
-        );
     }
 
     /**

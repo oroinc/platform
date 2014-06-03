@@ -38,7 +38,7 @@ define(['./abstract-action'
          */
         execute: function() {
             this.datagrid.setAdditionalParameter('refresh', true);
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
             this.datagrid.removeAdditionalParameter('refresh');
         }
     });

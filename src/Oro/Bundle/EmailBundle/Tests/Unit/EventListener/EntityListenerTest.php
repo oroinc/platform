@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\EventListener\EntitySubscriber;
-use Doctrine\ORM\Events;
+use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 
 class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var EntitySubscriber */
-    private $subscriber;
+    /** @var EntityListener */
+    private $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $emailOwnerManager;
@@ -18,19 +17,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscriber = new EntitySubscriber($this->emailOwnerManager);
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            array(
-                //@codingStandardsIgnoreStart
-                Events::onFlush,
-                //@codingStandardsIgnoreEnd
-            ),
-            $this->subscriber->getSubscribedEvents()
-        );
+        $this->listener = new EntityListener($this->emailOwnerManager);
     }
 
     public function testOnFlush()
@@ -43,6 +30,6 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('handleOnFlush')
             ->with($this->identicalTo($eventArgs));
 
-        $this->subscriber->onFlush($eventArgs);
+        $this->listener->onFlush($eventArgs);
     }
 }

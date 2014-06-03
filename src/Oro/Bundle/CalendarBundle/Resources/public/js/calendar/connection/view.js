@@ -30,7 +30,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             newOwnerSelector: '#new_calendar_owner'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());

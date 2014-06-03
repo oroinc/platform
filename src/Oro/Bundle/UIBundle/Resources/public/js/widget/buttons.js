@@ -22,6 +22,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
 
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             this.widget = this.$el;
             this.widget.addClass(this.options.cssClass);

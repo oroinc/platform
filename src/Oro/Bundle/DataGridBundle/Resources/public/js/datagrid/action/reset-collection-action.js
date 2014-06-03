@@ -38,7 +38,7 @@ define(['./abstract-action'
          */
         execute: function () {
             this.collection.updateState(this.collection.initialState);
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
         }
     });
 });

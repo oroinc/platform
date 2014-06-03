@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'backbone'
             var entityId = $(e.currentTarget).val();
             this.collection.setEntityId(entityId.split('\\').join('_'));
             if (entityId) {
-                this.collection.fetch();
+                this.collection.fetch({reset: true});
             } else {
                 this.collection.reset();
             }

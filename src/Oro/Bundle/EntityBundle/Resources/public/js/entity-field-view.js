@@ -20,7 +20,8 @@ define(['underscore', 'backbone'
         /** @property {Object} */
         util: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.util = this.$el.data('entity-field-util');
             this.util.fieldsLabel = this.options.fieldsLabel;
             this.util.relatedLabel = this.options.relatedLabel;

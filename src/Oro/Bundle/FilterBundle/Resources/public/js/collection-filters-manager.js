@@ -40,7 +40,7 @@ define(['underscore', './filters-manager'
                 return;
             }
             this.collection.state.currentPage = 1;
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
 
             FiltersManager.prototype._onFilterUpdated.apply(this, arguments);
         },
