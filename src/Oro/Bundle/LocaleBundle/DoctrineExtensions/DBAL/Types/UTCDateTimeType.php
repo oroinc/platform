@@ -8,8 +8,27 @@ use Doctrine\DBAL\Types\DateTimeType;
 
 class UTCDateTimeType extends DateTimeType
 {
+    const TYPE = 'utc_date_time';
+
     /** @var null| \DateTimeZone  */
     static private $utc = null;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return self::TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    {
+        $sqlDeclaration = parent::getSQLDeclaration($fieldDeclaration, $platform);
+        return $sqlDeclaration . " COMMENT '(DC2Type:" . $this->getName() . ")'";
+    }
 
     /**
      * {@inheritdoc}
