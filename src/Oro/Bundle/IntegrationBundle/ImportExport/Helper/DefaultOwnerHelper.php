@@ -67,7 +67,7 @@ class DefaultOwnerHelper
         if ($uow->getEntityState($entity, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED) {
             $entity = $this->em->find(
                 ClassUtils::getClass($entity),
-                $this->em->getUnitOfWork()->getEntityIdentifier($entity)
+                $entity->getId()
             );
         }
 
