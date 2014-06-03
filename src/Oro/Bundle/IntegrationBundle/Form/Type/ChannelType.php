@@ -80,7 +80,8 @@ class ChannelType extends AbstractType
             'oro_user_select',
             [
                 'required' => true,
-                'label'    => 'oro.integration.channel.default_user_owner.label'
+                'label'    => 'oro.integration.channel.default_user_owner.label',
+                'tooltip'  => 'oro.integration.channel.default_user_owner.tooltip'
             ]
         );
     }

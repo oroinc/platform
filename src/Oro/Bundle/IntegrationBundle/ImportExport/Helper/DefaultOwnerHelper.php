@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
@@ -38,6 +39,7 @@ class DefaultOwnerHelper
         $ownershipMetadata = $this->getMetadata($className);
 
         if ($defaultUserOwner && $ownershipMetadata->isUserOwned()) {
+            $defaultUserOwner = $this->ensureNotDetached($defaultUserOwner);
             $doctrineMetadata->setFieldValue($entity, $ownershipMetadata->getOwnerFieldName(), $defaultUserOwner);
         }
     }
@@ -52,5 +54,23 @@ class DefaultOwnerHelper
     protected function getMetadata($entityFQCN)
     {
         return $this->ownershipMetadataProvider->getMetadata($entityFQCN);
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return object
+     */
+    protected function ensureNotDetached($entity)
+    {
+        $uow = $this->em->getUnitOfWork();
+        if ($uow->getEntityState($entity, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED) {
+            $entity = $this->em->find(
+                ClassUtils::getClass($entity),
+                $this->em->getUnitOfWork()->getEntityIdentifier($entity)
+            );
+        }
+
+        return $entity;
     }
 }
