@@ -12,8 +12,11 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ContactNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
+    const FULL_MODE  = 'full';
+    const SHORT_MODE = 'short';
+
     /**
      * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
      */
@@ -39,6 +42,8 @@ class ContactNormalizer implements NormalizerInterface, DenormalizerInterface, S
     ) {
         $this->fieldProvider = $fieldProvider;
         $this->configProvider = $configProvider;
+
+        parent::__construct(array(self::FULL_MODE, self::SHORT_MODE), self::FULL_MODE);
     }
 
     /**
@@ -62,24 +67,31 @@ class ContactNormalizer implements NormalizerInterface, DenormalizerInterface, S
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $entityName = ClassUtils::getRealClass($object);
+        $entityName = ClassUtils::getRealClass(get_class($object));
         $fields = $this->fieldProvider->getFields($entityName, true);
 
         $result = array();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
+
+            // Do not normalize excluded fields
             if ($this->getConfigValue($entityName, $fieldName, 'excluded')) {
+                continue;
+            }
+            // Do not normalize non identity fields for short mode
+            if ($this->getMode($context) == self::SHORT_MODE
+                && !$this->getConfigValue($entityName, $fieldName, 'identity')) {
                 continue;
             }
 
             $fieldValue = $propertyAccessor->getValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 if ($this->isRelation($field)) {
-                    if ($this->getConfigValue($entityName, $fieldName, 'full')) {
-                        $context['mode'] = 'full';
+                    if ($this->getConfigValue($entityName, $fieldName, self::FULL_MODE)) {
+                        $context['mode'] = self::FULL_MODE;
                     } else {
-                        $context['mode'] = 'short';
+                        $context['mode'] = self::SHORT_MODE;
                     }
                 }
 
@@ -156,7 +168,7 @@ class ContactNormalizer implements NormalizerInterface, DenormalizerInterface, S
     public function supportsNormalization($data, $format = null)
     {
         if (is_object($data)) {
-            $dataClass = ClassUtils::getRealClass($data);
+            $dataClass = ClassUtils::getRealClass(get_class($data));
             return $this->configProvider->hasConfig($dataClass);
         }
 
