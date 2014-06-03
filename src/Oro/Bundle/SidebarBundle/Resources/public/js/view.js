@@ -18,6 +18,7 @@ define(function (require) {
     var WidgetSetupView = require('./widget-container/widget-setup-view');
 
     var sidebarTemplate = require('text!./templates/template.html');
+    require('jquery-ui');
 
     var WIDGET_SORT_DELAY = 100;
 

@@ -1,19 +1,17 @@
+/*jslint nomen:true */
 /*global define*/
 define(['underscore', '../content-manager'], function (_, ContentManager) {
     'use strict';
 
-    var initialized = false,
-        methods = {
-            initHandler: function ($el) {
-                this.metadata = $el.data('metadata') || {};
-
-                if (!_.isUndefined(this.metadata.options) && _.isArray(this.metadata.options.contentTags || [])) {
-                    ContentManager.tagContent(this.metadata.options.contentTags);
-                }
-
-                initialized = true;
+    var methods = {
+        initHandler: function (deferred, $el) {
+            this.metadata = $el.data('metadata') || {};
+            if (!_.isUndefined(this.metadata.options) && _.isArray(this.metadata.options.contentTags || [])) {
+                ContentManager.tagContent(this.metadata.options.contentTags);
             }
-        };
+            deferred.resolve();
+        }
+    };
 
     return {
         /** @property [] */
@@ -33,12 +31,13 @@ define(['underscore', '../content-manager'], function (_, ContentManager) {
         /**
          * Builder interface implementation
          *
-         * @param $el
+         * @param {jQuery.Deferred} deferred
+         * @param {jQuery} $el
          * @param {String} gridName
          */
-        init: function ($el, gridName) {
+        init: function (deferred, $el, gridName) {
             if (_.indexOf(this.allowedTracking, gridName) !== -1) {
-                methods.initHandler($el);
+                methods.initHandler(deferred, $el);
             }
         }
     };
