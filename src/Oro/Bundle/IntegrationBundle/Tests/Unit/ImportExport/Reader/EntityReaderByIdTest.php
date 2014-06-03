@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Reader;
+namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 
 use Doctrine\ORM\Query;
 
