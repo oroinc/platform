@@ -36,6 +36,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
 
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
             this.initializeWidget(options);
         },
 

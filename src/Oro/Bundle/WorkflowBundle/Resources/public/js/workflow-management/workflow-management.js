@@ -46,7 +46,8 @@ function(_, Backbone, routing, messenger, __,
             entities: []
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.saveAndClose = false;
 
             _.each(this.model.get('steps').models, this.setWorkflow, this);

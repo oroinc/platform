@@ -36,7 +36,8 @@ define(['underscore', 'backbone', 'oronavigation/js/navigation', 'orotranslation
         /**
          * Constructor
          */
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.collection = new TagCollection();
             this.listenTo(this.getCollection(), 'reset', this.render);
             this.listenTo(this, 'filter', this.render);

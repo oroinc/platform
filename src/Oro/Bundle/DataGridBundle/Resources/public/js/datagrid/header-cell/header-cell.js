@@ -162,7 +162,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid', '../../pageable-collecti
                     }
                     collection.fullCollection.sort();
                 }
-                else collection.fetch();
+                else collection.fetch({reset: true});
             }
             else {
                 collection.comparator = comparator;

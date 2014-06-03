@@ -32,6 +32,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js
 
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);

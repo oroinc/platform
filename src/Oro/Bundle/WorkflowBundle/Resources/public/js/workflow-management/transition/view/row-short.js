@@ -25,7 +25,8 @@ function(_, Backbone) {
             stepFrom: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
 
