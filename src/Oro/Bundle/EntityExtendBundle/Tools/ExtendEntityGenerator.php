@@ -68,21 +68,21 @@ class ExtendEntityGenerator
     /**
      * Generates extended entities
      *
-     * @param array $config
+     * @param array $schemas
      */
-    public function generate(array $config)
+    public function generate(array $schemas)
     {
         // filter supported extensions and pre-process configuration
         foreach ($this->getExtensions() as $extension) {
-            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $config)) {
+            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $schemas)) {
                 continue;
             }
 
-            $extension->preProcessEntityConfiguration($config);
+            $extension->preProcessEntityConfiguration($schemas);
         }
 
         $aliases = [];
-        foreach ($config as $item) {
+        foreach ($schemas as $item) {
             $this->generateClass($item);
 
             if ($item['type'] == 'Extend') {

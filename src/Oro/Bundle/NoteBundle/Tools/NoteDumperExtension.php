@@ -105,7 +105,7 @@ class NoteDumperExtension extends ConfigDumperExtension
             $className,
             $fieldName,
             [
-                'owner'         => ExtendScope::OWNER_CUSTOM,
+                'owner'         => ExtendScope::OWNER_SYSTEM,
                 'state'         => ExtendScope::STATE_NEW,
                 'is_extend'     => false,
                 'extend'        => true,

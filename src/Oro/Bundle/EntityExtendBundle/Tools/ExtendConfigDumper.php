@@ -120,9 +120,12 @@ class ExtendConfigDumper
         $extendProvider = $this->em->getExtendConfigProvider();
         $extendConfigs  = $extendProvider->getConfigs();
         foreach ($extendConfigs as $extendConfig) {
-            $schema = $extendConfig->get('schema');
+            $schema    = $extendConfig->get('schema');
+            $className = $extendConfig->getId()->getClassName();
+
             if ($schema) {
-                $schemas[$extendConfig->getId()->getClassName()] = $schema;
+                $schemas[$className] = $schema;
+                $schemas[$className]['relationData'] = $extendConfig->get('relation');
             }
         }
 
