@@ -20,7 +20,8 @@ function(_, Backbone, AttributeFormOptionRowView) {
             entity_field_template: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-list-template').html();
             this.template = _.template(template);
             this.rowViews = {};

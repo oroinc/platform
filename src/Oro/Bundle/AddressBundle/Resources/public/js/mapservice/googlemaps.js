@@ -28,7 +28,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
         mapLocationCache: {},
         mapsLoadExecuted: false,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
             this.$unknownAddress = $('<div class="map-unknown">' + __('map.unknown.location') + '</div>')

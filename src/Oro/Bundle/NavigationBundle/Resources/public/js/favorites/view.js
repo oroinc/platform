@@ -11,8 +11,8 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js
      * @extends oronavigation.AbstractView
      */
     return AbstractView.extend({
+        el: '.favorite-button',
         options: {
-            el: '.favorite-button',
             tabTitle: 'Favorites',
             tabIcon: 'icon-star-empty',
             tabId: 'favorite'
