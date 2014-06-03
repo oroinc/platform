@@ -316,8 +316,31 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
         self::callProtectedMethod(
             $extension,
             'addManyToOneRelation',
-            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey, true]
         );
+    }
+
+    public function testGetRelationKeyAndName()
+    {
+        $extension = $this->getMock(
+            'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
+            [],
+            [$this->configManager]
+        );
+
+        $keyName = self::callProtectedMethod(
+            $extension,
+            'getRelationKey',
+            ['Test\SourceEntity', 'Test\Entity', 'entity']
+        );
+        $this->assertEquals('manyToOne|Test\SourceEntity|Test\Entity|entity', $keyName);
+
+        $relationName = self::callProtectedMethod(
+            $extension,
+            'getRelationName',
+            ['Test\SourceEntity']
+        );
+        $this->assertEquals('source_entity', $relationName);
     }
 
     /**
