@@ -79,7 +79,6 @@ services:
         class: %oro_integration.writer.persistent_batch_writer.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @oro_importexport.writer.entity_detach_fixer
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
