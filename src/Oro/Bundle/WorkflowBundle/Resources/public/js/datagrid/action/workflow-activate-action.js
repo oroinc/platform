@@ -19,7 +19,7 @@ function (ModelAction, ActivationHandler) {
             });
             this.on('activation_success', function() {
                 datagrid.hideLoading();
-                datagrid.collection.fetch();
+                datagrid.collection.fetch({reset: true});
             });
             this.on('activation_error', function(xhr) {
                 datagrid.hideLoading();

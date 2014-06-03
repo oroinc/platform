@@ -9,8 +9,8 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', './item-view'
      * @extends Backbone.View
      */
     return Backbone.View.extend({
+        el: '.pin-menus .tabbable',
         options: {
-            el: '.pin-menus .tabbable',
             defaultTabOptions: {
                 hideOnEmpty: false
             }
@@ -23,7 +23,8 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', './item-view'
             emptyMessage: _.template($("#template-dot-menu-empty-message").html())
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.$tabsContainer = this.$('.nav-tabs');
             this.$tabsContent = this.$('.tab-content');
             this.init();

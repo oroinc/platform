@@ -202,7 +202,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
         _onAjaxSuccess: function (data, textStatus, jqXHR) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
-                this.datagrid.collection.fetch();
+                this.datagrid.collection.fetch({reset: true});
             }
             this._showAjaxSuccessMessage(data);
         },
