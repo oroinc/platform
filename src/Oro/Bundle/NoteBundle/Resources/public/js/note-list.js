@@ -1,10 +1,10 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
-    'oroui/js/mediator', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
+    'oroui/js/mediator', 'oronavigation/js/navigation', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
     'oronote/js/note/view', 'oronote/js/note/collection', 'jquery-outer-html'
 ], function (
     _, Backbone, __, app, messenger,
-    mediator, LoadingMask, DialogWidget, DeleteConfirmation,
+    mediator, Navigation, LoadingMask, DialogWidget, DeleteConfirmation,
     NoteView, NoteCollection
 ) {
     'use strict';
@@ -34,7 +34,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         initialize: function () {
             this.options.collection = this.options.collection || new NoteCollection();
-            this.options.collection.url = this._getUrl('listUrl');
+            this.options.collection.baseUrl = this._getUrl('listUrl');
 
             this.listenTo(this.getCollection(), 'add', this._onItemAdded);
             this.listenTo(this.getCollection(), 'reset', this._onItemsAdded);
@@ -59,6 +59,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         reloadItems: function () {
+            if (!_.isUndefined(arguments[0])) {
+                this.getCollection().setSortMode(arguments[0]);
+            }
             this._showLoading();
             try {
                 this.getCollection().fetch({
@@ -107,7 +110,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         _onItemAdded: function (model) {
             if (!this.$el.find('#' + this._buildItemIdAttribute(model.get('id'))).length) {
-                this.$itemsContainer.append(this._createItemView(model).render().$el);
+                this.$itemsContainer.append(this._renderItemView(model));
             }
         },
 
@@ -140,6 +143,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             itemView.on('edit', _.bind(this.editItem, this));
             itemView.on('delete', _.bind(this.deleteItem, this));
             return itemView;
+        },
+
+        _renderItemView: function (model) {
+            var $el = this._createItemView(model).render().$el;
+            var navigation = Navigation.getInstance();
+            if (navigation) {
+                // trigger hash navigation event for processing UI decorators
+                navigation.processClicks($el.find('a'));
+            }
+            return $el;
         },
 
         _getUrl: function (optionsKey) {
@@ -200,7 +213,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     if ($itemView.length) {
                         var model = this.getCollection().get(response.id);
                         model.set('message', response.message);
-                        $itemView.outerHTML(this._createItemView(model).render().$el);
+                        $itemView.outerHTML(this._renderItemView(model));
                     } else {
                         this.reloadItems();
                     }

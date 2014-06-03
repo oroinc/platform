@@ -61,6 +61,8 @@ class NoteController extends Controller
     {
         $entityClass = str_replace('_', '\\', $entityClass);
 
+        $sorting = strtoupper($this->getRequest()->get('sorting', 'DESC'));
+
         $em = $this->getDoctrine()->getManager();
         /** @var EntityRepository $repo */
         $repo = $em->getRepository('OroNoteBundle:Note');
@@ -75,7 +77,7 @@ class NoteController extends Controller
             ->leftJoin('n.owner', 'c')
             ->leftJoin('n.updatedBy', 'u')
             ->where('e.id = :entity_id')
-            ->orderBy('n.updatedBy', 'DESC')
+            ->orderBy('n.createdAt', $sorting)
             ->setParameter('entity_id', $entityId);
 
         /** @var AclHelper $aclHelper */
@@ -129,12 +131,14 @@ class NoteController extends Controller
         $targetEntity = $this->getTargetEntity($entityClass, $entityId);
 
         $entity = new Note();
-        $entity->setTargetEntity($targetEntity);
+        $entity->setTarget($targetEntity);
 
-        return $this->update(
-            $entity,
-            $this->get('router')->generate('oro_note_create', ['entityClass' => $entityClass, 'entityId' => $entityId])
+        $formAction = $this->get('router')->generate(
+            'oro_note_create',
+            ['entityClass' => str_replace('\\', '_', $entityClass), 'entityId' => $entityId]
         );
+
+        return $this->update($entity, $formAction);
     }
 
     /**
@@ -145,10 +149,9 @@ class NoteController extends Controller
      */
     public function updateAction(Note $entity)
     {
-        return $this->update(
-            $entity,
-            $this->get('router')->generate('oro_note_update', ['id' => $entity->getId()])
-        );
+        $formAction = $this->get('router')->generate('oro_note_update', ['id' => $entity->getId()]);
+
+        return $this->update($entity, $formAction);
     }
 
     protected function update(Note $entity, $formAction)

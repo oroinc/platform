@@ -5,11 +5,11 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_note_widget_notes', {
-                entityClass: oro_class_name(entity),
+                entityClass: oro_class_name(entity, true),
                 entityId: entity.id
             }),
             'title': 'oro.note.entity_plural_label'|trans,
-            'cssClass': 'inner-grid',
+            'cssClass': 'notes-widget',
         }) }}
     {% endset %}
     {{ ui.scrollSubblock(null, [widgetContent]) }}

@@ -9,6 +9,16 @@ define(['underscore', 'backbone', 'oronote/js/note/model'
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
-        model: NoteModel
+        model: NoteModel,
+        baseUrl: '',
+        sortMode: 'DESC',
+
+        url: function () {
+            return this.baseUrl + '?sorting=' + this.sortMode;
+        },
+
+        setSortMode: function (mode) {
+            this.sortMode = mode;
+        }
     });
 });
