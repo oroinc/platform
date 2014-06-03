@@ -19,12 +19,12 @@ define([ 'underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'
         },
 
         attributes: {
-            'class': 'note'
+            'class': 'item'
         },
 
         events: {
-            'click button:has(.icon-remove)': 'close',
-            'click button:has(.icon-pencil)': 'edit'
+            'click button:has(.icon-pencil)': 'editModel',
+            'click button:has(.icon-remove)': 'deleteModel'
         },
 
         initialize: function () {
@@ -34,12 +34,12 @@ define([ 'underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'
             this.listenTo(this.model, 'destroy', this.remove);
         },
 
-        edit: function () {
+        editModel: function () {
             this.trigger('edit', this, this.model);
         },
 
-        close: function () {
-            this.model.destroy({wait: true});
+        deleteModel: function () {
+            this.trigger('delete', this, this.model);
         },
 
         render: function () {

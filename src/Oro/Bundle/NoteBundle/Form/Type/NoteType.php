@@ -16,10 +16,10 @@ class NoteType extends AbstractType
         $builder
             ->add(
                 'message',
-                'text',
+                'textarea',
                 [
                     'required' => true,
-                    'label' => 'oro.note.message.label'
+                    'label'    => 'oro.note.message.label'
                 ]
             );
     }
@@ -31,9 +31,12 @@ class NoteType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\NoteBundle\Entity\Note',
-                'intention'  => 'note',
-                //'cascade_validation' => true
+                'data_class'              => 'Oro\Bundle\NoteBundle\Entity\Note',
+                'intention'               => 'note',
+                'ownership_disabled'      => true,
+                'dynamic_fields_disabled' => true,
+                'csrf_protection'         => true,
+                'cascade_validation'      => true
             ]
         );
     }

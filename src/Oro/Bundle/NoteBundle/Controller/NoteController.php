@@ -6,14 +6,11 @@ use Doctrine\ORM\EntityRepository;
 
 use FOS\Rest\Util\Codes;
 
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -25,25 +22,28 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
- * @Route("/note")
+ * @Route("/notes")
  */
 class NoteController extends Controller
 {
     /**
      * @Route(
-     *      "/widget/notes/{entityClass}/{entityId}",
+     *      "/view/widget/{entityClass}/{entityId}",
      *      name="oro_note_widget_notes"
      * )
      *
      * @AclAncestor("oro_note_view")
      * @Template("OroNoteBundle:Note:notes.html.twig")
      */
-    public function notesWidgetAction($entityClass, $entityId)
+    public function widgetAction($entityClass, $entityId)
     {
+        $entityClass = str_replace('_', '\\', $entityClass);
+
         return [
             'entity' => $this->getTargetEntity($entityClass, $entityId)
         ];
@@ -51,14 +51,16 @@ class NoteController extends Controller
 
     /**
      * @Route(
-     *      "/notes/{entityClass}/{entityId}",
+     *      "/view/{entityClass}/{entityId}",
      *      name="oro_note_notes"
      * )
      *
      * @AclAncestor("oro_note_view")
      */
-    public function notesAction($entityClass, $entityId)
+    public function getAction($entityClass, $entityId)
     {
+        $entityClass = str_replace('_', '\\', $entityClass);
+
         $em = $this->getDoctrine()->getManager();
         /** @var EntityRepository $repo */
         $repo = $em->getRepository('OroNoteBundle:Note');
@@ -115,17 +117,15 @@ class NoteController extends Controller
     }
 
     /**
-     * @Route(
-     *      "/create/{entityClass}/{entityId}",
-     *      name="oro_note_create"
-     * )
+     * @Route("/create/{entityClass}/{entityId}", name="oro_note_create")
      *
-     * @Route("/create", name="oro_note_create")
-     * @Template("OroCRMContactBundle:Contact:update.html.twig")
+     * @Template("OroNoteBundle:Note:update.html.twig")
      * @AclAncestor("oro_note_create")
      */
     public function createAction($entityClass, $entityId)
     {
+        $entityClass = str_replace('_', '\\', $entityClass);
+
         $targetEntity = $this->getTargetEntity($entityClass, $entityId);
 
         $entity = new Note();
@@ -151,7 +151,7 @@ class NoteController extends Controller
         );
     }
 
-    protected function update(Note $entity, $postRoute)
+    protected function update(Note $entity, $formAction)
     {
         $responseData = [
             'entity' => $entity,
@@ -161,8 +161,8 @@ class NoteController extends Controller
         if ($this->get('oro_note.form.handler.note')->process($entity)) {
             $responseData['saved'] = true;
         }
-        $responseData['form']        = $this->get('oro_note.form.type.note')->createView();
-        $responseData['form_action'] = $postRoute;
+        $responseData['form']       = $this->get('oro_note.form.note')->createView();
+        $responseData['formAction'] = $formAction;
 
         return $responseData;
     }

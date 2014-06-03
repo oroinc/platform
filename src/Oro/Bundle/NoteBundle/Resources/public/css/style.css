@@ -1,0 +1,10 @@
+.notes {
+    position: relative;
+}
+.notes .item:nth-child(2n+1) {
+    background-color: #f5f5f5;
+}
+.ui-dialog .note-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+}

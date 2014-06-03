@@ -6,5 +6,5 @@ placeholders:
 
 items:
     oro_notes:
-        template: OroNoteBundle:Note:associatedNotes.html.twig
+        template: OroNoteBundle:Note:notes.html.twig
         applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)

@@ -1,10 +1,10 @@
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator',
-    'oroui/js/mediator', 'oroui/js/messenger', 'oro/dialog-widget',
-    'oronote/js/note/view', 'oronote/js/note/collection'
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
+    'oroui/js/mediator', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
+    'oronote/js/note/view', 'oronote/js/note/collection', 'jquery-outer-html'
 ], function (
-    _, Backbone, __,
-    mediator, messenger, DialogWidget,
+    _, Backbone, __, app, messenger,
+    mediator, LoadingMask, DialogWidget, DeleteConfirmation,
     NoteView, NoteCollection
 ) {
     'use strict';
@@ -22,11 +22,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator',
             'listUrl': null,
             'createItemUrl': null,
             'updateItemUrl': null,
+            'deleteItemUrl': null,
             'labels': {
                 noData: '',
                 addDialogTitle: '',
                 editDialogTitle: '',
-                itemSaved: ''
+                itemSaved: '',
+                deleteConfirmation: ''
             }
         },
 
@@ -46,6 +48,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator',
             if (!this.$el.find('.no-data').length) {
                 this.$el.append(this.$noDataContainer);
             }
+
+            if (!this.$el.find('.loading-mask').length) {
+                this.$el.append($('<div class="loading-mask"></div>'));
+            }
         },
 
         getCollection: function () {
@@ -53,39 +59,87 @@ define(['underscore', 'backbone', 'orotranslation/js/translator',
         },
 
         reloadItems: function () {
-            this.getCollection().fetch({reset: true});
+            this._showLoading();
+            try {
+                this.getCollection().fetch({
+                    reset: true,
+                    success: _.bind(function () {
+                        this._hideLoading();
+                    }, this),
+                    error: _.bind(function (collection, response) {
+                        this._showLoadItemsError(response.responseJSON || {});
+                    }, this)
+                });
+            } catch (err) {
+                this._showLoadItemsError(err);
+            }
         },
 
         addItem: function () {
-            this._openItemEditForm(this._getUrl('addDialogTitle'), this._getUrl('createItemUrl'));
+            this._openItemEditForm(this._getLabel('addDialogTitle'), this._getUrl('createItemUrl'));
         },
 
-        editItem: function (itemView, item) {
-            this._openItemEditForm(this._getUrl('editDialogTitle'), this._getUrl('updateItemUrl', item));
+        editItem: function (itemView, model) {
+            this._openItemEditForm(this._getLabel('editDialogTitle'), this._getUrl('updateItemUrl', model));
         },
 
-        _onItemsAdded: function (items) {
+        deleteItem: function (itemView, model) {
+            var confirm = new DeleteConfirmation({
+                content: this._getLabel('deleteConfirmation')
+            });
+            confirm.on('ok', _.bind(function () {
+                this._onItemDelete(model);
+            }, this));
+            confirm.open();
+        },
+
+        _onItemsAdded: function (models) {
             this.$itemsContainer.empty();
-            if(items.length > 0){
+            if(models.length > 0){
                 this._hideEmptyMessage();
-                items.each(function (item) {
-                    this._onItemAdded(item);
+                models.each(function (model) {
+                    this._onItemAdded(model);
                 }, this);
             } else {
                 this._showEmptyMessage();
             }
         },
 
-        _onItemAdded: function (item) {
-            if (!this.$el.find('#' + this._buildItemIdAttribute(item.id)).length) {
-                var itemView = new NoteView({
-                    template: '#template-note-item',
-                    buildItemIdAttribute: this._buildItemIdAttribute,
-                    model: item
-                });
-                itemView.on('edit', _.bind(this.editItem, this));
-                this.$itemsContainer.append(itemView.render().$el);
+        _onItemAdded: function (model) {
+            if (!this.$el.find('#' + this._buildItemIdAttribute(model.get('id'))).length) {
+                this.$itemsContainer.append(this._createItemView(model).render().$el);
             }
+        },
+
+        _onItemDelete: function (model) {
+            this._showLoading();
+            try {
+                var deleteUrl = this._getUrl('deleteItemUrl', model);
+                model.destroy({
+                    wait: true,
+                    url: deleteUrl,
+                    success: _.bind(function () {
+                        this.reloadItems();
+                    }, this),
+                    error: _.bind(function (model, response) {
+                        this._showDeleteItemError(response.responseJSON || {});
+                    }, this)
+                });
+            } catch (err) {
+                this._showDeleteItemError(err);
+            }
+        },
+
+        _createItemView: function (model) {
+            var itemView = new NoteView({
+                template: '#template-note-item',
+                buildItemIdAttribute: this._buildItemIdAttribute,
+                deleteUrl: this.options['deleteItemUrl'],
+                model: model
+            });
+            itemView.on('edit', _.bind(this.editItem, this));
+            itemView.on('delete', _.bind(this.deleteItem, this));
+            return itemView;
         },
 
         _getUrl: function (optionsKey) {
@@ -139,12 +193,64 @@ define(['underscore', 'backbone', 'orotranslation/js/translator',
                         }
                     }, this)
                 );
-                this.itemEditDialog.on('formSave', _.bind(function () {
+                this.itemEditDialog.on('formSave', _.bind(function (response) {
                     this.itemEditDialog.remove();
                     messenger.notificationFlashMessage('success', this._getLabel('itemSaved'));
-                    this.reloadItems();
+                    var $itemView = this.$el.find('#' + this._buildItemIdAttribute(response.id));
+                    if ($itemView.length) {
+                        var model = this.getCollection().get(response.id);
+                        model.set('message', response.message);
+                        $itemView.outerHTML(this._createItemView(model).render().$el);
+                    } else {
+                        this.reloadItems();
+                    }
                 }, this));
             }
+        },
+
+        _showLoading: function () {
+            var loadingElement = this.$el.find('.loading-mask');
+            if (!loadingElement.data('loading-mask-visible')) {
+                this.loadingMask = new LoadingMask();
+                loadingElement.data('loading-mask-visible', true);
+                loadingElement.append(this.loadingMask.render().$el);
+                this.loadingMask.show();
+            }
+        },
+
+        _hideLoading: function () {
+            if (this.loadingMask) {
+                var loadingElement = this.$el.find('.loading-mask');
+                loadingElement.data('loading-mask-visible', false);
+                this.loadingMask.remove();
+                this.loadingMask = null;
+            }
+        },
+
+        _showLoadItemsError: function (err) {
+            this._showError(err, __('Sorry, notes were not loaded correctly'));
+        },
+
+        _showDeleteItemError: function (err) {
+            this._showError(err, __('Sorry, the note deleting was failed'));
+        },
+
+        _showError: function (err, message) {
+            this._hideLoading();
+            if (!_.isUndefined(console)) {
+                console.error(_.isUndefined(err.stack) ? err : err.stack);
+            }
+            var msg = message;
+            if (app.debug) {
+                if (!_.isUndefined(err.message)) {
+                    msg += ': ' + err.message;
+                } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
+                    msg += ': ' + err.errors.join();
+                } else if (_.isString(err)) {
+                    msg += ': ' + err;
+                }
+            }
+            messenger.notificationFlashMessage('error', msg);
         }
     });
 });

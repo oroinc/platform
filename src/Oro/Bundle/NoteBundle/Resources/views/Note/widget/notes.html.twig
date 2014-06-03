@@ -1,25 +1,9 @@
 <div class="widget-content">
-    <script type="text/html" id="template-note-item">
-        <div class="item">
-            <div class="map-actions">
-                <% if (editable) { %><button class="btn" title="{{ 'oro.note.action.edit'|trans }}"><i class="icon-pencil hide-text">{{ 'oro.note.action.edit'|trans }}</i></button><% } %>
-                <% if (removable) { %><button class="btn" title="{{ 'oro.note.action.remove'|trans }}"><i class="icon-remove hide-text">{{ 'oro.note.action.remove'|trans }}</i></button><% } %>
-            </div>
-            <ul class="inline-decorate">
-                <% if (createdBy_url) { %>
-                    <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
-                <% } else if (createdBy) { %>
-                    <li><%= createdBy %></li>
-                <% } %>
-                <li><%= createdAt %></li>
-            </ul>
-            <div class="message clearfix"><%= _.escape(message) %></div>
-        </div>
-    </script>
+    {% include 'OroNoteBundle:Note:view.js.twig' %}
 
     <div class="widget-actions">
-        {% if resource_granted(oro_note_create) %}
-            <button class="btn btn-mini btn-primary btn-uppercase" type="button" data-action-name="add_note"> + {{ 'oro.note.action.add'|trans }}</button>
+        {% if resource_granted('oro_note_create') %}
+            <button class="btn btn-mini" type="button" data-action-name="add_note">{{ 'oro.note.action.add'|trans }}</button>
         {% endif %}
     </div>
     <div class="notes map-box" id="note-list"></div>
@@ -35,16 +19,23 @@
                     noData: {{ "oro.note.no_notes_exist"|trans|json_encode|raw }},
                     addDialogTitle: {{ "oro.note.add_note_title"|trans|json_encode|raw }},
                     editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
-                    itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }}
+                    itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }},
+                    deleteConfirmation: {{ "oro.note.note_delete_confirmation"|trans|json_encode|raw }}
                 },
                 listUrl: {{ path('oro_note_notes', {
-                    'entityClass': oro_class_name(entity),
+                    'entityClass': oro_class_name(entity)|replace('\\', '_'),
                     'entityId': entity.id})|json_encode|raw
                 }},
                 createItemUrl: {{ path('oro_note_create', {
-                    'entityClass': oro_class_name(entity),
+                    'entityClass': oro_class_name(entity)|replace('\\', '_'),
                     'entityId': entity.id})|json_encode|raw
-                }}
+                }},
+                updateItemUrl: function(model) {
+                    return routing.generate('oro_note_update', {'id': model.get('id')});
+                },
+                deleteItemUrl: function(model) {
+                    return routing.generate('oro_api_delete_note', {'id': model.get('id')});
+                }
             });
             widget.getAction('add_note', 'adopted', function(action) {
                 action.on('click', _.bind(noteList.addItem, noteList));

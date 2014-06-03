@@ -1,0 +1,15 @@
+<script type="text/html" id="template-note-item">
+    <div class="map-actions">
+        <% if (editable) { %><button class="btn" title="{{ 'oro.note.action.edit'|trans }}"><i class="icon-pencil hide-text">{{ 'oro.note.action.edit'|trans }}</i></button><% } %>
+        <% if (removable) { %><button class="btn" title="{{ 'oro.note.action.remove'|trans }}"><i class="icon-remove hide-text">{{ 'oro.note.action.remove'|trans }}</i></button><% } %>
+    </div>
+    <ul class="inline-decorate">
+        <% if (createdBy_url) { %>
+            <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
+        <% } else if (createdBy) { %>
+            <li><%= createdBy %></li>
+        <% } %>
+        <li><%= createdAt %></li>
+    </ul>
+    <div class="message clearfix"><%= _.escape(message).replace(new RegExp('\r?\n', 'g'), '<br />') %></div>
+</script>

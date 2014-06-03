@@ -22,7 +22,7 @@ services:
         factory_method: createNamed
         factory_service: form.factory
         arguments:
-            - 'oro_note'
+            - 'note'
             - 'oro_note'
 
     oro_note.form.note.api:
