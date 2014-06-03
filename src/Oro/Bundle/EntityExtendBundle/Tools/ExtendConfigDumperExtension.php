@@ -5,13 +5,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-abstract class ConfigDumperExtension
+abstract class ExtendConfigDumperExtension
 {
-    const ACTION_PRE_UPDATE  = 'preUpdate';
-    const ACTION_POST_UPDATE = 'postUpdate';
-
     /**
-     * @param string                  $actionType       preUpdate or postUpdate
+     * @param string                  $actionType preUpdate or postUpdate
      * @param ConfigProvider          $extendProvider
      * @param array|ConfigInterface[] $extendConfigs
      *
@@ -25,7 +22,9 @@ abstract class ConfigDumperExtension
      * @param ConfigProvider $extendProvider
      * @param array          $extendConfigs
      */
-    public function preUpdate(ConfigProvider $extendProvider, array &$extendConfigs) {}
+    public function preUpdate(ConfigProvider $extendProvider, array &$extendConfigs)
+    {
+    }
 
     /**
      * Optionally can be overridden in child
@@ -33,5 +32,7 @@ abstract class ConfigDumperExtension
      * @param ConfigProvider $extendProvider
      * @param array          $extendConfigs
      */
-    public function postUpdate(ConfigProvider $extendProvider, array &$extendConfigs) {}
+    public function postUpdate(ConfigProvider $extendProvider, array &$extendConfigs)
+    {
+    }
 }

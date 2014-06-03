@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\NoteBundle\Tools\NoteDumperExtension;
 
 class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
@@ -64,10 +64,10 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($noteConfigs));
 
         $extension = new NoteDumperExtension($this->configManager);
-        $result = $extension->supports(ConfigDumperExtension::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
         $this->assertTrue($result);
 
-        $result = $extension->supports(ConfigDumperExtension::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
         $this->assertTrue($result);
     }
 
@@ -85,10 +85,10 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($noteConfigs));
 
         $extension = new NoteDumperExtension($this->configManager);
-        $result = $extension->supports(ConfigDumperExtension::ACTION_PRE_UPDATE, $this->extendConfigProvider, []);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, []);
         $this->assertFalse($result);
 
-        $result = $extension->supports(ConfigDumperExtension::ACTION_POST_UPDATE, $this->extendConfigProvider, []);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE, $this->extendConfigProvider, []);
         $this->assertFalse($result);
     }
 

@@ -6,10 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class NoteDumperExtension extends ConfigDumperExtension
+class NoteDumperExtension extends ExtendConfigDumperExtension
 {
     const NOTE_CONFIG_SCOPE = 'note';
     const NOTE_ENTITY       = 'Oro\Bundle\NoteBundle\Entity\Note';
@@ -34,7 +35,7 @@ class NoteDumperExtension extends ConfigDumperExtension
      */
     public function supports($actionType, ConfigProvider $extendProvider, array $extendConfigs)
     {
-        if ($actionType == ConfigDumperExtension::ACTION_PRE_UPDATE) {
+        if ($actionType == ExtendConfigDumper::ACTION_PRE_UPDATE) {
             $entitiesWithNotes = $this->getNotesEnabledFor();
 
             return !empty($entitiesWithNotes);

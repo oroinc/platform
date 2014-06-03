@@ -12,6 +12,9 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ExtendEntityGenerator
 {
+    const ACTION_PRE_PROCESS = 'pre-process';
+    const ACTION_GENERATE    = 'generate';
+
     /** @var string */
     protected $cacheDir;
 
@@ -74,7 +77,7 @@ class ExtendEntityGenerator
     {
         // filter supported extensions and pre-process configuration
         foreach ($this->getExtensions() as $extension) {
-            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $schemas)) {
+            if (!$extension->supports(self::ACTION_PRE_PROCESS, $schemas)) {
                 continue;
             }
 
@@ -123,7 +126,7 @@ class ExtendEntityGenerator
         $this->generateCollectionMethods($item, $class);
 
         foreach ($this->getExtensions() as $extension) {
-            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_GENERATE, $item)) {
+            if (!$extension->supports(self::ACTION_GENERATE, $item)) {
                 continue;
             }
 
@@ -231,5 +234,4 @@ class ExtendEntityGenerator
                 );
         }
     }
-
 }

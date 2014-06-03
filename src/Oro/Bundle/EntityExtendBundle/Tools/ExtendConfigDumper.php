@@ -14,6 +14,9 @@ use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 
 class ExtendConfigDumper
 {
+    const ACTION_PRE_UPDATE  = 'preUpdate';
+    const ACTION_POST_UPDATE = 'postUpdate';
+
     const ENTITY         = 'Extend\\Entity\\';
     const DEFAULT_PREFIX = 'default_';
 
@@ -29,10 +32,10 @@ class ExtendConfigDumper
     /** @var ExtendEntityGenerator */
     protected $extendEntityGenerator;
 
-    /** @var array|ConfigDumperExtension[] */
+    /** @var array|ExtendConfigDumperExtension[] */
     protected $extensions = [];
 
-    /** @var array|ConfigDumperExtension[]|null */
+    /** @var array|ExtendConfigDumperExtension[]|null */
     protected $sortedExtensions = null;
 
     /**
@@ -44,7 +47,7 @@ class ExtendConfigDumper
     public function __construct(
         OroEntityManager $em,
         ExtendDbIdentifierNameGenerator $nameGenerator,
-        ExtendEntityGenerator  $extendEntityGenerator,
+        ExtendEntityGenerator $extendEntityGenerator,
         $cacheDir
     ) {
         $this->nameGenerator         = $nameGenerator;
@@ -54,10 +57,10 @@ class ExtendConfigDumper
     }
 
     /**
-     * @param ConfigDumperExtension $extension
+     * @param ExtendConfigDumperExtension $extension
      * @param int                   $priority
      */
-    public function addExtension(ConfigDumperExtension $extension, $priority = 0)
+    public function addExtension(ExtendConfigDumperExtension $extension, $priority = 0)
     {
         if (!isset($this->extensions[$priority])) {
             $this->extensions[$priority] = [];
@@ -69,7 +72,7 @@ class ExtendConfigDumper
     /**
      * Return sorted extensions
      *
-     * @return array|ConfigDumperExtension[]
+     * @return array|ExtendConfigDumperExtension[]
      */
     protected function getExtensions()
     {
@@ -96,7 +99,7 @@ class ExtendConfigDumper
             : $extendProvider->getConfigs();
 
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->supports(ConfigDumperExtension::ACTION_PRE_UPDATE, $extendProvider, $extendConfigs)) {
+            if ($extension->supports(self::ACTION_PRE_UPDATE, $extendProvider, $extendConfigs)) {
                 $extension->preUpdate($extendProvider, $extendConfigs);
             }
         }
@@ -106,7 +109,7 @@ class ExtendConfigDumper
         }
 
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->supports(ConfigDumperExtension::ACTION_POST_UPDATE, $extendProvider, $extendConfigs)) {
+            if ($extension->supports(self::ACTION_POST_UPDATE, $extendProvider, $extendConfigs)) {
                 $extension->postUpdate($extendProvider, $extendConfigs);
             }
         }

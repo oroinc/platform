@@ -6,9 +6,10 @@ use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
 
-class NoteGeneratorExtension implements ExtendEntityGeneratorExtension
+class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
 {
     /**
      * Check if generator extension supports configuration pre-processing or can generate code
@@ -21,21 +22,9 @@ class NoteGeneratorExtension implements ExtendEntityGeneratorExtension
      */
     public function supports($actionType, array $schemas)
     {
-        return ExtendEntityGeneratorExtension::ACTION_GENERATE == $actionType &&
-            $schemas['class'] == 'Oro\Bundle\NoteBundle\Entity\Note' &&
-            !empty($schemas['relation']);
-    }
-
-    /**
-     * Apply extension to entity configuration before it will be generated as PHP, YAML files
-     *
-     * @param array $schemas
-     *
-     * @return void
-     */
-    public function preProcessEntityConfiguration(array &$schemas)
-    {
-        // nothing to pre-process here
+        return ExtendEntityGenerator::ACTION_GENERATE == $actionType &&
+        $schemas['class'] == 'Oro\Bundle\NoteBundle\Entity\Note' &&
+        !empty($schemas['relation']);
     }
 
     /**
@@ -46,11 +35,9 @@ class NoteGeneratorExtension implements ExtendEntityGeneratorExtension
      */
     public function generate(array $schema, PhpClass $class)
     {
-        $classBuilder   = new ClassBuilder();
-
+        $classBuilder = new ClassBuilder();
 
         $relationData = empty($schema['relationData']) ? [] : $schema['relationData'];
-
 
         $relationNames     = [];
         $supportedEntities = [];
@@ -64,7 +51,7 @@ class NoteGeneratorExtension implements ExtendEntityGeneratorExtension
             $targetClassName           = $relationItem['target_entity'];
             $relationNames[$fieldName] = $targetClassName;
 
-            $resetMethodsBody[] = sprintf(
+            $resetMethodsBody[]  = sprintf(
                 '$this->%s = null;',
                 $fieldName
             );
@@ -101,9 +88,7 @@ class NoteGeneratorExtension implements ExtendEntityGeneratorExtension
                     'setTarget',
                     implode("\n", $methodBody),
                     ['target']
-                )
-                ->setDocblock("/**\n * @param object \$target any object that can have notes\n */")
+                )->setDocblock("/**\n * @param object \$target any object that can have notes\n */")
             );
     }
-
 }
