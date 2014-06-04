@@ -49,9 +49,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     protected function getHeaderConversionRules()
     {
-        $this->assertEntityName();
+        $this->initialize();
 
-        return $this->getEntityRules($this->entityName, true, 2, 1);
+        return $this->headerConversionRules;
     }
 
     /**
@@ -59,59 +59,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     protected function getBackendHeader()
     {
-        $conversionRules = $this->receiveHeaderConversionRules();
+        $this->initialize();
 
-        // extract all multiple relations
-        $multipleRelations = array();
-        foreach ($conversionRules as $code => $value) {
-            if (is_array($value) && preg_match('~^(.+?):(.+?):(.+?)$~', $code, $matches)) {
-                $entityName = $matches[1];
-                $fieldName = $matches[2];
-                $relatedFieldName = $matches[3];
-
-                // leave one field at basic array
-                if (!isset($multipleRelations[$entityName][$fieldName])) {
-                    $multipleRelations[$entityName][$fieldName] = array($relatedFieldName => $value);
-                } else {
-                    $multipleRelations[$entityName][$fieldName][$relatedFieldName] = $value;
-                    unset($conversionRules[$code]);
-                }
-            }
-        }
-
-        // calculate max number of related entities
-        $maxRelations = array();
-        foreach ($multipleRelations as $entityName => $relations) {
-            foreach (array_keys($relations) as $fieldName) {
-                $maxRelations[$entityName][$fieldName]
-                    = $this->relationCalculator->getMaxRelatedEntities($entityName, $fieldName);
-            }
-        }
-
-        // build backend header
-        $backendHeader = array();
-        foreach ($conversionRules as $code => $value) {
-            if (is_string($value)) {
-                $backendHeader[] = $value;
-            } elseif (is_array($value) && preg_match('~^(.+?):(.+?):(.+?)$~', $code, $matches)) {
-                $entityName = $matches[1];
-                $fieldName = $matches[2];
-                if (!empty($multipleRelations[$entityName][$fieldName])
-                    && !empty($maxRelations[$entityName][$fieldName])
-                ) {
-                    // add required amount of field groups
-                    for ($i = 0; $i < $maxRelations[$entityName][$fieldName]; $i++) {
-                        foreach ($multipleRelations[$entityName][$fieldName] as $fieldData) {
-                            if (!empty($fieldData[self::BACKEND_TO_FRONTEND][0])) {
-                                $backendHeader[] = str_replace('(\d+)', $i, $fieldData[self::BACKEND_TO_FRONTEND][0]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $backendHeader;
+        return $this->backendHeader;
     }
 
     /**
@@ -120,6 +70,22 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     public function setEntityName($entityName)
     {
         $this->entityName = $entityName;
+    }
+
+    /**
+     * Receive backend header and header conversion rules simultaneously
+     */
+    protected function initialize()
+    {
+        if ($this->headerConversionRules === null || $this->backendHeader === null) {
+            $this->assertEntityName();
+
+            list($headerConversionRules, $backendHeader)
+                = $this->getEntityRulesAndBackendHeaders($this->entityName, true, 5, 3);
+
+            list($this->headerConversionRules, $this->backendHeader)
+                = array($this->processCollectionRegexp($headerConversionRules), $backendHeader);
+        }
     }
 
     /**
@@ -139,7 +105,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      * @param int $multipleRelationDeepLevel
      * @return array
      */
-    protected function getEntityRules(
+    protected function getEntityRulesAndBackendHeaders(
         $entityName,
         $fullData = false,
         $singleRelationDeepLevel = 0,
@@ -148,15 +114,18 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         // get fields data
         $fields = $this->fieldProvider->getFields($entityName, true);
 
-        // generate conversion rules
         $rules = array();
+        $backendHeaders = array();
         $defaultOrder = 10000;
+
+        // generate conversion rules and backend header
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
                 continue;
             }
 
+            // get import/export config parameters
             $fieldHeader = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'header', $field['label']);
 
             $fieldOrder = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'order');
@@ -166,66 +135,194 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             }
             $fieldOrder = (int)$fieldOrder;
 
+            // process relations
             if ($this->fieldHelper->isRelation($field)) {
                 $isSingleRelation = $this->fieldHelper->isSingleRelation($field) && $singleRelationDeepLevel > 0;
                 $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 
+                // if relation must be included
                 if ($fullData && ($isSingleRelation || $isMultipleRelation)) {
                     $relatedEntityName = $field['related_entity_name'];
                     $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
-                    $relationRules = $this->getEntityRules(
+                    // process and merge relation rules and backend header for relation
+                    list($relationRules, $relationBackendHeaders) = $this->getEntityRulesAndBackendHeaders(
                         $relatedEntityName,
                         $fieldFullData,
                         $singleRelationDeepLevel - 1,
                         $multipleRelationDeepLevel - 1
                     );
 
-                    $subOrder = 0;
-                    foreach ($relationRules as $header => $name) {
-                        // single relation
-                        if ($isSingleRelation) {
-                            $relationHeader = $fieldHeader . ' ' . $header;
-                            $relationName = $fieldName . $this->convertDelimiter . $name;
-                            $rules[$relationHeader] = array(
-                                'name' => $relationName,
-                                'order' => $fieldOrder,
-                                'subOrder' => $subOrder++,
-                            );
-                        // multiple relation
-                        } elseif ($isMultipleRelation) {
-                            $relationCode = $entityName . ':' . $fieldName . ':' . $name;
-                            $rules[$relationCode] = array(
-                                'name' => array(
-                                    self::FRONTEND_TO_BACKEND => array(
-                                        $fieldHeader . ' (\d+) ' . $header,
-                                        function (array $matches) use ($fieldName, $name) {
-                                            return $fieldName . $this->convertDelimiter . ($matches[1] - 1)
-                                                . $this->convertDelimiter . $name;
-                                        }
-                                    ),
-                                    self::BACKEND_TO_FRONTEND => array(
-                                        $fieldName . $this->convertDelimiter . '(\d+)'
-                                        . $this->convertDelimiter . $name,
-                                        function (array $matches) use ($fieldHeader, $header) {
-                                            return $fieldHeader . ' ' . ($matches[1] + 1) . ' ' . $header;
-                                        }
-                                    ),
-                                ),
-                                'order' => $fieldOrder,
-                                'subOrder' => $subOrder++,
-                            );
-                        }
-                    }
+                    $relationRules = $this->buildRelationRules(
+                        $relationRules,
+                        $isSingleRelation,
+                        $isMultipleRelation,
+                        $fieldName,
+                        $fieldHeader,
+                        $fieldOrder
+                    );
+                    $rules = array_merge($rules, $relationRules);
+
+                    $relationBackendHeaders = $this->buildBackendHeaders(
+                        $relationBackendHeaders,
+                        $isSingleRelation,
+                        $isMultipleRelation,
+                        $entityName,
+                        $fieldName,
+                        $fieldOrder
+                    );
+                    $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
                 }
+            // process scalars
             } else {
                 if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
-                    $rules[$fieldHeader] = array('name' => $fieldName, 'order' => $fieldOrder);
+                    $rules[$fieldHeader] = array('value' => $fieldName, 'order' => $fieldOrder);
+                    $backendHeaders[] = $rules[$fieldHeader];
                 }
             }
         }
 
-        return $this->sortRules($rules);
+        return array($this->sortData($rules), $this->sortData($backendHeaders));
+    }
+
+    /**
+     * @param array $relationRules
+     * @param bool $isSingleRelation
+     * @param bool $isMultipleRelation
+     * @param string $fieldName
+     * @param string $fieldHeader
+     * @param int $fieldOrder
+     * @return array
+     */
+    protected function buildRelationRules(
+        array $relationRules,
+        $isSingleRelation,
+        $isMultipleRelation,
+        $fieldName,
+        $fieldHeader,
+        $fieldOrder
+    ) {
+        $subOrder = 0;
+        $delimiter = $this->convertDelimiter;
+        $rules = array();
+
+        foreach ($relationRules as $header => $name) {
+            // single relation
+            if ($isSingleRelation) {
+                $relationHeader = $fieldHeader . ' ' . $header;
+                $relationName = $fieldName . $delimiter . $name;
+                $rules[$relationHeader] = array(
+                    'value' => $relationName,
+                    'order' => $fieldOrder,
+                    'subOrder' => $subOrder++,
+                );
+            // multiple relation
+            } elseif ($isMultipleRelation) {
+                $frontendHeader = $fieldHeader . ' (\d+) ' . $header;
+                $backendHeader
+                    = $fieldName . $delimiter . '(\d+)' . $delimiter . $name;
+                $rules[$frontendHeader] = array(
+                    'value' => $backendHeader,
+                    'order' => $fieldOrder,
+                    'subOrder' => $subOrder++,
+                );
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @param array $relationBackendHeaders
+     * @param bool $isSingleRelation
+     * @param bool $isMultipleRelation
+     * @param string $entityName
+     * @param string $fieldName
+     * @param int $fieldOrder
+     * @return array
+     */
+    protected function buildBackendHeaders(
+        array $relationBackendHeaders,
+        $isSingleRelation,
+        $isMultipleRelation,
+        $entityName,
+        $fieldName,
+        $fieldOrder
+    ) {
+        $subOrder = 0;
+        $delimiter = $this->convertDelimiter;
+        $backendHeaders = array();
+
+        // single relation
+        if ($isSingleRelation) {
+            foreach ($relationBackendHeaders as $header) {
+                $backendHeaders[] = array(
+                    'value' => $fieldName . $delimiter . $header,
+                    'order' => $fieldOrder,
+                    'subOrder' => $subOrder++,
+                );
+            }
+        // multiple relation
+        } elseif ($isMultipleRelation) {
+            $maxEntities = $this->relationCalculator->getMaxRelatedEntities($entityName, $fieldName);
+            for ($i = 0; $i < $maxEntities; $i++) {
+                foreach ($relationBackendHeaders as $header) {
+                    $backendHeaders[] = array(
+                        'value' => $fieldName . $delimiter . $i . $delimiter . $header,
+                        'order' => $fieldOrder,
+                        'subOrder' => $subOrder++,
+                    );
+                }
+            }
+        }
+
+        return $backendHeaders;
+    }
+
+    /**
+     * @param array $rules
+     * @return array
+     */
+    protected function processCollectionRegexp(array $rules)
+    {
+        foreach ($rules as $frontendHeader => $backendHeader) {
+            if (strpos($frontendHeader, '(\d+)') !== false) {
+                $rules[$frontendHeader] = array(
+                    self::FRONTEND_TO_BACKEND => array(
+                        $frontendHeader,
+                        $this->getReplaceCallback($backendHeader, -1)
+                    ),
+                    self::BACKEND_TO_FRONTEND => array(
+                        $backendHeader,
+                        $this->getReplaceCallback($frontendHeader, +1)
+                    ),
+                );
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @param string $string
+     * @param int $shift
+     * @return callable
+     */
+    protected function getReplaceCallback($string, $shift)
+    {
+        return function (array $matches) use ($string, $shift) {
+            $result = '';
+            $parts = explode('(\d+)', $string);
+
+            foreach ($parts as $index => $value) {
+                $result .= $value;
+                if ($index + 1 < count($parts)) {
+                    $result .= ((int)$matches[$index + 1] + $shift);
+                }
+            }
+
+            return $result;
+        };
     }
 
     /**
@@ -233,7 +330,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      * @param int $b
      * @return int
      */
-    protected function sortRulesCallback($a, $b)
+    protected function sortDataCallback($a, $b)
     {
         if ($a['order'] > $b['order']) {
             return 1;
@@ -252,14 +349,14 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      * @param array $rules
      * @return array
      */
-    protected function sortRules(array $rules)
+    protected function sortData(array $rules)
     {
         // sort fields by order
-        uasort($rules, array($this, 'sortRulesCallback'));
+        uasort($rules, array($this, 'sortDataCallback'));
 
         // clear unused data
         foreach ($rules as $label => $data) {
-            $rules[$label] = $data['name'];
+            $rules[$label] = $data['value'];
         }
 
         return $rules;

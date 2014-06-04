@@ -50,6 +50,24 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'related_entity_name' => 'ScalarEntity',
             ),
         ),
+        'DictionaryEntity' => array(
+            array(
+                'name' => 'id',
+                'label' => 'ID',
+            ),
+            array(
+                'name' => 'scalarEntity',
+                'label' => 'Scalar Entity',
+                'relation_type' => 'ref-one',
+                'related_entity_name' => 'ScalarEntity',
+            ),
+            array(
+                'name' => 'dictionaryScalarEntities',
+                'label' => 'Dictionary Scalar Entities',
+                'relation_type' => 'ref-many',
+                'related_entity_name' => 'ScalarEntity',
+            ),
+        ),
         'MultipleRelationEntity' => array(
             array(
                 'name' => 'id',
@@ -67,6 +85,12 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'relation_type' => 'oneToMany',
                 'related_entity_name' => 'SingleRelationEntity',
             ),
+            array(
+                'name' => 'dictionaryEntities',
+                'label' => 'Dictionary Entities',
+                'relation_type' => 'manyToMany',
+                'related_entity_name' => 'DictionaryEntity',
+            )
         ),
     );
 
@@ -102,6 +126,17 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'order' => 40,
             ),
         ),
+        'DictionaryEntity' => array(
+            'id' => array(
+                'order' => 10
+            ),
+            'scalarEntity' => array(
+                'order' => 20,
+            ),
+            'dictionaryScalarEntities' => array(
+                'order' => 30,
+            ),
+        ),
         'MultipleRelationEntity' => array(
             'id' => array(
                 'order' => 10
@@ -113,6 +148,10 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'order' => 30,
                 'full' => true,
             ),
+            'dictionaryEntities' => array(
+                'order' => 40,
+                'full' => true,
+            ),
         ),
     );
 
@@ -120,9 +159,13 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $relations = array(
+        'DictionaryEntity' => array(
+            'dictionaryScalarEntities' => 2,
+        ),
         'MultipleRelationEntity' => array(
             'scalarEntities' => 3,
             'singleRelationEntities' => 1,
+            'dictionaryEntities' => 2,
         )
     );
 
@@ -199,9 +242,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                         'name' => 'qwerty',
                         'created' => '2012-12-12 12:12:12',
                     ),
-                    'shortScalar' => array(
-                        'name' => 'asdfgh',
-                    ),
+                    'shortScalar' => array('name' => 'asdfgh'),
                 ),
                 'expected' => array(
                     'ID' => '1',
@@ -226,6 +267,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Single Relation Entities 1 Full Scalar Entity Name' => '',
                     'Single Relation Entities 1 Full Scalar Created' => '',
                     'Single Relation Entities 1 Short Scalar Entity Name' => '',
+                    'Dictionary Entities 1 ID' => '',
+                    'Dictionary Entities 1 Scalar Entity Entity Name' => '',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 1 Entity Name' => '',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 2 Entity Name' => '',
+                    'Dictionary Entities 2 ID' => '',
+                    'Dictionary Entities 2 Scalar Entity Entity Name' => '',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => '',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => '',
                 ),
             ),
             'full multiple relation' => array(
@@ -246,11 +295,31 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'qwerty',
                                 'created' => '2012-12-12 12:12:12',
                             ),
-                            'shortScalar' => array(
-                                'name' => 'asdfgh',
-                            ),
+                            'shortScalar' => array('name' => 'asdfgh'),
                         )
                     ),
+                    'dictionaryEntities' => array(
+                        array(
+                            'id' => 55,
+                            'scalarEntity' => array(
+                                'name' => 'dictionary_scalar_1',
+                            ),
+                            'dictionaryScalarEntities' => array(
+                                array('name' => 'dict_1'),
+                                array('name' => 'dict_2'),
+                            ),
+                        ),
+                        array(
+                            'id' => 56,
+                            'scalarEntity' => array(
+                                'name' => 'dictionary_scalar_2',
+                            ),
+                            'dictionaryScalarEntities' => array(
+                                array('name' => 'dict_3'),
+                                array('name' => 'dict_4'),
+                            ),
+                        ),
+                    )
                 ),
                 'expected' => array(
                     'ID' => '12',
@@ -263,6 +332,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Single Relation Entities 1 Full Scalar Entity Name' => 'qwerty',
                     'Single Relation Entities 1 Full Scalar Created' => '2012-12-12 12:12:12',
                     'Single Relation Entities 1 Short Scalar Entity Name' => 'asdfgh',
+                    'Dictionary Entities 1 ID' => '55',
+                    'Dictionary Entities 1 Scalar Entity Entity Name' => 'dictionary_scalar_1',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 1 Entity Name' => 'dict_1',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 2 Entity Name' => 'dict_2',
+                    'Dictionary Entities 2 ID' => '56',
+                    'Dictionary Entities 2 Scalar Entity Entity Name' => 'dictionary_scalar_2',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => 'dict_3',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => 'dict_4',
                 ),
             ),
         );
@@ -281,6 +358,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function importDataProvider()
@@ -350,6 +428,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Single Relation Entities 1 Full Scalar Entity Name' => 'qwerty',
                     'Single Relation Entities 1 Full Scalar Created' => '2012-12-12 12:12:12',
                     'Single Relation Entities 1 Short Scalar Entity Name' => 'asdfgh',
+                    'Dictionary Entities 1 ID' => '55',
+                    'Dictionary Entities 1 Scalar Entity Entity Name' => 'dictionary_scalar_1',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 1 Entity Name' => 'dict_1',
+                    'Dictionary Entities 1 Dictionary Scalar Entities 2 Entity Name' => 'dict_2',
+                    'Dictionary Entities 2 ID' => '56',
+                    'Dictionary Entities 2 Scalar Entity Entity Name' => 'dictionary_scalar_2',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => 'dict_3',
+                    'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => 'dict_4',
                 ),
                 'expected' => array(
                     'id' => '12',
@@ -367,11 +453,31 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'qwerty',
                                 'created' => '2012-12-12 12:12:12',
                             ),
-                            'shortScalar' => array(
-                                'name' => 'asdfgh',
-                            ),
+                            'shortScalar' => array('name' => 'asdfgh'),
                         )
                     ),
+                    'dictionaryEntities' => array(
+                        array(
+                            'id' => '55',
+                            'scalarEntity' => array(
+                                'name' => 'dictionary_scalar_1',
+                            ),
+                            'dictionaryScalarEntities' => array(
+                                array('name' => 'dict_1'),
+                                array('name' => 'dict_2'),
+                            ),
+                        ),
+                        array(
+                            'id' => '56',
+                            'scalarEntity' => array(
+                                'name' => 'dictionary_scalar_2',
+                            ),
+                            'dictionaryScalarEntities' => array(
+                                array('name' => 'dict_3'),
+                                array('name' => 'dict_4'),
+                            ),
+                        ),
+                    )
                 ),
             ),
         );
