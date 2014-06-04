@@ -15,6 +15,9 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
     const NOTE_CONFIG_SCOPE = 'note';
     const NOTE_ENTITY       = 'Oro\Bundle\NoteBundle\Entity\Note';
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var ConfigProvider */
     protected $noteConfigProvider;
 
@@ -26,6 +29,7 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
 
     public function __construct(ConfigManager $configManager)
     {
+        $this->configManager        = $configManager;
         $this->extendConfigProvider = $configManager->getProvider('extend');
         $this->noteConfigProvider   = $configManager->getProvider(self::NOTE_CONFIG_SCOPE);
     }
@@ -52,7 +56,7 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
     protected function getNotesEnabledFor()
     {
         if (is_null($this->notesEnabledFor)) {
-            $configs = $this->noteConfigProvider->getConfigs();
+            $configs               = $this->noteConfigProvider->getConfigs();
             $this->notesEnabledFor = [];
 
             foreach ($configs as $config) {
@@ -97,81 +101,57 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
      */
     protected function createField($className, $fieldName, $fieldType, $targetEntityName, $relationKey)
     {
-        $cm = $this->extendConfigProvider->getConfigManager();
-
-        $cm->createConfigFieldModel($className, $fieldName, $fieldType);
-        $this->updateFieldConfig(
-            $cm,
-            'extend',
-            $className,
-            $fieldName,
-            [
-                'owner'         => ExtendScope::OWNER_SYSTEM,
-                'state'         => ExtendScope::STATE_NEW,
-                'is_extend'     => false,
-                'extend'        => true,
-                'is_deleted'    => false,
-                'is_inverse'    => false,
-                'target_entity' => $targetEntityName,
-                'target_field'  => 'id',
-                'relation_key'  => $relationKey,
-            ]
-        );
-
+        $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
         $classAlias = ExtendHelper::buildAssociationName($className);
-        $this->updateFieldConfig(
-            $cm,
-            'entity',
+
+        $this->updateFieldConfigs(
             $className,
             $fieldName,
             [
-                'label'       => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
-                'description' => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
-            ]
-        );
-        $this->updateFieldConfig(
-            $cm,
-            'view',
-            $className,
-            $fieldName,
-            [
-                'is_displayable' => false
-            ]
-        );
-        $this->updateFieldConfig(
-            $cm,
-            'form',
-            $className,
-            $fieldName,
-            [
-                'is_enabled' => true
-            ]
-        );
-        $this->updateFieldConfig(
-            $cm,
-            'dataaudit',
-            $className,
-            $fieldName,
-            [
-                'auditable' => false
+                'extend'    => [
+                    'owner'         => ExtendScope::OWNER_SYSTEM,
+                    'state'         => ExtendScope::STATE_NEW,
+                    'is_extend'     => false,
+                    'extend'        => true,
+                    'is_deleted'    => false,
+                    'is_inverse'    => false,
+                    'target_entity' => $targetEntityName,
+                    'target_field'  => 'id',
+                    'relation_key'  => $relationKey,
+                ],
+                'entity'    => [
+                    'label'       => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
+                    'description' => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
+                ],
+                'view'      => [
+                    'is_displayable' => false
+                ],
+                'form'      => [
+                    'is_enabled' => true
+                ],
+                'dataaudit' => [
+                    'auditable' => false
+                ]
             ]
         );
     }
 
-    protected function updateFieldConfig(
-        ConfigManager $configManager,
-        $scope,
-        $className,
-        $fieldName,
-        array $values
-    ) {
-        $configProvider = $configManager->getProvider($scope);
-        $fieldConfig    = $configProvider->getConfig($className, $fieldName);
-        foreach ($values as $code => $val) {
-            $fieldConfig->set($code, $val);
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param array  $values
+     */
+    protected function updateFieldConfigs($className, $fieldName, array $values)
+    {
+        foreach ($values as $scope => $scopeValues) {
+            $configProvider = $this->configManager->getProvider($scope);
+            $fieldConfig    = $configProvider->getConfig($className, $fieldName);
+            foreach ($scopeValues as $code => $val) {
+                $fieldConfig->set($code, $val);
+            }
+            $this->configManager->persist($fieldConfig);
+            $this->configManager->calculateConfigChangeSet($fieldConfig);
         }
-        $configManager->persist($fieldConfig);
-        $configManager->calculateConfigChangeSet($fieldConfig);
     }
 
     /**
@@ -188,21 +168,21 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
         $relationKey,
         $isOwningSide = false
     ) {
-        $entityConfig  = $this->extendConfigProvider->getConfig($targetEntityName);
+        $entityConfig = $this->extendConfigProvider->getConfig($targetEntityName);
 
         $fieldId = new FieldConfigId('extend', self::NOTE_ENTITY, $relationName, 'manyToOne');
-        $assign        = false;
+        $assign  = false;
         if ($isOwningSide) {
             $owner         = true;
             $targetFieldId = false;
 
             // update schema info
-            $schema = $entityConfig->get('schema', false, []);
+            $schema                            = $entityConfig->get('schema', false, []);
             $schema['relation'][$relationName] = $relationName;
             $entityConfig->set('schema', $schema);
 
             // update index info
-            $index = $entityConfig->get('index', false, []);
+            $index                = $entityConfig->get('index', false, []);
             $index[$relationName] = null;
             $entityConfig->set('index', $index);
         } else {
@@ -211,7 +191,7 @@ class NoteDumperExtension extends ExtendConfigDumperExtension
             $fieldId       = false;
         }
 
-        $relations    = $entityConfig->get('relation', false, []);
+        $relations = $entityConfig->get('relation', false, []);
 
         // add relation to config
         $relations[$relationKey] = [

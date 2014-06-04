@@ -35,15 +35,16 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($this->extendConfigProvider));
-
-        $this->configManager->expects($this->at(1))
-            ->method('getProvider')
-            ->with(NoteDumperExtension::NOTE_CONFIG_SCOPE)
-            ->will($this->returnValue($this->noteConfigProvider));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $this->extendConfigProvider],
+                        [NoteDumperExtension::NOTE_CONFIG_SCOPE, $this->noteConfigProvider],
+                    ]
+                )
+            );
     }
 
     /**
@@ -139,23 +140,15 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = $this->getMock(
             'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
-            ['updateFieldConfig'],
+            ['updateFieldConfigs'],
             [$this->configManager]
         );
 
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $cm->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('createConfigFieldModel');
 
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfigManager')
-            ->will($this->returnValue($cm));
-
-        $extension->expects($this->exactly(5))
-            ->method('updateFieldConfig');
+        $extension->expects($this->once())
+            ->method('updateFieldConfigs');
 
         self::callProtectedMethod(
             $extension,
@@ -164,7 +157,7 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUpdateFieldConfig()
+    public function testUpdateFieldConfigs()
     {
         $extension = $this->getMock(
             'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
@@ -172,41 +165,28 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             [$this->configManager]
         );
 
-        $cm = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $cm->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
-
         $fieldConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $fieldConfig->expects($this->once())
             ->method('set')
             ->with('test', true);
 
-        $cm->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($fieldConfig);
 
-        $cm->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('calculateConfigChangeSet')
             ->with($fieldConfig);
 
-        $configProvider->expects($this->once())
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with('Test\Entity', 'entity')
+            ->with('Test\Entity', 'testField')
             ->will($this->returnValue($fieldConfig));
 
         self::callProtectedMethod(
             $extension,
-            'updateFieldConfig',
-            [$cm, 'extend', 'Test\Entity', 'entity', ['test' => true]]
+            'updateFieldConfigs',
+            ['Test\Entity', 'testField', ['extend' => ['test' => true]]]
         );
     }
 
