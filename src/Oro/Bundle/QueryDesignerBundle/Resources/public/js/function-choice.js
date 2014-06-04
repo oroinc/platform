@@ -38,8 +38,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var content = '';
             var functions = [];
 
-            console.log(criteria);
-
             _.each(options.converters, function (item, name) {
                 if (self._matchApplicable(item.applicable, criteria)) {
                     foundGroups.push({ group_name: name, group_type: 'converters' });
