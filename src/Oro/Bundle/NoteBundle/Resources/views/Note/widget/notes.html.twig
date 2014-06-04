@@ -1,0 +1,70 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+<div class="widget-content notes">
+    {% include 'OroNoteBundle:Note:view.js.twig' %}
+
+    <div class="widget-actions">
+        <a href="#note-list" class="collapse-all-button btn-mini" data-action="accordion:collapse-all">{{ 'Collapse All'|trans }}</a>
+        {{ UI.clientLink({
+            'aCss': 'sort-button icons-holder-text',
+            'iCss': 'icon-arrow-up',
+            'title' : 'oro.note.action.sorting-desc',
+            'label' : '',
+            'dataAttributes': {'action-name': 'toggle_sorting', 'sorting': 'DESC'}
+        }) }}
+    </div>
+    <div class="accordion map-box" id="note-list"></div>
+
+    <script type="text/javascript">
+    require(['jquery', 'underscore', 'routing', 'oroui/js/mediator', 'oronote/js/note-list', 'oroui/js/widget-manager'],
+    function($, _, routing, mediator, NoteList, widgetManager) {
+        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget){
+            /** @type oronote.NoteList */
+            var noteList = new NoteList({
+                el: '#note-list',
+                labels: {
+                    noData: {{ "oro.note.no_notes_exist"|trans|json_encode|raw }},
+                    addDialogTitle: {{ "oro.note.add_note_title"|trans|json_encode|raw }},
+                    editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
+                    itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }},
+                    deleteConfirmation: {{ "oro.note.note_delete_confirmation"|trans|json_encode|raw }}
+                },
+                listUrl: {{ path('oro_note_notes', {
+                    'entityClass': oro_class_name(entity, true),
+                    'entityId': entity.id})|json_encode|raw
+                }},
+                createItemUrl: {{ path('oro_note_create', {
+                    'entityClass': oro_class_name(entity, true),
+                    'entityId': entity.id})|json_encode|raw
+                }},
+                updateItemUrl: function(model) {
+                    return routing.generate('oro_note_update', {'id': model.get('id')});
+                },
+                deleteItemUrl: function(model) {
+                    return routing.generate('oro_api_delete_note', {'id': model.get('id')});
+                }
+            });
+            mediator.on('oro:note:add', _.bind(noteList.addItem, noteList));
+            widget.getAction('toggle_sorting', 'adopted', function(action) {
+                action.on('click', _.bind(function () {
+                    var sorting = (action.data('sorting') == 'DESC' ? 'ASC' : 'DESC');
+                    action.data('sorting', sorting);
+                    if (sorting == 'DESC') {
+                        action.attr('title', {{ 'oro.note.action.sorting-desc'|trans|json_encode|raw }});
+                        action.find('i').attr('class', 'icon-arrow-up hide-text');
+                    } else {
+                        action.attr('title', {{ 'oro.note.action.sorting-asc'|trans|json_encode|raw }});
+                        action.find('i').attr('class', 'icon-arrow-down hide-text');
+                    }
+                    this.reloadItems(sorting);
+                }, noteList));
+            });
+            noteList
+                .getCollection()
+                .reset({{ render(path('oro_note_notes', {
+                    entityClass: oro_class_name(entity, true),
+                    entityId: entity.id
+                })) }});
+        });
+    });
+    </script>
+</div>

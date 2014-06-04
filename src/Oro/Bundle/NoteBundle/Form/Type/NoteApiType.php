@@ -24,7 +24,15 @@ class NoteApiType extends NoteType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
+        $builder
+            ->add(
+                'message',
+                'text',
+                [
+                    'required' => true,
+                    'label' => 'oro.note.message.label'
+                ]
+            );
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventSubscriber(new NoteSubscriber($this->configManager));

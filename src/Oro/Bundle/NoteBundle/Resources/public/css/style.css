@@ -1,0 +1,47 @@
+.notes {
+    position: relative;
+}
+.notes .item {
+    padding: 3px 10px 5px 10px;
+}
+.notes .item:nth-child(2n+1) {
+    background-color: #f5f5f5;
+}
+.notes .accordion .accordion-group {
+    border: 0;
+    margin: 0;
+}
+.notes .accordion .accordion-heading {
+    display: inline-block;
+    vertical-align: top;
+}
+.notes .accordion .accordion-heading .accordion-toggle {
+    padding: 0px;
+}
+.notes .accordion .accordion-heading .accordion-toggle:before {
+    content: '\f078';
+    color: #727272;
+    font-family: FontAwesome;
+    margin-right: 5px;
+    font-size: 12px;
+    min-width: 12px;
+    display: inline-block;
+    vertical-align: top;
+}
+.notes .accordion .accordion-heading .accordion-toggle.collapsed:before {
+    content: '\f054';
+}
+.notes .accordion .accordion-body {
+    vertical-align: top;
+    display: inline-block;
+}
+.ui-dialog .note-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+.notes-widget .collapse-all-button {
+    padding-left: 25px;
+}
+.notes-widget .sort-button {
+    padding-left: 10px;
+}

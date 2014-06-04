@@ -1,0 +1,24 @@
+<script type="text/html" id="template-note-item">
+    <div class="map-actions">
+        <% if (editable) { %><button class="btn item-edit-button" title="{{ 'oro.note.action.edit'|trans }}"><i class="icon-pencil hide-text">{{ 'oro.note.action.edit'|trans }}</i></button><% } %>
+        <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans }}"><i class="icon-remove hide-text">{{ 'oro.note.action.remove'|trans }}</i></button><% } %>
+    </div>
+    <div class="accordion-group">
+    <div class="accordion-heading">
+        <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle collapsed" data-toggle="collapse"></a>
+    </div>
+    <div class="accordion-body">
+        <div id="accordion-item<%= id %>" class="collapse" style="height: 0px;">
+            <ul class="inline-decorate">
+                <% if (createdBy_url) { %>
+                    <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
+                <% } else if (createdBy) { %>
+                    <li><%= createdBy %></li>
+                <% } %>
+                <li><%= createdAt %></li>
+            </ul>
+        </div>
+        <div class="message clearfix"><%= _.escape(message).replace(new RegExp('\r?\n', 'g'), '<br />') %></div>
+    </div>
+    </div>
+</script>
