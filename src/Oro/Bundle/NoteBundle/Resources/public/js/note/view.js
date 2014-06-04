@@ -23,8 +23,8 @@ function (_, Backbone, routing, dateTimeFormatter) {
         },
 
         events: {
-            'click button:has(.icon-pencil)': 'editModel',
-            'click button:has(.icon-remove)': 'deleteModel'
+            'click .item-edit-button': 'editModel',
+            'click .item-remove-button': 'deleteModel'
         },
 
         initialize: function (options) {
