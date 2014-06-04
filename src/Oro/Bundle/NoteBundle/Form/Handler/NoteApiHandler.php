@@ -7,13 +7,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\NoteBundle\Entity\EntityId;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 
@@ -80,7 +81,7 @@ class NoteApiHandler
         /** @var NoteSoap $note */
         $note = $request->request->get('note');
 
-        /** @var EntityId $association */
+        /** @var EntityIdSoap $association */
         $association = $note['entityId'];
         if ($association && $association['id']) {
             /** @var ConfigProvider $noteProvider */

@@ -9,7 +9,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\NoteBundle\Entity\EntityId;
+use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
+
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -19,16 +20,16 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 class NoteController extends SoapController
 {
     /**
-     * @Soap\Method("getAssociatedNotes")
+     * @Soap\Method("getNotes")
      *
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
-     * @Soap\Param("entityId", phpType="Oro\Bundle\NoteBundle\Entity\EntityId")
+     * @Soap\Param("entityId", phpType="Oro\Bundle\EntityBundle\Model\EntityIdSoap")
      * @Soap\Result(phpType = "Oro\Bundle\NoteBundle\Entity\NoteSoap[]")
      *
      * @AclAncestor("oro_note_view")
      */
-    public function cgetAction(EntityId $entityId, $page = 1, $limit = 10)
+    public function cgetAction(EntityIdSoap $entityId, $page = 1, $limit = 10)
     {
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();

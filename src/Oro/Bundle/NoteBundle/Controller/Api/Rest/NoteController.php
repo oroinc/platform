@@ -69,7 +69,7 @@ class NoteController extends RestController implements ClassResourceInterface
 
         $items = array();
         foreach ($result as $item) {
-            $items[] = $this->getPreparedItem($item);
+            $items[] = $this->getPreparedItem($item, ['id', 'message', 'createdAt', 'updatedAt', 'owner', 'updatedBy']);
         }
         unset($result);
 

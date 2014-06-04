@@ -58,9 +58,10 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * Prepare entity for serialization
      *
      * @param  mixed $entity
+     * @param  array $resultFields If not empty, result item will contain only given fields.
      * @return array
      */
-    protected function getPreparedItem($entity)
+    protected function getPreparedItem($entity, $resultFields = [])
     {
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             $entity->__load();
@@ -70,6 +71,10 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             /** @var UnitOfWork $uow */
             $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
             foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
+                if ($resultFields && !in_array($field, $resultFields)) {
+                    continue;
+                }
+
                 $accessors = array('get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field));
                 foreach ($accessors as $accessor) {
                     if (method_exists($entity, $accessor)) {
