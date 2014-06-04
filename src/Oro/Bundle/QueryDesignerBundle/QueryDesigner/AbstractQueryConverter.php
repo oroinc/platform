@@ -116,6 +116,27 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Makes sure that child table joined by $joinByFieldName joined as a relation of table with $tableAlias alias
+     *
+     * For example:
+     *      table1::orders -> table2::products
+     * call of ensureChildTableJoined(table2, stockItem) will check whether following table is joined:
+     *      table1::orders -> table2::products -> table3::stockItem
+     *
+     * @param string $tableAlias      The alias of a table to check
+     * @param string $joinByFieldName The name of a field should be used to check a join
+     *
+     * @return string The table alias for the checked join
+     */
+    public function ensureChildTableJoined($tableAlias, $joinByFieldName)
+    {
+        $parentJoinId = $this->getJoinIdentifierByTableAlias($tableAlias);
+        $joinId       = $this->joinIdHelper->buildJoinIdentifier('OroCRM\Bundle\SalesBundle\Entity\Opportunity::' . $joinByFieldName, $parentJoinId);
+
+        return $this->ensureTableJoined($joinId);
+    }
+
+    /**
      * Makes sure that a table identified by the given $joinId exists in the query
      *
      * @param string $joinId
@@ -153,13 +174,6 @@ abstract class AbstractQueryConverter
     public function buildSiblingJoinIdentifier($joinId, $joinByFieldName)
     {
         return $this->joinIdHelper->buildSiblingJoinIdentifier($joinId, $joinByFieldName);
-    }
-
-    public function buildJoinIdentifier(
-        $join,
-        $parentJoinId = null
-    ) {
-        return $this->joinIdHelper->buildJoinIdentifier($join, $parentJoinId);
     }
 
     /**
