@@ -118,42 +118,11 @@ abstract class BaseDumperExtension extends ExtendConfigDumperExtension
      * @param string $className
      * @param string $fieldName
      * @param string $fieldType
-     * @param string $targetEntityName
-     * @param string $relationKey
      * @param array  $values
      */
-    protected function createField($className, $fieldName, $fieldType, $targetEntityName, $relationKey, $values = [])
+    protected function createField($className, $fieldName, $fieldType, $values)
     {
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
-        $classAlias = ExtendHelper::buildAssociationName($className);
-
-        $defaultValues = [
-            'extend'    => [
-                'owner'         => ExtendScope::OWNER_SYSTEM,
-                'state'         => ExtendScope::STATE_NEW,
-                'is_extend'     => false,
-                'extend'        => true,
-                'is_deleted'    => false,
-                'is_inverse'    => false,
-                'target_entity' => $targetEntityName,
-                'target_field'  => 'id',
-                'relation_key'  => $relationKey,
-            ],
-            'entity'    => [
-                'label'       => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
-                'description' => sprintf('oro.%s.%s.label', $classAlias, $fieldName),
-            ],
-            'view'      => [
-                'is_displayable' => false
-            ],
-            'form'      => [
-                'is_enabled' => true
-            ],
-            'dataaudit' => [
-                'auditable' => false
-            ]
-        ];
-        $values = array_merge_recursive($defaultValues, $values);
 
         $this->updateFieldConfigs(
             $className,
@@ -208,5 +177,20 @@ abstract class BaseDumperExtension extends ExtendConfigDumperExtension
     protected function getRelationName($entityClassName)
     {
         return ExtendHelper::buildAssociationName($entityClassName);
+    }
+
+    /**
+     * Return entity config for given scope
+     *
+     * @param string $scope
+     * @param string $entityName
+     *
+     * @return ConfigInterface
+     */
+    protected function getConfig($scope, $entityName)
+    {
+        return $this->configManager
+            ->getProvider($scope)
+            ->getConfig($entityName);
     }
 }
