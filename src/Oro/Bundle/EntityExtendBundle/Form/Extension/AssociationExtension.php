@@ -102,8 +102,7 @@ class AssociationExtension extends AbstractTypeExtension
                     && $this->isAssociationExist($className, $owningEntityClassName)
                 )
             ) {
-                // @todo: form type should be disabled correctly
-                $options['disabled'] = true;
+                $view->vars['disabled'] = true;
                 $this->appendClassAttr($view->vars, 'disabled-choice');
             }
         }

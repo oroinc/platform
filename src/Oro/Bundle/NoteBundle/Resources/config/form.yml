@@ -1,3 +1,34 @@
 parameters:
+    oro_note.form.type.note.class:                 Oro\Bundle\NoteBundle\Form\Type\NoteType
+    oro_note.form.type.note_api.class:             Oro\Bundle\NoteBundle\Form\Type\NoteApiType
+    oro_note.form.handler.note_api.class:          Oro\Bundle\NoteBundle\Form\Handler\NoteApiHandler
 
 services:
+    oro_note.form.type.note:
+        class: %oro_note.form.type.note.class%
+        tags:
+            - { name: form.type, alias: oro_note }
+
+    oro_note.form.type.note_api:
+        class: %oro_note.form.type.note_api.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_note_api }
+
+    oro_note.form.note.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - 'note'
+            - 'oro_note_api'
+
+    oro_note.form.handler.note_api:
+        class: %oro_note.form.handler.note_api.class%
+        scope: request
+        arguments:
+            - @oro_note.form.note.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager

@@ -11,7 +11,7 @@ use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
  * @ORM\Table(name="oro_note")
  * @Config(
  *  defaultValues={
