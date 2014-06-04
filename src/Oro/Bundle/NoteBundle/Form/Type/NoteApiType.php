@@ -39,7 +39,6 @@ class NoteApiType extends NoteType
             [
                 'data_class'         => 'Oro\Bundle\NoteBundle\Entity\Note',
                 'intention'          => 'note',
-                //'cascade_validation' => true,
                 'csrf_protection'    => false
             ]
         );

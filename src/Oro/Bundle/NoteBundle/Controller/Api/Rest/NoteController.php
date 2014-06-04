@@ -3,8 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
 use FOS\Rest\Util\Codes;
-use Oro\Bundle\NoteBundle\Entity\EntityId;
-use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +21,10 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+
+use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
+
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 
 /**
  * @RouteResource("note")
@@ -62,7 +65,7 @@ class NoteController extends RestController implements ClassResourceInterface
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();
 
-        $associationId = new EntityId();
+        $associationId = new EntityIdSoap();
         $associationId
             ->setEntity(str_replace('_', '\\', $entityClass))
             ->setId($entityId);

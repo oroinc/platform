@@ -33,7 +33,6 @@ class NoteType extends AbstractType
             [
                 'data_class' => 'Oro\Bundle\NoteBundle\Entity\Note',
                 'intention'  => 'note',
-                //'cascade_validation' => true
             ]
         );
     }

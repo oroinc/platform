@@ -4,18 +4,18 @@ namespace Oro\Bundle\NoteBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\EntityId;
 
 class NoteRepository extends EntityRepository
 {
     /**
-     * @param EntityId $entityId
-     * @param null     $page
-     * @param null     $limit
+     * @param EntityIdSoap $entityId
+     * @param null         $page
+     * @param null         $limit
      * @return array
      */
-    public function findByAssociatedEntity(EntityId $entityId, $page = null, $limit = null)
+    public function findByAssociatedEntity(EntityIdSoap $entityId, $page = null, $limit = null)
     {
         $entityClass = $entityId->getEntity();
 
