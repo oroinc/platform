@@ -99,8 +99,8 @@ class ExtendConfigDumper
             : $extendProvider->getConfigs();
 
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->supports(self::ACTION_PRE_UPDATE, $extendProvider, $extendConfigs)) {
-                $extension->preUpdate($extendProvider, $extendConfigs);
+            if ($extension->supports(self::ACTION_PRE_UPDATE, $extendConfigs)) {
+                $extension->preUpdate($extendConfigs);
             }
         }
 
@@ -109,8 +109,8 @@ class ExtendConfigDumper
         }
 
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->supports(self::ACTION_POST_UPDATE, $extendProvider, $extendConfigs)) {
-                $extension->postUpdate($extendProvider, $extendConfigs);
+            if ($extension->supports(self::ACTION_POST_UPDATE, $extendConfigs)) {
+                $extension->postUpdate($extendConfigs);
             }
         }
 

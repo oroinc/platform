@@ -65,10 +65,10 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($noteConfigs));
 
         $extension = new NoteDumperExtension($this->configManager);
-        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $configs);
         $this->assertTrue($result);
 
-        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, $configs);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $configs);
         $this->assertTrue($result);
     }
 
@@ -86,10 +86,10 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($noteConfigs));
 
         $extension = new NoteDumperExtension($this->configManager);
-        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, $this->extendConfigProvider, []);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE, []);
         $this->assertFalse($result);
 
-        $result = $extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE, $this->extendConfigProvider, []);
+        $result = $extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE, []);
         $this->assertFalse($result);
     }
 
@@ -97,7 +97,13 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = $this->getMock(
             'Oro\Bundle\NoteBundle\Tools\NoteDumperExtension',
-            ['createField', 'addManyToOneRelation', 'getRelationName', 'getRelationKey', 'getNotesEnabledFor'],
+            [
+                'createField',
+                'addManyToOneRelation',
+                'getRelationName',
+                'getRelationKey',
+                'getClassNamesWithFlagEnabled'
+            ],
             [$this->configManager]
         );
 
@@ -107,8 +113,15 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $withNotes     = [$entityName];
         $relationKey   = 'manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Test\Entity|entity';
 
+        $entityConfig = new Config(new EntityConfigId('extend', $entityName));
+        $entityConfig->set('entity', ['label' => 'test', 'description' => 'test']);
+
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->will($this->returnValue($entityConfig));
+
         $extension->expects($this->once())
-            ->method('getNotesEnabledFor')
+            ->method('getClassNamesWithFlagEnabled')
             ->will($this->returnValue($withNotes));
 
         $extension->expects($this->once())
@@ -133,7 +146,7 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('addManyToOneRelation')
             ->with($noteClassName, $entityName, 'entity', $relationKey, true);
 
-        $extension->preUpdate($this->extendConfigProvider, $configs);
+        $extension->preUpdate($configs);
     }
 
     public function testCreateField()
