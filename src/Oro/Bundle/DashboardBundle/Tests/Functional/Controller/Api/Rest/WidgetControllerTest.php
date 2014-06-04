@@ -9,21 +9,14 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class WidgetControllerTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     /**
      * @var EntityManager
      */
@@ -46,10 +39,10 @@ class WidgetControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->client           = static::createClient([], ToolsAPI::generateWsseHeader());
-        $this->em               = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-        $this->configProvider   = $this->client->getContainer()->get('oro_dashboard.config_provider');
-        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->em               = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider   = $this->getContainer()->get('oro_dashboard.config_provider');
+        $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
         $this->em->persist($this->widget);
@@ -65,7 +58,7 @@ class WidgetControllerTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_put_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -75,7 +68,7 @@ class WidgetControllerTest extends WebTestCase
             $data
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->em->refresh($this->widget);
 
@@ -95,15 +88,14 @@ class WidgetControllerTest extends WebTestCase
         $id         = $this->widget->getDashboard()->getId();
         $this->client->request(
             'POST',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_post_dashboard_widget_add_widget'
             ),
             array('dashboardId' => $id, 'widgetName' => $widgetName)
         );
 
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $content = ToolsAPI::jsonToArray($result->getContent());
+        $content = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
         $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
         $this->assertEquals($widgetName, $content['name']);
     }
@@ -115,7 +107,7 @@ class WidgetControllerTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -124,11 +116,11 @@ class WidgetControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard_widget',
                 [
                     'dashboardId' => $this->widget->getDashboard()->getId(),
@@ -137,7 +129,7 @@ class WidgetControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     /**
@@ -169,7 +161,7 @@ class WidgetControllerTest extends WebTestCase
 
         $this->client->request(
             'PUT',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_put_dashboard_widget_positions',
                 [
                     'dashboardId' => $dashboard->getId(),
@@ -179,7 +171,7 @@ class WidgetControllerTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
         foreach ($widgets as $key => $widget) {
             $this->em->refresh($widget);
             $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());

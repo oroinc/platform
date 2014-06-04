@@ -1,22 +1,17 @@
 <?php
+
 namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\BrowserKit\Response;
 
 /**
  * @outputBuffering enabled
  */
 class RestAddressTypeApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
@@ -24,18 +19,12 @@ class RestAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_addresstypes')
-        );
+        $this->client->request('GET', $this->getUrl('oro_api_get_addresstypes'));
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
+
         return $result;
     }
 
@@ -43,20 +32,17 @@ class RestAddressTypeApiTest extends WebTestCase
      * @depends testGetAddressTypes
      * @param array $expected
      */
-    public function testGetAddressType($expected)
+    public function testGetAddressType(array $expected)
     {
-        foreach ($expected as $addrType) {
+        foreach ($expected as $addressType) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_addresstype', array('name' => $addrType['name']))
+                $this->getUrl('oro_api_get_addresstype', array('name' => $addressType['name']))
             );
-            /** @var $result Response */
-            $result = $this->client->getResponse();
 
-            ToolsAPI::assertJsonResponse($result, 200);
-            $result = ToolsAPI::jsonToArray($result->getContent());
+            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
             $this->assertNotEmpty($result);
-            $this->assertEquals($addrType, $result);
+            $this->assertEquals($addressType, $result);
         }
     }
 }

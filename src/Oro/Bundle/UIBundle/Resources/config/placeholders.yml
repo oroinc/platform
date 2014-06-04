@@ -23,6 +23,7 @@ placeholders:
             init_pinned_dropdown_button:
                 order: 100
     requirejs_config_extend:
+        lable: RequireJS Configuration Run Time Extend
         items:
             ui_requirejs_config:
                 order: 10
@@ -42,8 +43,6 @@ items:
         template: OroUIBundle:Default:help.html.twig
     add_update_delete:
         template: OroUIBundle:Form:buttons.html.twig
-    ui_requirejs_config:
-        template: OroUIBundle::requirejs.config.js.twig
     init_pinned_dropdown_button:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
     navbar:

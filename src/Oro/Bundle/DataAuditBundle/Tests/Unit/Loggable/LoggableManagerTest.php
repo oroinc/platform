@@ -29,7 +29,7 @@ class LoggableManagerTest extends AbstractMetadataTest
      */
     protected $loggableClass;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

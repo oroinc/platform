@@ -2,30 +2,81 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
+
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
+
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-
 /**
- * Class WebTestCase
+ * Abstract class for functional and integration tests
  *
- * @package Oro\Bundle\TestFrameworkBundle\Test
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
-    const DB_ISOLATION = '/@db_isolation(.*)(\r|\n)/U';
-    const DB_REINDEX = '/@db_reindex(.*)(\r|\n)/U';
+    /** Annotation names */
+    const DB_ISOLATION_ANNOTATION = 'dbIsolation';
+    const DB_REINDEX_ANNOTATION = 'dbReindex';
 
-    static protected $db_isolation = false;
-    static protected $db_reindex = false;
+    /** Default WSSE credentials */
+    const USER_NAME = 'admin';
+    const USER_PASSWORD = 'admin_api_key';
+
+    /**  Default user name and password */
+    const AUTH_USER = 'admin@example.com';
+    const AUTH_PW = 'admin';
+
+    /**
+     * @var bool[]
+     */
+    private static $dbIsolation;
+
+    /**
+     * @var bool[]
+     */
+    private static $dbReindex;
 
     /**
      * @var Client
      */
-    static protected $internalClient;
+    private static $clientInstance;
+
+    /**
+     * @var Client
+     */
+    private static $soapClientInstance;
+
+    /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
+     * @var SoapClient
+     */
+    protected $soapClient;
+
+    /**
+     * @var array
+     */
+    private static $loadedFixtures = array();
+
+    /**
+     * @var ReferenceRepository
+     */
+    protected $referenceRepository;
 
     protected function tearDown()
     {
@@ -38,117 +89,69 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
+    public static function tearDownAfterClass()
+    {
+        if (self::$clientInstance) {
+            if (self::getDbIsolationSetting()) {
+                self::$clientInstance->rollbackTransaction();
+            }
+            self::$clientInstance = null;
+            self::$soapClientInstance = null;
+            self::$loadedFixtures = array();
+        }
+    }
+
     /**
      * Creates a Client.
      *
      * @param array $options An array of options to pass to the createKernel class
      * @param array $server  An array of server parameters
+     * @param bool  $force If this option - true, will reset client on each initClient call
      *
      * @return Client A Client instance
      */
-    protected static function createClient(array $options = array(), array $server = array())
+    protected function initClient(array $options = array(), array $server = array(), $force = false)
     {
-        if (!self::$internalClient) {
-            self::$internalClient = parent::createClient($options, $server);
+        if ($force) {
+            $this->resetClient();
+        }
 
-            if (self::$db_isolation) {
-                /** @var Client $client */
-                $client = self::$internalClient;
+        if (!self::$clientInstance) {
+            /** @var Client $client */
+            $client = self::$clientInstance = static::createClient($options, $server);
 
-                //workaround MyISAM search tables are not on transaction
-                if (self::$db_reindex) {
-                    $kernel = $client->getKernel();
-                    $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
-                    $application->setAutoExit(false);
-                    $options = array('command' => 'oro:search:reindex');
-                    $options['--env'] = "test";
-                    $options['--quiet'] = null;
-                    $application->run(new \Symfony\Component\Console\Input\ArrayInput($options));
+            if (self::getDbIsolationSetting()) {
+                //This is a workaround for MyISAM search tables that are not transactionanl
+                if (self::getDbReindexSetting()) {
+                    self::getContainer()->get('oro_search.search.engine')->reindex();
                 }
 
                 $client->startTransaction();
-                $pdoConnection = Client::getPdoConnection();
-                if ($pdoConnection) {
-                    //set transaction level to 1 for entityManager
-                    $connection = $client->createConnection($pdoConnection);
-                    $client->getContainer()->set('doctrine.dbal.default_connection', $connection);
-
-                    /** @var EntityManager $entityManager */
-                    $entityManager = $client->getContainer()->get('doctrine.orm.entity_manager');
-                    if (spl_object_hash($entityManager->getConnection()) != spl_object_hash($connection)) {
-                        $reflection = new \ReflectionProperty('Doctrine\ORM\EntityManager', 'conn');
-                        $reflection->setAccessible(true);
-                        $reflection->setValue($entityManager, $connection);
-                    }
-                }
             }
         } else {
-            self::$internalClient->setServerParameters($server);
+            self::$clientInstance->setServerParameters($server);
         }
 
-        return self::$internalClient;
+        $this->client = self::$clientInstance;
     }
 
-    public static function tearDownAfterClass()
+    /**
+     * Reset client and rollback transaction
+     */
+    protected function resetClient()
     {
-        if (self::$internalClient) {
-            /** @var Client $client */
-            $client = self::$internalClient;
-            if (self::$db_isolation) {
-                $client->rollbackTransaction();
-                self::$db_isolation = false;
+        if (self::$clientInstance) {
+            if (self::getDbIsolationSetting()) {
+                self::$clientInstance->rollbackTransaction();
             }
-            $client->setSoapClient(null);
-            self::$internalClient = null;
-        }
-    }
 
-    public static function setUpBeforeClass()
-    {
-        $class = new \ReflectionClass(get_called_class());
-        $doc = $class->getDocComment();
-        if (preg_match(self::DB_ISOLATION, $doc, $matches) > 0) {
-            self::$db_isolation = true;
-        } else {
-            self::$db_isolation = false;
-        }
-
-        if (preg_match(self::DB_REINDEX, $doc, $matches) > 0) {
-            self::$db_reindex = true;
-        } else {
-            self::$db_reindex = false;
+            $this->client = null;
+            self::$clientInstance = null;
         }
     }
 
     /**
-     * @return bool
-     */
-    public function getIsolation()
-    {
-        return self::$db_isolation;
-    }
-
-    /**
-     * @param bool $dbIsolation
-     */
-    public function setIsolation($dbIsolation = false)
-    {
-        self::$db_isolation = $dbIsolation;
-    }
-
-    public static function getInstance()
-    {
-        return self::$internalClient;
-    }
-
-    /**
-     * Attempts to guess the kernel location.
-     *
-     * When the Kernel is located, the file is required.
-     *
-     * @return string The Kernel class name
-     *
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
     protected static function getKernelClass()
     {
@@ -157,19 +160,477 @@ abstract class WebTestCase extends BaseWebTestCase
         $finder = new Finder();
         $finder->name('AppKernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException(
-                'Either set KERNEL_DIR in your phpunit.xml according to ' .
-                'http://symfony.com/doc/current/book/testing.html#your-first-functional-test ' .
-                'or override the WebTestCase::createKernel() method.'
+
+        if (count($results)) {
+            $file = current($results);
+            $class = $file->getBasename('.php');
+
+            require_once $file;
+        } else {
+            $class = parent::getKernelClass();
+        }
+
+        return $class;
+    }
+
+    /**
+     * Get value of dbIsolation option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbIsolationSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbIsolation[$calledClass])) {
+            self::$dbIsolation[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_ISOLATION_ANNOTATION);
+        }
+
+        return self::$dbIsolation[$calledClass];
+    }
+
+    /**
+     * Get value of dbIsolation option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbReindexSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbReindex[$calledClass])) {
+            self::$dbReindex[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_REINDEX_ANNOTATION);
+        }
+
+        return self::$dbReindex[$calledClass];
+    }
+
+    /**
+     * @param string $className
+     * @param string $annotationName
+     * @return bool
+     */
+    private static function isClassHasAnnotation($className, $annotationName)
+    {
+        $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations($className);
+        return isset($annotations['class'][$annotationName]);
+    }
+
+    /**
+     * @param string $wsdl
+     * @param array $options
+     * @param bool $force
+     * @return SoapClient
+     * @throws \Exception
+     */
+    protected function initSoapClient($wsdl = null, array $options = array(), $force = false)
+    {
+        if (!self::$soapClientInstance || $force) {
+
+            if ($wsdl === null) {
+                $wsdl = "http://localhost/api/soap";
+            }
+
+            $options = array_merge(
+                array(
+                    'location' => $wsdl,
+                    'soap_version' => SOAP_1_2
+                ),
+                $options
+            );
+
+            $client = $this->getClientInstance();
+            $client->request('GET', $wsdl);
+            $status = $client->getResponse()->getStatusCode();
+            $statusText = Response::$statusTexts[$status];
+            if ($status >= 400) {
+                throw new \Exception($statusText, $status);
+            }
+
+            $wsdl = $client->getResponse()->getContent();
+            //save to file
+            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
+            $fl = fopen($file, "w");
+            fwrite($fl, $wsdl);
+            fclose($fl);
+
+            self::$soapClientInstance = new SoapClient($file, $options, $client);
+
+            unlink($file);
+        }
+
+        $this->soapClient = self::$soapClientInstance;
+    }
+
+    /**
+     * Builds up the environment to run the given command.
+     *
+     * @param string $name
+     * @param array $params
+     *
+     * @return string
+     */
+    protected static function runCommand($name, array $params = array())
+    {
+        array_unshift($params, $name);
+
+        $kernel = self::getContainer()->get('kernel');
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $input = new ArrayInput($params);
+        $input->setInteractive(false);
+
+        $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');
+        $output = new StreamOutput($fp);
+
+        $application->run($input, $output);
+
+        rewind($fp);
+        return stream_get_contents($fp);
+    }
+
+    /**
+     * @param array $classNames
+     * @param bool $force
+     */
+    protected function loadFixtures(array $classNames, $force = false)
+    {
+        if (!$force) {
+            $classNames = array_filter(
+                $classNames,
+                function ($value) {
+                    return !in_array($value, self::$loadedFixtures);
+                }
+            );
+
+            if (!$classNames) {
+                return;
+            }
+        }
+
+        self::$loadedFixtures = array_merge(self::$loadedFixtures, $classNames);
+
+        $loader = $this->getFixtureLoader($classNames);
+        $fixtures = array_values($loader->getFixtures());
+
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $executor = new ORMExecutor($em, new ORMPurger($em));
+        $executor->execute($fixtures, true);
+        $this->referenceRepository = $executor->getReferenceRepository();
+        $this->postFixtureLoad();
+    }
+
+    /**
+     * @param string $referenceUID
+     *
+     * @return object
+     */
+    protected function getReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->getReference($referenceUID);
+    }
+
+    /**
+     * @return ReferenceRepository
+     */
+    protected function getReferenceRepository()
+    {
+        return $this->referenceRepository;
+    }
+
+    /**
+     * Callback function to be executed after fixture load.
+     */
+    protected function postFixtureLoad()
+    {
+
+    }
+
+    /**
+     * Retrieve Doctrine DataFixtures loader.
+     *
+     * @param array $classNames
+     * @return DataFixturesLoader
+     */
+    private function getFixtureLoader(array $classNames)
+    {
+        $loader = new DataFixturesLoader($this->getContainer());
+
+        foreach ($classNames as $className) {
+            $this->loadFixtureClass($loader, $className);
+        }
+
+        return $loader;
+    }
+
+    /**
+     * Load a data fixture class.
+     *
+     * @param DataFixturesLoader $loader
+     * @param string $className
+     */
+    private function loadFixtureClass(DataFixturesLoader $loader, $className)
+    {
+        $fixture = new $className();
+
+        if ($loader->hasFixture($fixture)) {
+            unset($fixture);
+            return;
+        }
+
+        $loader->addFixture($fixture);
+
+        if ($fixture instanceof DependentFixtureInterface) {
+            foreach ($fixture->getDependencies() as $dependency) {
+                $this->loadFixtureClass($loader, $dependency);
+            }
+        }
+    }
+
+    /**
+     * Creates a mock object of a service identified by its id.
+     *
+     * @param string $id
+     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     */
+    protected function getServiceMockBuilder($id)
+    {
+        $service = $this->getContainer()->get($id);
+        $class = get_class($service);
+        return $this->getMockBuilder($class)->disableOriginalConstructor();
+    }
+
+    /**
+     * Generates a URL or path for a specific route based on the given parameters.
+     *
+     * @param string $name
+     * @param array $parameters
+     * @param bool $absolute
+     * @return string
+     */
+    protected function getUrl($name, $parameters = array(), $absolute = false)
+    {
+        return self::getContainer()->get('router')->generate($name, $parameters, $absolute);
+    }
+
+    /**
+     * Get an instance of the dependency injection container.
+     *
+     * @return ContainerInterface
+     */
+    protected static function getContainer()
+    {
+        return static::getClientInstance()->getContainer();
+    }
+
+    /**
+     * @return Client
+     * @throws \BadMethodCallException
+     */
+    public static function getClientInstance()
+    {
+        if (!self::$clientInstance) {
+            throw new \BadMethodCallException('Client instance is not initialized.');
+        }
+
+        return self::$clientInstance;
+    }
+
+    /**
+     * Data provider for REST/SOAP API tests
+     *
+     * @param string $folder
+     * @return array
+     */
+    public static function getApiRequestsData($folder)
+    {
+        static $randomString;
+
+        // generate unique value
+        if (!$randomString) {
+            $randomString = self::generateRandomString(5);
+        }
+
+        $parameters = array();
+        $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
+        foreach ($testFiles as $fileName => $object) {
+            $parameters[$fileName] = Yaml::parse($fileName);
+            if (is_null($parameters[$fileName]['response'])) {
+                unset($parameters[$fileName]['response']);
+            }
+        }
+
+        $replaceCallback = function (&$value) use ($randomString) {
+            if (!is_null($value)) {
+                $value = str_replace('%str%', $randomString, $value);
+            }
+        };
+
+        foreach ($parameters as $key => $value) {
+            array_walk(
+                $parameters[$key]['request'],
+                $replaceCallback,
+                $randomString
+            );
+            array_walk(
+                $parameters[$key]['response'],
+                $replaceCallback,
+                $randomString
             );
         }
 
-        $file = current($results);
-        $class = $file->getBasename('.php');
+        return $parameters;
+    }
 
-        require_once $file;
+    /**
+     * @param int $length
+     * @return string
+     */
+    public static function generateRandomString($length = 10)
+    {
+        $random= "";
+        srand((double) microtime() * 1000000);
+        $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        $char_list .= "abcdefghijklmnopqrstuvwxyz";
+        $char_list .= "1234567890_";
 
-        return $class;
+        for ($i = 0; $i < $length; $i++) {
+            $random .= substr($char_list, (rand() % (strlen($char_list))), 1);
+        }
+
+        return $random;
+    }
+
+    /**
+     * Generate WSSE authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @param string|null $nonce
+     * @return array
+     */
+    public static function generateWsseAuthHeader(
+        $userName = self::USER_NAME,
+        $userPassword = self::USER_PASSWORD,
+        $nonce = null
+    ) {
+        if (null === $nonce) {
+            $nonce = uniqid();
+        }
+
+        $created  = date('c');
+        $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
+        $wsseHeader = array(
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
+            'HTTP_X-WSSE' => sprintf(
+                'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
+                $userName,
+                $digest,
+                $nonce,
+                $created
+            )
+        );
+        return $wsseHeader;
+    }
+
+    /**
+     * Generate Basic  authorization header
+     *
+     * @param string $userName
+     * @param string $userPassword
+     * @return array
+     */
+    public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
+    {
+        return array('PHP_AUTH_USER' => $userName, 'PHP_AUTH_PW' => $userPassword);
+    }
+
+    /**
+     * Convert value to array
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public static function valueToArray($value)
+    {
+        return self::jsonToArray(json_encode($value));
+    }
+
+    /**
+     * Convert json to array
+     *
+     * @param string $json
+     * @return array
+     */
+    public static function jsonToArray($json)
+    {
+        return (array)json_decode($json, true);
+    }
+
+    /**
+     * Checks json response status code and return content as array
+     *
+     * @param Response $response
+     * @param int $statusCode
+     * @return array
+     */
+    public static function getJsonResponseContent(Response $response, $statusCode)
+    {
+        self::assertJsonResponseStatusCodeEquals($response, $statusCode);
+        return self::jsonToArray($response->getContent());
+    }
+
+    /**
+     * Assert response is json and has status code
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertResponseContentTypeEquals($response, 'application/json');
+    }
+
+    /**
+     * Assert response is html and has status code
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8');
+    }
+
+    /**
+     * Assert response status code equals
+     *
+     * @param Response $response
+     * @param int $statusCode
+     */
+    public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        \PHPUnit_Framework_TestCase::assertEquals(
+            $statusCode,
+            $response->getStatusCode(),
+            $response->getContent()
+        );
+    }
+
+    /**
+     * Assert response content type equals
+     *
+     * @param Response $response
+     * @param string $contentType
+     */
+    public static function assertResponseContentTypeEquals(Response $response, $contentType)
+    {
+        \PHPUnit_Framework_TestCase::assertTrue(
+            $response->headers->contains('Content-Type', $contentType),
+            $response->headers
+        );
     }
 }

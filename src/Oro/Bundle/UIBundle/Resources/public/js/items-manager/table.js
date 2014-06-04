@@ -109,26 +109,26 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
 
-            mediator.trigger('items-manager:table:add', this.options.collection);
+            mediator.trigger('items-manager:table:add:' + this._getIdentifier(), this.options.collection);
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
 
-            mediator.trigger('items-manager:table:change', this.options.collection);
+            mediator.trigger('items-manager:table:change:' + this._getIdentifier(), this.options.collection);
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').remove();
 
-            mediator.trigger('items-manager:table:remove', this.options.collection);
+            mediator.trigger('items-manager:table:remove:' + this._getIdentifier(), this.options.collection);
         },
 
         _onResetCollection: function () {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
 
-            mediator.trigger('items-manager:table:reset', this.options.collection);
+            mediator.trigger('items-manager:table:reset:' + this._getIdentifier(), this.options.collection);
         },
 
         _renderModel: function (model) {
@@ -158,6 +158,11 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             } else {
                 model.trigger('action:' + action, model, data);
             }
+        },
+
+        _getIdentifier: function()
+        {
+            return _.first(_.first(this.element).className.split(' '));
         }
     });
 

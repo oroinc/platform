@@ -2,35 +2,30 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\DomCrawler\Form;
+
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->initClient(
             array(),
-            array_merge(ToolsAPI::generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_business_unit_index'));
+        $this->client->request('GET', $this->getUrl('oro_business_unit_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     /**
@@ -50,18 +45,18 @@ class ControllersTest extends WebTestCase
                 "owner" => "1"
             )
         );
-        $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $result['request'] = $request;
+
         return $result;
     }
 
     public function testCreate()
     {
         $user = $this->getUser();
-        $crawler = $this->client->request('GET', $this->client->generate('oro_business_unit_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_business_unit_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_business_unit_form[name]'] = 'testBU';
@@ -76,7 +71,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Business Unit saved", $crawler->html());
 
         return $user;
@@ -88,22 +83,17 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate()
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'business-unit-grid',
-            array(
-                'business-unit-grid[_filter][name][value]' => 'testBU'
-            )
+            array('business-unit-grid[_filter][name][value]' => 'testBU')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_business_unit_update', array('id' => $result['id']))
+            $this->getUrl('oro_business_unit_update', array('id' => $result['id']))
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -114,21 +104,18 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Business Unit saved", $crawler->html());
 
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'business-unit-grid',
-            array(
-                'business-unit-grid[_filter][name][value]' => 'testBU_Updated'
-            )
+            array('business-unit-grid[_filter][name][value]' => 'testBU_Updated')
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
+
         return $result['id'];
     }
 
@@ -141,11 +128,11 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->client->generate('oro_business_unit_view', array('id' => $id))
+            $this->getUrl('oro_business_unit_view', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("testBU_Updated - Business Units - User Management - System", $crawler->html());
     }
 
@@ -157,16 +144,12 @@ class ControllersTest extends WebTestCase
      */
     public function testViewUsers($id, $user)
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'bu-view-users-grid',
-            array(
-                'bu-view-users-grid[business_unit_id]' => $id
-            )
+            array('bu-view-users-grid[business_unit_id]' => $id)
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $this->assertEquals($user['request']['user']['username'], $result['username']);

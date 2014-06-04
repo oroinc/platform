@@ -11,7 +11,7 @@ class TaggingTest extends \PHPUnit_Framework_TestCase
      */
     protected $tagging;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->tagging = new Tagging();
     }

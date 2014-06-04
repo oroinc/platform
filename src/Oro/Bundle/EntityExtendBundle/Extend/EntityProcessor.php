@@ -4,8 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Process\PhpExecutableFinder;
-
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;

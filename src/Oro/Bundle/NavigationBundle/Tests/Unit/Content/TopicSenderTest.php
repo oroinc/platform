@@ -28,7 +28,7 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
     /** @var TopicSender */
     protected $sender;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->publisher       = $this->getMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
@@ -44,7 +44,7 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->publisher, $this->generator, $this->securityContext, $this->sender);
     }

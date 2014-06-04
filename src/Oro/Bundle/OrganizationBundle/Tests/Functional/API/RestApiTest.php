@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\API;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\BrowserKit\Response;
+
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestApiTest extends WebTestCase
 {
-    /** @var Client */
-    protected $client;
-
+    /**
+     * @var array
+     */
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
@@ -29,31 +28,26 @@ class RestApiTest extends WebTestCase
         )
     );
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     /**
      * Test POST
+     *
      * @return string
      */
     public function testCreate()
     {
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_businessunit'),
+            $this->getUrl('oro_api_post_businessunit'),
             $this->fixtureData
         );
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
+        $responseData = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
-        ToolsAPI::assertJsonResponse($result, 201);
-
-        $responseData = $result->getContent();
-        $this->assertNotEmpty($responseData);
-        $responseData = ToolsAPI::jsonToArray($responseData);
         $this->assertInternalType('array', $responseData);
         $this->assertArrayHasKey('id', $responseData);
 
@@ -70,16 +64,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunits')
+            $this->getUrl('oro_api_get_businessunits')
         );
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $responseData = $result->getContent();
-        $this->assertNotEmpty($responseData);
-        $responseData = ToolsAPI::jsonToArray($responseData);
+        $responseData = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $initialCount = $this->getCount();
 
         foreach ($responseData as $row) {
@@ -108,14 +96,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $responseData = ToolsAPI::jsonToArray($result->getContent());
+        $responseData = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($responseData);
         $this->assertArrayHasKey('id', $responseData);
@@ -142,24 +126,19 @@ class RestApiTest extends WebTestCase
         $requestData['business_unit']['name'] = $requestData['business_unit']['name'] . '_updated';
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_businessunit', array('id' => $id)),
+            $this->getUrl('oro_api_put_businessunit', array('id' => $id)),
             $requestData
         );
 
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // open address by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEquals($requestData['business_unit']['name'], $result['name']);
     }
 
@@ -173,19 +152,19 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_delete_businessunit', array('id' => $id))
         );
 
         /** @var $result Response */
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
+        $this->assertJsonResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 }

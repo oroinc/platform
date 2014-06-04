@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\FlexibleEntityBundle\Tests\Performance;
+
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Indexer\Fixtures;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;

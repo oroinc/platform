@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -85,13 +86,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         if ($context->getReadCount() < $this->totalCount) {
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
                 $this->page++;
-                $this->grid->getParameters()->set(
-                    PagerInterface::PAGER_ROOT_PARAM,
-                    [
-                        PagerInterface::PAGE_PARAM => $this->page
-                    ]
-                );
-                $gridData         = $this->grid->getData();
+                $gridData         = $this->getGridData();
                 $this->sourceData = $gridData->offsetGet('data');
                 $this->offset     = 0;
             }
@@ -115,7 +110,12 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         $this->context = $context;
 
         if ($context->hasOption('gridName')) {
-            $this->grid = $this->gridManagerLink->getService()->getDatagrid($context->getOption('gridName'));
+            $this->grid = $this->gridManagerLink
+                ->getService()
+                ->getDatagrid(
+                    $context->getOption('gridName'),
+                    $context->getOption('gridParameters')
+                );
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export reader must contain "gridName".'
@@ -146,18 +146,27 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
                 throw new LogicException('Reader must be configured with a grid');
             }
 
-            $this->page = 1;
-            $this->grid->getParameters()->set(
-                PagerInterface::PAGER_ROOT_PARAM,
-                [
-                    PagerInterface::PAGE_PARAM     => $this->page,
-                    PagerInterface::PER_PAGE_PARAM => $this->pageSize
-                ]
-            );
-            $gridData         = $this->grid->getData();
+            $this->page       = 1;
+            $gridData         = $this->getGridData();
             $this->totalCount = $gridData->offsetGetByPath(PagerInterface::TOTAL_PATH_PARAM);
             $this->sourceData = $gridData->offsetGet('data');
             $this->offset     = 0;
         }
+    }
+
+    /**
+     * @return ResultsObject
+     */
+    protected function getGridData()
+    {
+        $this->grid->getParameters()->set(
+            PagerInterface::PAGER_ROOT_PARAM,
+            [
+                PagerInterface::PAGE_PARAM     => $this->page,
+                PagerInterface::PER_PAGE_PARAM => $this->pageSize
+            ]
+        );
+
+        return $this->grid->getData();
     }
 }

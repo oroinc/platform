@@ -3,49 +3,32 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class SoapSearchApiTest extends WebTestCase
 {
     /** Default value for offset and max_records */
     const DEFAULT_VALUE = 0;
 
-    /** @var Client */
-    protected $client;
-
-    protected static $hasLoaded = false;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
 
-        $this->client->soap(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
-
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-        self::$hasLoaded = true;
+        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
     }
 
     /**
-     * @param string $request
-     * @param array  $response
+     * @param array $request
+     * @param array $response
      *
-     * @dataProvider requestsApi
+     * @dataProvider searchDataProvider
      */
-    public function testApi($request, $response)
+    public function testSearch(array $request, array $response)
     {
         if (is_null($request['search'])) {
             $request['search'] ='';
@@ -57,33 +40,13 @@ class SoapSearchApiTest extends WebTestCase
             $request['max_results'] = self::DEFAULT_VALUE;
         }
 
-        $result = $this->client->getSoap()->search(
+        $result = $this->soapClient->search(
             $request['search'],
             $request['offset'],
             $request['max_results']
         );
-        $result = ToolsAPI::classToArray($result);
-        $this->assertEqualsResponse($response, $result);
-    }
+        $result = $this->valueToArray($result);
 
-    /**
-     * Data provider for SOAP API tests
-     *
-     * @return array
-     */
-    public function requestsApi()
-    {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
-    }
-
-    /**
-     * Test API response
-     *
-     * @param array $response
-     * @param array $result
-     */
-    protected function assertEqualsResponse($response, $result)
-    {
         $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
         if (isset($response['soap']['item']) && is_array($response['soap']['item'])) {
@@ -98,5 +61,15 @@ class SoapSearchApiTest extends WebTestCase
                 }
             }
         }
+    }
+
+    /**
+     * Data provider for SOAP API tests
+     *
+     * @return array
+     */
+    public function searchDataProvider()
+    {
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 }

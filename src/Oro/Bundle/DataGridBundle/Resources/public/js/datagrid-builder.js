@@ -203,7 +203,7 @@ define(function (require) {
 
 
     /**
-     * Process datagirid's metadata and creates datagrid
+     * Process datagrid's metadata and creates datagrid
      *
      * @export orodatagrid/js/datagrid-builder
      * @name   orodatagrid.datagridBuilder

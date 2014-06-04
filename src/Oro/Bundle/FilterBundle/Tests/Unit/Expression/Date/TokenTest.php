@@ -12,7 +12,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     /** @var  Token */
     protected $token;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->testType  = Token::TYPE_INTEGER;
         $this->testValue = 123;
@@ -20,7 +20,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         $this->token = new Token($this->testType, $this->testValue);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->token);
     }

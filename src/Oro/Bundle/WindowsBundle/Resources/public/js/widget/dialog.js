@@ -32,12 +32,15 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
          */
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             this.on('adoptedFormResetClick', _.bind(this.remove, this));
 
             this.options.dialogOptions = this.options.dialogOptions || {};
             this.options.dialogOptions.title = this.options.dialogOptions.title || this.options.title;
             this.options.dialogOptions.limitTo = this.options.dialogOptions.limitTo || '#container';
+            this.options.dialogOptions.minWidth = this.options.dialogOptions.minWidth || 375;
+            this.options.dialogOptions.minHeight = this.options.dialogOptions.minHeight || 150;
 
             if (this.options.stateEnabled) {
                 this._initModel(this.options);
@@ -191,6 +194,16 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
             this.loadingElement = this.$el.closest('.ui-dialog');
             AbstractWidget.prototype.show.apply(this);
             this.widget.dialog('adjustContentSize');
+
+            this._fixDialogMinHeight(true);
+            this.widget.on("dialogmaximize dialogrestore", _.bind(function() {
+                this._fixDialogMinHeight(true);
+            }, this));
+            this.widget.on("dialogminimize", _.bind(function() {
+                this._fixDialogMinHeight(false);
+            }, this));
+
+            this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
         },
 
         _initAdjustHeight: function(content) {
@@ -201,6 +214,25 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
                 this.widget.on("dialogresize dialogmaximize dialogrestore", _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
+        },
+
+        _fixDialogMinHeight: function(isEnabled) {
+            if (isEnabled) {
+                var minHeight = this.options.dialogOptions.minHeight + this.widget.dialog('actionsContainer').height();
+                this.widget.dialog('widget').css('min-height', minHeight);
+            } else {
+                this.widget.dialog('widget').css('min-height', 0);
+            }
+        },
+
+        _fixBorderShifting: function() {
+            var dialogWidget = this.widget.dialog('widget');
+            var widthShift
+                = parseInt(dialogWidget.css('border-left-width')) + parseInt(dialogWidget.css('border-right-width'));
+            var heightShift
+                = parseInt(dialogWidget.css('border-top-width')) + parseInt(dialogWidget.css('border-bottom-width'));
+            this.widget.width(this.widget.width() - widthShift);
+            this.widget.height(this.widget.height() - heightShift);
         },
 
         _fixScrollableHeight: function() {

@@ -15,7 +15,7 @@ class SimpleTransportTest extends \PHPUnit_Framework_TestCase
     /** @var Transport|\PHPUnit_Framework_MockObject_MockObject */
     protected $transportEntity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->transport       = new SimpleTransport();
         $settings              = new ParameterBag();
@@ -24,7 +24,7 @@ class SimpleTransportTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($settings));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->transport, $this->transportEntity);
     }

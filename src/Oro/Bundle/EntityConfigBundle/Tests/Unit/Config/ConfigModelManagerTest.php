@@ -31,7 +31,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigModelManager */
     protected $configModelManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -503,37 +503,6 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             $fieldModel,
             $this->configModelManager->getFieldModel(self::TEST_ENTITY, self::TEST_FIELD)
-        );
-    }
-
-    public function testGetEntityModelByConfigId()
-    {
-        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $this->createRepositoryMock(
-            [$entityModel],
-            [UnitOfWork::STATE_MANAGED]
-        );
-
-        $this->assertSame(
-            $entityModel,
-            $this->configModelManager->getModelByConfigId(new EntityConfigId('test', self::TEST_ENTITY))
-        );
-    }
-
-    public function testGetFieldModelByConfigId()
-    {
-        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
-            [$entityModel],
-            [UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]
-        );
-
-        $this->assertSame(
-            $fieldModel,
-            $this->configModelManager->getModelByConfigId(
-                new FieldConfigId('test', self::TEST_ENTITY, self::TEST_FIELD, 'string')
-            )
         );
     }
 

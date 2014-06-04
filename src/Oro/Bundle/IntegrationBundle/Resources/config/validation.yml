@@ -9,3 +9,5 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
                 max: 255
         type:
             - NotBlank: ~
+        defaultUserOwner:
+            - NotBlank: ~

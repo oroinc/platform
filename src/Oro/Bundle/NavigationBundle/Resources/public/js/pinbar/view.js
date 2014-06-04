@@ -12,11 +12,12 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', '../navigation'
      * @extends oronavigation.AbstractView
      */
     return AbstractView.extend({
+        el: '#oroplatform-header',
+
         options: {
             maxItems: 10,
             tabTitle: 'Pinbar',
             tabIcon: 'icon-folder-close',
-            el: '#oroplatform-header',
             listBar: '.list-bar ul',
             minimizeButton: '.top-action-box .minimize-button',
             defaultUrl: '/',
