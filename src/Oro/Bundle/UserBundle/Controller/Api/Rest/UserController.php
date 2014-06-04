@@ -293,7 +293,7 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * {@inheritdoc}
      */
-    protected function getPreparedItem($entity)
+    protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
 
