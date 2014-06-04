@@ -14,7 +14,7 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
 use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\GeneratorExtensionPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class OroEntityExtendBundle extends Bundle
@@ -54,7 +54,7 @@ class OroEntityExtendBundle extends Bundle
                 )
             )
         );
-        $container->addCompilerPass(new GeneratorExtensionPass());
+        $container->addCompilerPass(new ExtensionPass());
     }
 
     private function ensureInitialized()

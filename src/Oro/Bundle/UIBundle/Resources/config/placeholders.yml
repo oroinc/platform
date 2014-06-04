@@ -19,7 +19,6 @@ placeholders:
                 order: 100
 
     requirejs_config_extend:
-        lable: RequireJS Configuration Run Time Extend
         items:
             ui_requirejs_config:
                 order: 10

@@ -4,11 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use CG\Generator\PhpClass;
 
-interface ExtendEntityGeneratorExtension
+abstract class ExtendEntityGeneratorExtension
 {
-    const ACTION_PRE_PROCESS = 'pre-process';
-    const ACTION_GENERATE    = 'generate';
-
     /**
      * Check if generator extension supports configuration pre-processing or can generate code
      *
@@ -18,7 +15,7 @@ interface ExtendEntityGeneratorExtension
      *
      * @return bool
      */
-    public function supports($actionType, array $schemas);
+    abstract public function supports($actionType, array $schemas);
 
     /**
      * Apply extension to entity configuration before it will be generated as PHP, YAML files
@@ -27,7 +24,9 @@ interface ExtendEntityGeneratorExtension
      *
      * @return void
      */
-    public function preProcessEntityConfiguration(array &$schemas);
+    public function preProcessEntityConfiguration(array &$schemas)
+    {
+    }
 
     /**
      * @param array    $schema
@@ -35,5 +34,7 @@ interface ExtendEntityGeneratorExtension
      *
      * @return void
      */
-    public function generate(array &$schema, PhpClass $class);
+    public function generate(array $schema, PhpClass $class)
+    {
+    }
 }
