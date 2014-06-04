@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oronote/js/note/model'
-    ], function (_, Backbone, NoteModel) {
+define(['underscore', 'backbone', 'oronote/js/note/model'],
+function (_, Backbone, NoteModel) {
     'use strict';
 
     /**

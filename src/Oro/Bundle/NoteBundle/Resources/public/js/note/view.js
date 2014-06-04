@@ -1,6 +1,6 @@
 /*global define, alert*/
-define([ 'underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'
-    ], function (_, Backbone, routing, dateTimeFormatter) {
+define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'],
+function (_, Backbone, routing, dateTimeFormatter) {
     'use strict';
 
     var $ = Backbone.$;

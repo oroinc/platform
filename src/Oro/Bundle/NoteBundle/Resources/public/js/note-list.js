@@ -1,8 +1,8 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
     'oroui/js/mediator', 'oronavigation/js/navigation', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
-    'oronote/js/note/view', 'oronote/js/note/collection', 'jquery-outer-html'
-], function (
+    'oronote/js/note/view', 'oronote/js/note/collection', 'jquery-outer-html'],
+function (
     _, Backbone, __, app, messenger,
     mediator, Navigation, LoadingMask, DialogWidget, DeleteConfirmation,
     NoteView, NoteCollection
