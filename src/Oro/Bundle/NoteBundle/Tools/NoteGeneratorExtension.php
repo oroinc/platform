@@ -61,7 +61,7 @@ class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
         $methodBody = [
             '// Note can have only one related entity',
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
-            'if (!in_array($className, [' . implode(', ', $supportedEntities) . ']) {',
+            'if (!in_array($className, [' . implode(', ', $supportedEntities) . '])) {',
             '    throw new \Exception(sprintf("There\'s no relation for %s entity class.", $className));',
             '}'
         ];
