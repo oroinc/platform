@@ -6,7 +6,6 @@ define(function (require) {
 
     var _ = require('underscore');
     var Backbone = require('backbone');
-    require('jquery-ui');
 
     var __ = require('orotranslation/js/translator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
