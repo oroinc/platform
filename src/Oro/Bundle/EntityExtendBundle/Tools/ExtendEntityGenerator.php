@@ -12,6 +12,9 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ExtendEntityGenerator
 {
+    const ACTION_PRE_PROCESS = 'pre-process';
+    const ACTION_GENERATE    = 'generate';
+
     /** @var string */
     protected $cacheDir;
 
@@ -22,7 +25,7 @@ class ExtendEntityGenerator
     protected $extensions = [];
 
     /** @var array|ExtendEntityGeneratorExtension[]|null */
-    protected $sortedExtensions = null;
+    protected $sortedExtensions = [];
 
     /** @var ClassBuilder */
     protected $classBuilder;
@@ -57,7 +60,7 @@ class ExtendEntityGenerator
      */
     protected function getExtensions()
     {
-        if (empty($this->sortedExtensions)) {
+        if (empty($this->sortedExtensions) && !empty($this->extensions)) {
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
@@ -68,21 +71,21 @@ class ExtendEntityGenerator
     /**
      * Generates extended entities
      *
-     * @param array $config
+     * @param array $schemas
      */
-    public function generate(array $config)
+    public function generate(array $schemas)
     {
         // filter supported extensions and pre-process configuration
         foreach ($this->getExtensions() as $extension) {
-            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_PRE_PROCESS, $config)) {
+            if (!$extension->supports(self::ACTION_PRE_PROCESS, $schemas)) {
                 continue;
             }
 
-            $extension->preProcessEntityConfiguration($config);
+            $extension->preProcessEntityConfiguration($schemas);
         }
 
         $aliases = [];
-        foreach ($config as $item) {
+        foreach ($schemas as $item) {
             $this->generateClass($item);
 
             if ($item['type'] == 'Extend') {
@@ -123,7 +126,7 @@ class ExtendEntityGenerator
         $this->generateCollectionMethods($item, $class);
 
         foreach ($this->getExtensions() as $extension) {
-            if (!$extension->supports(ExtendEntityGeneratorExtension::ACTION_GENERATE, $item)) {
+            if (!$extension->supports(self::ACTION_GENERATE, $item)) {
                 continue;
             }
 
@@ -231,5 +234,4 @@ class ExtendEntityGenerator
                 );
         }
     }
-
 }

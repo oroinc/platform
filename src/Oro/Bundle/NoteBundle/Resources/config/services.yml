@@ -1,19 +1,31 @@
 parameters:
-    oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
-    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendGenerator
+    oro_note.note_lifecycle_listener.class:              Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
+    oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteDumperExtension
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
+    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteGeneratorExtension
 
     #entity
     oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
     oro_note.manager.api.class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
 
 services:
-    oro_note.subscriber.note_lifecycle_subscriber:
-        class: %oro_note.subscriber.note_lifecycle_subscriber.class%
+    oro_note.note_lifecycle_listener:
+        class: %oro_note.note_lifecycle_listener.class%
         arguments:
             - @oro_security.security_facade.link
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+
+    #
+    # EntityExtend Dumper extension
+    #
+    oro_note.entity_extend.dumper_extension:
+        class: %oro_note.entity_extend.dumper_extension.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.dumper_extension }
 
     #
     # API
@@ -26,16 +38,6 @@ services:
             - @oro_entity_config.config_manager
 
     #
-    # EntityExtend Generator extension
-    #
-    oro_note.entity_extend.generator_extension:
-        class: %oro_note.entity_extend.generator_extension.class%
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: oro_entity_extend.generator_extension, priority: 1 }
-
-    #
     # placeholder
     #
     oro_note.placeholder.filter:
@@ -43,3 +45,12 @@ services:
         arguments:
             - @oro_entity_config.provider.note
             - @oro_entity.orm.entity_class_accessor
+
+    #
+    # EntityExtend Generator extension
+    #
+    oro_note.entity_extend.generator_extension:
+        class: %oro_note.entity_extend.generator_extension.class%
+        arguments:
+        tags:
+            - { name: oro_entity_extend.generator_extension }

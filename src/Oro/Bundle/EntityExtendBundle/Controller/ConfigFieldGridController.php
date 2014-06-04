@@ -155,7 +155,7 @@ class ConfigFieldGridController extends Controller
          * check if fieldType has 4th option [fieldName]
          */
         if (count($relationOptions) == 4) {
-            $fieldType = ExtendHelper::getReversRelationType($relationOptions[0]);
+            $fieldType = ExtendHelper::getReverseRelationType($relationOptions[0]);
 
             $relations = $extendEntityConfig->get('relation');
             if (isset($relations[$relationName])) {

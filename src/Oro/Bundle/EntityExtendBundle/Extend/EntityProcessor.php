@@ -42,7 +42,7 @@ class EntityProcessor
         // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
         'doctrine:schema:update'          => ['--force' => true],
-        // TODO: Update extended entity cache after during schema update
+        // TODO: Update extended entity cache after schema update
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
         'cache:clear'                     => [],
     ];

@@ -4,18 +4,15 @@ namespace Oro\Bundle\NoteBundle\EventListener;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
-class NoteLifecycleSubscriber implements EventSubscriber
+class NoteLifecycleListener
 {
     /** @var ServiceLink */
     protected $securityFacadeLink;
@@ -26,18 +23,6 @@ class NoteLifecycleSubscriber implements EventSubscriber
     public function __construct(ServiceLink $securityFacadeLink)
     {
         $this->securityFacadeLink = $securityFacadeLink;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return [
-            // @codingStandardsIgnoreStart
-            Events::prePersist, Events::preUpdate
-            // @codingStandardsIgnoreEnd
-        ];
     }
 
     /**

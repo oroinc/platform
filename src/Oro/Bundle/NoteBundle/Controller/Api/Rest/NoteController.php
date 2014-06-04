@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -21,8 +20,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-
-use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
 
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 
@@ -59,18 +56,16 @@ class NoteController extends RestController implements ClassResourceInterface
      */
     public function cgetAction($entityClass, $entityId)
     {
+        $entityClass = str_replace('_', '\\', $entityClass);
+
         $page = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();
+        $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId, $page, $limit);
 
-        $associationId = new EntityIdSoap();
-        $associationId
-            ->setEntity(str_replace('_', '\\', $entityClass))
-            ->setId($entityId);
-
-        $result = $repo->findByAssociatedEntity($associationId, $page, $limit);
+        $result = $qb->getQuery()->getResult();
 
         $items = array();
         foreach ($result as $item) {
