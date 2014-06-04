@@ -10,7 +10,7 @@ parameters:
 
 services:
     oro_note.note_lifecycle_listener:
-        class: %oro_note.subscriber.note_lifecycle_subscriber.class%
+        class: %oro_note.note_lifecycle_listener.class%
         arguments:
             - @oro_security.security_facade.link
         tags:
