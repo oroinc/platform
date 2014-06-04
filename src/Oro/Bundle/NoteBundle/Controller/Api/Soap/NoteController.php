@@ -32,7 +32,9 @@ class NoteController extends SoapController
     {
         /** @var NoteRepository $repo */
         $repo = $this->getManager()->getRepository();
-        $result = $repo->findByAssociatedEntity($entityId, $page, $limit);
+        $qb   = $repo->getAssociatedNotesQueryBuilder($entityId->getEntity(), $entityId->getId(), $page, $limit);
+
+        $result = $qb->getQuery()->getResult();
 
         return $this->transformToSoapEntities($result);
     }

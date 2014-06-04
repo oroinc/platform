@@ -3,45 +3,43 @@
 namespace Oro\Bundle\NoteBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\EntityId;
 
 class NoteRepository extends EntityRepository
 {
     /**
-     * @param EntityId $entityId
-     * @param null     $page
-     * @param null     $limit
-     * @return array
+     * @param int $entityClassName
+     * @param int $entityId
+     * @param int|null $page
+     * @param int|null $limit
+     * @return QueryBuilder
      */
-    public function findByAssociatedEntity(EntityId $entityId, $page = null, $limit = null)
+    public function getAssociatedNotesQueryBuilder($entityClassName, $entityId, $page = null, $limit = null)
     {
-        $entityClass = $entityId->getEntity();
-
         $qb = $this->createQueryBuilder('note')
-            ->select('partial note.{id, message, owner, createdAt, updatedBy, updatedAt}')
+            ->select('partial note.{id, message, owner, createdAt, updatedBy, updatedAt}, c, u')
             ->innerJoin(
-                $entityClass,
+                $entityClassName,
                 'e',
                 'WITH',
-                sprintf('note.%s = e', ExtendHelper::buildAssociationName($entityClass))
+                sprintf('note.%s = e', ExtendHelper::buildAssociationName($entityClassName))
             )
+            ->leftJoin('note.owner', 'c')
+            ->leftJoin('note.updatedBy', 'u')
             ->where('e.id = :entity_id')
-            ->orderBy('note.updatedBy', 'DESC')
-            ->setParameter('entity_id', $entityId->getId());
+            ->setParameter('entity_id', $entityId);
 
-        if (false === is_null($page)) {
+        if (null !== $page) {
             $qb->setFirstResult($this->getOffset($page) * $limit);
         }
-
-        if (false === is_null($limit)) {
+        if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
 
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
-
 
     /**
      * Get offset by page
@@ -57,4 +55,4 @@ class NoteRepository extends EntityRepository
 
         return $page;
     }
-} 
+}

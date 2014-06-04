@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
-use Doctrine\ORM\EntityRepository;
-
 use FOS\Rest\Util\Codes;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,6 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -64,21 +63,10 @@ class NoteController extends Controller
         $sorting = strtoupper($this->getRequest()->get('sorting', 'DESC'));
 
         $em = $this->getDoctrine()->getManager();
-        /** @var EntityRepository $repo */
+        /** @var NoteRepository $repo */
         $repo = $em->getRepository('OroNoteBundle:Note');
-        $qb   = $repo->createQueryBuilder('n')
-            ->select('partial n.{id, message, owner, createdAt, updatedBy, updatedAt}, c, u')
-            ->innerJoin(
-                $entityClass,
-                'e',
-                'WITH',
-                sprintf('n.%s = e', ExtendHelper::buildAssociationName($entityClass))
-            )
-            ->leftJoin('n.owner', 'c')
-            ->leftJoin('n.updatedBy', 'u')
-            ->where('e.id = :entity_id')
-            ->orderBy('n.createdAt', $sorting)
-            ->setParameter('entity_id', $entityId);
+        $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
+            ->orderBy('n.createdAt', $sorting);
 
         /** @var AclHelper $aclHelper */
         $aclHelper = $this->get('oro_security.acl_helper');
