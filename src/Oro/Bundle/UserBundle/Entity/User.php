@@ -1025,7 +1025,7 @@ class User extends ExtendUser implements
      */
     public function getRoles()
     {
-        $roles = $this->roles->toArray();
+        $roles = $this->getRolesCollection()->toArray();
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {

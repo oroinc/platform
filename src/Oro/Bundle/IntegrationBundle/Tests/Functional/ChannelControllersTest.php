@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -23,19 +24,37 @@ class ChannelControllersTest extends WebTestCase
     public function testIndex()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_index'));
-        $result = $this->client->getResponse();
+        $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Channels - System', $crawler->html());
     }
 
     public function testCreate()
     {
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+
+        /** @var User $user */
+        $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
+        $newUser = clone $user;
+        $newUser->setUsername('new username');
+        $newUser->setEmail(mt_rand() . $user->getEmail());
+        $em->persist($newUser);
+        $em->flush($newUser);
+
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
+
+        $this->assertEquals(
+            $user->getId(),
+            $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
+            'Should contains predefined default owner - current user'
+        );
+
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = 'Simple channel';
         $form['oro_integration_channel_form[type]'] = 'simple';
+        $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -44,20 +63,21 @@ class ChannelControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Channel saved", $crawler->html());
 
-        return $name;
+        return compact('name', 'newUser');
     }
 
     /**
-     * @param $name
+     * @param array $data
+     *
      * @depends testCreate
      *
      * @return array
      */
-    public function testUpdate($name)
+    public function testUpdate($data)
     {
         $response = $this->client->requestGrid(
             'channels-grid',
-            array('channels[_filter][name][value]' => $name)
+            array('channels[_filter][name][value]' => $data['name'])
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -71,6 +91,13 @@ class ChannelControllersTest extends WebTestCase
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
+
+        $this->assertEquals(
+            $data['newUser']->getId(),
+            $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
+            'Should save default user owner'
+        );
+
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
 
@@ -87,6 +114,7 @@ class ChannelControllersTest extends WebTestCase
 
     /**
      * @param $channel
+     *
      * @depends testUpdate
      *
      * @return string
@@ -106,6 +134,7 @@ class ChannelControllersTest extends WebTestCase
 
     /**
      * @param $channel
+     *
      * @depends testUpdate
      */
     public function testDelete($channel)
