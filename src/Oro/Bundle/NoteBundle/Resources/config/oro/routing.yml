@@ -20,3 +20,9 @@ oro_api_get_notes:
     defaults: {_controller: OroNoteBundle:Api/Rest/Note:cget, _format: json}
     requirements:
          _method: GET
+
+oro_api_get_note:
+    pattern: api/rest/{version}/note/{id}.{_format}
+    defaults: {_controller: OroNoteBundle:Api/Rest/Note:get, _format: json}
+    requirements:
+         _method: GET

@@ -9,13 +9,18 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
 use Oro\Bundle\NoteBundle\Entity\EntityId;
-use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 
 class NoteApiHandler
 {
+    const NOTE_ENTITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+
     /** @var FormInterface */
     protected $form;
 
@@ -77,19 +82,32 @@ class NoteApiHandler
 
         /** @var EntityId $association */
         $association = $note['entityId'];
-        if ($association) {
-            try {
-                /** @var ConfigProvider $noteProvider */
-                $noteProvider = $this->configManager->getProvider('note');
-                $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
-                if ($noteProvider->hasConfig('Oro\Bundle\NoteBundle\Entity\Note', $fieldName)) {
-                    $note[$fieldName] = $association['id'];
-                    unset ($note['entityId']);
-                    $request->request->set('note', $note);
-                }
-            } catch (\Exception $e) {
-                throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance Id not found.');
+        if ($association && $association['id']) {
+            /** @var ConfigProvider $noteProvider */
+            $noteProvider = $this->configManager->getProvider('note');
+
+            /** @var ConfigProvider $extendProvider */
+            $extendProvider = $this->configManager->getProvider('extend');
+
+            $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
+            if ($noteProvider->hasConfig(self::NOTE_ENTITY_CLASS, $fieldName)
+                && $extendProvider->getConfig(self::NOTE_ENTITY_CLASS, $fieldName)
+                    ->is('state', ExtendScope::STATE_ACTIVE)
+            ) {
+                $note[$fieldName] = $association['id'];
+                unset ($note['entityId']);
+                $request->request->set('note', $note);
+            } else {
+                throw new \SoapFault(
+                    'NOT_FOUND',
+                    sprintf(
+                        'Notes do not enabled or schema not updated for given entity "%s".',
+                        $association['entity']
+                    )
+                );
             }
+        } else {
+            throw new \SoapFault('NOT_FOUND', 'Associated entity OR it\'s instance Id not found.');
         }
 
         return $request;

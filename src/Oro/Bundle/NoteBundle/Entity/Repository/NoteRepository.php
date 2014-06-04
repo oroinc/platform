@@ -15,7 +15,7 @@ class NoteRepository extends EntityRepository
      * @param null     $limit
      * @return array
      */
-    public function findAssociatedEntity(EntityId $entityId, $page = null, $limit = null)
+    public function findByAssociatedEntity(EntityId $entityId, $page = null, $limit = null)
     {
         $entityClass = $entityId->getEntity();
 
