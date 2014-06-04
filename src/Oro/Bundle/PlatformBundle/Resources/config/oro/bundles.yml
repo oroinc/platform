@@ -9,7 +9,6 @@ bundles:
     - { name: Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle, priority: -220 }
     - { name: Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle, priority: -215 }
     - { name: JMS\SerializerBundle\JMSSerializerBundle, kernel: true, priority: -210 }
-    - { name: Knp\Bundle\PaginatorBundle\KnpPaginatorBundle, priority: -205 }
     - { name: Knp\Bundle\MenuBundle\KnpMenuBundle, priority: -200 }
     - { name: FOS\RestBundle\FOSRestBundle, priority: -195 }
     - { name: FOS\JsRoutingBundle\FOSJsRoutingBundle, priority: -190 }
