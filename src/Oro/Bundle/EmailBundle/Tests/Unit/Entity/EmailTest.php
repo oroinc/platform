@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
 class EmailTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,6 +69,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($ccRecipient === $recipients[1]);
         $this->assertTrue($bccRecipient === $recipients[2]);
 
+        /** @var GroupNodeDefinition $recipients */
         $recipients = $entity->getRecipients('to');
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $recipients);
         $this->assertCount(1, $recipients);

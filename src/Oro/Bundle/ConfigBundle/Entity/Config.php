@@ -28,7 +28,7 @@ class Config
      *
      * @ORM\Column(name="entity", type="string", length=255, nullable=true)
      */
-    protected $scopedEntity;
+    protected $entity;
 
     /**
      * @var int
@@ -67,7 +67,7 @@ class Config
      */
     public function getEntity()
     {
-        return $this->scopedEntity;
+        return $this->entity;
     }
 
     /**
@@ -79,7 +79,7 @@ class Config
      */
     public function setEntity($entity)
     {
-        $this->scopedEntity = $entity;
+        $this->entity = $entity;
 
         return $this;
     }

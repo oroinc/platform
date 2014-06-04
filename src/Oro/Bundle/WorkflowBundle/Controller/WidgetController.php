@@ -164,7 +164,7 @@ class WidgetController extends Controller
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
-                $workflowItem->setUpdated();
+                $workflowItem->setUpdatedAt();
                 $this->getEntityManager()->flush();
 
                 $saved = true;

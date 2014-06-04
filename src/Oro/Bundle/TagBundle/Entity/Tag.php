@@ -56,14 +56,14 @@ class Tag
      *
      * @ORM\Column(type="datetime")
      */
-    protected $created;
+    protected $createdAt;
 
     /**
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime")
      */
-    protected $updated;
+    protected $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="LAZY")
@@ -129,7 +129,7 @@ class Tag
      */
     public function setCreatedAt(\DateTime $date)
     {
-        $this->created = $date;
+        $this->createdAt = $date;
 
         return $this;
     }
@@ -141,7 +141,7 @@ class Tag
      */
     public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**
@@ -152,7 +152,7 @@ class Tag
      */
     public function setUpdatedAt(\DateTime $date)
     {
-        $this->updated = $date;
+        $this->updatedAt = $date;
 
         return $this;
     }
@@ -164,7 +164,7 @@ class Tag
      */
     public function getUpdatedAt()
     {
-        return $this->updated;
+        return $this->updatedAt;
     }
 
     /**
@@ -194,8 +194,8 @@ class Tag
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -204,7 +204,7 @@ class Tag
      */
     public function doUpdate()
     {
-        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

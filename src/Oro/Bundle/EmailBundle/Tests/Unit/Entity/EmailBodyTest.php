@@ -17,8 +17,8 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
     public function testContentGetterAndSetter()
     {
         $entity = new EmailBody();
-        $entity->setContent('test');
-        $this->assertEquals('test', $entity->getContent());
+        $entity->setBodyContent('test');
+        $this->assertEquals('test', $entity->getBodyContent());
     }
 
     public function testBodyIsTextGetterAndSetter()

@@ -55,7 +55,7 @@ class Email
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $created;
+    protected $createdAt;
 
     /**
      * @var string
@@ -144,7 +144,7 @@ class Email
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xMessageId;
+    protected $XMessageId;
 
     /**
      * @var string
@@ -153,7 +153,7 @@ class Email
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $xThreadId;
+    protected $XThreadId;
 
     /**
      * @var ArrayCollection|EmailFolder[] $folders
@@ -198,7 +198,7 @@ class Email
      */
     public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**
@@ -428,7 +428,7 @@ class Email
      */
     public function getXMessageId()
     {
-        return $this->xMessageId;
+        return $this->XMessageId;
     }
 
     /**
@@ -439,7 +439,7 @@ class Email
      */
     public function setXMessageId($xMessageId)
     {
-        $this->xMessageId = $xMessageId;
+        $this->XMessageId = $xMessageId;
 
         return $this;
     }
@@ -451,7 +451,7 @@ class Email
      */
     public function getXThreadId()
     {
-        return $this->xThreadId;
+        return $this->XThreadId;
     }
 
     /**
@@ -462,7 +462,7 @@ class Email
      */
     public function setXThreadId($xThreadId)
     {
-        $this->xThreadId = $xThreadId;
+        $this->XThreadId = $xThreadId;
 
         return $this;
     }
@@ -543,6 +543,6 @@ class Email
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

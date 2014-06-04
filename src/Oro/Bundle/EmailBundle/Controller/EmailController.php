@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +12,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -110,7 +107,7 @@ class EmailController extends Controller
      */
     public function bodyAction(EmailBody $entity)
     {
-        return new Response($entity->getContent());
+        return new Response($entity->getBodyContent());
     }
 
     /**
@@ -127,7 +124,7 @@ class EmailController extends Controller
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
         $content = ContentDecoder::decode(
-            $entity->getContent()->getValue(),
+            $entity->getContent()->getContent(),
             $entity->getContent()->getContentTransferEncoding()
         );
         $response->setContent($content);

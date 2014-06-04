@@ -32,7 +32,7 @@ class EmailBody
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $created;
+    protected $createdAt;
 
     /**
      * @var string
@@ -112,7 +112,7 @@ class EmailBody
      */
     public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**
@@ -120,7 +120,7 @@ class EmailBody
      *
      * @return string
      */
-    public function getContent()
+    public function getBodyContent()
     {
         return $this->bodyContent;
     }
@@ -131,7 +131,7 @@ class EmailBody
      * @param string $bodyContent
      * @return $this
      */
-    public function setContent($bodyContent)
+    public function setBodyContent($bodyContent)
     {
         $this->bodyContent = ($bodyContent === null ? '' : $bodyContent);
 
@@ -264,6 +264,6 @@ class EmailBody
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

@@ -47,7 +47,7 @@ class ConfigRepository extends EntityRepository
      */
     public function getByEntity($scopeEntityName, $scopeEntityIdentifier)
     {
-        $config = $this->findOneBy(['scopedEntity' => $scopeEntityName, 'recordId' => $scopeEntityIdentifier]);
+        $config = $this->findOneBy(['entity' => $scopeEntityName, 'recordId' => $scopeEntityIdentifier]);
 
         if (!$config) {
             $config = new Config();

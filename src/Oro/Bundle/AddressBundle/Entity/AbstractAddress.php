@@ -153,14 +153,14 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(type="datetime")
      */
-    protected $created;
+    protected $createdAt;
 
     /**
      * @var \DateTime $updated
      *
      * @ORM\Column(type="datetime")
      */
-    protected $updated;
+    protected $updatedAt;
 
     /**
      * Get id
@@ -578,7 +578,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**
@@ -588,7 +588,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function setCreatedAt($created)
     {
-        $this->created = $created;
+        $this->createdAt = $created;
     }
 
     /**
@@ -598,7 +598,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function getUpdatedAt()
     {
-        return $this->updated;
+        return $this->updatedAt;
     }
 
     /**
@@ -608,7 +608,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function setUpdatedAt($updated)
     {
-        $this->updated = $updated;
+        $this->updatedAt = $updated;
     }
 
     /**
@@ -618,8 +618,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     public function isRegionValid(ExecutionContext $context)

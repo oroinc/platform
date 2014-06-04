@@ -4,6 +4,10 @@ namespace Oro\Bundle\AddressBundle\Tests\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -48,8 +52,8 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             'postalCode' => array('postalCode', '12345'),
             'organization' => array('organization', 'Oro Inc.'),
             'country' => array('country', $countryMock),
-            'created' => array('createdAt', new \DateTime()),
-            'updated' => array('updatedAt', new \DateTime()),
+            'createdAt' => array('createdAt', new \DateTime()),
+            'updatedAt' => array('updatedAt', new \DateTime()),
         );
     }
 
@@ -172,11 +176,11 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
                     'firstName' => 'FirstName',
                     'lastName' => 'LastName',
                     'street' => 'Street',
-                    'region' => $this->createMockRegion('Kharkivs\'ka oblast\''),
+                    'region' => $this->createMockRegion('some region'),
                     'postalCode' => '12345',
                     'country' => $this->createMockCountry('Ukraine'),
                 ),
-                'FirstName LastName , Street   Kharkivs\'ka oblast\' , Ukraine 12345'
+                'FirstName LastName , Street   some region , Ukraine 12345'
             )
         );
     }
@@ -363,6 +367,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
      */
     protected function createAddress($id = null)
     {
+        /** @var AbstractAddress $result */
         $result = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
 
         if (null !== $id) {

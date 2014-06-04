@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 
 class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,7 +57,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testLoadSettings($isScope)
     {
         $criteria = array(
-            'scopedEntity' => 'user',
+            'entity'   => 'user',
             'recordId' => 1,
         );
 
@@ -94,7 +95,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $settings = $this->repository->loadSettings(
-            $criteria['scopedEntity'],
+            $criteria['entity'],
             $criteria['recordId']
         );
 

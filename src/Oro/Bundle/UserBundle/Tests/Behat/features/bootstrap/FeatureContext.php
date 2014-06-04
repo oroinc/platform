@@ -1,7 +1,6 @@
 <?php
 // @codingStandardsIgnoreStart
 use Behat\Gherkin\Node\TableNode;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\BehatWebContext;

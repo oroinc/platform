@@ -59,7 +59,7 @@ class Tagging
      *
      * @ORM\Column(type="datetime")
      */
-    protected $created;
+    protected $createdAt;
 
     /**
      * @var string
@@ -207,7 +207,7 @@ class Tagging
      */
     public function setCreatedAt(\DateTime $date)
     {
-        $this->created = $date;
+        $this->createdAt = $date;
 
         return $this;
     }
@@ -219,6 +219,6 @@ class Tagging
      */
     public function getCreatedAt()
     {
-        return $this->created;
+        return $this->createdAt;
     }
 }
