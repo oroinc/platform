@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Events;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -12,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class WorkflowItemSubscriber implements EventSubscriber
+class WorkflowItemListener
 {
     /**
      * @var DoctrineHelper
@@ -52,20 +50,6 @@ class WorkflowItemSubscriber implements EventSubscriber
         $this->doctrineHelper = $doctrineHelper;
         $this->entityConnector = $entityConnector;
         $this->workflowManager = $workflowManager;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            // @codingStandardsIgnoreStart
-            Events::postPersist,
-            Events::preRemove,
-            Events::postFlush
-            // @codingStandardsIgnoreEnd
-        );
     }
 
     /**

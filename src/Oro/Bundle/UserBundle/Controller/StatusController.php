@@ -21,15 +21,7 @@ class StatusController extends Controller
      */
     public function indexAction()
     {
-        return array(
-            'user' => $this->getUser(),
-            'statuses' => $this->get('knp_paginator')->paginate(
-                $this->getUser()->getStatuses(),
-                $this->getRequest()->get('page', 1),
-                $this->getRequest()->get('limit')
-            )
-
-        );
+        return array();
     }
 
     /**

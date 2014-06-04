@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Entity\EventListener;
 
-use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
 
-class UploadedImageSubscriber implements EventSubscriber
+class UploadedImageListener
 {
     /**
      * @var string
@@ -25,20 +24,6 @@ class UploadedImageSubscriber implements EventSubscriber
         if (!$this->webRoot) {
             throw new \InvalidArgumentException('Invalid kernel root');
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            'preUpdate',
-            'prePersist',
-            'postPersist',
-            'postUpdate',
-            'postRemove'
-        );
     }
 
     /**

@@ -22,7 +22,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
 
         cache: {},
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.$el.val('');
             this.$el.typeahead({
                 source:_.bind(this.source, this)

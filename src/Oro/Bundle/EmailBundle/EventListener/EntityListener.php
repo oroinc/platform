@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 
-class EntitySubscriber implements EventSubscriber
+class EntityListener
 {
     /**
      * @var EmailOwnerManager
@@ -18,18 +16,6 @@ class EntitySubscriber implements EventSubscriber
     public function __construct(EmailOwnerManager $emailOwnerManager)
     {
         $this->emailOwnerManager = $emailOwnerManager;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
-    {
-        return array(
-            //@codingStandardsIgnoreStart
-            Events::onFlush
-            //@codingStandardsIgnoreEnd
-        );
     }
 
     /**
