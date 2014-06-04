@@ -6,14 +6,14 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
-use Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber;
+use Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
+class NoteLifecycleListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var NoteLifecycleSubscriber */
+    /** @var NoteLifecycleListener */
     protected $subscriber;
 
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
@@ -36,7 +36,7 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->will($this->returnValue($this->securityFacade));
 
-        $this->subscriber = new NoteLifecycleSubscriber($securityFacadeLink);
+        $this->subscriber = new NoteLifecycleListener($securityFacadeLink);
     }
 
     protected function tearDown()
@@ -226,10 +226,5 @@ class NoteLifecycleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade->expects($this->any())
             ->method('getLoggedUser')
             ->will($this->returnValue($user));
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(['prePersist', 'preUpdate'], $this->subscriber->getSubscribedEvents());
     }
 }

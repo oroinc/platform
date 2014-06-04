@@ -1,5 +1,5 @@
 parameters:
-    oro_note.subscriber.note_lifecycle_subscriber.class: Oro\Bundle\NoteBundle\EventListener\NoteLifecycleSubscriber
+    oro_note.note_lifecycle_listener.class:              Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
     oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteDumperExtension
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteGeneratorExtension
@@ -9,12 +9,13 @@ parameters:
     oro_note.manager.api.class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
 
 services:
-    oro_note.subscriber.note_lifecycle_subscriber:
+    oro_note.note_lifecycle_listener:
         class: %oro_note.subscriber.note_lifecycle_subscriber.class%
         arguments:
             - @oro_security.security_facade.link
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
 
     #
     # EntityExtend Dumper extension
