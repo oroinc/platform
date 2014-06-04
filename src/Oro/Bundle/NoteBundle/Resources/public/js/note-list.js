@@ -32,7 +32,9 @@ function (
             }
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
+
             this.options.collection = this.options.collection || new NoteCollection();
             this.options.collection.baseUrl = this._getUrl('listUrl');
 

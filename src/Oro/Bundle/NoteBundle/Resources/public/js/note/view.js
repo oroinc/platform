@@ -27,7 +27,9 @@ function (_, Backbone, routing, dateTimeFormatter) {
             'click button:has(.icon-remove)': 'deleteModel'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
+
             this.$el.attr('id', this.options.buildItemIdAttribute(this.model.id));
             this.template = _.template($(this.options.template).html());
 
