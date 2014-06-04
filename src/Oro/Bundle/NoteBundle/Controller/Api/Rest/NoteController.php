@@ -67,13 +67,35 @@ class NoteController extends RestController implements ClassResourceInterface
 
         $result = $qb->getQuery()->getResult();
 
+        $resultFields = ['id', 'message', 'createdAt', 'updatedAt', 'owner', 'updatedBy'];
+
         $items = array();
         foreach ($result as $item) {
-            $items[] = $this->getPreparedItem($item);
+            $items[] = $this->getPreparedItem($item, $resultFields);
         }
         unset($result);
 
         return new Response(json_encode($items), Codes::HTTP_OK);
+    }
+
+    /**
+     * Prepare entity for serialization
+     * If $resultFields - result entity should contain only given fields.
+     *
+     * @param  mixed $entity
+     * @param  array $resultFields
+     *
+     * @return array
+     */
+    protected function getPreparedItem($entity, $resultFields = [])
+    {
+        $result = parent::getPreparedItem($entity);
+
+        if ($resultFields) {
+            $result = array_intersect_key($result, array_flip($resultFields));
+        }
+
+        return $result;
     }
 
     /**
