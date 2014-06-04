@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Oro\Bundle\ConfigBundle\Entity\Config;
-
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class RelationType extends AbstractType
@@ -38,7 +39,7 @@ class RelationType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->config = $this->configProvider->getConfigById($options['config_id']);
+        $this->config      = $this->configProvider->getConfigById($options['config_id']);
         $this->formFactory = $builder->getFormFactory();
 
         $builder->add(
@@ -55,92 +56,53 @@ class RelationType extends AbstractType
 
     public function preSubmitData(FormEvent $event)
     {
+        $form = $event->getForm();
         $data = $event->getData();
         if (!$data) {
-            $data = $event->getForm()->getParent()->getData();
-        }
-        $form         = $event->getForm();
-        $targetEntity = null;
-
-        if (isset($data['target_entity'])) {
-            $targetEntity = $data['target_entity'];
+            $data = $form->getParent()->getData();
         }
 
-        $relationType = $this->config->getId()->getFieldType();
-        if ($relationType == 'manyToOne') {
-            //target_field
-            $targetField = null;
-            if (isset($data['target_field'])) {
-                $targetField = $data['target_field'];
-            }
-            $form->add(
-                $this->formFactory->createNamed(
+        if ($this->config->get('owner') === ExtendScope::OWNER_CUSTOM) {
+            $targetEntity = $this->getArrayValue($data, 'target_entity');
+            $relationType = $this->config->getId()->getFieldType();
+
+            if ($relationType == 'manyToOne') {
+                $this->addTargetField(
+                    $form,
                     'target_field',
-                    new TargetFieldType($this->configProvider, $targetEntity),
-                    $targetField,
-                    [
-                        'constraints' => [new Assert\NotBlank()]
-                    ]
-                )
-            );
-        } else {
-            //target_grid
-            $targetGrid = null;
-            if (isset($data['target_grid'])) {
-                $targetGrid = $data['target_grid'];
-            }
-            $form->add(
-                $this->formFactory->createNamed(
+                    $targetEntity,
+                    $this->getArrayValue($data, 'target_field')
+                );
+            } else {
+                $this->addTargetField(
+                    $form,
                     'target_grid',
-                    new TargetFieldType($this->configProvider, $targetEntity),
-                    $targetGrid,
-                    [
-                        'multiple'    => true,
-                        'label'       => 'Related entity data fields',
-                        'constraints' => [new Assert\NotBlank()]
-                    ]
-                )
-            );
-
-            //target_title
-            $targetTitle = null;
-            if (isset($data['target_title'])) {
-                $targetTitle = $data['target_title'];
-            }
-            $form->add(
-                $this->formFactory->createNamed(
+                    $targetEntity,
+                    $this->getArrayValue($data, 'target_grid'),
+                    'Related entity data fields',
+                    true
+                );
+                $this->addTargetField(
+                    $form,
                     'target_title',
-                    new TargetFieldType($this->configProvider, $targetEntity),
-                    $targetTitle,
-                    [
-                        'multiple'    => true,
-                        'label'       => 'Related entity info title',
-                        'constraints' => [new Assert\NotBlank()]
-                    ]
-                )
-            );
-
-            //target_detailed
-            $targetDetailed = null;
-            if (isset($data['target_detailed'])) {
-                $targetDetailed = $data['target_detailed'];
-            }
-            $form->add(
-                $this->formFactory->createNamed(
+                    $targetEntity,
+                    $this->getArrayValue($data, 'target_title'),
+                    'Related entity info title',
+                    true
+                );
+                $this->addTargetField(
+                    $form,
                     'target_detailed',
-                    new TargetFieldType($this->configProvider, $targetEntity),
-                    $targetDetailed,
-                    [
-                        'multiple'    => true,
-                        'label'       => 'Related entity detailed',
-                        'constraints' => [new Assert\NotBlank()]
-                    ]
-                )
-            );
+                    $targetEntity,
+                    $this->getArrayValue($data, 'target_detailed'),
+                    'Related entity detailed',
+                    true
+                );
+            }
         }
 
         if ($event->getName() == FormEvents::PRE_SUBMIT) {
-            $event->getForm()->getParent()->setData(array_merge($event->getForm()->getParent()->getData(), $data));
+            $form->getParent()->setData(array_merge($form->getParent()->getData(), $data));
         }
     }
 
@@ -157,5 +119,53 @@ class RelationType extends AbstractType
     public function getName()
     {
         return 'oro_entity_relation_type';
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param string        $name
+     * @param string        $targetEntityClass
+     * @param array|null    $data
+     * @param string|null   $label
+     * @param bool          $multiple
+     */
+    protected function addTargetField(
+        FormInterface $form,
+        $name,
+        $targetEntityClass,
+        $data = null,
+        $label = null,
+        $multiple = false
+    ) {
+        $options                = [];
+        $options['constraints'] = [new Assert\NotBlank()];
+        if ($label) {
+            $options['label'] = $label;
+        }
+        if ($multiple) {
+            $options['multiple'] = true;
+        }
+
+        $form->add(
+            $this->formFactory->createNamed(
+                $name,
+                new TargetFieldType($this->configProvider, $targetEntityClass),
+                $data,
+                $options
+            )
+        );
+    }
+
+    /**
+     * @param array  $data
+     * @param string $key
+     * @param mixed  $defaultValue
+     * @return mixed
+     */
+    protected function getArrayValue(array &$data, $key, $defaultValue = null)
+    {
+        return isset($data[$key])
+            ? $data[$key]
+            : $defaultValue;
     }
 }
