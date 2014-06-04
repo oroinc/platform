@@ -52,7 +52,27 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        // TODO: Implement denormalize() method.
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $result = new $class();
+        $fields = $this->fieldProvider->getFields($class, true);
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (array_key_exists($fieldName, $data)) {
+                $value = $data[$fieldName];
+                if (empty($field['type']) || $field['type'] == 'datetime') {
+                    if ($field['type'] == 'datetime') {
+                        $relatedEntityClass = '\DateTime';
+                    } else {
+                        $relatedEntityClass = $field['related_entity_type'];
+                    }
+                    $value = $this->serializer->denormalize($value, $relatedEntityClass, $format, $context);
+                }
+
+                $propertyAccessor->setValue($result, $fieldName, $value);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -60,7 +80,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-
+        return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
     }
 
     /**
