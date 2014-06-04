@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 
@@ -71,6 +72,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var array
      */
     private static $loadedFixtures = array();
+
+    /**
+     * @var ReferenceRepository
+     */
+    protected $referenceRepository;
 
     protected function tearDown()
     {
@@ -310,7 +316,26 @@ abstract class WebTestCase extends BaseWebTestCase
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
+        $this->referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @param string $referenceUID
+     *
+     * @return object
+     */
+    protected function getReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->getReference($referenceUID);
+    }
+
+    /**
+     * @return ReferenceRepository
+     */
+    protected function getReferenceRepository()
+    {
+        return $this->referenceRepository;
     }
 
     /**
