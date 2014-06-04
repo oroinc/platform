@@ -66,7 +66,7 @@ class NoteController extends Controller
         /** @var NoteRepository $repo */
         $repo = $em->getRepository('OroNoteBundle:Note');
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
-            ->orderBy('n.createdAt', $sorting);
+            ->orderBy('note.createdAt', $sorting);
 
         /** @var AclHelper $aclHelper */
         $aclHelper = $this->get('oro_security.acl_helper');
