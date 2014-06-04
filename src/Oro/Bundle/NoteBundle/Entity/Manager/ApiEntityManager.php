@@ -5,11 +5,11 @@ namespace Oro\Bundle\NoteBundle\Entity\Manager;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\NoteBundle\Entity\EntityId;
-use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
+
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager as BaseApiEntityManager;
 
 class ApiEntityManager extends BaseApiEntityManager
@@ -45,7 +45,7 @@ class ApiEntityManager extends BaseApiEntityManager
 
                 $value = $result->{Inflector::camelize('get_' . $fieldConfigId->getFieldName())}();
                 if ($value) {
-                    $entityId = new EntityId();
+                    $entityId = new EntityIdSoap();
                     $entityId
                         ->setEntity($fieldExtendConfig->get('target_entity'))
                         ->setId($value->getId());

@@ -65,6 +65,7 @@ class NoteSubscriber implements EventSubscriberInterface
                     [
                         'required' => false,
                         'class'    => $fieldExtendConfig->get('target_entity'),
+                        'property' => $fieldExtendConfig->get('target_field'),
                         'label'    => $fieldEntityConfig->get('label')
                     ]
                 );

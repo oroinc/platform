@@ -1,10 +1,13 @@
 <?php
 
-namespace Oro\Bundle\NoteBundle\Entity;
+namespace Oro\Bundle\EntityBundle\Model;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-class EntityId
+/**
+ * @Soap\Alias("Oro.Bundle.EntityBundle.Entity.EntityId")
+ */
+class EntityIdSoap
 {
     /**
      * @Soap\ComplexType("string", nillable=false)
@@ -19,7 +22,7 @@ class EntityId
     /**
      * @param mixed $entity
      *
-     * @return EntityId
+     * @return EntityIdSoap
      */
     public function setEntity($entity)
     {
@@ -39,7 +42,7 @@ class EntityId
     /**
      * @param mixed $id
      *
-     * @return EntityId
+     * @return EntityIdSoap
      */
     public function setId($id)
     {
