@@ -102,7 +102,8 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 'addManyToOneRelation',
                 'getRelationName',
                 'getRelationKey',
-                'getClassNamesWithFlagEnabled'
+                'getClassNamesWithFlagEnabled',
+                'getConfig'
             ],
             [$this->configManager]
         );
@@ -116,7 +117,7 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $entityConfig = new Config(new EntityConfigId('extend', $entityName));
         $entityConfig->set('entity', ['label' => 'test', 'description' => 'test']);
 
-        $this->extendConfigProvider->expects($this->once())
+        $extension->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($entityConfig));
 
@@ -135,14 +136,13 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($relationKey));
 
         $extension->expects($this->once())
-            ->method('createField')
-            ->with($noteClassName, 'entity', 'manyToOne', $entityName, $relationKey);
+            ->method('createField');
 
-        $extension->expects($this->at(4))
+        $extension->expects($this->at(5))
             ->method('addManyToOneRelation')
             ->with($entityName, $noteClassName, 'entity', $relationKey);
 
-        $extension->expects($this->at(5))
+        $extension->expects($this->at(6))
             ->method('addManyToOneRelation')
             ->with($noteClassName, $entityName, 'entity', $relationKey, true);
 
@@ -166,7 +166,7 @@ class NoteDumperExtensionTest extends \PHPUnit_Framework_TestCase
         self::callProtectedMethod(
             $extension,
             'createField',
-            ['Test\Entity', 'entity', 'manyToOne', 'Test\Entity2', 'rel-key']
+            ['Test\Entity', 'entity', 'manyToOne', []]
         );
     }
 

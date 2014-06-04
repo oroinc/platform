@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Tools;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\BaseDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -43,26 +44,45 @@ class NoteDumperExtension extends BaseDumperExtension
         foreach ($withNotes as $entityName) {
             $relationName = $this->getRelationName($entityName);
             $relationKey  = $this->getRelationKey($noteClassName, $entityName, $relationName);
+            $entityConfig = $this->getConfig('entity', $entityName);
 
-            $entityConfig = $this->extendConfigProvider->getConfig($entityName);
-            $entity       = $entityConfig->get('entity');
-
-            $entityLabel = empty($entity['label']) ? sprintf('oro.note.%s.label', $relationName) : $entity['label'];
-            $entityDescription = empty($entity['description']) ?
-                sprintf('oro.note.%s.description', $relationName) : $entity['description'];
+            $entityLabel = $entityConfig->get('label', false, sprintf('oro.note.%s.label', $relationName));
+            $entityDescription = $entityConfig->get(
+                'description',
+                false,
+                sprintf('oro.note.%s.description', $relationName)
+            );
 
             // create field
             $this->createField(
                 $noteClassName,
                 $relationName,
                 'manyToOne',
-                $entityName,
-                $relationKey,
                 [
-                    'entity' => [
+                    'extend'    => [
+                        'owner'         => ExtendScope::OWNER_SYSTEM,
+                        'state'         => ExtendScope::STATE_NEW,
+                        'is_extend'     => false,
+                        'extend'        => true,
+                        'is_deleted'    => false,
+                        'is_inverse'    => false,
+                        'target_entity' => $entityName,
+                        'target_field'  => 'id',
+                        'relation_key'  => $relationKey,
+                    ],
+                    'entity'    => [
                         'label'       => $entityLabel,
                         'description' => $entityDescription,
                     ],
+                    'view'      => [
+                        'is_displayable' => false
+                    ],
+                    'form'      => [
+                        'is_enabled' => true
+                    ],
+                    'dataaudit' => [
+                        'auditable' => false
+                    ]
                 ]
             );
 

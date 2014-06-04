@@ -66,7 +66,6 @@ class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
             '}'
         ];
 
-
         foreach ($relationNames as $fieldName => $targetClassName) {
             $methodBody[] = sprintf(
                 'if ($className == \'%s\') { $this->__reset(); $this->%s = %s; }',
