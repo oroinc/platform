@@ -10,7 +10,6 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class NoteLifecycleListener
