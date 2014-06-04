@@ -4,6 +4,10 @@ parameters:
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteGeneratorExtension
 
+    #entity
+    oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
+    oro_note.manager.api.class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
+
 services:
     oro_note.subscriber.note_lifecycle_subscriber:
         class: %oro_note.subscriber.note_lifecycle_subscriber.class%
@@ -12,6 +16,9 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    #
+    # EntityExtend Dumper extension
+    #
     oro_note.entity_extend.dumper_extension:
         class: %oro_note.entity_extend.dumper_extension.class%
         arguments:
@@ -19,12 +26,28 @@ services:
         tags:
             - { name: oro_entity_extend.dumper_extension }
 
+    #
+    # API
+    #
+    oro_note.manager.api:
+        class: %oro_note.manager.api.class%
+        arguments:
+            - %oro_note.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
+
+    #
+    # placeholder
+    #
     oro_note.placeholder.filter:
         class: %oro_note.placeholder.filter.class%
         arguments:
             - @oro_entity_config.provider.note
             - @oro_entity.orm.entity_class_accessor
 
+    #
+    # EntityExtend Generator extension
+    #
     oro_note.entity_extend.generator_extension:
         class: %oro_note.entity_extend.generator_extension.class%
         arguments:

@@ -46,6 +46,8 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
      */
     public function getSetDataProvider()
     {
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
         return [
             'id'                  => ['id'],
             'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
@@ -53,6 +55,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
             'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
             'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
+            'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
         ];
     }
 
