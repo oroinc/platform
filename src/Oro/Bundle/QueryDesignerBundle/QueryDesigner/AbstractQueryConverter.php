@@ -155,6 +155,13 @@ abstract class AbstractQueryConverter
         return $this->joinIdHelper->buildSiblingJoinIdentifier($joinId, $joinByFieldName);
     }
 
+    public function buildJoinIdentifier(
+        $join,
+        $parentJoinId = null
+    ) {
+        return $this->joinIdHelper->buildJoinIdentifier($join, $parentJoinId);
+    }
+
     /**
      * Extracts a parent join identifier
      *
