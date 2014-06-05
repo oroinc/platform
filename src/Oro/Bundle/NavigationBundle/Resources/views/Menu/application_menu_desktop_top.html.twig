@@ -30,3 +30,12 @@
 
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
 {% endblock %}
+
+{% block children %}
+    {% if item.level is sameas(1) %}
+        {%- set labelAttributes = item.labelAttributes %}
+        <li class="dropdown-menu-title">{{ block('spanElement') }}</li>
+        <li class="divider"><span></span></li>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

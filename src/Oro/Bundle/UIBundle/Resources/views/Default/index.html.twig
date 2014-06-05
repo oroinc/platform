@@ -58,22 +58,13 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
+                            <ul class="nav pull-right user-menu">
+                                {{ block('user_menu') }}
+                            </ul>
                             {% placeholder dots_menu %}
-                            {% if isDesktopVersion() %}
-                                <div class="nav pull-right top-search shortcuts">
-                                    {{ block('navbar') }}
-                                </div>
-                                <ul class="nav pull-right user-menu">
-                                    {{ block('user_menu') }}
-                                </ul>
-                            {% else %}
-                                <ul class="nav pull-right user-menu">
-                                    {{ block('user_menu') }}
-                                </ul>
-                                <div class="nav pull-right top-search shortcuts">
-                                    {{ block('navbar') }}
-                                </div>
-                            {% endif %}
+                            <div class="nav top-search shortcuts">
+                                {{ block('navbar') }}
+                            </div>
                             {% placeholder pin_tabs_list %}
                         </div>
                     </div>

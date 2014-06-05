@@ -9,6 +9,7 @@ define(function (require) {
     var Backbone = require('backbone');
 
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     var constants = require('./constants');
