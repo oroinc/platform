@@ -8,8 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
+use Oro\Bundle\NoteBundle\Entity\Note;
 
-class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
+class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 {
     /**
      * Check if generator extension supports configuration pre-processing or can generate code
@@ -23,7 +24,7 @@ class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
     public function supports($actionType, array $schemas)
     {
         return ExtendEntityGenerator::ACTION_GENERATE == $actionType &&
-        $schemas['class'] == 'Oro\Bundle\NoteBundle\Entity\Note' &&
+        $schemas['class'] == Note::ENTITY_NAME &&
         !empty($schemas['relation']);
     }
 

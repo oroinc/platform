@@ -30,6 +30,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class Note extends ExtendNote
 {
+    const ENTITY_NAME = 'Oro\Bundle\NoteBundle\Entity\Note';
+
     /**
      * @var integer
      *

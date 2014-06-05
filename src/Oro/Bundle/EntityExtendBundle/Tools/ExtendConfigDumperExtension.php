@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
 abstract class ExtendConfigDumperExtension
 {
     /**
-     * @param string                  $actionType preUpdate or postUpdate
-     * @param array|ConfigInterface[] $extendConfigs
+     * @param string $actionType preUpdate or postUpdate
      *
      * @return mixed
      */
-    abstract public function supports($actionType, array $extendConfigs);
+    abstract public function supports($actionType);
 
     /**
      * Optionally can be overridden in child
