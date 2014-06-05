@@ -3,6 +3,10 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Tools;
 
+use CG\Core\DefaultGeneratorStrategy;
+
+use CG\Generator\PhpClass;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Tools\NoteExtendEntityGeneratorExtension;
@@ -34,5 +38,29 @@ class NoteGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ['class' => Note::ENTITY_NAME]
         );
         $this->assertFalse($result, 'Generate action, entity matched, relation absent');
+    }
+
+    public function testGenerate()
+    {
+        $strategy   = new DefaultGeneratorStrategy();
+
+        $schema = [
+            'relationData' => [
+                [
+                    'field_id' => new FieldConfigId('extend', 'Test\Entity', 'testField'),
+                    'target_entity' => 'Test\TargetEntity',
+                ],
+            ],
+        ];
+
+        $class = PhpClass::create('Test\Entity');
+
+        $this->extension->generate($schema, $class);
+        $classBody    = $strategy->generate($class);
+        $expectedBody = file_get_contents(
+            str_replace('__DS__', DIRECTORY_SEPARATOR, __DIR__ . '__DS__..__DS__Data__DS__testClassBody.txt')
+        );
+
+        $this->assertEquals(trim($expectedBody), $classBody);
     }
 }
