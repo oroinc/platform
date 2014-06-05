@@ -87,9 +87,7 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
                 $relationName
             );
 
-            $targetEntityMetadata          = $this->configManager->getEntityManager()
-                ->getClassMetadata($targetEntityClassName);
-            $targetEntityPrimaryKeyColumns = $targetEntityMetadata->getIdentifierColumnNames();
+            $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClassName);
             $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
 
             // create field
@@ -98,29 +96,23 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
                 $relationName,
                 'manyToOne',
                 [
-                    'extend'    => [
+                    'extend' => [
                         'owner'         => ExtendScope::OWNER_SYSTEM,
                         'state'         => ExtendScope::STATE_NEW,
-                        'is_extend'     => false,
                         'extend'        => true,
-                        'is_deleted'    => false,
-                        'is_inverse'    => false,
                         'target_entity' => $targetEntityClassName,
                         'target_field'  => $targetFieldName,
                         'relation_key'  => $relationKey,
                     ],
-                    'entity'    => [
+                    'entity' => [
                         'label'       => $label,
                         'description' => $description,
                     ],
-                    'view'      => [
+                    'view'   => [
                         'is_displayable' => false
                     ],
-                    'form'      => [
-                        'is_enabled' => true
-                    ],
-                    'dataaudit' => [
-                        'auditable' => false
+                    'form'   => [
+                        'is_enabled' => false
                     ]
                 ]
             );
@@ -289,5 +281,22 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     protected function getRelationName($targetEntityClassName)
     {
         return ExtendHelper::buildAssociationName($targetEntityClassName);
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return string[]
+     */
+    protected function getPrimaryKeyColumnNames($entityClassName)
+    {
+        try {
+            $targetEntityMetadata = $this->configManager->getEntityManager()
+                ->getClassMetadata($entityClassName);
+
+            return $targetEntityMetadata->getIdentifierColumnNames();
+        } catch (\ReflectionException $e) {
+            return ['id'];
+        }
     }
 }

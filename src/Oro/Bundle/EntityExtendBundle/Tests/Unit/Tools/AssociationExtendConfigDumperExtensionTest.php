@@ -128,6 +128,23 @@ class AssociationExtendConfigDumperExtensionTest extends \PHPUnit_Framework_Test
             ->method('addManyToOneRelationTargetSide')
             ->with($targetEntity, $assocClassName, $relationName, $relationKey);
 
+        $targetEntityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $targetEntityMetadata->expects($this->once())
+            ->method('getIdentifierColumnNames')
+            ->will($this->returnValue(['id']));
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($targetEntity)
+            ->will($this->returnValue($targetEntityMetadata));
+        $this->configManager->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em));
+
         $extension->preUpdate($configs);
     }
 
