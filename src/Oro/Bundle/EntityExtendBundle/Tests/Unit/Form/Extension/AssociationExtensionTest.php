@@ -115,7 +115,7 @@ class AssociationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view     = $this->callBuildView();
         $expected = [
-            'attr' => ['class' => 'disabled-choice'],
+            'attr' => [],
         ];
         foreach ($expected as $option => $value) {
             $this->assertArrayHasKey($option, $view->vars);
@@ -139,7 +139,7 @@ class AssociationExtensionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [self::ENTITY, null, $this->extendConfig],
+                        [self::TARGET_ENTITY, null, $this->extendConfig],
                         [self::TARGET_ENTITY, null, $extendConfigForTargetEntity],
                     ]
                 )
@@ -147,7 +147,7 @@ class AssociationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view     = $this->callBuildView(['attr' => ['class' => 'someCssClass']]);
         $expected = [
-            'attr' => ['class' => 'someCssClass disabled-choice']
+            'attr' => ['class' => 'someCssClass']
         ];
         foreach ($expected as $option => $value) {
             $this->assertArrayHasKey($option, $view->vars);

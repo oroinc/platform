@@ -18,7 +18,6 @@ class AssociationChoiceType extends AbstractType
             [
                 'empty_value'                  => false,
                 'choices'                      => ['No', 'Yes'],
-                'tooltip'                      => 'oro.entity_extend.entity.association_choice.tooltip',
                 'entity_class'                 => null, // can be full class name or entity name
                 'entity_config_scope'          => null,
                 'entity_config_attribute_name' => 'enabled'

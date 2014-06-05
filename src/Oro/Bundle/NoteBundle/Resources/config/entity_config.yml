@@ -12,6 +12,6 @@ oro_entity_config:
                         options:
                             block:          other
                             required:       true
-                            label:          'Can add notes'
+                            label:          oro.note.enabled
                             entity_class:   'OroNoteBundle:Note'
                             entity_config_scope: note
