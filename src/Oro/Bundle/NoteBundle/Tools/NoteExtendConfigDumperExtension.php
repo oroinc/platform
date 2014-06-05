@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationExtendConfigDumperExtension;
+use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteExtendConfigDumperExtension extends AssociationExtendConfigDumperExtension
 {
@@ -11,7 +12,7 @@ class NoteExtendConfigDumperExtension extends AssociationExtendConfigDumperExten
      */
     protected function getAssociationEntityClass()
     {
-        return 'Oro\Bundle\NoteBundle\Entity\Note';
+        return Note::ENTITY_NAME;
     }
 
     /**

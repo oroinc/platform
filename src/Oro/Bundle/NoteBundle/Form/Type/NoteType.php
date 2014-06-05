@@ -6,6 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\NoteBundle\Entity\Note;
+
 class NoteType extends AbstractType
 {
     /**
@@ -31,7 +33,7 @@ class NoteType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'              => 'Oro\Bundle\NoteBundle\Entity\Note',
+                'data_class'              => Note::ENTITY_NAME,
                 'intention'               => 'note',
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,

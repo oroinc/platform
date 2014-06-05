@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\NoteBundle\Form\EventListener\NoteSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Form\EventListener\NoteSubscriber;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class NoteApiType extends NoteType
@@ -45,7 +46,7 @@ class NoteApiType extends NoteType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => 'Oro\Bundle\NoteBundle\Entity\Note',
+                'data_class'         => Note::ENTITY_NAME,
                 'intention'          => 'note',
                 'csrf_protection'    => false
             ]

@@ -20,8 +20,6 @@ use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 
 class NoteApiHandler
 {
-    const NOTE_ENTITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
-
     /** @var FormInterface */
     protected $form;
 
@@ -91,8 +89,8 @@ class NoteApiHandler
             $extendProvider = $this->configManager->getProvider('extend');
 
             $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
-            if ($noteProvider->hasConfig(self::NOTE_ENTITY_CLASS, $fieldName)
-                && $extendProvider->getConfig(self::NOTE_ENTITY_CLASS, $fieldName)
+            if ($noteProvider->hasConfig(Note::ENTITY_NAME, $fieldName)
+                && $extendProvider->getConfig(Note::ENTITY_NAME, $fieldName)
                     ->is('state', ExtendScope::STATE_ACTIVE)
             ) {
                 $note[$fieldName] = $association['id'];
