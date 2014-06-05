@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-class OroEntityExtension extends Extension
+class OroEntityExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -27,6 +28,27 @@ class OroEntityExtension extends Extension
         $loader->load('orm.yml');
         $loader->load('form_type.yml');
         $loader->load('services.yml');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $extensions = $container->getExtensions();
+        if (!empty($extensions['doctrine'])) {
+            $container->prependExtensionConfig(
+                'doctrine',
+                array(
+                    'dbal' => array(
+                        'types' => array(
+                            'percent' => 'Oro\Bundle\EntityBundle\Entity\Type\PercentType',
+                            'money'   => 'Oro\Bundle\EntityBundle\Entity\Type\MoneyType',
+                        )
+                    ),
+                )
+            );
+        }
     }
 
     /**
