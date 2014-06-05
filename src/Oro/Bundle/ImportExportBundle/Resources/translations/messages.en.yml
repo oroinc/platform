@@ -4,7 +4,7 @@ oro:
             label:   Import
             success: "File was successful imported."
             error:   "Errors occurred during file import."
-            error    %number%: "Error in row #%number%."
+            error %number%: "Error in row #%number%."
         export:
             label:   Export
         action:
