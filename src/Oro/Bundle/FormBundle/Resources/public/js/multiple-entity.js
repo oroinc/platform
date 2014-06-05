@@ -31,7 +31,8 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
             'click .add-btn': 'addEntities'
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.template = _.template(this.options.template);
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);

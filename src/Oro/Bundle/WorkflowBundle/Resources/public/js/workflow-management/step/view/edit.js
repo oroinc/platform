@@ -24,7 +24,8 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
             workflow: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#step-form-template').html();
