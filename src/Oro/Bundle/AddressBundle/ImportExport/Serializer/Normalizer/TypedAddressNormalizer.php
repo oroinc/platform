@@ -4,11 +4,11 @@ namespace Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class TypedAddressNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
 {
@@ -40,8 +40,8 @@ class TypedAddressNormalizer implements DenormalizerInterface, NormalizerInterfa
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    'Symfony\Component\Serializer\Normalizer\NormalizerInterface',
-                    'Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface',
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface'
                 )
             );
         }
@@ -93,7 +93,7 @@ class TypedAddressNormalizer implements DenormalizerInterface, NormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return $data instanceof AbstractTypedAddress;
     }
@@ -101,7 +101,7 @@ class TypedAddressNormalizer implements DenormalizerInterface, NormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return
             is_array($data)

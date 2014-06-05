@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class AddressTypeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
@@ -37,7 +36,7 @@ class AddressTypeNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return $data instanceof AddressType;
     }
@@ -45,7 +44,7 @@ class AddressTypeNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return is_string($data) && $type == self::ADDRESS_TYPE_TYPE;
     }

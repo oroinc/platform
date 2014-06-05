@@ -20,8 +20,8 @@ Serializer uses normalizers to perform converting of objects. So you need to pro
 will be imported/exported.
 
 Requirement to normalizer is to implement interfaces:
-* **Symfony\Component\Serializer\Normalizer\NormalizerInterface** - used in export
-* **Symfony\Component\Serializer\Normalizer\DenormalizerInterface** - used in import
+* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface** - used in export
+* **Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface** - used in import
 
 Generally you should implement both interfaces if you need to add both import and export for entity.
 
@@ -32,9 +32,8 @@ Generally you should implement both interfaces if you need to add both import an
 
 namespace OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use OroCRM\Bundle\ContactBundle\Entity\Group;
 
 class GroupNormalizer implements NormalizerInterface, DenormalizerInterface
@@ -59,12 +58,12 @@ class GroupNormalizer implements NormalizerInterface, DenormalizerInterface
         return $result;
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return $data instanceof Group;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return is_array($data) && $type == 'OroCRM\Bundle\ContactBundle\Entity\Group';
     }
