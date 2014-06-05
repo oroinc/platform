@@ -26,7 +26,6 @@ class AssociationChoiceTypeTest extends TypeTestCase
             [
                 'empty_value'                  => false,
                 'choices'                      => ['No', 'Yes'],
-                'tooltip'                      => 'oro.entity_extend.entity.association_choice.tooltip',
                 'entity_class'                 => null,
                 'entity_config_scope'          => null,
                 'entity_config_attribute_name' => 'enabled'

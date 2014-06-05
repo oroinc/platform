@@ -17,7 +17,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  *  Form extension to communicate with ConfigScopeType
@@ -59,19 +58,21 @@ class AssociationExtension extends AbstractTypeExtension
                 if ($this->isApplicable($form->getName(), $options) && $form->getData() == true) {
                     /** @var EntityConfigId $configId */
                     $configId     = $options['config_id'];
-                    $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
-                    if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+                    if ($this->configManager->getConfig($configId)->is($form->getName(), false)) {
+                        $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
+                        if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+                            $entityConfig->set('state', ExtendScope::STATE_UPDATED);
 
-                        $this->extendConfigProvider->persist($entityConfig);
-                        $this->extendConfigProvider->flush();
-                    } else {
-                        /**
-                         * TODO: check if has other changes
-                         *      if NO -> revert state to "Active"
-                         * depends on EntityExtendBundle/Form/Extension/ExtendEntityExtension.php
-                         *      method: hasActiveFields
-                         */
+                            $this->extendConfigProvider->persist($entityConfig);
+                            $this->extendConfigProvider->flush();
+                        } else {
+                            /**
+                             * TODO: check if has other changes
+                             *      if NO -> revert state to "Active"
+                             * depends on EntityExtendBundle/Form/Extension/ExtendEntityExtension.php
+                             *      method: hasActiveFields
+                             */
+                        }
                     }
                 }
             }
@@ -85,23 +86,12 @@ class AssociationExtension extends AbstractTypeExtension
     {
         if ($this->isApplicable($form->getName(), $options)) {
             /** @var EntityConfigId $configId */
-            $configId               = $options['config_id'];
-            $className              = $configId->getClassName();
-            $entityConfig           = $this->configManager
-                ->getProvider($options['entity_config_scope'])
-                ->getConfig($className);
-            $owningEntityClassName = $this->entityClassResolver->getEntityClass($options['entity_class']);
+            $configId         = $options['config_id'];
+            $className        = $configId->getClassName();
+            $owningEntityName = $this->entityClassResolver->getEntityClass($options['entity_class']);
 
-            /**
-             * Disable the association choice element if the association already exists
-             *      OR the editing entity is the owning side of association
-             */
-            if ($className === $owningEntityClassName
-                || (
-                    $entityConfig->is($options['entity_config_attribute_name'])
-                    && $this->isAssociationExist($className, $owningEntityClassName)
-                )
-            ) {
+            // disable the association choice element if the editing entity is the owning side of association
+            if ($className === $owningEntityName) {
                 $view->vars['disabled'] = true;
                 $this->appendClassAttr($view->vars, 'disabled-choice');
             }
@@ -121,47 +111,6 @@ class AssociationExtension extends AbstractTypeExtension
             && isset($options['config_id'])
             && $options['config_id'] instanceof EntityConfigId
             && $options['config_id']->getScope() == $options['entity_config_scope'];
-    }
-
-    /**
-     * Checks if the association between the target entity and the owning entity exists
-     *
-     * @param string $targetEntityClassName
-     * @param string $owningEntityClassName
-     *
-     * @return bool
-     */
-    protected function isAssociationExist($targetEntityClassName, $owningEntityClassName)
-    {
-        $result    = false;
-        $config    = $this->extendConfigProvider->getConfig($targetEntityClassName);
-        $relations = $config->get('relation');
-        if ($relations) {
-            $relationFieldName = ExtendHelper::buildAssociationName($targetEntityClassName);
-            /**
-             * e.g. "manyToOne|Acme\Bundle\AcmeBundle\Entity\Activity|Oro\Bundle\UserBundle\Entity\User|user"
-             */
-            $relationKey = ExtendHelper::buildRelationKey(
-                $owningEntityClassName,
-                $relationFieldName,
-                'manyToOne',
-                $targetEntityClassName
-            );
-
-            if (isset($relations[$relationKey])) {
-                $relation = $relations[$relationKey];
-                if ($relation['assign'] == false
-                    && $relation['owner'] == false
-                    && $relation['target_field_id']
-                    && $this->extendConfigProvider->getConfig($relation['target_field_id']->getClassName())
-                        ->get('relation')[$relationKey]['assign'] == true
-                ) {
-                    $result = true;
-                }
-            }
-        }
-
-        return $result;
     }
 
     protected function appendClassAttr(array &$vars, $cssClass)
