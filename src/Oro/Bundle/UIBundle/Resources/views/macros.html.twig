@@ -119,7 +119,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -581,7 +581,7 @@
         <div class="{{ span }}">
     {% endif %#}
     <div class="{{ spanClass }}">
-    {% if title|length %}<h5 class="user-fiedset"><span>{{ title|trans }}</span></h5>{% endif %}
+    {% if title|length %}<h5 class="user-fieldset"><span>{{ title|trans }}</span></h5>{% endif %}
     {% for dataBlock in data %}
         {{ dataBlock|raw }}
     {% endfor %}
@@ -754,7 +754,7 @@
             {% endif %}
         {% endif %}
         {% if ownerName is defined %}
-            {{ 'Owner'|trans }}:
+            {{ 'oro.ui.owner'|trans }}:
             {% if ownerPath is defined %}
                 <a href="{{ ownerPath }}">{{ ownerName }}</a>
             {% else %}

@@ -1,6 +1,15 @@
-oro.config.module_label: "System configuration"
-oro.config.menu.system_configuration.label: "Configuration"
-oro.config.menu.system_configuration.description: "System configuration"
-oro.config.controller.config.saved.message: "Configuration saved"
-
 "Settings": "Settings"
+oro:
+    config:
+        actions:
+            collapse_all: Collapse All
+            expand_all:   Expand All
+
+        menu:
+            system_configuration.label:       "Configuration"
+            system_configuration.description: "System configuration"
+
+        module_label: "System configuration"
+
+        controller:
+            config.saved.message: "Configuration saved"
