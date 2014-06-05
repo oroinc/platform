@@ -27,16 +27,20 @@ class NoteExtension implements ExtendExtensionAwareInterface
 
     /**
      * @param Schema $schema
-     * @param string $targetTable
-     * @param string $targetColumnName
+     * @param string $targetTable      Target entity table name
+     * @param string $targetColumnName A column name is used to show related entity
      */
     public function addNoteAssociation(
         Schema $schema,
         $targetTable,
-        $targetColumnName
+        $targetColumnName = ''
     ) {
         $noteTable   = $schema->getTable(self::NOTE_TABLE_NAME);
         $entityTable = $schema->getTable($targetTable);
+
+        if (empty($targetColumnName)) {
+            $targetColumnName = array_shift($entityTable->getPrimaryKeyColumns());
+        }
 
         $options = [
             'note' => [
