@@ -9,7 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
 
-class NoteGeneratorExtension extends ExtendEntityGeneratorExtension
+class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 {
     /**
      * Check if generator extension supports configuration pre-processing or can generate code

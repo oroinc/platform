@@ -1,8 +1,8 @@
 parameters:
     oro_note.note_lifecycle_listener.class:              Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
-    oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteDumperExtension
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
-    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteGeneratorExtension
+    oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteExtendConfigDumperExtension
+    oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendEntityGeneratorExtension
 
     #entity
     oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
@@ -16,16 +16,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
-
-    #
-    # EntityExtend Dumper extension
-    #
-    oro_note.entity_extend.dumper_extension:
-        class: %oro_note.entity_extend.dumper_extension.class%
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: oro_entity_extend.dumper_extension }
 
     #
     # API
@@ -45,6 +35,16 @@ services:
         arguments:
             - @oro_entity_config.provider.note
             - @oro_entity.orm.entity_class_accessor
+
+    #
+    # EntityExtend Dumper extension
+    #
+    oro_note.entity_extend.dumper_extension:
+        class: %oro_note.entity_extend.dumper_extension.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.dumper_extension }
 
     #
     # EntityExtend Generator extension
