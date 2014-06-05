@@ -33,13 +33,14 @@ class NoteExtension implements ExtendExtensionAwareInterface
     public function addNoteAssociation(
         Schema $schema,
         $targetTable,
-        $targetColumnName = ''
+        $targetColumnName = null
     ) {
         $noteTable   = $schema->getTable(self::NOTE_TABLE_NAME);
         $entityTable = $schema->getTable($targetTable);
 
         if (empty($targetColumnName)) {
-            $targetColumnName = array_shift($entityTable->getPrimaryKeyColumns());
+            $primaryKeyColumns = $entityTable->getPrimaryKeyColumns();
+            $targetColumnName  = array_shift($primaryKeyColumns);
         }
 
         $options = [
