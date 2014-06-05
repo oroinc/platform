@@ -113,14 +113,14 @@ class WorkflowItem
      *
      * @ORM\Column(type="datetime")
      */
-    protected $createdAt;
+    protected $created;
 
     /**
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $updatedAt;
+    protected $updated;
 
     /**
      * Serialized data of WorkflowItem
@@ -512,9 +512,9 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /**
@@ -522,9 +522,9 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
-        return $this->updatedAt;
+        return $this->updated;
     }
 
     /**
@@ -534,8 +534,8 @@ class WorkflowItem
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->setUpdatedAt();
+        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->setUpdated();
     }
 
     /**
@@ -545,14 +545,14 @@ class WorkflowItem
      */
     public function preUpdate()
     {
-        $this->setUpdatedAt();
+        $this->setUpdated();
     }
 
     /**
      * Set updated property to actual Date
      */
-    public function setUpdatedAt()
+    public function setUpdated()
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

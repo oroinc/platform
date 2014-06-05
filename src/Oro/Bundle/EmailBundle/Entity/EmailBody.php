@@ -32,7 +32,7 @@ class EmailBody
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $createdAt;
+    protected $created;
 
     /**
      * @var string
@@ -110,9 +110,9 @@ class EmailBody
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /**
@@ -264,6 +264,6 @@ class EmailBody
      */
     public function beforeSave()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

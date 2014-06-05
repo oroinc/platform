@@ -56,14 +56,14 @@ class Tag
      *
      * @ORM\Column(type="datetime")
      */
-    protected $createdAt;
+    protected $created;
 
     /**
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime")
      */
-    protected $updatedAt;
+    protected $updated;
 
     /**
      * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="LAZY")
@@ -127,9 +127,9 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
-        $this->createdAt = $date;
+        $this->created = $date;
 
         return $this;
     }
@@ -139,9 +139,9 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /**
@@ -150,9 +150,9 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $date)
+    public function setUpdated(\DateTime $date)
     {
-        $this->updatedAt = $date;
+        $this->updated = $date;
 
         return $this;
     }
@@ -162,9 +162,9 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
-        return $this->updatedAt;
+        return $this->updated;
     }
 
     /**
@@ -194,8 +194,8 @@ class Tag
      */
     public function beforeSave()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -204,7 +204,7 @@ class Tag
      */
     public function doUpdate()
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

@@ -37,23 +37,23 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $regionMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
 
         return array(
-            'id' => array('id', 1),
-            'label' => array('label', 'Shipping'),
-            'namePrefix' => array('namePrefix', 'name prefix'),
-            'firstName' => array('firstName', 'first_name'),
-            'middleName' => array('middleName', 'middle name'),
-            'lastName' => array('lastName', 'last name'),
-            'nameSuffix' => array('nameSuffix', 'name suffix'),
-            'street' => array('street', 'street'),
-            'street2' => array('street2', 'street2'),
-            'city' => array('city', 'city'),
-            'region' => array('region', $regionMock),
-            'regionText' => array('regionText', 'test region'),
-            'postalCode' => array('postalCode', '12345'),
+            'country'      => array('country', $countryMock),
+            'city'         => array('city', 'city'),
+            'created'      => array('created', new \DateTime()),
+            'firstName'    => array('firstName', 'first_name'),
+            'id'           => array('id', 1),
+            'label'        => array('label', 'Shipping'),
+            'lastName'     => array('lastName', 'last name'),
+            'middleName'   => array('middleName', 'middle name'),
+            'namePrefix'   => array('namePrefix', 'name prefix'),
+            'nameSuffix'   => array('nameSuffix', 'name suffix'),
             'organization' => array('organization', 'Oro Inc.'),
-            'country' => array('country', $countryMock),
-            'createdAt' => array('createdAt', new \DateTime()),
-            'updatedAt' => array('updatedAt', new \DateTime()),
+            'postalCode'   => array('postalCode', '12345'),
+            'region'       => array('region', $regionMock),
+            'regionText'   => array('regionText', 'test region'),
+            'street'       => array('street', 'street'),
+            'street2'      => array('street2', 'street2'),
+            'updated'      => array('updated', new \DateTime()),
         );
     }
 
@@ -62,10 +62,10 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $address = $this->createAddress();
         $address->beforeSave();
 
-        $this->assertNotNull($address->getCreatedAt());
-        $this->assertNotNull($address->getUpdatedAt());
+        $this->assertNotNull($address->getCreated());
+        $this->assertNotNull($address->getUpdated());
 
-        $this->assertEquals($address->getCreatedAt(), $address->getUpdatedAt());
+        $this->assertEquals($address->getCreated(), $address->getUpdated());
     }
 
     public function testGetRegionName()

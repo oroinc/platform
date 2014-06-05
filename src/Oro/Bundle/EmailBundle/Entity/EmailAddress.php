@@ -38,7 +38,7 @@ abstract class EmailAddress
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    private $createdAt;
+    private $created;
 
     /**
      * @var \DateTime
@@ -46,7 +46,7 @@ abstract class EmailAddress
      * @ORM\Column(name="updated", type="datetime")
      * @JMS\Type("dateTime")
      */
-    private $updatedAt;
+    private $updated;
 
     /**
      * @var string
@@ -92,20 +92,20 @@ abstract class EmailAddress
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /**
      * Set entity created date/time
      *
-     * @param \DateTime $createdAt
+     * @param \DateTime $created
      * @return EmailAddress
      */
-    protected function setCreatedAt($createdAt)
+    protected function setCreated($created)
     {
-        $this->createdAt = $createdAt;
+        $this->created = $created;
 
         return $this;
     }
@@ -115,20 +115,20 @@ abstract class EmailAddress
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
-        return $this->updatedAt;
+        return $this->updated;
     }
 
     /**
      * Set entity updated date/time
      *
-     * @param \DateTime $updatedAt
+     * @param \DateTime $updated
      * @return EmailAddress
      */
-    protected function setUpdatedAt($updatedAt)
+    protected function setUpdated($updated)
     {
-        $this->updatedAt = $updatedAt;
+        $this->updated = $updated;
 
         return $this;
     }

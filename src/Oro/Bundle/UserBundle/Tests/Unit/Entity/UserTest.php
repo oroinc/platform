@@ -233,9 +233,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotEmpty($data);
 
-        $user->setPassword('newpass')
+        $user->setPassword('new-pass')
              ->setConfirmationToken('token')
-             ->setUsername('newname');
+             ->setUsername('new-name');
 
         $user->unserialize($data);
 

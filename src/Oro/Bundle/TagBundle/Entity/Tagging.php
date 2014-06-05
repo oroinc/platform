@@ -59,7 +59,7 @@ class Tagging
      *
      * @ORM\Column(type="datetime")
      */
-    protected $createdAt;
+    protected $created;
 
     /**
      * @var string
@@ -92,7 +92,7 @@ class Tagging
             $this->setResource($resource);
         }
 
-        $this->setCreatedAt(new \DateTime('now'));
+        $this->setCreated(new \DateTime('now'));
     }
 
     /**
@@ -205,9 +205,9 @@ class Tagging
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
-        $this->createdAt = $date;
+        $this->created = $date;
 
         return $this;
     }
@@ -217,8 +217,8 @@ class Tagging
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 }

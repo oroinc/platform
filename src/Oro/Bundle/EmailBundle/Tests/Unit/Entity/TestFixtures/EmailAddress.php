@@ -15,8 +15,8 @@ class EmailAddress extends OriginalEmailAddress
             $this->setId($id);
         }
         if ($date !== null) {
-            $this->setCreatedAt($date);
-            $this->setUpdatedAt($date);
+            $this->setCreated($date);
+            $this->setUpdated($date);
         }
     }
 

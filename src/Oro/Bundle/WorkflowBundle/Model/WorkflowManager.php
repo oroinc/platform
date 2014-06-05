@@ -234,7 +234,7 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdatedAt();
+            $workflowItem->setUpdated();
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {

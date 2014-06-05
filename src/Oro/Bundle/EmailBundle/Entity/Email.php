@@ -55,7 +55,7 @@ class Email
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $createdAt;
+    protected $created;
 
     /**
      * @var string
@@ -196,9 +196,9 @@ class Email
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
-        return $this->createdAt;
+        return $this->created;
     }
 
     /**
@@ -543,6 +543,6 @@ class Email
      */
     public function beforeSave()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

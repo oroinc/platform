@@ -57,8 +57,8 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testLoadSettings($isScope)
     {
         $criteria = array(
-            'entity'   => 'user',
-            'recordId' => 1,
+            'recordId'     => 1,
+            'scopedEntity' => 'user',
         );
 
         if ($isScope) {
@@ -78,7 +78,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
                 ->method('getValues')
                 ->will($this->returnValue(array($value)));
             $scope->expects($this->once())
-                ->method('getEntity')
+                ->method('getScopedEntity')
                 ->will($this->returnValue('user'));
 
             $this->repository
@@ -95,7 +95,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
         }
 
         $settings = $this->repository->loadSettings(
-            $criteria['entity'],
+            $criteria['scopedEntity'],
             $criteria['recordId']
         );
 

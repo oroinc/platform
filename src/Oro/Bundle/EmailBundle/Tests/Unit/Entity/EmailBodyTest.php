@@ -76,6 +76,6 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(false, $entity->getBodyIsText());
         $this->assertEquals(false, $entity->getHasAttachments());
         $this->assertEquals(false, $entity->getPersistent());
-        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreatedAt());
+        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
 }
