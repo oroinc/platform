@@ -10,7 +10,7 @@ oro_entity_config:
                         options:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
-                            block:          other
+                            block:          import and export
                 # field order in result file
                 order:
                     options: []
@@ -21,7 +21,7 @@ oro_entity_config:
                             precision:      0
                             empty_data:     ''
                             required:       false
-                            block:          other
+                            block:          import and export
                 # is filed will be used to find existing entity
                 identity:
                     options: []
@@ -34,7 +34,7 @@ oro_entity_config:
                                 true:       'Yes'
                             empty_value:    false
                             required:       false
-                            block:          other
+                            block:          import and export
                 # is field must be excluded from import/export
                 excluded:
                     options: []
@@ -47,7 +47,7 @@ oro_entity_config:
                                 true:       'Yes'
                             empty_value:    false
                             required:       false
-                            block:          other
+                            block:          import and export
                 # is relation must be represented by all it's fields
                 full:
                     options: []
@@ -60,5 +60,5 @@ oro_entity_config:
                                 true:       'Yes'
                             empty_value:    false
                             required:       false
-                            block:          other
+                            block:          import and export
 
