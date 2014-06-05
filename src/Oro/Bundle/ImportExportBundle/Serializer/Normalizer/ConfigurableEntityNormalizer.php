@@ -52,27 +52,69 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $result = new $class();
+        $result = $this->createObject($class, $data);
         $fields = $this->fieldProvider->getFields($class, true);
+
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
-                if (empty($field['type']) || $field['type'] == 'datetime') {
-                    if ($field['type'] == 'datetime') {
-                        $relatedEntityClass = '\DateTime';
+                if ($this->fieldHelper->isRelation($field) || $field['type'] == 'datetime') {
+                    if ($this->fieldHelper->isMultipleRelation($field)) {
+                        $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
+                    } elseif ($this->fieldHelper->isSingleRelation($field)) {
+                        $entityClass = $field['related_entity_name'];
                     } else {
-                        $relatedEntityClass = $field['related_entity_type'];
+                        $entityClass = 'DateTime';
                     }
-                    $value = $this->serializer->denormalize($value, $relatedEntityClass, $format, $context);
+                    $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
                 }
 
-                $propertyAccessor->setValue($result, $fieldName, $value);
+                $this->setObjectValue($result, $fieldName, $value);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Method can be overridden in normalizers for specific classes
+     *
+     * @param string $class
+     * @param mixed $data
+     * @return object
+     */
+    protected function createObject($class, &$data)
+    {
+        $reflection = new \ReflectionClass($class);
+        if ($reflection->getConstructor()->getNumberOfRequiredParameters() > 0) {
+            return $reflection->newInstanceWithoutConstructor();
+        } else {
+            return $reflection->newInstance();
+        }
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed $value
+     * @throws \Exception
+     */
+    protected function setObjectValue($object, $fieldName, $value)
+    {
+        try {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $propertyAccessor->setValue($object, $fieldName, $value);
+        } catch (\Exception $e) {
+            $class = ClassUtils::getClass($object);
+            if (property_exists($class, $fieldName)) {
+                $reflection = new \ReflectionProperty($class, $fieldName);
+                $reflection->setAccessible(true);
+                $reflection->setValue($object, $value);
+            } else {
+                throw $e;
+            }
+        }
     }
 
     /**
