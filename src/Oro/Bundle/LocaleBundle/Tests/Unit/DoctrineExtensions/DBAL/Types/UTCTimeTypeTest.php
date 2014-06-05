@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
-use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+
+use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
 class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -102,5 +104,13 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
     public function testConvertToPHPValueException()
     {
         $this->type->convertToPHPValue('qwerty', $this->platform);
+    }
+
+    public function testGetSQLDeclaration()
+    {
+        $platform = new MySqlPlatform();
+        $output = $this->type->getSQLDeclaration([], $platform);
+
+        $this->assertEquals("TIME COMMENT '(DC2Type:time in UTC)'", $output);
     }
 }

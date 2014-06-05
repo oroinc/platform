@@ -4,15 +4,17 @@ namespace Oro\Bundle\LocaleBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-class OroLocaleExtension extends Extension
+class OroLocaleExtension extends Extension implements PrependExtensionInterface
 {
     const PARAMETER_NAME_FORMATS = 'oro_locale.format.name';
     const PARAMETER_ADDRESS_FORMATS = 'oro_locale.format.address';
@@ -49,6 +51,28 @@ class OroLocaleExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $extensions = $container->getExtensions();
+        if (!empty($extensions['doctrine'])) {
+            $container->prependExtensionConfig(
+                'doctrine',
+                array(
+                    'dbal' => array(
+                        'types' => array(
+                            'date'     => 'Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateType',
+                            'datetime' => 'Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateTimeType',
+                            'time'     => 'Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType'
+                        )
+                    ),
+                )
+            );
+        }
     }
 
     /**
