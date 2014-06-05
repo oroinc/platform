@@ -3,6 +3,7 @@ parameters:
     oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteDumperExtension
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteGeneratorExtension
+    oro_note.migration.extension.note.class:             Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
 
     #entity
     oro_note.entity.class:      Oro\Bundle\NoteBundle\Entity\Note
@@ -54,3 +55,11 @@ services:
         arguments:
         tags:
             - { name: oro_entity_extend.generator_extension }
+
+    #
+    # Migrations note extension
+    #
+    oro_note.migration.extension.note:
+        class: %oro_note.migration.extension.note.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: note }
