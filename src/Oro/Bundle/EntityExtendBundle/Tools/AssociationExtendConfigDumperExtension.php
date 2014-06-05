@@ -87,6 +87,9 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
                 $relationName
             );
 
+            $targetEntityMetadata = $this->configManager->getEntityManager()->getClassMetadata($targetEntityClassName);
+            $targetFieldName      = array_shift($targetEntityMetadata->getIdentifierColumnNames());
+
             // create field
             $this->createField(
                 $entityClassName,
@@ -101,7 +104,7 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
                         'is_deleted'    => false,
                         'is_inverse'    => false,
                         'target_entity' => $targetEntityClassName,
-                        'target_field'  => 'id',
+                        'target_field'  => $targetFieldName,
                         'relation_key'  => $relationKey,
                     ],
                     'entity'    => [

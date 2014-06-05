@@ -1,6 +1,7 @@
 parameters:
     oro_note.note_lifecycle_listener.class:              Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
     oro_note.placeholder.filter.class:                   Oro\Bundle\NoteBundle\Placeholder\Filter
+    oro_note.migration.extension.note.class:             Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
     oro_note.entity_extend.dumper_extension.class:       Oro\Bundle\NoteBundle\Tools\NoteExtendConfigDumperExtension
     oro_note.entity_extend.generator_extension.class:    Oro\Bundle\NoteBundle\Tools\NoteExtendEntityGeneratorExtension
 
@@ -54,3 +55,11 @@ services:
         arguments:
         tags:
             - { name: oro_entity_extend.generator_extension }
+
+    #
+    # Migrations note extension
+    #
+    oro_note.migration.extension.note:
+        class: %oro_note.migration.extension.note.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: note }
