@@ -1,19 +1,23 @@
 oro:
     importexport:
+        action:
+            general: "General import/action operations"
+            import:  "Import entities"
+            export:  "Export entities"
+
+        entity_config:
+            header.label:   "Header"
+            order.label:    "Order"
+            identity.label: "Identity field"
+            excluded.label: "Exclude this field"
+            full.label:     "Export all relation fields"
+
+
+        export:
+            label: Export
+
         import:
             label:   Import
             success: "File was successful imported."
             error:   "Errors occurred during file import."
             error    %number%: "Error in row #%number%."
-        export:
-            label:   Export
-        action:
-            general: "General import/action operations"
-            import:  "Import entities"
-            export:  "Export entities"
-        entity_config:
-            header.label: "Import/export header"
-            order.label: "Import/export order"
-            identity.label: "Import/export identity field"
-            excluded.label: "Exclude from import/export"
-            full.label: "Export all relation fields"
