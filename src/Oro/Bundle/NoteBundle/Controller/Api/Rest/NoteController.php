@@ -30,10 +30,10 @@ use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 class NoteController extends RestController implements ClassResourceInterface
 {
     /**
-     * REST GET list
+     * Get notes list for given entity
      *
-     * @param string  $entityClass
-     * @param integer $entityId
+     * @param string  $entityClass Entity class name
+     * @param integer $entityId    Entity id
      *
      * @QueryParam(
      *      name="page",
@@ -48,7 +48,7 @@ class NoteController extends RestController implements ClassResourceInterface
      *      description="Number of items per page. defaults to 10."
      * )
      * @ApiDoc(
-     *      description="Get all note items",
+     *      description="Get note items",
      *      resource=true
      * )
      * @AclAncestor("oro_note_view")
