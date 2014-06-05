@@ -58,19 +58,21 @@ class AssociationExtension extends AbstractTypeExtension
                 if ($this->isApplicable($form->getName(), $options) && $form->getData() == true) {
                     /** @var EntityConfigId $configId */
                     $configId     = $options['config_id'];
-                    $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
-                    if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+                    if ($this->configManager->getConfig($configId)->is($form->getName(), false)) {
+                        $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
+                        if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+                            $entityConfig->set('state', ExtendScope::STATE_UPDATED);
 
-                        $this->extendConfigProvider->persist($entityConfig);
-                        $this->extendConfigProvider->flush();
-                    } else {
-                        /**
-                         * TODO: check if has other changes
-                         *      if NO -> revert state to "Active"
-                         * depends on EntityExtendBundle/Form/Extension/ExtendEntityExtension.php
-                         *      method: hasActiveFields
-                         */
+                            $this->extendConfigProvider->persist($entityConfig);
+                            $this->extendConfigProvider->flush();
+                        } else {
+                            /**
+                             * TODO: check if has other changes
+                             *      if NO -> revert state to "Active"
+                             * depends on EntityExtendBundle/Form/Extension/ExtendEntityExtension.php
+                             *      method: hasActiveFields
+                             */
+                        }
                     }
                 }
             }
@@ -88,9 +90,7 @@ class AssociationExtension extends AbstractTypeExtension
             $className        = $configId->getClassName();
             $owningEntityName = $this->entityClassResolver->getEntityClass($options['entity_class']);
 
-            /**
-             * Disable the association choice element if the association already exists
-             */
+            // disable the association choice element if the editing entity is the owning side of association
             if ($className === $owningEntityName) {
                 $view->vars['disabled'] = true;
                 $this->appendClassAttr($view->vars, 'disabled-choice');

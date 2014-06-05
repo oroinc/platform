@@ -1,7 +1,7 @@
 <script type="text/html" id="template-note-item">
     <div class="map-actions">
-        <% if (editable) { %><button class="btn item-edit-button" title="{{ 'oro.note.action.edit'|trans }}"><i class="icon-pencil hide-text">{{ 'oro.note.action.edit'|trans }}</i></button><% } %>
-        <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans }}"><i class="icon-trash hide-text">{{ 'oro.note.action.remove'|trans }}</i></button><% } %>
+        <% if (editable) { %><button class="btn item-edit-button" title="{{ 'oro.note.action.edit'|trans|raw }}"><i class="icon-edit hide-text">{{ 'oro.note.action.edit'|trans|raw }}</i></button><% } %>
+        <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans|raw }}"><i class="icon-trash hide-text">{{ 'oro.note.action.remove'|trans|raw }}</i></button><% } %>
     </div>
     <div class="accordion-group">
     <div class="accordion-heading">
