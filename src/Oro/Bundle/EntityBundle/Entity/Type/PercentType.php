@@ -22,7 +22,8 @@ class PercentType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return $platform->getFloatDeclarationSQL($fieldDeclaration);
+        $sqlDeclaration = $platform->getFloatDeclarationSQL($fieldDeclaration);
+        return $sqlDeclaration . " COMMENT '(DC2Type:" . $this->getName() . ")'";
     }
 
     /**
