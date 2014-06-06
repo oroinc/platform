@@ -85,13 +85,6 @@ class User extends ExtendUser implements
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
-     * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
-     * )
      */
     protected $id;
 

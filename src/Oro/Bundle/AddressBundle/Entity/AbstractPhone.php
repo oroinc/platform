@@ -22,13 +22,6 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Soap\ComplexType("int", nillable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
      */
     protected $id;
 
@@ -52,6 +45,13 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="is_primary", type="boolean", nullable=true)
      * @Soap\ComplexType("boolean", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $primary;
 

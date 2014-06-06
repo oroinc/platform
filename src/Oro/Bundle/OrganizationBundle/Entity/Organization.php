@@ -31,13 +31,6 @@ class Organization implements NotificationEmailInterface
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
-     * )
      */
     protected $id;
 
