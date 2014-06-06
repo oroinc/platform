@@ -210,6 +210,18 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function deleteEntity($entityData = array(), $actionName = 'Delete', $confirmation = true)
     {
+        return $this->action($entityData, $actionName, $confirmation);
+    }
+
+    /**
+     * @param array  $entityData
+     * @param string $actionName Default is Delete
+     * @param bool   $confirmation
+     *
+     * @return $this
+     */
+    public function action($entityData = array(), $actionName = 'Update', $confirmation = false)
+    {
         $entity = $this->getEntity($entityData);
         $element = $entity->element(
             $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]")
