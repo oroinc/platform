@@ -775,7 +775,7 @@ class ConfigManager
             );
             $providers = $this->getProviders();
             foreach ($providers as $provider) {
-                /** @var FieldConfigId $configId */
+                /** @var FieldConfigId $newConfigId */
                 $newConfigId = $this->getId($provider->getScope(), $className, $newFieldName);
                 $newConfigKey = $this->buildConfigKey($newConfigId);
                 $configId = new FieldConfigId(

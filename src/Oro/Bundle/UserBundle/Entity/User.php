@@ -86,11 +86,11 @@ class User extends ExtendUser implements
      * @JMS\Type("integer")
      * @JMS\Expose
      * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
      * )
      */
     protected $id;
@@ -103,14 +103,14 @@ class User extends ExtendUser implements
      * @JMS\Expose
      * @Oro\Versioned
      * @ConfigField(
-     *  defaultValues={
-     *    "dataaudit"={
-     *      "auditable"=true
-     *    },
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          },
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
      * )
      */
     protected $username;
@@ -122,7 +122,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $email;
 
@@ -135,7 +141,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $namePrefix;
 
@@ -148,7 +160,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $firstName;
 
@@ -161,7 +179,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $middleName;
 
@@ -174,7 +198,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastName;
 
@@ -187,7 +217,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $nameSuffix;
 
@@ -198,7 +234,13 @@ class User extends ExtendUser implements
      * @JMS\Type("DateTime")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $birthday;
 
@@ -232,7 +274,13 @@ class User extends ExtendUser implements
      * @JMS\Type("boolean")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $enabled = true;
 
@@ -371,7 +419,13 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $groups;
 
@@ -427,7 +481,13 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $businessUnits;
 
