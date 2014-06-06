@@ -5,6 +5,9 @@ oro_menu_config:
             uri: '#'
             extras:
                 position: 10
+                icon: icon-bar-chart
+            attributes:
+                class: 'only-icon'
         oro_dashboard_index:
             label: 'oro.dashboard.menu.dashboards_list.label'
             route: 'oro_dashboard_index'

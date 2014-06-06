@@ -133,7 +133,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("testBU_Updated - Business Units - Users Management - System", $crawler->html());
+        $this->assertContains("testBU_Updated - Business Units - User Management - System", $crawler->html());
     }
 
     /**

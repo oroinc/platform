@@ -23,7 +23,7 @@ class OptionSetEntityTest extends Selenium2TestCase
         $login = $this->login();
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
-            ->assertTitle('New Entity - Entities - System')
+            ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityData['entityName'])
             ->setLabel($entityData['entityName'])
             ->setPluralLabel($entityData['entityName'])

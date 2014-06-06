@@ -34,7 +34,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         $login = $this->login();
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -49,7 +49,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $username;
     }
@@ -65,13 +65,13 @@ class BusinessUnitsAclTest extends Selenium2TestCase
         $login = $this->login();
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->add()
-            ->assertTitle('Create Business Unit - Business Units - Users Management - System')
+            ->assertTitle('Create Business Unit - Business Units - User Management - System')
             ->setBusinessUnitName($unitName)
             ->setOwner('Main')
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - Users Management - System')
+            ->assertTitle('Business Units - User Management - System')
             ->close();
 
         return $unitName;
