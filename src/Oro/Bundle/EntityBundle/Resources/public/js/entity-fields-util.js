@@ -193,7 +193,7 @@ define(['underscore'], function (_) {
             var result = {
                 parent_entity: null,
                 entity: chain[chain.length - 1].field.entity.name,
-                field: fieldId
+                field:  chain[chain.length - 1].field.name
             };
             if (chain.length > 2) {
                 result.parent_entity = chain[chain.length - 2].field.entity.name;
