@@ -77,8 +77,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function createObject($class, &$data)
     {
-        $reflection = new \ReflectionClass($class);
-        if ($reflection->getConstructor()->getNumberOfRequiredParameters() > 0) {
+        $reflection  = new \ReflectionClass($class);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor && $constructor->getNumberOfRequiredParameters() > 0) {
             return $reflection->newInstanceWithoutConstructor();
         } else {
             return $reflection->newInstance();
