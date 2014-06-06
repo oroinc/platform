@@ -50,7 +50,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldName = $field['name'];
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
-                if ($this->fieldHelper->isRelation($field) || $field['type'] == 'datetime') {
+                if ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field)) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {

@@ -284,4 +284,36 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    /**
+     * @param bool $expected
+     * @param array $field
+     * @dataProvider dateTimeDataProvider
+     */
+    public function testIsDateTimeField($expected, array $field)
+    {
+        $this->assertSame($expected, $this->helper->isDateTimeField($field));
+    }
+
+    public function dateTimeDataProvider()
+    {
+        return array(
+            'date' => array(
+                'expected' => true,
+                'field' => array('type' => 'date'),
+            ),
+            'time' => array(
+                'expected' => true,
+                'field' => array('type' => 'time'),
+            ),
+            'datetime' => array(
+                'expected' => true,
+                'field' => array('type' => 'datetime'),
+            ),
+            'string' => array(
+                'expected' => false,
+                'field' => array('type' => 'string'),
+            ),
+        );
+    }
 }

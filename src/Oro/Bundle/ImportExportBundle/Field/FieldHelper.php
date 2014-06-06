@@ -96,4 +96,13 @@ class FieldHelper
         return $this->isRelation($field)
             && in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
     }
+
+    /**
+     * @param array $field
+     * @return bool
+     */
+    public function isDateTimeField(array $field)
+    {
+        return !empty($field['type']) && in_array($field['type'], array('datetime', 'date', 'time'));
+    }
 }
