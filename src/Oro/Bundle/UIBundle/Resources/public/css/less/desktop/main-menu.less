@@ -469,6 +469,10 @@
     .accordion-heading {
       .accordion-toggle{
         padding: 0;
+        &:not(.collapsed) {
+          font-weight: bold;
+          color: #fff;
+        }
       }
     }
     .accordion-group {
