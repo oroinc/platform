@@ -10,23 +10,19 @@
 #oroplatform-header {
   .navbar-inner .logo a,
   header .logo a{
-    background-color: @baseGradientColorStart;
-    color: darken(@headerTextColor, 10%);
-    &:hover {
-      color: darken(@headerTextColor, 5%);
-    }
+    background-color: @logoBackgroundColor;
   }
   .navbar-inner .logo:before,
   header .logo:before{
-    border-color: transparent transparent transparent @baseGradientColorStart;
+    border-color: transparent transparent transparent @logoBackgroundColor;
   }
   .navbar-inner .logo:after,
   header .logo:after{
-    border-color: transparent transparent transparent @baseGradientColorStart;
+    border-color: transparent transparent transparent @logoBackgroundColor;
   }
 
   .navbar-inner{
-    border-bottom-color: darken(@headerIconButtonColorEnd, 20%);
+    border-bottom-color: @baseGradientColorBorder;
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
   }
   .nav.pull-right li.dropdown .dropdown-menu li a{

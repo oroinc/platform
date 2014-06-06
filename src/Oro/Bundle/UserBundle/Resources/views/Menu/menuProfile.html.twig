@@ -4,9 +4,9 @@
             {% if isMobileVersion() %}
                 <i class="icon-user"></i>
             {% else %}
-                {% if app.user.imagePath %}
+                {#{% if app.user.imagePath %}
                     <img class="avatar" src="{{ app.user.imagePath | imagine_filter('avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
-                {%  endif %}
+                {%  endif %}#}
                 {{ app.user|oro_format_name|escape }}
                 <i class="icon-sort-down"></i>
             {% endif %}

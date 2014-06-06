@@ -1,17 +1,10 @@
+.list-bar-wrapper {
+  background-color: @logoBackgroundColor;
+}
 .pin-bar {
-  background-repeat: repeat-x;
-  #gradient > .vertical(@baseGradientColorEnd, @baseGradientColorStart);
   .pin-menus {
-    #header > .icon-button();
     .oro-dropdown-toggle[class^='icon-ellipsis'] {
-      #header > .icon-button > .icon();
-      &:hover {
-        #header > .icon-button > .icon > .hover();
-      }
-      &:active,
-      &:focus {
-        #header > .icon-button > .icon > .focus();
-      }
+      border-left-color: @baseGradientColorBorder;
     }
   }
 }
@@ -19,8 +12,7 @@
   li {
     color: @headerTextColor;
     .pin-holder {
-      #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
-      border-bottom: 1px solid @headerIconButtonColorEnd;
+      border-right-color: @baseGradientColorBorder;
       a {
         color: @headerTextColor;
         &.icon-remove {
@@ -30,10 +22,14 @@
         }
       }
       &:hover {
-        #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
         a {
           color: lighten(@headerTextColor, 10%);
         }
+      }
+    }
+    &.active {
+      .pin-holder {
+        background-color: darken(@logoBackgroundColor, 5%);
       }
     }
   }

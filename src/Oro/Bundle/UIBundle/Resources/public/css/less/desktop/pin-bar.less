@@ -1,29 +1,24 @@
-/* pin-bar */
+.list-bar-wrapper {
+  background-image: none;
+  background-color: @logoBackgroundColor;
+}
 .pin-bar {
   float: right;
   position: relative;
-//  z-index: 990;
   .pin-menus {
     float:right;
     position: relative;
-    width: 30px;
     cursor: pointer;
-    #header > .icon-button();
+    background-color: transparent;
     .oro-dropdown-toggle {
       &[class^='icon-ellipsis'] {
-        #header > .icon-button > .icon();
-      }
-      &:hover {
-        #header > .icon-button > .icon > .hover();
-      }
-      &:active,
-      &:focus {
-        #header > .icon-button > .icon > .focus();
-      }
-    }
-    &.open {
-      [class^='icon-ellipsis'] {
-        #header > .icon-button > .open();
+        color: #fff;
+        padding: 4px 12px;
+        line-height: 16px;
+        font-size: @baseFontSize * 1.2;
+        margin: 0;
+        border-left: 1px solid @baseGradientColorBorder;
+        .box-shadow(inset 0 -1px 2px rgba(0, 0, 0, .15));
       }
     }
     > span {
@@ -169,17 +164,9 @@
     position: relative;
     .pin-holder {
       position: relative;
-      padding: 0 25px 0 5px;
-      margin: 5px 2px 4px;
-      .border-radius(2px);
-      #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
-      border-bottom: 1px solid @headerIconButtonColorEnd;
-      .box-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
-      div {
-        display:block;
-        overflow:hidden;
-        height: 22px;
-      }
+      padding: 1px 25px 1px 5px;
+      border-right: 1px solid @baseGradientColorBorder;
+      .box-shadow(inset 0 -1px 2px rgba(0, 0, 0, .15));
       a {
         color: @headerTextColor;
         &:hover {
@@ -206,7 +193,6 @@
         }
       }
       &:hover {
-        #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
         a {
           color: lighten(@headerTextColor, 10%);
           &.icon-remove {
@@ -221,16 +207,10 @@
         }
       }
     }
-    &.item {
-      background-color: #434e5b;
-    }
     &.active {
       .pin-holder {
-        background-color: #2d333b;
-        background-image: none;
-        height: 24px;
-        margin-bottom:2px;
-        .box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.25));
+        background-color: lighten(@logoBackgroundColor, 5%);
+        .box-shadow(inset 0 -2px 5px rgba(0, 0, 0, 0.15));
       }
     }
   }

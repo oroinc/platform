@@ -12,14 +12,14 @@ header {
 }
 
 div.navbar-inner .help {
-    padding: 5px;
+    padding: 2px;
+    line-height: 19px;
 }
 
 div.navbar-inner .help a {
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
     text-decoration: none;
-
 }
 
 div.navbar-inner .help a:hover {

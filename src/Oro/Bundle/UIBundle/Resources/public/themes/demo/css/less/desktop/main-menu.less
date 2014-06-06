@@ -8,6 +8,21 @@
 .main-menu-top .main-menu {
   #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
   border-bottom-color: @baseGradientColorBorder;
+  > li.dropdown.only-icon,
+  > li.dropdown {
+    > a {
+      color: #fff;
+      i[class^=icon-] {
+        color: #fff;
+      }
+    }
+    &.active {
+      > a {
+        border-bottom-color: @baseGradientColorBorder;
+        #gradient > .vertical(darken(@baseGradientColorStart, 5%), darken(@baseGradientColorEnd, 5%));
+      }
+    }
+  }
 }
 
 // sided menu decoration
