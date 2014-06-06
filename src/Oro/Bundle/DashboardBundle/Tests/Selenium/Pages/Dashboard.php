@@ -23,7 +23,7 @@ class Dashboard extends AbstractPageEntity
     {
         parent::__construct($testCase, $redirect);
         $this->label = $this->test->byId('oro_dashboard_label');
-        $this->owner = $this->test->select($this->test->byId('oro_user_group_form_owner'));
+        $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_dashboard_owner')]/a");
     }
 
     public function init()
@@ -34,6 +34,7 @@ class Dashboard extends AbstractPageEntity
 
     public function setLabel($label)
     {
+        $this->label->clear();
         $this->label->value($label);
         return $this;
     }
@@ -45,13 +46,29 @@ class Dashboard extends AbstractPageEntity
 
     public function setOwner($owner)
     {
-        $this->owner->selectOptionByLabel($owner);
+        $this->owner->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
+        $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
+            "Owner autocomplete doesn't return search value"
+        );
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
     }
 
     public function getOwner()
     {
-        return trim($this->owner->selectedLabel());
+        return ;
     }
+
+    public function setClone($clone)
+    {
+        $this->clone->selectOptionByLabel($clone);
+
+        return $this;
+    }
+
 }
