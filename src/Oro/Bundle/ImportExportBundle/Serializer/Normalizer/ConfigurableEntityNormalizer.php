@@ -3,15 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
@@ -43,7 +42,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $result = $this->createObject($class, $data);
+        $result = $this->createObject($class);
         $fields = $this->fieldHelper->getFields($class, true);
 
         foreach ($fields as $field) {
@@ -72,10 +71,9 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      * Method can be overridden in normalizers for specific classes
      *
      * @param string $class
-     * @param mixed $data
      * @return object
      */
-    protected function createObject($class, &$data)
+    protected function createObject($class)
     {
         $reflection  = new \ReflectionClass($class);
         $constructor = $reflection->getConstructor();
