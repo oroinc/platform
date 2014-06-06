@@ -22,6 +22,9 @@ class Dashboards extends AbstractPageFilteredGrid
 
     }
 
+    /**
+     * @return Dashboard
+     */
     public function add()
     {
         $this->test->byXpath("//a[@title = 'Create Dashboard']")->click();
@@ -44,6 +47,11 @@ class Dashboards extends AbstractPageFilteredGrid
         $this->waitPageToLoad();
         $this->waitForAjax();
 
+        return new Dashboard($this->test);
+    }
+
+    public function edit()
+    {
         return new Dashboard($this->test);
     }
 }

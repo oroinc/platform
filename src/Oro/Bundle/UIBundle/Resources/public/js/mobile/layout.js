@@ -13,7 +13,7 @@ define(function (require) {
     function initMainMenu() {
         var menu = $('#main-menu');
         menu.insertAfter($('#oroplatform-header'));
-        menu.sideMenu({
+        menu.mobileSideMenu({
             toggleSelector: '#main-menu-toggle'
         });
     }

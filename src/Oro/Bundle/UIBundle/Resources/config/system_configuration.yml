@@ -5,6 +5,8 @@ oro_system_configuration:
             title:  'Application Settings'
         application_name_settings:
             title:  'Name'
+        navbar_settings:
+            title:       oro.ui.system_configuration.groups.navbar_settings.title
     fields:
         oro_ui.application_name:
             type: text
@@ -14,6 +16,13 @@ oro_system_configuration:
             type: text
             options:
                 label: 'Full Name'
+        oro_ui.navbar_position:
+            type: choice
+            options:
+                label: 'Position'
+                choices:
+                    top: Top
+                    left: Left
     tree:
         system_configuration:
             platform:
@@ -27,3 +36,8 @@ oro_system_configuration:
                                         children:
                                             - oro_ui.application_name
                                             - oro_ui.application_title
+                            look_and_feel:
+                                children:
+                                    navbar_settings:
+                                        children:
+                                            - oro_ui.navbar_position

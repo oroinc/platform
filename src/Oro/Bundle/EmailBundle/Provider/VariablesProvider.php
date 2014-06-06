@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -30,7 +32,7 @@ class VariablesProvider
      */
     public function getTemplateVariables($entityName)
     {
-        $userClassName = $this->getUser() ? get_class($this->getUser()) : false;
+        $userClassName = $this->getUser() ? ClassUtils::getClass($this->getUser()) : false;
         $allowedData = [];
 
         $ids = $this->configProvider->getIds();

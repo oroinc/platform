@@ -3,12 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
@@ -25,14 +27,21 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     /**
      * @var ImportStrategyHelper
      */
-    protected $helper;
+    protected $strategyHelper;
+
+    /**
+     * @var FieldHelper
+     */
+    protected $fieldHelper;
 
     /**
      * @param ImportStrategyHelper $helper
+     * @param FieldHelper $fieldHelper
      */
-    public function __construct(ImportStrategyHelper $helper)
+    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper)
     {
-        $this->helper = $helper;
+        $this->strategyHelper = $helper;
+        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -66,7 +75,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     protected function processEntity($entity, $isFullData = false)
     {
-        $entityManager = $this->helper->getEntityManager($this->entityName);
+        $entityManager = $this->strategyHelper->getEntityManager($this->entityName);
 
         $identifier = $this->getEntityIdentifier($entity);
         $identifierName = current(array_keys($identifier));
@@ -95,10 +104,10 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected function validateAndUpdateContext($entity)
     {
         // validate entity
-        $validationErrors = $this->helper->validateEntity($entity);
+        $validationErrors = $this->strategyHelper->validateEntity($entity);
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
-            $this->helper->addValidationErrors($validationErrors, $this->context);
+            $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
             return null;
         }
 
@@ -119,7 +128,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function getEntityIdentifier($entity)
     {
-        $entityManager = $this->helper->getEntityManager($this->entityName);
+        $entityManager = $this->strategyHelper->getEntityManager($this->entityName);
         return $entityManager->getClassMetadata($this->entityName)->getIdentifierValues($entity);
     }
 

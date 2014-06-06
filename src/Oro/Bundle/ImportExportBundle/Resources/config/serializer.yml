@@ -28,7 +28,6 @@ services:
     oro_importexport.serializer.configurable_entity_normalizer:
         class: %oro_importexport.serializer.configurable_entity_normalizer.class%
         arguments:
-            - @oro_entity.entity_field_provider
             - @oro_importexport.field.field_helper
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }

@@ -12,7 +12,7 @@
     {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Saved Values' }) %}
     {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
-    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true">
+    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true" data-nohash="true">
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
     </form>

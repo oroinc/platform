@@ -101,6 +101,8 @@ config:
         'oroui/js/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
         'oroui/js/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
 
+        'oroui/js/desktop/side-menu': 'bundles/oroui/js/desktop/side-menu.js'
+
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 

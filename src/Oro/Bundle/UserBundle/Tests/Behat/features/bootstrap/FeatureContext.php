@@ -37,7 +37,7 @@ class FeatureContext extends BehatWebContext
         $client->request('GET', $this->getUrl($route));
         WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains(
-            'Create User - Users - Users Management - System',
+            'Create User - Users - User Management - System',
             $client->getCrawler()->html()
         );
     }

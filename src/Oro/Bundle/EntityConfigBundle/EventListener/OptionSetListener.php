@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Inflector\Inflector;
-
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -35,7 +35,7 @@ class OptionSetListener
         $entity         = $event->getEntity();
         $configProvider = $em->getExtendConfigProvider();
 
-        $className = get_class($entity);
+        $className = ClassUtils::getClass($entity);
         if (!$configProvider->hasConfig($className)) {
             return;
         }

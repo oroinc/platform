@@ -43,7 +43,7 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
-            ->assertTitle('Roles - Users Management - System');
+            ->assertTitle('Roles - User Management - System');
     }
 
     public function testRolesGridDefaultContent()

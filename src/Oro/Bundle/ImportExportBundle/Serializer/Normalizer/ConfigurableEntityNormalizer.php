@@ -3,15 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
@@ -24,24 +23,15 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     protected $serializer;
 
     /**
-     * @var EntityFieldProvider
-     */
-    protected $fieldProvider;
-
-    /**
      * @var FieldHelper
      */
     protected $fieldHelper;
 
     /**
-     * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
      */
-    public function __construct(
-        EntityFieldProvider $fieldProvider,
-        FieldHelper $fieldHelper
-    ) {
-        $this->fieldProvider = $fieldProvider;
+    public function __construct(FieldHelper $fieldHelper)
+    {
         $this->fieldHelper = $fieldHelper;
 
         parent::__construct(array(self::FULL_MODE, self::SHORT_MODE), self::FULL_MODE);
@@ -52,14 +42,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $result = $this->createObject($class, $data);
-        $fields = $this->fieldProvider->getFields($class, true);
+        $result = $this->createObject($class);
+        $fields = $this->fieldHelper->getFields($class, true);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
-                if ($this->fieldHelper->isRelation($field) || $field['type'] == 'datetime') {
+                if ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field)) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {
@@ -81,13 +71,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      * Method can be overridden in normalizers for specific classes
      *
      * @param string $class
-     * @param mixed $data
      * @return object
      */
-    protected function createObject($class, &$data)
+    protected function createObject($class)
     {
-        $reflection = new \ReflectionClass($class);
-        if ($reflection->getConstructor()->getNumberOfRequiredParameters() > 0) {
+        $reflection  = new \ReflectionClass($class);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor && $constructor->getNumberOfRequiredParameters() > 0) {
             return $reflection->newInstanceWithoutConstructor();
         } else {
             return $reflection->newInstance();
@@ -131,7 +122,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     public function normalize($object, $format = null, array $context = array())
     {
         $entityName = ClassUtils::getClass($object);
-        $fields = $this->fieldProvider->getFields($entityName, true);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         $result = array();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -215,7 +206,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function hasIdentityFields($entityName)
     {
-        $fields = $this->fieldProvider->getFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {

@@ -18,14 +18,35 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     );
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configProvider;
+
+    /**
      * @var FieldHelper
      */
     protected $helper;
 
     protected function setUp()
     {
-        $configProvider = $this->prepareConfigProvider();
-        $this->helper = new FieldHelper($configProvider);
+        $this->fieldProvider = $this->prepareFieldProvider();
+        $this->configProvider = $this->prepareConfigProvider();
+        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function prepareFieldProvider()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -74,6 +95,18 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         return $configProvider;
+    }
+
+    public function testGetFields()
+    {
+        $entityName = 'TestEntity';
+        $withRelations = true;
+        $expectedFields = array(array('name' => 'field'));
+
+        $this->fieldProvider->expects($this->once())->method('getFields')->with($entityName, $withRelations)
+            ->will($this->returnValue($expectedFields));
+
+        $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
     }
 
     /**
@@ -249,6 +282,38 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                     'related_entity_name' => 'TestEntity',
                 ),
             )
+        );
+    }
+
+    /**
+     * @param bool $expected
+     * @param array $field
+     * @dataProvider dateTimeDataProvider
+     */
+    public function testIsDateTimeField($expected, array $field)
+    {
+        $this->assertSame($expected, $this->helper->isDateTimeField($field));
+    }
+
+    public function dateTimeDataProvider()
+    {
+        return array(
+            'date' => array(
+                'expected' => true,
+                'field' => array('type' => 'date'),
+            ),
+            'time' => array(
+                'expected' => true,
+                'field' => array('type' => 'time'),
+            ),
+            'datetime' => array(
+                'expected' => true,
+                'field' => array('type' => 'datetime'),
+            ),
+            'string' => array(
+                'expected' => false,
+                'field' => array('type' => 'string'),
+            ),
         );
     }
 }
