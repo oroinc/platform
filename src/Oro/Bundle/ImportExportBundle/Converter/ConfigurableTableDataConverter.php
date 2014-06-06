@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -15,11 +14,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected $entityName;
 
     /**
-     * @var EntityFieldProvider
-     */
-    protected $fieldProvider;
-
-    /**
      * @var FieldHelper
      */
     protected $fieldHelper;
@@ -30,16 +24,11 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected $relationCalculator;
 
     /**
-     * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
      * @param RelationCalculator $relationCalculator
      */
-    public function __construct(
-        EntityFieldProvider $fieldProvider,
-        FieldHelper $fieldHelper,
-        RelationCalculator $relationCalculator
-    ) {
-        $this->fieldProvider = $fieldProvider;
+    public function __construct(FieldHelper $fieldHelper, RelationCalculator $relationCalculator)
+    {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
     }
@@ -112,7 +101,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldProvider->getFields($entityName, true);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         $rules = array();
         $backendHeaders = array();

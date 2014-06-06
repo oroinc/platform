@@ -18,14 +18,35 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     );
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configProvider;
+
+    /**
      * @var FieldHelper
      */
     protected $helper;
 
     protected function setUp()
     {
-        $configProvider = $this->prepareConfigProvider();
-        $this->helper = new FieldHelper($configProvider);
+        $this->fieldProvider = $this->prepareFieldProvider();
+        $this->configProvider = $this->prepareConfigProvider();
+        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function prepareFieldProvider()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -74,6 +95,18 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         return $configProvider;
+    }
+
+    public function testGetFields()
+    {
+        $entityName = 'TestEntity';
+        $withRelations = true;
+        $expectedFields = array(array('name' => 'field'));
+
+        $this->fieldProvider->expects($this->once())->method('getFields')->with($entityName, $withRelations)
+            ->will($this->returnValue($expectedFields));
+
+        $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
     }
 
     /**

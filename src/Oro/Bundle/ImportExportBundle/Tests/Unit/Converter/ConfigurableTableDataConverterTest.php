@@ -176,10 +176,9 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $fieldProvider = $this->prepareFieldProvider();
         $fieldHelper = $this->prepareFieldHelper();
         $relationCalculator = $this->prepareRelationCalculator();
-        $this->converter = new ConfigurableTableDataConverter($fieldProvider, $fieldHelper, $relationCalculator);
+        $this->converter = new ConfigurableTableDataConverter($fieldHelper, $relationCalculator);
     }
 
     /**
@@ -498,31 +497,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function prepareFieldProvider()
-    {
-        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldProvider->expects($this->any())->method('getFields')->with($this->isType('string'))
-            ->will(
-                $this->returnCallback(
-                    function ($entityName) {
-                        return isset($this->fields[$entityName]) ? $this->fields[$entityName] : array();
-                    }
-                )
-            );
-
-        return $fieldProvider;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
     protected function prepareFieldHelper()
     {
         $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
             ->disableOriginalConstructor()
-            ->setMethods(array('getConfigValue'))
+            ->setMethods(array('getConfigValue', 'getFields'))
             ->getMock();
         $fieldHelper->expects($this->any())->method('getConfigValue')
             ->will(
@@ -531,6 +510,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                         return isset($this->config[$entityName][$fieldName][$parameter])
                             ? $this->config[$entityName][$fieldName][$parameter]
                             : $default;
+                    }
+                )
+            );
+        $fieldHelper->expects($this->any())->method('getFields')->with($this->isType('string'), true)
+            ->will(
+                $this->returnCallback(
+                    function ($entityName) {
+                        return isset($this->fields[$entityName]) ? $this->fields[$entityName] : array();
                     }
                 )
             );

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Field;
 
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 class FieldHelper
@@ -12,11 +13,28 @@ class FieldHelper
     protected $configProvider;
 
     /**
+     * @var EntityFieldProvider
+     */
+    protected $fieldProvider;
+
+    /**
+     * @param EntityFieldProvider $fieldProvider
      * @param ConfigProviderInterface $configProvider
      */
-    public function __construct(ConfigProviderInterface $configProvider)
+    public function __construct(EntityFieldProvider $fieldProvider, ConfigProviderInterface $configProvider)
     {
+        $this->fieldProvider = $fieldProvider;
         $this->configProvider = $configProvider;
+    }
+
+    /**
+     * @param $entityName
+     * @param bool $withRelations
+     * @return array
+     */
+    public function getFields($entityName, $withRelations = false)
+    {
+        return $this->fieldProvider->getFields($entityName, $withRelations);
     }
 
     /**

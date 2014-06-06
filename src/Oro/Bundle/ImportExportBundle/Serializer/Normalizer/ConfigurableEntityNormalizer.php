@@ -24,24 +24,15 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     protected $serializer;
 
     /**
-     * @var EntityFieldProvider
-     */
-    protected $fieldProvider;
-
-    /**
      * @var FieldHelper
      */
     protected $fieldHelper;
 
     /**
-     * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
      */
-    public function __construct(
-        EntityFieldProvider $fieldProvider,
-        FieldHelper $fieldHelper
-    ) {
-        $this->fieldProvider = $fieldProvider;
+    public function __construct(FieldHelper $fieldHelper)
+    {
         $this->fieldHelper = $fieldHelper;
 
         parent::__construct(array(self::FULL_MODE, self::SHORT_MODE), self::FULL_MODE);
@@ -53,7 +44,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         $result = $this->createObject($class, $data);
-        $fields = $this->fieldProvider->getFields($class, true);
+        $fields = $this->fieldHelper->getFields($class, true);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
@@ -131,7 +122,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     public function normalize($object, $format = null, array $context = array())
     {
         $entityName = ClassUtils::getClass($object);
-        $fields = $this->fieldProvider->getFields($entityName, true);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         $result = array();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -215,7 +206,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function hasIdentityFields($entityName)
     {
-        $fields = $this->fieldProvider->getFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
