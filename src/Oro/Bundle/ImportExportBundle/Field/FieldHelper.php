@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Field;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
@@ -104,5 +107,51 @@ class FieldHelper
     public function isDateTimeField(array $field)
     {
         return !empty($field['type']) && in_array($field['type'], array('datetime', 'date', 'time'));
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getObjectValue($object, $fieldName)
+    {
+        try {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            return $propertyAccessor->getValue($object, $fieldName);
+        } catch (\Exception $e) {
+            $class = ClassUtils::getClass($object);
+            if (property_exists($class, $fieldName)) {
+                $reflection = new \ReflectionProperty($class, $fieldName);
+                $reflection->setAccessible(true);
+                return $reflection->getValue($object);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed $value
+     * @throws \Exception
+     */
+    public function setObjectValue($object, $fieldName, $value)
+    {
+        try {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $propertyAccessor->setValue($object, $fieldName, $value);
+        } catch (\Exception $e) {
+            $class = ClassUtils::getClass($object);
+            if (property_exists($class, $fieldName)) {
+                $reflection = new \ReflectionProperty($class, $fieldName);
+                $reflection->setAccessible(true);
+                $reflection->setValue($object, $value);
+            } else {
+                throw $e;
+            }
+        }
     }
 }

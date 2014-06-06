@@ -60,7 +60,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
                 }
 
-                $this->setObjectValue($result, $fieldName, $value);
+                $this->fieldHelper->setObjectValue($result, $fieldName, $value);
             }
         }
 
@@ -82,29 +82,6 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             return $reflection->newInstanceWithoutConstructor();
         } else {
             return $reflection->newInstance();
-        }
-    }
-
-    /**
-     * @param object $object
-     * @param string $fieldName
-     * @param mixed $value
-     * @throws \Exception
-     */
-    protected function setObjectValue($object, $fieldName, $value)
-    {
-        try {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            $propertyAccessor->setValue($object, $fieldName, $value);
-        } catch (\Exception $e) {
-            $class = ClassUtils::getClass($object);
-            if (property_exists($class, $fieldName)) {
-                $reflection = new \ReflectionProperty($class, $fieldName);
-                $reflection->setAccessible(true);
-                $reflection->setValue($object, $value);
-            } else {
-                throw $e;
-            }
         }
     }
 
