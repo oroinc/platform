@@ -1,6 +1,6 @@
 /*global define, alert*/
-define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime'],
-function (_, Backbone, routing, dateTimeFormatter) {
+define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime', 'autolinker'],
+function (_, Backbone, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
     var $ = Backbone.$;
@@ -55,7 +55,10 @@ function (_, Backbone, routing, dateTimeFormatter) {
                 data['updatedBy_url'] = routing.generate('oro_user_view', {'id': data['updatedBy_id']});
             }
 
-            this.$el.append(this.template(data));
+            var content = this.template(data);
+            content = autolinker.link(content, {className: 'no-hash'});
+
+            this.$el.append(content);
 
             return this;
         }

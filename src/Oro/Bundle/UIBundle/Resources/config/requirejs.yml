@@ -106,6 +106,8 @@ config:
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 
+        'autolinker': 'bundles/oroui/lib/autolinker.min.js'
+
 build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
