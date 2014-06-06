@@ -126,10 +126,9 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalize($object, $context, $fields, $fieldsImportConfig, $result)
     {
-        $this->markTestIncomplete('WIP');
         $format = null;
         $entityName = get_class($object);
-        $this->fieldHelper->expects($this->once())
+        $this->fieldHelper->expects($this->atLeastOnce())
             ->method('getFields')
             ->with($entityName, true)
             ->will($this->returnValue($fields));
@@ -137,21 +136,80 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $configValueMap = array();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            foreach ($fieldsImportConfig as $configKey => $configValue) {
-                $configValueMap[] = array($entityName, $fieldName, $configKey, $configValue);
+            foreach ($fieldsImportConfig[$fieldName] as $configKey => $configValue) {
+                $configValueMap[] = array($entityName, $fieldName, $configKey, null, $configValue);
             }
         }
         $this->fieldHelper->expects($this->any())
             ->method('getConfigValue')
             ->will($this->returnValueMap($configValueMap));
 
+        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        if (isset($field['normalizedValue'])) {
+            $serializer->expects($this->once())
+                ->method('normalize')
+                ->with($field['value'], $format, $field['fieldContext'])
+                ->will($this->returnValue($field['normalizedValue']));
+        }
+
         $this->assertEquals($result, $this->normalizer->normalize($object, $format, $context));
     }
 
     public function normalizeDataProvider()
     {
+        $object = (object) array(
+            'fieldString' => 'string',
+            'fieldObject' => new \stdClass(),
+            'excluded' => 'excluded',
+            'id' => 'id',
+            'nonId' => 'nonId',
+            'objectNoIds' => new \stdClass()
+        );
+
         return array(
-            array(null, null, null, null, null)
+            'simple' => array(
+                $object,
+                array(),
+                array(
+                    array(
+                        'name' => 'fieldString'
+                    )
+                ),
+                array(
+                    'fieldString' => array(
+                        'excluded' => false
+                    )
+                ),
+                array(
+                    'fieldString' => 'string'
+                )
+            ),
+            'simple_with_excluded' => array(
+                $object,
+                array(),
+                array(
+                    array(
+                        'name' => 'fieldString'
+                    ),
+                    array(
+                        'name' => 'id'
+                    )
+                ),
+                array(
+                    'fieldString' => array(
+                        'excluded' => true
+                    ),
+                    'id' => array(
+                        'excluded' => false
+                    )
+                ),
+                array(
+                    'id' => 'id'
+                )
+            )
         );
     }
 }

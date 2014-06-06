@@ -21,3 +21,7 @@ oro:
         item:           item
         owner:          Owner
         updated:        Updated
+        system_configuration:
+            groups:
+                navbar_settings:
+                    title: 'Navigation bar'

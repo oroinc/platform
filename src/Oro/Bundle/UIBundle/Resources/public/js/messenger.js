@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore'],
-function($, _) {
+/*global define*/
+/*jslint nomen:true*/
+define(['jquery', 'underscore', 'bootstrap'], function ($, _) {
     'use strict';
 
     var defaults = {

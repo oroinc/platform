@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityMergeBundle\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
@@ -84,13 +85,13 @@ class DoctrineHelper
     }
 
     /**
-     * @param string $entity
+     * @param object $entity
      * @return string
      * @throws InvalidArgumentException
      */
     public function getEntityIdentifierValue($entity)
     {
-        $idValues = $this->getMetadataFor(get_class($entity))->getIdentifierValues($entity);
+        $idValues = $this->getMetadataFor(DoctrineClassUtils::getClass($entity))->getIdentifierValues($entity);
         if (count($idValues) > 1) {
             throw new InvalidArgumentException(
                 "Multiple id is not supported."

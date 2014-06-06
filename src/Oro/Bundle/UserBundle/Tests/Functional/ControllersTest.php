@@ -125,7 +125,7 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('John Doe - Users - Users Management - System', $result->getContent());
+        $this->assertContains('John Doe - Users - User Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()
@@ -133,7 +133,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
-            'John Doe - Edit - Users - Users Management - System',
+            'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
         /** @var Form $form */
@@ -150,7 +150,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
-            'John Doe - Edit - Users - Users Management - System',
+            'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
         /** @var Form $form */
