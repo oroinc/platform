@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -109,7 +111,7 @@ class InverseAssociationAccessor implements AccessorInterface
             } catch (NoSuchPropertyException $e) {
                 // If setter is not exist
                 $reflection = new \ReflectionProperty(
-                    get_class($relatedEntity),
+                    ClassUtils::getClass($relatedEntity),
                     $metadata->getDoctrineMetadata()->getFieldName()
                 );
                 $reflection->setAccessible(true);

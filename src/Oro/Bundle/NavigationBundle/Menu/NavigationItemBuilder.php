@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
@@ -56,7 +58,7 @@ class NavigationItemBuilder implements BuilderInterface
             $entity = $this->factory->createItem($alias, array());
 
             /** @var $repo NavigationRepositoryInterface */
-            $repo = $this->em->getRepository(get_class($entity));
+            $repo = $this->em->getRepository(ClassUtils::getClass($entity));
             $items = $repo->getNavigationItems($user->getId(), $alias, $options);
             foreach ($items as $item) {
                 $menu->addChild(

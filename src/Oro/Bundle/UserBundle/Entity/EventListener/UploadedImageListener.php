@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Entity\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
 
 class UploadedImageListener
@@ -55,7 +57,7 @@ class UploadedImageListener
             $em = $args->getEntityManager();
             $uow = $em->getUnitOfWork();
             $uow->recomputeSingleEntityChangeSet(
-                $em->getClassMetadata(get_class($entity)),
+                $em->getClassMetadata(ClassUtils::getClass($entity)),
                 $entity
             );
         }
