@@ -13,6 +13,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -321,7 +322,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             $permission = 'ASSIGN';
             $this->checkIsGranted($permission, $entity);
             $owner = $entity->getOwner();
-            $dataClassName = get_class($entity);
+            $dataClassName = ClassUtils::getClass($entity);
             $metadata = $this->getMetadata($dataClassName);
 
             if ($metadata) {
@@ -577,7 +578,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getMetadata($entity)
     {
         if (is_object($entity)) {
-            $dataClassName = get_class($entity);
+            $dataClassName = ClassUtils::getClass($entity);
         } else {
             $dataClassName = $entity;
         }
