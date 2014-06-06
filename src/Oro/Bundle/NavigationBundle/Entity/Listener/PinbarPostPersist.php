@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Listener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 
 class PinbarPostPersist
@@ -16,7 +18,7 @@ class PinbarPostPersist
         // perhaps you only want to act on some "PinbarTab" entity
         if ($entity instanceof PinbarTab) {
             /** @var $repo \Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository */
-            $repo = $entityManager->getRepository(get_class($entity));
+            $repo = $entityManager->getRepository(ClassUtils::getClass($entity));
             $repo->incrementTabsPositions($entity->getItem()->getUser(), $entity->getItem()->getId());
         }
     }
