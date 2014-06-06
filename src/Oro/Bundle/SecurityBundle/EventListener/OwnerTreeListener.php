@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -67,7 +68,7 @@ class OwnerTreeListener
     protected function checkEntities(array $entities)
     {
         foreach ($entities as $entity) {
-            if (in_array(get_class($entity), $this->securityClasses)) {
+            if (in_array(ClassUtils::getClass($entity), $this->securityClasses)) {
 
                 return true;
             }
