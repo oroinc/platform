@@ -20,7 +20,7 @@ class ApiEntityManager extends BaseApiEntityManager
     /**
      * {@inheritdoc}
      */
-    public function __construct($class, ObjectManager $om, ConfigManager$configManager)
+    public function __construct($class, ObjectManager $om, ConfigManager $configManager)
     {
         parent::__construct($class, $om);
 

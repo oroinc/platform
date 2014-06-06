@@ -5,9 +5,11 @@ namespace Oro\Bundle\NoteBundle\Model;
 class ExtendNote
 {
     /**
-     * Can be any extended entity
+     * Real implementation is auto generated.
      *
-     * @param object $object
+     * @param object $object Any extended entity
      */
-    public function setTarget($object) {}
+    public function setTarget($object)
+    {
+    }
 }
