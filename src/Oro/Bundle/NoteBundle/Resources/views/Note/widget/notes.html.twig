@@ -65,6 +65,14 @@
                     entityClass: oro_class_name(entity, true),
                     entityId: entity.id
                 })) }});
+
+            $(document).on('click', '#widget-container-' + {{ app.request.get('_wid')|json_encode|raw }} + ' .accordion-toggle', function (e) {
+                e.preventDefault();
+
+                var $el = $(this);
+                $el.toggleClass('collapsed');
+                $el.closest('.accordion-group').find('.accordion-body').toggleClass('in');
+            });
         });
     });
     </script>

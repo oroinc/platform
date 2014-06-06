@@ -4,21 +4,19 @@
         <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans|raw }}"><i class="icon-trash hide-text">{{ 'oro.note.action.remove'|trans|raw }}</i></button><% } %>
     </div>
     <div class="accordion-group">
-    <div class="accordion-heading">
-        <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle collapsed" data-toggle="collapse"></a>
-    </div>
-    <div class="accordion-body">
-        <div id="accordion-item<%= id %>" class="collapse" style="height: 0px;">
+        <div class="accordion-heading">
+            <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle collapsed"></a>
             <ul class="inline-decorate">
                 <% if (createdBy_url) { %>
-                    <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
+                <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
                 <% } else if (createdBy) { %>
-                    <li><%= createdBy %></li>
+                <li><%= createdBy %></li>
                 <% } %>
                 <li><%= createdAt %></li>
             </ul>
         </div>
-        <div class="message clearfix"><%= message %></div>
-    </div>
+        <div id="accordion-item<%= id %>" class="accordion-body collapse">
+            <div class="message clearfix"><%= message %></div>
+        </div>
     </div>
 </script>

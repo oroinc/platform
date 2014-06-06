@@ -16,7 +16,12 @@
     vertical-align: top;
 }
 .notes .accordion .accordion-heading .accordion-toggle {
+    display: inline-block;
     padding: 0px;
+    min-width: 16px;
+}
+.notes .accordion .accordion-heading ul {
+    display: inline-block;
 }
 .notes .accordion .accordion-heading .accordion-toggle:before {
     content: '\f078';
@@ -25,15 +30,24 @@
     margin-right: 5px;
     font-size: 12px;
     min-width: 12px;
-    display: inline-block;
-    vertical-align: top;
 }
 .notes .accordion .accordion-heading .accordion-toggle.collapsed:before {
     content: '\f054';
 }
 .notes .accordion .accordion-body {
-    vertical-align: top;
-    display: inline-block;
+    /* height: auto !important; */
+}
+.notes .accordion .accordion-body .message {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.notes .accordion .accordion-body.collapse {
+    height: auto;
+}
+.notes .accordion .accordion-body.in .message {
+    overflow: auto;
+    white-space: normal;
 }
 .ui-dialog .note-form textarea {
     width: 100%;

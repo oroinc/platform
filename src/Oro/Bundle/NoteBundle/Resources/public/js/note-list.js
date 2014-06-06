@@ -200,7 +200,7 @@ function (
                     }
                 });
                 this.itemEditDialog.render();
-                mediator.on(
+                mediator.once(
                     "hash_navigation_request:start",
                     _.bind(function () {
                         if (this.itemEditDialog) {
