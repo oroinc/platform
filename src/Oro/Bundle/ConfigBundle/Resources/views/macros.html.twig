@@ -215,7 +215,7 @@
 
         {% if block.description is defined and block.description != '' %}
             <div class="container-fluid">
-                <p>{{ block.description }}</p>
+                <p>{{ block.description|trans }}</p>
             </div>
         {% endif %}
 

@@ -24,7 +24,7 @@ class EntityTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
-            ->assertTitle('New Entity - Entities - System')
+            ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityName)
             ->setLabel($entityName)
             ->setPluralLabel($entityName)
@@ -60,7 +60,7 @@ class EntityTest extends Selenium2TestCase
             ->setLabel($newEntityName)
             ->save()
             ->assertMessage('Entity saved')
-            ->assertTitle($newEntityName .' - Entities - System')
+            ->assertTitle($newEntityName .' - Entity Management - Entities - System')
             ->createField()
             ->setFieldName('test_field2')
             ->setType('Integer')

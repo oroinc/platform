@@ -2,51 +2,47 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 
 class EmbeddedFormManager
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @var FormFactoryInterface
-     */
+    /** @var FormFactoryInterface */
     protected $formFactory;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $formTypes = [];
 
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface   $container
      * @param FormFactoryInterface $formFactory
      */
     public function __construct(ContainerInterface $container, FormFactoryInterface $formFactory)
     {
-        $this->container = $container;
+        $this->container   = $container;
         $this->formFactory = $formFactory;
     }
 
     /**
-     * @param $type
-     * @param null $data
+     * @param       $type
+     * @param null  $data
      * @param array $options
+     *
      * @return FormInterface
      */
     public function createForm($type, $data = null, $options = [])
     {
         $options = array_replace($options, ['channel_form_type' => 'oro_entity_identifier']);
-        $type = $this->getTypeInstance($type) ? : $type;
+        $type    = $this->getTypeInstance($type) ? : $type;
 
         return $this->formFactory->create($type, $data, $options);
     }
@@ -62,6 +58,7 @@ class EmbeddedFormManager
 
     /**
      * @param string $type
+     *
      * @return string|null
      */
     public function getLabelByType($type)
@@ -93,6 +90,7 @@ class EmbeddedFormManager
 
     /**
      * @param string $type
+     *
      * @return string
      */
     public function getDefaultCssByType($type)
@@ -108,6 +106,7 @@ class EmbeddedFormManager
 
     /**
      * @param string $type
+     *
      * @return string
      */
     public function getDefaultSuccessMessageByType($type)
@@ -123,6 +122,7 @@ class EmbeddedFormManager
 
     /**
      * @param string $type
+     *
      * @return string
      */
     public function getCustomFormLayoutByFormType($type)
@@ -133,12 +133,17 @@ class EmbeddedFormManager
             return $typeInstance->geFormLayout();
         }
 
+        if ($typeInstance instanceof CustomLayoutFormInterface) {
+            return $typeInstance->getFormLayout();
+        }
+
         return '';
 
     }
 
     /**
-     * @param $type
+     * @param string $type
+     *
      * @return EmbeddedFormInterface|AbstractType
      */
     protected function getTypeInstance($type)

@@ -49,6 +49,10 @@ class Configuration implements ConfigurationInterface
                     'value' => 'ORO Business Application Platform',
                     'type' => 'scalar'
                 ),
+                'navbar_position' => array(
+                    'value' => 'top',
+                    'type' => 'scalar'
+                ),
             )
         );
 

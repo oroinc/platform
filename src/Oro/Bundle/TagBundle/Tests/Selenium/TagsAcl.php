@@ -49,7 +49,7 @@ class TagsAcl extends Selenium2TestCase
         /** @var Users $login*/
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($userName)
             ->setOwner('Main')
             ->enable()
@@ -63,7 +63,7 @@ class TagsAcl extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $userName;
     }

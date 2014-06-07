@@ -17,11 +17,18 @@ placeholders:
         items:
             init_pinned_dropdown_button:
                 order: 100
-
     requirejs_config_extend:
         items:
             ui_requirejs_config:
                 order: 10
+    right_panel:
+        items:
+            navbar:
+                order: 250
+    left_panel:
+        items:
+            navbar:
+                order: 150
 
 items:
     logo:
@@ -32,3 +39,5 @@ items:
         template: OroUIBundle:Form:buttons.html.twig
     init_pinned_dropdown_button:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
+    navbar:
+        template: OroUIBundle:Default/navbar:sided.html.twig

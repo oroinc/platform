@@ -21,11 +21,18 @@ placeholders:
         items:
             application_menu:
                 order: 100
-    before_navigation:
+    dots_menu:
         items:
             dots_menu:
                 order: 100
-    after_navigation: ~
+
+    pin_tabs_list:
+        items:
+            pin_tabs_list:
+                order: 100
+    after_navigation:
+        label: Top Navigation After
+
     pin_button:
         items:
             pin_button:
@@ -54,6 +61,8 @@ items:
         template: OroNavigationBundle:ApplicationMenu:applicationMenu.html.twig
    dots_menu:
         template: OroNavigationBundle:ApplicationMenu:dotsMenu.html.twig
+   pin_tabs_list:
+        template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
    pin_button:
         template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
    breadcrumbs:
