@@ -59,36 +59,58 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
             $supportedEntities[] = sprintf("'%s'", $targetClassName);
         }
 
-        $methodBody = [
-            '// Note can have only one related entity',
+        $getMethodBody = [];
+        $setMethodBody = [
+            '// The note can be associated with one entity only',
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
             'if (!in_array($className, [' . implode(', ', $supportedEntities) . '])) {',
-            '    throw new \Exception(sprintf("There\'s no relation for %s entity class.", $className));',
+            '    throw new \RuntimeException(sprintf('
+            . '\'The association with "%s" entity was not configured.\', $className));',
             '}'
         ];
 
         foreach ($relationNames as $fieldName => $targetClassName) {
-            $methodBody[] = sprintf(
-                'if ($className == \'%s\') { $this->__reset(); $this->%s = %s; }',
+            $getMethodBody[] = sprintf(
+                'if (null !== $this->%s) { return $this->%s; }',
+                $fieldName,
+                $fieldName
+            );
+            $setMethodBody[] = sprintf(
+                'if ($className == \'%s\') { $this->resetTargets(); $this->%s = %s; }',
                 $targetClassName,
                 $fieldName,
                 '$target'
             );
         }
 
+        $getMethodBody[] = 'return null;';
+
+        $getMethodDocblock = "/**\n"
+            . " * Gets the entity this note is associated with\n"
+            . " *\n"
+            . " * @return object|null Any configurable entity\n"
+            . " */";
+        $setMethodDocblock = "/**\n"
+            . " * Sets the entity this note is associated with\n"
+            . " *\n"
+            . " * @param object \$target Any configurable entity that can have notes\n"
+            . " */";
+
         $class
             ->setMethod(
-                $classBuilder->generateClassMethod(
-                    '__reset',
-                    implode("\n", $resetMethodsBody)
-                )->setVisibility('private')
+                $classBuilder
+                    ->generateClassMethod('resetTargets', implode("\n", $resetMethodsBody))
+                    ->setVisibility('private')
             )
             ->setMethod(
-                $classBuilder->generateClassMethod(
-                    'setTarget',
-                    implode("\n", $methodBody),
-                    ['target']
-                )->setDocblock("/**\n * @param object \$target any object that can have notes\n */")
+                $classBuilder
+                    ->generateClassMethod('getTarget', implode("\n", $getMethodBody))
+                    ->setDocblock($getMethodDocblock)
+            )
+            ->setMethod(
+                $classBuilder
+                    ->generateClassMethod('setTarget', implode("\n", $setMethodBody), ['target'])
+                    ->setDocblock($setMethodDocblock)
             );
     }
 }

@@ -1,3 +1,3 @@
 css:
     'oronote':
-      - 'bundles/oronote/css/style.css'
+      - 'bundles/oronote/css/less/note.less'

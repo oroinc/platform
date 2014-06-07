@@ -5,10 +5,7 @@
         require(['oroui/js/widget-manager'],
         function(widgetManager) {
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                widget.trigger('formSave', {
-                    id: {{ form.vars.value.id|json_encode|raw }},
-                    message: {{ form.vars.value.message|json_encode|raw }}
-                });
+                widget.trigger('formSave', {{ model|json_encode|raw }});
             });
         });
         </script>

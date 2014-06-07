@@ -16,14 +16,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\NoteBundle\Entity\Manager\EntityManager;
 
 /**
  * @Route("/notes")
@@ -62,46 +58,12 @@ class NoteController extends Controller
 
         $sorting = strtoupper($this->getRequest()->get('sorting', 'DESC'));
 
-        $em = $this->getDoctrine()->getManager();
-        /** @var NoteRepository $repo */
-        $repo = $em->getRepository('OroNoteBundle:Note');
-        $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
-            ->orderBy('note.createdAt', $sorting);
+        /** @var EntityManager $securityFacade */
+        $manager = $this->get('oro_note.manager');
 
-        /** @var AclHelper $aclHelper */
-        $aclHelper = $this->get('oro_security.acl_helper');
-        $query     = $aclHelper->apply($qb);
-
-        /** @var Note[] $items */
-        $items = $query->getResult();
-
-        /** @var SecurityFacade $securityFacade */
-        $securityFacade = $this->get('oro_security.security_facade');
-        /** @var NameFormatter $nameFormatter */
-        $nameFormatter = $this->get('oro_locale.formatter.name');
-
-        $result = [];
-        foreach ($items as $item) {
-            $resultItem = [
-                'id'        => $item->getId(),
-                'message'   => $item->getMessage(),
-                'createdAt' => $item->getCreatedAt()->format('c'),
-                'updatedAt' => $item->getCreatedAt()->format('c'),
-                'editable'  => $securityFacade->isGranted('EDIT', $item),
-                'removable' => $securityFacade->isGranted('DELETE', $item),
-            ];
-            if ($item->getOwner()) {
-                $resultItem['createdBy']          = $nameFormatter->format($item->getOwner());
-                $resultItem['createdBy_id']       = $item->getOwner()->getId();
-                $resultItem['createdBy_viewable'] = $securityFacade->isGranted('VIEW', $item->getOwner());
-            }
-            if ($item->getUpdatedBy()) {
-                $resultItem['updatedBy']          = $nameFormatter->format($item->getUpdatedBy());
-                $resultItem['updatedBy_id']       = $item->getUpdatedBy()->getId();
-                $resultItem['updatedBy_viewable'] = $securityFacade->isGranted('VIEW', $item->getUpdatedBy());
-            }
-            $result[] = $resultItem;
-        }
+        $result = $manager->getEntityViewModels(
+            $manager->getList($entityClass, $entityId, $sorting)
+        );
 
         return new Response(json_encode($result), Codes::HTTP_OK);
     }
@@ -151,6 +113,9 @@ class NoteController extends Controller
 
         if ($this->get('oro_note.form.handler.note')->process($entity)) {
             $responseData['saved'] = true;
+            /** @var EntityManager $securityFacade */
+            $manager               = $this->get('oro_note.manager');
+            $responseData['model'] = $manager->getEntityViewModel($entity);
         }
         $responseData['form']       = $this->get('oro_note.form.note')->createView();
         $responseData['formAction'] = $formAction;
