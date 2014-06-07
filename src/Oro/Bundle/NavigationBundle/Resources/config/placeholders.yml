@@ -30,8 +30,8 @@ placeholders:
         items:
             pin_tabs_list:
                 order: 100
-    after_navigation:
-        label: Top Navigation After
+
+    after_navigation: ~
 
     pin_button:
         items:
