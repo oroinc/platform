@@ -3,16 +3,23 @@
     {% include 'OroNoteBundle:Note:view.js.twig' %}
 
     <div class="widget-actions">
-        <a href="#note-list" class="collapse-all-button btn-mini" data-action="accordion:collapse-all">{{ 'Collapse All'|trans }}</a>
+        <a href="#note-list" class="collapse-all-button btn-mini" data-action-name="collapse_all">{{ 'Collapse All'|trans }}</a>
         {{ UI.clientLink({
-            'aCss': 'sort-button icons-holder-text',
+            'aCss': 'btn refresh-button icons-holder-text',
+            'iCss': 'icon-refresh',
+            'title' : 'oro.note.action.refresh',
+            'label' : '',
+            'dataAttributes': {'action-name': 'refresh'}
+        }) }}
+        {{ UI.clientLink({
+            'aCss': 'btn sort-button icons-holder-text',
             'iCss': 'icon-arrow-up',
             'title' : 'oro.note.action.sorting-desc',
             'label' : '',
             'dataAttributes': {'action-name': 'toggle_sorting', 'sorting': 'DESC'}
         }) }}
     </div>
-    <div class="accordion map-box" id="note-list"></div>
+    <div class="accordion" id="note-list"></div>
 
     <script type="text/javascript">
     require(['jquery', 'underscore', 'routing', 'oroui/js/mediator', 'oronote/js/note-list', 'oroui/js/widget-manager'],
@@ -26,6 +33,7 @@
                     addDialogTitle: {{ "oro.note.add_note_title"|trans|json_encode|raw }},
                     editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
                     itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }},
+                    itemRemoved: {{ "oro.note.note_removed"|trans|json_encode|raw }},
                     deleteConfirmation: {{ "oro.note.note_delete_confirmation"|trans|json_encode|raw }}
                 },
                 listUrl: {{ path('oro_note_notes', {
@@ -45,6 +53,17 @@
             });
             mediator.off('note:add');
             mediator.on('note:add', _.bind(noteList.addItem, noteList));
+            widget.getAction('collapse_all', 'adopted', function(action) {
+                action.on('click', _.bind(function (e) {
+                    e.preventDefault();
+                    this.collapseAll();
+                }, noteList));
+            });
+            widget.getAction('refresh', 'adopted', function(action) {
+                action.on('click', _.bind(function () {
+                    this.reloadItems();
+                }, noteList));
+            });
             widget.getAction('toggle_sorting', 'adopted', function(action) {
                 action.on('click', _.bind(function () {
                     var sorting = (action.data('sorting') == 'DESC' ? 'ASC' : 'DESC');

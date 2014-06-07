@@ -5,11 +5,25 @@ namespace Oro\Bundle\NoteBundle\Model;
 class ExtendNote
 {
     /**
-     * Real implementation is auto generated.
+     * Gets the entity this note is associated with
      *
-     * @param object $object Any extended entity
+     * The real implementation of this method is auto generated.
+     *
+     * @return object|null Any configurable entity
      */
-    public function setTarget($object)
+    public function getTarget()
+    {
+        return null;
+    }
+
+    /**
+     * Sets the entity this note is associated with
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can have notes
+     */
+    public function setTarget($target)
     {
     }
 }

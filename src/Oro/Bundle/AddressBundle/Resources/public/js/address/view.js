@@ -19,8 +19,8 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
 
         events: {
             'click': 'activate',
-            'click button:has(.icon-remove)': 'close',
-            'click button:has(.icon-pencil)': 'edit'
+            'click .item-edit-button': 'edit',
+            'click .item-remove-button': 'close'
         },
 
         initialize: function () {

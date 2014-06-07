@@ -11,14 +11,18 @@ function (_, Backbone, NoteModel) {
     return Backbone.Collection.extend({
         model: NoteModel,
         baseUrl: '',
-        sortMode: 'DESC',
+        sorting: 'DESC',
 
         url: function () {
-            return this.baseUrl + '?sorting=' + this.sortMode;
+            return this.baseUrl + '?sorting=' + this.sorting;
         },
 
-        setSortMode: function (mode) {
-            this.sortMode = mode;
+        getSorting: function () {
+            return this.sorting;
+        },
+
+        setSorting: function (mode) {
+            this.sorting = mode;
         }
     });
 });

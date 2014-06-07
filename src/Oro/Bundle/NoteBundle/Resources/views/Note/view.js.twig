@@ -1,24 +1,58 @@
 <script type="text/html" id="template-note-item">
-    <div class="map-actions">
-        <% if (editable) { %><button class="btn item-edit-button" title="{{ 'oro.note.action.edit'|trans|raw }}"><i class="icon-edit hide-text">{{ 'oro.note.action.edit'|trans|raw }}</i></button><% } %>
-        <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans|raw }}"><i class="icon-trash hide-text">{{ 'oro.note.action.remove'|trans|raw }}</i></button><% } %>
-    </div>
     <div class="accordion-group">
-    <div class="accordion-heading">
-        <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle collapsed" data-toggle="collapse"></a>
-    </div>
-    <div class="accordion-body">
-        <div id="accordion-item<%= id %>" class="collapse" style="height: 0px;">
-            <ul class="inline-decorate">
+        <div class="accordion-heading collapse<% if (!collapsed) { %> in<% } %>">
+            <div class="map-title">
+                <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+                <span class="visual">
+                    <img src="<% if (createdBy_avatar) { %><%= createdBy_avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|raw }}<% } %>" />
+                </span>
                 <% if (createdBy_url) { %>
-                    <li><a href="<%= createdBy_url %>"><%= createdBy %></a></li>
+                <a class="user" href="<%= createdBy_url %>"><%= createdBy %></a>
                 <% } else if (createdBy) { %>
-                    <li><%= createdBy %></li>
+                <span class="user"><%= createdBy %></span>
                 <% } %>
-                <li><%= createdAt %></li>
-            </ul>
+                <span class="details">
+                    <% if (createdAt != updatedAt) { %>
+                        <i class="icon-edit hide-text"></i>
+                        {{ 'oro.note.updated'|trans|raw }}
+                        <%= updatedAt %>
+                    <% } else { %>
+                        <%= createdAt %>
+                    <% } %>
+                </span>
+            </div>
+            <div class="map-message">
+                <div class="message"><%= brief_message %></div>
+            </div>
+            <div class="map-actions">
+                <% if (editable) { %><button class="btn item-edit-button" title="{{ 'oro.note.action.edit'|trans|raw }}"><i class="icon-edit hide-text">{{ 'oro.note.action.edit'|trans|raw }}</i></button><% } %>
+                <% if (removable) { %><button class="btn item-remove-button" title="{{ 'oro.note.action.remove'|trans|raw }}"><i class="icon-trash hide-text">{{ 'oro.note.action.remove'|trans|raw }}</i></button><% } %>
+            </div>
         </div>
-        <div class="message clearfix"><%= message %></div>
-    </div>
+        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
+            <div class="message">
+                <%= message %>
+                <% if (createdAt != updatedAt) { %>
+                <div class="details">
+                    <div>
+                        <span class="visual">
+                            <img src="<% if (updatedBy_avatar) { %><%= updatedBy_avatar %><% } else { %>{{ asset('bundles/oroui/img/avatar-xsmall.png')|raw }}<% } %>" />
+                        </span>
+                        <% if (updatedBy_url) { %>
+                        <a class="user" href="<%= updatedBy_url %>"><%= updatedBy %></a>
+                        <% } else if (updatedBy) { %>
+                        <span class="user"><%= updatedBy %></span>
+                        <% } %>
+                        {{ 'oro.note.updated_by'|trans|raw }}
+                        <%= updatedAt %>
+                    </div>
+                    <div>
+                        <strong>{{ 'oro.note.posted'|trans|raw }}</strong>
+                        <%= createdAt %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
     </div>
 </script>
