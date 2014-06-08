@@ -95,7 +95,7 @@
 #}
 {% macro renderAttribute(title, data) %}
     <div class="control-group">
-        <label class="control-label">{{ title|trans }}</label>
+        <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}
         </div>
@@ -455,9 +455,7 @@
         {% if parameters.dataRedirect is defined %}
         data-redirect="{{ parameters.dataRedirect  }}"
         {% endif %}
-        {% if (parameters.title is defined) %}
-        title="{{ parameters.title|trans }}"
-        {% endif -%}
+        title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
         {% if (parameters.visible is defined and not parameters.visible) %}
         style="display: none"
         {% endif -%}
@@ -469,9 +467,9 @@
         {% endif %}
     >
         {%- if (parameters.iCss is defined) -%}
-        <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label|trans : '' }}</i>
-        {%- endif -%}
-        {{ parameters.label is defined ? parameters.label|trans : '' -}}
+            <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label : '' }}</i>
+        {%- endif %}
+        {{- parameters.label is defined ? parameters.label : '' -}}
     </a>
 {% endmacro %}
 

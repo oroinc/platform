@@ -6,20 +6,19 @@
     <div class="widget-actions">
         {{ UI.clientLink({
             'aCss': 'collapse-all-button btn-mini',
-            'title' : 'Collapse All',
-            'label' : 'Collapse All',
+            'label' : 'Collapse All'|trans,
             'dataAttributes': {'action-name': 'collapse_all'}
         }) }}
         {{ UI.clientLink({
             'aCss': 'btn refresh-button icons-holder-text',
             'iCss': 'icon-refresh',
-            'title' : 'Refresh',
+            'title' : 'Refresh'|trans,
             'dataAttributes': {'action-name': 'refresh'}
         }) }}
         {{ UI.clientLink({
             'aCss': 'btn sort-button icons-holder-text',
             'iCss': 'icon-arrow-up',
-            'title' : 'Descending Order',
+            'title' : 'Descending Order'|trans,
             'dataAttributes': {
                 'action-name': 'toggle_sorting',
                 'title-alt': 'Ascending Order'|trans,
