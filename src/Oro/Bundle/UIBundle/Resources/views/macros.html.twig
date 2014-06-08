@@ -610,7 +610,7 @@
 {% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider) %}
     {% set cols = subblocks|length %}
     <div class="responsive-section">
-        <h4 class="scrollspy-title">{{ title|trans }}</h4>
+        <h4 class="scrollspy-title">{{ title }}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
             {% if isForm is defined and isForm == true %}
@@ -667,7 +667,7 @@
             <div class="container-fluid" style="width: auto;">
                 <ul class="nav">
                     {% for navElement in dataBlocks %}
-                        <li {% if navElement.class is defined %}class="{{ navElement.class }}"{% endif %}><a href="#scroll-{{ loop.index }}">{{ navElement.title|trans }}</a></li>
+                        <li {% if navElement.class is defined %}class="{{ navElement.class }}"{% endif %}><a href="#scroll-{{ loop.index }}">{{ navElement.title }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
