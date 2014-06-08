@@ -1,6 +1,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 <div class="widget-content notes">
-    {% include 'OroNoteBundle:Note:view.js.twig' %}
+    {% include 'OroNoteBundle:Note:js/list.js.twig' %}
+    {% include 'OroNoteBundle:Note:js/view.js.twig' %}
 
     <div class="widget-actions">
         <a href="#note-list" class="collapse-all-button btn-mini" data-action-name="collapse_all">{{ 'Collapse All'|trans }}</a>
@@ -28,27 +29,30 @@
             /** @type oronote.NoteList */
             var noteList = new NoteList({
                 el: '#note-list',
+                template: '#template-note-list',
+                itemTemplate: '#template-note-item',
                 labels: {
-                    noData: {{ "oro.note.no_notes_exist"|trans|json_encode|raw }},
                     addDialogTitle: {{ "oro.note.add_note_title"|trans|json_encode|raw }},
                     editDialogTitle: {{ "oro.note.edit_note_title"|trans|json_encode|raw }},
                     itemSaved: {{ "oro.note.note_saved"|trans|json_encode|raw }},
                     itemRemoved: {{ "oro.note.note_removed"|trans|json_encode|raw }},
                     deleteConfirmation: {{ "oro.note.note_delete_confirmation"|trans|json_encode|raw }}
                 },
-                listUrl: {{ path('oro_note_notes', {
-                    'entityClass': oro_class_name(entity, true),
-                    'entityId': entity.id})|json_encode|raw
-                }},
-                createItemUrl: {{ path('oro_note_create', {
-                    'entityClass': oro_class_name(entity, true),
-                    'entityId': entity.id})|json_encode|raw
-                }},
-                updateItemUrl: function(model) {
-                    return routing.generate('oro_note_update', {'id': model.get('id')});
-                },
-                deleteItemUrl: function(model) {
-                    return routing.generate('oro_api_delete_note', {'id': model.get('id')});
+                urls: {
+                    list: {{ path('oro_note_notes', {
+                        'entityClass': oro_class_name(entity, true),
+                        'entityId': entity.id})|json_encode|raw
+                    }},
+                    createItem: {{ path('oro_note_create', {
+                        'entityClass': oro_class_name(entity, true),
+                        'entityId': entity.id})|json_encode|raw
+                    }},
+                    updateItem: function(model) {
+                        return routing.generate('oro_note_update', {'id': model.get('id')});
+                    },
+                    deleteItem: function(model) {
+                        return routing.generate('oro_api_delete_note', {'id': model.get('id')});
+                    }
                 }
             });
             mediator.off('note:add');
@@ -79,6 +83,7 @@
                 }, noteList));
             });
             noteList
+                .render()
                 .getCollection()
                 .reset({{ render(path('oro_note_notes', {
                     entityClass: oro_class_name(entity, true),

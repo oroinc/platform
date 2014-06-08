@@ -1,6 +1,6 @@
 /*global define, alert*/
-define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime', 'autolinker'],
-function (_, Backbone, routing, dateTimeFormatter, autolinker) {
+define(['underscore', 'backbone', 'routing', 'oronavigation/js/navigation', 'orolocale/js/formatter/datetime', 'autolinker'],
+function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
     'use strict';
 
     var $ = Backbone.$;
@@ -11,15 +11,12 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
-        tagName: 'div',
-
         options: {
-            'template': null,
-            'buildItemIdAttribute': null // function (id) { return string; }
+            'template': null
         },
 
         attributes: {
-            'class': 'map-item'
+            'class': 'list-item'
         },
 
         events: {
@@ -31,7 +28,6 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
 
-            this.$el.attr('id', this.options.buildItemIdAttribute(this.model.id));
             this.template = _.template($(this.options.template).html());
 
             this.listenTo(this.model, 'destroy', this.remove);
@@ -55,7 +51,7 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
 
         render: function (collapsed) {
             var data = this.model.toJSON();
-            data['collapsed'] = _.isUndefined(collapsed) ? true : collapsed;
+            data['collapsed'] = _.isUndefined(collapsed) ? false : collapsed;
             data['createdAt'] = dateTimeFormatter.formatDateTime(data['createdAt']);
             data['updatedAt'] = dateTimeFormatter.formatDateTime(data['updatedAt']);
             if (data['createdBy_id'] && data['createdBy_viewable']) {
@@ -74,6 +70,12 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
             data['brief_message'] = autolinker.link(data['brief_message'], {className: 'no-hash'});
 
             this.$el.append(this.template(data));
+
+            var navigation = Navigation.getInstance();
+            if (navigation) {
+                // trigger hash navigation event for processing UI decorators
+                navigation.processClicks(this.$el.find('a'));
+            }
 
             return this;
         }

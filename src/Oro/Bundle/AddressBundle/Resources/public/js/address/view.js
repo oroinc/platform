@@ -14,7 +14,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
         tagName: 'div',
 
         attributes: {
-            'class': 'map-item'
+            'class': 'list-item map-item'
         },
 
         events: {

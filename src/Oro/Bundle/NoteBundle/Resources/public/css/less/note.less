@@ -2,10 +2,9 @@
 
 .notes {
   position: relative;
-  .map-box {
-    .map-item {
+  .list-box {
+    .list-item {
       padding: 3px 10px 5px 10px;
-      cursor: default;
       .visual {
         .border-radius(2px);
         img {
@@ -13,21 +12,29 @@
           .border-radius(2px);
           width: 16px;
         }
+        .user {
+          padding-left: 3px;
+        }
       }
       .user {
-        padding-left: 3px;
+        font-style: normal;
       }
-      .map-title {
+      .date {
+        font-style: normal;
+        font-size: smaller;
+      }
+      .title-item {
         white-space: nowrap;
         .details {
           padding-left: 7px;
-          font-size: smaller;
         }
       }
-      .map-actions {
+      .actions {
         white-space: nowrap;
+        float: none;
+        margin: 0;
       }
-      .map-message {
+      .message-item {
         width: 100%;
         padding-left: 21px;
         .message {
@@ -36,7 +43,7 @@
         }
       }
     }
-    .map-item:last-child {
+    .list-item:last-child {
       border-bottom: 0;
     }
   }
@@ -94,28 +101,4 @@
 .ui-dialog .note-form textarea {
   width: 100%;
   box-sizing: border-box;
-}
-.notes-widget {
-  .collapse-all-button {
-    padding-left: 25px;
-  }
-  .btn {
-    line-height:1em;
-    height:auto;
-    border: 0;
-    background: 0;
-    .box-shadow(none);
-    padding: 0 0 0 10px;
-    [class^='icon-'] {
-      &:before {
-        opacity: 0.6;
-        font-size:15px;
-      }
-      &:hover {
-        &:before {
-          opacity: 1;
-        }
-      }
-    }
-  }
 }
