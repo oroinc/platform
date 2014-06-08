@@ -24,7 +24,7 @@ function (
                 list: null,
                 createItem: null,
                 updateItem: null,
-                deleteItem: null,
+                deleteItem: null
             },
             labels: {
                 noData: '',
@@ -42,20 +42,25 @@ function (
             this.options.collection = this.options.collection || new NoteCollection();
             this.options.collection.baseUrl = this._getUrl('list');
 
+            this.template = _.template($(this.options.template).html());
+
             this.listenTo(this.getCollection(), 'add', this._onItemAdded);
             this.listenTo(this.getCollection(), 'remove', this._onItemDeleted);
             this.listenTo(this.getCollection(), 'reset', this._onItemsAdded);
 
-            this.template = _.template($(this.options.template).html());
+            var addItem = _.bind(this._addItem, this);
+            mediator.once('hash_navigation_request:start', function () {
+                mediator.off('note:add', addItem);
+            });
+            mediator.on('note:add', addItem);
         },
 
         render: function () {
             this.$el.append(this.template());
             this.$itemsContainer = this.$el.find('.items');
-            this.$itemsContainer.hide();
             this.$noDataContainer = this.$el.find('.no-data');
-            this.$noDataContainer.hide();
             this.$loadingMaskContainer = this.$el.find('.loading-mask');
+            this.$itemsContainer.hide();
 
             return this;
         },
@@ -76,7 +81,23 @@ function (
             $groups.find('.collapse').removeClass('in');
         },
 
-        reloadItems: function (sorting) {
+        refresh: function () {
+            this._reload();
+        },
+
+        toggleSorting: function (e) {
+            var $el = $(e.currentTarget),
+                titleAlt = $el.data('title-alt'),
+                iconAlt = $el.data('icon-alt');
+            $el.data('title-alt', $el.attr('title'));
+            $el.attr('title', titleAlt);
+            $el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
+            $el.find('i').attr('class', iconAlt + ' hide-text');
+
+            this._reload(this.getCollection().getSorting() == 'DESC' ? 'ASC' : 'DESC');
+        },
+
+        _reload: function (sorting) {
             if (!_.isUndefined(sorting)) {
                 this.getCollection().setSorting(sorting);
             }
@@ -96,15 +117,15 @@ function (
             }
         },
 
-        addItem: function () {
+        _addItem: function () {
             this._openItemEditForm(this._getLabel('addDialogTitle'), this._getUrl('createItem'));
         },
 
-        editItem: function (itemView, model) {
+        _editItem: function (itemView, model) {
             this._openItemEditForm(this._getLabel('editDialogTitle'), this._getUrl('updateItem', model));
         },
 
-        deleteItem: function (itemView, model) {
+        _deleteItem: function (itemView, model) {
             var confirm = new DeleteConfirmation({
                 content: this._getLabel('deleteConfirmation')
             });
@@ -181,8 +202,8 @@ function (
                 id: this._buildItemIdAttribute(model.id),
                 model: model
             });
-            itemView.on('edit', _.bind(this.editItem, this));
-            itemView.on('delete', _.bind(this.deleteItem, this));
+            itemView.on('edit', _.bind(this._editItem, this));
+            itemView.on('delete', _.bind(this._deleteItem, this));
             return itemView;
         },
 
@@ -234,7 +255,7 @@ function (
                     'dialogOptions': {
                         'modal': true,
                         'resizable': false,
-                        'width': 475,
+                        'width': 675,
                         'autoResize': true,
                         'close': _.bind(function () {
                             delete this.itemEditDialog;
@@ -242,16 +263,14 @@ function (
                     }
                 });
                 this.itemEditDialog.render();
-                mediator.once(
-                    "hash_navigation_request:start",
-                    _.bind(function () {
-                        if (this.itemEditDialog) {
-                            this.itemEditDialog.remove();
-                        }
-                    }, this)
-                );
+                mediator.once('hash_navigation_request:start', _.bind(function () {
+                    if (this.itemEditDialog) {
+                        this.itemEditDialog.remove();
+                    }
+                }, this));
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
                     this.itemEditDialog.remove();
+                    delete this.itemEditDialog;
                     messenger.notificationFlashMessage('success', this._getLabel('itemSaved'));
                     var $itemView = this._findItemViewElement(response.id);
                     if ($itemView.length) {

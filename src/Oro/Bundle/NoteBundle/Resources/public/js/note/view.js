@@ -20,9 +20,9 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
         },
 
         events: {
-            'click .item-edit-button': 'editModel',
-            'click .item-remove-button': 'deleteModel',
-            'click .accordion-toggle': 'toggleView'
+            'click .item-edit-button': '_edit',
+            'click .item-remove-button': '_delete',
+            'click .accordion-toggle': '_toggle'
         },
 
         initialize: function (options) {
@@ -31,22 +31,6 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
             this.template = _.template($(this.options.template).html());
 
             this.listenTo(this.model, 'destroy', this.remove);
-        },
-
-        editModel: function () {
-            this.trigger('edit', this, this.model);
-        },
-
-        deleteModel: function () {
-            this.trigger('delete', this, this.model);
-        },
-
-        toggleView: function (e) {
-            e.preventDefault();
-
-            var $el = $(e.currentTarget);
-            $el.toggleClass('collapsed');
-            $el.closest('.accordion-group').find('.collapse').toggleClass('in');
         },
 
         render: function (collapsed) {
@@ -73,11 +57,26 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
 
             var navigation = Navigation.getInstance();
             if (navigation) {
-                // trigger hash navigation event for processing UI decorators
                 navigation.processClicks(this.$el.find('a'));
             }
 
             return this;
+        },
+
+        _edit: function () {
+            this.trigger('edit', this, this.model);
+        },
+
+        _delete: function () {
+            this.trigger('delete', this, this.model);
+        },
+
+        _toggle: function (e) {
+            e.preventDefault();
+
+            var $el = $(e.currentTarget);
+            $el.toggleClass('collapsed');
+            $el.closest('.accordion-group').find('.collapse').toggleClass('in');
         }
     });
 });

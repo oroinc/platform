@@ -439,7 +439,7 @@
         ]
 #}
 {% macro clientLink(parameters) %}
-    <a href="javascript: void(0);" class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+    <a href="javascript: void(0);" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
         {% if (parameters.id is defined) %}
         id="{{ parameters.id }}"
         {% endif %}
@@ -467,7 +467,11 @@
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
         {% endif %}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
+    >
+        {%- if (parameters.iCss is defined) -%}
+        <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label|trans : '' }}</i>
+        {%- endif -%}
+        {{ parameters.label is defined ? parameters.label|trans : '' -}}
     </a>
 {% endmacro %}
 
