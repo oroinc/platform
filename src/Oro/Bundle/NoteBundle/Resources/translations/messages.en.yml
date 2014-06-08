@@ -16,9 +16,6 @@ oro:
             add:              Add note
             edit:             Edit note
             remove:           Remove note
-            refresh:          Refresh
-            sorting-asc:      Ascending order - Click to sort in descending order
-            sorting-desc:     Descending order - Click to sort in ascending order
 
         no_notes_exist:       No notes found
         note_saved:           Note saved
