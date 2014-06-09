@@ -6,7 +6,8 @@ oro:
             import:  "Import entities"
             
         export:
-            label: Export
+            label: Export grid
+            tooltip: With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported.
 
         entity_config:
             excluded.label: "Exclude from import/export"
