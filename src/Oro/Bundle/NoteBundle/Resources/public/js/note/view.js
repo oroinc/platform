@@ -30,6 +30,7 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
 
             this.template = _.template($(this.options.template).html());
 
+            this.listenTo(this.model, 'change', this._onModelChanged);
             this.listenTo(this.model, 'destroy', this.remove);
         },
 
@@ -53,7 +54,10 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
             }
             data['brief_message'] = autolinker.link(data['brief_message'], {className: 'no-hash'});
 
-            this.$el.append(this.template(data));
+            var html = this.template(data);
+
+            this.$el.empty();
+            this.$el.append(html);
 
             var navigation = Navigation.getInstance();
             if (navigation) {
@@ -77,6 +81,11 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
             var $el = $(e.currentTarget);
             $el.toggleClass('collapsed');
             $el.closest('.accordion-group').find('.collapse').toggleClass('in');
+        },
+
+        _onModelChanged: function () {
+            var collapsed = this.$el.find('.accordion-toggle').hasClass('collapsed');
+            this.render(collapsed);
         }
     });
 });

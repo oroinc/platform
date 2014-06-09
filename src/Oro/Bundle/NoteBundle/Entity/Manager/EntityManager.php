@@ -92,6 +92,7 @@ class EntityManager
             'message'   => $entity->getMessage(),
             'createdAt' => $entity->getCreatedAt()->format('c'),
             'updatedAt' => $entity->getUpdatedAt()->format('c'),
+            'hasUpdate' => $entity->getCreatedAt() != $entity->getUpdatedAt(),
             'editable'  => $this->securityFacade->isGranted('EDIT', $entity),
             'removable' => $this->securityFacade->isGranted('DELETE', $entity),
         ];

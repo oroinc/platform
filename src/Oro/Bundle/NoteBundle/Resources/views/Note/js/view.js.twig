@@ -26,7 +26,7 @@
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
             <div class="message">
                 <%= message %>
-                <% if (createdAt != updatedAt) { %>
+                <% if (hasUpdate) { %>
                 <div class="details">
                     <div>
                         <%= _.template(

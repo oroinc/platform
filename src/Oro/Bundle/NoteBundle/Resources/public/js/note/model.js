@@ -14,6 +14,7 @@ function (Backbone) {
             message: '',
             createdAt: '',
             updatedAt: '',
+            hasUpdate: false,
             editable: false,
             removable: false,
             createdBy: null,

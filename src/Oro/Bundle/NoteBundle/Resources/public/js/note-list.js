@@ -1,7 +1,7 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
     'oroui/js/mediator', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
-    'oronote/js/note/view', 'oronote/js/note/model', 'oronote/js/note/collection', 'jquery-outer-html'],
+    'oronote/js/note/view', 'oronote/js/note/model', 'oronote/js/note/collection'],
 function (
     _, Backbone, __, messenger,
     mediator, LoadingMask, DialogWidget, DeleteConfirmation,
@@ -274,11 +274,7 @@ function (
                     messenger.notificationFlashMessage('success', this._getLabel('itemSaved'));
                     var $itemView = this._findItemViewElement(response.id);
                     if ($itemView.length) {
-                        var model = this.getCollection().get(response.id);
-                        model.set(response);
-                        $itemView.outerHTML(
-                            this._renderItemView(model, this._isItemViewCollapsed($itemView))
-                        );
+                        this.getCollection().get(response.id).set(response);
                     } else {
                         this.getCollection().add(new NoteModel(response));
                     }
