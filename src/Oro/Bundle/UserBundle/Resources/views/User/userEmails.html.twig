@@ -5,8 +5,7 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_user_widget_emails', {id: entity.id}),
-            'title': 'oro.user.emails.label'|trans,
-            'cssClass': 'inner-grid'
+            'title': 'oro.user.emails.label'|trans
         }) }}
     {% endset %}
     {{ UI.scrollSubblock(null, [userEmailsWidget]) }}

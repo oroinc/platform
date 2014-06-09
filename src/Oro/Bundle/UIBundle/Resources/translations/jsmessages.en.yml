@@ -7,6 +7,9 @@
 "Cancel": "Cancel"
 "Delete Confirmation": "Delete Confirmation"
 "Edit": "Edit"
+"Loading...": "Loading..."
+"Saving...": "Saving..."
+"Deleting...": "Deleting..."
 "Unexpected error occured. Please contact system administrator.": "Unexpected error occured. Please contact system administrator."
 Now: Now
 Prev: Prev
@@ -29,3 +32,4 @@ Microsecond: Microsecond
 "Server error": "Server error"
 "User input error": "User input error"
 "Error! Incorrect server response.": "Error! Incorrect server response."
+"Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"

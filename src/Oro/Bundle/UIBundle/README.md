@@ -41,7 +41,6 @@ items:                             # items to use in placeholders (templates or 
 
 placeholders:
   <placeholder_name>:
-    label: <placeholder_label>
     items:
       <item_name>:
         order: 100                 # sort order in placeholder
