@@ -40,6 +40,13 @@ class Region implements Translatable
      * @JMS\Type("string")
      * @JMS\SerializedName("combinedCode")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $combinedCode;
 
@@ -60,13 +67,6 @@ class Region implements Translatable
      * @ORM\Column(name="code", type="string", length=32)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
      */
     protected $code;
 
@@ -77,13 +77,6 @@ class Region implements Translatable
      * @Gedmo\Translatable
      * @JMS\Type("string")
      * @JMS\Expose
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
      */
     protected $name;
 

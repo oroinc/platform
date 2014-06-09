@@ -19,13 +19,6 @@ class Status
      * @ORM\Id
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @ConfigField(
-     *  defaultValues={
-     *    "importexport"={
-     *       "identity"=true
-     *    }
-     *   }
-     * )
      */
     protected $id;
 

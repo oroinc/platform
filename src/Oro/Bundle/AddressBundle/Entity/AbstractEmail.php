@@ -45,6 +45,13 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="is_primary", type="boolean", nullable=true)
      * @Soap\ComplexType("boolean", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $primary;
 
