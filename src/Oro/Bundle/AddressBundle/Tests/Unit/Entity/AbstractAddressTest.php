@@ -48,8 +48,8 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             'postalCode' => array('postalCode', '12345'),
             'organization' => array('organization', 'Oro Inc.'),
             'country' => array('country', $countryMock),
-            'created' => array('createdAt', new \DateTime()),
-            'updated' => array('updatedAt', new \DateTime()),
+            'created' => array('created', new \DateTime()),
+            'updated' => array('updated', new \DateTime()),
         );
     }
 
