@@ -7,11 +7,11 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
@@ -82,7 +82,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * @param object $entity
-     * @param bool $isFullData
+     * @param bool $isFullData optional
+     * @param  bool $isPersistNew optional
      * @return null|object
      */
     protected function processEntity($entity, $isFullData = false, $isPersistNew = false)
@@ -287,7 +288,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     }
 
     /**
-     * @param object $entity
+     * @param $entity
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     protected function assertEnvironment($entity)
     {
