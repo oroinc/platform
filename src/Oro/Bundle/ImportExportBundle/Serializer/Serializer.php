@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\Collection;
 
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Serializer as BaseSerializer;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\LogicException;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
@@ -24,6 +26,33 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         }
 
         return parent::normalize($data, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $type, $format = null, array $context = array())
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
+        }
+
+        if (isset($this->denormalizerCache[$type][$format])) {
+            return $this->denormalizerCache[$type][$format]->denormalize($data, $type, $format, $context);
+        }
+
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof DenormalizerInterface
+                && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
+                $this->denormalizerCache[$type][$format] = $normalizer;
+
+                return $normalizer->denormalize($data, $type, $format, $context);
+            }
+        }
+
+        throw new UnexpectedValueException(
+            sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type)
+        );
     }
 
     /**
