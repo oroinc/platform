@@ -77,7 +77,7 @@ define(function (require) {
             loadingMask:         '.hash-loading-mask',
             searchDropdown:      '#search-div',
             menuDropdowns:       '.pin-menus.dropdown, .nav .dropdown',
-            pinbarHelp:          '.pin-bar-empty',
+            pinbarHelp:          '.pin-bar-empty a',
             historyTab:          '#history-content',
             mostViewedTab:       '#mostviewed-content',
             flashMessages:       '#flash-messages',
@@ -542,13 +542,8 @@ define(function (require) {
                     _.bind(function(data) {
                         var dtContainer = $('<div class="sf-toolbar" id="sfwdt' + debugBarToken + '" style="display: block;" data-sfurl="' + url + '"/>');
                         dtContainer.html(data);
-                        var scrollable = $('.scrollable-container:last');
-                        var container = scrollable.length ? scrollable : this.getCached$('container');
-                        if (!container.closest('body').length) {
-                            container = $(document.body);
-                        }
                         $('.sf-toolbar').remove();
-                        container.append(dtContainer);
+                        $(document.body).append(dtContainer);
                         mediator.trigger('layout:adjustHeight');
                     }, this)
                 );
@@ -970,7 +965,11 @@ define(function (require) {
         processForms: function() {
             $('body').on('submit', _.bind(function (e) {
                 var $form = $(e.target);
-                if ($form.data('nohash') || e.isDefaultPrevented()) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                if ($form.data('nohash')) {
+                    $form.data('sent', true);
                     return;
                 }
                 e.preventDefault();

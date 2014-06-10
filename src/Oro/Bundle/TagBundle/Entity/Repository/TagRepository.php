@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Entity\Repository;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityRepository;
 
@@ -23,7 +24,7 @@ class TagRepository extends EntityRepository
             ->select('t')
             ->innerJoin('t.tagging', 't2', Join::WITH, 't2.recordId = :recordId AND t2.entityName = :entityName')
             ->setParameter('recordId', $resource->getTaggableId())
-            ->setParameter('entityName', get_class($resource));
+            ->setParameter('entityName', ClassUtils::getClass($resource));
 
         if (!is_null($createdBy)) {
             $qb->where('t2.owner ' . ($all ? '!=' : '=') . ' :createdBy')

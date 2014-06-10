@@ -34,7 +34,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login = $this->login();
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -48,7 +48,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $username;
     }

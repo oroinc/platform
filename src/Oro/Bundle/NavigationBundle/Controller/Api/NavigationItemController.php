@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Controller\FOSRestController;
@@ -13,8 +15,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("navigationitems")
@@ -39,7 +39,7 @@ class NavigationItemController extends FOSRestController
         $entity = $this->getFactory()->createItem($type, array());
 
         /** @var $repo NavigationRepositoryInterface */
-        $repo = $this->getDoctrine()->getRepository(get_class($entity));
+        $repo = $this->getDoctrine()->getRepository(ClassUtils::getClass($entity));
         $items = $repo->getNavigationItems($this->getUser(), $type);
 
         return $this->handleView(

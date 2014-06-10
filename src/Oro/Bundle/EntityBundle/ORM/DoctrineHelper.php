@@ -103,7 +103,20 @@ class DoctrineHelper
     public function getEntityReference($entityClass, $entityId)
     {
         $entityManager = $this->getEntityManager($entityClass);
+
         return $entityManager->getReference($entityClass, $entityId);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param mixed $entityId
+     * @return object|null
+     */
+    public function getEntity($entityClass, $entityId)
+    {
+        $entityManager = $this->getEntityManager($entityClass);
+
+        return $entityManager->getRepository($entityClass)->find($entityId);
     }
 
     /**

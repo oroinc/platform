@@ -12,7 +12,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
         _.extend(formState.prototype, {
             UNLOAD_EVENT: 'beforeunload.configFormState',
             LOAD_EVENT: 'ready.configFormState',
-            CONFIRMATION_MESSAGE: __('You have unsaved changes, are you sure that you want to leave?'),
+            CONFIRMATION_MESSAGE: __('You have unsaved changes, are you sure you want to leave this page?'),
 
             data: null,
             form: null,
@@ -38,7 +38,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @returns {boolean}
              */
             isChanged: function () {
-                if (!_.isNull(this.data)) {
+                if (!_.isNull(this.data) && !(this.form.data('nohash') && this.form.data('sent'))) {
                     return this.data !== this.getState();
                 }
 

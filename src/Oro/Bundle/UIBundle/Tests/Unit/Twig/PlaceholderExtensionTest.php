@@ -104,7 +104,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($controllerReference)
             ->will($this->returnValue($expectedActionRender));
 
-        $result = $this->extension->renderPlaceholder(self::PLACEHOLDER_NAME, $variables, self::DELIMITER);
+        $result = $this->extension->renderPlaceholder(
+            self::PLACEHOLDER_NAME,
+            $variables,
+            array('delimiter' => self::DELIMITER)
+        );
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -122,7 +126,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::INVALID_PLACEHOLDER_NAME, array())
             ->will($this->returnValue($this->placeholders[self::INVALID_PLACEHOLDER_NAME]['items']));
 
-        $this->extension->renderPlaceholder(self::INVALID_PLACEHOLDER_NAME, array(), self::DELIMITER);
+        $this->extension->renderPlaceholder(
+            self::INVALID_PLACEHOLDER_NAME,
+            array(),
+            array('delimiter' => self::DELIMITER)
+        );
     }
 
     public function testGetFunctions()

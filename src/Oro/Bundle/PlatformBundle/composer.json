@@ -8,7 +8,8 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": "2.3.*",
-        "lexik/maintenance-bundle": "dev-master"
+        "lexik/maintenance-bundle": "dev-master",
+        "oro/config": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\PlatformBundle": "" }

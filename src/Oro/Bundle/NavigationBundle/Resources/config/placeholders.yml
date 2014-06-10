@@ -1,45 +1,43 @@
 placeholders:
     scripts_before:
-        label: Scripts Before
         items:
             dot_menu_js:
                 order: 100
             pinbar_js:
                 order: 200
     scripts_after:
-        label: Scripts After
         items:
             navigationItem:
                 order: 100
     hash_nav:
-        label: Hash Navigation
         items:
             hashNavigation:
                 order: 100
     navbar:
-        label: Navigation Bar
         items:
             shortcuts:
                 order: 100
     application_menu:
-        label: Application Menu
         items:
             application_menu:
                 order: 100
-    before_navigation:
-        label: Top Navigation Before
+    dots_menu:
         items:
             dots_menu:
                 order: 100
-    after_navigation:
-        label: Top Navigation After
+
+    pin_tabs_list:
+        items:
+            pin_tabs_list:
+                order: 100
+
+    after_navigation: ~
+
     pin_button:
-        label: Pinbar buttons
         items:
             pin_button:
                 order: 100
     breadcrumb:
-        label: Breadcrumbs
         items:
             breadcrumbs:
                 order: 100
@@ -63,6 +61,8 @@ items:
         template: OroNavigationBundle:ApplicationMenu:applicationMenu.html.twig
    dots_menu:
         template: OroNavigationBundle:ApplicationMenu:dotsMenu.html.twig
+   pin_tabs_list:
+        template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
    pin_button:
         template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
    breadcrumbs:
