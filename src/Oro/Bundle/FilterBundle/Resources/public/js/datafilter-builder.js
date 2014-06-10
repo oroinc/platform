@@ -91,13 +91,14 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
                 modules: null
             };
 
-            onCollectionSet = function (collection, $el) {
-                if ($el === self.$el) {
+            onCollectionSet = function (collection) {
+                if (self.gridName === collection.inputName) {
                     self.collection = collection;
                     methods.build.call(self);
+                    mediator.off('datagrid_collection_set_after', onCollectionSet);
                 }
             };
-            mediator.once('datagrid_collection_set_after', onCollectionSet);
+            mediator.on('datagrid_collection_set_after', onCollectionSet);
             mediator.once('hash_navigation_request:start', function () {
                 mediator.off('datagrid_collection_set_after', onCollectionSet);
             });

@@ -38,6 +38,8 @@ define(['underscore', '../content-manager'], function (_, ContentManager) {
         init: function (deferred, $el, gridName) {
             if (_.indexOf(this.allowedTracking, gridName) !== -1) {
                 methods.initHandler(deferred, $el);
+            } else {
+                deferred.resolve();
             }
         }
     };
