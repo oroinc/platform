@@ -13,6 +13,14 @@
         {{ form_widget(form.transport) }}
     {% endif %}
 
+    {% if (form.isTwoWaySyncEnabled is defined) %}
+        {{ form_row(form.isTwoWaySyncEnabled) }}
+    {% endif %}
+
+    {% if (form.syncPriority is defined) %}
+        {{ form_row(form.syncPriority) }}
+    {% endif %}
+
     {% if (form.connectors is defined) %}
         <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
             {{ form_row(form.connectors) }}
@@ -33,11 +41,13 @@
                         type:          [
                             {{ form.type.vars.full_name|json_encode|raw }},
                             {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
                             {{ form._token.vars.full_name|json_encode|raw }}
                         ],
                         transportType: [
                             {{ form.type.vars.full_name|json_encode|raw }},
                             {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
                             {{ form.transportType.vars.full_name|json_encode|raw }},
                             {{ form._token.vars.full_name|json_encode|raw }}
                         ]

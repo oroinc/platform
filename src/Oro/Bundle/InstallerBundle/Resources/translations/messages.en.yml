@@ -16,6 +16,7 @@ form:
             user:         User
             password:     Password
             name:         Name
+            drop_full:    Drop Full Database
         mailer:
             header:       Mailer settings
             host:         Host

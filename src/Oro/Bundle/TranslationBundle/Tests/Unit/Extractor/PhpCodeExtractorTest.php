@@ -18,7 +18,7 @@ class PhpCodeExtractorTest extends \PHPUnit_Framework_TestCase
     /** @var PhpCodeExtractor */
     protected $extractor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()->getMock();
@@ -26,7 +26,7 @@ class PhpCodeExtractorTest extends \PHPUnit_Framework_TestCase
         $this->extractor = new PhpCodeExtractor($this->container);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->container);
         unset($this->extractor);

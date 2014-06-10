@@ -17,14 +17,15 @@ interface ConfigInterface extends \Serializable
     /**
      * Gets a value of a configuration parameter.
      *
-     * @param string $code    The code (name) a configuration parameter
-     * @param bool   $strict  Set to true if this method must raise an exception
-     *                        when the requested parameter does not exist
-     * @return mixed|null     The parameter value of null if the requested parameter does not exist
-     *                        and $strict = false
+     * @param string     $code    The code (name) a configuration parameter
+     * @param bool       $strict  Set to true if this method must raise an exception
+     *                            when the requested parameter does not exist
+     * @param mixed|null $default Will return default value if code does not exist and $strict == false
+     *
+     * @return mixed|null The parameter value of null if the requested parameter does not exist and $strict = false
      * @throws RuntimeException When $strict = true and the requested parameter does not exist
      */
-    public function get($code, $strict = false);
+    public function get($code, $strict = false, $default = null);
 
     /**
      * Sets a value of the given configuration parameter.

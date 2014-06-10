@@ -1,4 +1,8 @@
-oro.dataaudit.module_label: "Data audit"
-oro.dataaudit.menu.audit_list.label: "Data Audit"
-oro.dataaudit.menu.audit_list.description: "Data Audit"
+oro:
+    dataaudit:
+        module_label:           "Data audit"
+
+        menu:
+            audit_list.label:       "Data Audit"
+            audit_list.description: "Data Audit"
 

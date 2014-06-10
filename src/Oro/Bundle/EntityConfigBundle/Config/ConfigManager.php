@@ -265,7 +265,9 @@ class ConfigManager
             : null;
 
         if (!$config) {
-            $model = $this->modelManager->getModelByConfigId($configId);
+            $model = $configId instanceof FieldConfigId
+                ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
+                : $this->modelManager->getEntityModel($configId->getClassName());
 
             $config = new Config($configId);
             $config->setValues($model->toArray($configId->getScope()));
@@ -462,11 +464,16 @@ class ConfigManager
 
             $this->eventDispatcher->dispatch(Events::PRE_PERSIST_CONFIG, new PersistConfigEvent($config, $this));
 
-            $configKey = $this->buildConfigKey($config->getId());
+            $configId = $config->getId();
+            $configKey = $configId instanceof FieldConfigId
+                ? sprintf('%s_%s', $configId->getClassName(), $configId->getFieldName())
+                : $configId->getClassName();
             if (isset($models[$configKey])) {
                 $model = $models[$configKey];
             } else {
-                $model = $this->modelManager->getModelByConfigId($config->getId());
+                $model = $configId instanceof FieldConfigId
+                    ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
+                    : $this->modelManager->getEntityModel($configId->getClassName());
 
                 $models[$configKey] = $model;
             }
@@ -904,12 +911,11 @@ class ConfigManager
     {
         $defaultValues = [];
 
+        $scope = $provider->getScope();
+
         // try to get default values from an annotation
-        if ($metadata) {
-            $scope = $provider->getScope();
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
@@ -925,7 +931,7 @@ class ConfigManager
             foreach ($translatablePropertyNames as $propertyName) {
                 if (!in_array($propertyName, $defaultValues)) {
                     $defaultValues[$propertyName] =
-                        ConfigHelper::getTranslationKey($propertyName, $className);
+                        ConfigHelper::getTranslationKey($scope, $propertyName, $className);
                 }
             }
         }
@@ -952,12 +958,11 @@ class ConfigManager
     ) {
         $defaultValues = [];
 
+        $scope = $provider->getScope();
+
         // try to get default values from an annotation
-        if ($metadata) {
-            $scope = $provider->getScope();
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
@@ -972,7 +977,7 @@ class ConfigManager
         foreach ($translatablePropertyNames as $propertyName) {
             if (!in_array($propertyName, $defaultValues)) {
                 $defaultValues[$propertyName] =
-                    ConfigHelper::getTranslationKey($propertyName, $className, $fieldName);
+                    ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
             }
         }
 

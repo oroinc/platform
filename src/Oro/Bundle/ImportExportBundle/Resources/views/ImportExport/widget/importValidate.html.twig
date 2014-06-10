@@ -114,7 +114,7 @@
         <div class="clearfix">
             <div class="pull-right">
                 <a href="javascript:void(0);" class="error-toggle">{{ 'Hide'|trans }}</a>
-                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small"><i class="icon-download-alt"></i>{{ 'Download log'|trans }}</a>
+                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small no-hash"><i class="icon-download-alt"></i>{{ 'Download log'|trans }}</a>
             </div>
         </div>
     </div>
@@ -161,7 +161,7 @@
                             widget.trigger('importComplete', data);
                             var message = data.message;
                             if (!data.success && data.errorsUrl) {
-                                var link = '<a target="_blank" href="' + data.errorsUrl + '">' + __('Download error log') + '</a>';
+                                var link = '<a href="' + data.errorsUrl + '" class="no-hash" target="_blank">' + __('Download error log') + '</a>';
                                 message += ' ' + link;
                             }
                             Messanger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);

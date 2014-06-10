@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -70,14 +71,15 @@ class RecordOwnerDataListener
         if (!$user) {
             return;
         }
-        $entity = $args->getEntity();
-        if ($this->configProvider->hasConfig(get_class($entity))) {
-            $config = $this->configProvider->getConfig(get_class($entity));
+        $entity    = $args->getEntity();
+        $className = ClassUtils::getClass($entity);
+        if ($this->configProvider->hasConfig($className)) {
+            $config = $this->configProvider->getConfig($className);
             $ownerType = $config->get('owner_type');
             if ($ownerType && $ownerType !== OwnershipType::OWNER_TYPE_NONE) {
                 if (!method_exists($entity, 'getOwner')) {
                     throw new \LogicException(
-                        sprintf('Method getOwner must be implemented for %s entity', get_class($entity))
+                        sprintf('Method getOwner must be implemented for %s entity', $className)
                     );
                 }
                 if (!$entity->getOwner()) {

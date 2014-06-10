@@ -13,7 +13,7 @@ class MoneyTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!Type::hasType(MoneyType::TYPE)) {
             Type::addType(MoneyType::TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\MoneyType');
@@ -31,7 +31,7 @@ class MoneyTypeTest extends \PHPUnit_Framework_TestCase
         $platform = new MySqlPlatform();
         $output = $this->type->getSQLDeclaration([], $platform);
 
-        $this->assertEquals('NUMERIC(19, 4)', $output);
+        $this->assertEquals("NUMERIC(19, 4) COMMENT '(DC2Type:money)'", $output);
     }
 
     public function testConvertToPHPValue()

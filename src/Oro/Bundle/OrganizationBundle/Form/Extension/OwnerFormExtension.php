@@ -2,31 +2,33 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
+use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class OwnerFormExtension
@@ -152,6 +154,10 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if ($options['ownership_disabled']) {
+            return;
+        }
+
         $formConfig = $builder->getFormConfig();
         if (!$formConfig->getCompound()) {
             return;
@@ -214,6 +220,18 @@ class OwnerFormExtension extends AbstractTypeExtension
                 $this->fieldLabel,
                 $this->isAssignGranted,
                 $defaultOwner
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'ownership_disabled' => false,
             )
         );
     }
@@ -304,7 +322,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             $permission = 'ASSIGN';
             $this->checkIsGranted($permission, $entity);
             $owner = $entity->getOwner();
-            $dataClassName = get_class($entity);
+            $dataClassName = ClassUtils::getClass($entity);
             $metadata = $this->getMetadata($dataClassName);
 
             if ($metadata) {
@@ -560,7 +578,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getMetadata($entity)
     {
         if (is_object($entity)) {
-            $dataClassName = get_class($entity);
+            $dataClassName = ClassUtils::getClass($entity);
         } else {
             $dataClassName = $entity;
         }

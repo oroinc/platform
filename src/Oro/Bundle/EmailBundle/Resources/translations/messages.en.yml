@@ -1,48 +1,7 @@
 oro:
     email:
-        menu:
-            emailtemplate_list.description: List of email templates
-
         controller.emailtemplate.saved.message: "Template saved"
-        form.choose_template: "Choose a template..."
-        datagrid:
-            emailtemplate:
-                action:
-                    update: "Update"
-                    clone: "Clone"
-                    delete: "Delete"
-                filter:
-                    type:
-                        html: "Html"
-                        txt: "Plain text"
-                page_size:
-                    all: "All"
-                view:
-                    system_templates: "System only"
-
-        handler:
-            attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
-            unable_to_send_email: "Unable to send the email."
-
-        entity_label:        Email
-        entity_plural_label: Emails
-        entity_description:  Email message
-        send_email:          Send email
-        id.label:            Id
-        created.label:       Created at
-        subject.label:       Subject
-        from_name.label:     From
-        received_at.label:   Received at
-        sent_at.label:       Sent at
-        importance.label:    Importance
-        internal_date.label: Internal date
-        message_id.label:    Message Id
-        x_message_id.label:  xMessage Id
-        x_thread_id.label:   xThread Id
-        recipients.label:    Recipients
-        folder.label:        Folder
-        email_body.label:    Body
-        from_email_address.label: From
+        form.choose_template:                   "Choose a template..."
 
         emailtemplate:
             entity_label:        Template
@@ -60,6 +19,48 @@ oro:
             entity_name.label:   Entity name
             type.label:          Type
             translations.label:  Translations
+
+        menu:
+            emailtemplate_list.description: List of email templates
+
+        datagrid:
+            emailtemplate:
+                action:
+                    clone:  "Clone"
+                    delete: "Delete"
+                    update: "Update"
+                filter:
+                    type:
+                        html: "Html"
+                        txt:  "Plain text"
+                page_size:
+                    all: "All"
+                view:
+                    system_templates: "System only"
+
+        handler:
+            attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
+            unable_to_send_email:         "Unable to send the email."
+
+        created.label:            Created at
+        folders.label:            Folders
+        from_email_address.label: From
+        from_name.label:          From
+        email_body.label:         Body
+        entity_label:             Email
+        entity_plural_label:      Emails
+        entity_description:       Email message
+        id.label:                 Id
+        importance.label:         Importance
+        internal_date.label:      Internal date
+        message_id.label:         Message Id
+        received_at.label:        Received at
+        recipients.label:         Recipients
+        send_email:               Send email
+        sent_at.label:            Sent at
+        subject.label:            Subject
+        x_message_id.label:       xMessage Id
+        x_thread_id.label:        xThread Id
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

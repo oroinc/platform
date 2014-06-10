@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 class OwnerTreeListener
@@ -30,7 +29,7 @@ class OwnerTreeListener
     /**
      * @var bool
      */
-    protected $needWarmap;
+    protected $needWarmup;
 
     /**
      * @param ServiceLink $treeProviderLink
@@ -46,18 +45,18 @@ class OwnerTreeListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $this->needWarmap = false;
+        $this->needWarmup = false;
         if ($this->checkEntities($uow->getScheduledEntityInsertions())) {
-            $this->needWarmap = true;
+            $this->needWarmup = true;
         }
-        if (!$this->needWarmap && $this->checkEntities($uow->getScheduledEntityUpdates())) {
-            $this->needWarmap = true;
+        if (!$this->needWarmup && $this->checkEntities($uow->getScheduledEntityUpdates())) {
+            $this->needWarmup = true;
         }
-        if (!$this->needWarmap && $this->checkEntities($uow->getScheduledEntityDeletions())) {
-            $this->needWarmap = true;
+        if (!$this->needWarmup && $this->checkEntities($uow->getScheduledEntityDeletions())) {
+            $this->needWarmup = true;
         }
 
-        if ($this->needWarmap) {
+        if ($this->needWarmup) {
             $this->getTreeProvider()->clear();
         }
     }
@@ -69,7 +68,7 @@ class OwnerTreeListener
     protected function checkEntities(array $entities)
     {
         foreach ($entities as $entity) {
-            if (in_array(get_class($entity), $this->securityClasses)) {
+            if (in_array(ClassUtils::getClass($entity), $this->securityClasses)) {
 
                 return true;
             }

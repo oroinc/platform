@@ -151,7 +151,7 @@ class EmailEntityBuilder
     {
         $result = new EmailAttachmentContent();
         $result
-            ->setValue($content)
+            ->setContent($content)
             ->setContentTransferEncoding($contentTransferEncoding);
 
         return $result;
@@ -170,7 +170,7 @@ class EmailEntityBuilder
     {
         $result = new EmailBody();
         $result
-            ->setContent($content)
+            ->setBodyContent($content)
             ->setBodyIsText(!$isHtml)
             ->setPersistent($persistent);
 

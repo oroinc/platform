@@ -5,7 +5,7 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
             {% block head_style %}
                 {% if oro_theme_icon() %}
                     <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
@@ -17,7 +17,13 @@
                 {% block scripts_before %}
                     {% placeholder scripts_before %}
                 {% endblock %}
-                {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
+                {% set requirejs_config_extend %}
+                    {% placeholder requirejs_config_extend %}
+                {% endset %}
+                {% include 'OroRequireJSBundle::scripts.html.twig' with {
+                    compressed: not app.debug,
+                    config_extend: requirejs_config_extend
+                } %}
                 <script type="text/javascript">
                     require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
@@ -52,41 +58,29 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
-                            {% block navbar %}
-                            <div class="nav pull-left top-search shortcuts">
-                                {% placeholder navbar %}
-                            </div>
-                            {% endblock navbar %}
-                            <div class="divider-vertical small-divider"></div>
-                            <div id="main-menu">
-                                {% block application_menu %}
-                                    {% placeholder application_menu %}
-                                {% endblock application_menu %}
-                            </div>
                             <ul class="nav pull-right user-menu">
-                            {% block user_menu %}
-                                {% placeholder user_menu %}
-                                {# Disabled notification icon till it will be implemented
-                                {% block notifications %}
-                                <li class="divider-vertical small-divider"></li>
-                                <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
-                                {% endblock notifications %}
-                                #}
-                            {% endblock %}
+                                {{ block('user_menu') }}
                             </ul>
+                            {% placeholder dots_menu %}
+                            <div class="nav top-search shortcuts">
+                                {{ block('navbar') }}
+                            </div>
+                            {% placeholder pin_tabs_list %}
                         </div>
                     </div>
+                    {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
-            {% block main %}
-                <div id="main" >
-                    {% block right_panel %}
-                        {% placeholder right_panel with {placement: 'right'} %}
-                    {% endblock right_panel %}
-                    {% block left_panel %}
+            {% if isDesktopVersion() %}
+                {% block left_panel %}
+                    <div id="left-panel">
                         {% placeholder left_panel with {placement: 'left'} %}
-                    {% endblock left_panel %}
+                    </div>
+                {% endblock left_panel %}
+            {% endif %}
+            {% block main %}
+                <div id="main">
                     {% block before_content %}
                     <div class="breadcrumb-pin">
                         <div id="breadcrumb">
@@ -181,6 +175,13 @@
                     </div>
                 </div>
             {% endblock main %}
+            {% if isDesktopVersion() %}
+                {% block right_panel %}
+                    <div id="right-panel">
+                        {% placeholder right_panel with {placement: 'right'} %}
+                    </div>
+                {% endblock right_panel %}
+            {% endif %}
             {% block footer %}
                 <div id="dialog-extend-fixed-container"></div>
                 <footer id="footer" class="footer">
@@ -194,6 +195,7 @@
     </html>
 {% else %}
 {# Template for hash tag navigation#}
+{% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
 {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
     with {
         'script': block('head_script'),

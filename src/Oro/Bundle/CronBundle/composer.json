@@ -9,7 +9,6 @@
         "php": ">=5.3.3",
         "symfony/symfony": "2.3.*",
         "jms/job-queue-bundle": "dev-master",
-        "knplabs/knp-paginator-bundle": "dev-master",
         "mtdowling/cron-expression": "1.0.*",
         "oro/ui-bundle": "dev-master",
         "oro/user-bundle": "dev-master",

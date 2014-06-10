@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
+use Doctrine\ORM\Query;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -72,6 +74,15 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $this->leftJoins       = null;
 
         $this->config->offsetSetByPath('[source][type]', 'orm');
+        $this->config->offsetSetByPath(
+            '[source][hints]',
+            [
+                [
+                    'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
+                    'value' => 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                ]
+            ]
+        );
     }
 
     /**

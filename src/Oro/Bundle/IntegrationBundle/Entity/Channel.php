@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -66,6 +67,30 @@ class Channel
     protected $connectors;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_two_way_sync_enabled", type="boolean", nullable=true)
+     * @Oro\Versioned()
+     */
+    protected $isTwoWaySyncEnabled;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="sync_priority", type="string", length=255, nullable=true)
+     * @Oro\Versioned()
+     */
+    protected $syncPriority;
+
+    /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $defaultUserOwner;
+
+    /**
      * @var Status[]|ArrayCollection
      *
      * Cascade persisting is not used due to lots of detach/merge
@@ -78,7 +103,8 @@ class Channel
 
     public function __construct()
     {
-        $this->statuses = new ArrayCollection();
+        $this->statuses            = new ArrayCollection();
+        $this->isTwoWaySyncEnabled = false;
     }
 
     /**
@@ -218,5 +244,65 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
+    }
+
+    /**
+     * @param string $syncPriority
+     *
+     * @return $this
+     */
+    public function setSyncPriority($syncPriority)
+    {
+        $this->syncPriority = $syncPriority;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSyncPriority()
+    {
+        return $this->syncPriority;
+    }
+
+    /**
+     * @param boolean $isTwoWaySyncEnabled
+     *
+     * @return $this
+     */
+    public function setIsTwoWaySyncEnabled($isTwoWaySyncEnabled)
+    {
+        $this->isTwoWaySyncEnabled = $isTwoWaySyncEnabled;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsTwoWaySyncEnabled()
+    {
+        return $this->isTwoWaySyncEnabled;
+    }
+
+    /**
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function setDefaultUserOwner(User $owner = null)
+    {
+        $this->defaultUserOwner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getDefaultUserOwner()
+    {
+        return $this->defaultUserOwner;
     }
 }

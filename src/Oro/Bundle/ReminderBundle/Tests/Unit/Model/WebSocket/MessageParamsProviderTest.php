@@ -31,7 +31,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $urlProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()

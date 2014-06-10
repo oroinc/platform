@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).
@@ -43,7 +41,7 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function get($code, $strict = false)
+    public function get($code, $strict = false, $default = null)
     {
         if (isset($this->values[$code])) {
             return $this->values[$code];
@@ -53,7 +51,7 @@ class Config implements ConfigInterface
             throw new RuntimeException(sprintf('Value "%s" for %s', $code, $this->getId()->toString()));
         }
 
-        return null;
+        return $default;
     }
 
     /**

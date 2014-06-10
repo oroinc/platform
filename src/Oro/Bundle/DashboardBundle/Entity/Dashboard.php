@@ -171,7 +171,7 @@ class Dashboard
     /**
      * @return bool
      */
-    public function isDefault()
+    public function getIsDefault()
     {
         return $this->isDefault;
     }

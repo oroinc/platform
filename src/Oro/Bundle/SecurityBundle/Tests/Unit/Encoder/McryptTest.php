@@ -11,12 +11,12 @@ class McryptTest extends \PHPUnit_Framework_TestCase
     /** @var Mcrypt */
     protected $encryptor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->encryptor = $this->getInstance();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->encryptor);
     }

@@ -10,7 +10,7 @@ class EmailTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->type = new EmailType();
     }

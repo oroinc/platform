@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -21,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -83,10 +83,18 @@ class ConfigFieldGridController extends Controller
             $form->submit($request);
 
             if ($form->isValid()) {
+                $fieldName = $newFieldModel->getFieldName();
+
+                $originalFieldNames = $form->getConfig()->getAttribute(FieldType::ORIGINAL_FIELD_NAMES_ATTRIBUTE);
+                if (isset($originalFieldNames[$fieldName])) {
+                    $fieldName = $originalFieldNames[$fieldName];
+                }
+
                 $request->getSession()->set(
                     sprintf(self::SESSION_ID_FIELD_NAME, $entity->getId()),
-                    $newFieldModel->getFieldName()
+                    $fieldName
                 );
+
                 $request->getSession()->set(
                     sprintf(self::SESSION_ID_FIELD_TYPE, $entity->getId()),
                     $newFieldModel->getType()
@@ -147,7 +155,7 @@ class ConfigFieldGridController extends Controller
          * check if fieldType has 4th option [fieldName]
          */
         if (count($relationOptions) == 4) {
-            $fieldType = ExtendHelper::getReversRelationType($relationOptions[0]);
+            $fieldType = ExtendHelper::getReverseRelationType($relationOptions[0]);
 
             $relations = $extendEntityConfig->get('relation');
             if (isset($relations[$relationName])) {

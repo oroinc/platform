@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * QueryLog
+ * Query
  *
  * @ORM\Table(name="oro_search_query")
  * @ORM\Entity
@@ -63,8 +63,8 @@ class Query
     /**
      * Set from
      *
-     * @param  string   $entity
-     * @return QueryLog
+     * @param  string $entity
+     * @return Query
      */
     public function setEntity($entity)
     {
@@ -86,8 +86,8 @@ class Query
     /**
      * Set query
      *
-     * @param  string   $query
-     * @return QueryLog
+     * @param  string $query
+     * @return Query
      */
     public function setQuery($query)
     {
@@ -109,8 +109,8 @@ class Query
     /**
      * Set resultCount
      *
-     * @param  integer  $resultCount
-     * @return QueryLog
+     * @param  integer $resultCount
+     * @return Query
      */
     public function setResultCount($resultCount)
     {

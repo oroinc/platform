@@ -1,23 +1,24 @@
 oro:
     dashboard:
-        entity_label: Dashboard
-        entity_plural_label: Dashboards
-
-        management_title: Manage dashboards
-
+        block:
+            general: General Information
         title:
-            main: Dashboard
+            main:            Dashboard
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
 
-        block:
-            general: General Information
+        created_at.label:    Created At
+        entity_label:        Dashboard
+        entity_plural_label: Dashboards
+        id.label:            Id
+        is_default.label:    Is Default
+        label.label:         Label
+        management_title:    Manage dashboards
+        name.label:          Name
+        owner.label:         Owner
+        updated_at.label:    Updated At
+        widgets.label:       Widgets
 
-        name.label: Name
-        label.label: Label
-        owner.label: Owner
-        created_at.label: Created At
-        updated_at.label: Updated At
         start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
 
@@ -36,7 +37,7 @@ oro:
 
         list: List
 
-        saved_message: Dashboard saved successfully
+        saved_message: Dashboard saved
 
         menu:
             dashboards_tab:

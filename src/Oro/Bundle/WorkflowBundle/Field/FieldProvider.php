@@ -29,9 +29,17 @@ class FieldProvider extends EntityFieldProvider
     /**
      * {@inheritdoc}
      */
-    protected function addFields(array &$result, $className, EntityManager $em, $withVirtualFields, $translate)
-    {
-        parent::addFields($result, $className, $em, $withVirtualFields, $translate);
+    protected function addFields(
+        array &$result,
+        $className,
+        EntityManager $em,
+        $withVirtualFields,
+        $withExclusions,
+        $translate
+    ) {
+        // in workflow exclusions not used
+        $withExclusions = false;
+        parent::addFields($result, $className, $em, $withVirtualFields, $withExclusions, $translate);
 
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {

@@ -5,6 +5,8 @@ oro_menu_config:
             uri: '#'
             attributes:
                 class: 'mobile-hide'
+            extras:
+                icon: icon-gear
         users_management:
             label: 'oro.user.menu.users_management.label'
             uri: '#'

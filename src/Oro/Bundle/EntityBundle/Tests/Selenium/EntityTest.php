@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -19,9 +21,10 @@ class EntityTest extends Selenium2TestCase
         $entityName = 'Entity'.mt_rand();
 
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
-            ->assertTitle('New Entity - Entities - System')
+            ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityName)
             ->setLabel($entityName)
             ->setPluralLabel($entityName)
@@ -49,14 +52,15 @@ class EntityTest extends Selenium2TestCase
     {
         $newEntityName = 'Update' . $entityName;
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            //->filterBy('Label', $entityName)
+            ->filterBy('Name', $entityName)
             ->open(array($entityName))
             ->edit()
             ->setLabel($newEntityName)
             ->save()
             ->assertMessage('Entity saved')
-            ->assertTitle($newEntityName .' - Entities - System')
+            ->assertTitle($newEntityName .' - Entity Management - Entities - System')
             ->createField()
             ->setFieldName('test_field2')
             ->setType('Integer')
@@ -76,6 +80,7 @@ class EntityTest extends Selenium2TestCase
     public function testEntityFieldsAvailability($entityName)
     {
         $login = $this->login();
+        /** @var Navigation $login */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
@@ -88,14 +93,15 @@ class EntityTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testUpdateEntity
+     * @depends testCreateEntity
      * @param $entityName
      */
     public function testDeleteEntity($entityName)
     {
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $entityExist = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            //->filterBy('Label', $entityName)
+            ->filterBy('Name', $entityName)
             ->deleteEntity(array($entityName), 'Remove')
             ->assertMessage('Item was removed')
             ->open(array($entityName))

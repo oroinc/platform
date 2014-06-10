@@ -21,7 +21,8 @@ function(_, Backbone, TransitionsShortRowView) {
             stepFrom: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.rowViews = [];
 
             this.listenTo(this.getCollection(), 'add', this.addItem);

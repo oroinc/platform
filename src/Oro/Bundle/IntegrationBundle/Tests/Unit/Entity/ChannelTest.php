@@ -7,6 +7,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_STRING = 'testString';
+    const TEST_BOOLEAN = true;
 
     /** @var array */
     protected static $testConnectors = ['customer', 'product'];
@@ -14,12 +15,12 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
     /** @var Channel */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new Channel();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }
@@ -45,11 +46,16 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
      */
     public function getSetDataProvider()
     {
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
         return [
-            'id'         => ['id'],
-            'name'       => ['name', self::TEST_STRING, self::TEST_STRING],
-            'type'       => ['type', self::TEST_STRING, self::TEST_STRING],
-            'connectors' => ['connectors', self::$testConnectors, self::$testConnectors]
+            'id'                  => ['id'],
+            'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
+            'type'                => ['type', self::TEST_STRING, self::TEST_STRING],
+            'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
+            'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
+            'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
+            'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
         ];
     }
 

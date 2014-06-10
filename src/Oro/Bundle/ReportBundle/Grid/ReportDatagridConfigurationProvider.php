@@ -7,8 +7,10 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\VirtualFieldProviderInterface;
+
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface
 {
@@ -35,20 +37,28 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     private $configuration = null;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * Constructor
      *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider ,
      * @param ManagerRegistry               $doctrine
+     * @param ConfigManager $configManager
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        ConfigManager $configManager
     ) {
         $this->functionProvider     = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
         $this->doctrine             = $doctrine;
+        $this->configManager        = $configManager;
     }
 
     /**
@@ -73,7 +83,8 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
                 $report,
                 $this->functionProvider,
                 $this->virtualFieldProvider,
-                $this->doctrine
+                $this->doctrine,
+                $this->configManager
             );
 
             $this->configuration = $builder->getConfiguration();

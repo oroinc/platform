@@ -67,7 +67,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
@@ -164,7 +164,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->ownershipMetadataProvider->expects($this->never())
             ->method('getMetadata');
 
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     public function testAnonymousUser()
@@ -184,7 +184,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->never())
             ->method('add');
 
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -197,7 +197,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->fieldName,
             'oro_user_acl_select'
         );
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -207,7 +207,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->mockConfigs(array('is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_USER));
         $this->builder->expects($this->never())->method('add');
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -233,7 +233,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -255,7 +255,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Owner'
             )
         );
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -275,7 +275,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'constraints' => array(new NotBlank())
             )
         );
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     /**
@@ -296,7 +296,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'constraints' => array(new NotBlank())
             )
         );
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     public function testEventListener()
@@ -306,7 +306,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber'))
             ->will($this->returnCallback(array($this, 'eventCallback')));
-        $this->extension->buildForm($this->builder, array());
+        $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
 
     public function eventCallback(OwnerFormSubscriber $listener)

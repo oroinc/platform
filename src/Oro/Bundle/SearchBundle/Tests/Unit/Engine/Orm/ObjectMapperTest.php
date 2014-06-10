@@ -90,7 +90,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
 

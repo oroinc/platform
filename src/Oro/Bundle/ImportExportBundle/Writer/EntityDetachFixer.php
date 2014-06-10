@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
@@ -38,7 +39,7 @@ class EntityDetachFixer
             return;
         }
 
-        $metadata = $this->entityManager->getClassMetadata(get_class($entity));
+        $metadata = $this->entityManager->getClassMetadata(ClassUtils::getClass($entity));
         foreach ($metadata->getAssociationMappings() as $associationMapping) {
             $fieldName = $associationMapping['fieldName'];
             $value = PropertyAccess::createPropertyAccessor()->getValue($entity, $fieldName);
@@ -90,7 +91,7 @@ class EntityDetachFixer
      */
     protected function reloadEntity($entity)
     {
-        $entityClass = get_class($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $id = $this->entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
         return $this->entityManager->find($entityClass, $id);
     }

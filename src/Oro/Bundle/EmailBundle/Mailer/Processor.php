@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
@@ -49,11 +49,10 @@ class Processor
      * Process email model sending.
      *
      * @param Email  $model
-     * @param string $originName
      * @return \Oro\Bundle\EmailBundle\Entity\Email
      * @throws \Swift_SwiftException
      */
-    public function process(Email $model, $originName = InternalEmailOrigin::BAP)
+    public function process(Email $model)
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -72,28 +71,7 @@ class Processor
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-            $this->em,
-            EmailUtil::extractPureEmailAddress($model->getFrom())
-        );
-
-        if ($emailOwner instanceof User) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                function ($item) {
-                    return $item instanceof InternalEmailOrigin;
-                }
-            );
-
-            $origin = $origins->isEmpty() ? null : $origins->first();
-            if ($origin == null) {
-                $origin = $this->createUserInternalOrigin($emailOwner);
-            }
-        } else {
-            $origin = $this->em
-                ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                ->findOneBy(array('internalName' => $originName));
-        }
-
+        $origin = $this->getEmailOrigin($model->getFrom());
         $this->emailEntityBuilder->setOrigin($origin);
 
         $email = $this->emailEntityBuilder->email(
@@ -113,6 +91,40 @@ class Processor
         $this->em->flush();
 
         return $email;
+    }
+
+    /**
+     * Find existing email origin entity by email string or create and persist new one.
+     *
+     * @param string $email
+     * @param string $originName
+     * @return EmailOrigin
+     */
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
+    {
+        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+            $this->em,
+            EmailUtil::extractPureEmailAddress($email)
+        );
+
+        if ($emailOwner instanceof User) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                function ($item) {
+                    return $item instanceof InternalEmailOrigin;
+                }
+            );
+
+            $origin = $origins->isEmpty() ? null : $origins->first();
+            if ($origin == null) {
+                $origin = $this->createUserInternalOrigin($emailOwner);
+            }
+        } else {
+            $origin = $this->em
+                ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                ->findOneBy(array('internalName' => $originName));
+        }
+
+        return $origin;
     }
 
     /**

@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -17,6 +18,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
+    const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
+
     protected $types = [
         'string'     => 'oro.entity_extend.form.data_type.string',
         'integer'    => 'oro.entity_extend.form.data_type.integer',
@@ -35,13 +38,19 @@ class FieldType extends AbstractType
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     ];
 
-    /** @var ConfigManager */
+    /**
+     * @var ConfigManager
+     */
     protected $configManager;
 
-    /** @var Translator */
+    /**
+     * @var Translator
+     */
     protected $translator;
 
-    /** @var ExtendDbIdentifierNameGenerator */
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
     protected $nameGenerator;
 
     /**
@@ -78,46 +87,34 @@ class FieldType extends AbstractType
 
         $entityProvider = $this->configManager->getProvider('entity');
         $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfig   = $extendProvider->getConfig($options['class_name']);
 
-        $entityConfig = $extendProvider->getConfig($options['class_name']);
         if ($entityConfig->is('relation')) {
-            $types = [];
+            $originalFieldNames = array();
+            $types     = [];
             $relations = $entityConfig->get('relation');
             foreach ($relations as $relationKey => $relation) {
-                /** @var FieldConfigId $fieldId */
-                $fieldId       = $relation['field_id'];
-                /** @var FieldConfigId $targetFieldId */
-                $targetFieldId = $relation['target_field_id'];
-
-                if (!$relation['assign'] || !$targetFieldId) {
-                    if (!$targetFieldId) {
-                        continue;
-                    }
-
-                    // additional check for revers relation of manyToOne field type
-                    $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
-                    if (false === (!$relation['assign']
-                        && !$fieldId
-                        && $targetFieldId
-                        && $targetFieldId->getFieldType() == 'manyToOne'
-                        && $targetEntityConfig->get('relation')
-                        && $targetEntityConfig->get('relation')[$relationKey]['assign']
-                    )) {
-                        continue;
-                    }
-                }
-
-                if ($fieldId
-                    && $extendProvider->hasConfigById($fieldId)
-                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
-                ) {
+                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
                     continue;
                 }
 
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
+                $targetFieldId = $relation['target_field_id'];
+
                 $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
 
-                $key         = $relationKey . '||' . ($fieldId ? $fieldId->getFieldName() : '');
+                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+                if (strlen($fieldName) > $maxFieldNameLength) {
+                    $cutFieldName = substr($fieldName, 0, $maxFieldNameLength);
+                    $originalFieldNames[$cutFieldName] = $fieldName;
+                    $fieldName = $cutFieldName;
+                }
+
+                $key         = $relationKey . '||' . $fieldName;
                 $types[$key] = sprintf(
                     '%s (%s) %s',
                     $this->translator->trans('Relation'),
@@ -127,6 +124,7 @@ class FieldType extends AbstractType
             }
 
             $this->types = array_merge($this->types, $types);
+            $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
 
         $builder->add(
@@ -166,5 +164,53 @@ class FieldType extends AbstractType
     public function getName()
     {
         return 'oro_entity_extend_field_type';
+    }
+
+    /**
+     * Check if reverse relation can be created
+     *
+     * @param ConfigProvider $extendProvider
+     * @param array          $relation
+     * @param string         $relationKey
+     *
+     * @return bool
+     */
+    protected function isAvailableRelation(
+        ConfigProvider $extendProvider,
+        array $relation,
+        $relationKey
+    ) {
+        /** @var FieldConfigId|false $fieldId */
+        $fieldId = $relation['field_id'];
+        /** @var FieldConfigId $targetFieldId */
+        $targetFieldId = $relation['target_field_id'];
+
+        if (!$relation['assign'] || !$targetFieldId) {
+            if (!$targetFieldId) {
+                return false;
+            }
+
+            // additional check for revers relation of manyToOne field type
+            $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
+            if (false === (!$relation['assign']
+                    && !$fieldId
+                    && $targetFieldId
+                    && $targetFieldId->getFieldType() == 'manyToOne'
+                    && $targetEntityConfig->get('relation')
+                    && $targetEntityConfig->get('relation')[$relationKey]['assign']
+                )
+            ) {
+                return false;
+            }
+        }
+
+        if ($fieldId
+            && $extendProvider->hasConfigById($fieldId)
+            && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

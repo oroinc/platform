@@ -49,6 +49,19 @@ class SyncCommand extends AbstractSyncCronCommand
                 InputOption::VALUE_OPTIONAL,
                 'If option exists sync will be performed for given connector name'
             )
+            ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Run sync in force mode, might not be supported by some channel/connector types'
+            )
+            ->addOption(
+                'transport-batch-size',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Batch size used in transport layer (value bigger than 100 requires memory limit increase)',
+                100
+            )
             ->addArgument(
                 'connector-parameters',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
@@ -67,6 +80,7 @@ class SyncCommand extends AbstractSyncCronCommand
         /** @var SyncProcessor $processor */
         $connector           = $input->getOption('connector');
         $channelId           = $input->getOption('channel-id');
+        $batchSize           = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
         $repository          = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
@@ -98,6 +112,9 @@ class SyncCommand extends AbstractSyncCronCommand
             try {
                 $logger->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
 
+                if ($batchSize) {
+                    $channel->getTransport()->getSettingsBag()->set('page_size', $batchSize);
+                }
                 $processor->process($channel, $connector, $connectorParameters);
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
@@ -115,12 +132,13 @@ class SyncCommand extends AbstractSyncCronCommand
      * Get connector additional parameters array from the input
      *
      * @param InputInterface $input
+     *
      * @return array key - parameter name, value - parameter value
      * @throws \LogicException
      */
     protected function getConnectorParameters(InputInterface $input)
     {
-        $result              = [];
+        $result              = ['force' => $input->getOption('force')];
         $connectorParameters = $input->getArgument('connector-parameters');
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {

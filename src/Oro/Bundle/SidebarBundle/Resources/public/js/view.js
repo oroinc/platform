@@ -4,12 +4,12 @@
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _jqueryUI = require('jquery-ui');
+    require('jquery-ui');
     var _ = require('underscore');
     var Backbone = require('backbone');
 
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     var constants = require('./constants');
@@ -32,7 +32,7 @@ define(function (require) {
      * @class   orosidebar.View
      * @extends Backbone.View
      */
-    var SidebarView = Backbone.View.extend({
+    return Backbone.View.extend({
         template: _.template(sidebarTemplate),
 
         events: {
@@ -46,10 +46,13 @@ define(function (require) {
             widgets: null
         },
 
-        initialize: function () {
-            var view = this;
-            var model = view.model;
-            var widgets = this.getWidgets();
+        initialize: function (options) {
+            var view, model, widgets;
+            this.options = _.defaults(options || {}, this.options);
+
+            view = this;
+            model = view.model;
+            widgets = this.getWidgets();
 
             view.iconViews = {};
             view.hoverViews = {};
@@ -100,6 +103,8 @@ define(function (require) {
             } else {
                 view.renderWidgets();
             }
+
+            mediator.trigger('layout:adjustHeight');
 
             return view;
         },
@@ -206,8 +211,6 @@ define(function (require) {
         },
 
         onClickAdd: function (e) {
-            var view = this;
-
             e.stopPropagation();
             e.preventDefault();
 
@@ -230,32 +233,24 @@ define(function (require) {
             var view = this;
 
             this.getWidgets().each(function (widget) {
-                var widgetView = new WidgetContainerView({
+                view.widgetViews[widget.cid] = new WidgetContainerView({
                     model: widget
                 });
 
-                view.widgetViews[widget.cid] = widgetView;
-
-                var iconView = new IconView({
+                view.iconViews[widget.cid] = new IconView({
                     model: widget
                 });
-
-                view.iconViews[widget.cid] = iconView;
             });
         },
 
         onWidgetAdded: function (widget) {
-            var widgetView = new WidgetContainerView({
+            this.widgetViews[widget.cid] = new WidgetContainerView({
                 model: widget
             });
 
-            this.widgetViews[widget.cid] = widgetView;
-
-            var iconView = new IconView({
+            this.iconViews[widget.cid] = new IconView({
                 model: widget
             });
-
-            this.iconViews[widget.cid] = iconView;
         },
 
         onWidgetRemoved: function (widget) {
@@ -391,6 +386,4 @@ define(function (require) {
             widgetSetupView.open();
         }
     });
-
-    return SidebarView;
 });

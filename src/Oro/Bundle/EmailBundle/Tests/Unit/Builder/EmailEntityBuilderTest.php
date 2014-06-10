@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 
 class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
@@ -44,6 +46,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($obj) use (&$storage) {
+                        /** @var EmailAddress $obj */
                         $storage[$obj->getEmail()] = $obj;
                     }
                 )
@@ -128,6 +131,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($origin) use (&$storage) {
+                        /** @var EmailOrigin $origin */
                         $storage[$origin->getId()] = $origin;
                     }
                 )
@@ -156,6 +160,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($obj) use (&$storage) {
+                        /** @var EmailFolder $obj */
                         $storage[$obj->getType() . $obj->getFullName()] = $obj;
                     }
                 )
@@ -188,7 +193,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $body = $this->builder->body('testContent', true, true);
 
-        $this->assertEquals('testContent', $body->getContent());
+        $this->assertEquals('testContent', $body->getBodyContent());
         $this->assertFalse($body->getBodyIsText());
         $this->assertTrue($body->getPersistent());
     }
@@ -205,7 +210,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $attachmentContent = $this->builder->attachmentContent('testContent', 'testEncoding');
 
-        $this->assertEquals('testContent', $attachmentContent->getValue());
+        $this->assertEquals('testContent', $attachmentContent->getContent());
         $this->assertEquals('testEncoding', $attachmentContent->getContentTransferEncoding());
     }
 

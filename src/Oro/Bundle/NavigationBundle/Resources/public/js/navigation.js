@@ -19,6 +19,7 @@ define(function (require) {
     var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
     var _jqueryForm = require('jquery.form');
+    var routing = require('routing');
 
     var Navigation;
     var instance;
@@ -59,7 +60,7 @@ define(function (require) {
          * menuDropdowns - Selector for 3 dots menu and user dropdowns
          * pinbarHelp - Selector for pinbars help link
          * historyTab - Selector for history 3 dots menu tab
-         * mostViwedTab - Selector for most viewed 3 dots menu tab
+         * mostViewedTab - Selector for most viewed 3 dots menu tab
          * flashMessages - Selector for system messages block
          * menu - Selector for system main menu
          * breadcrumb - Selector for breadcrumb block
@@ -76,7 +77,7 @@ define(function (require) {
             loadingMask:         '.hash-loading-mask',
             searchDropdown:      '#search-div',
             menuDropdowns:       '.pin-menus.dropdown, .nav .dropdown',
-            pinbarHelp:          '.pin-bar-empty',
+            pinbarHelp:          '.pin-bar-empty a',
             historyTab:          '#history-content',
             mostViewedTab:       '#mostviewed-content',
             flashMessages:       '#flash-messages',
@@ -308,7 +309,7 @@ define(function (require) {
             /**
              * Processing links in 3 dots menu after item is added (e.g. favourites)
              */
-            mediator.bind("navigaion_item:added", function (item) {
+            mediator.bind("navigation_item:added", function (item) {
                 this.processClicks(item.find(this.selectors.links));
             }, this);
 
@@ -372,14 +373,18 @@ define(function (require) {
         /**
          * Routing default action
          *
-         * @param {String} page
-         * @param {String} encodedStateData
+         * @param {string} page
+         * @param {string} encodedStateData
+         * @param {string=} params
          */
-        defaultAction: function(page, encodedStateData) {
+        defaultAction: function(page, encodedStateData, params) {
             this.beforeAction();
             this.beforeDefaultAction();
             this.encodedStateData = encodedStateData;
             this.url = page;
+            if (this.url !== null && params) {
+                this.url += '?' + params
+            }
             if (!this.url) {
                 this.url = window.location.href.replace(this.baseUrl, '');
             }
@@ -530,24 +535,15 @@ define(function (require) {
          */
         updateDebugToolbar: function(jqXHR) {
             var debugBarToken = jqXHR.getResponseHeader('x-debug-token');
-            var entryPoint = window.location.pathname;
-            if (entryPoint.indexOf('.php') !== -1) {
-                entryPoint = entryPoint.substr(0, entryPoint.indexOf('.php') + 4);
-            }
             if(debugBarToken) {
-                var url = entryPoint + '/_wdt/' + debugBarToken;
+                var url = routing.getBaseUrl() + '/_wdt/' + debugBarToken;
                 $.get(
                     this.baseUrl + url,
                     _.bind(function(data) {
                         var dtContainer = $('<div class="sf-toolbar" id="sfwdt' + debugBarToken + '" style="display: block;" data-sfurl="' + url + '"/>');
                         dtContainer.html(data);
-                        var scrollable = $('.scrollable-container:last');
-                        var container = scrollable.length ? scrollable : this.getCached$('container');
-                        if (!container.closest('body').length) {
-                            container = $(document.body);
-                        }
                         $('.sf-toolbar').remove();
-                        container.append(dtContainer);
+                        $(document.body).append(dtContainer);
                         mediator.trigger('layout:adjustHeight');
                     }, this)
                 );
@@ -817,8 +813,17 @@ define(function (require) {
                 this.updateDebugToolbar(XMLHttpRequest);
             }
 
-            this.handleResponse(XMLHttpRequest.responseText);
-            this.addErrorClass();
+            var options = {
+                stopPageProcessing: false
+            };
+
+            mediator.trigger('navigation:page_load:error', XMLHttpRequest, options);
+
+            if (!options.stopPageProcessing) {
+                this.handleResponse(XMLHttpRequest.responseText);
+                this.addErrorClass();
+            }
+
             this.hideLoading();
         },
 
@@ -847,7 +852,7 @@ define(function (require) {
         /**
          * View / hide pins div and set titles
          *
-         * @param showPinButton
+         * @param data
          */
         processPinButton: function(data) {
             if (data.showPinButton) {
@@ -960,7 +965,11 @@ define(function (require) {
         processForms: function() {
             $('body').on('submit', _.bind(function (e) {
                 var $form = $(e.target);
-                if ($form.data('nohash') || e.isDefaultPrevented()) {
+                if (e.isDefaultPrevented()) {
+                    return;
+                }
+                if ($form.data('nohash')) {
+                    $form.data('sent', true);
                     return;
                 }
                 e.preventDefault();
@@ -1147,7 +1156,7 @@ define(function (require) {
     /**
      * Register Pinbar view instance
      *
-     * @param {Object} pinbarView
+     * @param {Object} instance pinbarView
      */
     Navigation.registerPinbarView = function (instance) {
         pinbarView = instance;

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Selenium;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles;
 
 /**
@@ -43,7 +43,7 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
-            ->assertTitle('Roles - Users Management - System');
+            ->assertTitle('Roles - User Management - System');
     }
 
     public function testRolesGridDefaultContent()
@@ -83,8 +83,7 @@ class RolesTest extends Selenium2TestCase
 
     public function testRolesAdd()
     {
-
-        $randomPrefix = ToolsAPI::randomGen(5);
+        $randomPrefix = WebTestCase::generateRandomString(5);
 
         $login = $this->login();
         /** @var Roles $login */

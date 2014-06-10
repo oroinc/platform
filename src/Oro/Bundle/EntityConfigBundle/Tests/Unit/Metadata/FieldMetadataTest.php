@@ -19,7 +19,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
      */
     protected $fieldMetadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
         $this->entityMetadata->mode = ConfigModelManager::MODE_DEFAULT;

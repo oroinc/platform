@@ -23,7 +23,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $className = 'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
@@ -41,7 +41,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->adapter, $this->dumper, $this->service);
     }

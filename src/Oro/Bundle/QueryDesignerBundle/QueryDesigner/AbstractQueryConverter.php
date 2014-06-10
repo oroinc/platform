@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -103,6 +104,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $tableAlias      The alias of a table to check
      * @param string $joinByFieldName The name of a field should be used to check a join
+     *
      * @return string The table alias for the checked join
      */
     public function ensureSiblingTableJoined($tableAlias, $joinByFieldName)
@@ -112,6 +114,32 @@ abstract class AbstractQueryConverter
         $newJoinId    = $this->buildSiblingJoinIdentifier($parentJoinId, $joinByFieldName);
 
         return $this->ensureTableJoined($newJoinId);
+    }
+
+    /**
+     * Makes sure that child table joined by $joinByFieldName joined as a relation of table with $tableAlias alias
+     *
+     * For example:
+     *      table1::orders -> table2::products
+     * call of ensureChildTableJoined(table2, stockItem) will check whether following table is joined:
+     *      table1::orders -> table2::products -> table2::stockItem
+     *
+     * @param string      $tableAlias      The alias of a table to check
+     * @param string      $joinByFieldName The name of a field should be used to check a join
+     * @param null|string $joinType
+     *
+     * @return string The table alias for the checked join
+     */
+    public function ensureChildTableJoined($tableAlias, $joinByFieldName, $joinType = null)
+    {
+        $parentJoinId = $this->getJoinIdentifierByTableAlias($tableAlias);
+        $joinId       = $this->joinIdHelper->buildJoinIdentifier(
+            $tableAlias . '.' . $joinByFieldName,
+            $parentJoinId,
+            $joinType
+        );
+
+        return $this->ensureTableJoined($joinId);
     }
 
     /**
@@ -133,6 +161,7 @@ abstract class AbstractQueryConverter
      * Gets join identifier for the given table alias
      *
      * @param $tableAlias
+     *
      * @return string
      */
     public function getJoinIdentifierByTableAlias($tableAlias)
@@ -147,6 +176,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId          The join identifier
      * @param string $joinByFieldName The name of a field should be used to join new table
+     *
      * @return string The join identifier
      */
     public function buildSiblingJoinIdentifier($joinId, $joinByFieldName)
@@ -158,6 +188,7 @@ abstract class AbstractQueryConverter
      * Extracts a parent join identifier
      *
      * @param string $joinId
+     *
      * @return string
      * @throws \LogicException if incorrect join identifier specified
      */
@@ -170,6 +201,7 @@ abstract class AbstractQueryConverter
      * Converts a query from the query designer format to a target format
      *
      * @param AbstractQueryDesigner $source
+     *
      * @throws InvalidConfigurationException
      */
     protected function doConvert(AbstractQueryDesigner $source)
@@ -378,6 +410,7 @@ abstract class AbstractQueryConverter
      * @param string $columnName
      * @param string $tableAlias
      * @param string $fieldName
+     *
      * @return string
      */
     protected function buildColumnExpression($columnName, $tableAlias, $fieldName)
@@ -641,9 +674,10 @@ abstract class AbstractQueryConverter
         ];
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner');
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left');
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner', $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left', $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
+
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
             }
@@ -693,7 +727,7 @@ abstract class AbstractQueryConverter
         }
 
         $delimiterPos = strpos($item['join'], '.');
-        if (false === $delimiterPos) {
+        if (false !== $delimiterPos) {
             $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
@@ -731,8 +765,11 @@ abstract class AbstractQueryConverter
      * @param array  $aliases
      * @param array  $query
      * @param string $joinType
+     * @param        $parentJoinId
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType)
+    protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
     {
         if (isset($query['join'][$joinType])) {
             foreach ($query['join'][$joinType] as $item) {
@@ -751,6 +788,19 @@ abstract class AbstractQueryConverter
                     $aliases[$alias] = $this->generateTableAlias();
                 }
                 $item['alias'] = $aliases[$alias];
+
+                $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
+                    $item['join'],
+                    $parentJoinId,
+                    $item['type'],
+                    isset($item['conditionType']) ? $item['conditionType'] : null,
+                    isset($item['condition']) ? $item['condition'] : null
+                );
+
+                if (isset($this->tableAliases[$itemJoinId])) {
+                    $item['alias']   = $this->tableAliases[$itemJoinId];
+                    $aliases[$alias] = $this->tableAliases[$itemJoinId];
+                }
 
                 $joins[] = $item;
             }
@@ -806,6 +856,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $selectExpr
      * @param array  $aliases
+     *
      * @return string The corrected select expression
      */
     protected function replaceTableAliasesInVirtualColumnSelect($selectExpr, &$aliases)
@@ -841,12 +892,13 @@ abstract class AbstractQueryConverter
      *
      * @param string $selectExpr
      * @param string $alias
+     *
      * @return bool|int The position of $alias in selectExpr or FALSE if it was not found
      */
     protected function checkTableAliasInSelect($selectExpr, $alias)
     {
         $pos = strpos($selectExpr, $alias);
-        if (false !== $pos) {
+        while (false !== $pos) {
             if (0 === $pos) {
                 $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                 if ('.' === $nextChar) {
@@ -854,13 +906,14 @@ abstract class AbstractQueryConverter
                 }
             } elseif (strlen($selectExpr) !== $pos + strlen($alias) + 1) {
                 $prevChar = substr($selectExpr, $pos - 1, 1);
-                if (in_array($prevChar, [' ', '('])) {
+                if (in_array($prevChar, [' ', '(', ','])) {
                     $nextChar = substr($selectExpr, $pos + strlen($alias), 1);
                     if ('.' === $nextChar) {
                         return $pos;
                     }
                 }
             }
+            $pos = strpos($selectExpr, $alias, $pos + strlen($alias));
         }
 
         return false;
@@ -871,6 +924,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $condition
      * @param string $alias
+     *
      * @return bool|int The position of $alias in $condition or FALSE if it was not found
      */
     protected function checkTableAliasInCondition($condition, $alias)
@@ -915,6 +969,7 @@ abstract class AbstractQueryConverter
      * Extracts an entity class name for the given column or from the given join identifier
      *
      * @param string $columnNameOrJoinId
+     *
      * @return string
      */
     protected function getEntityClassName($columnNameOrJoinId)
@@ -926,6 +981,7 @@ abstract class AbstractQueryConverter
      * Extracts a field name for the given column or from the given join identifier
      *
      * @param string $columnNameOrJoinId
+     *
      * @return string
      */
     protected function getFieldName($columnNameOrJoinId)
@@ -938,6 +994,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return string
      */
     protected function getFieldType($className, $fieldName)
@@ -958,6 +1015,7 @@ abstract class AbstractQueryConverter
      * Gets join part of the given join identifier
      *
      * @param string $joinId
+     *
      * @return string
      */
     protected function getJoin($joinId)
@@ -969,6 +1027,7 @@ abstract class AbstractQueryConverter
      * Gets join type for the given join identifier
      *
      * @param string $joinId
+     *
      * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     protected function getJoinType($joinId)
@@ -980,6 +1039,7 @@ abstract class AbstractQueryConverter
      * Gets the join condition type for the given join identifier
      *
      * @param string $joinId
+     *
      * @return string
      */
     protected function getJoinConditionType($joinId)
@@ -991,6 +1051,7 @@ abstract class AbstractQueryConverter
      * Gets the join condition type for the given join identifier
      *
      * @param string $joinId
+     *
      * @return string
      */
     protected function getUnidirectionalJoinConditionType($joinId)
@@ -1002,6 +1063,7 @@ abstract class AbstractQueryConverter
      * Gets the join condition the given join identifier
      *
      * @param string $joinId
+     *
      * @return null|string
      */
     protected function getJoinCondition($joinId)
@@ -1015,6 +1077,7 @@ abstract class AbstractQueryConverter
      * @param string $joinTableAlias
      * @param string $joinFieldName
      * @param string $joinAlias
+     *
      * @return string
      */
     protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
@@ -1046,6 +1109,7 @@ abstract class AbstractQueryConverter
      * Returns a table alias for the given column
      *
      * @param string $columnName
+     *
      * @return string
      */
     protected function getTableAliasForColumn($columnName)
@@ -1061,6 +1125,7 @@ abstract class AbstractQueryConverter
      * Builds a string which is used as a key of column aliases array
      *
      * @param array|string $column The column definition or name
+     *
      * @return string
      */
     protected function buildColumnAliasKey($column)
@@ -1091,6 +1156,7 @@ abstract class AbstractQueryConverter
      * @param string                   $fieldName
      * @param string                   $columnName
      * @param string                   $columnAlias
+     *
      * @return string
      * @throws InvalidConfigurationException if incorrect type $functionExpr specified
      */
