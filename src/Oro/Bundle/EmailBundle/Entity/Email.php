@@ -144,7 +144,7 @@ class Email
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $XMessageId;
+    protected $xMessageId;
 
     /**
      * @var string
@@ -153,7 +153,7 @@ class Email
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
-    protected $XThreadId;
+    protected $xThreadId;
 
     /**
      * @var ArrayCollection|EmailFolder[] $folders
@@ -428,7 +428,7 @@ class Email
      */
     public function getXMessageId()
     {
-        return $this->XMessageId;
+        return $this->xMessageId;
     }
 
     /**
@@ -439,7 +439,7 @@ class Email
      */
     public function setXMessageId($xMessageId)
     {
-        $this->XMessageId = $xMessageId;
+        $this->xMessageId = $xMessageId;
 
         return $this;
     }
@@ -451,7 +451,7 @@ class Email
      */
     public function getXThreadId()
     {
-        return $this->XThreadId;
+        return $this->xThreadId;
     }
 
     /**
@@ -462,7 +462,7 @@ class Email
      */
     public function setXThreadId($xThreadId)
     {
-        $this->XThreadId = $xThreadId;
+        $this->xThreadId = $xThreadId;
 
         return $this;
     }
