@@ -1,0 +1,27 @@
+oro_note_view:
+    type: entity
+    class: OroNoteBundle:Note
+    permission: VIEW
+    group_name: ""
+    bindings: ~
+
+oro_note_create:
+    type: entity
+    class: OroNoteBundle:Note
+    permission: CREATE
+    group_name: ""
+    bindings: ~
+
+oro_note_update:
+    type: entity
+    class: OroNoteBundle:Note
+    permission: EDIT
+    group_name: ""
+    bindings: ~
+
+oro_note_delete:
+    type: entity
+    class: OroNoteBundle:Note
+    permission: DELETE
+    group_name: ""
+    bindings: ~

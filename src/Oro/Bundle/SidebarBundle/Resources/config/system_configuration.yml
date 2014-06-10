@@ -2,7 +2,6 @@ oro_system_configuration:
     groups:
         sidebar_settings:
             title:       'Sidebar settings'
-            description: 'Reload the page for settings to take effect'
     fields:
         oro_sidebar.sidebar_left_active:
             type: choice

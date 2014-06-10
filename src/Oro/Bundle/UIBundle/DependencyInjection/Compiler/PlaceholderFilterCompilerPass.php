@@ -21,6 +21,6 @@ class PlaceholderFilterCompilerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds(self::PLACEHOLDER_FILTER_TAG) as $id => $attributes) {
             $stepArguments[] = new Reference($id);
         }
-        $providerDefinition->replaceArgument(1, $stepArguments);
+        $providerDefinition->replaceArgument(2, $stepArguments);
     }
 }

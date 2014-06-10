@@ -83,7 +83,7 @@ class TranslationRepository extends EntityRepository
      * @param string $oldKey
      * @param string $newKey
      * @param string $domain
-     * @return bool if a translation key exists and it was renamed
+     * @return bool TRUE if a translation key exists and it was renamed
      */
     public function renameKey($oldKey, $newKey, $domain = self::DEFAULT_DOMAIN)
     {
@@ -98,6 +98,58 @@ class TranslationRepository extends EntityRepository
         foreach ($translationValues as $translationValue) {
             $translationValue->setKey($newKey);
             $this->getEntityManager()->persist($translationValue);
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Copies a translation value
+     *
+     * @param string $srcKey
+     * @param string $destKey
+     * @param string $domain
+     * @return bool TRUE if a translation key exists and it was copied
+     */
+    public function copyValue($srcKey, $destKey, $domain = self::DEFAULT_DOMAIN)
+    {
+        /** @var Translation[] $srcTranslationValues */
+        $srcTranslationValues = $this->findBy(
+            [
+                'key' => $srcKey,
+                'domain' => $domain
+            ]
+        );
+        /** @var Translation[] $destTranslationValues */
+        $destTranslationValues = $this->findBy(
+            [
+                'key' => $destKey,
+                'domain' => $domain
+            ]
+        );
+        $result = false;
+        foreach ($srcTranslationValues as $srcTranslationValue) {
+            $destTranslationValue = null;
+            foreach ($destTranslationValues as $val) {
+                if ($val->getLocale() === $srcTranslationValue->getLocale()) {
+                    $destTranslationValue = $val;
+                    break;
+                }
+            }
+            if (!$destTranslationValue) {
+                $destTranslationValue = new Translation();
+                $destTranslationValue
+                    ->setKey($destKey)
+                    ->setValue($srcTranslationValue->getValue())
+                    ->setLocale($srcTranslationValue->getLocale())
+                    ->setDomain($srcTranslationValue->getDomain())
+                    ->setScope($srcTranslationValue->getScope());
+            } else {
+                $destTranslationValue->setValue($srcTranslationValue->getValue());
+            }
+            $this->getEntityManager()->persist($destTranslationValue);
+
             $result = true;
         }
 

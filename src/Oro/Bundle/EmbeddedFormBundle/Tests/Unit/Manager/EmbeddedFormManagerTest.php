@@ -174,21 +174,38 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider customLayoutTypesProvider
      */
-    public function shouldReturnCustomFormLayoutByFormType()
+    public function shouldReturnCustomFormLayoutByFormType($typeInstance, $expectedLayout)
     {
-        $type = 'type';
-        $typeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
         $container = $this->createContainerMock($typeInstance);
         $formFactory = $this->createFormFactoryMock();
-        $customLayout = 'layout.html.twig';
 
-        $typeInstance->expects($this->once())
-            ->method('geFormLayout')
+        $type = 'type';
+        $manager = new EmbeddedFormManager($container, $formFactory);
+        $this->assertEquals($expectedLayout, $manager->getCustomFormLayoutByFormType($type));
+    }
+
+    /**
+     * @return array
+     */
+    public function customLayoutTypesProvider()
+    {
+        $customLayout = 'layout.html.twig';
+        $typeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
+        $newInterfaceTypeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface');
+
+        $typeInstance->expects($this->any())->method('geFormLayout')
             ->will($this->returnValue($customLayout));
 
-        $manager = new EmbeddedFormManager($container, $formFactory);
-        $this->assertEquals($customLayout, $manager->getCustomFormLayoutByFormType($type));
+        $newInterfaceTypeInstance->expects($this->any())->method('getFormLayout')
+            ->will($this->returnValue($customLayout));
+
+        return [
+            'not custom layout aware form'         => [null, ''],
+            'deprecated interface, should be used' => [$typeInstance, $customLayout],
+            'new interface, should be used'        => [$newInterfaceTypeInstance, $customLayout],
+        ];
     }
 
     /**

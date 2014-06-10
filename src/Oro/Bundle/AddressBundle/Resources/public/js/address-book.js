@@ -41,7 +41,7 @@ define([
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
-            'class': 'map-box'
+            'class': 'list-box map-box'
         },
 
         initialize: function (options) {

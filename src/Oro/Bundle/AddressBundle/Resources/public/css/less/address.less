@@ -1,12 +1,6 @@
 @import "../../../oroui/css/less/mixins";
 
 .map-box {
-  /*background: url("../../img/vertical-separator.png") repeat-y 40% 0;*/
-  &:after {
-    content: "";
-    clear: both;
-    display: block;
-  }
   .map-address-list {
     width: 40%;
     height: 420px;
@@ -37,14 +31,7 @@
     text-align: center;
   }
   .map-item {
-    border-bottom:1px solid #eee;
-    padding: 15px;
-    .box-sizing(border-box);
-    width: 100%;
     cursor:pointer;
-    &:hover {
-      background:#f8f8f8;
-    }
     address {
       margin-bottom:0;
       line-height:1.5em;
@@ -85,30 +72,5 @@
   .title-item {
     font: bold 14px/18px @baseFontFamily;
     float: left;
-  }
-  .map-actions {
-    position:relative;
-    float: right;
-    margin-right:-4px;
-    z-index:99;
-    .btn {
-      line-height:1em;
-      height:auto;
-      border: 0;
-      background: 0;
-      .box-shadow(none);
-      padding: 0;
-      [class^='icon-'] {
-        &:before {
-          opacity: 0.3;
-          font-size:15px;
-        }
-        &:hover {
-          &:before {
-            opacity: 0.7;
-          }
-        }
-      }
-    }
   }
 }

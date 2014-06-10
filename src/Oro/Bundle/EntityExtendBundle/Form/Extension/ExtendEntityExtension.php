@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -31,6 +32,10 @@ class ExtendEntityExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if ($options['dynamic_fields_disabled']) {
+            return;
+        }
+
         $name = $builder instanceof FormConfigBuilder ? $builder->getName() : $builder->getForm()->getName();
         if ($name == CustomEntityType::NAME || empty($options['data_class'])) {
             return;
@@ -51,6 +56,18 @@ class ExtendEntityExtension extends AbstractTypeExtension
             array(
                 'inherit_data' => true,
                 'class_name' => $className
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'dynamic_fields_disabled' => false,
             )
         );
     }

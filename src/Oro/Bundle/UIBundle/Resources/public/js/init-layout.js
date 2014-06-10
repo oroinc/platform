@@ -227,9 +227,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 }
             }
         };
-
+        var $main = $('#main');
+        var $topPage = $('#top-page');
+        var $leftPanel = $('#left-panel');
+        var $rightPanel = $('#right-panel');
         var adjustHeight = function () {
             initializeContent();
+
+            // set width for #main container
+            $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
 
             var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
             var anchorTop = anchor.position().top;
@@ -240,6 +246,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 el = $(el);
                 el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
             });
+
+            // set height for #left-panel and #right-panel
+            $leftPanel.add($rightPanel).height($main.height());
 
             scrollspy.adjust();
 

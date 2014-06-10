@@ -1,0 +1,104 @@
+@import "../../../oroui/css/less/mixins";
+
+.notes {
+  position: relative;
+  .list-box {
+    .list-item {
+      padding: 3px 10px 5px 10px;
+      .visual {
+        .border-radius(2px);
+        img {
+          margin-top: -3px;
+          .border-radius(2px);
+          width: 16px;
+        }
+        .user {
+          padding-left: 3px;
+        }
+      }
+      .user {
+        font-style: normal;
+      }
+      .date {
+        font-style: normal;
+        font-size: smaller;
+      }
+      .title-item {
+        white-space: nowrap;
+        .details {
+          padding-left: 7px;
+        }
+      }
+      .actions {
+        white-space: nowrap;
+        float: none;
+        margin: 0;
+      }
+      .message-item {
+        width: 100%;
+        padding-left: 21px;
+        .message {
+          padding-left: 10px;
+          border-left: 1px solid #e6e6e6;
+        }
+      }
+    }
+    .list-item:last-child {
+      border-bottom: 0;
+    }
+  }
+  .accordion {
+    .accordion-group {
+      border: 0;
+      margin: 0;
+      .accordion-heading {
+        display: table;
+        width: 100%;
+        & > div {
+          display: table-cell;
+        }
+        .message {
+          display: block;
+          overflow: hidden;
+          height: 20px;
+        }
+        .accordion-toggle {
+          display: inline-block;
+          padding: 0;
+          min-width: 17px;
+          &:before {
+            content: '\f078';
+            font-family: FontAwesome;
+            color: #727272;
+            margin-right: 5px;
+          }
+        }
+        .accordion-toggle.collapsed:before {
+          content: '\f054';
+        }
+      }
+      .accordion-heading.in .message {
+        display: none;
+      }
+      .accordion-body.collapse {
+        height: auto;
+      }
+      .accordion-body {
+        .message {
+          display: none;
+          padding-top: 10px;
+        }
+        .details {
+          padding-top: 10px;
+        }
+      }
+      .accordion-body.in .message {
+        display: block;
+      }
+    }
+  }
+}
+.ui-dialog .note-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
