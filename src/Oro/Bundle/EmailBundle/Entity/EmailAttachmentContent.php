@@ -89,7 +89,7 @@ class EmailAttachmentContent
      *
      * @return string
      */
-    public function getValue()
+    public function getContent()
     {
         return $this->content;
     }
@@ -100,7 +100,7 @@ class EmailAttachmentContent
      * @param string $content
      * @return $this
      */
-    public function setValue($content)
+    public function setContent($content)
     {
         $this->content = $content;
 

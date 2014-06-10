@@ -31,7 +31,7 @@ class ConfigRepository extends EntityRepository
         foreach ($scope->getValues() as $value) {
             $settings[$value->getSection()][$value->getName()] = [
                 'value'                  => $value->getValue(),
-                'scope'                  => $scope->getEntity(),
+                'scope'                  => $scope->getScopedEntity(),
                 'use_parent_scope_value' => false
             ];
         }
@@ -51,7 +51,7 @@ class ConfigRepository extends EntityRepository
 
         if (!$config) {
             $config = new Config();
-            $config->setEntity($scopeEntityName)
+            $config->setScopedEntity($scopeEntityName)
                 ->setRecordId($scopeEntityIdentifier);
         }
 

@@ -4,8 +4,6 @@ namespace Oro\Bundle\UserBundle\Controller\Dashboard;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class DashboardController extends Controller
 {
