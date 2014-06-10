@@ -34,11 +34,11 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getLabel());
     }
 
-    public function testIsDefault()
+    public function testGetIsDefault()
     {
-        $this->assertFalse($this->dashboard->isDefault());
+        $this->assertFalse($this->dashboard->getisDefault());
         $this->dashboard->setIsDefault(true);
-        $this->assertTrue($this->dashboard->isDefault());
+        $this->assertTrue($this->dashboard->getisDefault());
     }
 
     public function testName()

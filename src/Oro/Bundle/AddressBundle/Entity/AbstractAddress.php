@@ -577,7 +577,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -587,7 +587,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @param \DateTime $created
      */
-    public function setCreatedAt($created)
+    public function setCreated($created)
     {
         $this->created = $created;
     }
@@ -597,7 +597,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }
@@ -607,7 +607,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @param \DateTime $updated
      */
-    public function setUpdatedAt($updated)
+    public function setUpdated($updated)
     {
         $this->updated = $updated;
     }

@@ -65,7 +65,7 @@ class Config
      *
      * @return string
      */
-    public function getEntity()
+    public function getScopedEntity()
     {
         return $this->scopedEntity;
     }
@@ -77,7 +77,7 @@ class Config
      *
      * @return Config
      */
-    public function setEntity($entity)
+    public function setScopedEntity($entity)
     {
         $this->scopedEntity = $entity;
 

@@ -155,7 +155,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $batchIndex = 0;
         $count      = 0;
         foreach ($this->getKnownEmailAddresses() as $emailAddress) {
-            $needFullSync = !$lastSyncTime || $emailAddress->getUpdatedAt() > $lastSyncTime;
+            $needFullSync = !$lastSyncTime || $emailAddress->getUpdated() > $lastSyncTime;
             if ($count >= self::EMAIL_ADDRESS_BATCH_SIZE
                 || (isset($batches[$batchIndex]) && $needFullSync !== $batches[$batchIndex]['needFullSync'])
             ) {
@@ -453,7 +453,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 continue;
             }
 
-            /** @var int $newImapIdArray */
+            /** @var int[] $newImapIdArray */
             $newImapIdArray = $newImapIds[$emailDTO->getMessageId()];
 
             foreach ($newImapIdArray as $newImapId) {
