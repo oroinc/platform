@@ -97,4 +97,20 @@ class Dashboards extends AbstractPageFilteredGrid
     {
         return !$this->isElementPresent("//div[@class = 'empty-text hidden-empty-text']");
     }
+
+    public function tools($action)
+    {
+        //click Tools
+        $this->test->byXPath(
+            "//a[contains(@class, 'dropdown-toggle') and normalize-space(.) = 'Tools']"
+        )->click();
+        //select action
+        $this->test->byXPath(
+            "//ul[contains(@class, 'dropdown-menu')//a[@title = '{$action}']"
+        )->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+
+        return $this;
+    }
 }
