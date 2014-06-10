@@ -58,7 +58,6 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
     public function setGetDataProvider()
     {
         return array(
-            'job' => array('job', new Job('my_command')),
             'processTrigger' => array('processTrigger', new ProcessTrigger()),
             'entityHash' => array('entityHash', 'My\Entity' . serialize(array('id' => 1))),
             'serializedData' => array('serializedData', serialize(array('some' => 'data'))),

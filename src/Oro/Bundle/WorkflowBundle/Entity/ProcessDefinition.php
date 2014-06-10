@@ -4,10 +4,27 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Table("oro_process_definition")
- * @ORM\Entity
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
+ * @Config(
+ *  routeName="oro_workflow_definition_index",
+ *  routeView="oro_workflow_definition_view",
+ *  defaultValues={
+ *      "entity"={
+ *          "label"="Process",
+ *          "plural_label"="Processes",
+ *          "icon"="icon-inbox"
+ *      },
+ *      "security"={
+ *          "type"="ACL",
+ *          "group_name"=""
+ *      }
+ *  }
+ * )
  */
 class ProcessDefinition
 {
@@ -46,13 +63,6 @@ class ProcessDefinition
      * @ORM\Column(name="execution_order", type="smallint")
      */
     protected $executionOrder = 0;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="execution_required", type="boolean")
-     */
-    protected $executionRequired = false;
 
     /**
      * @var array
@@ -171,25 +181,6 @@ class ProcessDefinition
     }
 
     /**
-     * @param boolean $executionRequired
-     * @return ProcessDefinition
-     */
-    public function setExecutionRequired($executionRequired)
-    {
-        $this->executionRequired = $executionRequired;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isExecutionRequired()
-    {
-        return $this->executionRequired;
-    }
-
-    /**
      * @param array $configuration
      * @return ProcessDefinition
      */
@@ -274,7 +265,6 @@ class ProcessDefinition
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
             ->setExecutionOrder($definition->getExecutionOrder())
-            ->setExecutionRequired($definition->isExecutionRequired())
             ->setActionsConfiguration($definition->getActionsConfiguration());
 
         return $this;

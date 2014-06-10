@@ -3,13 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-use JMS\JobQueueBundle\Entity\Job;
-
 use Doctrine\ORM\Mapping as ORM;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table("oro_process_job")
- * @ORM\Entity
+ * @ORM\Entity()
+ * @Config()
  */
 class ProcessJob
 {
@@ -21,14 +22,6 @@ class ProcessJob
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-
-    /**
-     * @var Job
-     *
-     * @ORM\OneToOne(targetEntity="JMS\JobQueueBundle\Entity\Job")
-     * @ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $job;
 
     /**
      * @var ProcessTrigger
@@ -55,7 +48,7 @@ class ProcessJob
     /**
      * @var array
      *
-     * @ORM\Column(name="entity_id", type="array")
+     * @ORM\Column(name="entity_id", type="integer")
      */
     protected $entityId;
 
@@ -70,25 +63,6 @@ class ProcessJob
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param Job $job
-     * @return ProcessJob
-     */
-    public function setJob($job)
-    {
-        $this->job = $job;
-
-        return $this;
-    }
-
-    /**
-     * @return Job
-     */
-    public function getJob()
-    {
-        return $this->job;
     }
 
     /**

@@ -58,6 +58,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         return array(
             'event' => array('event', 'update'),
             'field' => array('field', 'status'),
+            'queued' => array('queued', true, false),
             'timeShift' => array('timeShift', time()),
             'definition' => array('definition', new ProcessDefinition()),
             'createdAt' => array('createdAt', new \DateTime()),

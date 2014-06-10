@@ -4,18 +4,21 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Table(
  *  "oro_process_trigger",
  *  uniqueConstraints={
  *      @ORM\UniqueConstraint(
  *          name="process_trigger_unique_idx",
- *          columns={"event", "field", "time_shift", "definition_name"}
+ *          columns={"event", "field", "definition_name"}
  *      )
  *  }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @Config()
  */
 class ProcessTrigger
 {
@@ -45,6 +48,15 @@ class ProcessTrigger
      * @ORM\Column(name="field", type="string", length=255, nullable=true)
      */
     protected $field;
+
+    /**
+     * Whether process should be queued or processed immediately
+     *
+     * @var boolean
+     *
+     * @ORM\Column(name="queued", type="boolean")
+     */
+    protected $queued = false;
 
     /**
      * Number of seconds before process must be triggered
@@ -121,6 +133,25 @@ class ProcessTrigger
     public function getField()
     {
         return $this->field;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isQueued()
+    {
+        return $this->queued;
+    }
+
+    /**
+     * @param boolean $queued
+     * @return ProcessTrigger
+     */
+    public function setQueued($queued)
+    {
+        $this->queued = $queued;
+
+        return $this;
     }
 
     /**

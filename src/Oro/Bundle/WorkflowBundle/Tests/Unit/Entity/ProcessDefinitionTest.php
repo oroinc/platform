@@ -49,7 +49,6 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
             'actionsConfiguration' => array('actionsConfiguration', array('my' => 'configuration')),
             'relatedEntity' => array('relatedEntity', 'My\Entity'),
             'executionOrder' => array('executionOrder', 42, 0),
-            'executionRequired' => array('executionRequired', true, false),
             'createdAt' => array('createdAt', new \DateTime()),
             'updatedAt' => array('updatedAt', new \DateTime()),
         );
@@ -63,14 +62,12 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setRelatedEntity('My/Entity')
             ->setExecutionOrder(25)
-            ->setExecutionRequired(true)
             ->setActionsConfiguration(array('key' => 'value'));
 
         $this->assertNotEquals($importedEntity->getName(), $this->entity->getName());
         $this->assertNotEquals($importedEntity->getLabel(), $this->entity->getLabel());
         $this->assertNotEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
         $this->assertNotEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
-        $this->assertNotEquals($importedEntity->isExecutionRequired(), $this->entity->isExecutionRequired());
         $this->assertNotEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
         $this->assertTrue($this->entity->isEnabled());
 
@@ -80,7 +77,6 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($importedEntity->getLabel(), $this->entity->getLabel());
         $this->assertEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
         $this->assertEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
-        $this->assertEquals($importedEntity->isExecutionRequired(), $this->entity->isExecutionRequired());
         $this->assertEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
         $this->assertTrue($this->entity->isEnabled()); // enabled must not be changed
     }

@@ -18,8 +18,7 @@ class ProcessTriggerRepository extends EntityRepository
             array(
                 'event' => $trigger->getEvent(),
                 'field' => $trigger->getField(),
-                'timeShift' => $trigger->getTimeShift(),
-                'definition' => $trigger->getDefinition()
+                'definition' => $trigger->getDefinition(),
             )
         );
     }
