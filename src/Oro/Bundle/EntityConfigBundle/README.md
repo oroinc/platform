@@ -9,12 +9,12 @@ Getting Started
 To show how metadata can be added to an entity lets add the following YAML file (this file must be located in [BundleName]\Resources\config\entity_config.yml):
 ``` yaml
 oro_entity_config:
-    acme:                                                        # a configuration scope name
-        entity:                                                  # a section describes en entity
-            items:                                               # starts a description of entity attributes
-                demo_attr:                                       # adds an attribute named 'demo_attr'
+    acme:                                      # a configuration scope name
+        entity:                                # a section describes an entity
+            items:                             # starts a description of entity attributes
+                demo_attr:                     # adds an attribute named 'demo_attr'
                     options:
-                        default_value:      'Demo'               # sets the default value for 'demo_attr' attribute
+                        default_value: 'Demo'  # sets the default value for 'demo_attr' attribute
 ```
 This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with @Config annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
 To apply this changes execute **oro:entity-config:update** command:
@@ -31,7 +31,7 @@ An example how to get a value of a configuration attribute:
     // the value of $demoAttr variable will be 'Demo'
     $demoAttr = $acmeConfigProvider->getConfig('AcmeBundle\Entity\SomeEntity')->get('demo_attr');
 ```
-If you want to set a value different than the default one for some entity just write it in @config annotation for this entiry. For example:
+If you want to set a value different than the default one for some entity just write it in @config annotation for this entity. For example:
 ``` php
 <?php
 /**
@@ -67,31 +67,28 @@ The result is demonstrated in the following code:
 Basically it is all you need to add metadata to any entity. But in most cases you want to allow an administrator to manage your attribute in UI. To accomplish this lets change our YAML file in the following way:
 ``` yaml
 oro_entity_config:
-    acme:                                                        # a configuration scope name
-        entity:                                                  # a section describes en entity
-            items:                                               # starts a description of entity attributes
-                demo_attr:                                       # adds an attribute named 'demo_attr'
+    acme:                                           # a configuration scope name
+        entity:                                     # a section describes an entity
+            items:                                  # starts a description of entity attributes
+                demo_attr:                          # adds an attribute named 'demo_attr'
                     options:
-                        default_value:      'Demo'               # sets the default value for 'demo_attr' attribute
-
-                        translatable:       true                 # means that value of this attribute is translation key
-                                                                 # and actual value should be taken from translation table
-                                                                 # or in twig via "|trans" filter
-
-                        indexed:            true                 # should be TRUE because this attribute is displayed in a data grid
-
-                    grid:                                        # configure a data grid to display 'demo_attr' attribute
-                        type:               string               # sets the attribute type
-                        label:              'Demo Attr'          # sets the data grid column name
-                        show_filter:        true                 # the next three lines configure a filter for 'Demo Attr' column
-                        filterable:         true
-                        filter_type:        string
-                        sortable:           true                 # allows an administrator to sort rows clicks on 'Demo Attr' column
+                        default_value: 'Demo'       # sets the default value for 'demo_attr' attribute
+                        translatable:  true         # means that value of this attribute is translation key
+                                                    # and actual value should be taken from translation table
+                                                    # or in twig via "|trans" filter
+                        indexed:       true         # should be TRUE because this attribute is displayed in a data grid
+                    grid:                           # configure a data grid to display 'demo_attr' attribute
+                        type:          string       # sets the attribute type
+                        label:         'Demo Attr'  # sets the data grid column name
+                        show_filter:   true         # the next three lines configure a filter for 'Demo Attr' column
+                        filterable:    true
+                        filter_type:   string
+                        sortable:      true         # allows an administrator to sort rows clicks on 'Demo Attr' column
                     form:
-                        type:               text                 # sets the attribute type
+                        type:          text         # sets the attribute type
                         options:
-                            block:          entity               # specifies in which block on the form this attribute should be displayed
-                            label:          'Demo Attr'          # sets the the label name
+                            block:     entity       # specifies in which block on the form this attribute should be displayed
+                            label:     'Demo Attr'  # sets the the label name
 ```
 Now you may go to System > Entities. The 'Demo Attr' column should be displayed in the grid. Click Edit on any entity to go to edit entity form. 'Demo Attr' field should be displayed there.
 

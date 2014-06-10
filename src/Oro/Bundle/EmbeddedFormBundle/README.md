@@ -49,7 +49,7 @@ To add default styles or default success message FormType must implement `Oro\Bu
 
 ## Custom form layout
 By default all forms have common layout `OroEmbeddedFormBundle:EmbedForm:formLayout.html.twig`
-If FormType has to have different layout then FormType must implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface`.
+If FormType has to have different layout then FormType must implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface`.
 
 ## Changing FormType
 It is possible to change embedded form FormType on/after creation.

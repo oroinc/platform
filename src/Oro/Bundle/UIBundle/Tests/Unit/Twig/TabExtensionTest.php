@@ -32,6 +32,11 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
+
+    /**
      * Set up test environment
      */
     protected function setUp()
@@ -51,7 +56,14 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new TabExtension($this->menuExtension, $this->router, $this->securityFacade);
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
+        $this->extension = new TabExtension(
+            $this->menuExtension,
+            $this->router,
+            $this->securityFacade,
+            $this->translator
+        );
 
         $this->environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
@@ -139,6 +151,15 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        if (empty($options['label'])) {
+            $this->translator->expects($this->never())
+                ->method('trans');
+        } else {
+            $this->translator->expects($this->once())
+                ->method('trans')
+                ->will($this->returnArgument(0));
+        }
+
         $result = $this->extension->getTabs('menu', $tabOptions);
         $this->assertEquals($tab ? [$tab] : [], $result);
     }
@@ -146,15 +167,16 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function menuProvider()
     {
         return [
-            'uri' => [
+            'uri and label' => [
                 'options' => [
                     'name' => 'item',
                     'uri' => 'test',
+                    'label' => 'testLabel',
                     'widgetAcl' => 'testAcl',
                 ],
                 'tab' => [
                     'alias' => 'item',
-                    'label' => null,
+                    'label' => 'testLabel',
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
                     'url' => 'test'
                 ],
@@ -231,7 +253,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
         $menuItem = $this
             ->getMockBuilder('Knp\Menu\MenuItem')
             ->disableOriginalConstructor()
-            ->setMethods(['getChildren', 'getUri', 'getName', 'getExtra'])
+            ->setMethods(['getChildren', 'getUri', 'getName', 'getLabel', 'getExtra'])
             ->getMock();
 
         if ($child) {
@@ -253,6 +275,13 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->any())
                 ->method('getName')
                 ->will($this->returnValue($options['name']));
+        }
+
+        if (isset($options['label'])) {
+            $menuItem
+                ->expects($this->any())
+                ->method('getLabel')
+                ->will($this->returnValue($options['label']));
         }
 
         $menuItem

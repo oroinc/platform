@@ -244,6 +244,7 @@ services:
 ```
 
 If you need an access to the database platform or the name generator you extension class should implement [DatabasePlatformAwareInterface][3] or [NameGeneratorAwareInterface][4] appropriately.
+Also if you need to use other extension in your extension the extension class should just implement `*AwareInterface` of the extension you need.
 
 Data fixtures
 -------------

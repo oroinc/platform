@@ -103,7 +103,7 @@ oro:
             user_list.description: List of system users
             user_roles.description: List of system roles
             user_groupes.description: List of system groups
-            users_management.label: Users Management
+            users_management.label: User Management
             user_create.label: Create User
             shortcut_new_user.label: Create new user
             shortcut_new_user.description: Create new user instance

@@ -29,11 +29,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $object = $this->object;
         $entity = 'Oro\Entity';
 
-        $this->assertEmpty($object->getEntity());
+        $this->assertEmpty($object->getScopedEntity());
 
-        $object->setEntity($entity);
+        $object->setScopedEntity($entity);
 
-        $this->assertEquals($entity, $object->getEntity());
+        $this->assertEquals($entity, $object->getScopedEntity());
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $object->getValues());
     }
 

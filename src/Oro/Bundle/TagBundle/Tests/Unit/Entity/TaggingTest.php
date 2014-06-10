@@ -59,7 +59,7 @@ class TaggingTest extends \PHPUnit_Framework_TestCase
     public function testDateTimeMethods()
     {
         $timeCreated = new \DateTime('now');
-        $this->tagging->setCreatedAt($timeCreated);
-        $this->assertEquals($timeCreated, $this->tagging->getCreatedAt());
+        $this->tagging->setCreated($timeCreated);
+        $this->assertEquals($timeCreated, $this->tagging->getCreated());
     }
 }
