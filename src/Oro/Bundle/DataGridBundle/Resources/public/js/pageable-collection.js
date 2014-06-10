@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
-    ], function (_, Backbone, BackbonePageableCollection, app) {
+define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tools'
+    ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     /**
@@ -89,7 +89,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 _.extend(this.state, options.state);
             }
 
-            this.initialState = app.deepClone(this.state);
+            this.initialState = tools.deepClone(this.state);
 
             if (options.url) {
                 this.url = options.url;
@@ -139,8 +139,8 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
         encodeStateData: function(stateObject) {
             var data = _.pick(stateObject, _.keys(this.stateShortKeys));
             data.gridName = this.inputName;
-            data = app.invertKeys(data, this.stateShortKeys);
-            return app.packToQueryString(data);
+            data = tools.invertKeys(data, this.stateShortKeys);
+            return tools.packToQueryString(data);
         },
 
         /**
@@ -150,8 +150,8 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          * @return {Object}
          */
         decodeStateData: function(stateString) {
-            var data = app.unpackFromQueryString(stateString);
-            data = app.invertKeys(data, _.invert(this.stateShortKeys));
+            var data = tools.unpackFromQueryString(stateString);
+            data = tools.invertKeys(data, _.invert(this.stateShortKeys));
             return data;
         },
 
@@ -188,7 +188,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          * @return {Object}
          */
         processAdditionalParams: function (state) {
-            var state = app.deepClone(state);
+            var state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
             _.each(this.additionalParameters, _.bind(function(value, key) {
@@ -361,7 +361,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 var nvp = url.slice(qsi + 1).split('&');
                 for (var i = 0 ; i < nvp.length ; i++) {
                     var pair  = nvp[i].split('=');
-                    data[app.decodeUriComponent(pair[0])] = app.decodeUriComponent(pair[1]);
+                    data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
             }
 
@@ -395,7 +395,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             var url = options.url || _.result(this, "url") || '';
             var qsi = url.indexOf('?');
             if (qsi != -1) {
-                _.extend(data, app.unpackFromQueryString(url.slice(qsi + 1)));
+                _.extend(data, tools.unpackFromQueryString(url.slice(qsi + 1)));
                 url = url.slice(0, qsi);
             }
 
@@ -591,7 +591,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             collectionOptions.url = this.url;
             collectionOptions.inputName = this.inputName;
             var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
-            newCollection.state = app.deepClone(this.state);
+            newCollection.state = tools.deepClone(this.state);
             return newCollection;
         }
     });

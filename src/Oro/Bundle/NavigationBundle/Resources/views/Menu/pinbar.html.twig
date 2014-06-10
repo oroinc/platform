@@ -24,9 +24,9 @@
     {% endif %}
     {% import _self as pinbar %}
     <script type="text/javascript">
-        require(['jquery', 'oronavigation/js/pinbar/view', 'oronavigation/js/navigation', 'oroui/js/app'],
-                function ($, PinbarView, Navigation, app) {
-            if (app.isMobile()) {
+        require(['jquery', 'oronavigation/js/pinbar/view', 'oronavigation/js/navigation', 'oroui/js/tools'],
+                function ($, PinbarView, Navigation, tools) {
+            if (tools.isMobile()) {
                 return;
             }
 

@@ -8,7 +8,7 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
     var __ = require('orotranslation/js/translator');
-    var app = require('oroui/js/app');
+    var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
     var messenger = require('oroui/js/messenger');
     var Modal = require('oroui/js/modal');
@@ -558,7 +558,7 @@ define(function (require) {
         savePageToCache: function(data) {
             this.tempCache = {};
             this.tempCache = _.clone(data);
-            this.tempCache.states = app.deepClone(pageCacheStates);
+            this.tempCache.states = tools.deepClone(pageCacheStates);
         },
 
         /**
@@ -755,7 +755,7 @@ define(function (require) {
                 if (!_.isUndefined(console)) {
                     console.error(err);
                 }
-                if (app.debug) {
+                if (tools.debug) {
                     document.body.innerHTML = rawData;
                 } else {
                     messenger.notificationMessage('error', __('Sorry, page was not loaded correctly'));
@@ -809,7 +809,7 @@ define(function (require) {
          * @param {String} errorThrown
          */
         processError: function(XMLHttpRequest, textStatus, errorThrown) {
-            if (app.debug) {
+            if (tools.debug) {
                 this.updateDebugToolbar(XMLHttpRequest);
             }
 

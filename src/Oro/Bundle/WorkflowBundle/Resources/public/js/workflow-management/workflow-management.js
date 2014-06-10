@@ -8,7 +8,7 @@ define([
     'oroworkflow/js/workflow-management/transition/view/edit',
     'oroworkflow/js/workflow-management/helper',
     'oronavigation/js/navigation',
-    'oroui/js/app',
+    'oroui/js/tools',
     'oroui/js/mediator',
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
@@ -21,7 +21,7 @@ function(_, Backbone, routing, messenger, __,
      TransitionEditForm,
      Helper,
      Navigation,
-     app,
+     tools,
      mediator,
      Confirmation
 ) {
@@ -253,7 +253,7 @@ function(_, Backbone, routing, messenger, __,
                     navigation.hideLoading();
                     var jsonResponse = response.responseJSON || {};
 
-                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
+                    if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
                     }
                     messenger.notificationFlashMessage('error', __('Could not save workflow.'));

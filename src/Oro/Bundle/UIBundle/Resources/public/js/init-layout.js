@@ -13,11 +13,11 @@ require(['oroui/js/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
         'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
+    ], function ($, _, __, tools, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
     /* ============================================================
@@ -209,7 +209,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
      * from height_fix.js
      * ============================================================ */
     (function () {
-        if (app.isMobile()) {
+        if (tools.isMobile()) {
             return;
         }
         /* dynamic height for central column */
@@ -219,7 +219,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         var initializeContent = function () {
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                if (!app.isMobile()) {
+                if (!tools.isMobile()) {
                     content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                 } else {
                     content.css('overflow', 'hidden');

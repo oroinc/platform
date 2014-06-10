@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'oroui/js/app', 'oroui/js/modal', 'oronavigation/js/navigation'
-], function (_, __, $, routing, app, Modal, Navigation) {
+define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'oroui/js/tools', 'oroui/js/modal', 'oronavigation/js/navigation'
+], function (_, __, $, routing, tools, Modal, Navigation) {
     'use strict';
 
     var defaults = {
@@ -24,7 +24,7 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
 
                 if (xhr.status === 401) {
                     this._processRedirect();
-                } else if (xhr.readyState === 4 && app.debug && (typeof xhr.error !== 'function' || force)) {
+                } else if (xhr.readyState === 4 && tools.debug && (typeof xhr.error !== 'function' || force)) {
                     // show error in modal window in following cases:
                     // when custom error handling is not added
                     this.modalHandler(xhr);
@@ -39,7 +39,7 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
             modalHandler: function (xhr) {
                 var modal,
                     message = defaults.message;
-                if (app.debug) {
+                if (tools.debug) {
                     message += '<br><b>Debug:</b>' + xhr.responseText;
                 }
 

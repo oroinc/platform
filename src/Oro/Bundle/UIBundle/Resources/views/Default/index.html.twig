@@ -30,7 +30,7 @@
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oroui/js/app'], function(app){app.debug = true;});
+                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
                 {% endif %}
                 </script>
                 {% block hash_nav %}

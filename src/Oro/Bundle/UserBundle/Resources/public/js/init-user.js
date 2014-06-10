@@ -1,8 +1,8 @@
 /* jshint browser:true */
 /* global require */
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/messenger',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget', 'jquery.dialog.extended'],
-function($, _, __, app, mediator, messenger, DialogWidget) {
+function($, _, __, mediator, messenger, DialogWidget) {
     'use strict';
 
     /* ============================================================

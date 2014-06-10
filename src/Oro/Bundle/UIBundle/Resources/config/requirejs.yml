@@ -77,7 +77,6 @@ config:
         'backbone': 'bundles/oroui/lib/backbone.js'
         'backbone/bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
 
-        'oroui/js/app': 'bundles/oroui/js/app.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/init-layout': 'bundles/oroui/js/init-layout.js'
@@ -90,7 +89,6 @@ config:
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
-        'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/widget-control-initializer': 'bundles/oroui/js/widget-control-initializer.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget-manager.js'
         'oroui/js/widget/abstract': 'bundles/oroui/js/widget/abstract.js'

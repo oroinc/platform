@@ -1,7 +1,7 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/error',
+define(['underscore', 'backbone', 'oroui/js/tools', 'oroui/js/mediator', 'oroui/js/error',
         '../abstract-view', '../model', '../collection'
-    ], function (_, Backbone, app, mediator, error,
+    ], function (_, Backbone, tools, mediator, error,
         AbstractView, NavigationModel, NavigationCollection) {
     'use strict';
 
@@ -65,7 +65,7 @@ define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js
                     item.destroy({
                         wait: false, // This option affects correct disabling of favorites icon
                         error: function(model, xhr) {
-                            if (xhr.status == 404 && !app.debug) {
+                            if (xhr.status == 404 && !tools.debug) {
                                 // Suppress error if it's 404 response and not debug mode
                                 self.inactivate();
                             } else {

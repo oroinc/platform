@@ -1,7 +1,7 @@
 /*global define*/
 /*jslint nomen:true*/
-define(['jquery', 'underscore', 'oroui/js/app', 'bootstrap'],
-function ($, _, app) {
+define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap'],
+function ($, _, tools) {
     'use strict';
 
     var defaults = {
@@ -115,7 +115,7 @@ function ($, _, app) {
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
                     }
-                    if (app.debug) {
+                    if (tools.debug) {
                         if (!_.isUndefined(err.message)) {
                             msg += ': ' + err.message;
                         } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {

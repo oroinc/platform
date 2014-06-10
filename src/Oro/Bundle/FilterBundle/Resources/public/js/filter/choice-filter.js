@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', './text-filter'
-    ], function ($, _, __, app, TextFilter) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', './text-filter'
+    ], function ($, _, __, tools, TextFilter) {
     'use strict';
 
     /**
@@ -148,7 +148,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!app.isEqualsLoosely(newValue, oldValue)) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
         },
