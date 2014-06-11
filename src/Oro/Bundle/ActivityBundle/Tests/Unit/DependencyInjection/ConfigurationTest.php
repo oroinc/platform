@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\NoteBundle\DependencyInjection\Configuration;
+use Oro\Bundle\ActivityBundle\DependencyInjection\Configuration;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

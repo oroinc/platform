@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\NoteBundle\Tests\Unit;
+namespace Oro\Bundle\ActivityBundle\Tests\Unit;
 
 use Oro\Bundle\ActivityBundle\OroActivityBundle;
 
