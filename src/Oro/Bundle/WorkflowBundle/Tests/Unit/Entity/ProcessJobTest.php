@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 
