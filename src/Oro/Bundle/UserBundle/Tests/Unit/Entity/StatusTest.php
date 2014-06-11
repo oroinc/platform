@@ -8,6 +8,9 @@ class StatusTest extends \PHPUnit_Framework_TestCase
 {
     private $user;
 
+    /**
+     * @var Status
+     */
     private $status;
 
     protected function setUp()

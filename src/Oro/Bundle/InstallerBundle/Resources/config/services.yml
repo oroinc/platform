@@ -3,9 +3,6 @@ parameters:
     oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
     oro_installer.listener.request.class:             Oro\Bundle\InstallerBundle\EventListener\RequestListener
     oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
-    oro_installer.helper.requirements_helper.class:   Oro\Bundle\InstallerBundle\Helper\RequirementsHelper
-
-    oro_installer.event_listener.requirements_listener.class: Oro\Bundle\InstallerBundle\EventListener\RequirementsListener
 services:
     oro_installer.scenario:
         class: %oro_installer.scenario.class%
@@ -31,15 +28,3 @@ services:
         class: %oro_installer.script_manager.class%
         arguments:
             - @kernel
-
-    oro_installer.helper.requirements_helper:
-        class: %oro_installer.helper.requirements_helper.class%
-        arguments:
-            - %kernel.root_dir%
-
-    oro_installer.event_listener.requirements_listener:
-        class: %oro_installer.event_listener.requirements_listener.class%
-        arguments:
-            - @oro_installer.helper.requirements_helper
-        tags:
-            - { name: kernel.event_listener, event: console.command }

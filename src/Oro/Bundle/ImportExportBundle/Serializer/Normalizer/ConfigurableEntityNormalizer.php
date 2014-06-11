@@ -183,7 +183,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function hasIdentityFields($entityName)
     {
-        $fields = $this->fieldHelper->getFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName, true);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {

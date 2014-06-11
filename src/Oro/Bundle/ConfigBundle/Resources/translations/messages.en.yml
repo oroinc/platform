@@ -1,15 +1,16 @@
-"Settings": "Settings"
 oro:
     config:
-        actions:
-            collapse_all: Collapse All
-            expand_all:   Expand All
-
+        module_label:             "System configuration"
+		
+		actions:
+			collapse_all: Collapse All
+			expand_all:   Expand All
+		
         menu:
             system_configuration.label:       "Configuration"
             system_configuration.description: "System configuration"
 
-        module_label: "System configuration"
-
         controller:
             config.saved.message: "Configuration saved"
+
+"Settings": "Settings"

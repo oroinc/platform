@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Doctrine\Common\Persistence\Proxy;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 
@@ -256,6 +257,41 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $expectedResult,
             $this->doctrineHelper->getEntityReference($entityClass, $entityId)
+        );
+    }
+
+    public function testGetEntity()
+    {
+        $expectedResult = new TestEntity();
+        $entityClass = 'MockEntity';
+        $entityId = 100;
+
+        $entityManager = $this->getMockBuilder('Doctrine\Orm\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRepository'))
+            ->getMock();
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->will($this->returnValue($entityManager));
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->once())
+            ->method('find')
+            ->with($entityId)
+            ->will($this->returnValue($expectedResult));
+
+        $entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->will($this->returnValue($repo));
+
+        $this->assertSame(
+            $expectedResult,
+            $this->doctrineHelper->getEntity($entityClass, $entityId)
         );
     }
 

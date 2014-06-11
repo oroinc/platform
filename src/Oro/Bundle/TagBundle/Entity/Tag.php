@@ -127,7 +127,7 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
         $this->created = $date;
 
@@ -139,7 +139,7 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -150,7 +150,7 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $date)
+    public function setUpdated(\DateTime $date)
     {
         $this->updated = $date;
 
@@ -162,7 +162,7 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }

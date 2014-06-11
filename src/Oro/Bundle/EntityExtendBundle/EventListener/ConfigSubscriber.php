@@ -270,7 +270,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $scope,
                 $targetEntityClass,
                 $relationFieldName,
-                ExtendHelper::getReversRelationType($selfFieldType)
+                ExtendHelper::getReverseRelationType($selfFieldType)
             );
         }
 

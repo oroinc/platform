@@ -117,6 +117,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @dataProvider normalizeDataProvider
      * @param object $object
      * @param array $context
@@ -128,14 +129,34 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $format = null;
         $entityName = get_class($object);
+
+        $fieldsValueMap = array(
+            array($entityName, true, $fields),
+            array('DateTime', true, array())
+        );
         $this->fieldHelper->expects($this->atLeastOnce())
             ->method('getFields')
-            ->with($entityName, true)
-            ->will($this->returnValue($fields));
+            ->with()
+            ->will($this->returnValueMap($fieldsValueMap));
 
         $configValueMap = array();
+        $normalizedMap = array();
+        $isRelationMap = array();
+        $hasConfigMap = array();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
+
+            if (isset($field['normalizedValue'])) {
+                $fieldValue = $object->$fieldName;
+                $fieldContext = isset($field['fieldContext']) ? $field['fieldContext'] : $context;
+                $normalizedMap[] = array($fieldValue, null, $fieldContext, $field['normalizedValue']);
+            }
+
+            if (isset($field['related_entity_type'])) {
+                $hasConfigMap[] = array($field['related_entity_type'], true);
+                $isRelationMap[] = array($field, true);
+            }
+
             foreach ($fieldsImportConfig[$fieldName] as $configKey => $configValue) {
                 $configValueMap[] = array($entityName, $fieldName, $configKey, null, $configValue);
             }
@@ -143,31 +164,44 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->fieldHelper->expects($this->any())
             ->method('getConfigValue')
             ->will($this->returnValueMap($configValueMap));
+        if ($hasConfigMap) {
+            $this->fieldHelper->expects($this->any())
+                ->method('hasConfig')
+                ->will($this->returnValue($hasConfigMap));
+        }
+        if ($isRelationMap) {
+            $this->fieldHelper->expects($this->atLeastOnce())
+                ->method('isRelation')
+                ->will($this->returnValue($isRelationMap));
+        }
 
         $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
             ->disableOriginalConstructor()
             ->getMock();
-
-        if (isset($field['normalizedValue'])) {
-            $serializer->expects($this->once())
+        if ($normalizedMap) {
+            $serializer->expects($this->atLeastOnce())
                 ->method('normalize')
-                ->with($field['value'], $format, $field['fieldContext'])
-                ->will($this->returnValue($field['normalizedValue']));
+                ->will($this->returnValueMap($normalizedMap));
         }
+        $this->normalizer->setSerializer($serializer);
 
         $this->assertEquals($result, $this->normalizer->normalize($object, $format, $context));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function normalizeDataProvider()
     {
         $object = (object) array(
             'fieldString' => 'string',
-            'fieldObject' => new \stdClass(),
             'excluded' => 'excluded',
             'id' => 'id',
             'nonId' => 'nonId',
-            'objectNoIds' => new \stdClass()
+            'objectNoIds' => new \DateTime()
         );
+        $object->relatedObjectWithId = clone $object;
 
         return array(
             'simple' => array(
@@ -209,7 +243,117 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'id' => 'id'
                 )
-            )
+            ),
+            'with_identity' => array(
+                $object,
+                array(
+                    'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                ),
+                array(
+                    array(
+                        'name' => 'fieldString'
+                    ),
+                    array(
+                        'name' => 'nonId'
+                    ),
+                    array(
+                        'name' => 'id'
+                    )
+                ),
+                array(
+                    'fieldString' => array(
+                        'excluded' => false
+                    ),
+                    'nonId' => array(
+                        'identity' => false,
+                    ),
+                    'id' => array(
+                        'identity' => true,
+                    )
+                ),
+                array(
+                    'id' => 'id'
+                )
+            ),
+            'with_object_full_non_identity' => array(
+                $object,
+                array(),
+                array(
+                    array(
+                        'name' => 'relatedObjectWithId',
+                        'normalizedValue' => 'obj1',
+                        'related_entity_type' => 'stdClass',
+                        'fieldContext' => array(
+                            'mode' => ConfigurableEntityNormalizer::FULL_MODE
+                        ),
+                    ),
+                    array(
+                        'name' => 'objectNoIds',
+                        'normalizedValue' => 'obj2',
+                        'related_entity_type' => 'DateTime',
+                        'fieldContext' => array(
+                            'mode' => ConfigurableEntityNormalizer::FULL_MODE
+                        ),
+                    ),
+                    array(
+                        'name' => 'id'
+                    )
+                ),
+                array(
+                    'relatedObjectWithId' => array(
+                        'full' => true
+                    ),
+                    'objectNoIds' => array(
+                        'full' => true
+                    ),
+                    'id' => array(
+                        'identity' => true,
+                    )
+                ),
+                array(
+                    'id' => 'id',
+                    'relatedObjectWithId' => 'obj1',
+                    'objectNoIds' => 'obj2'
+                )
+            ),
+            'object_relation_short_with_non_identity' => array(
+                $object,
+                array(),
+                array(
+                    array(
+                        'name' => 'relatedObjectWithId',
+                        'normalizedValue' => 'obj1',
+                        'fieldContext' => array(
+                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                        ),
+                        'related_entity_type' => 'stdClass'
+                    ),
+                    array(
+                        'name' => 'objectNoIds',
+                        'normalizedValue' => 'obj2',
+                        'fieldContext' => array(
+                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                        ),
+                        'related_entity_type' => 'DateTime'
+                    ),
+                    array(
+                        'name' => 'id'
+                    )
+                ),
+                array(
+                    'relatedObjectWithId' => array(
+                    ),
+                    'objectNoIds' => array(
+                    ),
+                    'id' => array(
+                        'identity' => true,
+                    )
+                ),
+                array(
+                    'id' => 'id',
+                    'relatedObjectWithId' => 'obj1'
+                )
+            ),
         );
     }
 }

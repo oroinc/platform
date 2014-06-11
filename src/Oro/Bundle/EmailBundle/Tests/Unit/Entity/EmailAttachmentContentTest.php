@@ -27,8 +27,8 @@ class EmailAttachmentContentTest extends \PHPUnit_Framework_TestCase
     public function testValueGetterAndSetter()
     {
         $entity = new EmailAttachmentContent();
-        $entity->setValue('test');
-        $this->assertEquals('test', $entity->getValue());
+        $entity->setContent('test');
+        $this->assertEquals('test', $entity->getContent());
     }
 
     public function testContentTransferEncodingGetterAndSetter()

@@ -196,7 +196,7 @@ class Email
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }

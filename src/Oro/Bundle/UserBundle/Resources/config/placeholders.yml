@@ -14,4 +14,4 @@ items:
 
     oro_user_emails:
         template: OroUserBundle:User:userEmails.html.twig
-        attribute_instance_of: [entity, %oro_user.entity.class%]
+        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)

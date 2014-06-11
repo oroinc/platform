@@ -14,13 +14,13 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
         tagName: 'div',
 
         attributes: {
-            'class': 'map-item'
+            'class': 'list-item map-item'
         },
 
         events: {
             'click': 'activate',
-            'click button:has(.icon-remove)': 'close',
-            'click button:has(.icon-pencil)': 'edit'
+            'click .item-edit-button': 'edit',
+            'click .item-remove-button': 'close'
         },
 
         initialize: function () {
