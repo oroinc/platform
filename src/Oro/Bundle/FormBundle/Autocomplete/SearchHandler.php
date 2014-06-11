@@ -3,12 +3,12 @@
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SearchHandler implements SearchHandlerInterface
 {
@@ -46,6 +46,11 @@ class SearchHandler implements SearchHandlerInterface
      * @var ObjectManager
      */
     protected $objectManager;
+
+    /**
+     * @var AclHelper $aclHelper
+     */
+    protected $aclHelper;
 
     /**
      * @param string $entityName
@@ -172,7 +177,8 @@ class SearchHandler implements SearchHandlerInterface
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
             $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-            $resultEntities = $queryBuilder->getQuery()->getResult();
+            $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
+            $resultEntities = $query->getResult();
         }
 
         return $resultEntities;
@@ -257,5 +263,13 @@ class SearchHandler implements SearchHandlerInterface
     public function getEntityName()
     {
         return $this->entityName;
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
     }
 }
