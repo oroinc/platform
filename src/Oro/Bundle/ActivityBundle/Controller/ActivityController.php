@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\NoteBundle\Controller;
+namespace Oro\Bundle\ActivityBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/activities")
  */
-class NoteController extends Controller
+class ActivityController extends Controller
 {
 }
