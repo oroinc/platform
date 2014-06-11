@@ -1,12 +1,12 @@
 oro:
-  attachment:
-      entity_label:         Attachment
-      entity_plural_label:  Attachments
-      entity_description:   Entity attachments
-      id.label:             Id
-      filename.label:       File name
-      original_filename.label: Original file name
-      filepath.label:       File path
-      created_at.label:     Created
-      updated_at.label:     Updated
-      owner.label:          Owner
+    attachment:
+          entity_label:         Attachment
+          entity_plural_label:  Attachments
+          entity_description:   Entity attachments
+          id.label:             Id
+          filename.label:       File name
+          original_filename.label: Original file name
+          filepath.label:       File path
+          created_at.label:     Created
+          updated_at.label:     Updated
+          owner.label:          Owner

@@ -5,8 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
 /**
  * Attachment
@@ -31,7 +31,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *  }
  * )
  */
-class Attachment
+class Attachment extends ExtendAttachment
 {
     /**
      * @var integer
