@@ -1,8 +1,17 @@
 parameters:
+    oro_workflow.listener.process_data_serialize.class:  Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener
     oro_workflow.listener.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
-    oro_workflow.listener.workflow_item.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
+    oro_workflow.listener.workflow_item.class:           Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
 
 services:
+    oro_workflow.listener.process_data_serialize:
+        class: %oro_workflow.listener.process_data_serialize.class%
+        arguments:
+            - @oro_workflow.serializer.data.process_serializer
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postLoad }
+
     oro_workflow.listener.workflow_data_serialize:
         class: %oro_workflow.listener.workflow_data_serialize.class%
         arguments:

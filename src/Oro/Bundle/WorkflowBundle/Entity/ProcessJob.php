@@ -6,6 +6,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @ORM\Table("oro_process_job")
@@ -53,9 +57,19 @@ class ProcessJob
     protected $entityId;
 
     /**
-     * @var Collection
+     * @var ProcessData
      */
     protected $data;
+
+    /**
+     * @var SerializerInterface;
+     */
+    protected $serializer;
+
+    /**
+     * @var string
+     */
+    protected $serializeFormat;
 
     /**
      * @return integer
@@ -142,21 +156,51 @@ class ProcessJob
     }
 
     /**
-     * @return Collection
+     * Get data
+     *
+     * @return ProcessData
+     * @throws SerializerException If data cannot be deserialized
      */
     public function getData()
     {
+        if (!$this->data) {
+            if (!$this->serializedData) {
+                $this->data = new ProcessData();
+            } elseif (!$this->serializer) {
+                throw new SerializerException('Cannot deserialize data of process job. Serializer is not available.');
+            } else {
+                $this->data = $this->serializer->deserialize(
+                    $this->serializedData,
+                    'Oro\Bundle\WorkflowBundle\Model\ProcessData',
+                    $this->serializeFormat
+                );
+            }
+        }
         return $this->data;
     }
 
     /**
-     * @param Collection $data
+     * @param ProcessData $data
      * @return ProcessJob
      */
-    public function setData(Collection $data)
+    public function setData(ProcessData $data)
     {
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * Set serializer with custom format.
+     *
+     * This method should be called only from ProcessDataSerializeListener.
+     *
+     * @param SerializerInterface $serializer
+     * @param string $format
+     */
+    public function setSerializer(SerializerInterface $serializer, $format)
+    {
+        $this->serializer      = $serializer;
+        $this->serializeFormat = $format;
     }
 }

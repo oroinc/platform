@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class ProcessJobTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +46,7 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
 
-        $this->assertSame($defaultValue, $this->entity->$getter());
+        $this->assertEquals($defaultValue, $this->entity->$getter());
         $this->assertSame($this->entity, $this->entity->$setter($testValue));
         $this->assertSame($testValue, $this->entity->$getter());
     }
@@ -59,6 +60,7 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
             'processTrigger' => array('processTrigger', new ProcessTrigger()),
             'entityHash' => array('entityHash', 'My\Entity' . serialize(array('id' => 1))),
             'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
+            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData(array())),
         );
     }
 }
