@@ -11,6 +11,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
+use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+
 /**
  * Email
  *
@@ -28,11 +30,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE",
  *          "group_name"=""
- *      }
+ *      },
+ *      "grouping"={"groups"={"activity"}}
  *  }
  * )
  */
-class Email
+class Email extends ExtendEmail
 {
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
