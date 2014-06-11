@@ -1,11 +1,11 @@
 oro:
     config:
         module_label:             "System configuration"
-		
-		actions:
-			collapse_all: Collapse All
-			expand_all:   Expand All
-		
+
+        actions:
+            collapse_all: Collapse All
+            expand_all:   Expand All
+
         menu:
             system_configuration.label:       "Configuration"
             system_configuration.description: "System configuration"
