@@ -1,16 +1,15 @@
 oro_entity_config:
-    note:
+    activity:
         entity:
             items:
-                enabled:
+                activities:
                     options:
                         priority:           250
-                        default_value:      false
                         auditable:          false
                     form:
-                        type:               oro_entity_extend_association_choice
+                        type:               oro_entity_extend_multiple_association_choice
                         options:
                             block:          associations
                             required:       true
-                            label:          oro.note.enabled
-                            association_class: 'OroNoteBundle:Note'
+                            label:          oro.activity.activities
+                            association_class: activity

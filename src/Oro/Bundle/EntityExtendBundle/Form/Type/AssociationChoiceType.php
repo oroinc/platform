@@ -2,25 +2,24 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class AssociationChoiceType extends AbstractType
-{
-    const NAME = 'oro_entity_extend_association_choice';
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
+class AssociationChoiceType extends AbstractAssociationChoiceType
+{
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
+
         $resolver->setDefaults(
             [
-                'empty_value'                  => false,
-                'choices'                      => ['No', 'Yes'],
-                'entity_class'                 => null, // can be full class name or entity name
-                'entity_config_scope'          => null,
-                'entity_config_attribute_name' => 'enabled'
+                'empty_value'       => false,
+                'choices'           => ['No', 'Yes'],
+                'association_class' => null // can be full class name or entity name
             ]
         );
     }
@@ -28,9 +27,29 @@ class AssociationChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    protected function isSchemaUpdateRequired($newVal, $oldVal)
+    {
+        return true == $newVal && false == $oldVal;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isReadOnly($options)
+    {
+        /** @var EntityConfigId $configId */
+        $configId  = $options['config_id'];
+        $className = $this->entityClassResolver->getEntityClass($options['association_class']);
+
+        return $configId->getClassName() === $className;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
-        return self::NAME;
+        return 'oro_entity_extend_association_choice';
     }
 
     /**
