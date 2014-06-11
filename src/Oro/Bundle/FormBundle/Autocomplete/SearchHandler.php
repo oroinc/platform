@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class SearchHandler implements SearchHandlerInterface
@@ -50,6 +52,11 @@ class SearchHandler implements SearchHandlerInterface
      * @var EntityManager $manager
      */
     protected $manager;
+
+    /**
+     * @var AclHelper $aclHelper
+     */
+    protected $aclHelper;
 
     /**
      * @param string $entityName
@@ -133,7 +140,9 @@ class SearchHandler implements SearchHandlerInterface
         $firstResult = ($page - 1) * $perPage;
 
         if ($query == '') {
-            $items = $this->manager->getRepository($this->entityName)->findBy(array(), null, $perPage, $firstResult);
+            $queryBuilder = $this->manager->getRepository($this->entityName)->createQueryBuilder('e');
+            $query = $this->getAclHelper()->apply($queryBuilder, 'VIEW'); 
+            $items = $query->getResult();
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
@@ -186,7 +195,8 @@ class SearchHandler implements SearchHandlerInterface
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
             $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-            $currentEntities = $queryBuilder->getQuery()->getResult();
+            $query = $this->getAclHelper()->apply($queryBuilder, 'VIEW'); 
+            $currentEntities = $query->getResult();
 
             foreach ($currentEntities as $entity) {
                 $resultEntities[] = $entity;
@@ -283,5 +293,21 @@ class SearchHandler implements SearchHandlerInterface
     public function setEntityManager(EntityManager $manager)
     {
         $this->manager = $manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclHelper()
+    {
+        return $this->aclHelper;
+    }
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
     }
 }
