@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class ProcessJobTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,6 +60,7 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
             'processTrigger' => array('processTrigger', new ProcessTrigger()),
             'entityHash' => array('entityHash', 'My\Entity' . serialize(array('id' => 1))),
             'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
+            'data' => array('data', new ProcessData(array('some' => 'data'))),
         );
     }
 }

@@ -5,7 +5,8 @@ definitions:
         entity: Oro\Bundle\UserBundle\Entity\User
         order: 20
         actions_configuration:
-            - @assign_value: [$entity.namePrefix, 'Pr.']
+            - @assign_value: [$namePrefix, 'Pr.']
+            - @assign_value: [$.new, $namePrefix]
 
     another_definition:
         label: 'Another definition'

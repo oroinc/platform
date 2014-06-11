@@ -36,7 +36,7 @@ class ProcessHandler
             $contextData['new'] = $new;
         }
         $process = $this->processFactory->create($processTrigger->getDefinition());
-        $process->execute(new ArrayCollection($contextData));
+        $process->execute(new ProcessData($contextData));
     }
 
     /**

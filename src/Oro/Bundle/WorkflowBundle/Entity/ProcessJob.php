@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 /**
  * @ORM\Table("oro_process_job")
@@ -53,7 +53,7 @@ class ProcessJob
     protected $entityId;
 
     /**
-     * @var Collection
+     * @var ProcessData
      */
     protected $data;
 
@@ -142,7 +142,7 @@ class ProcessJob
     }
 
     /**
-     * @return Collection
+     * @return ProcessData
      */
     public function getData()
     {
@@ -150,10 +150,10 @@ class ProcessJob
     }
 
     /**
-     * @param Collection $data
+     * @param ProcessData $data
      * @return ProcessJob
      */
-    public function setData(Collection $data)
+    public function setData(ProcessData $data)
     {
         $this->data = $data;
 

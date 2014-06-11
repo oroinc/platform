@@ -2,6 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-class WorkflowResult extends AbstractStorage
+class ProcessData extends AbstractStorage
 {
 }
