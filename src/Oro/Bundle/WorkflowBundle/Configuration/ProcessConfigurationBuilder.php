@@ -33,7 +33,6 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
 
         $enabled = $this->getConfigurationOption($configuration, 'enabled', true);
         $order = $this->getConfigurationOption($configuration, 'order', 0);
-        $executionRequired = $this->getConfigurationOption($configuration, 'execution_required', false);
         $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', array());
 
         $definition = new ProcessDefinition();
@@ -43,7 +42,6 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             ->setRelatedEntity($configuration['entity'])
             ->setEnabled($enabled)
             ->setExecutionOrder($order)
-            ->setExecutionRequired($executionRequired)
             ->setActionsConfiguration($actionsConfiguration);
 
         return $definition;
@@ -86,6 +84,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         }
 
         $field = $this->getConfigurationOption($configuration, 'field', null);
+        $queued = $this->getConfigurationOption($configuration, 'queued', false);
         $timeShift = $this->getConfigurationOption($configuration, 'time_shift', null);
 
         if ($timeShift && !is_int($timeShift) && !$timeShift instanceof \DateInterval) {
@@ -100,6 +99,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         $trigger
             ->setEvent($event)
             ->setField($field)
+            ->setQueued($queued)
             ->setDefinition($definition);
 
         if ($timeShift instanceof \DateInterval) {

@@ -4,9 +4,8 @@ definitions:
         enabled: true
         entity: Oro\Bundle\UserBundle\Entity\User
         order: 20
-        execution_required: true
         actions_configuration:
-            - @assign_value: [$namePrefix, 'Pr.']
+            - @assign_value: [$entity.namePrefix, 'Pr.']
 
     another_definition:
         label: 'Another definition'
@@ -18,9 +17,11 @@ triggers:
         -
             event: update
             field: some_field
+            queued: true
             time_shift: 123456
         -
             event: create
+            queued: true
             time_shift: P6YT5M
         -
             event: delete

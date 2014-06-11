@@ -47,6 +47,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => null,
+                    'queued' => false,
                     'time_shift' => null,
                 ),
             ),
@@ -54,21 +55,25 @@ class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
                 'input' => array(
                     'event' => ProcessTrigger::EVENT_UPDATE,
                     'field' => 'status',
+                    'queued' => true,
                     'time_shift' => 12345
                 ),
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_UPDATE,
                     'field' => 'status',
+                    'queued' => true,
                     'time_shift' => 12345
                 ),
             ),
             'date interval time shift' => array(
                 'input' => array(
                     'event' => ProcessTrigger::EVENT_DELETE,
+                    'queued' => true,
                     'time_shift' => 'P1D'
                 ),
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_DELETE,
+                    'queued' => true,
                     'time_shift' => 24 * 3600,
                     'field' => null,
                 ),

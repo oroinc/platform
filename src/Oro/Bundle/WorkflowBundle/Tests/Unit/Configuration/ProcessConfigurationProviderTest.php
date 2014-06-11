@@ -28,7 +28,6 @@ class ProcessConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestIncomplete('Need to be fixed in scope of CRM-739');
         $this->definitionConfiguration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
         $this->triggerConfiguration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }

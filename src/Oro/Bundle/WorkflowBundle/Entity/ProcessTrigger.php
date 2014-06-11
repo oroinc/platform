@@ -280,7 +280,7 @@ class ProcessTrigger
      */
     public static function convertDateIntervalToSeconds(\DateInterval $interval)
     {
-        $date = new \DateTime('now');
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $basicTimestamp = $date->getTimestamp();
         $shiftedTimestamp = $date->add($interval)->getTimestamp();
 

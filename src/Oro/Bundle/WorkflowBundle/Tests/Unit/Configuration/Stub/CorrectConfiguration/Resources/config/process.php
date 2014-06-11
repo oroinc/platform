@@ -10,7 +10,6 @@ return array(
             'enabled' => true,
             'entity' => 'Oro\Bundle\UserBundle\Entity\User',
             'order' => 20,
-            'execution_required' => true,
             'actions_configuration' => array(
                 array('@assign_value' => array('$entity.field', 'value'))
             )
@@ -20,7 +19,6 @@ return array(
             'enabled' => true,
             'entity' => 'My\Entity',
             'order' => 0,
-            'execution_required' => false,
             'actions_configuration' => array()
         ),
     ),
@@ -29,16 +27,19 @@ return array(
             array(
                 'event' => ProcessTrigger::EVENT_UPDATE,
                 'field' => 'some_field',
+                'queued' => true,
                 'time_shift' => 123456,
             ),
             array(
                 'event' => ProcessTrigger::EVENT_CREATE,
                 'field' => null,
-                'time_shift' => 189302700,
+                'queued' => true,
+                'time_shift' => 86700,
             ),
             array(
                 'event' => ProcessTrigger::EVENT_DELETE,
                 'field' => null,
+                'queued' => false,
                 'time_shift' => null,
             )
         )

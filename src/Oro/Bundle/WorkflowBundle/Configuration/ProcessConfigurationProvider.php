@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessConfigurationProvider extends AbstractConfigurationProvider
@@ -52,9 +50,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
         array $usedDirectories = null,
         array $usedDefinitions = null
     ) {
-        $this->setUsedDirectories($usedDirectories);
-
-        $finder = $this->getConfigFinder();
+        $finder = $this->getConfigFinder((array)$usedDirectories);
 
         $definitions = array();
         $triggers = array();
@@ -62,11 +58,7 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
-            if (!$this->isFileAllowed($realPathName)) {
-                continue;
-            }
-
-            $configData = Yaml::parse($realPathName);
+            $configData = $this->loadConfigFile($file);
 
             list($definitionsData, $triggersData) = $this->parseConfiguration($configData, $realPathName);
 

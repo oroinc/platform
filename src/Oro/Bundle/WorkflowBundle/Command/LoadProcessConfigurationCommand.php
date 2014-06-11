@@ -114,9 +114,6 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO: command should be fixed in scope of CRM-739
-        return;
-
         $usedDirectories = $input->getOption('directories');
         $usedDirectories = $usedDirectories ?: null;
 

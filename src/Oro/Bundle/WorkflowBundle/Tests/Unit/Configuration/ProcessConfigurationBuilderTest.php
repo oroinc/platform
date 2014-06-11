@@ -17,8 +17,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestIncomplete('Should be fixed in scope of CRM-739');
-
         $this->builder = new ProcessConfigurationBuilder();
     }
 
@@ -37,7 +35,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['entity'], $definition->getRelatedEntity());
         $this->assertEquals($expected['enabled'], $definition->isEnabled());
         $this->assertEquals($expected['order'], $definition->getExecutionOrder());
-        $this->assertEquals($expected['execution_required'], $definition->isExecutionRequired());
         $this->assertEquals($expected['actions_configuration'], $definition->getActionsConfiguration());
     }
 
@@ -53,6 +50,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->assertEquals($expected['event'], $trigger->getEvent());
         $this->assertEquals($expected['field'], $trigger->getField());
+        $this->assertEquals($expected['queued'], $trigger->isQueued());
         $this->assertSame($expected['time_shift'], $trigger->getTimeShift());
         $this->assertSame($definition, $trigger->getDefinition());
     }
@@ -89,7 +87,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'entity' => 'My\Entity',
                     'enabled' => true,
                     'order' => 0,
-                    'execution_required' => false,
                     'actions_configuration' => array(),
                 ),
             ),
@@ -100,7 +97,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'execution_required' => true,
                     'actions_configuration' => array('key' => 'value'),
                 ),
                 'expected' => array(
@@ -108,7 +104,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'execution_required' => true,
                     'actions_configuration' => array('key' => 'value'),
                 ),
             ),
@@ -181,6 +176,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => null,
+                    'queued' => false,
                     'time_shift' => null,
                 ),
             ),
@@ -188,21 +184,25 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'configuration' => array(
                     'event' => ProcessTrigger::EVENT_UPDATE,
                     'field' => 'status',
+                    'queued' => true,
                     'time_shift' => 12345
                 ),
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_UPDATE,
                     'field' => 'status',
+                    'queued' => true,
                     'time_shift' => 12345
                 ),
             ),
             'date interval time shift' => array(
                 'configuration' => array(
                     'event' => ProcessTrigger::EVENT_DELETE,
-                    'time_shift' => new \DateInterval('P1D')
+                    'queued' => true,
+                    'time_shift' => new \DateInterval('P1D'),
                 ),
                 'expected' => array(
                     'event' => ProcessTrigger::EVENT_DELETE,
+                    'queued' => true,
                     'time_shift' => 24 * 3600,
                     'field' => null,
                 ),

@@ -49,7 +49,6 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'entity' => 'My\Entity',
                     'enabled' => true,
                     'order' => 0,
-                    'execution_required' => false,
                     'actions_configuration' => array(),
                 ),
             ),
@@ -60,7 +59,6 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'execution_required' => true,
                     'actions_configuration' => array('key' => 'value'),
                 ),
                 'expected' => array(
@@ -69,7 +67,6 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
-                    'execution_required' => true,
                     'actions_configuration' => array('key' => 'value'),
                 ),
             ),
