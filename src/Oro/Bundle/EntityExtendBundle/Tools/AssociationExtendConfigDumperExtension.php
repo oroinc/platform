@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -15,6 +16,9 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     /** @var string[] */
     private $targetEntityClassNames;
 
+    /** @var array|ConfigInterface[] */
+    private $targetEntityConfigs;
+
     /**
      * @param ConfigManager $configManager
      */
@@ -26,9 +30,13 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     /**
      * Gets the entity class who is owning side of the association
      *
+     * @throws \Exception
      * @return string
      */
-    abstract protected function getAssociationEntityClass();
+    protected function getAssociationEntityClass()
+    {
+        throw new \Exception('Method should be implemented or not invoked');
+    }
 
     /**
      * Gets the scope name where the association is declared
@@ -38,14 +46,13 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     abstract protected function getAssociationScope();
 
     /**
-     * Gets the config attribute name which indicates whether the association is enabled or not
+     * Check if entity target matched for further processing
      *
-     * @return string
+     * @param ConfigInterface $config
+     *
+     * @return bool
      */
-    protected function getAssociationAttributeName()
-    {
-        return 'enabled';
-    }
+    abstract protected function targetEntityMatch(ConfigInterface $config);
 
     /**
      * {@inheritdoc}
@@ -66,73 +73,84 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
      */
     public function preUpdate(array &$extendConfigs)
     {
-        $entityClassName = $this->getAssociationEntityClass();
-        $targetEntities  = $this->getTargetEntities();
-        foreach ($targetEntities as $targetEntityClassName) {
-            $relationName = $this->getRelationName($targetEntityClassName);
-            $relationKey  = $this->getRelationKey($entityClassName, $relationName, $targetEntityClassName);
+        $entityClass          = $this->getAssociationEntityClass();
+        $targetEntities       = $this->getTargetEntities();
 
-            $entityConfigProvider = $this->configManager->getProvider('entity');
-            $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClassName);
-
-            $label       = $targetEntityConfig->get(
-                'label',
-                false,
-                ConfigHelper::getTranslationKey('entity', 'label', $targetEntityClassName, $relationName)
-            );
-            $description = ConfigHelper::getTranslationKey(
-                'entity',
-                'description',
-                $targetEntityClassName,
-                $relationName
-            );
-
-            $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClassName);
-            $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
-
-            // create field
-            $this->createField(
-                $entityClassName,
-                $relationName,
-                'manyToOne',
-                [
-                    'extend' => [
-                        'owner'         => ExtendScope::OWNER_SYSTEM,
-                        'state'         => ExtendScope::STATE_NEW,
-                        'extend'        => true,
-                        'target_entity' => $targetEntityClassName,
-                        'target_field'  => $targetFieldName,
-                        'relation_key'  => $relationKey,
-                    ],
-                    'entity' => [
-                        'label'       => $label,
-                        'description' => $description,
-                    ],
-                    'view'   => [
-                        'is_displayable' => false
-                    ],
-                    'form'   => [
-                        'is_enabled' => false
-                    ]
-                ]
-            );
-
-            // add relation to owning entity
-            $this->addManyToOneRelation(
-                $targetEntityClassName,
-                $entityClassName,
-                $relationName,
-                $relationKey
-            );
-
-            // add relation to target entity
-            $this->addManyToOneRelationTargetSide(
-                $targetEntityClassName,
-                $entityClassName,
-                $relationName,
-                $relationKey
-            );
+        foreach ($targetEntities as $targetEntityClass) {
+            $this->createRelation($entityClass, $targetEntityClass, 'manyToOne');
         }
+    }
+
+    /**
+     * @param string $sourceEntityClass
+     * @param string $targetEntityClass
+     * @param string $relationType      manyToOne, manyToMany, etc
+     */
+    protected function createRelation($sourceEntityClass, $targetEntityClass, $relationType)
+    {
+        $relationName = $this->getRelationName($targetEntityClass);
+        $relationKey  = $this->getRelationKey($sourceEntityClass, $relationName, $targetEntityClass);
+
+        $targetEntityConfig = $this->configManager
+            ->getProvider('entity')
+            ->getConfig($targetEntityClass);
+        $label              = $targetEntityConfig->get(
+            'label',
+            false,
+            ConfigHelper::getTranslationKey('entity', 'label', $targetEntityClass, $relationName)
+        );
+        $description        = ConfigHelper::getTranslationKey(
+            'entity',
+            'description',
+            $targetEntityClass,
+            $relationName
+        );
+
+        $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
+        $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
+
+        // create field
+        $this->createField(
+            $sourceEntityClass,
+            $relationName,
+            $relationType,
+            [
+                'extend' => [
+                    'owner'         => ExtendScope::OWNER_SYSTEM,
+                    'state'         => ExtendScope::STATE_NEW,
+                    'extend'        => true,
+                    'target_entity' => $targetEntityClass,
+                    'target_field'  => $targetFieldName,
+                    'relation_key'  => $relationKey,
+                ],
+                'entity' => [
+                    'label'       => $label,
+                    'description' => $description,
+                ],
+                'view'   => [
+                    'is_displayable' => false
+                ],
+                'form'   => [
+                    'is_enabled' => false
+                ]
+            ]
+        );
+
+        // add relation to owning entity
+        $this->addManyToOneRelation(
+            $targetEntityClass,
+            $sourceEntityClass,
+            $relationName,
+            $relationKey
+        );
+
+        // add relation to target entity
+        $this->addManyToOneRelationTargetSide(
+            $targetEntityClass,
+            $sourceEntityClass,
+            $relationName,
+            $relationKey
+        );
     }
 
     /**
@@ -241,24 +259,39 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     }
 
     /**
-     * Gets the list of class names for entities which can the target of the association
+     * Gets the list of class names for entities that can be the target of the association
      *
      * @return string[] the list of class names
      */
     protected function getTargetEntities()
     {
         if (null === $this->targetEntityClassNames) {
-            $this->targetEntityClassNames = [];
-
-            $configs = $this->configManager->getProvider($this->getAssociationScope())->getConfigs();
+            $configs = $this->getTargetEntitiesConfigs();
             foreach ($configs as $config) {
-                if ($config->is($this->getAssociationAttributeName())) {
-                    $this->targetEntityClassNames[] = $config->getId()->getClassName();
-                }
+                $this->targetEntityClassNames[] = $config->getId()->getClassName();
             }
         }
 
         return $this->targetEntityClassNames;
+    }
+
+    /**
+     * @return array|ConfigInterface[]
+     */
+    protected function getTargetEntitiesConfigs()
+    {
+        if (null === $this->targetEntityConfigs) {
+            $this->targetEntityConfigs = [];
+
+            $configs = $this->configManager->getProvider($this->getAssociationScope())->getConfigs();
+            foreach ($configs as $config) {
+                if ($this->targetEntityMatch($config)) {
+                    $this->targetEntityConfigs[] = $config;
+                }
+            }
+        }
+
+        return $this->targetEntityConfigs;
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+
 abstract class ExtendConfigDumperExtension
 {
     /**
@@ -12,18 +14,20 @@ abstract class ExtendConfigDumperExtension
     abstract public function supports($actionType);
 
     /**
-     * Optionally can be overridden in child
+     * Entities configs for extend scope,
+     * optionally can be overridden in child, can change extend config
      *
-     * @param array          $extendConfigs
+     * @param array|ConfigInterface[] $extendConfigs
      */
     public function preUpdate(array &$extendConfigs)
     {
     }
 
     /**
-     * Optionally can be overridden in child
+     * Entities configs for extend scope,
+     * optionally can be overridden in child, can change extend config
      *
-     * @param array          $extendConfigs
+     * @param array|ConfigInterface[] $extendConfigs
      */
     public function postUpdate(array &$extendConfigs)
     {
