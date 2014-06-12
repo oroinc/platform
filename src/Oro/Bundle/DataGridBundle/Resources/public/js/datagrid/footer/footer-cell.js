@@ -23,6 +23,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
          * Initialize.
          */
         initialize: function (options) {
+            this.options = options || {};
             Backgrid.requireOptions(options, ["column", "collection"]);
 
             this.column = options.column;
