@@ -1,3 +1,4 @@
+/*jslint browser:true, nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'backbone'
     ], function ($, _, Backbone) {
@@ -25,7 +26,7 @@ define(['jquery', 'underscore', 'backbone'
         loadingHint: 'Loading...',
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<div class="loading-wrapper"></div>' +
             '<div class="loading-frame">' +
                 '<div class="box well">' +
@@ -54,7 +55,7 @@ define(['jquery', 'underscore', 'backbone'
                 updateProxy = $.proxy(this.updatePos, this);
                 $(window).resize(updateProxy).scroll(updateProxy);
             }
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            this.constructor.__super__.initialize.apply(this, arguments);
         },
 
         /**

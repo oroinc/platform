@@ -10,7 +10,8 @@ define([
             mainContainer: '#container',
             mainMenu: '#main-menu',
             userMenu: '#top-page .user-menu',
-            breadcrumb: '#breadcrumb'
+            breadcrumb: '#breadcrumb',
+            loadingMask: '#main .hash-loading-mask'
         }
     });
 
