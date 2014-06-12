@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 
 class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
 {
+    const ENTITY = 'Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity';
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -93,7 +96,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssertEnvironmentContext()
     {
-        $this->strategy->process($this->getMock('\stdClass'));
+        $this->strategy->process($this->getMock(self::ENTITY));
     }
 
     /**
@@ -104,7 +107,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $this->strategy->setImportExportContext($this->context);
 
-        $this->strategy->process($this->getMock('\stdClass'));
+        $this->strategy->process($this->getMock(self::ENTITY));
     }
 
     /**
@@ -116,7 +119,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName('Namespace\Entity');
 
-        $this->strategy->process($this->getMock('\stdClass'));
+        $this->strategy->process($this->getMock(self::ENTITY));
     }
 
     /**
@@ -130,7 +133,6 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess($className, array $fields, array $identifier, $existingEntity, array $objectValue)
     {
-        $escapedClassName = trim($className, '\\');
         $singleIdentifier = !empty($identifier[0]) ? $identifier[0] : null;
         $object           = new $className;
 
@@ -144,7 +146,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigValue')
             ->will(
                 $this->returnCallback(
-                    function ($escapedClassName, $fieldName, $type, $default) use ($fields) {
+                    function ($className, $fieldName, $type, $default) use ($fields) {
                         $field = $fields[$fieldName];
 
                         return isset($field[$type]) ? $field[$type] : $default;
@@ -160,7 +162,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->em
             ->expects($this->atLeastOnce())
             ->method('getClassMetadata')
-            ->with($this->equalTo($escapedClassName))
+            ->with($this->equalTo($className))
             ->will($this->returnValue($this->metadata));
 
         if (!empty($objectValue)) {
@@ -179,14 +181,14 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             $this->em
                 ->expects($this->any())
                 ->method('getRepository')
-                ->with($this->equalTo($escapedClassName))
+                ->with($this->equalTo($className))
                 ->will($this->returnValue($this->repository));
         }
 
         $this->em
             ->expects($this->any())
             ->method('find')
-            ->with($this->equalTo($escapedClassName), $this->equalTo($singleIdentifier))
+            ->with($this->equalTo($className), $this->equalTo($singleIdentifier))
             ->will($this->returnValue($existingEntity));
 
         $this->strategy->setImportExportContext($this->context);
@@ -200,18 +202,18 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function entityProvider()
     {
-        $object = new \stdClass();
+        $object = new ImportEntity();
 
         return [
             'empty'        => [
-                'className'      => '\stdClass',
+                'className'      => self::ENTITY,
                 'fields'         => [],
                 'identifier'     => [],
                 'existingEntity' => null,
                 'objectValue'    => []
             ],
             'existing'     => [
-                'className'      => '\stdClass',
+                'className'      => self::ENTITY,
                 'fields'         => [
                     'identity' => [
                         'name'     => 'identity',
@@ -230,15 +232,8 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                     'identity' => 'value'
                 ]
             ],
-            'cached'       => [
-                'className'      => '\stdClass',
-                'fields'         => [],
-                'identifier'     => ['id'],
-                'existingEntity' => $object,
-                'objectValue'    => []
-            ],
             'not_existing' => [
-                'className'      => '\stdClass',
+                'className'      => self::ENTITY,
                 'fields'         => [
                     'identity' => [
                         'name'     => 'identity',
@@ -269,7 +264,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessRelation($className, array $fields, array $identifier)
     {
-        $escapedClassName = trim($className, '\\');
+        $object = new $className;
 
         $this->fieldHelper
             ->expects($this->atLeastOnce())
@@ -330,13 +325,19 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->em
             ->expects($this->atLeastOnce())
             ->method('getClassMetadata')
-            ->with($this->equalTo($escapedClassName))
+            ->with($this->equalTo($className))
             ->will($this->returnValue($this->metadata));
+
+        $this->em
+            ->expects($this->any())
+            ->method('find')
+            ->with($this->equalTo($className), $this->equalTo($identifier[0]))
+            ->will($this->returnValue($object));
 
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName($className);
 
-        $this->strategy->process(new $className);
+        $this->strategy->process($object);
     }
 
     /**
@@ -344,27 +345,29 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function relationEntityProvider()
     {
+        $object = new ImportEntity();
+
         return [
             'single'   => [
-                'className'  => '\stdClass',
+                'className'  => self::ENTITY,
                 'fields'     => [
                     'single' => [
                         'name'                => 'single',
                         'relation_type'       => ClassMetadataInfo::MANY_TO_ONE,
-                        'related_entity_name' => '\stdClass',
-                        'value'               => new \stdClass()
+                        'related_entity_name' => self::ENTITY,
+                        'value'               => $object
                     ],
                 ],
                 'identifier' => ['id'],
             ],
             'multiple' => [
-                'className'  => '\stdClass',
+                'className'  => self::ENTITY,
                 'fields'     => [
                     'multiple' => [
                         'name'                => 'multiple',
                         'relation_type'       => ClassMetadataInfo::ONE_TO_MANY,
-                        'related_entity_name' => '\stdClass',
-                        'value'               => new ArrayCollection([new \stdClass(), new \stdClass()])
+                        'related_entity_name' => self::ENTITY,
+                        'value'               => new ArrayCollection([$object, $object])
                     ],
                 ],
                 'identifier' => ['id'],
@@ -374,7 +377,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateAndUpdateContext()
     {
-        $object = new \stdClass();
+        $object = new ImportEntity();
         $errors = ['error'];
 
         $this->fieldHelper
@@ -390,7 +393,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->em
             ->expects($this->atLeastOnce())
             ->method('getClassMetadata')
-            ->with($this->equalTo('stdClass'))
+            ->with($this->equalTo(self::ENTITY))
             ->will($this->returnValue($this->metadata));
 
         $this->importStrategyHelper
@@ -409,7 +412,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('incrementErrorEntriesCount');
 
         $this->strategy->setImportExportContext($this->context);
-        $this->strategy->setEntityName('\stdClass');
+        $this->strategy->setEntityName(self::ENTITY);
 
         $this->strategy->process($object);
     }

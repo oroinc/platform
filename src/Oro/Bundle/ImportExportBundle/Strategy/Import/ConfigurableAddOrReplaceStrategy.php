@@ -88,7 +88,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function processEntity($entity, $isFullData = false, $isPersistNew = false)
     {
-        if (isset($this->cachedEntities[spl_object_hash($entity)])) {
+        $oid = spl_object_hash($entity);
+        if (isset($this->cachedEntities[$oid])) {
             return $entity;
         }
 
@@ -98,17 +99,18 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $fields);
         if ($existingEntity) {
-            if (isset($this->cachedEntities[spl_object_hash($existingEntity)])) {
+            $existingOid = spl_object_hash($existingEntity);
+            if (isset($this->cachedEntities[$existingOid])) {
                 return $existingEntity;
             }
-            $this->cachedEntities[spl_object_hash($existingEntity)] = $existingEntity;
+            $this->cachedEntities[$existingOid] = $existingEntity;
         } else {
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
                 return null;
             }
             $this->resetEntityIdentifier($entity);
-            $this->cachedEntities[spl_object_hash($entity)] = $entity;
+            $this->cachedEntities[$oid] = $entity;
         }
 
         // import entity fields
