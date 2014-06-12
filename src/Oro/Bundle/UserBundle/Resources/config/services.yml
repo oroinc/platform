@@ -197,3 +197,10 @@ services:
         parent: oro_soap.handler.delete.abstract
         arguments:
             - @oro_security.acl.sid_manager
+            
+    oro_user.validator.unique_user_role:
+        class: Oro\Bundle\UserBundle\Validator\Constraints\UniqueRoleValidator
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.unique_role }

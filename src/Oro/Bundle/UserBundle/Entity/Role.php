@@ -34,6 +34,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Role extends BaseRole
 {
+    const PREFIX_ROLE = 'ROLE_';
+    
     /**
      * @var int
      *
@@ -123,8 +125,8 @@ class Role extends BaseRole
         $this->role = (string) strtoupper($role);
 
         // every role should be prefixed with 'ROLE_'
-        if (strpos($this->role, 'ROLE_') !== 0) {
-            $this->role = 'ROLE_' . $this->role;
+        if (strpos($this->role, self::PREFIX_ROLE) !== 0) {
+            $this->role = self::PREFIX_ROLE . $this->role;
         }
 
         return $this;
