@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -102,7 +103,7 @@ class ConfigType extends AbstractType
                         $configModel
                     ),
                     array(
-                        'block_config' => (array)$provider->getPropertyConfig()->getFormBlockConfig($configType)
+                        'block_config' => $this->getFormBlockConfig($provider, $configType)
                     )
                 );
                 $data[$provider->getScope()] = $config->all();
@@ -146,5 +147,30 @@ class ConfigType extends AbstractType
     public function getName()
     {
         return 'oro_entity_config_type';
+    }
+
+    /**
+     * @param ConfigProvider $configProvider
+     * @param string         $configType
+     * @return array
+     */
+    protected function getFormBlockConfig(ConfigProvider $configProvider, $configType)
+    {
+        $result = (array)$configProvider->getPropertyConfig()->getFormBlockConfig($configType);
+
+        $this->applyFormBlockConfigTranslations($result);
+
+        return $result;
+    }
+
+    protected function applyFormBlockConfigTranslations(array &$config)
+    {
+        foreach ($config as $key => &$val) {
+            if (is_array($val)) {
+                $this->applyFormBlockConfigTranslations($val);
+            } elseif (is_string($val) && $key === 'title' && !empty($val)) {
+                $val = $this->translator->trans($val);
+            }
+        }
     }
 }

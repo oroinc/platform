@@ -10,8 +10,7 @@ oro_entity_config:
                     form:
                         type:               oro_entity_extend_association_choice
                         options:
-                            block:          other
+                            block:          associations
                             required:       true
                             label:          oro.note.enabled
-                            entity_class:   'OroNoteBundle:Note'
-                            entity_config_scope: note
+                            association_class: 'OroNoteBundle:Note'

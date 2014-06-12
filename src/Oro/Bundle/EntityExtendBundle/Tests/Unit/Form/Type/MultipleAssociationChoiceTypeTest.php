@@ -12,14 +12,20 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
 
-class AssociationChoiceTypeTest extends TypeTestCase
+class MultipleAssociationChoiceTypeTest extends TypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /** @var AssociationChoiceType */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $groupingConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityConfigProvider;
+
+    /** @var MultipleAssociationChoiceType */
     protected $type;
 
     protected function setUp()
@@ -28,14 +34,39 @@ class AssociationChoiceTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $config1 = new Config(new EntityConfigId('grouping', 'Test\Entity1'));
+        $config2 = new Config(new EntityConfigId('grouping', 'Test\Entity2'));
+        $config2->set('groups', []);
+        $config3 = new Config(new EntityConfigId('grouping', 'Test\Entity3'));
+        $config3->set('groups', ['test']);
+        $config4 = new Config(new EntityConfigId('grouping', 'Test\Entity4'));
+        $config4->set('groups', ['test', 'test1']);
+        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->will($this->returnArgument(0));
+        $this->groupingConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will($this->returnValue([$config1, $config2, $config3, $config4]));
 
-        $this->type = new AssociationChoiceType($this->configManager, $entityClassResolver);
+        $entityConfig3 = new Config(new EntityConfigId('entity', 'Test\Entity3'));
+        $entityConfig3->set('plural_label', 'Entity3');
+        $entityConfig4 = new Config(new EntityConfigId('entity', 'Test\Entity4'));
+        $entityConfig4->set('plural_label', 'Entity4');
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Test\Entity3', null, $entityConfig3],
+                        ['Test\Entity4', null, $entityConfig4],
+                    ]
+                )
+            );
+
+        $this->type = new MultipleAssociationChoiceType($this->configManager);
 
         parent::setUp();
     }
@@ -54,16 +85,31 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testSetDefaultOptions()
     {
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['grouping', $this->groupingConfigProvider],
+                        ['entity', $this->entityConfigProvider],
+                    ]
+                )
+            );
+
         $resolver = new OptionsResolver();
         $this->type->setDefaultOptions($resolver);
 
         $this->assertEquals(
             [
                 'empty_value'       => false,
-                'choices'           => ['No', 'Yes'],
-                'association_class' => null
+                'choices'           => [
+                    'Test\Entity3' => 'Entity3',
+                    'Test\Entity4' => 'Entity4',
+                ],
+                'multiple'          => true,
+                'association_class' => 'test'
             ],
-            $resolver->resolve([])
+            $resolver->resolve(['association_class' => 'test'])
         );
     }
 
@@ -74,7 +120,7 @@ class AssociationChoiceTypeTest extends TypeTestCase
     {
         $configId = new EntityConfigId('test', 'Test\Entity');
         $config = new Config($configId);
-        $config->set('enabled', $oldVal);
+        $config->set('items', $oldVal);
         $extendConfigId = new EntityConfigId('extend', 'Test\Entity');
         $extendConfig = new Config($extendConfigId);
         $extendConfig->set('state', $state);
@@ -91,8 +137,15 @@ class AssociationChoiceTypeTest extends TypeTestCase
             ->will($this->returnValue($config));
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['grouping', $this->groupingConfigProvider],
+                        ['entity', $this->entityConfigProvider],
+                        ['extend', $extendConfigProvider],
+                    ]
+                )
+            );
 
         $expectedExtendConfig = new Config($extendConfigId);
         if ($isSetStateExpected) {
@@ -112,9 +165,9 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
         $options  = [
             'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\AssocEntity'
+            'association_class' => 'test'
         ];
-        $form = $this->factory->createNamed('enabled', $this->type, $oldVal, $options);
+        $form = $this->factory->createNamed('items', $this->type, $oldVal, $options);
 
         $form->submit($newVal);
 
@@ -125,21 +178,34 @@ class AssociationChoiceTypeTest extends TypeTestCase
     public function submitProvider()
     {
         return [
-            [false, false, ExtendScope::STATE_ACTIVE, false],
-            [true, true, ExtendScope::STATE_ACTIVE, false],
-            [false, true, ExtendScope::STATE_ACTIVE, false],
-            [true, false, ExtendScope::STATE_ACTIVE, true],
-            [true, false, ExtendScope::STATE_UPDATED, false],
+            [[], null, ExtendScope::STATE_ACTIVE, false],
+            [[], [], ExtendScope::STATE_ACTIVE, false],
+            [['Test\Entity3'], ['Test\Entity3'], ExtendScope::STATE_ACTIVE, false],
+            [[], ['Test\Entity3'], ExtendScope::STATE_ACTIVE, false],
+            [['Test\Entity3'], [], ExtendScope::STATE_ACTIVE, true],
+            [['Test\Entity3', 'Test\Entity4'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
+            [['Test\Entity3'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
+            [['Test\Entity3'], [], ExtendScope::STATE_UPDATED, false],
         ];
     }
 
     public function testBuildView()
     {
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['grouping', $this->groupingConfigProvider],
+                    ]
+                )
+            );
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
             'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\AssocEntity'
+            'association_class' => 'test'
         ];
 
         $this->type->buildView($view, $form, $options);
@@ -155,11 +221,21 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testBuildViewForDisabled()
     {
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['grouping', $this->groupingConfigProvider],
+                    ]
+                )
+            );
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
-            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\Entity'
+            'config_id'         => new EntityConfigId('test', 'Test\Entity3'),
+            'association_class' => 'test'
         ];
 
         $this->type->buildView($view, $form, $options);
@@ -178,11 +254,21 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testBuildViewForDisabledWithCssClass()
     {
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['grouping', $this->groupingConfigProvider],
+                    ]
+                )
+            );
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
-            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\Entity'
+            'config_id'         => new EntityConfigId('test', 'Test\Entity3'),
+            'association_class' => 'test'
         ];
 
         $view->vars['attr']['class'] = 'test-class';
@@ -203,7 +289,7 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_entity_extend_association_choice', $this->type->getName());
+        $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->type->getName());
     }
 
     public function testGetParent()
