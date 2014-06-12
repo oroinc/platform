@@ -1,3 +1,6 @@
 oro.integration.channel.sync_priority.tooltip: >
     Select if your local version of the data or    the remote application
     data get priority in the case that both were updated since the last sync process.
+oro.integration.channel.default_user_owner.tooltip: >
+    Select the owner of the channel. All entities imported from the channel
+    will be assigned to the selected user.

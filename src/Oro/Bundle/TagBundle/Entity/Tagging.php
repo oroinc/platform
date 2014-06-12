@@ -92,7 +92,7 @@ class Tagging
             $this->setResource($resource);
         }
 
-        $this->setCreatedAt(new \DateTime('now'));
+        $this->setCreated(new \DateTime('now'));
     }
 
     /**
@@ -205,7 +205,7 @@ class Tagging
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
         $this->created = $date;
 
@@ -217,7 +217,7 @@ class Tagging
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }

@@ -2,26 +2,17 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -89,9 +80,9 @@ class ConfigSubscriber implements EventSubscriberInterface
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             if (isset($data[$scope])) {
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
-                    $this->configManager->getConfigIdByModel($configModel, $scope)
-                );
+                $configId = $this->configManager->getConfigIdByModel($configModel, $scope);
+
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         if ($this->translator->hasTrans($value)) {
@@ -117,65 +108,57 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function postSubmit(FormEvent $event)
     {
-        $configModel = $event->getForm()->getConfig()->getOption('config_model');
-        if ($configModel instanceof FieldConfigModel) {
-            $className = $configModel->getEntity()->getClassName();
-            $fieldName = $configModel->getFieldName();
-        } else {
-            $fieldName = null;
-            $className = $configModel->getClassName();
-        }
+        $form        = $event->getForm();
+        $configModel = $form->getConfig()->getOption('config_model');
+        $data        = $event->getData();
 
-        $data = $event->getData();
+        $labelsToBeUpdated = [];
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             if (isset($data[$scope])) {
-                $config = $provider->getConfig($className, $fieldName);
+                $configId = $this->configManager->getConfigIdByModel($configModel, $scope);
+                $config   = $provider->getConfigById($configId);
 
-                // config translations
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
-                    $this->configManager->getConfigIdByModel($configModel, $scope)
-                );
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
-                        $key = $this->configManager->getProvider('entity')
-                            ->getConfig($className, $fieldName)
-                            ->get($code);
-
-                        if ($event->getForm()->get($scope)->get($code)->isValid()
-                            && $value != $this->translator->trans($config->get($code))
-                        ) {
-                            $locale = $this->translator->getLocale();
-                            // save into translation table
-                            /** @var TranslationRepository $translationRepo */
-                            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
-                            $translationRepo->saveValue(
-                                $key,
-                                $value,
-                                $locale,
-                                TranslationRepository::DEFAULT_DOMAIN,
-                                Translation::SCOPE_UI
-                            );
-                            // mark translation cache dirty
-                            $this->dbTranslationMetadataCache->updateTimestamp($locale);
-                        }
-
+                        // check if a label text was changed
+                        $labelKey = $config->get($code);
                         if (!$configModel->getId()) {
-                            $data[$scope][$code] = $key;
-                        } else {
-                            unset($data[$scope][$code]);
+                            $labelsToBeUpdated[$labelKey] = $value;
+                        } elseif ($value != $this->translator->trans($labelKey)) {
+                            $labelsToBeUpdated[$labelKey] = $value;
                         }
+                        // replace label text with label name in $value variable
+                        $value = $config->get($code);
                     }
-                }
-
-                foreach ($data[$scope] as $code => $value) {
                     $config->set($code, $value);
                 }
+
                 $this->configManager->persist($config);
             }
         }
 
-        if ($event->getForm()->isValid()) {
+        if ($form->isValid()) {
+            // update changed labels if any
+            if (!empty($labelsToBeUpdated)) {
+                $locale = $this->translator->getLocale();
+                foreach ($labelsToBeUpdated as $labelKey => $labelText) {
+                    // save into translation table
+                    /** @var TranslationRepository $translationRepo */
+                    $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
+                    $translationRepo->saveValue(
+                        $labelKey,
+                        $labelText,
+                        $locale,
+                        TranslationRepository::DEFAULT_DOMAIN,
+                        Translation::SCOPE_UI
+                    );
+                }
+                // mark translation cache dirty
+                $this->dbTranslationMetadataCache->updateTimestamp($locale);
+            }
+
             $this->configManager->flush();
         }
     }

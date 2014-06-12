@@ -18,7 +18,8 @@ define(['underscore', 'backbone', 'oronavigation/js/navigation', './dotmenu/view
             collection: null
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.dotMenu = new DotmenuView();
         },
 

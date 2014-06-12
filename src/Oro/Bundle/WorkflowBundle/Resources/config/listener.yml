@@ -1,21 +1,24 @@
 parameters:
-    oro_workflow.listener.subscriber.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeSubscriber
-    oro_workflow.listener.subscriber.workflow_item.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemSubscriber
+    oro_workflow.listener.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
+    oro_workflow.listener.workflow_item.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
 
 services:
-    oro_workflow.listener.subscriber.workflow_data_serialize:
-        class: %oro_workflow.listener.subscriber.workflow_data_serialize.class%
+    oro_workflow.listener.workflow_data_serialize:
+        class: %oro_workflow.listener.workflow_data_serialize.class%
         arguments:
             - @oro_workflow.serializer.data.serializer
             - @oro_entity.doctrine_helper
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postLoad }
 
-    oro_workflow.listener.subscriber.workflow_item:
-        class: %oro_workflow.listener.subscriber.workflow_item.class%
+    oro_workflow.listener.workflow_item:
+        class: %oro_workflow.listener.workflow_item.class%
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_workflow.entity_connector
             - @oro_workflow.manager
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: preRemove }
+            - { name: doctrine.event_listener, event: postFlush }

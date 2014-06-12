@@ -63,6 +63,10 @@
                     var formAction = form.attr('action');
 
                     form.one('submit', function(e) {
+                        if (!e.result) {
+                            return;
+                        }
+
                         var loader;
                         var confirmModal = new Modal({
                             title: __('Preview'),

@@ -13,6 +13,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js
     return AbstractWidget.extend({
         options: _.extend({}, AbstractWidget.prototype.options, {
             type: 'block',
+            cssClass: '',
             title: null,
             titleBlock: '.title',
             titleContainer: '.widget-title',
@@ -31,6 +32,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js
 
         initialize: function(options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);
@@ -40,6 +42,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js
                 'contentClasses': this.options.contentClasses
             }, this.options.templateParams);
             this.widget = $(this.options.template(params));
+            this.widget.addClass(this.options.cssClass);
             this.widgetContentContainer = this.widget.find(this.options.contentContainer);
             this.initializeWidget(options);
         },

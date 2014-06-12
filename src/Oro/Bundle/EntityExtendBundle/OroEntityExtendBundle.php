@@ -4,19 +4,18 @@ namespace Oro\Bundle\EntityExtendBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
 use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class OroEntityExtendBundle extends Bundle
 {
@@ -55,6 +54,7 @@ class OroEntityExtendBundle extends Bundle
                 )
             )
         );
+        $container->addCompilerPass(new ExtensionPass());
     }
 
     private function ensureInitialized()
@@ -67,14 +67,14 @@ class OroEntityExtendBundle extends Bundle
     private function ensureCacheInitialized()
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
-        if (!$this->isCommandExecuting('oro:entity-extend:dump') && !file_exists($aliasesPath)) {
+        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup') && !file_exists($aliasesPath)) {
             // We have to warm up the extend entities cache in separate process
             // to allow this process continue executing.
             // The problem is we need initialized DI contained for warming up this cache,
             // but in this moment we are exactly doing this for the current process.
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
-            $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
+            $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
             $process->setTimeout(300);
             $process->run();
         }

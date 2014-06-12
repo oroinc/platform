@@ -91,7 +91,7 @@ class EmbedFormController extends Controller
     public function formSuccessAction(EmbeddedForm $formEntity)
     {
         return [
-            'entity' => $formEntity
+            'formEntity' => $formEntity
         ];
     }
 }

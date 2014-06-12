@@ -1,6 +1,18 @@
 "Delete": "Delete"
 "Save": "Save"
+"Save and Close": "Save and Close"
 "Cancel": "Cancel"
+"Edit": "Edit"
+"Refresh": "Refresh"
+"Reset": "Reset"
+"Expand All": "Expand All"
+"Collapse All": "Collapse All"
+"Ascending Order": "Ascending order - Click to sort in descending order"
+"Descending Order": "Descending order - Click to sort in ascending order"
+"N/A": "N/A"
+"Loading...": "Loading..."
+"Saving...": "Saving..."
+"Deleting...": "Deleting..."
 oro.age: "{0} newborn|]0,Inf[age %count%"
 "Get help": "Get help"
 "Communications": "Communications"
@@ -17,3 +29,7 @@ oro:
         item: item
         delete_confirm: Are you sure you want to delete this %entity_label%?
         delete_message: %entity_label% deleted
+        system_configuration:
+            groups:
+                navbar_settings:
+                    title: 'Navigation bar'

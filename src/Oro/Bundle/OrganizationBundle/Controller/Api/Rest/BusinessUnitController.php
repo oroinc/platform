@@ -136,7 +136,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     /**
      * {@inheritdoc}
      */
-    protected function getPreparedItem($entity)
+    protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
 

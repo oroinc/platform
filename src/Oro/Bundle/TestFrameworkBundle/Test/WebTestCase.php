@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 
@@ -72,6 +73,11 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     private static $loadedFixtures = array();
 
+    /**
+     * @var ReferenceRepository
+     */
+    protected $referenceRepository;
+
     protected function tearDown()
     {
         $refClass = new \ReflectionClass($this);
@@ -100,10 +106,16 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param array $options An array of options to pass to the createKernel class
      * @param array $server  An array of server parameters
+     * @param bool  $force If this option - true, will reset client on each initClient call
+     *
      * @return Client A Client instance
      */
-    protected function initClient(array $options = array(), array $server = array())
+    protected function initClient(array $options = array(), array $server = array(), $force = false)
     {
+        if ($force) {
+            $this->resetClient();
+        }
+
         if (!self::$clientInstance) {
             /** @var Client $client */
             $client = self::$clientInstance = static::createClient($options, $server);
@@ -121,6 +133,21 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $this->client = self::$clientInstance;
+    }
+
+    /**
+     * Reset client and rollback transaction
+     */
+    protected function resetClient()
+    {
+        if (self::$clientInstance) {
+            if (self::getDbIsolationSetting()) {
+                self::$clientInstance->rollbackTransaction();
+            }
+
+            $this->client = null;
+            self::$clientInstance = null;
+        }
     }
 
     /**
@@ -289,7 +316,26 @@ abstract class WebTestCase extends BaseWebTestCase
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
+        $this->referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @param string $referenceUID
+     *
+     * @return object
+     */
+    protected function getReference($referenceUID)
+    {
+        return $this->getReferenceRepository()->getReference($referenceUID);
+    }
+
+    /**
+     * @return ReferenceRepository
+     */
+    protected function getReferenceRepository()
+    {
+        return $this->referenceRepository;
     }
 
     /**

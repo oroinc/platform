@@ -4,10 +4,12 @@
 define(function (require) {
     'use strict';
 
+    require('jquery-ui');
     var _ = require('underscore');
     var Backbone = require('backbone');
 
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
     var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     var constants = require('./constants');
@@ -44,10 +46,13 @@ define(function (require) {
             widgets: null
         },
 
-        initialize: function () {
-            var view = this;
-            var model = view.model;
-            var widgets = this.getWidgets();
+        initialize: function (options) {
+            var view, model, widgets;
+            this.options = _.defaults(options || {}, this.options);
+
+            view = this;
+            model = view.model;
+            widgets = this.getWidgets();
 
             view.iconViews = {};
             view.hoverViews = {};
@@ -98,6 +103,8 @@ define(function (require) {
             } else {
                 view.renderWidgets();
             }
+
+            mediator.trigger('layout:adjustHeight');
 
             return view;
         },

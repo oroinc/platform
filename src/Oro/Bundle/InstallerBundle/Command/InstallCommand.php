@@ -15,7 +15,7 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
-class InstallCommand extends ContainerAwareCommand
+class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
 {
     /**
      * {@inheritdoc}
@@ -172,8 +172,8 @@ class InstallCommand extends ContainerAwareCommand
                 'doctrine:schema:drop',
                 $schemaDropOptions
             )
-            ->runCommand('oro:entity-config:clear')
-            ->runCommand('oro:entity-extend:clear')
+            ->runCommand('oro:entity-config:cache:clear', array('--no-warmup' => true))
+            ->runCommand('oro:entity-extend:cache:clear', array('--no-warmup' => true))
             ->runCommand(
                 'oro:migration:load',
                 array(

@@ -730,3 +730,13 @@ html, body {
 td.progress span {
     display: none
 }
+
+td pre.output {
+    background-color: #232125;
+    overflow: auto;
+    line-height: 1.3em;
+    color: #fff;
+    font-size: 14px;
+    padding: .7em;
+    margin-top: 10px;
+}

@@ -1,10 +1,13 @@
 oro:
     importexport:
         import:
+            label:   Import
             success: "File was successful imported."
-            error: "Errors occurred during file import."
-            error %number%: "Error in row #%number%."
+            error:   "Errors occurred during file import."
+            error    %number%: "Error in row #%number%."
+        export:
+            label:   Export
         action:
             general: "General import/action operations"
-            import: "Import entities"
-            export: "Export entities"
+            import:  "Import entities"
+            export:  "Export entities"

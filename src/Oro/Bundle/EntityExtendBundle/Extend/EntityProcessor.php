@@ -4,8 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Process\PhpExecutableFinder;
-
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
@@ -43,7 +42,7 @@ class EntityProcessor
         // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
         'doctrine:schema:update'          => ['--force' => true],
-        // TODO: Update extended entity cache after during schema update
+        // TODO: Update extended entity cache after schema update
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
         'cache:clear'                     => [],
     ];

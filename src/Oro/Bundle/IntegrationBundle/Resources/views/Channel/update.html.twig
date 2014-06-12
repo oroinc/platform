@@ -29,8 +29,7 @@
         {{ UI.clientButton({
             'dataUrl': path('oro_integration_channel_schedule', { 'id': entity.id }) ,
             'aCss':   'no-hash schedule-button btn-primary',
-            'title' : 'Schedule sync',
-            'label' : 'Schedule sync'
+            'label' : 'Schedule sync'|trans
         }) }}
     {% endif %}
     {% set html = UI.saveAndCloseButton() %}
@@ -90,11 +89,7 @@
 
                     $.ajax(url, {
                         success: function (res) {
-                            var successMessage = __('oro.integration.sync'),
-                                url = routing.generate('oro_cron_job_view', {id: res.job_id}),
-                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('oro.integration.progress') + '</a>';
-
-                            messenger.notificationMessage('success', [successMessage, jobViewLink].join(' '));
+                            messenger.notificationMessage('success', res.message);
                             if (navigation) {
                                 navigation.processClicks($('.job-view-link'));
                             }

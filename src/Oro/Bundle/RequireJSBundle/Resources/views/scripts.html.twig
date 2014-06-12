@@ -1,3 +1,10 @@
+{% set compressed = compressed is defined ? compressed : true %}
+{% set config_extend %}
+    require({
+        baseUrl: {{ asset('bundles')|json_encode|raw }}
+    });
+    {{ config_extend|default('') }}
+{% endset %}
 {% if compressed and requirejs_build_exists() %}
     <script type="text/javascript">
         var require = (function(){
@@ -5,7 +12,7 @@
                 for (var i in b)b[i].toString()==='[object Object]'?m(a[i]||(a[i]={}),b[i]):a[i]=b[i]}
             return r;
         }());
-        {% placeholder requirejs_config_extend %}
+        {{ config_extend|raw }}
         require = require.c;
     </script>
     <script type="text/javascript" src="{{ asset(get_requirejs_build_path()) }}"></script>
@@ -15,6 +22,6 @@
         {{ get_requirejs_config() }}
     </script>
     <script type="text/javascript">
-        {% placeholder requirejs_config_extend %}
+        {{ config_extend|raw }}
     </script>
 {% endif %}

@@ -21,13 +21,13 @@ class BusinessUnitsTest extends Selenium2TestCase
         $login = $this->login();
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->add()
-            ->assertTitle('Create Business Unit - Business Units - Users Management - System')
+            ->assertTitle('Create Business Unit - Business Units - User Management - System')
             ->setBusinessUnitName($unitName)
             ->setOwner('Main')
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - Users Management - System')
+            ->assertTitle('Business Units - User Management - System')
             ->close();
 
         return $unitName;
@@ -50,7 +50,7 @@ class BusinessUnitsTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - Users Management - System');
+            ->assertTitle('Business Units - User Management - System');
 
         return $newUnitName;
     }
@@ -66,7 +66,7 @@ class BusinessUnitsTest extends Selenium2TestCase
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
             ->delete()
-            ->assertTitle('Business Units - Users Management - System')
+            ->assertTitle('Business Units - User Management - System')
             ->assertMessage('Business Unit deleted');
     }
 }

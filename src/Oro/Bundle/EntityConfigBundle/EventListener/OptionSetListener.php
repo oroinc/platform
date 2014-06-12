@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Inflector\Inflector;
-
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 
@@ -27,6 +25,9 @@ class OptionSetListener
 {
     protected $needFlush = false;
 
+    /**
+     * @param LifecycleEventArgs $event
+     */
     public function postPersist(LifecycleEventArgs $event)
     {
         /** @var OroEntityManager $em */
@@ -34,49 +35,77 @@ class OptionSetListener
         $entity         = $event->getEntity();
         $configProvider = $em->getExtendConfigProvider();
 
-        $className = get_class($entity);
-        if ($configProvider->hasConfig($className)) {
-            $config = $configProvider->getConfig($className);
-            $schema = $config->get('schema');
-            if (isset($schema['relation'])) {
-                foreach ($schema['relation'] as $fieldName) {
-                    if ($configProvider->hasConfig($className, $fieldName)) {
-                        /** @var Config $fieldConfig */
-                        $fieldConfig = $configProvider->getConfig($className, $fieldName);
-                        if ($fieldConfig->getId()->getFieldType() == 'optionSet'
-                            && $setData = $entity->{Inflector::camelize('get_' . $fieldName)}()
-                        ) {
-                            $model = $configProvider->getConfigManager()->getConfigFieldModel(
-                                $fieldConfig->getId()->getClassName(),
-                                $fieldConfig->getId()->getFieldName()
-                            );
+        $className = ClassUtils::getClass($entity);
+        if (!$configProvider->hasConfig($className)) {
+            return;
+        }
 
-                            /**
-                             * in case of single select field type, should wrap value in array
-                             */
-                            if ($setData && !is_array($setData)) {
-                                $setData = [$setData];
-                            }
+        $config = $configProvider->getConfig($className);
+        $schema = $config->get('schema');
+        if (!isset($schema['relation'])) {
+            return;
+        }
 
-                            foreach ($setData as $option) {
-                                $optionSetRelation = new OptionSetRelation();
-                                $optionSetRelation->setData(
-                                    null,
-                                    $entity->getId(),
-                                    $model,
-                                    $em->getRepository(OptionSet::ENTITY_NAME)->find($option)
-                                );
+        foreach ($schema['relation'] as $fieldName) {
+            if (!$configProvider->hasConfig($className, $fieldName)) {
+                continue;
+            }
+            /** @var ConfigInterface $fieldConfig */
+            $fieldConfig = $configProvider->getConfig($className, $fieldName);
+            $options     = $this->getEntityFieldData($fieldConfig, $fieldName, $entity);
+            if (!$options) {
+                continue;
+            }
 
-                                $em->persist($optionSetRelation);
-                                $this->needFlush = true;
-                            }
-                        }
-                    }
-                }
+            $model = $configProvider->getConfigManager()->getConfigFieldModel(
+                $fieldConfig->getId()->getClassName(),
+                $fieldConfig->getId()->getFieldName()
+            );
+
+            /**
+             * in case of single select field type, should wrap value in array
+             */
+            if (!is_array($options)) {
+                $options = [$options];
+            }
+
+            foreach ($options as $option) {
+                $optionSetRelation = new OptionSetRelation();
+                $optionSetRelation->setData(
+                    null,
+                    $entity->getId(),
+                    $model,
+                    $em->getRepository(OptionSet::ENTITY_NAME)->find($option)
+                );
+
+                $em->persist($optionSetRelation);
+                $this->needFlush = true;
             }
         }
     }
 
+    /**
+     * @param ConfigInterface $fieldConfig
+     * @param string          $fieldName
+     * @param object          $entity
+     * @return null|mixed
+     */
+    protected function getEntityFieldData(ConfigInterface $fieldConfig, $fieldName, $entity)
+    {
+        $getterName = Inflector::camelize('get_' . $fieldName);
+        if ($fieldConfig->getId()->getFieldType() != 'optionSet'
+            || !method_exists($entity, $getterName)
+            || !$options = $entity->$getterName()
+        ) {
+            return null;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param PostFlushEventArgs $eventArgs
+     */
     public function postFlush(PostFlushEventArgs $eventArgs)
     {
         if ($this->needFlush) {

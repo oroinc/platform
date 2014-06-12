@@ -1,10 +1,10 @@
 /* jshint devel:true*/
 /*global define, console*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger', 'oroui/js/loading-mask',
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
     'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
-    ], function (_, Backbone, __, app, messenger, LoadingMask,
+    ], function (_, Backbone, __, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
          ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
     'use strict';
@@ -24,7 +24,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     '<div class="calendar"></div>' +
                     '<div class="loading-mask"></div>' +
                 '</div>' +
-                '</div>'
+            '</div>'
         ),
 
         /** @property {Object} */
@@ -59,7 +59,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadingMask: null,
         colorManager: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             // init event collection
             this.options.collection = this.options.collection || new EventCollection();
             this.options.collection.setCalendar(this.options.calendar);
@@ -164,7 +165,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     });
                     this.getEventsView(eventModel).render();
                 } catch (err) {
-                    this.showError(err);
+                    this.showMiscError(err);
                 }
             }
         },
@@ -175,7 +176,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     var eventModel = this.getCollection().get(fcEvent.id);
                     this.getEventsView(eventModel).render();
                 } catch (err) {
-                    this.showError(err);
+                    this.showMiscError(err);
                 }
             }
         },
@@ -281,33 +282,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         showLoadEventsError: function (err) {
-            this._showError(err, __('Sorry, calendar events were not loaded correctly'));
+            this._showError(__('Sorry, calendar events were not loaded correctly'), err);
         },
 
         showSaveEventError: function (err) {
-            this._showError(err, __('Sorry, calendar event was not saved correctly'));
+            this._showError(__('Sorry, calendar event was not saved correctly'), err);
         },
 
-        showError: function (err) {
-            this._showError(err, __('Sorry, unexpected error was occurred'));
+        showMiscError: function (err) {
+            this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
-        _showError: function (err, message) {
+        _showError: function (message, err) {
             this._hideMask();
-            if (!_.isUndefined(console)) {
-                console.error(_.isUndefined(err.stack) ? err : err.stack);
-            }
-            var msg = message;
-            if (app.debug) {
-                if (!_.isUndefined(err.message)) {
-                    msg += ': ' + err.message;
-                } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
-                    msg += ': ' + err.errors.join();
-                } else if (_.isString(err)) {
-                    msg += ': ' + err;
-                }
-            }
-            messenger.notificationFlashMessage('error', msg);
+            messenger.showErrorMessage(message, err);
         },
 
         initCalendarContainer: function () {

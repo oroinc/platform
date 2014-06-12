@@ -32,11 +32,6 @@ config:
                 - 'jquery'
         'underscore':
             exports: '_'
-        'backbone':
-            deps:
-                - 'jquery'
-                - 'underscore'
-            exports: 'Backbone'
         'backbone/bootstrap-modal':
             deps:
                 - 'jquery'
@@ -106,7 +101,18 @@ config:
         'oroui/js/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
         'oroui/js/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
 
+        'oroui/js/desktop/side-menu': 'bundles/oroui/js/desktop/side-menu.js'
+
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
+
+        'autolinker': 'bundles/oroui/lib/autolinker.min.js'
+
+build:
+    paths:
+#       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
+#       files which does not support AMD. backbone/bootstrap-modal use AMD without dependency,
+#       therefore it's excluded
+        'backbone/bootstrap-modal': 'empty:'

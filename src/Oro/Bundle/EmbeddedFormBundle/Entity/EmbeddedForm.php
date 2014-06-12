@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Entity
@@ -71,7 +71,7 @@ class EmbeddedForm
     /**
      * @var string
      *
-     * @ORM\Column(name="success_message", type="string", length=255)
+     * @ORM\Column(name="success_message", type="text")
      */
     protected $successMessage;
 

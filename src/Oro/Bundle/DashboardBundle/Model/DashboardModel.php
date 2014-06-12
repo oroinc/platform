@@ -202,7 +202,7 @@ class DashboardModel implements EntityModelInterface
      */
     public function isDefault()
     {
-        return $this->entity->isDefault();
+        return $this->entity->getIsDefault();
     }
 
     /**

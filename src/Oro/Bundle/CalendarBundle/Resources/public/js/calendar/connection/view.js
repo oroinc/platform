@@ -1,7 +1,7 @@
 /*global define, console*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model'
-    ], function ($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionModel) {
+    ], function ($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel) {
     'use strict';
 
     /**
@@ -30,7 +30,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             newOwnerSelector: '#new_calendar_owner'
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());
@@ -116,7 +117,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     });
                 } catch (err) {
                     savingMsg.close();
-                    this.showError(err);
+                    this.showMiscError(err);
                 }
             }
         },
@@ -139,37 +140,24 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 });
             } catch (err) {
                 deletingMsg.close();
-                this.showError(err);
+                this.showMiscError(err);
             }
         },
 
         showAddError: function (err) {
-            this._showError(err, __('Sorry, the calendar adding was failed'));
+            this._showError(__('Sorry, the calendar adding was failed'), err);
         },
 
         showDeleteError: function (err) {
-            this._showError(err, __('Sorry, the calendar excluding was failed'));
+            this._showError(__('Sorry, the calendar excluding was failed'), err);
         },
 
-        showError: function (err) {
-            this._showError(err, __('Sorry, unexpected error was occurred'));
+        showMiscError: function (err) {
+            this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
-        _showError: function (err, message) {
-            if (!_.isUndefined(console)) {
-                console.error(_.isUndefined(err.stack) ? err : err.stack);
-            }
-            var msg = message;
-            if (app.debug) {
-                if (!_.isUndefined(err.message)) {
-                    msg += ': ' + err.message;
-                } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
-                    msg += ': ' + err.errors.join();
-                } else if (_.isString(err)) {
-                    msg += ': ' + err;
-                }
-            }
-            messenger.notificationFlashMessage('error', msg);
+        _showError: function (message, err) {
+            messenger.showErrorMessage(message, err);
         }
     });
 });

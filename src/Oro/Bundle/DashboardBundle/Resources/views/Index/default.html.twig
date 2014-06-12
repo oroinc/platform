@@ -17,91 +17,94 @@
                 </div>
                 {% endblock title %}
                 {% block titleNavButtons %}
-                <div class="pull-right title-buttons-container">
+
                     {% placeholder dashboard_navButtons_before %}
 
+                    <div class="pull-right title-buttons-container">
+                        {% if allowEdit %}
+                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
+                                <i class="icon-plus"></i>
+                                Add widget
+                            </a>
+                        {% endif %}
+
+                        {% if resource_granted('DELETE', dashboard.entity) or resource_granted('oro_dashboard_create') or resource_granted('EDIT', dashboard.entity) %}
+                            {% set html %}
+                                {% if resource_granted('EDIT', dashboard.entity) %}
+                                    {{ UI.dropdownItem({
+                                        'path': path('oro_dashboard_update', {id:dashboard.id}),
+                                        'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
+                                        'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
+                                        'iCss': 'icon-edit'
+                                    }) }}
+                                {% endif %}
+                                {% if resource_granted('oro_dashboard_create') %}
+                                    {{ UI.dropdownItem({
+                                        'path': path('oro_dashboard_create'),
+                                        'title': 'oro.dashboard.create_dashboard_link.title'|trans,
+                                        'label': 'oro.dashboard.create_dashboard_link.text'|trans,
+                                        'iCss': 'icon-plus'
+                                    }) }}
+                                {% endif %}
+                                {% if resource_granted('DELETE', dashboard.entity) %}
+                                    <li>
+                                        {{  UI.deleteLink({
+                                            'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
+                                            'dataRedirect': path('oro_dashboard_index'),
+                                            'aCss': 'no-hash remove-button',
+                                            'id': 'btn-remove-user',
+                                            'dataId': dashboard.id,
+                                            'entity_label': 'oro.dashboard.entity_label'|trans
+                                        }) }}
+                                    </li>
+                                {% endif %}
+                            {% endset %}
+
+                            {{ UI.dropdownButton({
+                                'label': 'oro.dashboard.tools_dropdown.label'|trans,
+                                'iCss': 'icon icon-cog',
+                                'aCss': 'pull-right',
+                                'html': html
+                            }) }}
+                        {% endif %}
+                    </div>
                     {% block navButtons %}
                         {% if dashboards|length > 1 %}
-                        <div class="dashboard-selector-container pull-left">
-                            <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
-                            <select id="dashboard_selector">
-                                {% for dashboardModel in dashboards %}
-                                    <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                        {{ dashboardModel.getLabel()|trans }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                            <div class="dashboard-selector-container pull-right title-buttons-container">
+                                <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
+                                <select id="dashboard_selector">
+                                    {% for dashboardModel in dashboards %}
+                                        <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
+                                            {{ dashboardModel.getLabel()|trans }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                        <script type="text/javascript">
-                            require(['jquery', 'routing', 'oronavigation/js/navigation'],
-                            function($, routing, Navigation){
-                                $(function () {
-                                    $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true}),
-                                            navigation = Navigation.getInstance();
-                                        if (navigation) {
-                                            navigation.processRedirect({
-                                                fullRedirect: false,
-                                                location: url
+                            <script type="text/javascript">
+                                require(['jquery', 'routing', 'oronavigation/js/navigation'],
+                                        function($, routing, Navigation){
+                                            $(function () {
+                                                $('#dashboard_selector').on('change', function (e) {
+                                                    var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true}),
+                                                            navigation = Navigation.getInstance();
+                                                    if (navigation) {
+                                                        navigation.processRedirect({
+                                                            fullRedirect: false,
+                                                            location: url
+                                                        });
+                                                    } else {
+                                                        location.href = url;
+                                                    }
+                                                });
                                             });
-                                        } else {
-                                            location.href = url;
-                                        }
-                                    });
-                                });
-                            });
-                        </script>
+                                        });
+                            </script>
                         {% endif %}
                     {% endblock navButtons %}
-                    {% if allowEdit %}
-                        <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
-                            <i class="icon-plus"></i>
-                            Add widget
-                        </a>
-                    {% endif %}
 
-                    {% if resource_granted('DELETE', dashboard.entity) or resource_granted('oro_dashboard_create') or resource_granted('EDIT', dashboard.entity) %}
-                        {% set html %}
-                            {% if resource_granted('EDIT', dashboard.entity) %}
-                                {{ UI.dropdownItem({
-                                    'path': path('oro_dashboard_update', {id:dashboard.id}),
-                                    'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
-                                    'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
-                                    'iCss': 'icon-edit'
-                                }) }}
-                            {% endif %}
-                            {% if resource_granted('oro_dashboard_create') %}
-                                {{ UI.dropdownItem({
-                                    'path': path('oro_dashboard_create'),
-                                    'title': 'oro.dashboard.create_dashboard_link.title'|trans,
-                                    'label': 'oro.dashboard.create_dashboard_link.text'|trans,
-                                    'iCss': 'icon-plus'
-                                }) }}
-                            {% endif %}
-                            {% if resource_granted('DELETE', dashboard.entity) %}
-                                <li>
-                                    {{  UI.deleteLink({
-                                        'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
-                                        'dataRedirect': path('oro_dashboard_index'),
-                                        'aCss': 'no-hash remove-button',
-                                        'id': 'btn-remove-user',
-                                        'dataId': dashboard.id,
-                                        'entity_label': 'oro.dashboard.entity_label'|trans
-                                    }) }}
-                                </li>
-                            {% endif %}
-                        {% endset %}
-
-                        {{ UI.dropdownButton({
-                            'label': 'oro.dashboard.tools_dropdown.label'|trans,
-                            'iCss': 'icon icon-cog',
-                            'aCss': 'pull-right',
-                            'html': html
-                        }) }}
-                    {% endif %}
                     {% placeholder dashboard_navButtons_after %}
-                </div>
+
                 {% endblock titleNavButtons %}
             </div>
         </div>
