@@ -32,4 +32,12 @@ trait IntegrationEntityTrait
     {
         return $this->channel;
     }
+
+    /**
+     * @return string
+     */
+    public function getChannelName()
+    {
+        return $this->channel ? $this->channel->getName() : null;
+    }
 }
