@@ -1,0 +1,2 @@
+bundles:
+    - OroAttachmentBundle:Form:fields.html.twig
