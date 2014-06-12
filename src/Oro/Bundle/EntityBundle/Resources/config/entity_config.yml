@@ -4,8 +4,14 @@ oro_entity_config:
             form:
                 block_config:
                     entity:
-                        title:              'General'
-                        priority:           20
+                        title:              oro.entity.form.block.general
+                        priority:           100
+                    associations:
+                        title:              oro.entity.form.block.associations
+                        priority:           50
+                    other:
+                        title:              oro.entity.form.block.other
+                        priority:           -255
 
             items:
                 icon:
@@ -67,8 +73,12 @@ oro_entity_config:
             form:
                 block_config:
                     entity:
-                        title:              'General'
-                        priority:           20
+                        title:              oro.entity.form.block.general
+                        priority:           100
+                    other:
+                        title:              oro.entity.form.block.other
+                        priority:           -255
+
             items:
                 label:
                     options:
