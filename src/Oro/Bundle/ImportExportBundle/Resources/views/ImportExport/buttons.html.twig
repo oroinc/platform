@@ -10,9 +10,6 @@
     {% if exportProcessor is defined and resource_granted('oro_importexport_export') %}
         <a type="button"
            class="btn export-btn icons-holder-text no-hash"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           data-container="body"
            href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
             <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
         </a>
