@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
  * Class CalendarTest
- * @package Oro\Bundle\DashboardBundle\Tests\Selenium
+ * @package Oro\Bundle\CalendarBundle\Tests\Selenium
  */
 class CalendarTest extends Selenium2TestCase
 {
@@ -51,7 +51,7 @@ class CalendarTest extends Selenium2TestCase
      * @depends testEditEvent
      * @param $eventName
      */
-    public function TestDeleteEvent($eventName)
+    public function testDeleteEvent($eventName)
     {
         $login = $this->login();
         $login->openCalendar('Oro\Bundle\CalendarBundle')
