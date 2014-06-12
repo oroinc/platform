@@ -2,7 +2,8 @@ oro_entity_config:
     activity:
         entity:
             items:
-                activities:
+                # the list of activities that can be assigned to some entity
+                activities: # array of class names
                     options:
                         priority:           250
                         auditable:          false
@@ -10,6 +11,6 @@ oro_entity_config:
                         type:               oro_entity_extend_multiple_association_choice
                         options:
                             block:          associations
-                            required:       true
+                            required:       false
                             label:          oro.activity.activities
                             association_class: activity

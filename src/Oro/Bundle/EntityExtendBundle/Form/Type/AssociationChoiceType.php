@@ -4,10 +4,25 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class AssociationChoiceType extends AbstractAssociationChoiceType
 {
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /**
+     * @param ConfigManager       $configManager
+     * @param EntityClassResolver $entityClassResolver
+     */
+    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
+    {
+        parent::__construct($configManager);
+        $this->entityClassResolver = $entityClassResolver;
+    }
+
     /**
      * {@inheritdoc}
      */

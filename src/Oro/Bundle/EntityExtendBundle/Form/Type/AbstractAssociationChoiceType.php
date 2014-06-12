@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -24,17 +23,12 @@ abstract class AbstractAssociationChoiceType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
     /**
-     * @param ConfigManager       $configManager
-     * @param EntityClassResolver $entityClassResolver
+     * @param ConfigManager $configManager
      */
-    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->configManager       = $configManager;
-        $this->entityClassResolver = $entityClassResolver;
+        $this->configManager = $configManager;
     }
 
     /**
