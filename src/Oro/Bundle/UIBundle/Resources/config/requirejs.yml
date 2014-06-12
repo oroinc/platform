@@ -75,7 +75,10 @@ config:
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
         'underscore': 'bundles/oroui/lib/underscore.js'
         'backbone': 'bundles/oroui/lib/backbone.js'
+        'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone/bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
+
+        'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
