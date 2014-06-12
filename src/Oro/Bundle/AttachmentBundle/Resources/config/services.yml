@@ -1,3 +1,10 @@
-parameters: ~
+parameters:
+    oro_attachment.entity_extend.dumper_extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentExtendConfigDumperExtension
 
-services: ~
+services:
+    oro_attachment.entity_extend.dumper_extension:
+        class: %oro_attachment.entity_extend.dumper_extension.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.dumper_extension }

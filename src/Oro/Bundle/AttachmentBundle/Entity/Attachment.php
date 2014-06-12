@@ -4,9 +4,9 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
 /**
  * Attachment

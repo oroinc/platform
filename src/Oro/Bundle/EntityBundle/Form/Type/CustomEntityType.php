@@ -45,6 +45,8 @@ class CustomEntityType extends AbstractType
         'datetime'   => 'oro_datetime',
         'text'       => 'textarea',
         'float'      => 'number',
+        //'attachment'      => 'oro_attachment',
+        //'attachmentImage' => 'oro_attachment_image',
         'manyToOne'  => 'oro_entity_select',
         'oneToMany'  => 'oro_multiple_entity',
         'manyToMany' => 'oro_multiple_entity',
