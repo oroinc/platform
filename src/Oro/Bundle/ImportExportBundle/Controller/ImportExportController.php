@@ -12,6 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ImportExportController extends Controller
@@ -108,6 +109,26 @@ class ImportExportController extends Controller
             JobExecutor::JOB_EXPORT_TO_CSV,
             $processorAlias
         );
+    }
+
+    /**
+     * @Route("/export/template/{processorAlias}", name="oro_importexport_export_template")
+     * @AclAncestor("oro_importexport_export")
+     *
+     * @param string $processorAlias
+     * @return Response
+     */
+    public function templateExportAction($processorAlias)
+    {
+        /** @var ExportHandler $handler */
+        $handler = $this->get('oro_importexport.handler.export');
+
+        $result = $handler->getExportResult(
+            JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
+            $processorAlias
+        );
+
+        return $this->redirect($result['url']);
     }
 
     /**

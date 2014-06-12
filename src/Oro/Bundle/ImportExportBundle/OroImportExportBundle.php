@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle;
 
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateFixtureCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -19,5 +20,6 @@ class OroImportExportBundle extends Bundle
 
         $container->addCompilerPass(new AddNormalizerCompilerPass());
         $container->addCompilerPass(new ProcessorRegistryCompilerPass());
+        $container->addCompilerPass(new TemplateFixtureCompilerPass());
     }
 }

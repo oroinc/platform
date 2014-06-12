@@ -13,6 +13,18 @@ connector:
                         processor: oro_importexport.processor.export_delegate
                         writer:    oro_importexport.writer.csv
                     parameters: ~
+        entity_export_template_to_csv:
+            title: "Entity Template Export to CSV"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_importexport.reader.template_fixture
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.csv
+                    parameters: ~
         entity_import_validation_from_csv:
             title: "Entity Import Validation from CSV"
             type: import_validation

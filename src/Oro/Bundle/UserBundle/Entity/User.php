@@ -874,30 +874,39 @@ class User extends ExtendUser implements
      * Set middle name
      *
      * @param string $middleName
+     * @return User
      */
     public function setMiddleName($middleName)
     {
         $this->middleName = $middleName;
+
+        return $this;
     }
 
     /**
      * Set name prefix
      *
      * @param string $namePrefix
+     * @return User
      */
     public function setNamePrefix($namePrefix)
     {
         $this->namePrefix = $namePrefix;
+
+        return $this;
     }
 
     /**
      * Set name suffix
      *
      * @param string $nameSuffix
+     * @return User
      */
     public function setNameSuffix($nameSuffix)
     {
         $this->nameSuffix = $nameSuffix;
+
+        return $this;
     }
 
     /**

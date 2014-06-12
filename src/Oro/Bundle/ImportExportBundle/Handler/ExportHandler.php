@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -40,16 +40,16 @@ class ExportHandler extends AbstractHandler
     }
 
     /**
-     * Handles export action
+     * Get export result
      *
      * @param string $jobName
      * @param string $processorAlias
      * @param string $outputFormat
      * @param string $outputFilePrefix
      * @param array  $options
-     * @return Response
+     * @return array
      */
-    public function handleExport(
+    public function getExportResult(
         $jobName,
         $processorAlias,
         $outputFormat = 'csv',
@@ -104,12 +104,38 @@ class ExportHandler extends AbstractHandler
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
+        return  array(
+            'success'     => $jobResult->isSuccessful(),
+            'url'         => $url,
+            'readsCount'  => $readsCount,
+            'errorsCount' => $errorsCount,
+        );
+    }
+
+    /**
+     * Handles export action
+     *
+     * @param string $jobName
+     * @param string $processorAlias
+     * @param string $outputFormat
+     * @param string $outputFilePrefix
+     * @param array  $options
+     * @return JsonResponse
+     */
+    public function handleExport(
+        $jobName,
+        $processorAlias,
+        $outputFormat = 'csv',
+        $outputFilePrefix = null,
+        array $options = []
+    ) {
         return new JsonResponse(
-            array(
-                'success'     => $jobResult->isSuccessful(),
-                'url'         => $url,
-                'readsCount'  => $readsCount,
-                'errorsCount' => $errorsCount,
+            $this->getExportResult(
+                $jobName,
+                $processorAlias,
+                $outputFormat,
+                $outputFilePrefix,
+                $options
             )
         );
     }
