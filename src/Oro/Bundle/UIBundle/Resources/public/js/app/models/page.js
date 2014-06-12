@@ -9,18 +9,19 @@ define([
     var PageModel = BaseModel.extend({
         defaults: {
             content: '',
+            scripts: '',
+            mainMenu: '',
+            userMenu: '',
+            breadcrumb: '',
+
+            history: '',
+            mostviewed: '',
 
             title: '',
             titleSerialized: '',
             titleShort: '',
 
-            scripts: '',
-            mainMenu: '',
-            userMenu: '',
-            breadcrumb: '',
             flashMessages: [],
-            history: '',
-            mostviewed: '',
             showPinButton: false
         },
 

@@ -1,4 +1,8 @@
 /*global require*/
+
+/**
+ * Init PageView
+ */
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page-view'
@@ -8,53 +12,53 @@ require([
 });
 
 /**
- * Init BreadcrumbView
+ * Init PageBreadcrumbView
  */
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page/breadcrumb-view'
-], function (BaseController, BreadcrumbView) {
+], function (BaseController, PageBreadcrumbView) {
     'use strict';
-    BaseController.addBeforeActionReuse('breadcrumb', BreadcrumbView, {
+    BaseController.addBeforeActionReuse('breadcrumb', PageBreadcrumbView, {
         el: 'breadcrumb'
     });
 });
 
 /**
- * Init ContentView
+ * Init PageContentView
  */
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page/content-view'
-], function (BaseController, ContentView) {
+], function (BaseController, PageContentView) {
     'use strict';
-    BaseController.addBeforeActionReuse('content', ContentView, {
+    BaseController.addBeforeActionReuse('content', PageContentView, {
         el: 'mainContainer'
     });
 });
 
 /**
- * Init MainMenuView
+ * Init PageMainMenuView
  */
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page/main-menu-view'
-], function (BaseController, MainMenuView) {
+], function (BaseController, PageMainMenuView) {
     'use strict';
-    BaseController.addBeforeActionReuse('mainMenu', MainMenuView, {
+    BaseController.addBeforeActionReuse('mainMenu', PageMainMenuView, {
         el: 'mainMenu'
     });
 });
 
 /**
- * Init UserMenuView
+ * Init PageUserMenuView
  */
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page/user-menu-view'
-], function (BaseController, UserMenuView) {
+], function (BaseController, PageUserMenuView) {
     'use strict';
-    BaseController.addBeforeActionReuse('userMenu', UserMenuView, {
+    BaseController.addBeforeActionReuse('userMenu', PageUserMenuView, {
         el: 'userMenu'
     });
 });
