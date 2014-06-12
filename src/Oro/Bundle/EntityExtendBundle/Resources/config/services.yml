@@ -17,6 +17,7 @@ parameters:
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator
+    oro_entity_extend.association_build_helper.class:         Oro\Bundle\EntityExtendBundle\Tools\AssociationBuildHelper
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -133,3 +134,13 @@ services:
             - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: rename, priority: -10 }
+
+    oro_entity_extend.association_build_helper:
+        class: %oro_entity_extend.association_build_helper.class%
+        arguments:
+            - @oro_entity_config.config_manager
+
+    oro_entity_extend.config_dumper_extension:
+        abstract: true
+        arguments:
+            - @oro_entity_extend.association_build_helper

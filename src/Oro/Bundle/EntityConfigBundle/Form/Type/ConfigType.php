@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
