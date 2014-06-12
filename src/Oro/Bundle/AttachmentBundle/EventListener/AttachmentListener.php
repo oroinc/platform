@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
+
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 
 class AttachmentListener
 {

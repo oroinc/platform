@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 class AttachmentController extends Controller
 {

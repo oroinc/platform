@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-use Gaufrette\Stream\Local as LocalStream;
+
 use Gaufrette\Filesystem;
 use Gaufrette\StreamMode;
 use Gaufrette\Adapter\MetadataSupporter;
+use Gaufrette\Stream\Local as LocalStream;
+
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 class AttachmentManager
 {
