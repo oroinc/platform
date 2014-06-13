@@ -30,7 +30,7 @@ class CalendarTest extends Selenium2TestCase
     /**
      * Test edit of existing event
      * @depends testAddEvent
-     * @param $eventName
+     * @param string $eventName
      * @return string
      */
     public function testEditEvent($eventName)
@@ -49,11 +49,10 @@ class CalendarTest extends Selenium2TestCase
     /**
      * Test deletion of existing event
      * @depends testEditEvent
-     * @param $eventName
+     * @param string $eventName
      */
     public function testDeleteEvent($eventName)
     {
-        $this->markTestSkipped('Due to bug BAP-4432');
         $login = $this->login();
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)

@@ -26,6 +26,9 @@ class Calendar extends AbstractPage
 
     }
 
+    /**
+     * @return $this
+     */
     public function addEvent()
     {
         $this->test->byXpath("//td[contains(@class,'fc-widget-content fc-today fc-state-highlight')]")->click();
@@ -40,7 +43,7 @@ class Calendar extends AbstractPage
 
     /**
      * @param string $event
-     * @return object $this
+     * @return $this
      */
     public function editEvent($event)
     {
@@ -56,7 +59,7 @@ class Calendar extends AbstractPage
 
     /**
      * @param string $title
-     * @return object $this
+     * @return $this
      */
     public function setTitle($title)
     {
@@ -67,6 +70,9 @@ class Calendar extends AbstractPage
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function saveEvent()
     {
         $this->test->byXpath("//button[@type='submit'][normalize-space(.)='Save']")->click();
@@ -79,6 +85,9 @@ class Calendar extends AbstractPage
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function deleteEvent()
     {
         $this->test->byXpath(
@@ -95,7 +104,7 @@ class Calendar extends AbstractPage
 
     /**
      * @param string $event
-     * @return object $this
+     * @return $this
      */
     public function checkEventPresent($event)
     {
@@ -109,7 +118,7 @@ class Calendar extends AbstractPage
 
     /**
      * @param string $event
-     * @return object $this
+     * @return $this
      */
     public function checkEventNotPresent($event)
     {
