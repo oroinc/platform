@@ -47,6 +47,7 @@ class AttachmentConfigType extends AbstractType
 
                 $relationKey = ExtendHelper::buildRelationKey(
                     $configId->getClassName(),
+                    //'attach_' . $configId->getFieldName(),
                     $configId->getFieldName(),
                     'manyToOne',
                     self::ATTACHMENT_ENTITY
