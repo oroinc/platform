@@ -51,7 +51,7 @@ define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/
 
             var navigation = Navigation.getInstance();
             if (navigation) {
-                navigation.loadingMask.show();
+                navigation.showLoading();
             }
             var url = routing.generate('oro_embedded_form_default_data', {'formType': formType});
             var css = $.get(url)
@@ -64,7 +64,7 @@ define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/
                     rememberedFormType = formType;
                 }).always(function () {
                     if (navigation) {
-                        navigation.loadingMask.hide();
+                        navigation.hideLoading();
                     }
                 });
         }

@@ -84,7 +84,7 @@
 
                     var navigation = Navigation.getInstance();
                     if (navigation) {
-                        navigation.loadingMask.show();
+                        navigation.showLoading();
                     }
 
                     $.ajax(url, {
@@ -100,7 +100,7 @@
                         dataType: 'json'
                     }).always(function () {
                         if (navigation) {
-                            navigation.loadingMask.hide();
+                            navigation.hideLoading();
                         }
                     });
                 });

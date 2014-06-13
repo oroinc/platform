@@ -123,7 +123,7 @@
                             navigation = Navigation.getInstance(),
                                 run = function () {
                                     if (navigation) {
-                                        navigation.loadingMask.show();
+                                        navigation.showLoading();
                                     }
 
                                     var success = false;
@@ -133,7 +133,7 @@
                                         messenger.notificationFlashMessage('error', __('An unidentified error has occurred. Please contact your Administrator.'));
                                     }).always(function () {
                                         if (navigation) {
-                                            navigation.loadingMask.hide();
+                                            navigation.hideLoading();
                                         }
                                         if (success) {
                                             var successMessage = __('Segment successfully processed.');

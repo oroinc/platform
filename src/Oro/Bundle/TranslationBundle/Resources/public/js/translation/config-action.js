@@ -78,7 +78,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             if (actionMediator.action == 'download' || actionMediator.action == 'update') {
                 var navigation = Navigation.getInstance();
                 if (navigation) {
-                    navigation.loadingMask.show();
+                    navigation.showLoading();
                 }
 
                 var url = routing.generate(this.route, { code: actionMediator.code });
@@ -92,7 +92,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                         var message;
 
                         if (navigation) {
-                            navigation.loadingMask.hide();
+                            navigation.hideLoading();
                         }
 
                         if (status !== 'success' || response.success !== true) {

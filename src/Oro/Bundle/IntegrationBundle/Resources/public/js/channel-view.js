@@ -97,7 +97,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
 
             var navigation = Navigation.getInstance();
             if (navigation) {
-                navigation.loadingMask.show();
+                navigation.showLoading();
             }
 
             var $form = $(this.options.formSelector),
@@ -126,7 +126,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
                 }
             }).always(function () {
                 if (navigation) {
-                    navigation.loadingMask.hide();
+                    navigation.hideLoading();
                 }
             });
         },

@@ -344,7 +344,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 confirm.on('ok', function () {
                     var navigation = Navigation.getInstance();
                     if (navigation) {
-                        navigation.loadingMask.show();
+                        navigation.showLoading();
                     }
 
                     $.ajax({
@@ -361,12 +361,12 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                                     window.location.href = el.data('redirect');
                                 }
                             } else if (navigation) {
-                                navigation.loadingMask.hide();
+                                navigation.hideLoading();
                             }
                         },
                         error: function () {
                             if (navigation) {
-                                navigation.loadingMask.hide();
+                                navigation.hideLoading();
                             }
 
                             messenger.notificationMessage(
