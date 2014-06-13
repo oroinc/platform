@@ -12,6 +12,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuildHelper
 {
+    const ASSOC_MANY2ONE  = 'manyToOne';
+    const ASSOC_MANY2MANY = 'manyToMany';
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -30,10 +33,20 @@ class AssociationBuildHelper
         return $this->configManager->getProvider($scope)->getConfigs();
     }
 
-    public function createManyToManyRelation($sourceEntityClass, $targetEntityClass)
+    /**
+     * @param string $sourceEntityClass
+     * @param string $targetEntityClass
+     * @param bool   $unidirectional
+     */
+    public function createManyToManyRelation($sourceEntityClass, $targetEntityClass, $unidirectional = true)
     {
         $relationName = $this->getRelationName($targetEntityClass);
-        $relationKey  = $this->getRelationKey($sourceEntityClass, $relationName, $targetEntityClass, 'manyToOne');
+        $relationKey = $this->getRelationKey(
+            $sourceEntityClass,
+            $relationName,
+            $targetEntityClass,
+            self::ASSOC_MANY2MANY
+        );
 
         $targetEntityConfig = $this->configManager
             ->getProvider('entity')
@@ -50,8 +63,8 @@ class AssociationBuildHelper
             $relationName
         );
 
-        $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
-        $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
+        $targetEntityFields = $this->getFieldNames($targetEntityClass);
+        $targetFieldName    = array_shift($targetEntityFields);
 
         // create field
         $this->createField(
@@ -60,32 +73,36 @@ class AssociationBuildHelper
             'manyToMany',
             [
                 'extend' => [
-                    'owner'         => ExtendScope::OWNER_SYSTEM,
-                    'state'         => ExtendScope::STATE_NEW,
-                    'extend'        => true,
-                    'target_entity' => $targetEntityClass,
-                    'target_field'  => $targetFieldName,
-                    'relation_key'  => $relationKey,
+                    'owner'           => ExtendScope::OWNER_SYSTEM,
+                    'state'           => ExtendScope::STATE_NEW,
+                    'extend'          => true,
+                    'is_inverse'      => false,
+                    'relation_key'    => $relationKey,
+                    'target_entity'   => $targetEntityClass,
+                    'target_grid'     => $targetEntityFields,
+                    'target_title'    => [$targetFieldName],
+                    'target_detailed' => $targetEntityFields,
                 ],
                 'entity' => [
                     'label'       => $label,
                     'description' => $description,
                 ],
                 'view'   => [
-                    'is_displayable' => false
+                    'is_displayable' => true
                 ],
                 'form'   => [
-                    'is_enabled' => false
+                    'is_enabled' => true
                 ]
             ]
         );
 
         // add relation to owning entity
-        $this->addManyToOneRelation(
+        $this->addManyToManyRelation(
             $targetEntityClass,
             $sourceEntityClass,
             $relationName,
-            $relationKey
+            $relationKey,
+            $unidirectional
         );
     }
 
@@ -96,7 +113,12 @@ class AssociationBuildHelper
     public function createManyToOneRelation($sourceEntityClass, $targetEntityClass)
     {
         $relationName = $this->getRelationName($targetEntityClass);
-        $relationKey  = $this->getRelationKey($sourceEntityClass, $relationName, $targetEntityClass, 'manyToOne');
+        $relationKey = $this->getRelationKey(
+            $sourceEntityClass,
+            $relationName,
+            $targetEntityClass,
+            self::ASSOC_MANY2ONE
+        );
 
         $targetEntityConfig = $this->configManager
             ->getProvider('entity')
@@ -200,6 +222,53 @@ class AssociationBuildHelper
      * @param string $sourceEntityName
      * @param string $relationName
      * @param string $relationKey
+     * @param bool   $unidirectional
+     */
+    protected function addManyToManyRelation(
+        $targetEntityName,
+        $sourceEntityName,
+        $relationName,
+        $relationKey,
+        $unidirectional
+    ) {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfig         = $extendConfigProvider->getConfig($sourceEntityName);
+
+        // update index info
+        $index                = $extendConfig->get('index', false, []);
+        $index[$relationName] = null;
+        $extendConfig->set('index', $index);
+
+        $targetFieldId = null;
+        if (!$unidirectional) {
+            $targetFieldId = new FieldConfigId(
+                'extend',
+                $targetEntityName,
+                $this->getRelationName($sourceEntityName) . '_' . $relationName,
+                'manyToMany'
+            );
+        }
+
+        // add relation to config
+        $relations               = $extendConfig->get('relation', false, []);
+        $relations[$relationKey] = [
+            'assign'          => false,
+            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2MANY),
+            'owner'           => true,
+            'target_entity'   => $targetEntityName,
+            'target_field_id' => $targetFieldId,
+        ];
+        $extendConfig->set('relation', $relations);
+
+        $extendConfigProvider->persist($extendConfig);
+        $this->configManager->calculateConfigChangeSet($extendConfig);
+    }
+
+    /**
+     * @param string $targetEntityName
+     * @param string $sourceEntityName
+     * @param string $relationName
+     * @param string $relationKey
      */
     protected function addManyToOneRelation(
         $targetEntityName,
@@ -224,7 +293,7 @@ class AssociationBuildHelper
         $relations               = $extendConfig->get('relation', false, []);
         $relations[$relationKey] = [
             'assign'          => false,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
+            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2ONE),
             'owner'           => true,
             'target_entity'   => $targetEntityName,
             'target_field_id' => false
@@ -257,7 +326,7 @@ class AssociationBuildHelper
             'field_id'        => false,
             'owner'           => false,
             'target_entity'   => $sourceEntityName,
-            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne')
+            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2ONE)
         ];
         $extendConfig->set('relation', $relations);
 
@@ -289,19 +358,32 @@ class AssociationBuildHelper
     }
 
     /**
-     * @param string $entityClassName
+     * @param string $entityClass
      *
      * @return string[]|ClassMetadata
      */
-    public function getPrimaryKeyColumnNames($entityClassName)
+    public function getPrimaryKeyColumnNames($entityClass)
     {
         try {
             $targetEntityMetadata = $this->configManager->getEntityManager()
-                ->getClassMetadata($entityClassName);
+                ->getClassMetadata($entityClass);
 
             return $targetEntityMetadata->getIdentifierColumnNames();
         } catch (\ReflectionException $e) {
             return ['id'];
         }
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function getFieldNames($entityClass)
+    {
+        $targetEntityMetadata = $this->configManager->getEntityManager()
+            ->getClassMetadata($entityClass);
+
+        return $targetEntityMetadata->getFieldNames();
     }
 }
