@@ -70,5 +70,4 @@ class Dashboard extends AbstractPageEntity
 
         return $this;
     }
-
 }
