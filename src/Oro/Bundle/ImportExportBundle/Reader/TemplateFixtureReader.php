@@ -38,10 +38,17 @@ class TemplateFixtureReader extends IteratorBasedReader
     {
         if ($context->hasOption('entityName')) {
             $this->fixture = $this->fixtureRegistry->getEntityFixture($context->getOption('entityName'));
-            $this->setSourceIterator($this->fixture->getData());
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of fixture reader must contain "entityName".'
+            );
+        }
+
+        if ($this->fixture) {
+            $this->setSourceIterator($this->fixture->getData());
+        } else {
+            throw new InvalidConfigurationException(
+                sprintf('There is no template fixture registered for "%s".', $context->getOption('entityName'))
             );
         }
     }

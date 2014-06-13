@@ -58,6 +58,33 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader->setStepExecution($stepExecution);
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage There is no template fixture registered for "stdClass".
+     */
+    public function testInitializeFromContextExceptionNoFixture()
+    {
+        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context->expects($this->once())
+            ->method('hasOption')
+            ->with('entityName')
+            ->will($this->returnValue(true));
+        $context->expects($this->atLeastOnce())
+            ->method('getOption')
+            ->with('entityName')
+            ->will($this->returnValue('stdClass'));
+
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->contextRegistry->expects($this->once())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        $this->reader->setStepExecution($stepExecution);
+    }
+
     public function testInitializeFromContext()
     {
         $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
