@@ -298,10 +298,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set id
      *
      * @param int $id
+     * @return AbstractAddress
      */
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -580,7 +583,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name prefix
      *
      * @param string $namePrefix
-     * @return $this
+     * @return AbstractAddress
      */
     public function setNamePrefix($namePrefix)
     {
@@ -604,7 +607,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set first name
      *
      * @param string $firstName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setFirstName($firstName)
     {
@@ -628,7 +631,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set middle name
      *
      * @param string $middleName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setMiddleName($middleName)
     {
@@ -651,7 +654,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set last name
      *
      * @param string $lastName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setLastName($lastName)
     {
@@ -674,7 +677,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name suffix
      *
      * @param string $nameSuffix
-     * @return $this
+     * @return AbstractAddress
      */
     public function setNameSuffix($nameSuffix)
     {
@@ -707,10 +710,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address created date/time
      *
      * @param \DateTime $created
+     * @return AbstractAddress
      */
     public function setCreated($created)
     {
         $this->created = $created;
+
+        return $this;
     }
 
     /**
@@ -727,10 +733,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address updated date/time
      *
      * @param \DateTime $updated
+     * @return AbstractAddress
      */
     public function setUpdated($updated)
     {
         $this->updated = $updated;
+
+        return $this;
     }
 
     /**
