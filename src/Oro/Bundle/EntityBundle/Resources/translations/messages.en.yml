@@ -4,6 +4,11 @@ oro:
             message:
                 saved:              Entity saved
         form:
+            block:
+                general:            General
+                other:              Other
+                associations:       Communication & Collaboration
+
             choose_entity:          Choose an entity...
             choose_entity_field:    Choose a field...
             choose_entity_fields:   Choose fields...
