@@ -45,8 +45,7 @@
     {% set businessUnitEmailsWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_business_unit_widget_users', {id: entity.id}),
-            'cssClass': 'inner-grid'
+            'url': path('oro_business_unit_widget_users', {id: entity.id})
         }) }}
     {% endset %}
 

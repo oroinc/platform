@@ -1,0 +1,19 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% if resource_granted('oro_note_create') %}
+    {{ UI.clientButton({
+        'id': 'add-entity-note-button',
+        'aCss': 'no-hash',
+        'iCss': 'icon-comment-alt hide-text',
+        'label' : 'oro.note.action.add'|trans
+    }) }}
+    <script type="text/javascript">
+        require(['jquery', 'oroui/js/mediator'],
+        function($, mediator){
+            $('#add-entity-note-button').on('click', function(e) {
+                e.preventDefault();
+                mediator.trigger('note:add');
+            });
+        });
+    </script>
+{% endif %}

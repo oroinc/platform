@@ -591,9 +591,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->will($this->returnValue($entityManager));
 
-        $this->assertEmpty($workflowItem->getUpdatedAt());
+        $this->assertEmpty($workflowItem->getUpdated());
         $this->workflowManager->transit($workflowItem, $transition);
-        $this->assertNotEmpty($workflowItem->getUpdatedAt());
+        $this->assertNotEmpty($workflowItem->getUpdated());
     }
 
     /**

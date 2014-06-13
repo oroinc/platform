@@ -1,7 +1,6 @@
 <?php
 // @codingStandardsIgnoreStart
 use Behat\Gherkin\Node\TableNode;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\TestFrameworkBundle\Test\BehatWebContext;
@@ -37,7 +36,7 @@ class FeatureContext extends BehatWebContext
         $client->request('GET', $this->getUrl($route));
         WebTestCase::assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         PHPUnit_Framework_Assert::assertContains(
-            'Create User - Users - Users Management - System',
+            'Create User - Users - User Management - System',
             $client->getCrawler()->html()
         );
     }

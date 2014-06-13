@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 
 class FormListener
@@ -32,7 +33,7 @@ class FormListener
         $entityProvider = $this->configManager->getProvider('entity');
 
         if (is_object($form->vars['value'])) {
-            $className = get_class($form->vars['value']);
+            $className = ClassUtils::getClass($form->vars['value']);
             if (class_exists($className)
                 && $entityProvider->hasConfig($className, 'owner')
             ) {

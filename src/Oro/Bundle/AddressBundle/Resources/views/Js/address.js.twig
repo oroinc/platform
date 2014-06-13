@@ -1,8 +1,8 @@
 <script type="text/html" id="template-addressbook-item">
-    <div class="map-actions">
+    <div class="actions">
         {% if address_edit_acl_resource is not defined or resource_granted(address_edit_acl_resource) %}
-        <button class="btn" title="<%= _.__('Edit') %>"><i class="icon-pencil hide-text"><%= _.__('Edit') %></i></button>
-        <% if (!primary) { %><button class="btn" title="<%= _.__('Remove') %>"><i class="icon-remove hide-text"><%= _.__('Remove') %></i></button><% } %>
+        <button class="btn item-edit-button" title="<%= _.__('Edit') %>"><i class="icon-edit hide-text"><%= _.__('Edit') %></i></button>
+        <% if (!primary) { %><button class="btn item-remove-button" title="<%= _.__('Remove') %>"><i class="icon-trash hide-text"><%= _.__('Remove') %></i></button><% } %>
         {% endif %}
     </div>
     <div class="title-item"><%= _.escape(label) %></div>

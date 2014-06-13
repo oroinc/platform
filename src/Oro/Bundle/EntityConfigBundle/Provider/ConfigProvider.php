@@ -166,7 +166,8 @@ class ConfigProvider implements ConfigProviderInterface
      * the given $className.
      *
      * @param string|null $className
-     * @param bool $withHidden
+     * @param bool        $withHidden
+     *
      * @return array|ConfigInterface[]
      */
     public function getConfigs($className = null, $withHidden = false)

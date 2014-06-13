@@ -1,0 +1,115 @@
+@menuItemTextColor:            @headerTextColor;
+@menuBackGroundColor:          #2762c6;
+@menuItemBorderTopColor:       lighten(@menuBackGroundColor, 5%);
+@menuItemBorderBottomColor:    darken(@menuBackGroundColor, 4%);
+@menuItemTreeLine:             darken(@menuBackGroundColor, 20%);
+
+// menu top decoration
+.main-menu-top .main-menu {
+  #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+  border-bottom-color: @baseGradientColorBorder;
+  > li.dropdown.only-icon,
+  > li.dropdown {
+    > a {
+      color: #fff;
+      i[class^=icon-] {
+        color: #fff;
+      }
+    }
+    &.active {
+      > a {
+        border-bottom-color: @baseGradientColorBorder;
+        #gradient > .vertical(darken(@baseGradientColorStart, 5%), darken(@baseGradientColorEnd, 5%));
+      }
+    }
+  }
+}
+
+// sided menu decoration
+.main-menu-sided {
+  background-color: @menuBackGroundColor;
+  .main-menu {
+    border-bottom: 1px solid @menuItemBorderTopColor;
+    // first level
+    > li.dropdown,
+    > li.accordion-group > .accordion-heading > .accordion-toggle{
+      border-top-color: @menuItemBorderTopColor;
+      border-bottom-color: @menuItemBorderBottomColor;
+    }
+    > li.accordion-group > .accordion-heading > .accordion-toggle {
+      #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
+      border-top-color: darken(@headerIconButtonColorStart, 1%);
+      border-bottom-color: darken(@headerIconButtonColorEnd, 8%);
+      color: #fff;
+      &.collapsed {
+        border-top-color: @menuItemBorderTopColor;
+        border-bottom-color: @menuItemBorderBottomColor;
+      }
+      &:hover {
+        #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
+        border-top-color: darken(@headerIconButtonColorStart, 3%);
+        border-bottom-color: darken(@headerIconButtonColorEnd, 10%);
+        color: #fff;
+      }
+    }
+    > li.accordion-group {
+      a {
+        color: @menuItemTextColor;
+      }
+      > .accordion {
+        background-color: darken(@menuBackGroundColor, 8%);
+        &:after {
+          border-bottom: 1px solid @menuItemBorderBottomColor;
+        }
+        > ul {
+          &:before {
+            background-color: @menuItemTreeLine;
+          }
+          > li {
+            border-left: 1px solid @menuItemTreeLine;
+            &:last-child {
+              border-color: transparent;
+              &:after {
+                background-color: @menuItemTreeLine;
+              }
+            }
+            &:before {
+              background-color: @menuItemTreeLine;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.minimized {
+    .main-menu {
+      // first level
+      > li.dropdown {
+        &.active {
+          #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
+          border-top-color: darken(@headerIconButtonColorStart, 1%);
+          border-bottom-color: darken(@headerIconButtonColorEnd, 8%);
+          a {
+            background-image: none;
+            background-color: transparent;
+          }
+        }
+        > a {
+          i[class^=icon-] {
+            color: @menuItemTextColor;
+          }
+        }
+        &:hover {
+          > a {
+            i[class^=icon-] {
+              color: @menuBackGroundColor;
+            }
+          }
+        }
+      }
+    }
+  }
+  .menu-toggler {
+    color: @menuItemTextColor;
+  }
+}

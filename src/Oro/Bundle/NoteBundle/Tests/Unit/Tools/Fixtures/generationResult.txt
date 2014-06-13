@@ -1,0 +1,38 @@
+namespace Test;
+
+class Entity
+{
+    /**
+     * Sets the entity this note is associated with
+     *
+     * @param object $target Any configurable entity that can have notes
+     */
+    public function setTarget($target)
+    {
+        // The note can be associated with one entity only
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if (!in_array($className, ['Test\TargetEntity1', 'Test\TargetEntity2'])) {
+            throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+        }
+        if ($className == 'Test\TargetEntity1') { $this->resetTargets(); $this->targetField1 = $target; }
+        if ($className == 'Test\TargetEntity2') { $this->resetTargets(); $this->targetField2 = $target; }
+    }
+
+    /**
+     * Gets the entity this note is associated with
+     *
+     * @return object|null Any configurable entity
+     */
+    public function getTarget()
+    {
+        if (null !== $this->targetField1) { return $this->targetField1; }
+        if (null !== $this->targetField2) { return $this->targetField2; }
+        return null;
+    }
+
+    private function resetTargets()
+    {
+        $this->targetField1 = null;
+        $this->targetField2 = null;
+    }
+}
