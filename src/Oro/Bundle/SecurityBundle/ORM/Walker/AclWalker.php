@@ -158,15 +158,12 @@ class AclWalker extends TreeWalkerAdapter
 
         $conditionalFactors = [];
 
-        $joinConditionsArray = is_array($condition->getJoinConditions())
-            ? $condition->getJoinConditions()
-            : array($condition->getJoinConditions());
-        foreach ($joinConditionsArray as $joinCondition) {
+        foreach ($condition->getJoinConditions() as $joinCondition) {
             $rightExpression = new ArithmeticExpression();
             $pathExpression = new PathExpression(
                 self::EXPECTED_TYPE,
                 $condition->getEntityAlias(),
-                is_string($joinCondition) ? $joinCondition : $joinCondition['referencedColumnName']
+                $joinCondition
             );
             $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
             $rightExpression->simpleArithmeticExpression = $pathExpression;
