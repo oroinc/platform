@@ -37,7 +37,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 class Role extends BaseRole
 {
     const PREFIX_ROLE = 'ROLE_';
-    
+
     /**
      * @var int
      *
@@ -175,48 +175,54 @@ class Role extends BaseRole
 
         return $this;
     }
-    
+
     /**
      * Pre persist event listener
      *
      * @ORM\PrePersist
+     *
      * @param LifecycleEventArgs $args
+     *
      * @throws \LogicException
      */
     public function beforeSave(LifecycleEventArgs $args)
     {
         /**
          * @var integer $count
-         * count of attempts to set unique roel, maximum 10 else exception 
+         * count of attempts to set unique role, maximum 10 else exception
          */
         $count = 1;
 
-        while (!$this->updateRole($args) && $count++ < 10) {}
-        
+        while (!$this->updateRole($args) && $count++ < 10) {
+        }
+
         if ($count > 10) {
-            throw new \LogicException('10 attempts to generate unique role is failed.');
+            throw new \LogicException('10 attempts to generate unique role are failed.');
         }
     }
-    
+
     /**
      * Update role field.
      *
      * @param LifecycleEventArgs $args
+     *
+     * @return bool
      */
     protected function updateRole(LifecycleEventArgs $args)
     {
         if ($this->getRole()) {
             return true;
         }
-        
-        $roleValue = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
+
+        $roleValue  = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
         $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($roleValue);
-        
+
         if ($sameObject) {
             return false;
         }
-        
+
         $this->setRole($roleValue);
+
         return true;
     }
 }

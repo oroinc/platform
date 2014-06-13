@@ -55,41 +55,41 @@ class RoleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
-    
+
     /**
      * Test prePersist role that to generate new value of "role" field
      */
     public function testCallbacksValid()
     {
         $role = $this->getRole();
-        
+
         $this->assertEmpty($role->getId());
         $this->assertEmpty($role->getRole());
-        
+
         $role->beforeSave($this->getEvent($role));
-        
+
         $this->assertNotEmpty($role->getRole());
     }
-    
+
     /**
      * Test prePersist role that generate exception \LogicException
-     * 
+     *
      * @expectedException \LogicException
-     * @expectedExceptionMessage 10 attempts to generate unique role is failed.
+     * @expectedExceptionMessage 10 attempts to generate unique role are failed.
      */
     public function testCallbacksInValid()
     {
         $role = $this->getRole();
-        
+
         $this->assertEmpty($role->getId());
         $this->assertEmpty($role->getRole());
 
         $role->beforeSave($this->getEvent($role, true));
     }
-    
+
     /**
      * Prepare event object for test callbacks
-     * 
+     *
      * @param Role $entity
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
@@ -105,17 +105,17 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Role')
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         if ($duplicate) {
             $repository->expects($this->any())
                 ->method('findOneByRole')
                 ->will($this->returnValue($entity));
         }
-        
+
         $em->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repository));
-        
+
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
