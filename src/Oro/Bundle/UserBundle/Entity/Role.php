@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\RoleRepository")
  * @ORM\Table(name="oro_access_role")
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={
  *      "ownership"={
@@ -172,5 +174,48 @@ class Role extends BaseRole
         $this->owner = $owningBusinessUnit;
 
         return $this;
+    }
+    
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     * @param LifecycleEventArgs $args
+     * @throws \LogicException
+     */
+    public function beforeSave(LifecycleEventArgs $args)
+    {
+        /**
+         * @var integer $count
+         * count of attempts to set unique roel, maximum 10 else exception 
+         */
+        $count = 0;
+        
+        while (!$this->updateRole($args) && $count++ < 10);
+        
+        if ($count > 10) {
+            throw new \LogicException(sprintf('The role "%s" already exists.', $this->getRole()));
+        }
+    }
+    
+    /**
+     * Update role field.
+     *
+     * @param LifecycleEventArgs $args
+     */
+    protected function updateRole(LifecycleEventArgs $args)
+    {
+        if ($this->getRole()) {
+            return true;
+        }
+        
+        $this->setRole(strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand()))));
+        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($this->getRole());
+        
+        if ($sameObject) {
+            return false;
+        }
+        
+        return true;
     }
 }

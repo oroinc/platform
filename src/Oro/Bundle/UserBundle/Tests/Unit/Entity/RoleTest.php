@@ -58,4 +58,51 @@ class RoleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
+    
+    /**
+     * Test prePersist role that to generate new value of "role" field
+     */
+    public function testCallbacks()
+    {
+        $role = $this->getRole();
+        
+        $this->assertEmpty($role->getId());
+        $this->assertEmpty($role->getRole());
+        
+        $role->beforeSave($this->getEvent($role));
+        
+        $this->assertNotEmpty($role->getRole());
+    }
+    
+    /**
+     * Prepare event object for test callbacks
+     * 
+     * @param Role $entity
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEvent($entity)
+    {
+        $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository = $this->getMock(
+            'Doctrine\Common\Persistence\ObjectRepository',
+            array('find', 'findAll', 'findBy', 'findOneBy', 'findOneByRole', 'getClassName')
+        );
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+        
+        $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($entity));
+        $event->expects($this->any())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em));
+
+        return $event;
+    }
 }

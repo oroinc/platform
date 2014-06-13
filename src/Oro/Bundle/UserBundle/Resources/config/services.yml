@@ -23,6 +23,7 @@ parameters:
     oro_user.event_listener.user_email_grid_listener.class: Oro\Bundle\UserBundle\EventListener\UserEmailGridListener
     oro_user.handler.delete.class:      Oro\Bundle\UserBundle\Handler\UserDeleteHandler
     oro_user.role.handler.delete.class: Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
+    oro_user.entity_role.listener.class: Oro\Bundle\UserBundle\Entity\EventListener\UserRoleListener
 
 services:
     oro_user.manager:
@@ -197,10 +198,3 @@ services:
         parent: oro_soap.handler.delete.abstract
         arguments:
             - @oro_security.acl.sid_manager
-            
-    oro_user.validator.unique_user_role:
-        class: Oro\Bundle\UserBundle\Validator\Constraints\UniqueRoleValidator
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: validator.constraint_validator, alias: oro_user.unique_role }
