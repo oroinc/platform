@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Doctrine\Common\Inflector\Inflector;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -15,8 +13,8 @@ use Symfony\Component\Translation\Translator;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -134,15 +132,6 @@ class CustomEntityType extends AbstractType
                         $blockName           = array_pop($classArray);
                         $selectorWindowTitle = 'Select ' . $blockName;
 
-                        $builder->add(
-                            'default_' . $fieldConfigId->getFieldName(),
-                            'oro_entity_identifier',
-                            [
-                                'class'    => $extendConfig->get('target_entity'),
-                                'multiple' => false
-                            ]
-                        );
-
                         $options = [
                             'label'                 => $entityConfig->get('label'),
                             'required'              => false,
@@ -160,11 +149,24 @@ class CustomEntityType extends AbstractType
                                 ]
                             ),
                             'selector_window_title' => $selectorWindowTitle,
-                            'default_element'       => 'default_' . $fieldConfigId->getFieldName(),
                             'initial_elements'      => null,
                             'mapped'                => false,
                             'extend'                => true,
                         ];
+
+                        if (!$extendConfig->is('without_default')) {
+                            $defaultFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldConfigId->getFieldName();
+                            $builder->add(
+                                $defaultFieldName,
+                                'oro_entity_identifier',
+                                [
+                                    'class'    => $extendConfig->get('target_entity'),
+                                    'multiple' => false
+                                ]
+                            );
+                            $options['default_element'] = $defaultFieldName;
+                        }
+
                         break;
                 }
 
@@ -178,6 +180,7 @@ class CustomEntityType extends AbstractType
      * @param FormInterface $form
      * @param array $options
      *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
@@ -238,9 +241,14 @@ class CustomEntityType extends AbstractType
                             ]
                         );
 
-                    $defaultFieldName   = 'get_' . ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-                    $defaultEntityId    = $data->{Inflector::camelize($defaultFieldName)}();
-                    $selectedCollection = $data->{Inflector::classify('get_' . $fieldName)}();
+                    $defaultEntityId = null;
+                    if (!$extendConfig->is('without_default')) {
+                        $defaultEntityId = FieldAccessor::getValue(
+                            $data,
+                            ExtendConfigDumper::DEFAULT_PREFIX . $fieldName
+                        );
+                    }
+                    $selectedCollection = FieldAccessor::getValue($data, $fieldName);
 
                     if ($data->getId()) {
                         $view->children[$fieldName]->vars['initial_elements'] =
@@ -269,13 +277,13 @@ class CustomEntityType extends AbstractType
 
                 $extraData[] = [
                     'label' => $this->translator->trans($label),
-                    'value' => $entity->{Inflector::camelize('get_' . $fieldName)}()
+                    'value' => FieldAccessor::getValue($entity, $fieldName)
                 ];
             }
 
             $title = [];
             foreach ($extendConfig->get('target_title') as $fieldName) {
-                $title[] = $entity->{Inflector::camelize('get_' . $fieldName)}();
+                $title[] = FieldAccessor::getValue($entity, $fieldName);
             }
 
             $result[] = [

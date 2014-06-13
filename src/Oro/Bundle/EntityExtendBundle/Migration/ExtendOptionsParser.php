@@ -27,7 +27,12 @@ class ExtendOptionsParser
     {
         $builder = new ExtendOptionsBuilder($this->entityMetadataHelper);
 
-        $objectKeys = array_keys($options);
+        $objectKeys = array_filter(
+            array_keys($options),
+            function ($key) {
+                return strpos($key, '_') !== 0;
+            }
+        );
 
         // at first all table's options should be processed,
         // because it is possible that a reference to new table is created
@@ -42,6 +47,35 @@ class ExtendOptionsParser
             if (strpos($objectKey, '!')) {
                 $keyParts = explode('!', $objectKey);
                 $builder->addColumnOptions($keyParts[0], $keyParts[1], $options[$objectKey]);
+            }
+        }
+
+        // process auxiliary sections, such as append flags
+        $auxiliarySections = array_filter(
+            array_keys($options),
+            function ($key) {
+                return strpos($key, '_') === 0;
+            }
+        );
+        foreach ($auxiliarySections as $sectionName) {
+            $configType = $builder->getAuxiliaryConfigType($sectionName);
+            $objectKeys = array_keys($options[$sectionName]);
+            foreach ($objectKeys as $objectKey) {
+                if (!strpos($objectKey, '!')) {
+                    $builder->addTableAuxiliaryOptions(
+                        $configType,
+                        $objectKey,
+                        $options[$sectionName][$objectKey]
+                    );
+                } else {
+                    $keyParts = explode('!', $objectKey);
+                    $builder->addColumnAuxiliaryOptions(
+                        $configType,
+                        $keyParts[0],
+                        $keyParts[1],
+                        $options[$sectionName][$objectKey]
+                    );
+                }
             }
         }
 
