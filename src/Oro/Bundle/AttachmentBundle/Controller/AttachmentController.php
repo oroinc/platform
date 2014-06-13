@@ -32,4 +32,23 @@ class AttachmentController extends Controller
 
         return $response;
     }
+
+    /**
+     * @Route("/resize/{id}/{width}/{height}/{filename}", name="oro_resize_attachment", requirements={"id"="\d+"})
+     */
+    public function getResizedAttachmentImageAction(Attachment $attachment, $width, $height)
+    {
+        $path = substr($this->getRequest()->getPathInfo(), 1);
+        $filterName = 'attachment_' . $width . '_' . $height;
+
+        $this->get('liip_imagine.filter.configuration')->set(
+            $filterName,
+            ['filters' => ['thumbnail' => ['size' => [$width, $height]]]]
+        );
+        $binary = $this->get('liip_imagine')->load($this->get('oro_attachment.manager')->getContent($attachment));
+        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
+
+        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+    }
 }

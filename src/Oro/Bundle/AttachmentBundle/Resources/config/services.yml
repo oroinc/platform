@@ -1,5 +1,6 @@
 parameters:
     oro_attachment.form.type.file.class: Oro\Bundle\AttachmentBundle\Form\FileType
+    oro_attachment.form.type.image.class: Oro\Bundle\AttachmentBundle\Form\ImageType
     oro_attachment.form.file_subscriber.class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
     oro_attachment.manager.attachment_manager.class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
     oro_attachment.listener.attachment_listener.class: Oro\Bundle\AttachmentBundle\EventListener\AttachmentListener
@@ -12,6 +13,11 @@ services:
             - [setEventListener, [@oro_attachment.form.file_subscriber]]
         tags:
             - { name: form.type, alias: oro_file }
+
+    oro_attachment.form.type.image:
+        class: %oro_attachment.form.type.image.class%
+        tags:
+            - { name: form.type, alias: oro_image }
 
     oro_attachment.form.file_subscriber:
         class: %oro_attachment.form.file_subscriber.class%
@@ -31,6 +37,6 @@ services:
 
     oro_attachment.twig.attachment_extension:
         class: %oro_attachment.twig.attachment_extension.class%
-        arguments: [@oro_attachment.manager]
+        arguments: [@oro_attachment.manager, @liip_imagine.cache.manager]
         tags:
             - { name: twig.extension }

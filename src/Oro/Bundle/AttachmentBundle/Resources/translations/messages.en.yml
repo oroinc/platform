@@ -12,4 +12,4 @@ oro:
           owner.label:          Owner
           extension.label:      Extension
           file.label:           File
-          delete_file.label:    Delete file
+          delete_file.label:    Delete

@@ -124,4 +124,23 @@ class AttachmentManager
             $absolute
         );
     }
+
+    /**
+     * @param Attachment $entity
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
+    public function getResizedImageUrl(Attachment $entity, $width = 100, $height = 100)
+    {
+        return $this->router->generate(
+            'oro_resize_attachment',
+            [
+                'width' => $width,
+                'height' => $height,
+                'id' => $entity->getId(),
+                'filename' => $entity->getOriginalFilename()
+            ]
+        );
+    }
 }

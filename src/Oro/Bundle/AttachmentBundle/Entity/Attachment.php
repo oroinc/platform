@@ -230,6 +230,98 @@ class Attachment extends ExtendAttachment
     }
 
     /**
+     * @param File $file
+     */
+    public function setFile(File $file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @return File
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param $extension
+     * @return $this
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param $emptyFile
+     * @return $this
+     */
+    public function setEmptyFile($emptyFile)
+    {
+        $this->emptyFile = $emptyFile;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEmptyFile()
+    {
+        return $this->emptyFile;
+    }
+
+    /**
+     * @param $mimeType
+     * @return $this
+     */
+    public function setMimeType($mimeType)
+    {
+        $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType()
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param $fileSize
+     * @return $this
+     */
+    public function setFileSize($fileSize)
+    {
+        $this->fileSize = $fileSize;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFileSize()
+    {
+        return $this->fileSize;
+    }
+
+    /**
      * Pre persist event handler
      *
      * @ORM\PrePersist
@@ -248,85 +340,5 @@ class Attachment extends ExtendAttachment
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    /**
-     * @param File $file
-     */
-    public function setFile(File $file)
-    {
-        $this->file = $file;
-    }
-
-    /**
-     * @return File
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * @param string $extension
-     */
-    public function setExtension($extension)
-    {
-        $this->extension = $extension;
-    }
-
-    /**
-     * @return string
-     */
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    /**
-     * @param boolean $emptyFile
-     */
-    public function setEmptyFile($emptyFile)
-    {
-        $this->emptyFile = $emptyFile;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isEmptyFile()
-    {
-        return $this->emptyFile;
-    }
-
-    /**
-     * @param string $mimeType
-     */
-    public function setMimeType($mimeType)
-    {
-        $this->mimeType = $mimeType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMimeType()
-    {
-        return $this->mimeType;
-    }
-
-    /**
-     * @param int $fileSize
-     */
-    public function setFileSize($fileSize)
-    {
-        $this->fileSize = $fileSize;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFileSize()
-    {
-        return $this->fileSize;
     }
 }

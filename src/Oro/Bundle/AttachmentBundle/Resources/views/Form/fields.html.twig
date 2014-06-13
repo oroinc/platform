@@ -9,3 +9,17 @@
         {% endif %}
     {% endspaceless %}
 {% endblock %}
+
+{% block oro_image_widget %}
+    {% spaceless %}
+        {{ form_widget(form.file) }}
+        {% if value is not empty and form.vars.valid %}
+            {% if form.emptyFile is defined %}
+                {{ form_row(form.emptyFile) }}
+            {% endif %}
+            <a href="{{ oro_attachment_url(value, true, 'download') }}" class="no-hash">
+                <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
+            </a>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

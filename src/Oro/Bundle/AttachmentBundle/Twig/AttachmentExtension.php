@@ -27,6 +27,7 @@ class AttachmentExtension extends \Twig_Extension
     {
         return [
             'oro_attachment_url' => new \Twig_Function_Method($this, 'getAttachmentUrl'),
+            'oro_resized_attachment_url' => new \Twig_Function_Method($this, 'getResizedImageUrl'),
         ];
     }
 
@@ -47,5 +48,16 @@ class AttachmentExtension extends \Twig_Extension
     public function getAttachmentUrl(Attachment $attachment, $absolute = false, $type = 'get')
     {
         return $this->manager->getAttachmentUrl($attachment, $absolute, $type);
+    }
+
+    /**
+     * @param Attachment $attachment
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
+    public function getResizedImageUrl(Attachment $attachment, $width = 100, $height = 100)
+    {
+        return $this->manager->getResizedImageUrl($attachment, $width, $height);
     }
 }
