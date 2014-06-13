@@ -93,7 +93,6 @@ class DoctrineListener
                     switch ($fieldId->getFieldType()) {
                         case 'manyToOne':
                         case 'attachment':
-                        case 'attachmentImage':
                             $builder = $cmBuilder->createManyToOne($fieldName, $relation['target_entity']);
                             if ($targetFieldName) {
                                 $builder->inversedBy($targetFieldName);

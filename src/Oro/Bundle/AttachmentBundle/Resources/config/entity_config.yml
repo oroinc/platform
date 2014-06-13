@@ -4,7 +4,7 @@ oro_entity_config:
             items:
                 attachment:
                     options:
-                        allowed_type:       [attachment, attachmentImage] #Oro/Bundle/AttachmentBundle/EntityConfig/AttachmentScope.php
+                        allowed_type:       [attachment]
                         auditable:          false
                     form:
                         type:               oro_attachment_config
@@ -14,7 +14,7 @@ oro_entity_config:
 
                 filetype:
                     options:
-                        allowed_type:   [attachment, attachmentImage] #Oro/Bundle/AttachmentBundle/EntityConfig/AttachmentScope.php
+                        allowed_type:   [attachment]
                         auditable:      false
                     constraints:
                         - NotBlank: ~
@@ -36,30 +36,9 @@ oro_entity_config:
                             subblock:   properties
                             tooltip:    Allowed file types for upload.
 
-#                filetype:
-#                    options:
-#                        allowed_type:   [attachmentImage]
-#                        auditable:      false
-#                    constraints:
-#                        - NotBlank: ~
-#                    form:
-#                        type:           choice
-#                        options:
-#                            required:   true
-#                            choices:
-#                                bmp: Bmp
-#                                gif: Gif
-#                                jpg: Jpg
-#                                png: Png
-#                            label:      File Types
-#                            multiple:   true
-#                            block:      entity
-#                            subblock:   properties
-#                            tooltip:    Allowed file types for upload.
-
                 maxsize:
                     options:
-                        allowed_type:   [attachment, attachmentImage] #Oro/Bundle/AttachmentBundle/EntityConfig/AttachmentScope.php
+                        allowed_type:   [attachment]
                         auditable:      false
                     constraints:
                         - NotBlank:  ~

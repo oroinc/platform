@@ -71,7 +71,6 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                     );
 
                     if (!isset($entityExtendConfig->get('relation')[$relationKey])) {
-                        //$relationName = Inflector::tableize('attach_' . $attachmentFieldName);
                         $relationName = Inflector::tableize($attachmentFieldName);
                         $label        = ConfigHelper::getTranslationKey(
                             'entity',
@@ -98,12 +97,6 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                                     'label'       => $label,
                                     'description' => '',
                                 ],
-//                                'view'   => [
-//                                    'is_displayable' => false
-//                                ],
-//                                'form'   => [
-//                                    'is_enabled' => false
-//                                ]
                             ]
                         );
 

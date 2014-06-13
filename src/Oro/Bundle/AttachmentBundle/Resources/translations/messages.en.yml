@@ -12,8 +12,5 @@ oro:
         updated_at.label:        Updated
         owner.label:             Owner
 
-    entity_extend:
-        form:
-            data_type:
-                attachment:       File
-                attachmentImage:  Image
+    entity_extend.form.data_type.attachment: File
+

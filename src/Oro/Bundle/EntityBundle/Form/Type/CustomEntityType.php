@@ -124,7 +124,6 @@ class CustomEntityType extends AbstractType
                         break;
                     case 'manyToOne':
                     case 'attachment':
-                    case 'attachmentImage':
                         $options['entity_class'] = $extendConfig->get('target_entity');
                         $options['configs']      = [
                             'placeholder'   => 'oro.form.choose_value',

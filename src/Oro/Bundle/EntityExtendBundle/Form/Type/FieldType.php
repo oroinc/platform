@@ -34,7 +34,6 @@ class FieldType extends AbstractType
         'percent'    => 'oro.entity_extend.form.data_type.percent',
 
         'attachment'      => 'oro.entity_extend.form.data_type.attachment',
-        'attachmentImage' => 'oro.entity_extend.form.data_type.attachmentImage',
 
         'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
         'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
@@ -42,13 +41,19 @@ class FieldType extends AbstractType
         'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
     ];
 
-    /** @var ConfigManager */
+    /**
+     * @var ConfigManager
+     */
     protected $configManager;
 
-    /** @var Translator */
+    /**
+     * @var Translator
+     */
     protected $translator;
 
-    /** @var ExtendDbIdentifierNameGenerator */
+    /**
+     * @var ExtendDbIdentifierNameGenerator
+     */
     protected $nameGenerator;
 
     /**
