@@ -28,7 +28,7 @@ class Calendar extends AbstractPage
 
     public function addEvent()
     {
-        $this->test->byXpath("//td[@class='fc-day fc-thu fc-widget-content fc-today fc-state-highlight']")->click();
+        $this->test->byXpath("//td[contains(@class,'fc-widget-content fc-today fc-state-highlight')]")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
@@ -59,18 +59,22 @@ class Calendar extends AbstractPage
      * @return object $this
      */
     public function setTitle($title)
-   {
-       $this->$title = $this->test->byId('oro_calendar_event_form_title');
-       $this->$title->clear();
-       $this->$title->value($title);
+    {
+        $this->$title = $this->test->byId('oro_calendar_event_form_title');
+        $this->$title->clear();
+        $this->$title->value($title);
 
-       return $this;
-   }
+        return $this;
+    }
 
     public function saveEvent()
     {
         $this->test->byXpath("//button[@type='submit'][normalize-space(.)='Save']")->click();
         $this->waitForAjax();
+        $this->assertElementNotPresent(
+            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']",
+            'Event window is still open'
+        );
 
         return $this;
     }
@@ -81,6 +85,10 @@ class Calendar extends AbstractPage
             "//div[@class='widget-actions-section']//a[@title[normalize-space(.)='Delete event']]"
         )->click();
         $this->waitForAjax();
+        $this->assertElementNotPresent(
+            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']",
+            'Event window is still open'
+        );
 
         return $this;
     }
@@ -93,7 +101,8 @@ class Calendar extends AbstractPage
     {
         $this->assertElementPresent(
             "//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']",
-            'Event not found at calendar');
+            'Event not found at calendar'
+        );
 
         return $this;
     }
@@ -106,7 +115,8 @@ class Calendar extends AbstractPage
     {
         $this->assertElementNotPresent(
             "//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']",
-            'Event is found at calendar');
+            'Event is found at calendar'
+        );
 
         return $this;
     }
