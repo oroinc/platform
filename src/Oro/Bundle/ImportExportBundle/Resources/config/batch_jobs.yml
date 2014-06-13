@@ -15,14 +15,14 @@ connector:
                     parameters: ~
         entity_export_template_to_csv:
             title: "Entity Template Export to CSV"
-            type: export
+            type: export_template
             steps:
-                export:
-                    title:     export
+                export_template:
+                    title:     export_template
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
                         reader:    oro_importexport.reader.template_fixture
-                        processor: oro_importexport.processor.export_delegate
+                        processor: oro_importexport.processor.export_template_delegate
                         writer:    oro_importexport.writer.csv
                     parameters: ~
         entity_import_validation_from_csv:

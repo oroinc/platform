@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -107,7 +108,8 @@ class ImportExportController extends Controller
 
         return $handler->handleExport(
             JobExecutor::JOB_EXPORT_TO_CSV,
-            $processorAlias
+            $processorAlias,
+            ProcessorRegistry::TYPE_EXPORT
         );
     }
 
@@ -125,7 +127,8 @@ class ImportExportController extends Controller
 
         $result = $handler->getExportResult(
             JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
-            $processorAlias
+            $processorAlias,
+            ProcessorRegistry::TYPE_EXPORT_TEMPLATE
         );
 
         return $this->redirect($result['url']);

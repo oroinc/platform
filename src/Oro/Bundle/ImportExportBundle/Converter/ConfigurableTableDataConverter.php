@@ -27,7 +27,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      * @param FieldHelper $fieldHelper
      * @param RelationCalculator $relationCalculator
      */
-    public function __construct(FieldHelper $fieldHelper, RelationCalculator $relationCalculator)
+    public function __construct(FieldHelper $fieldHelper, RelationCalculatorInterface $relationCalculator)
     {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
@@ -162,8 +162,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     );
                     $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
                 }
-            // process scalars
             } else {
+                // process scalars
                 if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
                     $rules[$fieldHeader] = array('value' => $fieldName, 'order' => $fieldOrder);
                     $backendHeaders[] = $rules[$fieldHeader];
@@ -205,8 +205,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     'order' => $fieldOrder,
                     'subOrder' => $subOrder++,
                 );
-            // multiple relation
             } elseif ($isMultipleRelation) {
+                // multiple relation
                 $frontendHeader = $fieldHeader . ' (\d+) ' . $header;
                 $backendHeader
                     = $fieldName . $delimiter . '(\d+)' . $delimiter . $name;
@@ -251,8 +251,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     'subOrder' => $subOrder++,
                 );
             }
-        // multiple relation
         } elseif ($isMultipleRelation) {
+            // multiple relation
             $maxEntities = $this->relationCalculator->getMaxRelatedEntities($entityName, $fieldName);
             for ($i = 0; $i < $maxEntities; $i++) {
                 foreach ($relationBackendHeaders as $header) {

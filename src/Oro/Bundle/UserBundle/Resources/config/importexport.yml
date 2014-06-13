@@ -11,6 +11,9 @@ services:
     oro_user.importexport.data_converter:
         parent: oro_importexport.data_converter.configurable
 
+    oro_user.importexport.template_fixture.data_converter:
+        parent: oro_importexport.data_converter.template_fixture.configurable
+
     # Export processor
     oro_user.importexport.processor.export:
         parent: oro_importexport.processor.export_abstract
@@ -18,6 +21,13 @@ services:
             - [setDataConverter, [@oro_user.importexport.data_converter]]
         tags:
             - { name: oro_importexport.processor, type: export, entity: %oro_user.entity.class%, alias: oro_user }
+
+    oro_user.importexport.processor.export_template:
+        parent: oro_importexport.processor.export_abstract
+        calls:
+            - [setDataConverter, [@oro_user.importexport.template_fixture.data_converter]]
+        tags:
+            - { name: oro_importexport.processor, type: export_template, entity: %oro_user.entity.class%, alias: oro_user }
 
     oro_user.importexport.templatefixture.userfixture:
         class: %oro_user.importexport.templatefixture.userfixture.class%

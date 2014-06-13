@@ -1,15 +1,16 @@
 {% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
+{% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
 
 {% if exportAllowed or importAllowed %}
-    {% if has_export_template(entity_class) %}
+    {% if hasExportTemplateProcessor %}
         <div class="btn-group">
             <a type="button"
                 class="btn no-hash"
                 target="_blank"
-                href="{{ path('oro_importexport_export_template', {'processorAlias': exportProcessor}) }}">
+                href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
                 {{ 'oro.importexport.import.tempate'|trans }}
             </a>
         </div>

@@ -1,14 +1,6 @@
 parameters:
     oro_importexport.template_fixture.registry.class: Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry
-    oro_importexport.twig.importexportextension.class: Oro\Bundle\ImportExportBundle\Twig\ImportExportExtension
 
 services:
-    oro_importexport.twig.importexportextension:
-        class: %oro_importexport.twig.importexportextension.class%
-        arguments:
-            - @oro_importexport.template_fixture.registry
-        tags:
-            - { name: twig.extension }
-
     oro_importexport.template_fixture.registry:
         class: %oro_importexport.template_fixture.registry.class%
