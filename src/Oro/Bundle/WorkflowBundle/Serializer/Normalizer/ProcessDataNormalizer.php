@@ -52,7 +52,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
                 $className = $value['className'];
                 unset($value['className']);
                 $denormalizedData[$key] = $this->denormalizeEntity($className, $value);
-            } else {
+            } elseif (is_array($value)) {
                 foreach ($value as $attributeName => $attributeValue) {
                     if (is_array($attributeValue) || is_object($attributeValue)) {
                         $denormalizedData[$key][$attributeName] = $this->denormalizeValues($value);
@@ -60,6 +60,8 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
                         $denormalizedData[$key][$attributeName] = $attributeValue;
                     }
                 }
+            } else {
+                $denormalizedData[$key] = $value;
             }
         }
 
@@ -68,6 +70,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
 
     /**
      * {@inheritdoc}
+     * @param object|array $object
      */
     public function normalize($object, $format = null, array $context = array())
     {
@@ -78,7 +81,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
                 $normalizedData[$key] = null;
             } elseif (is_object($value)) {
                 $normalizedData[$key] = $this->normalizeEntity($value, $format);
-            } else {
+            } elseif (is_array($value)) {
                 foreach ($value as $attributeName => $attributeValue) {
                     if (is_array($attributeValue)) {
                         $normalizedData[$key][$attributeName] = $this->normalize($attributeValue, $format, $context);
@@ -88,6 +91,8 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
                         $normalizedData[$key][$attributeName] = $attributeValue;
                     }
                 }
+            } else {
+                $normalizedData[$key] = $value;
             }
         }
 
@@ -133,7 +138,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     protected function supportsClass($class)
     {
         $workflowDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-        return '\DateTime' == $class ||
+        return '\DateTime' == $class || 'DateTime' == $class ||
                $workflowDataClass == $class ||
                (is_string($class) && class_exists($class) && in_array($workflowDataClass, class_parents($class)));
     }

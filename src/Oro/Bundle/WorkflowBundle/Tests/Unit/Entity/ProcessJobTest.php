@@ -52,6 +52,57 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\SerializerException
+     * @expectedExceptionMessage Cannot deserialize data of process job. Serializer is not available.
+     */
+    public function testGetDataWithSerializationFails()
+    {
+        $this->entity->setSerializedData('serialized_data');
+        $this->entity->getData();
+    }
+
+    public function testGetDataWithSerialization()
+    {
+        $originalData = new ProcessData(array('original_data'));
+        $serializedData = 'serialized_data';
+
+        $serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
+        $serializer->expects($this->once())
+            ->method('deserialize')
+            ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\ProcessData', 'json')
+            ->will($this->returnValue($originalData));
+
+        $this->entity->setSerializer($serializer, 'json');
+        $this->entity->setSerializedData($serializedData);
+
+        $this->assertSame($originalData, $this->entity->getData());
+        $this->assertSame($originalData, $this->entity->getData());
+    }
+
+    public function testGetDataWithEmptySerializedData()
+    {
+        $data = $this->entity->getData();
+        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\ProcessData', $data);
+        $this->assertTrue($data->isEmpty());
+    }
+
+    public function testSetSerializedData()
+    {
+        $this->assertAttributeEmpty('serializedData', $this->entity);
+        $data = 'serialized_data';
+        $this->entity->setSerializedData($data);
+        $this->assertAttributeEquals($data, 'serializedData', $this->entity);
+    }
+
+    public function testGetSerializedData()
+    {
+        $this->assertNull($this->entity->getSerializedData());
+        $data = 'serialized_data';
+        $this->entity->setSerializedData($data);
+        $this->assertEquals($data, $this->entity->getSerializedData());
+    }
+
+    /**
      * @return array
      */
     public function setGetDataProvider()
