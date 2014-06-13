@@ -189,12 +189,12 @@ class Role extends BaseRole
          * @var integer $count
          * count of attempts to set unique roel, maximum 10 else exception 
          */
-        $count = 0;
-        
-        while (!$this->updateRole($args) && $count++ < 10);
+        $count = 1;
+
+        while (!$this->updateRole($args) && $count++ < 10) {}
         
         if ($count > 10) {
-            throw new \LogicException(sprintf('The role "%s" already exists.', $this->getRole()));
+            throw new \LogicException('10 attempts to generate unique role is failed.');
         }
     }
     
@@ -209,13 +209,14 @@ class Role extends BaseRole
             return true;
         }
         
-        $this->setRole(strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand()))));
-        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($this->getRole());
+        $roleValue = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
+        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($roleValue);
         
         if ($sameObject) {
             return false;
         }
         
+        $this->setRole($roleValue);
         return true;
     }
 }

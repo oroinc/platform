@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\UserBundle\Entity\Role;
-
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class RoleTest extends \PHPUnit_Framework_TestCase
@@ -62,7 +59,7 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     /**
      * Test prePersist role that to generate new value of "role" field
      */
-    public function testCallbacks()
+    public function testCallbacksValid()
     {
         $role = $this->getRole();
         
@@ -75,12 +72,28 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Test prePersist role that generate exception \LogicException
+     * 
+     * @expectedException \LogicException
+     * @expectedExceptionMessage 10 attempts to generate unique role is failed.
+     */
+    public function testCallbacksInValid()
+    {
+        $role = $this->getRole();
+        
+        $this->assertEmpty($role->getId());
+        $this->assertEmpty($role->getRole());
+
+        $role->beforeSave($this->getEvent($role, true));
+    }
+    
+    /**
      * Prepare event object for test callbacks
      * 
      * @param Role $entity
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getEvent($entity)
+    protected function getEvent($entity, $duplicate = false)
     {
         $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -89,6 +102,16 @@ class RoleTest extends \PHPUnit_Framework_TestCase
             'Doctrine\Common\Persistence\ObjectRepository',
             array('find', 'findAll', 'findBy', 'findOneBy', 'findOneByRole', 'getClassName')
         );
+        $entity = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Role')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
+        if ($duplicate) {
+            $repository->expects($this->any())
+                ->method('findOneByRole')
+                ->will($this->returnValue($entity));
+        }
+        
         $em->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repository));
@@ -96,9 +119,6 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $event = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($entity));
         $event->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($em));
