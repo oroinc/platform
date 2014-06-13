@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
