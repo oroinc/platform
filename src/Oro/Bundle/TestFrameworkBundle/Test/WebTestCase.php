@@ -633,4 +633,20 @@ abstract class WebTestCase extends BaseWebTestCase
             $response->headers
         );
     }
+
+    /**
+     * Assert that intersect of $actual with $expected equals $expected
+     *
+     * @param array $expected
+     * @param array $actual
+     * @param string $message
+     */
+    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    {
+        \PHPUnit_Framework_TestCase::assertEquals(
+            $expected,
+            array_intersect_assoc($actual, $expected),
+            $message
+        );
+    }
 }
