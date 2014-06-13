@@ -10,6 +10,11 @@ class ImportEntity
     protected $id;
 
     /**
+     * @var
+     */
+    protected $twitter;
+
+    /**
      * @return int
      */
     public function getId()
@@ -23,5 +28,21 @@ class ImportEntity
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTwitter()
+    {
+        return $this->twitter;
+    }
+
+    /**
+     * @param mixed $twitter
+     */
+    public function setTwitter($twitter)
+    {
+        $this->twitter = $twitter;
     }
 }
