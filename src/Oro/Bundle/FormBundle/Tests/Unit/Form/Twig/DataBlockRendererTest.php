@@ -6,9 +6,9 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
 
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\FormBundle\Form\Twig\DataBlocks;
+use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 
-class DataBlocksTest extends \PHPUnit_Framework_TestCase
+class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \Twig_Environment
@@ -21,9 +21,9 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
     private $factory;
 
     /**
-     * @var  DataBlocks
+     * @var DataBlockRenderer
      */
-    private $dataBlocks;
+    private $renderer;
 
     /**
      * @var array
@@ -89,7 +89,7 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dataBlocks = new DataBlocks();
+        $this->renderer = new DataBlockRenderer();
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())
@@ -105,14 +105,6 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
         $this->twig->expects($this->any())
             ->method('getLoader')
             ->will($this->returnValue($this->getMockForAbstractClass('\Twig_LoaderInterface')));
-    }
-
-    public function testConstruct()
-    {
-        $this->assertInstanceOf(
-            'Symfony\Component\PropertyAccess\PropertyAccessor',
-            $this->readAttribute($this->dataBlocks, 'accessor')
-        );
     }
 
     public function testRender()
@@ -146,7 +138,7 @@ class DataBlocksTest extends \PHPUnit_Framework_TestCase
 
         $formView = $builder->getForm()->createView();
 
-        $result = $this->dataBlocks->render($this->twig, array('form' => $formView), $formView);
+        $result = $this->renderer->render($this->twig, array('form' => $formView), $formView);
 
         $this->assertEquals($this->testFormConfig, $result);
     }

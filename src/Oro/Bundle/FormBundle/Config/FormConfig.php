@@ -41,7 +41,7 @@ class FormConfig implements FormConfigInterface
     }
 
     /**
-     * @return array|BlockConfig
+     * @return BlockConfig[]
      */
     public function getBlocks()
     {
