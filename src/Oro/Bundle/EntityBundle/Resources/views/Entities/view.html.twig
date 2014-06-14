@@ -35,10 +35,10 @@
 
 {% block content_data %}
     {% set data = { 'dataBlocks': [{
-        'title': 'General',
+        'title': 'General'|trans,
         'class': 'active',
         'subblocks': [{
-            'title': 'General Information',
+            'title': 'General Information'|trans,
             'data':  [entityConfig.renderDynamicFields(entity, entity_class)]
         }]
     }] } %}
