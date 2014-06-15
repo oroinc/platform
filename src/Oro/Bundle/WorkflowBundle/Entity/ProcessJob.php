@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @ORM\Table("oro_process_job")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository")
  * @Config()
  */
 class ProcessJob

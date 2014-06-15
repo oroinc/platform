@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\WorkflowBundle\Model\Process;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
 
