@@ -9,7 +9,6 @@ use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
-use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
@@ -39,20 +38,12 @@ class ProcessCollectorListener
     }
 
     /**
-     * @return ProcessTriggerRepository
-     */
-    protected function getTriggerRepository()
-    {
-        return $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger');
-    }
-
-    /**
      * Cache triggers in the internal storage
      */
     protected function initializeTriggers()
     {
         if (null === $this->triggers) {
-            $triggers = $this->getTriggerRepository()->findAllWithDefinitions();
+            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')->findAllWithDefinitions();
             $this->triggers = array();
             foreach ($triggers as $trigger) {
                 $entityClass = $trigger->getDefinition()->getRelatedEntity();
