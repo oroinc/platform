@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -14,20 +15,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ExecuteProcessJobCommand extends ContainerAwareCommand
 {
     /**
-     * @var EntityManager
+     * @var Registry
      */
-    protected $entityManager;
+    protected $registry;
 
     /**
-     * @return EntityManager
+     * @return Registry
      */
-    protected function getEntityManager()
+    protected function getRegistry()
     {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        if (!$this->registry) {
+            $this->registry = $this->getContainer()->get('doctrine');
         }
 
-        return $this->entityManager;
+        return $this->registry;
     }
 
     /**
@@ -37,7 +38,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     {
         $this->setName('oro:process:execute:job')
             ->setDescription('Execute process job with received identity')
-            ->addOption('id', null, InputOption::VALUE_OPTIONAL, 'Identity of the process job that should be executed');
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Identity of the process job that should be executed');
     }
 
     /**
@@ -45,43 +46,22 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $processJobId = $input->getOption('id');
-
-        if (!$processJobId) {
-            $output->writeln('<error>Process job id is required. Please enter --id=<process job identity></error>');
-            return;
-        }
-
-        $processJobRepository = $this->getEntityManager()->getRepository('OroWorkflowBundle:ProcessJob');
+        $processJobId         = $input->getOption('id');
+        $processJobRepository = $this->getRegistry()->getRepository('OroWorkflowBundle:ProcessJob');
         $processJob           = $processJobRepository->find($processJobId);
 
-        if (!$this->processJobValidate($processJobId, $processJob, $output)) {
-            return;
-        }
-
-        $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
-    }
-
-    /**
-     * @param $processJobId
-     * @param ProcessJob $processJob
-     * @param OutputInterface $output
-     * @return bool
-     */
-    protected function processJobValidate($processJobId, $processJob, OutputInterface $output)
-    {
         if (!$processJob) {
             $output->writeln(
                 sprintf('<error>Process job with passed identity "%s" does not exist.</error>', $processJobId)
             );
-            return false;
-        } elseif ($processJob->getProcessTrigger()->getDefinition()->isEnabled()) {
-            $output->writeln(
-                sprintf('<error>Process job with passed identity "%s" already enabled.</error>', $processJobId)
-            );
-            return false;
-        } else {
-            return true;
+            return;
+        }
+
+        try {
+            $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
+        } catch (\Exception $e) {
+            $logger = new OutputLogger($output);
+            $logger->critical($e->getMessage(), ['exception' => $e]);
         }
     }
 }

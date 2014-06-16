@@ -63,7 +63,9 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processJob = $this->assetProcessEnabled(false);
+        $processJob = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessJob')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $processHandler->expects($this->once())
             ->method('handleJob')
@@ -80,11 +82,9 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
         $this->command->execute($this->input, $this->output);
     }
 
-    /**
-     * @dataProvider executeErrorProvider
-     */
-    public function testExecuteEmptyIdError($id, $state, $message)
+    public function testExecuteEmptyIdError()
     {
+        $id = 1;
         $this->input->expects($this->once())
             ->method('getOption')
             ->with('id')
@@ -92,45 +92,12 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($message)
+            ->with(sprintf('<error>Process job with passed identity "%s" does not exist.</error>', $id))
             ->will($this->returnSelf());
 
-        if (!$id) {
-            $this->container->expects($this->never())
-                ->method('get');
-        } else {
-            if (self::PROCESS_JOB_NOT_FOUND === $state) {
-                $processJob = null;
-            } else {
-                $processJob = $this->assetProcessEnabled(true);
-            }
-
-            $this->assetProcessJobRepository($id, $processJob);
-        }
+        $this->assetProcessJobRepository($id, null);
 
         $this->command->execute($this->input, $this->output);
-    }
-
-    public function executeErrorProvider()
-    {
-        $processId = 1;
-        return array(
-            'empty ID' => array(
-                'id'      => null,
-                'state'   => self::PROCESS_JOB_ENABLED,
-                'message' => '<error>Process job id is required. Please enter --id=<process job identity></error>'
-            ),
-            'job not found' => array(
-                'id'      => $processId,
-                'state'   => self::PROCESS_JOB_NOT_FOUND,
-                'message' => '<error>Process job with passed identity "' . $processId . '" does not exist.</error>'
-            ),
-            'job already enabled' => array(
-                'id'      => $processId,
-                'state'   => self::PROCESS_JOB_ENABLED,
-                'message' => '<error>Process job with passed identity "' . $processId . '" already enabled.</error>'
-            )
-        );
     }
 
     protected function assetProcessJobRepository($processJobId, $processJob, $callOrder = 0)
@@ -143,43 +110,18 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->with($processJobId)
             ->will($this->returnValue($processJob));
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
+            ->setMethods(array('getRepository'))
             ->getMock();
-        $entityManager->expects($this->once())
+        $registry->expects($this->once())
             ->method('getRepository')
             ->with('OroWorkflowBundle:ProcessJob')
             ->will($this->returnValue($repository));
 
         $this->container->expects($this->at($callOrder))
             ->method('get')
-            ->with('doctrine.orm.default_entity_manager')
-            ->will($this->returnValue($entityManager));
-    }
-
-    protected function assetProcessEnabled($isEnabled)
-    {
-        $processDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $processDefinition->expects($this->once())
-            ->method('isEnabled')
-            ->will($this->returnValue($isEnabled));
-
-        $processTrigger = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $processTrigger->expects($this->once())
-            ->method('getDefinition')
-            ->will($this->returnValue($processDefinition));
-
-        $processJob = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessJob')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $processJob->expects($this->once())
-            ->method('getProcessTrigger')
-            ->will($this->returnValue($processTrigger));
-
-        return $processJob;
+            ->with('doctrine')
+            ->will($this->returnValue($registry));
     }
 }
