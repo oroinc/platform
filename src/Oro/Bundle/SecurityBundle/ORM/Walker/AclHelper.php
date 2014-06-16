@@ -246,9 +246,20 @@ class AclHelper
                 list($entityField, $value, $pathExpressionType) = $resultData;
             }
 
-            $joinConditions = isset($associationMapping['joinColumns'])
+            $joinConditionsColumns = isset($associationMapping['joinColumns'])
                 ? $associationMapping['joinColumns']
-                : $associationMapping['mappedBy'];
+                : [$associationMapping['mappedBy']];
+
+            $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
+            $joinConditions = [];
+            foreach ($joinConditionsColumns as $joinConditionsColumn) {
+                if (is_string($joinConditionsColumn)) {
+                    $joinConditions[] = $joinConditionsColumn;
+                } else {
+                    $joinConditions[] = $targetEntityMetadata
+                        ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
+                }
+            }
 
             return new JoinAssociationCondition(
                 $join->joinAssociationDeclaration->aliasIdentificationVariable,
