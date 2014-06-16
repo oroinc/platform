@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
+use Symfony\Component\HttpFoundation\File\File;
+
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -46,6 +48,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime('now');
         $filepath = 'some/path';
         $owner = new User();
+        $file = new File('testPath', false);
+        $extension = 'txt';
+        $type = 'text/doc';
+        $fileSize = 10000;
 
         return [
             'filename' => ['filename', $filename, $filename],
@@ -54,6 +60,10 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             'createdAt' => ['createdAt', $date, $date],
             'updatedAt' => ['updatedAt', $date, $date],
             'owner' => ['owner', $owner, $owner],
+            'file' => ['file', $file, $file],
+            'extension' => ['extension', $extension, $extension],
+            'mimeType' => ['mimeType', $type, $type],
+            'fileSize' => ['fileSize', $fileSize, $fileSize]
         ];
     }
 

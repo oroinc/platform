@@ -1,3 +1,42 @@
-parameters: ~
+parameters:
+    oro_attachment.form.type.file.class: Oro\Bundle\AttachmentBundle\Form\FileType
+    oro_attachment.form.type.image.class: Oro\Bundle\AttachmentBundle\Form\ImageType
+    oro_attachment.form.file_subscriber.class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
+    oro_attachment.manager.attachment_manager.class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
+    oro_attachment.listener.attachment_listener.class: Oro\Bundle\AttachmentBundle\EventListener\AttachmentListener
+    oro_attachment.twig.attachment_extension.class: Oro\Bundle\AttachmentBundle\Twig\AttachmentExtension
 
-services: ~
+services:
+    oro_attachment.form.type.file:
+        class: %oro_attachment.form.type.file.class%
+        calls:
+            - [setEventListener, [@oro_attachment.form.file_subscriber]]
+        tags:
+            - { name: form.type, alias: oro_file }
+
+    oro_attachment.form.type.image:
+        class: %oro_attachment.form.type.image.class%
+        tags:
+            - { name: form.type, alias: oro_image }
+
+    oro_attachment.form.file_subscriber:
+        class: %oro_attachment.form.file_subscriber.class%
+
+    oro_attachment.manager:
+        class: %oro_attachment.manager.attachment_manager.class%
+        arguments: [@knp_gaufrette.filesystem_map, @router, %oro_attachment.files%]
+
+    oro_attachment.listener.attachment_listener:
+        class: %oro_attachment.listener.attachment_listener.class%
+        arguments: [@oro_attachment.manager]
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postUpdate }
+
+    oro_attachment.twig.attachment_extension:
+        class: %oro_attachment.twig.attachment_extension.class%
+        arguments: [@oro_attachment.manager, @liip_imagine.cache.manager]
+        tags:
+            - { name: twig.extension }
