@@ -15,11 +15,17 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Parser;
+
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
     /** @var string */
     protected $path;
+
+    /** @var  boolean */
+    protected $hasNewKeywords;
 
     /**
      * {@inheritdoc}
@@ -94,6 +100,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Download all language packs from project at translation service'
                     ),
+                    new InputOption(
+                        'skipCheck',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Skip check files before upload/update'
+                    ),
                 )
             )
             ->setHelp(
@@ -153,10 +165,25 @@ EOF
     protected function upload(InputInterface $input, OutputInterface $output)
     {
         $projectName      = $input->getArgument('project');
+        $skipCheckNewKeywords = $input->getOption('skipCheck');
         $languagePackPath = $this->getLangPackDir($projectName);
 
         $translationService = $this->getTranslationService($input, $output);
         $mode = $input->getOption('upload-mode');
+
+        if (!$skipCheckNewKeywords && is_dir($languagePackPath)) {
+            if (!$this->checkFiles($languagePackPath, $output)) {
+                /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
+                $dialog = $this->getHelperSet()->get('dialog');
+                if (!$dialog->askConfirmation($output,
+                    '<question>Some files require correction, send anyway? (y/n)</question>',
+                    false
+                )
+                ) {
+                    return;
+                }
+            }
+        }
 
         if ($mode == 'update') {
             $translationService->update($languagePackPath);
@@ -265,7 +292,7 @@ EOF
                     $this->createDirectory($bundleLanguagePackPath);
                 }
 
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle);
+                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $output->writeln(
                     sprintf(
                         'Writing files for <info>%s</info>',
@@ -279,7 +306,9 @@ EOF
                 );
             }
         }
-
+        if($this->hasNewKeywords) {
+            $output->writeln('<question>Attention! Found new placeholders. Want to make changes to the files before Upload.</question>');
+        }
         return true;
     }
 
@@ -318,10 +347,11 @@ EOF
      *
      * @param string          $defaultLocale
      * @param BundleInterface $bundle
+     * @param OutputInterface $output
      *
      * @return MessageCatalogue
      */
-    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle)
+    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle, OutputInterface $output)
     {
         $bundleTransPath = $bundle->getPath() . '/Resources/translations';
         $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
@@ -342,6 +372,72 @@ EOF
         $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
         $messageCatalogue = $operation->getResult();
 
+        foreach($operation->getDomains() as $domain)
+        {
+            $newMessages = $operation->getNewMessages($domain);
+            if(count($newMessages) > 0)
+            {
+                $output->writeln(sprintf('<comment>New keywords in %s</comment>', $domain));
+                foreach($newMessages as $newMessage)
+                {
+                    if($this->checkKeyWord($newMessage))
+                    {
+                        $this->hasNewKeywords = true;
+                        $output->writeln($newMessage);
+                    }
+                }
+            }
+        }
         return $messageCatalogue;
+    }
+
+    /**
+     * Checks transmitted text and returns true if this keyword is.
+     *
+     * @param $message
+     * @return int
+     */
+    protected function checkKeyWord($message)
+    {
+        $pattern = '#\.[^\s]#';
+        return preg_match($pattern, $message);
+    }
+
+    /**
+     * Check yaml files in translation pack and display files and keywords which need translate
+     *
+     * @param string $languagePackPath
+     * @param OutputInterface $output
+     * @return bool
+     */
+    protected function checkFiles($languagePackPath, OutputInterface $output)
+    {
+        $needTranslate = array();
+        $result = true;
+        //if(!is_dir($languagePackPath)) return false;
+        $finder = Finder::create()->files()->name('*.yml')->in($languagePackPath);
+        $yaml = new Parser();
+
+        foreach ($finder->files() as $file) {
+            $value = $yaml->parse(file_get_contents((string)$file));
+            array_walk($value, function (&$value, $key) {
+                if ($value != $key || strpos($key, ' ')) $value = false;
+
+            });
+            $tempArr = array_filter($value);
+            if (count($tempArr) > 0) {
+                $needTranslate[(string)$file] = $tempArr;
+                $result = false;
+            }
+        }
+
+        foreach ($needTranslate as $key => $value) {
+            $output->writeln(sprintf('<comment>Need translate keywords in %s</comment>', $key));
+            foreach ($value as $keyword) {
+                $output->writeln($keyword);
+            }
+        }
+
+        return $result;
     }
 }
