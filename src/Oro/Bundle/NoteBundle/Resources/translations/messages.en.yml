@@ -18,5 +18,4 @@ oro:
             remove:           Remove note
 
         no_notes_exist:       No notes found
-        note_delete_confirmation: Are you sure you want to delete this note?
         updated_by:           Updated by {{ user }} at {{ date }}
