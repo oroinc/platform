@@ -4,3 +4,5 @@ oro.integration.integration.sync_priority.tooltip: >
 oro.integration.integration.default_user_owner.tooltip: >
     Select the owner of the integration. All entities imported from the integration
     will be assigned to the selected user.
+oro.integration.integration.default_organization.tooltip: >
+    Select the organization for the integration.

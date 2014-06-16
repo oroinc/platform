@@ -40,6 +40,7 @@ oro:
             remote_wins.label: Remote wins
             local_wins.label: Local wins
             default_user_owner.label: Default owner
+            default_organization.label: Default  organization
         channel:
             entity_label:        Integration
             entity_plural_label: Integrations
