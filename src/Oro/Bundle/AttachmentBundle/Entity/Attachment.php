@@ -341,4 +341,11 @@ class Attachment extends ExtendAttachment
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    public function __toString()
+    {
+        return (string) $this->getFilename()
+            ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
+            : '';
+    }
 }
