@@ -9,6 +9,6 @@ class SimpleChannelType implements ChannelInterface
      */
     public function getLabel()
     {
-        return 'oro.integration.channel_type.simple.label';
+        return 'oro.integration.integration_type.simple.label';
     }
 }
