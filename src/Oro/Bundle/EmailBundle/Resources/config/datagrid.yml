@@ -59,6 +59,9 @@ datagrid:
                 subject:          { type: string,   data_name: e.subject }
                 sentAt:           { type: datetime, data_name: e.sentAt }
 
+    activity-email-grid:
+        extends: email-grid
+
     email-templates:
         source:
             type: orm
