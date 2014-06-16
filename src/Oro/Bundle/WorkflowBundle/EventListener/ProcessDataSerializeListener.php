@@ -95,14 +95,11 @@ class ProcessDataSerializeListener
      */
     protected function serialize(ProcessJob $processJob, UnitOfWork $unitOfWork)
     {
-        $processJobData = $processJob->getData();
-        if ($processJobData) {
-            $oldValue = $processJob->getSerializedData();
+        $processJobData    = $processJob->getData();
+        $oldSerializedData = $processJob->getSerializedData();
+        $newSerializedData = $this->serializer->serialize($processJobData, $this->format);
 
-            $serializedData = $this->serializer->serialize($processJobData, $this->format);
-            $processJob->setSerializedData($serializedData);
-
-            $unitOfWork->propertyChanged($processJob, 'serializedData', $oldValue, $serializedData);
-        }
+        $processJob->setSerializedData($newSerializedData);
+        $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
     }
 }

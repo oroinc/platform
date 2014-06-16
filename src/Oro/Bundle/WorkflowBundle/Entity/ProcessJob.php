@@ -162,7 +162,7 @@ class ProcessJob
      */
     public function getData()
     {
-        if (!$this->data) {
+        if (null === $this->data) {
             if (!$this->serializedData) {
                 $this->data = new ProcessData();
             } elseif (!$this->serializer) {

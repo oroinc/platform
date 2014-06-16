@@ -12,7 +12,7 @@ services:
     oro_workflow.serializer.data.process_serializer:
         class: %oro_workflow.serializer.data.process_serializer.class%
         arguments:
-          - [@oro_workflow.serializer.data.process_normalizer, @oro_importexport.serializer.datetime_normalizer]
+          - [@oro_workflow.serializer.data.process_normalizer]
           - [@serializer.encoder.json]
 
     # Services for WorkflowData serialization
@@ -28,7 +28,9 @@ services:
         class: %oro_workflow.serializer.data.normalizer.class%
 
     oro_workflow.serializer.data.process_normalizer:
-            class: %oro_workflow.serializer.data.process_normalizer.class%
+        class: %oro_workflow.serializer.data.process_normalizer.class%
+        arguments:
+            - @doctrine
 
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: %oro_workflow.serializer.data.attribute_normalizer.standard.class%

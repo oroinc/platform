@@ -61,22 +61,48 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
         $this->entity->getData();
     }
 
-    public function testGetDataWithSerialization()
+    /**
+     * @dataProvider getDataWithSerializationProvider
+     */
+    public function testGetDataWithSerialization($data)
     {
-        $originalData = new ProcessData(array('original_data'));
-        $serializedData = 'serialized_data';
-
+        $isDataNull = is_null($data);
         $serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
-        $serializer->expects($this->once())
-            ->method('deserialize')
-            ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\ProcessData', 'json')
-            ->will($this->returnValue($originalData));
+
+        if (!$isDataNull && empty($data)) {
+            $originalData   = new ProcessData($data);
+            $serializedData = $data;
+            $serializer->expects($this->never())
+                ->method('deserialize');
+        } else {
+            $originalData   = $isDataNull ? null : new ProcessData($data);
+            $serializedData = 'serialized_data';
+            $serializer->expects($this->exactly($isDataNull ? 2 : 1))
+                ->method('deserialize')
+                ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\ProcessData', 'json')
+                ->will($this->returnValue($originalData));
+        }
 
         $this->entity->setSerializer($serializer, 'json');
         $this->entity->setSerializedData($serializedData);
 
-        $this->assertSame($originalData, $this->entity->getData());
-        $this->assertSame($originalData, $this->entity->getData());
+        $this->assertEquals($originalData, $this->entity->getData());
+        $this->assertEquals($originalData, $this->entity->getData());
+    }
+
+    public function getDataWithSerializationProvider()
+    {
+        return array(
+            'when data is null' => array(
+                'data' => null
+            ),
+            'when data is empty' => array(
+                'data' => array()
+            ),
+            'when data is filled' => array(
+                'data' => array('some_data' => 'some_value')
+            )
+        );
     }
 
     public function testGetDataWithEmptySerializedData()
@@ -111,7 +137,7 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
             'processTrigger' => array('processTrigger', new ProcessTrigger()),
             'entityHash' => array('entityHash', 'My\Entity' . serialize(array('id' => 1))),
             'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
-            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData(array())),
+            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData()),
         );
     }
 }

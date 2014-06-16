@@ -2,12 +2,34 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
 class ProcessDataNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @var ClassMetadata
+     */
+    protected $classMetadata;
+
+    /**
+     * @var Registry
+     */
+    protected $registry;
+
+    /**
+     * @param Registry $registry
+     */
+    public function __construct(Registry $registry)
+    {
+        $this->registry = $registry;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -27,11 +49,11 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     protected function denormalizeEntity($className, $attributes = array())
     {
-        $reflection = new \ReflectionClass($className);
-        $entity     = $reflection->newInstanceWithoutConstructor();
+        $classMetadata = $this->getClassMetadata($className);
+        $entity        = $classMetadata->getReflectionClass();
 
         foreach ($attributes as $name => $value) {
-            $this->writeAttribute($entity, $name, $value);
+            $this->writeProperty($entity, $name, $value);
         }
 
         return $entity;
@@ -49,23 +71,31 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
             if (empty($value)) {
                 $denormalizedData[$key] = null;
             } elseif (!empty($value['className'])) {
-                $className = $value['className'];
-                unset($value['className']);
-                $denormalizedData[$key] = $this->denormalizeEntity($className, $value);
+                $denormalizedData[$key] = $this->denormalizeEntity($value['className'], $value['classData']);
             } elseif (is_array($value)) {
-                foreach ($value as $attributeName => $attributeValue) {
-                    if (is_array($attributeValue) || is_object($attributeValue)) {
-                        $denormalizedData[$key][$attributeName] = $this->denormalizeValues($value);
-                    } else {
-                        $denormalizedData[$key][$attributeName] = $attributeValue;
-                    }
-                }
+                $denormalizedData[$key] = $this->denormalizeValues($value);
             } else {
                 $denormalizedData[$key] = $value;
             }
         }
 
         return $denormalizedData;
+    }
+
+    /**
+     * @param string|object $className
+     * @return ClassMetadata
+     */
+    protected function getClassMetadata($className)
+    {
+        if (!$this->classMetadata) {
+            if (is_object($className)) {
+                $className = ClassUtils::getClass($className);
+            }
+            $this->classMetadata = $this->registry->getManager()->getClassMetadata($className);
+        }
+
+        return $this->classMetadata;
     }
 
     /**
@@ -80,17 +110,9 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
             if (empty($value)) {
                 $normalizedData[$key] = null;
             } elseif (is_object($value)) {
-                $normalizedData[$key] = $this->normalizeEntity($value, $format);
+                $normalizedData[$key] = $this->normalizeEntity($value);
             } elseif (is_array($value)) {
-                foreach ($value as $attributeName => $attributeValue) {
-                    if (is_array($attributeValue)) {
-                        $normalizedData[$key][$attributeName] = $this->normalize($attributeValue, $format, $context);
-                    } elseif (is_object($attributeValue)) {
-                        $normalizedData[$key][$attributeName] = null;
-                    } else {
-                        $normalizedData[$key][$attributeName] = $attributeValue;
-                    }
-                }
+                $normalizedData[$key] = $this->normalize($value, $format, $context);
             } else {
                 $normalizedData[$key] = $value;
             }
@@ -99,34 +121,39 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         return $normalizedData;
     }
 
-    protected function normalizeEntity($entity, $format = null)
+    protected function normalizeEntity($entity)
     {
-        $normalizedData['className'] = get_class($entity);
-        $reflection = new \ReflectionClass($entity);
-        $properties = $reflection->getProperties();
+        $normalizedData = array(
+            'className' => ClassUtils::getClass($entity),
+            'classData' => array()
+        );
 
+        $reflection = $this->getClassMetadata($entity);
+        $properties = $reflection->getReflectionProperties();
+
+        /** @var $property \ReflectionProperty */
         foreach ($properties as $property) {
-            $name      = $property->getName();
-            $attribute = $this->readAttribute($entity, $name);
-            if ($attribute instanceof \DateTime) {
-                $attribute = $this->serializer->serialize($attribute, $format);
+            $property->setAccessible(true);
+            $name  = $property->getName();
+            $value = $property->getValue($entity);
+
+            if ($value instanceof \DateTime) {
+                $value = $this->serialize($value);
             }
-            $normalizedData[$name] = is_object($attribute) ? null : $attribute;
+
+            $normalizedData['classData'][$name] = is_object($value) ? null : $value;
         }
 
         return $normalizedData;
     }
 
     /**
-     * @param $class
-     * @param $attributeName
-     * @return mixed
+     * @param mixed $value
+     * @return string
      */
-    private function readAttribute($class, $attributeName)
+    protected function serialize($value)
     {
-        $reflection = new \ReflectionProperty($class, $attributeName);
-        $reflection->setAccessible(true);
-        return $reflection->getValue($class);
+        return base64_encode(serialize($value));
     }
 
     /**
@@ -137,10 +164,9 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     protected function supportsClass($class)
     {
-        $workflowDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-        return '\DateTime' == $class || 'DateTime' == $class ||
-               $workflowDataClass == $class ||
-               (is_string($class) && class_exists($class) && in_array($workflowDataClass, class_parents($class)));
+        $processDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
+        return $processDataClass == $class ||
+               (is_string($class) && class_exists($class) && in_array($processDataClass, class_parents($class)));
     }
 
     /**
@@ -156,19 +182,37 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supportsClass(get_class($data));
+        return is_object($data) && $this->supportsClass(ClassUtils::getClass($data));
+    }
+
+    /**
+     * @param string $value
+     * @return mixed|null
+     */
+    protected function unserialize($value)
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        $value = base64_decode($value);
+
+        if (!is_string($value) || !$value) {
+            return null;
+        }
+        return unserialize($value);
     }
 
     /**
      * @param object $class
-     * @param string $attributeName
-     * @param mixed $attributeValue
+     * @param string $propertyName
+     * @param mixed $propertyValue
      */
-    private function writeAttribute($class, $attributeName, $attributeValue)
+    private function writeProperty($class, $propertyName, $propertyValue)
     {
-        $reflectionProperty = new \ReflectionProperty($class, $attributeName);
+        $reflectionProperty = $this->getClassMetadata($class)->getReflectionProperty($propertyName);
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($class, $attributeValue);
+        $reflectionProperty->setValue($class, $propertyValue);
         $reflectionProperty->setAccessible(false);
     }
 }

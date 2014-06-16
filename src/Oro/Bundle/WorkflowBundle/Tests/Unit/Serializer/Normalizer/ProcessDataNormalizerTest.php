@@ -3,11 +3,17 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer;
 
 class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $registry;
+
     /**
      * @var ProcessDataNormalizer
      */
@@ -20,8 +26,12 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
-        $this->normalizer = new ProcessDataNormalizer();
+        $this->normalizer = new ProcessDataNormalizer($this->registry);
     }
 
     /**
@@ -53,18 +63,11 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNormalize($denormalizedValue, $normalizedValue)
     {
         $this->normalizer->setSerializer($this->serializer);
+
         if (!empty($denormalizedValue['entity'])) {
-            /** @var $entity \Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition*/
-            $entity = $denormalizedValue['entity'];
-            $this->serializer->expects($this->at(0))
-                ->method('serialize')
-                ->with($entity->getCreatedAt(), 'json')
-                ->will($this->returnValue($normalizedValue['entity']['createdAt']));
-            $this->serializer->expects($this->at(1))
-                ->method('serialize')
-                ->with($entity->getUpdatedAt(), 'json')
-                ->will($this->returnValue($normalizedValue['entity']['updatedAt']));
+            $this->assetReflectionMock($denormalizedValue['entity']);
         }
+
         $this->assertEquals($normalizedValue, $this->normalizer->normalize($denormalizedValue, 'json'));
     }
 
@@ -154,7 +157,10 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function normalizeEntity($entity)
     {
-        $normalizedData['className'] = get_class($entity);
+        $normalizedData = array(
+            'className' => ClassUtils::getClass($entity),
+            'classData' => array()
+        );
         $reflection = new \ReflectionClass($entity);
         $properties = $reflection->getProperties();
 
@@ -164,9 +170,9 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             $reflection->setAccessible(true);
             $attribute = $reflection->getValue($entity);
             if ($attribute instanceof \DateTime) {
-                $attribute = $attribute->format(\DateTime::ISO8601);
+                $attribute = base64_encode(serialize($attribute));
             }
-            $normalizedData[$name] = is_object($attribute) ? null : $attribute;
+            $normalizedData['classData'][$name] = is_object($attribute) ? null : $attribute;
         }
 
         return $normalizedData;
@@ -185,7 +191,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
         return array(
             'null'        => array(null, false),
             'string'      => array('string', false),
-            'dateTime'    => array('DateTime', true),
+            'dateTime'    => array('DateTime', false),
             'processData' => array('Oro\Bundle\WorkflowBundle\Model\ProcessData', true),
             'stdClass'    => array('stdClass', false),
         );
@@ -204,9 +210,34 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
         return array(
             'null'        => array(null, false),
             'scalar'      => array('scalar', false),
-            'datetime'    => array(new \DateTime(), true),
+            'datetime'    => array(new \DateTime(), false),
             'processData' => array(new ProcessData(), true),
             'stdClass'    => array(new \stdClass(), false),
         );
+    }
+
+    protected function assetReflectionMock($class)
+    {
+        $reflection = new \ReflectionClass($class);
+        $properties = $reflection->getProperties();
+
+        $classMetadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetadata->expects($this->once())
+            ->method('getReflectionProperties')
+            ->will($this->returnValue($properties));
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(ClassUtils::getClass($class))
+            ->will($this->returnValue($classMetadata));
+
+        $this->registry->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($entityManager));
     }
 }
