@@ -7,17 +7,16 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Parser;
-
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -306,8 +305,10 @@ EOF
                 );
             }
         }
-        if($this->hasNewKeywords) {
-            $output->writeln('<question>Attention! Found new placeholders. Want to make changes to the files before Upload.</question>');
+        if ($this->hasNewKeywords) {
+            $output->writeln(
+                '<question>Found new placeholders. Want to make changes to the files before Upload.</question>'
+            );
         }
         return true;
     }
@@ -372,16 +373,12 @@ EOF
         $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
         $messageCatalogue = $operation->getResult();
 
-        foreach($operation->getDomains() as $domain)
-        {
+        foreach ($operation->getDomains() as $domain) {
             $newMessages = $operation->getNewMessages($domain);
-            if(count($newMessages) > 0)
-            {
+            if (count($newMessages) > 0) {
                 $output->writeln(sprintf('<comment>New keywords in %s</comment>', $domain));
-                foreach($newMessages as $newMessage)
-                {
-                    if($this->checkKeyWord($newMessage))
-                    {
+                foreach ($newMessages as $newMessage) {
+                    if ($this->checkKeyWord($newMessage)) {
                         $this->hasNewKeywords = true;
                         $output->writeln($newMessage);
                     }
@@ -414,14 +411,15 @@ EOF
     {
         $needTranslate = array();
         $result = true;
-        //if(!is_dir($languagePackPath)) return false;
         $finder = Finder::create()->files()->name('*.yml')->in($languagePackPath);
         $yaml = new Parser();
 
         foreach ($finder->files() as $file) {
             $value = $yaml->parse(file_get_contents((string)$file));
             array_walk($value, function (&$value, $key) {
-                if ($value != $key || strpos($key, ' ')) $value = false;
+                if ($value != $key || strpos($key, ' ')) {
+                    $value = false;
+                }
 
             });
             $tempArr = array_filter($value);
