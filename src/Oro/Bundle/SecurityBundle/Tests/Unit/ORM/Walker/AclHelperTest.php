@@ -37,7 +37,7 @@ class AclHelperTest extends OrmTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult)
+    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception)
     {
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
@@ -73,6 +73,12 @@ class AclHelperTest extends OrmTestCase
         $resultAst    = $this->walker->walkSelectStatement($query->getAST());
 
         $this->$walkerResult($resultAst);
+
+        if ($exception) {
+            list($class, $message) = $exception;
+            $this->setExpectedException($class, $message);
+        }
+        $this->assertNotEmpty($query->getSQL());
     }
 
     public function dataProvider()
@@ -82,7 +88,8 @@ class AclHelperTest extends OrmTestCase
                 $this->getRequest0(),
                 [],
                 'resultHelper0',
-                'resultWalker0'
+                'resultWalker0',
+                []
             ],
             [
                 $this->getRequest1(),
@@ -90,74 +97,84 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [1, 2, 3],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_STATE_FIELD
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [1],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ]
                 ],
                 'resultHelper1',
-                'resultWalker1'
+                'resultWalker1',
+                []
             ],
             [
                 $this->getRequest2(),
                 [
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [1],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ]
                 ],
                 'resultHelper2',
-                'resultWalker2'
+                'resultWalker2',
+                []
             ],
             [
                 $this->getRequest3(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
+                        [3, 2, 1],
+                        PathExpression::TYPE_STATE_FIELD
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                        'user',
                         [10],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
-                        'id',
+                        'article',
                         [100],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
-                        'id',
-                        [3, 2, 1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
-                    ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [150],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ]
                 ],
                 'resultHelper3',
-                'resultWalker3'
+                'resultWalker3',
+                [
+                    'Doctrine\ORM\Query\QueryException',
+                    'A single-valued association path expression to an inverse side is not supported in DQL queries.'
+                ]
             ]
             ,
             [
                 $this->getRequest4(),
                 [
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
-                        'id',
+                        'user',
                         [10],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_STATE_FIELD
                     ],
                 ],
                 'resultHelper4',
-                'resultWalker4'
+                'resultWalker4',
+                [
+                    'Doctrine\ORM\Query\QueryException',
+                    'A single-valued association path expression to an inverse side is not supported in DQL queries.'
+                ]
             ]
         ];
     }
