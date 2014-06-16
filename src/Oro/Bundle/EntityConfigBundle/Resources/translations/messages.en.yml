@@ -48,3 +48,5 @@ oro:
         menu:
             entities_list.label:       Entities
             entities_list.description: List of entities
+            entity_management.label: Entity Management
+            entity_management.description: List of entities
