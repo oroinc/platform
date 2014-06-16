@@ -14,12 +14,12 @@ class DeleteManager
     protected $em;
 
     /**
-     * @var ChannelDeleteProviderInterface[]
+     * @var DeleteProviderInterface[]
      */
     protected $deleteProviders;
 
     /**
-     * @param EntityManager   $em
+     * @param EntityManager $em
      */
     public function __construct(EntityManager $em)
     {
@@ -29,9 +29,9 @@ class DeleteManager
     /**
      * Add delete channel provider
      *
-     * @param ChannelDeleteProviderInterface $deleteProvider
+     * @param DeleteProviderInterface $deleteProvider
      */
-    public function addProvider(ChannelDeleteProviderInterface $deleteProvider)
+    public function addProvider(DeleteProviderInterface $deleteProvider)
     {
         $this->deleteProviders[] = $deleteProvider;
     }
@@ -40,15 +40,16 @@ class DeleteManager
      * Delete channel
      *
      * @param Channel $channel
+     *
      * @return bool
      */
-    public function deleteChannel(Channel $channel)
+    public function delete(Channel $channel)
     {
         try {
             $this->em->getConnection()->beginTransaction();
-            $channelType = $channel->getType();
+            $type = $channel->getType();
             foreach ($this->deleteProviders as $deleteProvider) {
-                if ($deleteProvider->isSupport($channelType)) {
+                if ($deleteProvider->supports($type)) {
                     $deleteProvider->deleteRelatedData($channel);
                 }
             }
