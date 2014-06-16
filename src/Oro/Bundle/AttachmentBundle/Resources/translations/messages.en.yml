@@ -11,10 +11,12 @@ oro:
         created_at.label:        Created
         updated_at.label:        Updated
         owner.label:             Owner
+        extension.label:         Extension
+        file.label:              File
+        delete_file.label:       Delete
 
     entity_extend:
         form:
             data_type:
                 attachment:      File
                 attachmentImage: Image
-

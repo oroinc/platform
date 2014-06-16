@@ -1,0 +1,4 @@
+oro_attachment_bundle:
+    resource:     "@OroAttachmentBundle/Controller"
+    type:         annotation
+    prefix:       /attachment

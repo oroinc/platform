@@ -4,9 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
+use Symfony\Component\HttpFoundation\File\File;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
 /**
  * Attachment
@@ -40,42 +42,56 @@ class Attachment extends ExtendAttachment
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="filename", type="string", length=255)
+     * @ORM\Column(name="filename", type="string", length=255, nullable=true)
      */
-    private $filename;
+    protected $filename;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="original_filename", type="string", length=255)
+     * @ORM\Column(name="extension", type="string", length=10, nullable=true)
      */
-    private $originalFilename;
+    protected $extension;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="filepath", type="string", length=255)
+     * @ORM\Column(name="mime_type", type="string", length=100, nullable=true)
      */
-    private $filepath;
+    protected $mimeType;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="original_filename", type="string", length=255, nullable=true)
+     */
+    protected $originalFilename;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="file_size", type="integer", nullable=true)
+     */
+    protected $fileSize;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
      */
-    private $updatedAt;
+    protected $updatedAt;
 
     /**
      * @var User
@@ -84,6 +100,16 @@ class Attachment extends ExtendAttachment
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var File $file
+     */
+    protected $file;
+
+    /**
+     * @var bool
+     */
+    protected $emptyFile;
 
     /**
      * Get id
@@ -139,29 +165,6 @@ class Attachment extends ExtendAttachment
     public function getOriginalFilename()
     {
         return $this->originalFilename;
-    }
-
-    /**
-     * Set filepath
-     *
-     * @param string $filepath
-     * @return Attachment
-     */
-    public function setFilepath($filepath)
-    {
-        $this->filepath = $filepath;
-
-        return $this;
-    }
-
-    /**
-     * Get filepath
-     *
-     * @return string 
-     */
-    public function getFilepath()
-    {
-        return $this->filepath;
     }
 
     /**
@@ -224,6 +227,98 @@ class Attachment extends ExtendAttachment
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @param File $file
+     */
+    public function setFile(File $file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @return File
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param $extension
+     * @return $this
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param $emptyFile
+     * @return $this
+     */
+    public function setEmptyFile($emptyFile)
+    {
+        $this->emptyFile = $emptyFile;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEmptyFile()
+    {
+        return $this->emptyFile;
+    }
+
+    /**
+     * @param $mimeType
+     * @return $this
+     */
+    public function setMimeType($mimeType)
+    {
+        $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType()
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param $fileSize
+     * @return $this
+     */
+    public function setFileSize($fileSize)
+    {
+        $this->fileSize = $fileSize;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFileSize()
+    {
+        return $this->fileSize;
     }
 
     /**
