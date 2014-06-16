@@ -6,6 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class DashboardModelTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -302,7 +306,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
     {
         $isDefault = true;
         $this->dashboardEntity->expects($this->once())
-            ->method('isDefault')
+            ->method('getIsDefault')
             ->will($this->returnValue($isDefault));
 
         $this->assertEquals($isDefault, $this->dashboardModel->isDefault());

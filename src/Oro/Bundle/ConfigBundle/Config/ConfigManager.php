@@ -284,8 +284,9 @@ class ConfigManager
     {
         $settings = array();
 
+        /** @var FormInterface $child */
         foreach ($form as $child) {
-            $key                         = str_replace(
+            $key = str_replace(
                 self::SECTION_VIEW_SEPARATOR,
                 self::SECTION_MODEL_SEPARATOR,
                 $child->getName()
