@@ -18,16 +18,15 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_attachment');
 
         /**
-         * file types list -> http://www.freeformatter.com/mime-types-list.html
+         * See file types list -> http://www.freeformatter.com/mime-types-list.html
          */
-
         $mimeTypes = <<<EOF
 application/msword
-application/vnd.openxmlformats-officedocument.wordprocessingml.document
 application/vnd.ms-excel
 application/pdf
+application/zip
 EOF;
-        $imagemimeTypes = <<<EOF
+        $mimeTypesImage = <<<EOF
 image/gif
 image/jpeg
 image/png
@@ -37,7 +36,7 @@ EOF;
             $rootNode,
             [
                 'upload_mime_types' => ['value' => $mimeTypes],
-                'upload_image_mime_types'  => ['value' => $imagemimeTypes]
+                'upload_image_mime_types'  => ['value' => $mimeTypesImage]
             ]
         );
 
