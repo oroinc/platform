@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', './text-filter'
     ], function ($, _, __, app, TextFilter) {
@@ -75,16 +76,26 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
             TextFilter.prototype.initialize.apply(this, arguments);
         },
 
+        render: function () {
+            // render only wrapper (a button and a dropdown container e.g.)
+            this._wrap('');
+            // if there's no any wrapper, means it's embedded filter
+            if (this.$el.html() === '') {
+                this._renderCriteria();
+            }
+            return this;
+        },
+
         /**
          * @inheritDoc
          */
-        render: function () {
+        _renderCriteria: function () {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                        return (choice.value == value.type);
-                    });
+                    return (choice.value == value.type);
+                });
                 selectedChoiceLabel = foundChoice.label;
             }
             var $filter = $(this.template({
@@ -94,8 +105,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value
             }));
-            this._wrap($filter);
-            return this;
+            this._appendFilter($filter);
+            this._criteriaRenderd = true;
+        },
+
+        _showCriteria: function () {
+            if (!this._criteriaRenderd) {
+                this._renderCriteria();
+            }
+            TextFilter.prototype._showCriteria.apply(this, arguments);
         },
 
         /**

@@ -220,7 +220,7 @@
 #}
 {% macro body(emailBody, cssClass) -%}
     {% if emailBody.bodyIsText -%}
-        <pre class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}">{{ emailBody.content }}</pre>
+        <pre class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}">{{ emailBody.bodyContent }}</pre>
     {%- else -%}
         <iframe class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}" src="{{ path('oro_email_body', {id:emailBody.id}) }}"></iframe>
     {%- endif %}
