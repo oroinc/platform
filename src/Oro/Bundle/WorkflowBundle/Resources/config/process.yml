@@ -6,7 +6,6 @@ definitions:
         order: 20
         actions_configuration:
             - @assign_value: [$namePrefix, 'Pr.']
-            - @assign_value: [$.new, $namePrefix]
 
     another_definition:
         label: 'Another definition'
@@ -17,7 +16,7 @@ triggers:
     test_definition:
         -
             event: update
-            field: some_field
+            field: loginCount
             queued: true
             time_shift: 123456
         -

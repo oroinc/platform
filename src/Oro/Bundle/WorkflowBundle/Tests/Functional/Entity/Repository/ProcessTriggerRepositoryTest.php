@@ -3,10 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -30,6 +30,7 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $this->initClient();
 
         $doctrine = $this->getContainer()->get('doctrine');
+        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
 
         $this->entityManager = $doctrine->getManagerForClass('OroWorkflowBundle:ProcessTrigger');
         $this->repository = $doctrine->getRepository('OroWorkflowBundle:ProcessTrigger');
@@ -37,20 +38,8 @@ class ProcessTriggerRepositoryTest extends WebTestCase
 
     public function testEqualTriggers()
     {
-        $definition = new ProcessDefinition();
-        $definition->setName('test')
-            ->setLabel('Test');
-
-        $this->entityManager->persist($definition);
-        $this->entityManager->flush($definition);
-
-        $existingTrigger = new ProcessTrigger();
-        $existingTrigger->setDefinition($definition)
-            ->setEvent(ProcessTrigger::EVENT_UPDATE)
-            ->setField('name');
-
-        $this->entityManager->persist($existingTrigger);
-        $this->entityManager->flush($existingTrigger);
+        $definition = $this->entityManager->find('OroWorkflowBundle:ProcessDefinition', 'test');
+        $trigger = $this->repository->findOneBy(array('definition' => $definition));
 
         // test equal (existing) trigger
         $equalTrigger = new ProcessTrigger();
@@ -58,8 +47,8 @@ class ProcessTriggerRepositoryTest extends WebTestCase
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
             ->setField('name');
 
-        $this->assertEquals($existingTrigger, $this->repository->findEqualTrigger($equalTrigger));
-        $this->assertTrue($this->repository->isEqualTriggerExists($existingTrigger));
+        $this->assertEquals($trigger, $this->repository->findEqualTrigger($equalTrigger));
+        $this->assertTrue($this->repository->isEqualTriggerExists($equalTrigger));
 
         // test not equal (not existing) trigger
         $notEqualTrigger = new ProcessTrigger();
@@ -68,5 +57,19 @@ class ProcessTriggerRepositoryTest extends WebTestCase
 
         $this->assertNull($this->repository->findEqualTrigger($notEqualTrigger));
         $this->assertFalse($this->repository->isEqualTriggerExists($notEqualTrigger));
+    }
+
+    public function testFindAllWithDefinitions()
+    {
+        $expectedCount = (int)$this->repository->createQueryBuilder('trigger')
+            ->select('COUNT(trigger.id) as triggerCount')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $triggers = $this->repository->findAllWithDefinitions();
+        $this->assertCount($expectedCount, $triggers);
+        foreach ($triggers as $trigger) {
+            $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
+        }
     }
 }
