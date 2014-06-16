@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/modal', './abstract-listener'
     ], function ($, _, __, mediator, Modal, AbstractListener) {
@@ -242,11 +243,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         }
     });
 
-    ColumnFormListener.init = function ($gridContainer, gridName) {
+    /**
+     * Builder interface implementation
+     *
+     * @param {jQuery.Deferred} deferred
+     * @param {jQuery} $gridContainer
+     * @param {String} gridName
+     */
+    ColumnFormListener.init = function (deferred, $gridContainer, gridName) {
         var metadata = $gridContainer.data('metadata');
         var options = metadata.options || {};
         if (options.columnListener) {
             new ColumnFormListener(_.extend({ $gridContainer: $gridContainer, gridName: gridName }, options.columnListener));
+            deferred.resolve();
         }
     };
 
