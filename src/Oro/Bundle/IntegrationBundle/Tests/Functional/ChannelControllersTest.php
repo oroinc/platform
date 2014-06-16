@@ -23,7 +23,7 @@ class ChannelControllersTest extends WebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_index'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_index'));
         $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Channels - System', $crawler->html());
@@ -41,7 +41,7 @@ class ChannelControllersTest extends WebTestCase
         $em->persist($newUser);
         $em->flush($newUser);
 
-        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -123,7 +123,7 @@ class ChannelControllersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_integration_channel_schedule', array('id' => $channel['id']))
+            $this->getUrl('oro_integration_schedule', array('id' => $channel['id']))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

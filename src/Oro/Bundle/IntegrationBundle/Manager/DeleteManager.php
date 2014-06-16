@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class ChannelDeleteManager
+class DeleteManager
 {
     /**
      * @var EntityManager

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class DeleteChannelProvidersPass implements CompilerPassInterface
 {
     const DELETE_CHANNEL_PROVIDER_TAG = 'oro_integration.channel_delete_provider';
-    const DELETE_CHANNEL_MANAGER = 'oro_integration.channel_delete_manager';
+    const DELETE_CHANNEL_MANAGER      = 'oro_integration.delete_manager';
 
     /**
      * {@inheritDoc}
