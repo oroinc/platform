@@ -28,6 +28,7 @@ class AttachmentExtension extends \Twig_Extension
         return [
             'oro_attachment_url' => new \Twig_Function_Method($this, 'getAttachmentUrl'),
             'oro_resized_attachment_url' => new \Twig_Function_Method($this, 'getResizedImageUrl'),
+            'oro_attachment_icon' => new \Twig_Function_Method($this, 'getAttachmentIcon'),
         ];
     }
 
@@ -40,24 +41,39 @@ class AttachmentExtension extends \Twig_Extension
     }
 
     /**
+     * Get attachment file url
+     *
      * @param Attachment $attachment
-     * @param bool $absolute
-     * @param string $type
+     * @param bool       $absolute
+     * @param string     $type
      * @return string
      */
-    public function getAttachmentUrl(Attachment $attachment, $absolute = false, $type = 'get')
+    public function getAttachmentUrl(Attachment $attachment, $type = 'get', $absolute = false)
     {
-        return $this->manager->getAttachmentUrl($attachment, $absolute, $type);
+        return $this->manager->getAttachmentUrl($attachment, $type, $absolute);
     }
 
     /**
+     * Get resized attachment image url
+     *
      * @param Attachment $attachment
-     * @param int $width
-     * @param int $height
+     * @param int        $width
+     * @param int        $height
      * @return string
      */
-    public function getResizedImageUrl(Attachment $attachment, $width = 100, $height = 100)
+    public function getResizedImageUrl(Attachment $attachment, $width = 32, $height = 32)
     {
         return $this->manager->getResizedImageUrl($attachment, $width, $height);
+    }
+
+    /**
+     * Get attachment icon class
+     *
+     * @param Attachment $attachment
+     * @return string
+     */
+    public function getAttachmentIcon(Attachment $attachment)
+    {
+        return $this->manager->getAttachmentIconClass($attachment);
     }
 }

@@ -24,7 +24,7 @@ services:
 
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
-        arguments: [@knp_gaufrette.filesystem_map, @router]
+        arguments: [@knp_gaufrette.filesystem_map, @router, %oro_attachment.files%]
 
     oro_attachment.listener.attachment_listener:
         class: %oro_attachment.listener.attachment_listener.class%

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
+use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -19,5 +20,9 @@ class OroAttachmentExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $yaml = new Parser();
+        $value = $yaml->parse(file_get_contents(__DIR__.'/../Resources/config/files.yml'));
+        $container->setParameter('oro_attachment.files', $value['file-icons']);
     }
 }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -50,12 +49,15 @@ class FileType extends AbstractType
         return self::NAME;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
-            )
+            ]
         );
     }
 }

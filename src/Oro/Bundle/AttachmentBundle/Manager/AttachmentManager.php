@@ -22,14 +22,18 @@ class AttachmentManager
     /** @var  Router */
     protected $router;
 
+    protected $fileIcons;
+
     /**
      * @param FilesystemMap $filesystemMap
-     * @param Router $router
+     * @param Router        $router
+     * @param               $fileIcons
      */
-    public function __construct(FilesystemMap $filesystemMap, Router $router)
+    public function __construct(FilesystemMap $filesystemMap, Router $router, $fileIcons)
     {
         $this->filesystem = $filesystemMap->get('attachments');
         $this->router = $router;
+        $this->fileIcons = $fileIcons;
     }
 
     /**
@@ -101,6 +105,8 @@ class AttachmentManager
     }
 
     /**
+     * Get file content
+     *
      * @param Attachment $entity
      * @return string
      */
@@ -111,24 +117,32 @@ class AttachmentManager
 
 
     /**
+     * Get attachment url
+     *
      * @param Attachment $entity
-     * @param bool $absolute
-     * @param string $type
+     * @param bool       $absolute
+     * @param string     $type
      * @return string
      */
-    public function getAttachmentUrl(Attachment $entity, $absolute = false, $type = 'get')
+    public function getAttachmentUrl(Attachment $entity, $type = 'get', $absolute = false)
     {
         return $this->router->generate(
             'oro_attachment_file',
-            ['type' => $type, 'id' => $entity->getId(), 'filename' => $entity->getOriginalFilename()],
+            [
+                'type' => $type,
+                'id' => $entity->getId(),
+                'filename' => $entity->getOriginalFilename()
+            ],
             $absolute
         );
     }
 
     /**
+     * Get resized image url
+     *
      * @param Attachment $entity
-     * @param int $width
-     * @param int $height
+     * @param int        $width
+     * @param int        $height
      * @return string
      */
     public function getResizedImageUrl(Attachment $entity, $width = 100, $height = 100)
@@ -142,5 +156,20 @@ class AttachmentManager
                 'filename' => $entity->getOriginalFilename()
             ]
         );
+    }
+
+    /**
+     * Get filetype icon
+     * 
+     * @param Attachment $entity
+     * @return string
+     */
+    public function getAttachmentIconClass(Attachment $entity)
+    {
+        if (isset($this->fileIcons[$entity->getExtension()])) {
+            return $this->fileIcons[$entity->getExtension()];
+        }
+
+        return $this->fileIcons['default'];
     }
 }

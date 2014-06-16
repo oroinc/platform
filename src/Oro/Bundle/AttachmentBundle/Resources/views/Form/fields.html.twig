@@ -1,24 +1,30 @@
 {% block oro_file_widget %}
     {% spaceless %}
-        {{ form_widget(form.file) }}
+        <div class="control-group">
+            {{ form_widget(form.file) }}
+        </div>
         {% if value is not empty and form.vars.valid %}
             {% if form.emptyFile is defined %}
                 {{ form_row(form.emptyFile) }}
             {% endif %}
-            <a href="{{ oro_attachment_url(value, true, 'download') }}" class="no-hash">{{ value.originalFilename }}</a>
+            <i class="{{ oro_attachment_icon(value) }}"></i>
+            <a href="{{ oro_attachment_url(value, 'download', true) }}" class="no-hash">{{ value.originalFilename }}</a>
         {% endif %}
     {% endspaceless %}
 {% endblock %}
 
 {% block oro_image_widget %}
     {% spaceless %}
-        {{ form_widget(form.file) }}
+        <div class="control-group">
+            {{ form_widget(form.file) }}
+        </div>
         {% if value is not empty and form.vars.valid %}
             {% if form.emptyFile is defined %}
                 {{ form_row(form.emptyFile) }}
             {% endif %}
-            <a href="{{ oro_attachment_url(value, true, 'download') }}" class="no-hash">
+            <a href="{{ oro_attachment_url(value, 'download', true) }}" class="no-hash">
                 <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
+                {{ value.originalFilename }}
             </a>
         {% endif %}
     {% endspaceless %}
