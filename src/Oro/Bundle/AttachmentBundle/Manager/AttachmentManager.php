@@ -115,7 +115,6 @@ class AttachmentManager
         return $this->filesystem->get($entity->getFilename())->getContent();
     }
 
-
     /**
      * Get attachment url
      *
