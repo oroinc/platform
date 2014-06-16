@@ -344,6 +344,8 @@ class Attachment extends ExtendAttachment
 
     public function __toString()
     {
-        return (string) $this->getFilename();
+        return (string) $this->getFilename()
+            ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
+            : '';
     }
 }
