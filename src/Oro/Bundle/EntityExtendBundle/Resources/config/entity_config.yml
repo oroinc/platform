@@ -285,13 +285,6 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                # indicated whether the relation is bidirectional or unidirectional
-                # for example regular many-to-many is bidirectional,
-                # but you can create it as unidirectional
-                unidirectional: # bool
-                    options:
-                        auditable:          false
-
                 target_entity:
                     options:
                         auditable:          false

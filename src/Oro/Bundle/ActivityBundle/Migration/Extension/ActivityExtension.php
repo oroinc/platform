@@ -79,7 +79,6 @@ class ActivityExtension implements ExtendExtensionAwareInterface
                 'extend' => [
                     'owner'           => ExtendScope::OWNER_SYSTEM,
                     'is_extend'       => true,
-                    'unidirectional'  => true,
                     'without_default' => true
                 ]
             ]
