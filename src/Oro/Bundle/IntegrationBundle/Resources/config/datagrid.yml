@@ -12,9 +12,9 @@ datagrid:
                     - { table: %oro_integration.entity.class%, alias: c }
         columns:
             name:
-                label: oro.integration.channel.name.label
+                label: oro.integration.integration.name.label
             type:
-                label: oro.integration.channel.type.label
+                label: oro.integration.integration.type.label
                 frontend_type:  select
                 choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
         properties:
@@ -65,9 +65,9 @@ datagrid:
                 icon:         trash
                 label:        oro.integration.datagrid.action.delete
                 defaultMessages:
-                    confirm_content: oro.integration.delete_sync_channel_window.content
-                    confirm_ok:      oro.integration.delete_sync_channel_window.button_ok
-                    confirm_title:   oro.integration.delete_sync_channel_window.title
-                    success:         oro.integration.delete_sync_channel_window.success
+                    confirm_content: oro.integration.delete_sync_integration_window.content
+                    confirm_ok:      oro.integration.delete_sync_integration_window.button_ok
+                    confirm_title:   oro.integration.delete_sync_integration_window.title
+                    success:         oro.integration.delete_sync_integration_window.success
         options:
             entityHint: channel

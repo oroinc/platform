@@ -104,7 +104,7 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                 'isTwoWaySyncEnabled',
                 'checkbox',
                 [
-                    'label'    => 'oro.integration.channel.is_two_way_sync_enabled.label',
+                    'label'    => 'oro.integration.integration.is_two_way_sync_enabled.label',
                     'required' => false,
                 ]
             );
@@ -112,12 +112,12 @@ class ChannelFormTwoWaySyncSubscriber implements EventSubscriberInterface
                 'syncPriority',
                 'choice',
                 [
-                    'label'    => 'oro.integration.channel.sync_priority.label',
-                    'tooltip'  => 'oro.integration.channel.sync_priority.tooltip',
+                    'label'    => 'oro.integration.integration.sync_priority.label',
+                    'tooltip'  => 'oro.integration.integration.sync_priority.tooltip',
                     'required' => true,
                     'choices'  => [
-                        self::REMOTE_WINS => 'oro.integration.channel.remote_wins.label',
-                        self::LOCAL_WINS  => 'oro.integration.channel.local_wins.label'
+                        self::REMOTE_WINS => 'oro.integration.integration.remote_wins.label',
+                        self::LOCAL_WINS  => 'oro.integration.integration.local_wins.label'
                     ],
                 ]
             );

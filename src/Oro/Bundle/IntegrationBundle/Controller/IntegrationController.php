@@ -123,7 +123,7 @@ class IntegrationController extends Controller
         if ($this->get('oro_integration.form.handler.channel')->process($channel)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.integration.controller.channel.message.saved')
+                $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
