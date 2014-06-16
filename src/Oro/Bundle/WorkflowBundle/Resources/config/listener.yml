@@ -2,6 +2,7 @@ parameters:
     oro_workflow.listener.process_data_serialize.class:  Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener
     oro_workflow.listener.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener
     oro_workflow.listener.workflow_item.class:           Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener
+    oro_workflow.listener.process_collector.class:       Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener
 
 services:
     oro_workflow.listener.process_data_serialize:
@@ -31,3 +32,13 @@ services:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
+
+    oro_workflow.listener.process_collector:
+        class: %oro_workflow.listener.process_collector.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: preRemove }
+            - { name: doctrine.event_listener, event: onClear }
