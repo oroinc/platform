@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\File;
 
 class FileType extends AbstractType
 {
@@ -35,6 +36,9 @@ class FileType extends AbstractType
             [
                 'label' => 'oro.attachment.file.label',
                 'required'  => false,
+                'constraints' => [
+                    new File()
+                ]
             ]
         );
 
