@@ -21,6 +21,7 @@ services:
 
     oro_attachment.form.file_subscriber:
         class: %oro_attachment.form.file_subscriber.class%
+        arguments: [@validator]
 
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
