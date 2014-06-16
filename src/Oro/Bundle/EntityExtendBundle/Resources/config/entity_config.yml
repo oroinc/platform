@@ -194,7 +194,7 @@ oro_entity_config:
                         options:
                             required:       false
                             label:          'Length'
-                            block:          entity
+                            block:          general
                             subblock:       properties
 
                 precision:
@@ -215,7 +215,7 @@ oro_entity_config:
                         options:
                             required:       false
                             label:          'Precision'
-                            block:          entity
+                            block:          general
                             subblock:       properties
 
                 scale:
@@ -236,7 +236,7 @@ oro_entity_config:
                         options:
                             required:       false
                             label:          'Scale'
-                            block:          entity
+                            block:          general
                             subblock:       properties
 
                 is_deleted:
@@ -271,7 +271,7 @@ oro_entity_config:
                     form:
                         type:               oro_entity_relation_type
                         options:
-                            block:          entity
+                            block:          general
                             subblock:       properties
                 target_entity:
                     options:
@@ -309,7 +309,7 @@ oro_entity_config:
                             label:          'Expanded'
                             attr:
                                 class:      is-option-set-expanded
-                            block:          entity
+                            block:          general
                             subblock:       properties
                 set_options:
                     options:
@@ -320,7 +320,7 @@ oro_entity_config:
                         options:
                             required:       false
                             label:          'Options'
-                            block:          entity
+                            block:          general
                             subblock:       properties
                             type:           oro_entity_option_set
                             tooltip:        oro.entity_extend.field.option_set.option.tooltip

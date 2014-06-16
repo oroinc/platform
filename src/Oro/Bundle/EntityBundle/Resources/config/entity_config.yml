@@ -3,14 +3,14 @@ oro_entity_config:
         entity:
             form:
                 block_config:
-                    entity:
-                        title:              oro.entity.form.block.general
+                    general:
+                        title:              oro.entity_config.form.block.general
                         priority:           100
                     associations:
-                        title:              oro.entity.form.block.associations
+                        title:              oro.entity_config.form.block.associations
                         priority:           50
                     other:
-                        title:              oro.entity.form.block.other
+                        title:              oro.entity_config.form.block.other
                         priority:           -255
 
             items:
@@ -20,7 +20,7 @@ oro_entity_config:
                     form:
                         type:               oro_icon_select
                         options:
-                            block:          entity
+                            block:          general
                 label:
                     options:
                         translatable:       true
@@ -40,7 +40,7 @@ oro_entity_config:
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            block:          general
                             required:       true
 
                 plural_label:
@@ -54,7 +54,7 @@ oro_entity_config:
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            block:          general
                             required:       true
 
                 description:
@@ -67,16 +67,16 @@ oro_entity_config:
                     form:
                         type:               textarea
                         options:
-                            block:          entity
+                            block:          general
                             required:       false
         field:
             form:
                 block_config:
-                    entity:
-                        title:              oro.entity.form.block.general
+                    general:
+                        title:              oro.entity_config.form.block.general
                         priority:           100
                     other:
-                        title:              oro.entity.form.block.other
+                        title:              oro.entity_config.form.block.other
                         priority:           -255
 
             items:
@@ -102,7 +102,7 @@ oro_entity_config:
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            block:          general
                             required:       true
 
                 description:
@@ -115,7 +115,7 @@ oro_entity_config:
                     form:
                         type:               textarea
                         options:
-                            block:          entity
+                            block:          general
                             required:       false
 
     datagrid:

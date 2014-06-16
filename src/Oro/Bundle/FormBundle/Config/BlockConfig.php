@@ -188,7 +188,7 @@ class BlockConfig implements FormConfigInterface
     }
 
     /**
-     * @return array|SubBlockConfig
+     * @return SubBlockConfig[]
      */
     public function getSubBlocks()
     {

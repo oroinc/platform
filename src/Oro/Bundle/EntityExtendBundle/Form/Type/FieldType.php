@@ -78,7 +78,7 @@ class FieldType extends AbstractType
             'text',
             [
                 'label'       => 'Field Name',
-                'block'       => 'type',
+                'block'       => 'general',
                 'constraints' => [
                     new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])
                 ],
@@ -133,7 +133,7 @@ class FieldType extends AbstractType
             [
                 'choices'     => $this->types,
                 'empty_value' => 'Select field type',
-                'block'       => 'type',
+                'block'       => 'general',
             ]
         );
     }
@@ -149,9 +149,9 @@ class FieldType extends AbstractType
                 [
                     'require_js'   => [],
                     'block_config' => [
-                        'type' => [
-                            'title'    => 'General',
-                            'priority' => 1,
+                        'general' => [
+                            'title'    => $this->translator->trans('oro.entity_config.form.block.general'),
+                            'priority' => 10,
                         ]
                     ]
                 ]

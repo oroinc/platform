@@ -18,6 +18,7 @@ oro:
             entities_list.label: Entities
             entity_management.label: Entity Management
             entity_management.description: List of entities
+
         action:
             manage: Manage configurable entities
             view_entities: View configurable entities
@@ -25,6 +26,7 @@ oro:
             view_entity: View configurable entity
             update_entity_field: Update configurable entity field
             field_search: Return varchar type field(s) in given entity
+
         controller:
             config_entity:
                 message:
@@ -33,3 +35,10 @@ oro:
             config_field:
                 message:
                     saved: Field saved
+
+        form:
+            block:
+                general:            General
+                other:              Other
+                associations:       Communication & Collaboration
+                fields:             Fields
