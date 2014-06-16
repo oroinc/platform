@@ -45,17 +45,17 @@ class ChannelType extends AbstractType
             [
                 'required' => true,
                 'choices'  => $this->registry->getAvailableChannelTypesChoiceList(),
-                'label'    => 'oro.integration.channel.type.label'
+                'label'    => 'oro.integration.integration.type.label'
             ]
         );
-        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.channel.name.label']);
+        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
 
         // add transport type selector
         $builder->add(
             'transportType',
             'choice',
             [
-                'label'       => 'oro.integration.channel.transport.label',
+                'label'       => 'oro.integration.integration.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
                 'constraints' => new NotBlank()
@@ -67,7 +67,7 @@ class ChannelType extends AbstractType
             'connectors',
             'choice',
             [
-                'label'    => 'oro.integration.channel.connectors.label',
+                'label'    => 'oro.integration.integration.connectors.label',
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
@@ -80,8 +80,8 @@ class ChannelType extends AbstractType
             'oro_user_select',
             [
                 'required' => true,
-                'label'    => 'oro.integration.channel.default_user_owner.label',
-                'tooltip'  => 'oro.integration.channel.default_user_owner.tooltip'
+                'label'    => 'oro.integration.integration.default_user_owner.label',
+                'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip'
             ]
         );
 
