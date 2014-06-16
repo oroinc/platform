@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
-class RelationCalculator
+class RelationCalculator implements RelationCalculatorInterface
 {
     /**
      * @var ManagerRegistry

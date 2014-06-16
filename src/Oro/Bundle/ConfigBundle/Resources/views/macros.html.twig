@@ -187,7 +187,7 @@
                         {% endif %}
 
                         {% for subblock in scrollBlock.subblocks %}
-                            {{ _self.renderFiedset(subblock) }}
+                            {{ _self.renderFieldset(subblock) }}
                         {% endfor %}
                     </div>
                 </div>
@@ -207,15 +207,15 @@
         block.description - fieldset description (optional)
         block.data        - fields data
 #}
-{% macro renderFiedset(block) %}
+{% macro renderFieldset(block) %}
     <fieldset class="form-horizontal form-horizontal-large">
-        <h5 class="user-fiedset">
+        <h5 class="user-fieldset">
             <span>{{ block.title|trans }}</span>
         </h5>
 
         {% if block.description is defined and block.description != '' %}
             <div class="container-fluid">
-                <p>{{ block.description }}</p>
+                <p>{{ block.description|trans }}</p>
             </div>
         {% endif %}
 
@@ -232,8 +232,8 @@
 #}
 {% macro renderCollapseExpandActions(target) %}
     <ul class="inline small-text">
-        <li><a href="{{ target }}" data-action="accordion:expand-all">{{ 'Expand All'|trans }}</a></li>
+        <li><a href="{{ target }}" data-action="accordion:expand-all">{{ 'oro.config.actions.expand_all'|trans }}</a></li>
         <li class="separator">|</li>
-        <li><a href="{{ target }}" data-action="accordion:collapse-all">{{ 'Collapse All'|trans }}</a></li>
+        <li><a href="{{ target }}" data-action="accordion:collapse-all">{{ 'oro.config.actions.collapse_all'|trans }}</a></li>
     </ul>
 {% endmacro %}

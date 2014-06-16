@@ -38,11 +38,6 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
     protected $entityName;
 
     /**
-     * @var bool
-     */
-    protected $initialized = false;
-
-    /**
      * {@inheritdoc}
      */
     public function setImportExportContext(ContextInterface $context)

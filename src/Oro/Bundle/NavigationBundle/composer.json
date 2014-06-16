@@ -3,7 +3,6 @@
     "type": "symfony-bundle",
     "description": "BAP Navigation Bundle",
     "keywords": ["BAP", "UI", "User Interface", "Menu", "Navigation", "Pinbar", "Shortcuts", "History"],
-    "homepage": "https://github.com/laboro/NavigationBundle",
     "license": "MIT",
     "require": {
         "php": ">=5.3.3",

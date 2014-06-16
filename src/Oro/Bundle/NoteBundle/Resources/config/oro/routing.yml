@@ -1,0 +1,34 @@
+oro_note_bundle:
+    resource:     "@OroNoteBundle/Controller"
+    type:         annotation
+    prefix:       /
+
+oro_note_bundle_api:
+    resource: "@OroNoteBundle/Controller/Api/Rest/NoteController.php"
+    type: rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+    defaults:
+        version:  latest
+
+#
+# REST actions
+#
+oro_api_get_notes:
+    pattern: api/rest/{version}/notes/{entityClass}/{entityId}.{_format}
+    defaults: {_controller: OroNoteBundle:Api/Rest/Note:cget, _format: json}
+    requirements:
+         _method: GET
+
+oro_api_get_note:
+    pattern: api/rest/{version}/notes/{id}.{_format}
+    defaults: {_controller: OroNoteBundle:Api/Rest/Note:get, _format: json}
+    requirements:
+         _method: GET
+
+oro_api_post_note:
+    pattern: api/rest/{version}/notes.{_format}
+    defaults: {_controller: OroNoteBundle:Api/Rest/Note:post, _format: json}
+    requirements:
+         _method: POST

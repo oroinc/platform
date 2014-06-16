@@ -1,4 +1,4 @@
-{% set compressed = compressed|default(true) %}
+{% set compressed = compressed is defined ? compressed : true %}
 {% set config_extend %}
     require({
         baseUrl: {{ asset('bundles')|json_encode|raw }}

@@ -5,13 +5,16 @@
 
 {% block navButtons %}
     {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
-        exportProcessor: 'oro_user'
+        exportProcessor: 'oro_user',
+        exportTemplateProcessor: 'oro_user'
     } %}
 
     {% if resource_granted('oro_user_user_create') %}
-        {{ UI.addButton({
+        <div class="btn-group">
+            {{ UI.addButton({
             'path': path('oro_user_create'),
             'entity_label': 'oro.user.entity_label'|trans
-        }) }}
+            }) }}
+        </div>
     {% endif %}
 {% endblock %}

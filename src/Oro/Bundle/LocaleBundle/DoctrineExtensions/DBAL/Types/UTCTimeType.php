@@ -14,15 +14,6 @@ class UTCTimeType extends TimeType
     /**
      * {@inheritdoc}
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
-        $sqlDeclaration = parent::getSQLDeclaration($fieldDeclaration, $platform);
-        return $sqlDeclaration . " COMMENT '(DC2Type:" . $this->getName() . " in UTC)'";
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {

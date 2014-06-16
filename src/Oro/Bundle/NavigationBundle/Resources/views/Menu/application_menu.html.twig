@@ -1,39 +1,5 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
-
-{% block list_wrapper %}
-    {{ block('list') }}
-{% endblock %}
-
-{% block item %}
-    {% if isDesktopVersion() %}
-        {%- set itemClass = 'dropdown' %}
-        {%- set childrenClass = 'dropdown-menu' %}
-    {% else %}
-        {%- set itemClass = '' %}
-        {%- set childrenClass = '' %}
-    {% endif %}
-    {% if item.hasChildren and item.displayChildren %}
-        {%- set classes = classes|merge([itemClass]) %}
-        {%- set childrenClasses = childrenClasses|merge([childrenClass]) %}
-    {% endif %}
-    {{ block('item_renderer') }}
-{% endblock %}
-
-{% block linkElement %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
-
-    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
-        {% set linkAttributes = linkAttributes|merge({
-            'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
-            'data-toggle': 'dropdown'
-        }) %}
-    {% endif %}
-
-    {% if item.uri is empty or item.uri=='#' %}
-        {% set linkAttributes = linkAttributes|merge({
-            'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
-        }) %}
-    {% endif %}
-
-    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
-{% endblock %}
+{% if isMobileVersion() or oro_config_value('oro_ui.navbar_position') == 'top' %}
+    {% include 'OroNavigationBundle:Menu:application_menu_desktop_top.html.twig' %}
+{% else %}
+    {% include 'OroNavigationBundle:Menu:application_menu_desktop_sided.html.twig' %}
+{% endif %}

@@ -512,7 +512,7 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -522,7 +522,7 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }

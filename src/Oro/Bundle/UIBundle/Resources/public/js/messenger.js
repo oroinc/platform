@@ -1,6 +1,7 @@
-/* global define */
-define(['jquery', 'underscore'],
-function($, _) {
+/*global define*/
+/*jslint nomen:true*/
+define(['jquery', 'underscore', 'oroui/js/app', 'bootstrap'],
+function ($, _, app) {
     'use strict';
 
     var defaults = {
@@ -79,8 +80,52 @@ function($, _) {
                 return actions;
             },
 
+            /**
+             * Shows flash notification message
+             *
+             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} message text of message
+             * @param {Object=} options
+             *
+             * @param {(string|jQuery)} options.container selector of jQuery with container element
+             * @param {(number|boolean)} options.delay time in ms to auto close message
+             *      or false - means to not close automatically
+             * @param {Function} options.template template function
+             * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
+             *
+             * @return {Object} collection of methods - actions over message element,
+             *      at the moment there's only one method 'close', allows to close the message
+             */
             notificationFlashMessage: function(type, message, options) {
                 return this.notificationMessage(type, message, _.extend({flash: true}, options));
+            },
+
+            /**
+             * Shows error message
+             *
+             * @param {string} message text of message
+             * @param {*=} err an error. Can be a string, exception object or an object represents JSON REST response
+             *
+             * @return {Object} collection of methods - actions over message element,
+             *      at the moment there's only one method 'close', allows to close the message
+             */
+            showErrorMessage: function (message, err) {
+                var msg = message;
+                if (!_.isUndefined(err) && !_.isNull(err)) {
+                    if (!_.isUndefined(console)) {
+                        console.error(_.isUndefined(err.stack) ? err : err.stack);
+                    }
+                    if (app.debug) {
+                        if (!_.isUndefined(err.message)) {
+                            msg += ': ' + err.message;
+                        } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
+                            msg += ': ' + err.errors.join();
+                        } else if (_.isString(err)) {
+                            msg += ': ' + err;
+                        }
+                    }
+                }
+                return this.notificationFlashMessage('error', msg);
             },
 
             setup: function(options) {

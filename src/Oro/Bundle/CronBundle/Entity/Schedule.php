@@ -59,7 +59,7 @@ class Schedule
      * Set command name
      *
      * @param  string  $command
-     * @return Shedule
+     * @return Schedule
      */
     public function setCommand($command)
     {
@@ -100,7 +100,7 @@ class Schedule
      *  @hourly                 Run once an hour at the beginning of the hour                           0 * * * *
      *
      * @param  string  $definition New cron definition
-     * @return Shedule
+     * @return Schedule
      */
     public function setDefinition($definition)
     {

@@ -355,6 +355,17 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * Gets an entity full class name by a table name
+     *
+     * @param string $tableName
+     * @return string|null
+     */
+    public function getEntityClassByTableName($tableName)
+    {
+        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
+    }
+
+    /**
      * @param Table|string $table A Table object or table name
      * @return string
      */
@@ -371,17 +382,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected function getTable($table, Schema $schema)
     {
         return $table instanceof Table ? $table : $schema->getTable($table);
-    }
-
-    /**
-     * Gets an entity full class name by a table name
-     *
-     * @param string $tableName
-     * @return string|null
-     */
-    protected function getEntityClassByTableName($tableName)
-    {
-        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
     }
 
     /**

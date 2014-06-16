@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -14,7 +15,6 @@ use JMS\JobQueueBundle\Entity\Job;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 
 class Orm extends AbstractEngine
 {
@@ -334,7 +334,10 @@ class Orm extends AbstractEngine
      */
     protected function computeSet(Item $item)
     {
-        $this->em->getUnitOfWork()->computeChangeSet($this->em->getClassMetadata(get_class($item)), $item);
+        $this->em->getUnitOfWork()->computeChangeSet(
+            $this->em->getClassMetadata(DoctrineClassUtils::getClass($item)),
+            $item
+        );
         $this->computeFields($item->getTextFields());
         $this->computeFields($item->getIntegerFields());
         $this->computeFields($item->getDatetimeFields());
@@ -348,7 +351,10 @@ class Orm extends AbstractEngine
     {
         if (count($fields)) {
             foreach ($fields as $field) {
-                $this->em->getUnitOfWork()->computeChangeSet($this->em->getClassMetadata(get_class($field)), $field);
+                $this->em->getUnitOfWork()->computeChangeSet(
+                    $this->em->getClassMetadata(DoctrineClassUtils::getClass($field)),
+                    $field
+                );
             }
         }
     }
