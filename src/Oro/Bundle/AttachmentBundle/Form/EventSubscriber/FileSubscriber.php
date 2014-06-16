@@ -53,7 +53,9 @@ class FileSubscriber implements EventSubscriberInterface
         /** @var Attachment $entity */
         $entity = $event->getData();
         $form = $event->getForm();
-        if (($form->has('emptyFile') && $form->get('emptyFile')->getData()) || $entity->getFile() !== null) {
+        if (($form->has('emptyFile') && $form->get('emptyFile')->getData())
+            || (is_object($entity) && $entity->getFile() !== null)
+        ) {
             // trigger update in entity
             $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }

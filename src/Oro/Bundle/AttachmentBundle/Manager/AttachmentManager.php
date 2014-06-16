@@ -51,7 +51,7 @@ class AttachmentManager
             $entity->setExtension(null);
             $entity->setOriginalFilename(null);
         } else {
-            if ($entity->getFile() !== null) {
+            if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
                 $file = $entity->getFile();
                 if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
                     $this->filesystem->delete($entity->getFilename());
@@ -87,7 +87,7 @@ class AttachmentManager
      */
     public function upload(Attachment $entity)
     {
-        if (!$entity->isEmptyFile() && $entity->getFile() !== null) {
+        if (!$entity->isEmptyFile() && $entity->getFile() !== null && $entity->getFile()->isFile()) {
             $file = $entity->getFile();
 
             $src = new LocalStream($file->getPathname());
@@ -160,7 +160,7 @@ class AttachmentManager
 
     /**
      * Get filetype icon
-     * 
+     *
      * @param Attachment $entity
      * @return string
      */
