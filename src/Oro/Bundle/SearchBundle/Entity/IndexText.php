@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-
 /**
  * Text entity for search index
  *
