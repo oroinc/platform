@@ -643,9 +643,15 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
     {
+        $actualIntersect = array();
+        foreach (array_keys($expected) as $expectedKey) {
+            if (array_key_exists($expectedKey, $actual)) {
+                $actualIntersect[$expectedKey] = $actual[$expectedKey];
+            }
+        }
         \PHPUnit_Framework_TestCase::assertEquals(
             $expected,
-            array_intersect_assoc($actual, $expected),
+            $actualIntersect,
             $message
         );
     }

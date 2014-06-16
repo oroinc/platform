@@ -18,9 +18,5 @@ oro:
             remove:           Remove note
 
         no_notes_exist:       No notes found
-        note_saved:           Note saved
-        note_removed:         Note deleted
         note_delete_confirmation: Are you sure you want to delete this note?
-        add_note_title:       Add note
-        edit_note_title:      Update note
         updated_by:           Updated by {{ user }} at {{ date }}
