@@ -14,7 +14,7 @@ oro_entity_config:
 
                 filetype:
                     options:
-                        allowed_type:   [attachment, attachmentImage]
+                        allowed_type:   [attachment]
                         auditable:      false
                     constraints:
                         - NotBlank: ~
@@ -23,13 +23,33 @@ oro_entity_config:
                         options:
                             required:   true
                             choices:
+                                doc: Doc
+                                xls: Xls
+                                pdf: PDF
                                 bmp: Bmp
                                 gif: Gif
                                 jpg: Jpg
                                 png: Png
-                                doc: Doc
-                                xls: Xls
-                                pdf: PDF
+                            label:      File Types
+                            multiple:   true
+                            block:      entity
+                            subblock:   properties
+                            tooltip:    Allowed file types for upload.
+
+                filetype_image:
+                    options:
+                        allowed_type:   [attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - NotBlank: ~
+                    form:
+                        type:           choice
+                        options:
+                            required:   true
+                            choices:
+                                gif: Gif
+                                jpg: Jpg
+                                png: Png
                             label:      File Types
                             multiple:   true
                             block:      entity
@@ -48,8 +68,9 @@ oro_entity_config:
                     form:
                         type:           integer
                         options:
-                            required:   true
-                            label:      File size
-                            block:      entity
-                            subblock:   properties
-                            tooltip:    Max allowed file size to upload in MB.
+                            required:    true
+                            label:       File size
+                            block:       entity
+                            subblock:    properties
+                            emtpy_value: 1
+                            tooltip:     Max allowed file size to upload in MB.

@@ -45,10 +45,8 @@ class CustomEntityType extends AbstractType
         'datetime'   => 'oro_datetime',
         'text'       => 'textarea',
         'float'      => 'number',
-
-        'attachment'      => 'oro_entity_select', //'oro_attachment',
-        'attachmentImage' => 'oro_entity_select', //'oro_attachment_image',
-
+        'attachment'      => 'oro_file',
+        'attachmentImage' => 'oro_image',
         'manyToOne'  => 'oro_entity_select',
         'oneToMany'  => 'oro_multiple_entity',
         'manyToMany' => 'oro_multiple_entity',
@@ -123,7 +121,8 @@ class CustomEntityType extends AbstractType
                         $options['entityFieldName'] = $fieldConfigId->getFieldName();
                         break;
                     case 'manyToOne':
-                    case 'attachment':
+                    //case 'attachment':
+                    //case 'attachmentImage':
                         $options['entity_class'] = $extendConfig->get('target_entity');
                         $options['configs']      = [
                             'placeholder'   => 'oro.form.choose_value',

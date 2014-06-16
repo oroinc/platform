@@ -126,6 +126,10 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
         Config $entityExtendConfig,
         $attachmentFieldName
     ) {
+        $indices = $entityExtendConfig->get('index');
+        unset($indices[$attachmentFieldName]);
+        $entityExtendConfig->set('index', $indices);
+
         $schemaConfig = $entityExtendConfig->get('schema');
         $extendClass  = $entityExtendConfig->get('extend_class');
         unset($schemaConfig['doctrine'][$extendClass]['fields'][$attachmentFieldName]);
