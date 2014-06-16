@@ -58,7 +58,7 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('flush');
 
-        $this->assertTrue($this->deleteManager->deleteChannel($this->testChannel));
+        $this->assertTrue($this->deleteManager->delete($this->testChannel));
     }
 
     public function testDeleteChannelWithErrors()
@@ -69,6 +69,6 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new \Exception()));
         $this->connection->expects($this->once())
             ->method('rollback');
-        $this->assertFalse($this->deleteManager->deleteChannel($this->testChannel));
+        $this->assertFalse($this->deleteManager->delete($this->testChannel));
     }
 }
