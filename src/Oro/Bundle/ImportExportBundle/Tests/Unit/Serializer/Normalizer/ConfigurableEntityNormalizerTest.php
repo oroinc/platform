@@ -99,18 +99,20 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @codingStandardsIgnoreStart
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Serializer must implement "Symfony\Component\Serializer\Normalizer\NormalizerInterface" and "Symfony\Component\Serializer\Normalizer\DenormalizerInterface"
+     * @expectedExceptionMessage Serializer must implement "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface" and "Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface"
      * @codingStandardsIgnoreEnd
      */
     public function testSetSerializerException()
     {
-        $serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->normalizer->setSerializer($serializer);
     }
 
     public function testSetSerializer()
     {
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
             ->disableOriginalConstructor()
             ->getMock();
         $this->normalizer->setSerializer($serializer);
@@ -167,7 +169,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($hasConfigMap));
         }
 
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
             ->disableOriginalConstructor()
             ->getMock();
         if ($normalizedMap) {
@@ -380,7 +382,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+        $serializer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Serializer')
             ->disableOriginalConstructor()
             ->getMock();
         if ($denormalizedMap) {

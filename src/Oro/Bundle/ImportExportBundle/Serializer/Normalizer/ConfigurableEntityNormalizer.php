@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -88,7 +86,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
     }
@@ -150,7 +148,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         if (is_object($data)) {
             $dataClass = ClassUtils::getClass($data);
@@ -169,8 +167,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    'Symfony\Component\Serializer\Normalizer\NormalizerInterface',
-                    'Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface',
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface'
                 )
             );
         }
