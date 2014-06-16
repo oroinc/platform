@@ -27,14 +27,22 @@ define(function (require) {
             }
         },
 
-        methods = {
+        gridBuilder = {
             /**
              * Reads data from grid container, collects required modules and runs grid builder
+             * Builder interface implementation
              *
-             * @param {Function} initBuilders
+             * @param {jQuery.Deferred} deferred
+             * @param {jQuery} $el
+             * @param {String} gridName
              */
-            initBuilder: function (initBuilders) {
-                var self = this;
+            init: function (deferred, $el, gridName) {
+                var self = {
+                    deferred: deferred,
+                    $el: $el,
+                    gridName: gridName,
+                    modules: {}
+                };
 
                 self.metadata = _.extend({
                     columns: [],
@@ -44,16 +52,10 @@ define(function (require) {
                     massActions: {}
                 }, self.$el.data('metadata'));
 
-                self.modules = {};
-
-                methods.collectModules.call(self);
+                gridBuilder.collectModules.call(self);
 
                 // load all dependencies and build grid
-                tools.loadModules(self.modules, function () {
-                    methods.buildGrid.call(self);
-                    initBuilders();
-                    methods.afterBuild.call(self);
-                });
+                tools.loadModules(self.modules, gridBuilder.build, self);
             },
 
             /**
@@ -82,7 +84,7 @@ define(function (require) {
             /**
              * Build grid
              */
-            buildGrid: function () {
+            build: function () {
                 var options, collectionOptions, collection, grid, payload;
 
                 // collection can be stored in the page cache
@@ -92,12 +94,14 @@ define(function (require) {
                     collection = payload.collection;
                 } else {
                     // otherwise, create collection from metadata
-                    collectionOptions = methods.combineCollectionOptions.call(this);
+                    collectionOptions = gridBuilder.combineCollectionOptions.call(this);
                     collection = new PageableCollection(this.$el.data('data'), collectionOptions);
                 }
 
+                mediator.trigger('datagrid_collection_set_after', collection, this.$el);
+
                 // create grid
-                options = methods.combineGridOptions.call(this);
+                options = gridBuilder.combineGridOptions.call(this);
                 mediator.trigger('datagrid_create_before', options, collection);
                 grid = new Grid(_.extend({collection: collection}, options));
                 mediator.trigger('datagrid_create_after', grid);
@@ -112,15 +116,10 @@ define(function (require) {
                 }
 
                 // create grid view
-                options = methods.combineGridViewsOptions.call(this);
+                options = gridBuilder.combineGridViewsOptions.call(this);
                 $(gridGridViewsSelector).append((new GridViewsView(_.extend({collection: collection}, options))).render().$el);
-            },
 
-            /**
-             * After build
-             */
-            afterBuild: function () {
-                mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
+                this.deferred.resolve();
             },
 
             /**
@@ -214,21 +213,39 @@ define(function (require) {
     return function (builders, selector) {
         var $el = $(selector).filter(gridSelector);
 
+        builders.push(gridBuilder);
+
         $el.each(function (i, el) {
-            var $el = $(el);
-            var gridName = (($el.data('metadata') || {}).options || {}).gridName;
+            var $el, gridName, fragment, promises;
+
+            $el = $(el);
+            gridName = (($el.data('metadata') || {}).options || {}).gridName;
             if (!gridName) {
                 return;
             }
-            $el.attr('data-rendered', true);
-            methods.initBuilder.call({ $el: $el }, function () {
-                _.each(builders, function (builder) {
-                    if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
-                        throw new TypeError('Builder does not have init method');
-                    }
-                    builder.init($el, gridName);
-                });
+
+            var $placeHolder = $('<div/>');
+            $el.before($placeHolder);
+            fragment = document.createDocumentFragment();
+            fragment.appendChild($el[0]);
+            promises = [];
+
+            _.each(builders, function (builder) {
+                var deferred;
+                if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
+                    throw new TypeError('Builder does not have init method');
+                }
+                deferred = $.Deferred();
+                setTimeout(function () {
+                    builder.init(deferred, $el, gridName);
+                }, 0);
+                promises.push(deferred.promise());
             });
-        }).end();
+
+            $.when.apply($, promises).done(function () {
+                $el.attr('data-rendered', true);
+                $placeHolder.replaceWith($el);
+            });
+        });
     };
 });
