@@ -1,63 +1,82 @@
-<div class="btn-group">
-    {% if importTitle is defined and resource_granted('oro_importexport_import') %}
-        <a type="button"
-            class="btn import-btn icons-holder-text no-hash"
-            href="{{ path('oro_importexport_import_form', {'entity': entityClass}) }}">
-            <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
-        </a>
+{% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
+{% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
+{% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
+{% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
+{% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
+
+{% if exportAllowed or importAllowed %}
+    {% if hasExportTemplateProcessor %}
+        <div class="btn-group">
+            <a type="button"
+                class="btn no-hash"
+                target="_blank"
+                href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
+                {{ 'oro.importexport.import.tempate'|trans }}
+            </a>
+        </div>
     {% endif %}
 
-    {% if exportProcessor is defined and resource_granted('oro_importexport_export') %}
-        <a type="button"
-           class="btn export-btn icons-holder-text no-hash"
-           href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-            <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
-        </a>
-    {% endif %}
-</div>
+    <div class="btn-group">
+        {% if importAllowed %}
+            <a type="button"
+                class="btn import-btn icons-holder-text no-hash"
+                href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
+                <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+            </a>
+        {% endif %}
 
-<script type="text/javascript">
-    require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/mediator', 'oroimportexport/js/export-handler'],
-    function($, __, DialogWidget, mediator, exportHandler) {
-        {% if importTitle is defined %}
-        $('.import-btn').on('click', function(e) {
-            e.preventDefault();
+        {% if exportAllowed %}
+            <a type="button"
+               class="btn export-btn icons-holder-text no-hash"
+               href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
+                <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+            </a>
+        {% endif %}
+    </div>
 
-            var widget = new DialogWidget({
-                'url': this.href,
-                'title': {{ importTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
-                'stateEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'width': 650,
-                    'autoResize': true,
-                    'modal': true,
-                    'minHeight': 100
-                }
+    <script type="text/javascript">
+        require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/mediator', 'oroimportexport/js/export-handler'],
+        function($, __, DialogWidget, mediator, exportHandler) {
+            {% if hasImportProcessor %}
+            $('.import-btn').on('click', function(e) {
+                e.preventDefault();
+
+                var widget = new DialogWidget({
+                    'url': this.href,
+                    'title': {{ importTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
+                    'stateEnabled': false,
+                    'incrementalPosition': false,
+                    'dialogOptions': {
+                        'width': 650,
+                        'autoResize': true,
+                        'modal': true,
+                        'minHeight': 100
+                    }
+                });
+                widget.render();
+
+                {% if dataGridName is defined %}
+                var datagridName = {{ dataGridName|json_encode|raw }};
+                widget.on('importComplete', function (data) {
+                    if (data.success) {
+                        mediator.trigger('datagrid:doReset:' + datagridName);
+                    }
+                });
+                {% endif %}
             });
-            widget.render();
+            {% endif %}
 
-            {% if dataGridName is defined %}
-            var datagridName = {{ dataGridName|json_encode|raw }};
-            widget.on('importComplete', function (data) {
-                if (data.success) {
-                    mediator.trigger('datagrid:doReset:' + datagridName);
-                }
+            {% if hasExportProcessor %}
+            $('.export-btn').on('click', function(e) {
+                e.preventDefault();
+
+                var exportStartedMessage = exportHandler.startExportNotificationMessage();
+                $.getJSON(this.href, function(data) {
+                    exportStartedMessage.close();
+                    exportHandler.handleExportResponse(data);
+                });
             });
             {% endif %}
         });
-        {% endif %}
-
-        {% if exportProcessor is defined %}
-        $('.export-btn').on('click', function(e) {
-            e.preventDefault();
-
-            var exportStartedMessage = exportHandler.startExportNotificationMessage();
-            $.getJSON(this.href, function(data) {
-                exportStartedMessage.close();
-                exportHandler.handleExportResponse(data);
-            });
-        });
-        {% endif %}
-    });
-</script>
+    </script>
+{% endif %}

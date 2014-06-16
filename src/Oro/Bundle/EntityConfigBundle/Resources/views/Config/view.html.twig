@@ -42,12 +42,28 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'Created'|trans }}: {{ entity.created|oro_format_datetime }}</li>
-    <li>{{ 'Updated'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
+    <li>{{ 'oro.entity_config.info.created.label'|trans }}: {{ entity.created|oro_format_datetime }}</li>
+    <li>{{ 'oro.entity_config.info.updated.label'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
     {% if link %}
-    <li>{{ ['<a href="', link, '">', 'Number of records'|trans, ': ', entity_count|default(0) , '</a>']|join|raw }}</li>
+    <li>
+        {{ [
+            '<a href="', link, '">',
+            'oro.entity_config.info.records_count.label'|trans,
+            ': ',
+            entity_count|default(0) ,
+            '</a>'
+        ]|join|raw }}
+    </li>
     {% else %}
-    <li>{{ ['<span>', 'Number of records'|trans, ': ', entity_count|default(0) , '</span>']|join|raw }}</li>
+    <li>
+        {{ [
+            '<span>',
+            'oro.entity_config.info.records_count.label'|trans,
+            ': ',
+            entity_count|default(0) ,
+            '</span>'
+        ]|join|raw }}
+    </li>
     {% endif %}
 {% endblock stats%}
 
@@ -62,7 +78,7 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_entityconfig_widget_info', {id: entity.id}),
-            'title': 'Entity Information'|trans
+            'title': 'oro.entity_config.entity.information.label'|trans
         }) }}
     {% endset %}
 
@@ -70,21 +86,20 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_entityconfig_widget_unique_keys', {id: entity.id}),
-            'title': 'Unique Keys'|trans
+            'title': 'oro.entity_config.entity.unique.label'|trans
         }) }}
     {% endset %}
 
     {% set entityFieldsWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_entityconfig_widget_entity_fields', {id: entity.id}),
-            'cssClass': 'inner-grid'
+            'url': path('oro_entityconfig_widget_entity_fields', {id: entity.id})
         }) }}
     {% endset %}
 
     {% set dataBlocks = [
         {
-            'title': 'General Information'|trans,
+            'title': 'oro.entity_config.block_titles.general.label'|trans,
             'class': 'active',
             'subblocks': [
                 {'data' : [entityInformationWidget]},
@@ -92,7 +107,7 @@
             ]
         },
         {
-            'title': 'Fields'|trans,
+            'title': 'oro.entity_config.block_titles.fields.label'|trans,
             'subblocks': [
                 {'data' : [entityFieldsWidget]},
             ]

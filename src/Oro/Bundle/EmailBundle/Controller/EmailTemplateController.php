@@ -35,7 +35,9 @@ class EmailTemplateController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_email.emailtemplate.entity.class')
+        ];
     }
 
     /**

@@ -121,7 +121,12 @@ class ApiEntityManager
         $page = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
-        return $this->getRepository()->findBy(array(), $this->getOrderBy($orderBy), $limit, $this->getOffset($page));
+        return $this->getRepository()->findBy(
+            [],
+            $this->getOrderBy($orderBy),
+            $limit,
+            $this->getOffset($page, $limit)
+        );
     }
 
     /**
@@ -139,12 +144,15 @@ class ApiEntityManager
      * Get offset by page
      *
      * @param  int|null $page
+     * @param  int      $limit
      * @return int
      */
-    protected function getOffset($page)
+    protected function getOffset($page, $limit)
     {
         if (!$page !== null) {
-            $page = $page > 0 ? $page - 1 : 0;
+            $page = $page > 0
+                ? ($page - 1) * $limit
+                : 0;
         }
 
         return $page;

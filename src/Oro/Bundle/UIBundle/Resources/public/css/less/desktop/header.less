@@ -1,23 +1,25 @@
 #oroplatform-header {
   .logo {
     position: relative;
-    height: 40px;
+    height: 24px;
     font-weight: bold;
-    font-size: 17px;
-    padding: 0 14px 0 0;
-    margin: 0 5px 0 0;
-    line-height:36px;
+    font-size: 18px;
+    padding: 0 15px 0 0;
+    margin: 0;
+    line-height: 24px;
     float: left;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
     &:before {
       width: 0px;
       height: 0px;
       border-style: solid;
-      border-width: 20px 0 21px 12px;
-      border-color: transparent transparent transparent #1b1e24;
+      border-width: 12px 0 12px 10px;
+      border-color: transparent transparent transparent rgba(0, 0, 0, 0.30);
       content: "";
       display: inline-block;
       position: absolute;
-      right: 1px;
+      right: 5px;
       top: 0;
       bottom:0;
     }
@@ -25,13 +27,13 @@
       width: 0px;
       height: 0px;
       border-style: solid;
-      border-width: 21px 0 21px 12px;
+      border-width: 12px 0 12px 10px;
       border-color: transparent transparent transparent #2d333b;
       content: "";
       display: inline-block;
       position: absolute;
-      right:2px;
-      top: -1px;
+      right:6px;
+      top:0;
       bottom:0;
     }
     a {
@@ -40,16 +42,75 @@
       display: block;
       position: relative;
       text-transform: uppercase;
-      padding: 2px 6px 3px 10px;
+      padding: 0 10px 0 14px;
       [class^='icon-'] {
         font-size:1.2em;
       }
-      &:hover,
-      &:focus,
-      &:active {
-        text-decoration: none;
-        color: #fff;
-        outline: 0;
+    }
+  }
+  .navbar-inner {
+    a.help {
+      position: relative;
+      &:before{
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        width: 1px;
+        height: 16px;
+        display: block;
+        background-color: @baseGradientColorBorder;
+      }
+    }
+    .nav {
+      margin:0;
+      >li {
+        > a {
+          color: #fff;
+          font-weight: normal;
+          text-shadow: none;
+        }
+      }
+    }
+  }
+  .nav.user-menu {
+    >li {
+      > a {
+        padding: 2px 12px;
+        font-weight: bold;
+      }
+    }
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+    border-left: 1px solid @baseGradientColorBorder;
+    .dropdown {
+      > .dropdown-menu {
+        margin-top: 1px;
+        right: -2px;
+        left: auto;
+      }
+    }
+  }
+  .nav.top-search {
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+    padding: 0 10px 0 5px;
+    border-right: 1px solid @baseGradientColorBorder;
+    .dropdown {
+      > .dropdown-toggle {
+        > [class^='icon-'] {
+          margin: 2px;
+          width: 21px;
+          height: 20px;
+          font-size: 15px;
+          border: 1px solid transparent;
+          &:before {
+            vertical-align: top;
+            line-height: 18px;
+          }
+        }
+      }
+      > .dropdown-menu {
+        margin-top: 0;
+        left: -5px;
       }
     }
   }

@@ -37,7 +37,7 @@ oro:
 
         list: List
 
-        saved_message: Dashboard saved successfully
+        saved_message: Dashboard saved
 
         menu:
             dashboards_tab:

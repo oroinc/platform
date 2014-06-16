@@ -2,22 +2,19 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class ConfigurableTableDataConverter extends AbstractTableDataConverter implements EntityNameAwareInterface
 {
+    const DEFAULT_SINGLE_RELATION_LEVEL = 5;
+    const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
+
     /**
      * @var string
      */
     protected $entityName;
-
-    /**
-     * @var EntityFieldProvider
-     */
-    protected $fieldProvider;
 
     /**
      * @var FieldHelper
@@ -30,16 +27,11 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected $relationCalculator;
 
     /**
-     * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
-     * @param RelationCalculator $relationCalculator
+     * @param RelationCalculatorInterface $relationCalculator
      */
-    public function __construct(
-        EntityFieldProvider $fieldProvider,
-        FieldHelper $fieldHelper,
-        RelationCalculator $relationCalculator
-    ) {
-        $this->fieldProvider = $fieldProvider;
+    public function __construct(FieldHelper $fieldHelper, RelationCalculatorInterface $relationCalculator)
+    {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
     }
@@ -80,8 +72,12 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         if ($this->headerConversionRules === null || $this->backendHeader === null) {
             $this->assertEntityName();
 
-            list($headerConversionRules, $backendHeader)
-                = $this->getEntityRulesAndBackendHeaders($this->entityName, true, 5, 3);
+            list($headerConversionRules, $backendHeader) = $this->getEntityRulesAndBackendHeaders(
+                $this->entityName,
+                true,
+                self::DEFAULT_SINGLE_RELATION_LEVEL,
+                self::DEFAULT_MULTIPLE_RELATION_LEVEL
+            );
 
             list($this->headerConversionRules, $this->backendHeader)
                 = array($this->processCollectionRegexp($headerConversionRules), $backendHeader);
@@ -99,7 +95,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param bool $fullData
      * @param int $singleRelationDeepLevel
      * @param int $multipleRelationDeepLevel
@@ -112,7 +108,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldProvider->getFields($entityName, true);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         $rules = array();
         $backendHeaders = array();
@@ -173,8 +169,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     );
                     $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
                 }
-            // process scalars
             } else {
+                // process scalars
                 if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
                     $rules[$fieldHeader] = array('value' => $fieldName, 'order' => $fieldOrder);
                     $backendHeaders[] = $rules[$fieldHeader];
@@ -216,8 +212,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     'order' => $fieldOrder,
                     'subOrder' => $subOrder++,
                 );
-            // multiple relation
             } elseif ($isMultipleRelation) {
+                // multiple relation
                 $frontendHeader = $fieldHeader . ' (\d+) ' . $header;
                 $backendHeader
                     = $fieldName . $delimiter . '(\d+)' . $delimiter . $name;
@@ -262,8 +258,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                     'subOrder' => $subOrder++,
                 );
             }
-        // multiple relation
         } elseif ($isMultipleRelation) {
+            // multiple relation
             $maxEntities = $this->relationCalculator->getMaxRelatedEntities($entityName, $fieldName);
             for ($i = 0; $i < $maxEntities; $i++) {
                 foreach ($relationBackendHeaders as $header) {

@@ -1,33 +1,34 @@
 placeholders:
     header_logo:
-        label: Header Logo
         items:
             logo:
                 order: 100
     user_menu:
-        label: Profile menu
         items:
             help:
                 order: 200
     form_buttons:
-        label: Profile menu
         items:
             add_update_delete:
                 order: 100
-    head_style:
-        label: Head styles
-    head_script:
-        label: Head scripts
+    head_style: ~
+    head_script: ~
     scripts_after:
         items:
             init_pinned_dropdown_button:
                 order: 100
-
     requirejs_config_extend:
-        lable: RequireJS Configuration Run Time Extend
         items:
             ui_requirejs_config:
                 order: 10
+    right_panel:
+        items:
+            navbar:
+                order: 250
+    left_panel:
+        items:
+            navbar:
+                order: 150
 
 items:
     logo:
@@ -38,3 +39,5 @@ items:
         template: OroUIBundle:Form:buttons.html.twig
     init_pinned_dropdown_button:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
+    navbar:
+        template: OroUIBundle:Default/navbar:sided.html.twig

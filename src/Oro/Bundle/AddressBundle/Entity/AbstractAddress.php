@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Validator\ExecutionContext;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\LocaleBundle\Model\AddressInterface;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\LocaleBundle\Model\AddressInterface;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
+
+use Symfony\Component\Validator\ExecutionContext;
 
 /**
  * Address
@@ -31,6 +32,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Soap\ComplexType("int", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $id;
 
@@ -39,6 +47,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="label", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=10
+     *          }
+     *      }
+     * )
      */
     protected $label;
 
@@ -47,6 +62,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="street", type="string", length=500, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=80
+     *          }
+     *      }
+     * )
      */
     protected $street;
 
@@ -55,6 +77,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="street2", type="string", length=500, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=90
+     *          }
+     *      }
+     * )
      */
     protected $street2;
 
@@ -63,6 +92,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="city", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=110
+     *          }
+     *      }
+     * )
      */
     protected $city;
 
@@ -71,6 +107,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="postal_code", type="string", length=20, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=100
+     *          }
+     *      }
+     * )
      */
     protected $postalCode;
 
@@ -80,6 +123,14 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Country", cascade={"persist"})
      * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
      * @Soap\ComplexType("string", nillable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=140,
+     *              "short"=true
+     *          }
+     *      }
+     * )
      */
     protected $country;
 
@@ -89,6 +140,14 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region", cascade={"persist"})
      * @ORM\JoinColumn(name="region_code", referencedColumnName="combined_code")
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=130,
+     *              "short"=true
+     *          }
+     *      }
+     * )
      */
     protected $region;
 
@@ -97,6 +156,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="organization", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=20
+     *          }
+     *      }
+     * )
      */
     protected $organization;
 
@@ -105,6 +171,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="region_text", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=120
+     *          }
+     *      }
+     * )
      */
     protected $regionText;
 
@@ -113,6 +186,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=30
+     *          }
+     *      }
+     * )
      */
     protected $namePrefix;
 
@@ -121,6 +201,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=40
+     *          }
+     *      }
+     * )
      */
     protected $firstName;
 
@@ -129,6 +216,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=50
+     *          }
+     *      }
+     * )
      */
     protected $middleName;
 
@@ -137,6 +231,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=60
+     *          }
+     *      }
+     * )
      */
     protected $lastName;
 
@@ -145,6 +246,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "order"=70
+     *          }
+     *      }
+     * )
      */
     protected $nameSuffix;
 
@@ -152,6 +260,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @var \DateTime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $created;
 
@@ -159,6 +274,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @var \DateTime $updated
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $updated;
 
@@ -176,10 +298,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set id
      *
      * @param int $id
+     * @return AbstractAddress
      */
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -458,7 +583,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name prefix
      *
      * @param string $namePrefix
-     * @return $this
+     * @return AbstractAddress
      */
     public function setNamePrefix($namePrefix)
     {
@@ -482,7 +607,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set first name
      *
      * @param string $firstName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setFirstName($firstName)
     {
@@ -506,7 +631,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set middle name
      *
      * @param string $middleName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setMiddleName($middleName)
     {
@@ -529,7 +654,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set last name
      *
      * @param string $lastName
-     * @return $this
+     * @return AbstractAddress
      */
     public function setLastName($lastName)
     {
@@ -552,7 +677,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set name suffix
      *
      * @param string $nameSuffix
-     * @return $this
+     * @return AbstractAddress
      */
     public function setNameSuffix($nameSuffix)
     {
@@ -585,10 +710,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address created date/time
      *
      * @param \DateTime $created
+     * @return AbstractAddress
      */
     public function setCreated($created)
     {
         $this->created = $created;
+
+        return $this;
     }
 
     /**
@@ -605,10 +733,13 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * Set address updated date/time
      *
      * @param \DateTime $updated
+     * @return AbstractAddress
      */
     public function setUpdated($updated)
     {
         $this->updated = $updated;
+
+        return $this;
     }
 
     /**
@@ -688,7 +819,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function isEqual($other)
     {
-        $class = get_class($this);
+        $class = ClassUtils::getClass($this);
 
         if (!$other instanceof $class) {
             return false;

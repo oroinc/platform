@@ -10,14 +10,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Route("/dashboard")
@@ -42,7 +40,9 @@ class DashboardController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_dashboard.dashboard_entity.class')
+        ];
     }
 
     /**

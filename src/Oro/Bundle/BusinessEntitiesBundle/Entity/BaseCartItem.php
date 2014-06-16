@@ -3,6 +3,7 @@
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use OroCRM\Bundle\MagentoBundle\Entity\Cart;
 
 /**
  * Class BasePerson

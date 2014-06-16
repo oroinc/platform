@@ -66,13 +66,6 @@ class Country implements Translatable
      * @Gedmo\Translatable
      * @JMS\Type("string")
      * @JMS\Expose
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "identity"=true
-     *          }
-     *      }
-     * )
      */
     protected $name;
 

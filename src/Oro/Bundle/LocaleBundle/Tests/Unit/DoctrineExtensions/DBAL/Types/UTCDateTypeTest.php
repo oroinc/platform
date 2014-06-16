@@ -92,12 +92,4 @@ class UTCDateTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->type->convertToPHPValue('qwerty', $this->platform);
     }
-
-    public function testGetSQLDeclaration()
-    {
-        $platform = new MySqlPlatform();
-        $output = $this->type->getSQLDeclaration([], $platform);
-
-        $this->assertEquals("DATE COMMENT '(DC2Type:date in UTC)'", $output);
-    }
 }

@@ -7,9 +7,11 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\InvalidAwareInterfaceExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherTestExtension;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtensionDepended;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\NoAwareInterfaceExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherNoAwareInterfaceExtension;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtensionDepended;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
@@ -108,6 +110,21 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($nameGenerator, $extension->getNameGenerator());
         $this->assertSame($platform, $migration->getDatabasePlatform());
         $this->assertSame($nameGenerator, $migration->getNameGenerator());
+    }
+
+    public function testExtensionDependedToOtherExtension()
+    {
+        $migration = new MigrationWithTestExtensionDepended();
+        $otherExtension = new TestExtension();
+        $extension = new TestExtensionDepended();
+
+        $manager = new MigrationExtensionManager();
+        $manager->addExtension('test', $extension);
+        $manager->addExtension('other', $otherExtension);
+        $manager->applyExtensions($migration);
+
+        $this->assertSame($extension, $migration->getTestExtensionDepended());
+        $this->assertSame($otherExtension, $migration->getTestExtensionDepended()->getTestExtension());
     }
 
     public function testExtensionWithNoAwareInterface()

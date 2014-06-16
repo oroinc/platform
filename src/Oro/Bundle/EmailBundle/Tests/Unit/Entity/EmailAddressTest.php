@@ -24,7 +24,7 @@ class EmailAddressTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $entity = new EmailAddress(null, $date);
-        $this->assertEquals($date, $entity->getCreatedAt());
+        $this->assertEquals($date, $entity->getCreated());
     }
 
     public function testUpdatedAtGetterAndSetter()
@@ -32,6 +32,6 @@ class EmailAddressTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $entity = new EmailAddress(null, $date);
-        $this->assertEquals($date, $entity->getUpdatedAt());
+        $this->assertEquals($date, $entity->getUpdated());
     }
 }
