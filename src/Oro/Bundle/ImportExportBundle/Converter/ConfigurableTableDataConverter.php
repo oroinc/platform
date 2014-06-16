@@ -8,6 +8,9 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class ConfigurableTableDataConverter extends AbstractTableDataConverter implements EntityNameAwareInterface
 {
+    const DEFAULT_SINGLE_RELATION_LEVEL = 5;
+    const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
+
     /**
      * @var string
      */
@@ -25,7 +28,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
     /**
      * @param FieldHelper $fieldHelper
-     * @param RelationCalculator $relationCalculator
+     * @param RelationCalculatorInterface $relationCalculator
      */
     public function __construct(FieldHelper $fieldHelper, RelationCalculatorInterface $relationCalculator)
     {
@@ -69,8 +72,12 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         if ($this->headerConversionRules === null || $this->backendHeader === null) {
             $this->assertEntityName();
 
-            list($headerConversionRules, $backendHeader)
-                = $this->getEntityRulesAndBackendHeaders($this->entityName, true, 5, 3);
+            list($headerConversionRules, $backendHeader) = $this->getEntityRulesAndBackendHeaders(
+                $this->entityName,
+                true,
+                self::DEFAULT_SINGLE_RELATION_LEVEL,
+                self::DEFAULT_MULTIPLE_RELATION_LEVEL
+            );
 
             list($this->headerConversionRules, $this->backendHeader)
                 = array($this->processCollectionRegexp($headerConversionRules), $backendHeader);
