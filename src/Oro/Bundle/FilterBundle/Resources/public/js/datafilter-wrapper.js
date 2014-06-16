@@ -1,4 +1,4 @@
-/* jshint browser:true */
+/*jslint browser:true, nomen:true*/
 /*global define*/
 define(['jquery', 'underscore'], function ($, _) {
     'use strict';
@@ -27,7 +27,7 @@ define(['jquery', 'underscore'], function ($, _) {
                 isEmpty: this.isEmptyValue()
             }));
 
-            this.$(this.criteriaSelector).append($filter);
+            this._appendFilter($filter);
 
             this._clickOutsideCriteriaCallback = _.bind(function(e) {
                 if (this.popupCriteriaShowed) {
@@ -42,6 +42,10 @@ define(['jquery', 'underscore'], function ($, _) {
                     this._hideCriteria();
                 }
             }, this));
+        },
+
+        _appendFilter: function ($filter) {
+            this.$(this.criteriaSelector).append($filter);
         }
     };
 });
