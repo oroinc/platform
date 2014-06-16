@@ -17,9 +17,9 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-channel',
             'dataId': entity.id,
-            'entity_label': 'oro.integration.channel.entity_label'|trans,
-            'dataMessage': 'oro.integration.delete_sync_channel.content',
-            'successMessage': 'oro.integration.delete_sync_channel.success'
+            'entity_label': 'oro.integration.integration.entity_label'|trans,
+            'dataMessage': 'oro.integration.delete_sync_integration.content',
+            'successMessage': 'oro.integration.delete_sync_integration.success'
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -44,12 +44,12 @@
         {% set breadcrumbs = {
             'entity':      entity,
             'indexPath':   path('oro_integration_channel_index'),
-            'indexLabel':  'oro.integration.channel.entity_plural_label'|trans,
+            'indexLabel':  'oro.integration.integration.entity_plural_label'|trans,
             'entityTitle': entity.name|default('N/A')
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.integration.channel.entity_plural_label'|trans}) %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.integration.integration.entity_plural_label'|trans}) %}
         {% include 'OroUIBundle::page_title_block.html.twig' with { title: title }%}
     {% endif %}
 {% endblock pageHeader %}

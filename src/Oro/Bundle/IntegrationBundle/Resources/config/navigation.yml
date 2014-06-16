@@ -1,12 +1,12 @@
 oro_menu_config:
     items:
         channels_submenu:
-            label: 'oro.integration.menu.channels_submenu.label'
+            label: 'oro.integration.menu.integrations_submenu.label'
             uri: '#'
             extras:
                 position: 50
         channels_list:
-            label: 'oro.integration.menu.channels_list.label'
+            label: 'oro.integration.menu.integrations_list.label'
             route: oro_integration_channel_index
             extras:
                 position: 10
