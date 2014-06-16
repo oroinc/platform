@@ -49,6 +49,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
             /** @var FieldConfigId[] $entityCustomFields */
             $entityCustomFields = $this->configManager->getProvider('extend')->getIds($entityClassName);
 
+            $attachmentFields = [];
             if (!empty($entityCustomFields)) {
                 /** @var FieldConfigId[] $attachmentFields */
                 $attachmentFields = array_filter(
@@ -57,7 +58,9 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                         return in_array($item->getFieldType(), AttachmentScope::$attachmentTypes);
                     }
                 );
+            }
 
+            if (!empty($attachmentFields)) {
                 foreach ($attachmentFields as $fieldConfig) {
                     $attachmentFieldName = $fieldConfig->getFieldName();
 
@@ -87,7 +90,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                             [
                                 'extend' => [
                                     'owner'         => ExtendScope::OWNER_CUSTOM,
-                                    'state'         => ExtendScope::STATE_NEW,
+                                    'state'         => ExtendScope::STATE_ACTIVE,
                                     'is_extend'     => true,
                                     'target_entity' => AttachmentScope::ATTACHMENT_ENTITY,
                                     'target_field'  => 'id',
@@ -108,10 +111,10 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                             $relationKey
                         );
                     }
-
-                    $this->configManager->persist($entityExtendConfig);
-                    $this->configManager->flush();
                 }
+
+                $this->configManager->persist($entityExtendConfig);
+                $this->configManager->flush();
             }
         }
     }
@@ -126,9 +129,9 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
         Config $entityExtendConfig,
         $attachmentFieldName
     ) {
-        $indices = $entityExtendConfig->get('index');
-        unset($indices[$attachmentFieldName]);
-        $entityExtendConfig->set('index', $indices);
+//        $indices = $entityExtendConfig->get('index');
+//        unset($indices[$attachmentFieldName]);
+//        $entityExtendConfig->set('index', $indices);
 
         $schemaConfig = $entityExtendConfig->get('schema');
         $extendClass  = $entityExtendConfig->get('extend_class');
@@ -136,6 +139,11 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
         unset($schemaConfig['property'][$attachmentFieldName]);
 
         $entityExtendConfig->set('schema', $schemaConfig);
+
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfigProvider->persist($entityExtendConfig);
+        $this->configManager->calculateConfigChangeSet($entityExtendConfig);
+
     }
 
     /**
@@ -200,7 +208,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
         // add relation to config
         $relations               = $extendConfig->get('relation', false, []);
         $relations[$relationKey] = [
-            'assign'          => false,
+            'assign'          => true,
             'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
             'owner'           => true,
             'target_entity'   => $targetEntityName,

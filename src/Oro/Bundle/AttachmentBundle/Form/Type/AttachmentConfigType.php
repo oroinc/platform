@@ -47,28 +47,18 @@ class AttachmentConfigType extends AbstractType
 
                 $relationKey = ExtendHelper::buildRelationKey(
                     $configId->getClassName(),
-                    //'attach_' . $configId->getFieldName(),
                     $configId->getFieldName(),
                     'manyToOne',
                     self::ATTACHMENT_ENTITY
                 );
 
-                /**
-                 * TODO implement isApplicable
-                 */
-                $entityConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
-                if ($entityConfig
-                    && $entityConfig->has('relation')
-                    && isset($entityConfig->get('relation')[$relationKey])
-                    && $entityConfig->get('relation')[$relationKey]['assigned']
-                ) {
+                /** @var Config $entityExtendConfig */
+                $entityExtendConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
+                if ($this->isApplicable($entityExtendConfig, $relationKey)) {
+                    if ($entityExtendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATED);
 
-
-                } else {
-                    if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
-
-                        $this->extendConfigProvider->persist($entityConfig);
+                        $this->extendConfigProvider->persist($entityExtendConfig);
                         $this->extendConfigProvider->flush();
                     }
                 }
@@ -98,10 +88,17 @@ class AttachmentConfigType extends AbstractType
     }
 
     /**
+     * @param  Config $entityConfig
+     * @param  string $relationKey
      * @return bool
      */
-    protected function isApplicable()
+    protected function isApplicable($entityConfig, $relationKey)
     {
-        return true;
+        return
+            $entityConfig->has('relation')
+            && (
+                !isset($entityConfig->get('relation')[$relationKey])
+                || $entityConfig->get('relation')[$relationKey]['assign'] === false
+            );
     }
 }

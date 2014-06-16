@@ -68,9 +68,9 @@ oro_entity_config:
                     form:
                         type:           integer
                         options:
-                            required:    true
-                            label:       File size
-                            block:       entity
-                            subblock:    properties
-                            emtpy_value: 1
-                            tooltip:     Max allowed file size to upload in MB.
+                            required:   true
+                            label:      File size
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 1
+                            tooltip:    Max allowed file size to upload in MB.
