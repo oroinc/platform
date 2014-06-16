@@ -84,6 +84,16 @@ class ChannelType extends AbstractType
                 'tooltip'  => 'oro.integration.channel.default_user_owner.tooltip'
             ]
         );
+
+        $builder->add(
+            'organization',
+            'oro_organization_select',
+            [
+                'required' => true,
+                'label'    => 'oro.integration.integration.default_organization.label',
+                'tooltip'  => 'oro.integration.integration.default_organization.tooltip'
+            ]
+        );
     }
 
     /**

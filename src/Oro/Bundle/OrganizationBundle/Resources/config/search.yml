@@ -1,0 +1,13 @@
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+    alias:                          organization
+    title_fields:                   [name]
+    route:
+        name:                       oro_organisation_view
+        parameters:
+            id:                     id
+    search_template:                OroOrganizationBundle:Search:organisation_result.html.twig
+    fields:
+        -
+            name:                   name
+            target_type:            text
+            target_fields:          [name]
