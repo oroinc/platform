@@ -6,6 +6,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
@@ -37,7 +42,13 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     {
         $denormalizedData = $this->denormalizeValues($data);
 
-        return new $class($denormalizedData);
+        if (!empty($context['processJob'])) {
+            /** @var ProcessJob $processJob */
+            $processJob = $context['processJob'];
+            return $this->prepareProcessData($denormalizedData, $processJob);
+        } else {
+            return new $class($denormalizedData);
+        }
     }
 
     /**
@@ -145,6 +156,48 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         }
 
         return $normalizedData;
+    }
+
+    /**
+     * @param array $processData
+     * @param ProcessJob $processJob
+     * @return ProcessData
+     * @throws InvalidParameterException
+     */
+    protected function prepareProcessData($processData, $processJob)
+    {
+        $old = $new = null;
+        $triggerEvent = $processJob->getProcessTrigger()->getEvent();
+        switch ($triggerEvent) {
+            case ProcessTrigger::EVENT_DELETE:
+                if (empty($processData['entity'])) {
+                    throw new InvalidParameterException(
+                        'Invalid process job data for the delete event. Entity can not be empty.'
+                    );
+                } elseif (!is_object($processData['entity'])) {
+                    throw new InvalidParameterException(
+                        'Invalid process job data for the delete event. Entity must be an object.'
+                    );
+                }
+                return new ProcessData(array(
+                    'entity' => $processData['entity'],
+                    'old'    => null,
+                    'new'    => null
+                ));
+            case ProcessTrigger::EVENT_UPDATE:
+                $old = $processData['old'];
+                $new = $processData['new'];
+            // break intentionally omitted
+            case ProcessTrigger::EVENT_CREATE:
+                $repository = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
+                return new ProcessData(array(
+                    'entity' => $repository->findEntity($processJob),
+                    'old'    => $old,
+                    'new'    => $new
+                ));
+            default:
+                throw new InvalidParameterException(sprintf('Got invalid or unregister event "%s"', $triggerEvent));
+        }
     }
 
     /**

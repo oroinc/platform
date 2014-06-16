@@ -171,7 +171,8 @@ class ProcessJob
                 $this->data = $this->serializer->deserialize(
                     $this->serializedData,
                     'Oro\Bundle\WorkflowBundle\Model\ProcessData',
-                    $this->serializeFormat
+                    $this->serializeFormat,
+                    array('processJob' => $this)
                 );
             }
         }
