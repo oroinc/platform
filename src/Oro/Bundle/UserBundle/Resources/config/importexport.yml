@@ -1,13 +1,7 @@
 parameters:
-    oro_user.importexport.user_normalizer.class: Oro\Bundle\UserBundle\ImportExport\Serializer\Normalizer\UserNormalizer
     oro_user.importexport.templatefixture.userfixture.class: Oro\Bundle\UserBundle\ImportExport\TemplateFixture\UserFixture
 
 services:
-    oro_user.importexport.user_normalizer:
-        class: %oro_user.importexport.user_normalizer.class%
-#        tags:
-#            - { name: oro_importexport.normalizer }
-
     oro_user.importexport.data_converter:
         parent: oro_importexport.data_converter.configurable
 

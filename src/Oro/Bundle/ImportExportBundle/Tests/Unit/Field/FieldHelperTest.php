@@ -295,6 +295,9 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->helper->isDateTimeField($field));
     }
 
+    /**
+     * @return array
+     */
     public function dateTimeDataProvider()
     {
         return array(

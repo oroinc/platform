@@ -83,7 +83,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     /**
      * @param object $entity
      * @param bool $isFullData optional
-     * @param  bool $isPersistNew optional
+     * @param bool $isPersistNew optional
      * @return null|object
      */
     protected function processEntity($entity, $isFullData = false, $isPersistNew = false)
@@ -185,7 +185,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     }
 
     /**
-     * @param $entity
+     * @param object $entity
      * @param array $fields
      * @return null|object
     */
@@ -290,7 +290,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     }
 
     /**
-     * @param $entity
+     * @param object $entity
      * @throws InvalidArgumentException
      * @throws LogicException
      */

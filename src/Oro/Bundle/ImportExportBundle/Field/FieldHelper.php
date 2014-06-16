@@ -31,7 +31,7 @@ class FieldHelper
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param bool $withRelations
      * @return array
      */

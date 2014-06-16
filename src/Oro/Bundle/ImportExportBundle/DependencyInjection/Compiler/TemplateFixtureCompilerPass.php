@@ -12,6 +12,9 @@ class TemplateFixtureCompilerPass implements CompilerPassInterface
     const TEMPLATE_REGISTRY_KEY = 'oro_importexport.template_fixture.registry';
     const TEMPLATE_FIXTURE_TAG = 'oro_importexport.template_fixture';
 
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$definition = $container->hasDefinition(self::TEMPLATE_REGISTRY_KEY)) {

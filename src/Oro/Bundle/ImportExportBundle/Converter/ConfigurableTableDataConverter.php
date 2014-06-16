@@ -95,7 +95,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param bool $fullData
      * @param int $singleRelationDeepLevel
      * @param int $multipleRelationDeepLevel

@@ -106,7 +106,7 @@ class ExportHandler extends AbstractHandler
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
-        return  array(
+        return array(
             'success'     => $jobResult->isSuccessful(),
             'url'         => $url,
             'readsCount'  => $readsCount,
