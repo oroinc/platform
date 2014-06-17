@@ -36,7 +36,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Invalid data for the "handleTrigger" function. Entity parameter can not be empty.
+     * @expectedExceptionMessage Invalid process data. Entity parameter can not be empty.
      */
     public function testHandleTriggerException()
     {

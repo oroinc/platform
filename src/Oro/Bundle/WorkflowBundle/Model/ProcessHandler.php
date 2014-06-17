@@ -38,9 +38,7 @@ class ProcessHandler
     public function handleTrigger(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         if (!$processData['entity']) {
-            throw new InvalidParameterException(
-                sprintf('Invalid data for the "%s" function. Entity parameter can not be empty.', __FUNCTION__)
-            );
+            throw new InvalidParameterException('Invalid process data. Entity parameter can not be empty.');
         }
         $process = $this->processFactory->create($processTrigger->getDefinition());
         $process->execute($processData);
