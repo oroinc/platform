@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -70,12 +71,12 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
         $serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
 
         if (!$isDataNull && empty($data)) {
-            $originalData   = new ProcessData($data);
+            $originalData = new ProcessData($data);
             $serializedData = $data;
             $serializer->expects($this->never())
                 ->method('deserialize');
         } else {
-            $originalData   = $isDataNull ? null : new ProcessData($data);
+            $originalData = $isDataNull ? null : new ProcessData($data);
             $serializedData = 'serialized_data';
             $serializer->expects($this->exactly($isDataNull ? 2 : 1))
                 ->method('deserialize')
@@ -135,9 +136,54 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'processTrigger' => array('processTrigger', new ProcessTrigger()),
-            'entityHash' => array('entityHash', 'My\Entity' . serialize(array('id' => 1))),
             'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
             'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData()),
         );
+    }
+
+    public function testSetGetEntityIdAndHash()
+    {
+        $entityClass = 'Test\Entity';
+        $entityId = 12;
+
+        $definition = new ProcessDefinition();
+        $definition->setRelatedEntity($entityClass);
+
+        $trigger = new ProcessTrigger();
+        $trigger->setDefinition($definition);
+
+        $this->entity->setProcessTrigger($trigger);
+
+        $this->assertNull($this->entity->getEntityId());
+        $this->assertNull($this->entity->getEntityHash());
+
+        $this->entity->setEntityId($entityId);
+
+        $this->assertEquals($entityId, $this->entity->getEntityId());
+        $this->assertEquals(ProcessJob::generateEntityHash($entityClass, $entityId), $this->entity->getEntityHash());
+
+        $this->entity->setEntityId(null);
+
+        $this->assertNull($this->entity->getEntityId());
+        $this->assertNull($this->entity->getEntityHash());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Process trigger must be defined for process jo
+     */
+    public function testSetEntityIdNoTrigger()
+    {
+        $this->entity->setEntityId(1);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Process definition must be defined for process jo
+     */
+    public function testSetEntityIdNoDefinition()
+    {
+        $this->entity->setProcessTrigger(new ProcessTrigger());
+        $this->entity->setEntityId(1);
     }
 }

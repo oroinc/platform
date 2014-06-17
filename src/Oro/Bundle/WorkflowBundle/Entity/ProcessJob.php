@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
@@ -13,7 +12,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @ORM\Table("oro_process_job")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository")
- * @Config()
  */
 class ProcessJob
 {
@@ -39,14 +37,14 @@ class ProcessJob
      *
      * @ORM\Column(name="entity_id", type="integer", nullable=true)
      */
-    protected $entityId;
+    protected $entityId = null;
 
     /**
      * @var string
      *
      * @ORM\Column(name="entity_hash", type="string", length=255, nullable=true)
      */
-    protected $entityHash;
+    protected $entityHash = null;
 
     /**
      * @var string
@@ -98,17 +96,6 @@ class ProcessJob
     }
 
     /**
-     * @param string $entityHash
-     * @return ProcessJob
-     */
-    public function setEntityHash($entityHash)
-    {
-        $this->entityHash = $entityHash;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getEntityHash()
@@ -150,6 +137,22 @@ class ProcessJob
     public function setEntityId($entityId)
     {
         $this->entityId = $entityId;
+
+        $trigger = $this->getProcessTrigger();
+        if (!$trigger) {
+            throw new \LogicException('Process trigger must be defined for process job');
+        }
+
+        $definition = $trigger->getDefinition();
+        if (!$definition) {
+            throw new \LogicException('Process definition must be defined for process job');
+        }
+
+        if (null !== $entityId) {
+            $this->entityHash = self::generateEntityHash($definition->getRelatedEntity(), $entityId);
+        } else {
+            $this->entityHash = null;
+        }
 
         return $this;
     }
@@ -202,5 +205,15 @@ class ProcessJob
     {
         $this->serializer      = $serializer;
         $this->serializeFormat = $format;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param int $entityId
+     * @return string
+     */
+    public static function generateEntityHash($entityClass, $entityId)
+    {
+        return sprintf('%s:%s', $entityClass, $entityId);
     }
 }

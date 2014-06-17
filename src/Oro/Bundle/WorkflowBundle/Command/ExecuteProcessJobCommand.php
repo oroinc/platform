@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+
 class ExecuteProcessJobCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:process:execute:job';
+
     /**
      * @var ManagerRegistry
      */
@@ -36,7 +37,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
      */
     public function configure()
     {
-        $this->setName('oro:process:execute:job')
+        $this->setName(self::NAME)
             ->setDescription('Execute process job with received identity')
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Identity of the process job that should be executed');
     }
@@ -57,14 +58,11 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             return;
         }
 
-        try {
-            $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
-            $entityManager = $this->getRegistry()->getManagerForClass('OroWorkflowBundle:ProcessJob');
-            $entityManager->remove($processJob);
-            $entityManager->flush();
-        } catch (\Exception $e) {
-            $logger = new OutputLogger($output);
-            $logger->critical($e->getMessage(), ['exception' => $e]);
-        }
+        $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
+
+        // remove process job and flush handled data
+        $entityManager = $this->getRegistry()->getManagerForClass('OroWorkflowBundle:ProcessJob');
+        $entityManager->remove($processJob);
+        $entityManager->flush();
     }
 }

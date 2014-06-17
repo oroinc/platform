@@ -84,4 +84,3 @@ services:
         class: %oro_workflow.process.process_handler.class%
         arguments:
             - @oro_workflow.process.process_factory
-            - @doctrine.orm.entity_manager

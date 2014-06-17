@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
@@ -11,22 +9,15 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 class ProcessHandler
 {
     /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
      * @var ProcessFactory
      */
     protected $processFactory;
 
     /**
      * @param ProcessFactory $processFactory
-     * @param EntityManager $entityManager
      */
-    public function __construct(ProcessFactory $processFactory, EntityManager $entityManager)
+    public function __construct(ProcessFactory $processFactory)
     {
-        $this->entityManager  = $entityManager;
         $this->processFactory = $processFactory;
     }
 

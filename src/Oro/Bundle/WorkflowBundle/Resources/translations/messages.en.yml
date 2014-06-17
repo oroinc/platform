@@ -159,15 +159,6 @@ oro:
             label.label:                  Label
             related_entity.label:         Related entity
 
-        processjob:
-            entity_label:           Process Job
-            entity_plural_label:    Process Jobs
-            id.label:               ID
-            entity_hash.label:      Entity hash
-            entity_id.label:        Entity ID
-            process_trigger.label:  Process trigger
-            serialized_data.label:  Serialized data
-
         processtrigger:
             entity_label:         Process Trigger
             entity_plural_label:  Process Triggers

@@ -9,11 +9,6 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $entityManager;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $processFactory;
 
     /**
@@ -23,15 +18,11 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityManager  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->processFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processHandler = new ProcessHandler($this->processFactory, $this->entityManager);
+        $this->processHandler = new ProcessHandler($this->processFactory);
     }
 
     /**
