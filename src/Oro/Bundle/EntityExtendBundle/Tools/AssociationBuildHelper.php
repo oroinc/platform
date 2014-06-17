@@ -12,9 +12,6 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuildHelper
 {
-    const ASSOC_MANY2ONE  = 'manyToOne';
-    const ASSOC_MANY2MANY = 'manyToMany';
-
     /** @var ConfigManager */
     protected $configManager;
 
@@ -45,7 +42,7 @@ class AssociationBuildHelper
             $sourceEntityClass,
             $relationName,
             $targetEntityClass,
-            self::ASSOC_MANY2MANY
+            'manyToMany'
         );
 
         $targetEntityConfig = $this->configManager
@@ -117,7 +114,7 @@ class AssociationBuildHelper
             $sourceEntityClass,
             $relationName,
             $targetEntityClass,
-            self::ASSOC_MANY2ONE
+            'manyToOne'
         );
 
         $targetEntityConfig = $this->configManager
@@ -180,6 +177,59 @@ class AssociationBuildHelper
             $relationName,
             $relationKey
         );
+    }
+
+    /**
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @param string $targetEntityClass
+     * @param string $relationType manyToOne, manyToMany, etc
+     *
+     * @return string e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user"
+     */
+    public function getRelationKey($entityClassName, $fieldName, $targetEntityClass, $relationType)
+    {
+        return ExtendHelper::buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClass);
+    }
+
+    /**
+     * @param string $targetEntityClass
+     *
+     * @return string
+     */
+    public function getRelationName($targetEntityClass)
+    {
+        return ExtendHelper::buildAssociationName($targetEntityClass);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string[]|ClassMetadata
+     */
+    public function getPrimaryKeyColumnNames($entityClass)
+    {
+        try {
+            $targetEntityMetadata = $this->configManager->getEntityManager()
+                ->getClassMetadata($entityClass);
+
+            return $targetEntityMetadata->getIdentifierColumnNames();
+        } catch (\ReflectionException $e) {
+            return ['id'];
+        }
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function getFieldNames($entityClass)
+    {
+        $targetEntityMetadata = $this->configManager->getEntityManager()
+            ->getClassMetadata($entityClass);
+
+        return $targetEntityMetadata->getFieldNames();
     }
 
     /**
@@ -253,7 +303,7 @@ class AssociationBuildHelper
         $relations               = $extendConfig->get('relation', false, []);
         $relations[$relationKey] = [
             'assign'          => false,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2MANY),
+            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToMany'),
             'owner'           => true,
             'target_entity'   => $targetEntityName,
             'target_field_id' => $targetFieldId,
@@ -293,7 +343,7 @@ class AssociationBuildHelper
         $relations               = $extendConfig->get('relation', false, []);
         $relations[$relationKey] = [
             'assign'          => false,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2ONE),
+            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
             'owner'           => true,
             'target_entity'   => $targetEntityName,
             'target_field_id' => false
@@ -326,64 +376,11 @@ class AssociationBuildHelper
             'field_id'        => false,
             'owner'           => false,
             'target_entity'   => $sourceEntityName,
-            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, self::ASSOC_MANY2ONE)
+            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne')
         ];
         $extendConfig->set('relation', $relations);
 
         $extendConfigProvider->persist($extendConfig);
         $this->configManager->calculateConfigChangeSet($extendConfig);
-    }
-
-    /**
-     * @param string $entityClassName
-     * @param string $fieldName
-     * @param string $targetEntityClass
-     * @param string $relationType manyToOne, manyToMany, etc
-     *
-     * @return string e.g. "manyToOne|Oro\Bundle\NoteBundle\Entity\Note|Oro\Bundle\UserBundle\Entity\User|user"
-     */
-    public function getRelationKey($entityClassName, $fieldName, $targetEntityClass, $relationType)
-    {
-        return ExtendHelper::buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClass);
-    }
-
-    /**
-     * @param string $targetEntityClass
-     *
-     * @return string
-     */
-    public function getRelationName($targetEntityClass)
-    {
-        return ExtendHelper::buildAssociationName($targetEntityClass);
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return string[]|ClassMetadata
-     */
-    public function getPrimaryKeyColumnNames($entityClass)
-    {
-        try {
-            $targetEntityMetadata = $this->configManager->getEntityManager()
-                ->getClassMetadata($entityClass);
-
-            return $targetEntityMetadata->getIdentifierColumnNames();
-        } catch (\ReflectionException $e) {
-            return ['id'];
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    public function getFieldNames($entityClass)
-    {
-        $targetEntityMetadata = $this->configManager->getEntityManager()
-            ->getClassMetadata($entityClass);
-
-        return $targetEntityMetadata->getFieldNames();
     }
 }

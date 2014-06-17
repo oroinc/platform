@@ -70,21 +70,6 @@ class ExtendConfigDumper
     }
 
     /**
-     * Return sorted extensions
-     *
-     * @return array|ExtendConfigDumperExtension[]
-     */
-    protected function getExtensions()
-    {
-        if (empty($this->sortedExtensions)) {
-            krsort($this->extensions);
-            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
-        }
-
-        return $this->sortedExtensions;
-    }
-
-    /**
      * @param null $className
      */
     public function updateConfig($className = null)
@@ -148,6 +133,21 @@ class ExtendConfigDumper
         /** @var ExtendClassMetadataFactory $metadataFactory */
         $metadataFactory = $this->em->getMetadataFactory();
         $metadataFactory->clearCache();
+    }
+
+    /**
+     * Return sorted extensions
+     *
+     * @return array|ExtendConfigDumperExtension[]
+     */
+    protected function getExtensions()
+    {
+        if (empty($this->sortedExtensions)) {
+            krsort($this->extensions);
+            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
+        }
+
+        return $this->sortedExtensions;
     }
 
     /**
