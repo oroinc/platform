@@ -242,7 +242,7 @@ function (
         },
 
         _buildItemViewIdAttribute: function (id) {
-            return this.itemViewIdPrefix + id;
+            return this.options.itemViewIdPrefix + id;
         },
 
         _showEmptyMessage: function () {
