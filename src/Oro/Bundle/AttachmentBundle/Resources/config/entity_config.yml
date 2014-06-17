@@ -25,11 +25,11 @@ oro_entity_config:
                         type:           integer
                         options:
                             required:   true
-                            label:      File size
+                            label:      oro.attachment.config.file_size.label
                             block:      entity
                             subblock:   properties
                             empty_data: 1
-                            tooltip:    Max allowed file size to upload in MB.
+                            tooltip:    oro.attachment.max_size
 
                 width:
                     options:
@@ -42,11 +42,11 @@ oro_entity_config:
                         type:           integer
                         options:
                             required:   false
-                            label:      Thumbnail width
+                            label:      oro.attachment.config.thumb_width.label
                             block:      entity
                             subblock:   properties
                             empty_data: 32
-                            tooltip:    Thumbnail width in PX.
+                            tooltip:    oro.attachment.thumb_width
 
                 height:
                     options:
@@ -59,9 +59,8 @@ oro_entity_config:
                         type:           integer
                         options:
                             required:   false
-                            label:      Thumbnail height
+                            label:      oro.attachment.config.thumb_height.label
                             block:      entity
                             subblock:   properties
                             empty_data: 32
-                            tooltip:    Thumbnail height in PX.
-
+                            tooltip:    oro.attachment.thumb_height
