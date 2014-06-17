@@ -14,7 +14,8 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
 
         requiredOptions: ["columns", "collection", "footerCell"],
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = options || {};
             Backgrid.Row.prototype.initialize.apply(this, arguments);
         },
 

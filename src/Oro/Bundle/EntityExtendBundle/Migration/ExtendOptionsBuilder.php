@@ -147,6 +147,69 @@ class ExtendOptionsBuilder
     }
 
     /**
+     * @param string $configType
+     * @param string $tableName
+     * @param array  $options
+     */
+    public function addTableAuxiliaryOptions($configType, $tableName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        if (!isset($this->result[$configType])) {
+            $this->result[$configType] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName])) {
+            $this->result[$configType][$entityClassName] = [];
+        }
+        $this->result[$configType][$entityClassName]['configs'] = $options;
+    }
+
+    /**
+     * @param string $configType
+     * @param string $tableName
+     * @param string $columnName
+     * @param array  $options
+     */
+    public function addColumnAuxiliaryOptions($configType, $tableName, $columnName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        $fieldName = $this->getFieldName($tableName, $columnName);
+
+        if (!isset($this->result[$configType])) {
+            $this->result[$configType] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName])) {
+            $this->result[$configType][$entityClassName] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName]['fields'])) {
+            $this->result[$configType][$entityClassName]['fields'] = [];
+        }
+        $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
+    }
+
+    /**
+     * @param string $sectionName
+     * @return string
+     * @throws \RuntimeException if unknown section name specified
+     */
+    public function getAuxiliaryConfigType($sectionName)
+    {
+        switch ($sectionName) {
+            case ExtendOptionsManager::APPEND_SECTION:
+                return ExtendConfigProcessor::APPEND_CONFIGS;
+            default:
+                throw new \RuntimeException(sprintf('Unknown auxiliary section: %s.', $sectionName));
+        }
+    }
+
+    /**
      * Gets an entity class name by its table name
      *
      * @param string $tableName

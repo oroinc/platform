@@ -1,3 +1,7 @@
-parameters: ~
-
-services: ~
+parameters:
+    oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
+services:
+    oro_activity.migration.extension.activity:
+        class: %oro_activity.migration.extension.activity.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: activity }

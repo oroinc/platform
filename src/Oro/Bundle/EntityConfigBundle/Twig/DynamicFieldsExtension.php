@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -21,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 class DynamicFieldsExtension extends \Twig_Extension
 {
@@ -130,7 +130,7 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             if ($value && $fieldConfigId->getFieldType() == 'manyToOne') {
                 $value = $this->propertyAccessor->getValue(
-                    $entity->{Inflector::camelize('get_' . $fieldName)}(),
+                    FieldAccessor::getValue($entity, $fieldName),
                     $field->get('target_field')
                 );
             }
