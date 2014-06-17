@@ -144,7 +144,7 @@ class ProcessJob
     }
 
     /**
-     * @param array $entityId
+     * @param int $entityId
      * @return ProcessJob
      */
     public function setEntityId($entityId)
