@@ -76,8 +76,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'cache:clear',
                 array(
                     '--no-optional-warmers' => true,
-                    '--process-isolation' => true,
-                    '--no-debug' => false
+                    '--process-isolation' => true
                 )
             );
         }
@@ -356,12 +355,10 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        // --no-debug set to false, as Twig cache clear memory usage dramatically rise with true
         $commandExecutor->runCommand(
             'cache:clear',
             array(
                 '--process-isolation' => true,
-                '--no-debug' => false
             )
         );
 

@@ -148,10 +148,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $commandArgs
         );
 
-        if ($this->env == 'prod') {
-            $commandArgs[] = '--no-debug';
-        }
-
         return parent::createJob($command, $commandArgs);
     }
 }
