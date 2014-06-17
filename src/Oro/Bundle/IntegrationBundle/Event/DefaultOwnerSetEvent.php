@@ -8,8 +8,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 /**
- * This event is dispatched default owner set for existing channel instance.
- * It's aimed to handle situations when channel where created before 1.3(when channel did not have default owner)
+ * This event is dispatched default owner set for existing integration instance.
+ * It's aimed to handle situations when integration was created before 1.3(when integration did not have default owner)
  *
  * @package Oro\Bundle\IntegrationBundle\Event
  */

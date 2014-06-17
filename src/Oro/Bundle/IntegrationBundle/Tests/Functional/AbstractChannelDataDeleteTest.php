@@ -45,7 +45,7 @@ abstract class AbstractChannelDataDeleteTest extends WebTestCase
     {
         $this->generateTestData();
         $channelId = $this->channel->getId();
-        $this->container->get('oro_integration.channel_delete_manager')->deleteChannel($this->channel);
+        $this->container->get('oro_integration.delete_manager')->delete($this->channel);
 
         $resultChannel = $this->em->getRepository('OroIntegrationBundle:Channel')->find($channelId);
         $resultForm = $this->em->getRepository($this->entityClassName)

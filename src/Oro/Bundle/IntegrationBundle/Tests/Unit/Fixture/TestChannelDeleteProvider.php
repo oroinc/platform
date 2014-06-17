@@ -3,14 +3,14 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteProviderInterface;
+use Oro\Bundle\IntegrationBundle\Manager\DeleteProviderInterface;
 
-class TestChannelDeleteProvider implements ChannelDeleteProviderInterface
+class TestChannelDeleteProvider implements DeleteProviderInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function isSupport($channelType)
+    public function supports($type)
     {
         return true;
     }

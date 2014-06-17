@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_integration_channel")
  * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
  * @Config(
- *  routeName="oro_integration_channel_index",
+ *  routeName="oro_integration_index",
  *  defaultValues={
  *      "security"={
  *          "type"="ACL",
