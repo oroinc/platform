@@ -1,6 +1,6 @@
 Oro\Bundle\OrganizationBundle\Entity\Organization:
     alias:                          organization
-    search_template:                OroSearchBundle:Search:searchResults.html.twig
+    search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
     title_fields:                   [name]
     fields:
         -
