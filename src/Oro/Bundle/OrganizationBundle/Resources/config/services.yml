@@ -187,7 +187,6 @@ services:
 
     # Autocomplete search handler
     oro_organization.autocomplete.organization.search_handler:
-        class: %oro_organization.autocomplete.organization.search_handler%
         parent: oro_form.autocomplete.search_handler
         arguments:
             - %oro_organization.organization.entity.class%
