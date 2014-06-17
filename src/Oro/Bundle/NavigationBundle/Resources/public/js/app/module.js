@@ -27,6 +27,20 @@ require([
 });
 
 /**
+ * Init PinBar and Favorite related views
+ */
+require([
+    'oroui/js/app/controllers/base/controller',
+    'oronavigation/js/app/views/page/pin-buttons-view'
+], function (BaseController, PagePinButtonsView) {
+    'use strict';
+    BaseController.addBeforeActionReuse('pinButtons', PagePinButtonsView, {
+        el: '#pin-button-div',
+        buttons: '.minimize-button, .favorite-button'
+    });
+});
+
+/**
  * Init ContentManager
  */
 require([
