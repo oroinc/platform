@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: de-key
- * Date: 6/16/14
- * Time: 7:17 PM
- */
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 
@@ -21,17 +15,14 @@ class OroIntegrationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_integration_channel');
-
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-
-        $table->addIndex(['organization_id'], 'organization_id', []);
-
+        $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
+            $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
-            'FK_55B9B9C5A89019EA'
+            'FK_55B9B9C532C8A3DE'
         );
     }
 }
