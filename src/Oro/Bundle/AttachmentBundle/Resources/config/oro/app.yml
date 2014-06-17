@@ -1,0 +1,9 @@
+knp_gaufrette:
+    adapters:
+        attachments:
+            local:
+                directory: %kernel.root_dir%/attachment
+    filesystems:
+        attachments:
+            adapter:    attachments
+            alias:      attachments_filesystem

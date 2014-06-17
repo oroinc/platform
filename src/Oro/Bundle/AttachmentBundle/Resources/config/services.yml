@@ -48,6 +48,6 @@ services:
 
     oro_attachment.twig.attachment_extension:
         class: %oro_attachment.twig.attachment_extension.class%
-        arguments: [@oro_attachment.manager, @liip_imagine.cache.manager]
+        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager]
         tags:
             - { name: twig.extension }

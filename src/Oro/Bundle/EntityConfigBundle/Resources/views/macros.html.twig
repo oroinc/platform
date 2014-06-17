@@ -2,7 +2,7 @@
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
-        {% for item in dynamicFields %}
+        {% for fieldName, item in dynamicFields %}
             {% set hasLink = false %}
             {% set itemValue = item.value %}
             {% if itemValue is iterable %}
@@ -31,6 +31,15 @@
                 {% set itemValue = itemValue ? itemValue | oro_format_percent : null %}
             {% elseif item.type == 'date' %}
                 {% set itemValue = itemValue ? itemValue | oro_format_date : null %}
+            {% elseif item.type == 'attachment' %}
+                {% set itemValue = oro_file_view(itemValue) %}
+            {% elseif item.type == 'attachmentImage' %}
+                {% if entity_class is null %}
+                    {% set entityInfo = entity %}
+                {% else  %}
+                    {% set entityInfo = entity_class %}
+                {% endif %}
+                {% set itemValue = oro_image_view(itemValue, entityInfo, fieldName) %}
             {% elseif not hasLink %}
                 {% set itemValue = itemValue|escape %}
             {% endif %}
