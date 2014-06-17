@@ -12,13 +12,20 @@ class ActivityExtendConfigDumperExtension extends ExtendConfigDumperExtension
     /** @var ConfigInterface[] */
     private $targetСonfigs;
 
+    /**
+     * @param AssociationBuildHelper $assocBuildHelper
+     */
     public function __construct(AssociationBuildHelper $assocBuildHelper)
     {
         $this->assocBuildHelper = $assocBuildHelper;
     }
 
     /**
-     * {@inheritdoc}
+     * Check if entity config matched rule for target entity
+     *
+     * @param ConfigInterface $config
+     *
+     * @return bool
      */
     protected function targetEntityMatch(ConfigInterface $config)
     {
@@ -28,7 +35,9 @@ class ActivityExtendConfigDumperExtension extends ExtendConfigDumperExtension
     }
 
     /**
-     * {@inheritdoc}
+     * Return scope for association specific config
+     *
+     * @return string
      */
     protected function getAssociationScope()
     {
