@@ -36,9 +36,6 @@ class FileType extends AbstractType
             [
                 'label' => 'oro.attachment.file.label',
                 'required'  => false,
-                'constraints' => [
-                    new File()
-                ]
             ]
         );
 
