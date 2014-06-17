@@ -80,10 +80,9 @@ class ExtendHelper
     public static function getShortClassName($className)
     {
         $lastDelimiter = strrpos($className, '\\');
-        $shortName = false === $lastDelimiter
+
+        return false === $lastDelimiter
             ? $className
             : substr($className, $lastDelimiter + 1);
-
-        return $shortName;
     }
 }
