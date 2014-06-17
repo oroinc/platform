@@ -278,9 +278,9 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                # indicated whether the relation has the devault value or not
-                # for example regular many-to-many or one-to-many have the devault value,
-                # but you can create them without the devault value
+                # indicated whether the relation has the default value or not
+                # for example regular many-to-many or one-to-many have the default value,
+                # but you can create them without the default value
                 without_default: # bool
                     options:
                         auditable:          false

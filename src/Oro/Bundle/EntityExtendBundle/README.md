@@ -7,7 +7,7 @@ OroEntityExtendBundle
 Manage entities through UI
 --------------------------
 
-To manage existing entities or create new ones through UI go to **System > Entities > Entity Management** page. On this page you can see a list of all entities, but please note that you can modify only entities marked as extendable. See **IS EXTEND** column to see whether an entity can be extended or not. To create a new entity click **Create entity** button at the top right corner of the page, fill the form and click **Save And Close**. Next add necessary fields to you entity clicking on **Create field** button. To add new field to existing entity go to view page of this entity and click **Create field** button. When all changes are made do not forget to click **Update schema** button to apply your changes.
+To manage existing entities or create new ones through UI go to **System > Entities > Entity Management** page. On this page you can see a list of all entities, but please note that you can modify only entities marked as extendable. Check **IS EXTEND** column to see whether an entity can be modified or not. To create a new entity click **Create entity** button at the top right corner of the page, fill the form and click **Save And Close**. Next add necessary fields to your entity clicking on **Create field** button. To add new field to existing entity go to view page of this entity and click **Create field** button. When all changes are made do not forget to click **Update schema** button to apply your changes.
 
 Modify existing entity
 ----------------------
