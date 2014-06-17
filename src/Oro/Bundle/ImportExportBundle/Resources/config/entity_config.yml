@@ -11,6 +11,7 @@ oro_entity_config:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
                             block:          import and export
+                            tooltip:        oro.importexport.entity_config.header.tooltip
                 # field order in result file
                 order:
                     options: []
@@ -52,13 +53,13 @@ oro_entity_config:
                 full:
                     options: []
                     form:
-                        type:               choice
+                        type:               oro_importexport_full_option
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:
-                                false:      'No'
-                                true:       'Yes'
+                                false:      'Identity only'
+                                true:       'All'
                             empty_value:    false
                             required:       false
                             block:          import and export
-
+                            tooltip:        'oro.importexport.entity_config.full.tooltip'
