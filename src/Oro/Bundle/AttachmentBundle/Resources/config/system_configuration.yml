@@ -1,0 +1,29 @@
+oro_system_configuration:
+    groups:
+        attachment_settings:
+            icon:   icon-file
+            title:  'Upload Settings'
+        attachment_mime_types_settings:
+            title:  'Mime types'
+    fields:
+        oro_attachment.upload_mime_types:
+            type: textarea
+            options:
+                label: 'File mime types'
+        oro_attachment.upload_image_mime_types:
+            type: textarea
+            options:
+                label: 'Image mime types'
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            attachment_settings:
+                                priority: -10
+                                children:
+                                    attachment_mime_types_settings:
+                                        children:
+                                            - oro_attachment.upload_mime_types
+                                            - oro_attachment.upload_image_mime_types

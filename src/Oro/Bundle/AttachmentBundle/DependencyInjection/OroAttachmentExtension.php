@@ -16,7 +16,7 @@ class OroAttachmentExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -25,5 +25,7 @@ class OroAttachmentExtension extends Extension
         $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__.'/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }
