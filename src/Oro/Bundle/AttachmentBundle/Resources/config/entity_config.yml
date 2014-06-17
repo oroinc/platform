@@ -12,50 +12,6 @@ oro_entity_config:
                             block:          entity
                             subblock:       properties
 
-                filetype:
-                    options:
-                        allowed_type:   [attachment]
-                        auditable:      false
-                    constraints:
-                        - NotBlank: ~
-                    form:
-                        type:           choice
-                        options:
-                            required:   true
-                            choices:
-                                doc: Doc
-                                xls: Xls
-                                pdf: PDF
-                                bmp: Bmp
-                                gif: Gif
-                                jpg: Jpg
-                                png: Png
-                            label:      File Types
-                            multiple:   true
-                            block:      entity
-                            subblock:   properties
-                            tooltip:    Allowed file types for upload.
-
-                filetype_image:
-                    options:
-                        allowed_type:   [attachmentImage]
-                        auditable:      false
-                    constraints:
-                        - NotBlank: ~
-                    form:
-                        type:           choice
-                        options:
-                            required:   true
-                            choices:
-                                gif: Gif
-                                jpg: Jpg
-                                png: Png
-                            label:      File Types
-                            multiple:   true
-                            block:      entity
-                            subblock:   properties
-                            tooltip:    Allowed file types for upload.
-
                 maxsize:
                     options:
                         allowed_type:   [attachment, attachmentImage]
@@ -74,3 +30,38 @@ oro_entity_config:
                             subblock:   properties
                             empty_data: 1
                             tooltip:    Max allowed file size to upload in MB.
+
+                width:
+                    options:
+                        allowed_type:   [attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   false
+                            label:      Thumbnail width
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    Thumbnail width in PX.
+
+                height:
+                    options:
+                        allowed_type:   [attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   false
+                            label:      Thumbnail height
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    Thumbnail height in PX.
+
