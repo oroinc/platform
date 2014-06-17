@@ -35,9 +35,16 @@ class ProcessJob
     protected $processTrigger;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     */
+    protected $entityId;
+
+    /**
      * @var string
      *
-     * @ORM\Column(name="entity_hash", type="string", length=255)
+     * @ORM\Column(name="entity_hash", type="string", length=255, nullable=true)
      */
     protected $entityHash;
 
@@ -47,13 +54,6 @@ class ProcessJob
      * @ORM\Column(name="serialized_data", type="text")
      */
     protected $serializedData;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="entity_id", type="integer")
-     */
-    protected $entityId;
 
     /**
      * @var ProcessData
