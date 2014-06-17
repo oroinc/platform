@@ -135,7 +135,8 @@ class ProcessCollectorListener
 
         $triggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_DELETE);
         foreach ($triggers as $trigger) {
-            $this->scheduleProcess($trigger, $entity);
+            // cloned to save all data after flush
+            $this->scheduleProcess($trigger, clone $entity);
         }
     }
 

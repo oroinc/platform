@@ -131,8 +131,9 @@ class ProcessJob
     }
 
     /**
-     * @param int $entityId
+     * @param integer $entityId
      * @return ProcessJob
+     * @throws \LogicException
      */
     public function setEntityId($entityId)
     {

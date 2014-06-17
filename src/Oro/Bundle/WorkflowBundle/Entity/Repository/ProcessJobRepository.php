@@ -7,13 +7,15 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 
 class ProcessJobRepository extends EntityRepository
 {
+    /**
+     * @param ProcessJob $processJob
+     * @return null|object
+     */
     public function findEntity(ProcessJob $processJob)
     {
-        $entityHash  = $processJob->getEntityHash();
-        $entityId    = $processJob->getEntityId();
-        $entityClass = substr($entityHash, 0, strrpos($entityHash, $entityId));
-
-        $entityManager = $this->getEntityManager();
-        return $entityManager->getRepository($entityClass)->find($entityId);
+        if ($entityClass = $processJob->getProcessTrigger()->getDefinition()->getRelatedEntity()) {
+            return $this->getEntityManager()->getRepository($entityClass)->find($processJob->getEntityId());
+        }
+        return null;
     }
 }

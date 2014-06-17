@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
@@ -64,13 +67,26 @@ class ProcessJobRepositoryTest extends WebTestCase
             ->setEntityAttributeName('secondName');
         $this->entityManager->persist($entitySecond);
 
-        $entityClass = get_class($entityFirst);
+        $entityClass = ClassUtils::getClass($entityFirst);
+
+        $processDefinition = new ProcessDefinition();
+        $processDefinition
+            ->setName('test')
+            ->setLabel('Test')
+            ->setRelatedEntity($entityClass);
+        $this->entityManager->persist($processDefinition);
+
+        $processTrigger = new ProcessTrigger();
+        $processTrigger
+            ->setDefinition($processDefinition)
+            ->setEvent(ProcessTrigger::EVENT_UPDATE);
+        $this->entityManager->persist($processTrigger);
 
         $processJob = new ProcessJob();
-        $processJob->setEntityId($entityIdFirst)->setEntityHash($entityClass . $entityIdFirst);
+        $processJob
+            ->setProcessTrigger($processTrigger)
+            ->setEntityId($entityIdFirst);
         $this->entityManager->persist($processJob);
-
-        $this->entityManager->flush();
 
         $foundEntity = $this->repository->findEntity($processJob);
         $this->assertEquals($foundEntity, $entityFirst);

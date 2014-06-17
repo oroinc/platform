@@ -15,8 +15,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
+/**
+ * Class ProcessDataNormalizer
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ProcessDataNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const MAX_DEEP_LEVEL = 1;
+    const SERIALIZED     = '__SERIALIZED__';
     /**
      * @var ClassMetadata
      */
@@ -26,6 +32,16 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      * @var Registry
      */
     protected $registry;
+
+    /**
+     * @var array
+     */
+    protected $managedEntities;
+
+    /**
+     * @var string
+     */
+    protected $currentEvent;
 
     /**
      * @param Registry $registry
@@ -45,7 +61,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         if (!empty($context['processJob'])) {
             /** @var ProcessJob $processJob */
             $processJob = $context['processJob'];
-            return $this->prepareProcessData($denormalizedData, $processJob);
+            return $this->prepareDenormalizedData($denormalizedData, $processJob);
         } else {
             return new $class($denormalizedData);
         }
@@ -64,6 +80,9 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         $entity        = $classMetadata->getReflectionClass();
 
         foreach ($attributes as $name => $value) {
+            if (is_array($value) && !empty($value[self::SERIALIZED])) {
+                $value = $this->unserialize($value[self::SERIALIZED]);
+            }
             $this->writeProperty($entity, $name, $value);
         }
 
@@ -79,9 +98,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         $denormalizedData = array();
 
         foreach ($values as $key => $value) {
-            if (empty($value)) {
-                $denormalizedData[$key] = null;
-            } elseif (!empty($value['className'])) {
+            if (!empty($value['className'])) {
                 $denormalizedData[$key] = $this->denormalizeEntity($value['className'], $value['classData']);
             } elseif (is_array($value)) {
                 $denormalizedData[$key] = $this->denormalizeValues($value);
@@ -94,6 +111,15 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     }
 
     /**
+     * @param object $entity
+     * @return string
+     */
+    protected function getClass($entity)
+    {
+        return ClassUtils::getClass($entity);
+    }
+
+    /**
      * @param string|object $className
      * @return ClassMetadata
      */
@@ -101,12 +127,52 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     {
         if (!$this->classMetadata) {
             if (is_object($className)) {
-                $className = ClassUtils::getClass($className);
+                $className = $this->getClass($className);
             }
             $this->classMetadata = $this->registry->getManager()->getClassMetadata($className);
         }
 
         return $this->classMetadata;
+    }
+
+    protected function getEvent($context)
+    {
+        if (!$this->currentEvent && !empty($context['processJob'])) {
+            /** @var ProcessJob $processJob */
+            $processJob = $context['processJob'];
+            $this->currentEvent = $processJob->getProcessTrigger()->getEvent();
+        }
+
+        return $this->currentEvent;
+    }
+
+    /**
+     * @return \Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository
+     */
+    protected function getRepository()
+    {
+        return $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    protected function isEntityManaged($entity)
+    {
+        if (!$this->managedEntities) {
+            $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
+            /** @var ClassMetadata $metadata */
+            foreach ($allMetadata as $metadata) {
+                $this->managedEntities[] = $metadata->getName();
+            }
+        }
+
+        if (count($this->managedEntities) > 1) {
+            return in_array($this->getClass($entity), $this->managedEntities);
+        } else {
+            return !empty($this->managedEntities) && reset($this->managedEntities) == $this->getClass($entity);
+        }
     }
 
     /**
@@ -116,12 +182,15 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     public function normalize($object, $format = null, array $context = array())
     {
         $normalizedData = array();
+        $currentEvent   = $this->getEvent($context);
 
         foreach ($object as $key => $value) {
-            if (empty($value)) {
-                $normalizedData[$key] = null;
-            } elseif (is_object($value)) {
-                $normalizedData[$key] = $this->normalizeEntity($value);
+            if ($currentEvent && $currentEvent != ProcessTrigger::EVENT_UPDATE && ('old' == $key || 'new' == $key)) {
+                continue;
+            }
+
+            if (is_object($value)) {
+                $normalizedData[$key] = $this->normalizeEntity($value, $context);
             } elseif (is_array($value)) {
                 $normalizedData[$key] = $this->normalize($value, $format, $context);
             } else {
@@ -132,27 +201,44 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         return $normalizedData;
     }
 
-    protected function normalizeEntity($entity)
+    /**
+     * @param object $entity
+     * @param array $context
+     * @param integer $deepLevel
+     * @return array
+     */
+    protected function normalizeEntity($entity, $context, $deepLevel = 0)
     {
+        $classMetadata  = $this->getClassMetadata($entity);
         $normalizedData = array(
-            'className' => ClassUtils::getClass($entity),
+            'className' => $this->getClass($entity),
             'classData' => array()
         );
 
-        $reflection = $this->getClassMetadata($entity);
-        $properties = $reflection->getReflectionProperties();
+        if (!empty($context['processJob'])) {
+            /** @var ProcessJob $processJob */
+            $processJob = $context['processJob'];
 
-        /** @var $property \ReflectionProperty */
-        foreach ($properties as $property) {
-            $property->setAccessible(true);
-            $name  = $property->getName();
-            $value = $property->getValue($entity);
+            if ($this->getEvent($context) != ProcessTrigger::EVENT_DELETE) {
+                $identifierNames = $classMetadata->getIdentifierFieldNames();
+                $normalizedData['classData'][reset($identifierNames)] = $processJob->getEntityId();
+                return $normalizedData;
+            }
+        }
 
-            if ($value instanceof \DateTime) {
-                $value = $this->serialize($value);
+        $fieldNames = $classMetadata->getFieldNames();
+        foreach ($fieldNames as $fieldName) {
+            $fieldValue = $classMetadata->getFieldValue($entity, $fieldName);
+
+            if (is_object($fieldValue)) {
+                if ($this->isEntityManaged($fieldValue) && $deepLevel <= self::MAX_DEEP_LEVEL) {
+                    $fieldValue = $this->normalizeEntity($fieldValue, $context, $deepLevel + 1);
+                } else {
+                    $fieldValue = $this->serialize($fieldValue);
+                }
             }
 
-            $normalizedData['classData'][$name] = is_object($value) ? null : $value;
+            $normalizedData['classData'][$fieldName] = $fieldValue;
         }
 
         return $normalizedData;
@@ -164,9 +250,8 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      * @return ProcessData
      * @throws InvalidParameterException
      */
-    protected function prepareProcessData($processData, $processJob)
+    protected function prepareDenormalizedData($processData, $processJob)
     {
-        $old = $new = null;
         $triggerEvent = $processJob->getProcessTrigger()->getEvent();
         switch ($triggerEvent) {
             case ProcessTrigger::EVENT_DELETE:
@@ -185,15 +270,17 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
                     'new'    => null
                 ));
             case ProcessTrigger::EVENT_UPDATE:
-                $old = $processData['old'];
-                $new = $processData['new'];
-            // break intentionally omitted
-            case ProcessTrigger::EVENT_CREATE:
-                $repository = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
                 return new ProcessData(array(
-                    'entity' => $repository->findEntity($processJob),
-                    'old'    => $old,
-                    'new'    => $new
+                    'entity' => $this->getRepository()->findEntity($processJob),
+                    'old'    => $processData['old'],
+                    'new'    => $processData['new']
+                ));
+            break;
+            case ProcessTrigger::EVENT_CREATE:
+                return new ProcessData(array(
+                    'entity' => $this->getRepository()->findEntity($processJob),
+                    'old'    => null,
+                    'new'    => null
                 ));
             default:
                 throw new InvalidParameterException(sprintf('Got invalid or unregister event "%s"', $triggerEvent));
@@ -206,7 +293,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     protected function serialize($value)
     {
-        return base64_encode(serialize($value));
+        return array(self::SERIALIZED => base64_encode(serialize($value)));
     }
 
     /**
@@ -235,7 +322,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supportsClass(ClassUtils::getClass($data));
+        return is_object($data) && $this->supportsClass($this->getClass($data));
     }
 
     /**
@@ -253,6 +340,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         if (!is_string($value) || !$value) {
             return null;
         }
+
         return unserialize($value);
     }
 
@@ -266,6 +354,5 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         $reflectionProperty = $this->getClassMetadata($class)->getReflectionProperty($propertyName);
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($class, $propertyValue);
-        $reflectionProperty->setAccessible(false);
     }
 }
