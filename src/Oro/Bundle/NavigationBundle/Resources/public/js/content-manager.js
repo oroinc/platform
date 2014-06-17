@@ -1,6 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'
-    ], function (_, sync, mediator, messenger, __) {
+define([
+    'underscore',
+    'orosync/js/sync',
+    'oroui/js/mediator',
+    'oroui/js/messenger',
+    'orotranslation/js/translator'
+], function (_, sync, mediator, messenger, __) {
     'use strict';
 
     /**
@@ -36,7 +42,9 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          */
         current = {
             tags: [],
-            url: null
+            url: null,
+            page: null, // object with page content
+            state: {} // each page component can cache own state
         },
 
         /**
@@ -58,44 +66,20 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
         outdatedPageHandlers = {};
 
     /**
-     * Remove restore params from url
-     *
-     * @param {string} url
-     * @return {string}
-     */
-    function clearUrl(url) {
-        return url.replace(/[\?&]restore=1/g, '');
-    }
-
-    /**
-     * Keeper and switcher of current URL
-     *
-     * in "get" call - returns current url
-     * in "set" call - stores a new URL and switches tags collector
-     *
-     * @param {?string} url
-     * @returns {string}
-     */
-    function currentUrl(url) {
-        if (!_.isUndefined(url)) {
-            current.url = clearUrl(url);
-            pagesTags[current.url] = current.tags;
-        }
-        return current.url;
-    }
-
-    /**
      * On URL changes clean up tags collection and set a new URL as current
      *
      * @param {string} newUrl
      */
     function changeUrl(newUrl) {
-        var oldUrl = currentUrl();
-        if (!pagesCache[oldUrl]) {
+        var oldUrl = current.url;
+        if (oldUrl !== null && !pagesCache[oldUrl]) {
             delete pagesTags[oldUrl];
         }
         current.tags = [];
-        currentUrl(newUrl);
+        current.url = newUrl;
+        current.page = null;
+        current.state = {};
+        pagesTags[current.url] = current.tags;
     }
 
     /**
@@ -139,7 +123,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
 
             // filter only unique callbacks to protects notification duplication
             callbacks = _.uniq(callbacks);
-            if (url === currentUrl()) {
+            if (url === current.url) {
                 // current page is outdated - execute all callbacks
                 _.each(callbacks, function (callback) {
                     callback(url);
@@ -152,7 +136,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
                     mediator.on('hash_navigation_request:refresh', handler);
                 }
             }
-            mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === currentUrl() });
+            mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === current.url });
         });
     }
 
@@ -160,8 +144,8 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
      * Page refresh handler, check whenever
      *
      * @param {string} url
-     * @param {array} callbacks
-     * @param {object} obj
+     * @param {Array} callbacks
+     * @param {Object} obj
      */
     function refreshHandler(url, callbacks, obj) {
         if (url === obj.url) {
@@ -191,10 +175,19 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
     }
 
     // handles page changing
-    mediator.on('hash_navigation_request:start', function (navigation) {
-        changeUrl(navigation.url);
+    mediator.on('page_fetch:request', function (args) {
+        changeUrl(args.route.path);
         if (notifier) {
             notifier.close();
+        }
+    });
+
+    // handles page changing
+    mediator.on('page_fetch:update', function (page, args) {
+        current.page = page;
+        // if it's forced page reload and page was in a cache, update it
+        if (args.options.force === true && contentManager.get()) {
+            contentManager.add();
         }
     });
 
@@ -215,7 +208,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          * @param {string} userName
          */
         init: function (url, userName) {
-            currentUrl(url);
+            changeUrl(url);
             currentUser = userName;
         },
 
@@ -223,7 +216,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          * Stores content related tags for current page
          *
          * @param {Array.<string>} tags list of tags
-         * @param {?function(string)} callback is optional,
+         * @param {function(string)=} callback is optional,
          *      handler which will be executed on content by the tags gets outdated
          */
         tagContent: function (tags, callback) {
@@ -239,53 +232,72 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
         },
 
         /**
-         * Clear cache data
+         * Clear cached data, by default for current url
          *
-         * by URL, or if it's not passed - clears all the cache
-         *
-         * @param {?string} url
+         * @param {string=} url
          */
-        clearCache: function (url) {
+        remove: function (url) {
             if (!_.isUndefined(url)) {
-                url = clearUrl(url);
-                delete pagesCache[url];
-                delete pagesTags[url];
-
-                if (outdatedPageHandlers[url]) {
-                    mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
-                    delete outdatedPageHandlers[url];
-                }
+                url = current.url;
             } else {
-                pagesCache = {};
+                delete pagesTags[url];
+            }
+            delete pagesCache[url];
+
+            if (outdatedPageHandlers[url]) {
+                mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
+                delete outdatedPageHandlers[url];
             }
         },
 
         /**
          * Add current page to permanent cache
-         *
-         * @param {string} url
-         * @param {Object} page
          */
-        addPage: function (url, page) {
-            pagesCache[clearUrl(url)] = page;
+        add: function () {
+            var url;
+            url = current.url;
+            pagesCache[url] = current;
         },
 
         /**
-         * Fetches cache data for url
+         * Fetches cache data for url, by default for current url
          *
-         * @param {string} url
-         * @return {Object}
+         * @param {string=} url
+         * @return {Object|boolean}
          */
-        getPage: function (url) {
-            return pagesCache[clearUrl(url)] || false;
+        get: function (url) {
+            if (_.isUndefined(url)) {
+                url = current.url;
+            }
+            return pagesCache[url] || undefined;
+        },
+
+        /**
+         * Saves state of a page component in a cache
+         *
+         * @param {string} key
+         * @param {*} value
+         */
+        saveState: function (key, value) {
+            current.state[key] = value;
+        },
+
+        /**
+         * Fetches state of a page component from cached page
+         *
+         * @param {string} key
+         * @return {*}
+         */
+        fetchState: function (key) {
+            return current.state[key];
         },
 
         /**
          * Prevents storing current page in cache
          */
         cacheIgnore: function () {
-            mediator.once('hash_navigation_request:before', function (navigation) {
-                contentManager.clearCache(navigation.url);
+            mediator.once('page_fetch:before', function (oldRoute) {
+                contentManager.remove(oldRoute.path);
             });
         }
     };

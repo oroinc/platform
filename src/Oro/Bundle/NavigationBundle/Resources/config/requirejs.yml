@@ -27,3 +27,5 @@ config:
         'oronavigation/js/pinbar/model': 'bundles/oronavigation/js/pinbar/model.js'
         'oronavigation/js/pinbar/view': 'bundles/oronavigation/js/pinbar/view.js'
         'oronavigation/js/shortcuts/view': 'bundles/oronavigation/js/shortcuts/view.js'
+    appmodules:
+        - oronavigation/js/app/module

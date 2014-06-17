@@ -3,10 +3,9 @@
 define([
     'underscore',
     'chaplin',
-    'routing', // @TODO get rid of routes dependency
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page'
-], function (_, Chaplin, routing, BaseController, PageModel) {
+], function (_, Chaplin, BaseController, PageModel) {
     'use strict';
 
     var document, location, utils, PageController;
@@ -19,7 +18,6 @@ define([
 
         /**
          * Creates page model
-         *
          * @override
          */
         initialize: function () {
@@ -37,7 +35,7 @@ define([
          * @param {Object} options
          */
         index: function (params, route, options) {
-            var url;
+            var url, cacheItem, args;
 
             if (!route.previous) {
                 return;
@@ -45,12 +43,24 @@ define([
 
             this._beforePageLoad(route, params, options);
 
-            url = routing.getBaseUrl() + route.path + (route.query ? '?' + route.query : '');
+            args = {// collect arguments to reuse in events of page_fetch state change
+                params: params,
+                route: route,
+                options: options
+            };
+            cacheItem = this.cache.get(route.path);
 
-            this.model.fetch({
-                url: url,
-                validate: true
-            });
+            if (cacheItem && options.force !== true) {
+                this.model.set(cacheItem.page, {actionArgs: args});
+                this.publishEvent('page_fetch:after', args);
+            } else {
+                url = this._combineRoutePath(route);
+                this.model.fetch({
+                    url: url,
+                    validate: true,
+                    actionArgs: args
+                });
+            }
         },
 
         /**
@@ -75,33 +85,34 @@ define([
             this.listenTo(page, 'sync', this.onPageUpdated);
             this.listenTo(page, 'invalid', this.onPageInvalid);
 
-            this.publishEvent('page_fetch:before', oldRoute, newRoute);
+            this.publishEvent('page_fetch:before', oldRoute, newRoute, options);
         },
 
         /**
          * Handles page request
-         *  - triggers 'page_fetch:start' event
+         *  - triggers 'page_fetch:request' event
          *
          * @param {Chaplin.Model} model
          * @param {XMLHttpRequest} xhr
          * @param {Object} options
          */
         onPageRequest: function (model, xhr, options) {
-            this.publishEvent('page_fetch:start');
+            this.publishEvent('page_fetch:request', options.actionArgs);
         },
 
         /**
          * Handles page request done
-         *  - triggers 'page_fetch:end' event with
+         *  - triggers 'page_fetch:update' event with
          *  - updates page title
          *
          * @param {Chaplin.Model} model
          * @param {Object} options
          */
         onPageLoaded: function (model, options) {
-            var attrs = model.getAttributes();
-            this.publishEvent('page_fetch:end', attrs);
-            this.adjustTitle(attrs.title);
+            var attributes;
+            attributes = model.getAttributes();
+            this.publishEvent('page_fetch:update', attributes, options.actionArgs);
+            this.adjustTitle(attributes.title);
         },
 
         /**
@@ -109,11 +120,11 @@ define([
          *  - triggers 'page_fetch:after' event with
          *
          * @param {Chaplin.Model} model
-         * @param {Object} attributes
+         * @param {Object} resp
          * @param {Object} options
          */
-        onPageUpdated: function (model, attributes, options) {
-            this.publishEvent('page_fetch:after');
+        onPageUpdated: function (model, resp, options) {
+            this.publishEvent('page_fetch:after', options.actionArgs);
         },
 
         /**
@@ -148,10 +159,7 @@ define([
                 parser.href = url;
                 url = parser.pathname + (parser.search || '');
                 this.publishEvent('page_fetch:redirect');
-                utils.redirectTo({url: url}, {forceStartup: true});
-                //clearing cache for current and redirect urls, e.g. form and grid page
-//                contentManager.clearCache(this.url);
-//                this.setLocation(url, {clearCache: true, useCache: this.getCachedData(url) !== false});
+                utils.redirectTo({url: url}, {forceStartup: true, force: true});
             }
         }
     });

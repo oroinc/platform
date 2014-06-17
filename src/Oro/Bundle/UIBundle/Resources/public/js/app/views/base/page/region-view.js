@@ -10,7 +10,7 @@ define([
 
     var PageRegionView = BaseView.extend({
         listen: {
-            'page_fetch:end mediator': 'onPageLoad'
+            'page_fetch:update mediator': 'onPageUpdate'
         },
 
         data: null,
@@ -24,7 +24,7 @@ define([
          *
          * @param {Object} data
          */
-        onPageLoad: function (data) {
+        onPageUpdate: function (data) {
             this.data = _.pick(data, this.pageItems);
             this.render();
             this.data = null;

@@ -25,3 +25,20 @@ require([
         el: '#mostviewed-content'
     });
 });
+
+/**
+ * Init ContentManager
+ */
+require([
+    'chaplin',
+    'oronavigation/js/content-manager'
+], function (Chaplin, contentManager) {
+    'use strict';
+
+    Chaplin.mediator.setHandler('pageCache:init', contentManager.init);
+    Chaplin.mediator.setHandler('pageCache:add', contentManager.add);
+    Chaplin.mediator.setHandler('pageCache:get', contentManager.get);
+    Chaplin.mediator.setHandler('pageCache:remove', contentManager.remove);
+    Chaplin.mediator.setHandler('pageCache:state:save', contentManager.saveState);
+    Chaplin.mediator.setHandler('pageCache:state:fetch', contentManager.fetchState);
+});

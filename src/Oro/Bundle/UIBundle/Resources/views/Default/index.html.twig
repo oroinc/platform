@@ -18,12 +18,15 @@
                     {% placeholder scripts_before %}
                 {% endblock %}
                 {% set requirejs_config_extend %}
-                    {% placeholder requirejs_config_extend %}
+                    {%- placeholder requirejs_config_extend -%}
                 {% endset %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {
                     compressed: not app.debug,
                     config_extend: requirejs_config_extend
                 } %}
+                <script type="text/javascript">
+                    require(['oroui/js/app']);
+                </script>
                 <script type="text/javascript">
                     require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}

@@ -39,5 +39,7 @@ items:
         template: OroUIBundle:Form:buttons.html.twig
     init_pinned_dropdown_button:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
+    ui_requirejs_config:
+        template: OroUIBundle::requirejs.config.js.twig
     navbar:
         template: OroUIBundle:Default/navbar:sided.html.twig
