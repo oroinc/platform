@@ -112,12 +112,28 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 
         $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRepository'))
             ->getMock();
         $registry->expects($this->once())
             ->method('getRepository')
             ->with('OroWorkflowBundle:ProcessJob')
             ->will($this->returnValue($repository));
+
+        if ($processJob) {
+            $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $entityManager->expects($this->once())
+                ->method('remove')
+                ->with($processJob)
+                ->will($this->returnSelf());
+            $entityManager->expects($this->once())
+                ->method('flush')
+                ->will($this->returnSelf());
+            $registry->expects($this->once())
+                ->method('getManagerForClass')
+                ->with('OroWorkflowBundle:ProcessJob')
+                ->will($this->returnValue($entityManager));
+        }
 
         $this->container->expects($this->at($callOrder))
             ->method('get')
