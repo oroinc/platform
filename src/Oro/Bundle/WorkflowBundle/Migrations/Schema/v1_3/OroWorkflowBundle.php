@@ -57,6 +57,7 @@ class OroWorkflowBundle implements Migration
         $jobTable->addColumn('serialized_data', 'text', []);
         $jobTable->setPrimaryKey(['id']);
         $jobTable->addIndex(['process_trigger_id'], 'IDX_1957630F196FFDE', []);
+        $jobTable->addIndex(['entity_hash'], 'process_job_entity_hash_idx', []);
         $jobTable->addForeignKeyConstraint(
             $triggerTable,
             ['process_trigger_id'],

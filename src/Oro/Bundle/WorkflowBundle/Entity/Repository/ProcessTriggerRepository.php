@@ -42,6 +42,7 @@ class ProcessTriggerRepository extends EntityRepository
         return $this->createQueryBuilder('trigger')
             ->select('trigger, definition')
             ->innerJoin('trigger.definition', 'definition')
+            ->orderBy('definition.executionOrder')
             ->getQuery()
             ->execute();
     }

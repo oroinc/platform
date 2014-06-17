@@ -72,8 +72,18 @@ class ProcessTriggerRepositoryTest extends WebTestCase
 
         $triggers = $this->repository->findAllWithDefinitions();
         $this->assertCount($expectedCount, $triggers);
+
+        $previousOrder = null;
         foreach ($triggers as $trigger) {
             $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
+
+            $executionOrder = $trigger->getDefinition()->getExecutionOrder();
+            if ($previousOrder === null) {
+                $previousOrder = $executionOrder;
+            }
+
+            $this->assertGreaterThanOrEqual($previousOrder, $executionOrder);
+            $previousOrder = $executionOrder;
         }
     }
 }

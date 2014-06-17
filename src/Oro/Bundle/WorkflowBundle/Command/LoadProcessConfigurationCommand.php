@@ -196,8 +196,10 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
                     )
                 );
 
-                /** @var ProcessDefinition $existingDefinition */
-                if (!$triggerRepository->isEqualTriggerExists($trigger)) {
+                $existingTrigger = $triggerRepository->findEqualTrigger($trigger);
+                if ($existingTrigger) {
+                    $existingTrigger->import($trigger);
+                } else {
                     $entityManager->persist($trigger);
                 }
             }
