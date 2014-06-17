@@ -73,7 +73,7 @@ class ExtendHelper
     /**
      * Gets the short name of the class, the part without the namespace.
      *
-     * @param string $className            The full name of a class
+     * @param string $className The full name of a class
      *
      * @return string
      */
