@@ -6,9 +6,17 @@ define([
 
     var PageMostViewedView = PageRegionView.extend({
         template: '<%= mostviewed %>',
-        pageItems: ['mostviewed']
+        pageItems: ['mostviewed'],
+
+        render: function () {
+            // does not update view is data is from cache
+            if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
+                return;
+            }
+
+            PageRegionView.prototype.render.call(this);
+        }
     });
-    // @TODO check if page is not loaded from cache before render
 
     return PageMostViewedView;
 });

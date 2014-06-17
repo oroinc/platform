@@ -23,11 +23,14 @@ define([
          *  - dispose cached data
          *
          * @param {Object} data
+         * @param {Object} actionArgs arguments of controller's action point
          */
-        onPageUpdate: function (data) {
+        onPageUpdate: function (data, actionArgs) {
             this.data = _.pick(data, this.pageItems);
+            this.actionArgs = actionArgs;
             this.render();
             this.data = null;
+            this.actionArgs = null;
         },
 
         /**
