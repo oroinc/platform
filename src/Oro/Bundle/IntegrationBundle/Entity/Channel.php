@@ -316,7 +316,7 @@ class Channel
     }
 
     /**
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
+     * @param Organization $organization
      */
     public function setOrganization($organization)
     {
@@ -324,7 +324,7 @@ class Channel
     }
 
     /**
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     * @return Organization
      */
     public function getOrganization()
     {
