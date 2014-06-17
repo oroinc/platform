@@ -18,17 +18,16 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
- * @Route("/channel")
+ * @Route("/integration")
  */
-class ChannelController extends Controller
+class IntegrationController extends Controller
 {
     /**
-     * @Route("/", name="oro_integration_channel_index")
+     * @Route("/", name="oro_integration_index")
      * @Acl(
-     *      id="oro_integration_channel_index",
+     *      id="oro_integration_view",
      *      type="entity",
      *      permission="VIEW",
      *      class="OroIntegrationBundle:Channel"
@@ -41,14 +40,14 @@ class ChannelController extends Controller
     }
 
     /**
-     * @Route("/create", name="oro_integration_channel_create")
+     * @Route("/create", name="oro_integration_create")
      * @Acl(
-     *      id="oro_integration_channel_create",
+     *      id="oro_integration_create",
      *      type="entity",
      *      permission="CREATE",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template("OroIntegrationBundle:Channel:update.html.twig")
+     * @Template("OroIntegrationBundle:Integration:update.html.twig")
      */
     public function createAction()
     {
@@ -56,9 +55,9 @@ class ChannelController extends Controller
     }
 
     /**
-     * @Route("/update/{id}", requirements={"id"="\d+"}), name="oro_integration_channel_update")
+     * @Route("/update/{id}", requirements={"id"="\d+"}, name="oro_integration_update")
      * @Acl(
-     *      id="oro_integration_channel_update",
+     *      id="oro_integration_update",
      *      type="entity",
      *      permission="EDIT",
      *      class="OroIntegrationBundle:Channel"
@@ -71,8 +70,8 @@ class ChannelController extends Controller
     }
 
     /**
-     * @Route("/schedule/{id}", requirements={"id"="\d+"}), name="oro_integration_channel_schedule")
-     * @AclAncestor("oro_integration_channel_update")
+     * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
+     * @AclAncestor("oro_integration_update")
      */
     public function scheduleAction(Channel $channel)
     {
@@ -128,8 +127,8 @@ class ChannelController extends Controller
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_integration_channel_update', 'parameters' => ['id' => $channel->getId()]],
-                ['route' => 'oro_integration_channel_index'],
+                ['route' => 'oro_integration_update', 'parameters' => ['id' => $channel->getId()]],
+                ['route' => 'oro_integration_index'],
                 $channel
             );
         }

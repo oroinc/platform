@@ -1,15 +1,15 @@
 datagrid:
-    channels-grid:
+    oro-integration-grid:
         source:
             type: orm
-            acl_resource: oro_integration_channel_index
+            acl_resource: oro_integration_view
             query:
                 select:
                     - c.id
                     - c.name
                     - c.type
                 from:
-                    - { table: %oro_integration.channel.entity.class%, alias: c }
+                    - { table: %oro_integration.entity.class%, alias: c }
         columns:
             name:
                 label: oro.integration.integration.name.label
@@ -21,15 +21,15 @@ datagrid:
             id: ~
             update_link:
                 type:    url
-                route:   oro_integration_channel_update
+                route:   oro_integration_update
                 params:  [ id ]
             delete_link:
                 type:    url
-                route:   oro_api_delete_channel
+                route:   oro_api_delete_integration
                 params:  [ id ]
             schedule_link:
                 type:    url
-                route:   oro_integration_channel_schedule
+                route:   oro_integration_schedule
                 params:  [ id ]
         sorters:
             columns:
@@ -48,20 +48,20 @@ datagrid:
             update:
                 type:         navigate
                 link:         update_link
-                acl_resource: oro_integration_channel_update
+                acl_resource: oro_integration_update
                 icon:         edit
                 label:        oro.integration.datagrid.action.update
                 rowAction:    true
             schedule:
                 type:         schedule-sync
                 link:         schedule_link
-                acl_resource: oro_integration_channel_update
+                acl_resource: oro_integration_update
                 icon:         refresh
                 label:        oro.integration.datagrid.action.schedule_sync
             delete:
                 type:         delete
                 link:         delete_link
-                acl_resource: oro_integration_channel_delete
+                acl_resource: oro_integration_delete
                 icon:         trash
                 label:        oro.integration.datagrid.action.delete
                 defaultMessages:

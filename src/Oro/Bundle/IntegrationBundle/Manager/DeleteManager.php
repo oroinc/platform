@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class ChannelDeleteManager
+class DeleteManager
 {
     /**
      * @var EntityManager
@@ -14,12 +14,12 @@ class ChannelDeleteManager
     protected $em;
 
     /**
-     * @var ChannelDeleteProviderInterface[]
+     * @var DeleteProviderInterface[]
      */
     protected $deleteProviders;
 
     /**
-     * @param EntityManager   $em
+     * @param EntityManager $em
      */
     public function __construct(EntityManager $em)
     {
@@ -29,9 +29,9 @@ class ChannelDeleteManager
     /**
      * Add delete channel provider
      *
-     * @param ChannelDeleteProviderInterface $deleteProvider
+     * @param DeleteProviderInterface $deleteProvider
      */
-    public function addProvider(ChannelDeleteProviderInterface $deleteProvider)
+    public function addProvider(DeleteProviderInterface $deleteProvider)
     {
         $this->deleteProviders[] = $deleteProvider;
     }
@@ -40,15 +40,16 @@ class ChannelDeleteManager
      * Delete channel
      *
      * @param Channel $channel
+     *
      * @return bool
      */
-    public function deleteChannel(Channel $channel)
+    public function delete(Channel $channel)
     {
         try {
             $this->em->getConnection()->beginTransaction();
-            $channelType = $channel->getType();
+            $type = $channel->getType();
             foreach ($this->deleteProviders as $deleteProvider) {
-                if ($deleteProvider->isSupport($channelType)) {
+                if ($deleteProvider->supports($type)) {
                     $deleteProvider->deleteRelatedData($channel);
                 }
             }

@@ -1,5 +1,5 @@
 parameters:
-    oro_integration.channel.entity.class:                                 Oro\Bundle\IntegrationBundle\Entity\Channel
+    oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
     oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
@@ -19,7 +19,7 @@ parameters:
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
 
-    oro_integration.channel_delete_manager.class:                         Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteManager
+    oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
@@ -27,10 +27,10 @@ parameters:
     #Reader
 
 services:
-    oro_integration.channel.manager.api:
+    oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         arguments:
-            - %oro_integration.channel.entity.class%
+            - %oro_integration.entity.class%
             - @doctrine.orm.entity_manager
 
     oro_integration.form.channel:
@@ -122,8 +122,8 @@ services:
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
 
-    oro_integration.channel_delete_manager:
-        class: %oro_integration.channel_delete_manager.class%
+    oro_integration.delete_manager:
+        class: %oro_integration.delete_manager.class%
         arguments: [ @doctrine.orm.entity_manager ]
 
     oro_integration.sync_scheduler:

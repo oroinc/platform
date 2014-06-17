@@ -13,13 +13,12 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 /**
- * @RouteResource("channel")
+ * @RouteResource("integration")
  * @NamePrefix("oro_api_")
  */
-class ChannelController extends FOSRestController
+class IntegrationController extends FOSRestController
 {
     /**
      * REST DELETE
@@ -27,11 +26,11 @@ class ChannelController extends FOSRestController
      * @param int $id
      *
      * @ApiDoc(
-     *      description="Delete Channel",
+     *      description="Delete Integration",
      *      resource=true
      * )
      * @Acl(
-     *      id="oro_integration_channel_delete",
+     *      id="oro_integration_delete",
      *      type="entity",
      *      permission="DELETE",
      *      class="OroIntegrationBundle:Channel"
@@ -44,7 +43,7 @@ class ChannelController extends FOSRestController
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-        if (!$this->get('oro_integration.channel_delete_manager')->deleteChannel($entity)) {
+        if (!$this->get('oro_integration.delete_manager')->delete($entity)) {
             return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
         }
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
@@ -57,6 +56,6 @@ class ChannelController extends FOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_integration.channel.manager.api');
+        return $this->get('oro_integration.manager.api');
     }
 }
