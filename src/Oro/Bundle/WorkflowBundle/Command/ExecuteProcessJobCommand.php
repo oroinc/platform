@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -15,12 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ExecuteProcessJobCommand extends ContainerAwareCommand
 {
     /**
-     * @var Registry
+     * @var ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @return Registry
+     * @return ManagerRegistry
      */
     protected function getRegistry()
     {
@@ -59,6 +59,9 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
 
         try {
             $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
+            $entityManager = $this->getRegistry()->getManagerForClass('OroWorkflowBundle:ProcessJob');
+            $entityManager->remove($processJob);
+            $entityManager->flush();
         } catch (\Exception $e) {
             $logger = new OutputLogger($output);
             $logger->critical($e->getMessage(), ['exception' => $e]);
