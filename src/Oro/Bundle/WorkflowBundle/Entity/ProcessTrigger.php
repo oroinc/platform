@@ -303,4 +303,19 @@ class ProcessTrigger
     {
         return array(self::EVENT_CREATE, self::EVENT_UPDATE, self::EVENT_DELETE);
     }
+
+    /**
+     * @param ProcessTrigger $trigger
+     * @return ProcessTrigger
+     */
+    public function import(ProcessTrigger $trigger)
+    {
+        $this->setEvent($trigger->getEvent())
+            ->setField($trigger->getField())
+            ->setQueued($trigger->isQueued())
+            ->setTimeShift($trigger->getTimeShift())
+            ->setDefinition($trigger->getDefinition());
+
+        return $this;
+    }
 }

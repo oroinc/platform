@@ -12,16 +12,30 @@ definitions:
         entity: My\Entity
         actions_configuration: []
 
+    contact_definition:
+        label: 'Contact Definition'
+        enabled: true
+        entity: OroCRM\Bundle\ContactBundle\Entity\Contact
+        order: 20
+        actions_configuration:
+            - @assign_value: [$namePrefix, 'Pr.']
+
 triggers:
     test_definition:
         -
             event: update
             field: loginCount
             queued: true
-            time_shift: 123456
+            time_shift: 60
         -
             event: create
             queued: true
             time_shift: P6YT5M
         -
             event: delete
+
+    contact_definition:
+        -
+            event: update
+            queued: true
+            time_shift: 60

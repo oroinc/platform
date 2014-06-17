@@ -8,6 +8,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -23,6 +24,16 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $handler;
+
+    /**
      * @var ProcessCollectorListener
      */
     protected $listener;
@@ -30,7 +41,16 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->listener = new ProcessCollectorListener($this->registry);
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->handler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessHandler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new ProcessCollectorListener($this->registry, $this->doctrineHelper, $this->handler);
     }
 
     public function testPrePersist()
@@ -96,8 +116,12 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->prepareRegistry($triggers);
 
         $entityClass = self::ENTITY;
+        $entityId = 1;
         $entity = new $entityClass();
         $args = new LifecycleEventArgs($entity, $this->getEntityManager());
+
+        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
+            ->will($this->returnValue($entityId));
 
         $this->listener->preRemove($args);
 
@@ -110,9 +134,11 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
+        $expectedEntityHashes = array(ProcessJob::generateEntityHash($entityClass, $entityId));
 
         $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
         $this->assertAttributeEquals($expectedScheduledProcessed, 'scheduledProcesses', $this->listener);
+        $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
     }
 
     /**

@@ -144,4 +144,32 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $this->entity->getUpdatedAt());
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
+
+    public function testImport()
+    {
+        $importedDefinition = new ProcessDefinition();
+
+        $importedEntity = new ProcessTrigger();
+        $importedEntity
+            ->setEvent(ProcessTrigger::EVENT_UPDATE)
+            ->setField('testField')
+            ->setQueued(true)
+            ->setTimeShift(123)
+            ->setDefinition($importedDefinition);
+
+        $this->assertNotEquals($importedEntity->getEvent(), $this->entity->getEvent());
+        $this->assertNotEquals($importedEntity->getField(), $this->entity->getField());
+        $this->assertNotEquals($importedEntity->isQueued(), $this->entity->isQueued());
+        $this->assertNotEquals($importedEntity->getTimeShift(), $this->entity->getTimeShift());
+        $this->assertNotEquals($importedEntity->getDefinition(), $this->entity->getDefinition());
+
+        $this->entity->import($importedEntity);
+
+        $this->assertEquals($importedEntity->getEvent(), $this->entity->getEvent());
+        $this->assertEquals($importedEntity->getField(), $this->entity->getField());
+        $this->assertEquals($importedEntity->isQueued(), $this->entity->isQueued());
+        $this->assertEquals($importedEntity->getTimeShift(), $this->entity->getTimeShift());
+        $this->assertEquals($importedEntity->getDefinition(), $this->entity->getDefinition());
+
+    }
 }

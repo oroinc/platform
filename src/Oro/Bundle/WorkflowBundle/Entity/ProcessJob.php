@@ -10,7 +10,12 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * @ORM\Table("oro_process_job")
+ * @ORM\Table(
+ *      "oro_process_job",
+ *      indexes={
+ *          @ORM\Index(name="process_job_entity_hash_idx", columns={"entity_hash"})
+ *      }
+ * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository")
  */
 class ProcessJob
