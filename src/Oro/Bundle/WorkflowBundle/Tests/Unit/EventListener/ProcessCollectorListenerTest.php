@@ -38,7 +38,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
 
-        $entity = new \stdClass();
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
         $args = new LifecycleEventArgs($entity, $this->getEntityManager());
 
         $this->listener->prePersist($args);
@@ -62,7 +63,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
 
-        $entity = new \stdClass();
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
         $oldValue = 1;
         $newValue = 2;
         $changeSet = array(self::FIELD => array($oldValue, $newValue));
@@ -93,7 +95,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
 
-        $entity = new \stdClass();
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
         $args = new LifecycleEventArgs($entity, $this->getEntityManager());
 
         $this->listener->preRemove($args);
@@ -125,7 +128,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $expectedTriggers = $this->getExpectedTriggers($triggers);
 
         // prepare environment
-        $this->listener->prePersist(new LifecycleEventArgs(new \stdClass(), $this->getEntityManager()));
+        $entityClass = self::ENTITY;
+        $this->listener->prePersist(new LifecycleEventArgs(new $entityClass(), $this->getEntityManager()));
 
         $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
         $this->assertAttributeNotEmpty('scheduledProcesses', $this->listener);

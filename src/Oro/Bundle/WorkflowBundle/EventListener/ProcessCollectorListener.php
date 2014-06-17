@@ -83,10 +83,8 @@ class ProcessCollectorListener
                     return $this->triggers[$entityClass][$event]['entity'];
                 }
             }
-        } else {
-            if (!empty($this->triggers[$entityClass][$event])) {
-                return $this->triggers[$entityClass][$event];
-            }
+        } elseif (!empty($this->triggers[$entityClass][$event])) {
+            return $this->triggers[$entityClass][$event];
         }
 
         return array();

@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
  * @dbIsolation
@@ -38,14 +39,17 @@ class ProcessTriggerRepositoryTest extends WebTestCase
 
     public function testEqualTriggers()
     {
-        $definition = $this->entityManager->find('OroWorkflowBundle:ProcessDefinition', 'test');
+        $definition = $this->entityManager->find(
+            'OroWorkflowBundle:ProcessDefinition',
+            LoadProcessEntities::FIRST_DEFINITION
+        );
         $trigger = $this->repository->findOneBy(array('definition' => $definition));
 
         // test equal (existing) trigger
         $equalTrigger = new ProcessTrigger();
         $equalTrigger->setDefinition($definition)
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
-            ->setField('name');
+            ->setField(LoadProcessEntities::UPDATE_TRIGGER_FIELD);
 
         $this->assertEquals($trigger, $this->repository->findEqualTrigger($equalTrigger));
         $this->assertTrue($this->repository->isEqualTriggerExists($equalTrigger));

@@ -13,6 +13,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class LoadProcessEntities extends AbstractFixture implements ContainerAwareInterface
 {
+    const FIRST_DEFINITION = 'first';
+    const SECOND_DEFINITION = 'second';
+    const UPDATE_TRIGGER_FIELD = 'name';
+
     /**
      * @var ContainerInterface
      */
@@ -33,19 +37,36 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
     {
         $entityManager = $this->container->get('doctrine')->getManager();
 
-        $definition = new ProcessDefinition();
-        $definition->setName('test')
-            ->setLabel('Test');
+        // first definition
+        $firstDefinition = new ProcessDefinition();
+        $firstDefinition->setName(self::FIRST_DEFINITION)
+            ->setLabel(self::FIRST_DEFINITION);
 
-        $entityManager->persist($definition);
-        $entityManager->flush($definition);
-
-        $existingTrigger = new ProcessTrigger();
-        $existingTrigger->setDefinition($definition)
+        $updateTrigger = new ProcessTrigger();
+        $updateTrigger->setDefinition($firstDefinition)
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
-            ->setField('name');
+            ->setField(self::UPDATE_TRIGGER_FIELD);
 
-        $entityManager->persist($existingTrigger);
-        $entityManager->flush($existingTrigger);
+        $entityManager->persist($firstDefinition);
+        $entityManager->persist($updateTrigger);
+
+        // second definition
+        $secondDefinition  = new ProcessDefinition();
+        $secondDefinition->setName(self::SECOND_DEFINITION)
+            ->setLabel(self::SECOND_DEFINITION);
+
+        $createTrigger = new ProcessTrigger();
+        $createTrigger->setDefinition($secondDefinition)
+            ->setEvent(ProcessTrigger::EVENT_CREATE);
+
+        $deleteTrigger = new ProcessTrigger();
+        $deleteTrigger->setDefinition($secondDefinition)
+            ->setEvent(ProcessTrigger::EVENT_DELETE);
+
+        $entityManager->persist($secondDefinition);
+        $entityManager->persist($createTrigger);
+        $entityManager->persist($deleteTrigger);
+
+        $entityManager->flush();
     }
 }
