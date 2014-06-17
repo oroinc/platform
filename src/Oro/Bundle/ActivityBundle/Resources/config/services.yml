@@ -1,5 +1,6 @@
 parameters:
-    oro_activity.entity_extend.dumper_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
+    oro_activity.entity_extend.dumper_extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
+    oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
 
 services:
     oro_activity.entity_extend.dumper_extension:
@@ -7,3 +8,8 @@ services:
         parent: oro_entity_extend.config_dumper_extension
         tags:
             - { name: oro_entity_extend.dumper_extension }
+
+    oro_activity.migration.extension.activity:
+        class: %oro_activity.migration.extension.activity.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: activity }

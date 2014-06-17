@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class NoteExtension implements ExtendExtensionAwareInterface
@@ -26,40 +26,38 @@ class NoteExtension implements ExtendExtensionAwareInterface
     }
 
     /**
+     * Adds the association between the target table and the note table
+     *
      * @param Schema $schema
-     * @param string $targetTable      Target entity table name
+     * @param string $targetTableName  Target entity table name
      * @param string $targetColumnName A column name is used to show related entity
      */
     public function addNoteAssociation(
         Schema $schema,
-        $targetTable,
+        $targetTableName,
         $targetColumnName = null
     ) {
         $noteTable   = $schema->getTable(self::NOTE_TABLE_NAME);
-        $entityTable = $schema->getTable($targetTable);
+        $targetTable = $schema->getTable($targetTableName);
 
         if (empty($targetColumnName)) {
-            $primaryKeyColumns = $entityTable->getPrimaryKeyColumns();
+            $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
             $targetColumnName  = array_shift($primaryKeyColumns);
         }
 
-        $options = [
-            'note' => [
-                'enabled' => true
-            ]
-        ];
+        $options = new OroOptions();
+        $options->set('note', 'enabled', true);
+        $targetTable->addOption(OroOptions::KEY, $options);
 
-        $entityTable->addOption(ExtendColumn::ORO_OPTIONS_NAME, $options);
-
-        $entityAssociationName = ExtendHelper::buildAssociationName(
-            $this->extendExtension->getEntityClassByTableName($targetTable)
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->extendExtension->getEntityClassByTableName($targetTableName)
         );
 
         $this->extendExtension->addManyToOneRelation(
             $schema,
             $noteTable,
-            $entityAssociationName,
-            $entityTable,
+            $associationName,
+            $targetTable,
             $targetColumnName,
             [
                 'extend' => [

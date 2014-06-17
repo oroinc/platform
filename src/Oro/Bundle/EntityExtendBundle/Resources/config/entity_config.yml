@@ -273,6 +273,18 @@ oro_entity_config:
                         options:
                             block:          general
                             subblock:       properties
+
+                relation_key: # string
+                    options:
+                        auditable:          false
+
+                # indicated whether the relation has the default value or not
+                # for example regular many-to-many or one-to-many have the default value,
+                # but you can create them without the default value
+                without_default: # bool
+                    options:
+                        auditable:          false
+
                 target_entity:
                     options:
                         auditable:          false
@@ -311,6 +323,7 @@ oro_entity_config:
                                 class:      is-option-set-expanded
                             block:          general
                             subblock:       properties
+
                 set_options:
                     options:
                         allowed_type:       [optionSet]
