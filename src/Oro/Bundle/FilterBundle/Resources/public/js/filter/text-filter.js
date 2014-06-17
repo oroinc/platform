@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter'
     ], function ($, _, __, AbstractFilter) {
@@ -189,7 +190,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             return this;
         },
 
+        /**
+         * Renders filter's wrapper, (a button and a dropdown container e.g.)
+         *
+         * @param {Element|jQuery|string}  $filter
+         * @private
+         */
         _wrap: function ($filter) {
+            this._appendFilter($filter);
+        },
+
+        /**
+         * Append filter to its place
+         *
+         * @param {Element|jQuery|string} $filter
+         * @private
+         */
+        _appendFilter: function ($filter) {
             this.$el.append($filter);
         },
 
