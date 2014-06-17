@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -89,6 +90,14 @@ class Channel
      * @Oro\Versioned()
      */
     protected $defaultUserOwner;
+
+    /**
+     * @var Organization
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $organization;
 
     /**
      * @var Status[]|ArrayCollection
@@ -304,5 +313,21 @@ class Channel
     public function getDefaultUserOwner()
     {
         return $this->defaultUserOwner;
+    }
+
+    /**
+     * @param Organization $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

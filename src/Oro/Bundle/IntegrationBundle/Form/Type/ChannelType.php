@@ -50,6 +50,16 @@ class ChannelType extends AbstractType
         );
         $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
 
+        $builder->add(
+            'organization',
+            'oro_organization_select',
+            [
+                'required' => true,
+                'label'    => 'oro.integration.integration.organization.label',
+                'tooltip'  => 'oro.integration.integration.organization.tooltip'
+            ]
+        );
+
         // add transport type selector
         $builder->add(
             'transportType',

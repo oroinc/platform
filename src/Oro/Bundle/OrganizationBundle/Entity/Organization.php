@@ -18,6 +18,9 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
+ *      },
+ *      "form"={
+ *          "form_type"="oro_organization_select"
  *      }
  *  }
  * )

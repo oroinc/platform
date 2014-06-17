@@ -6,6 +6,7 @@ use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
  * @outputBuffering enabled
@@ -19,6 +20,17 @@ class ChannelControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+    }
+
+    /**
+     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization|null
+     */
+    public function getOrganization()
+    {
+        return $this->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->findOneByName(LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION);
     }
 
     public function testIndex()
@@ -41,6 +53,7 @@ class ChannelControllersTest extends WebTestCase
         $em->persist($newUser);
         $em->flush($newUser);
 
+        $organization = $this->getOrganization();
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
@@ -51,8 +64,15 @@ class ChannelControllersTest extends WebTestCase
             'Should contains predefined default owner - current user'
         );
 
+        $this->assertEquals(
+            '',
+            $form['oro_integration_channel_form[organization]']->getValue(),
+            'Should contains predefined organization'
+        );
+
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = 'Simple channel';
+        $form['oro_integration_channel_form[organization]'] = $organization->getId();
         $form['oro_integration_channel_form[type]'] = 'simple';
         $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
 
@@ -63,7 +83,7 @@ class ChannelControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Integration saved", $crawler->html());
 
-        return compact('name', 'newUser');
+        return compact('name', 'newUser', 'organization');
     }
 
     /**
@@ -96,6 +116,12 @@ class ChannelControllersTest extends WebTestCase
             $data['newUser']->getId(),
             $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
             'Should save default user owner'
+        );
+
+        $this->assertEquals(
+            $data['organization']->getId(),
+            $form['oro_integration_channel_form[organization]']->getValue(),
+            'Should save organization'
         );
 
         $name = 'name' . $this->generateRandomString();
