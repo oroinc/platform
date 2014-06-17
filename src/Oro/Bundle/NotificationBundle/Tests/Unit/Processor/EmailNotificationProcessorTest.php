@@ -262,8 +262,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                             array(
                                 '--message-limit=' . self::TEST_MESSAGE_LIMIT,
                                 '--env=' . self::TEST_ENV,
-                                '--mailer=db_spool_mailer',
-                                '--no-debug'
+                                '--mailer=db_spool_mailer'
                             ),
                             $job->getArgs()
                         );

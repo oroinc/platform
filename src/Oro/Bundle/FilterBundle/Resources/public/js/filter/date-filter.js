@@ -1,4 +1,4 @@
-/*jslint nomen: true*/
+/*jslint nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter',
         'orolocale/js/locale-settings', '../datevariables-widget'
@@ -206,7 +206,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         /**
          * @inheritDoc
          */
-        render: function () {
+        _renderCriteria: function () {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var part  = {value: value.part, type: value.part};
 
@@ -219,10 +219,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             var parts = [];
 
             // add date parts only if embed template used
-            if (this.templateTheme != "") {
+            if (this.templateTheme !== "") {
                 parts.push(
                     datePartTemplate({
-                        name: this.name+'_part',
+                        name: this.name + '_part',
                         choices: this.dateParts,
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel
@@ -246,7 +246,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                     parts: parts
                 })
             );
-            this._wrap($filter);
+            this._appendFilter($filter);
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
             this.changeFilterType(value.type);
@@ -260,7 +260,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 $(this).tab('show');
             });
 
-            return this;
+            this._criteriaRenderd = true;
         },
 
         _appendDropdown: function (template, actualSelector, name) {
