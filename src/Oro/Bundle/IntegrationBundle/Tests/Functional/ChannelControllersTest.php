@@ -54,7 +54,6 @@ class ChannelControllersTest extends WebTestCase
         $em->flush($newUser);
 
         $organization = $this->getOrganization();
-
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
