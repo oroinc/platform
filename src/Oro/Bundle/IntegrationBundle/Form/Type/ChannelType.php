@@ -55,8 +55,8 @@ class ChannelType extends AbstractType
             'oro_organization_select',
             [
                 'required' => true,
-                'label'    => 'oro.integration.integration.default_organization.label',
-                'tooltip'  => 'oro.integration.integration.default_organization.tooltip'
+                'label'    => 'oro.integration.integration.organization.label',
+                'tooltip'  => 'oro.integration.integration.organization.tooltip'
             ]
         );
 
