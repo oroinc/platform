@@ -16,8 +16,6 @@ class OrganizationSelectType extends AbstractType
             [
                 'configs' => [
                     'placeholder' => 'oro.organization.form.choose_organization',
-                    'result_template_twig' => 'OroOrganizationBundle:Organization:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroOrganizationBundle:Organization:Autocomplete/selection.html.twig'
                 ],
                 'autocomplete_alias' => 'organization'
             ]
