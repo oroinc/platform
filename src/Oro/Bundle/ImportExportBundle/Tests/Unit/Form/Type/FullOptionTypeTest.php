@@ -23,10 +23,11 @@ class FullOptionTypeTest extends FormIntegrationTestCase
 
     /**
      * @param string $fieldType
+     * @param array $viewVars
      *
      * @dataProvider submitDataProvider
      */
-    public function testSubmit($fieldType)
+    public function testSubmit($fieldType, array $viewVars)
     {
         $options = [];
 
@@ -50,6 +51,8 @@ class FullOptionTypeTest extends FormIntegrationTestCase
 
         $formView = new FormView();
         $this->type->finishView($formView, $formMock, $options);
+
+        $this->assertEquals($viewVars, $formView->vars);
     }
 
     /**
@@ -60,12 +63,60 @@ class FullOptionTypeTest extends FormIntegrationTestCase
         return [
             'empty'    => [
                 'fieldType' => null,
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
             ],
             'single'   => [
                 'fieldType' => 'string',
+                'viewVars' => [
+                    'disabled' => 'disabled',
+                    'value' => null,
+                    'attr' => []
+                ]
             ],
-            'relation' => [
+            'ref-one' => [
+                'fieldType' => 'ref-one',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
+            ],
+            'oneToOne' => [
+                'fieldType' => 'oneToOne',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
+            ],
+            'manyToOne' => [
+                'fieldType' => 'manyToOne',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
+            ],
+            'ref-many' => [
+                'fieldType' => 'ref-many',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
+            ],
+            'oneToMany' => [
                 'fieldType' => 'oneToMany',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
+            ],
+            'manyToMany' => [
+                'fieldType' => 'manyToMany',
+                'viewVars' => [
+                    'value' => null,
+                    'attr' => []
+                ]
             ],
         ];
     }
