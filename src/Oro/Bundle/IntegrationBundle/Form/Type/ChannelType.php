@@ -44,7 +44,7 @@ class ChannelType extends AbstractType
             'oro_integration_type_select',
             [
                 'required' => true,
-                'choices'  => $this->registry->getAvailableChannelTypesChoiceList(),
+                'choices'  => $this->registry->getAvailableChannelTypesChoiceListWithIcon(),
                 'label'    => 'oro.integration.integration.type.label'
             ]
         );

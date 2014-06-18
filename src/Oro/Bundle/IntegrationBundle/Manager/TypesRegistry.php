@@ -64,16 +64,27 @@ class TypesRegistry
      */
     public function getAvailableChannelTypesChoiceList()
     {
-        $registry = $this;
-        $types    = $registry->getRegisteredChannelTypes();
-        $types    = $types->partition(
-            function ($key, ChannelInterface $type) use ($registry) {
-                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
-            }
-        );
-
         /** @var ArrayCollection $types */
-        $types  = $types[0];
+        $types  = $this->getAvailableChannelTypes();
+        $keys   = $types->getKeys();
+        $values = $types->map(
+            function (ChannelInterface $type) {
+                return $type->getLabel();
+            }
+        )->toArray();
+
+        return array_combine($keys, $values);
+    }
+
+    /**
+     * Collect available types for choice field with icon
+     *
+     * @return array
+     */
+    public function getAvailableChannelTypesChoiceListWithIcon()
+    {
+        /** @var ArrayCollection $types */
+        $types  = $this->getAvailableChannelTypes();
         $keys   = $types->getKeys();
         $values = $types->map(
             function (ChannelInterface $type) {
@@ -86,6 +97,21 @@ class TypesRegistry
         )->toArray();
 
         return array_combine($keys, $values);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAvailableChannelTypes()
+    {
+        $registry = $this;
+        $types    = $registry->getRegisteredChannelTypes();
+        $types    = $types->partition(
+            function ($key, ChannelInterface $type) use ($registry) {
+                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
+            }
+        );
+        return $types[0];
     }
 
     /**
