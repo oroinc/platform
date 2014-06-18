@@ -4,13 +4,12 @@ namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 
 class AttachmentExtension implements ExtendExtensionAwareInterface
 {
@@ -59,10 +58,13 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         $entityTable = $schema->getTable($sourceTable);
 
         $attachmentScopeOptions = [
-            'maxsize' => $attachmentMaxSize,
-            'width'   => $attachmentThumbWidth,
-            'height'  => $attachmentThumbHeight
+            'maxsize' => $attachmentMaxSize
         ];
+
+        if ($type == AttachmentScope::ATTACHMENT_IMAGE) {
+            $attachmentScopeOptions['width']  = $attachmentThumbWidth;
+            $attachmentScopeOptions['height'] = $attachmentThumbHeight;
+        }
 
         $this->extendExtension->addManyToOneRelation(
             $schema,
