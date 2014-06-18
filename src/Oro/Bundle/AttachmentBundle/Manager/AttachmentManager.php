@@ -28,7 +28,7 @@ class AttachmentManager
     /**
      * @param FilesystemMap $filesystemMap
      * @param Router        $router
-     * @param               $fileIcons
+     * @param array         $fileIcons
      */
     public function __construct(FilesystemMap $filesystemMap, Router $router, $fileIcons)
     {
@@ -74,7 +74,7 @@ class AttachmentManager
                 if ($this->filesystem->getAdapter() instanceof MetadataSupporter) {
                     $this->filesystem->getAdapter()->setMetadata(
                         $entity->getFilename(),
-                        ['contentType' => $file->getMimeType()]
+                        ['contentType' => $entity->getMimeType()]
                     );
                 }
             }
