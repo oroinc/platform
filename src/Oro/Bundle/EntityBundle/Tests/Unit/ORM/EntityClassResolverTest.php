@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Doctrine\ORM\ORMException;
+
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -96,5 +97,36 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->resolver->isKnownEntityClassNamespace('Acme\Bundle\SomeBundle\Entity'));
         $this->assertFalse($this->resolver->isKnownEntityClassNamespace('Acme\Bundle\AnotherBundle\Entity'));
+    }
+
+    public function testIsEntity()
+    {
+        $className = 'Test\Entity';
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($className)
+            ->will($this->returnValue($em));
+
+        $this->assertTrue(
+            $this->resolver->isEntity($className)
+        );
+    }
+
+    public function testIsEntityForNotManageableEntity()
+    {
+        $className = 'Test\Entity';
+
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($className)
+            ->will($this->returnValue(null));
+
+        $this->assertFalse(
+            $this->resolver->isEntity($className)
+        );
     }
 }
