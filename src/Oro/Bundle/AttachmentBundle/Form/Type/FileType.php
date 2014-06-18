@@ -15,14 +15,14 @@ class FileType extends AbstractType
     /**
      * @var EventSubscriberInterface
      */
-    protected $eventListener;
+    protected $eventSubscriber;
 
     /**
-     * @param EventSubscriberInterface $eventListener
+     * @param EventSubscriberInterface $eventSubscriber
      */
-    public function setEventListener(EventSubscriberInterface $eventListener)
+    public function setEventSubscriber(EventSubscriberInterface $eventSubscriber)
     {
-        $this->eventListener = $eventListener;
+        $this->eventSubscriber = $eventSubscriber;
     }
 
     /**
@@ -39,7 +39,7 @@ class FileType extends AbstractType
             ]
         );
 
-        $builder->addEventSubscriber($this->eventListener);
+        $builder->addEventSubscriber($this->eventSubscriber);
     }
 
     /**

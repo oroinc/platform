@@ -15,7 +15,7 @@ services:
     oro_attachment.form.type.file:
         class: %oro_attachment.form.type.file.class%
         calls:
-            - [setEventListener, [@oro_attachment.form.file_subscriber]]
+            - [setEventSubscriber, [@oro_attachment.form.file_subscriber]]
         tags:
             - { name: form.type, alias: oro_file }
 

@@ -15,7 +15,7 @@ class AttachmentController extends Controller
     /**
      * @Route("attachment/{type}/{id}/{filename}",
      *   name="oro_attachment_file",
-     *   requirements={"id"="\d+", "type"="get|download"}
+     *   requirements={"id"="\d+", "type"="get|download", "filename"="\w+"}
      * )
      */
     public function getAttachmentAction($type, $id, $filename)
@@ -41,7 +41,7 @@ class AttachmentController extends Controller
     /**
      * @Route("media/cache/attachment/resize/{id}/{width}/{height}/{filename}",
      *  name="oro_resize_attachment",
-     *  requirements={"id"="\d+"}
+     *  requirements={"id"="\d+", "width"="\d+", "height"="\d+", "filename"="\w+"}
      * )
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
