@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,11 +53,11 @@ class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @@dataProvider formDataProvider
+     *
+     * @param Channel|null $formData
      */
     public function testPostSet($formData)
     {
-        $formData = null;
-
         $events = $this->subscriber->getSubscribedEvents();
         $this->assertArrayHasKey(FormEvents::POST_SET_DATA, $events);
         $this->assertEquals($events[FormEvents::POST_SET_DATA], 'postSet');
