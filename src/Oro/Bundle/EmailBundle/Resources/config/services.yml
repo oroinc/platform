@@ -252,5 +252,7 @@ services:
 
     oro_email.event_listener.activity_grid_listener:
         class: %oro_email.event_listener.activity_grid_listener.class%
+        arguments:
+            - @oro_activity.activity_helper
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }

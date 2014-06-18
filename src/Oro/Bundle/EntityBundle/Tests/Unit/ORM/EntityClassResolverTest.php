@@ -19,7 +19,7 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->resolver = new EntityClassResolver($this->doctrine);
@@ -78,7 +78,7 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->setMethods(array('getConfiguration'))
             ->getMockForAbstractClass();
