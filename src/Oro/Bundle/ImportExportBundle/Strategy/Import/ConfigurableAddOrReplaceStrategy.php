@@ -164,8 +164,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                             = $this->processEntity($relationEntity, $isFullRelation, $isPersistRelation);
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
-                // multiple relation
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
+                    // multiple relation
                     $relationCollection = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationCollection instanceof Collection) {
                         $collectionEntities = array();
