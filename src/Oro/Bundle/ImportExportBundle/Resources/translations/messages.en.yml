@@ -9,11 +9,11 @@ oro:
             label: Export
 
         entity_config:
-            excluded.label: "Exclude from import/export"
-            full.label:     "Export all relation fields"
-            header.label:   "Import/export header"
-            identity.label: "Import/export identity field"
-            order.label:    "Import/export order"
+            excluded.label: "Exclude Column"
+            full.label:     "Export Fields"
+            header.label:   "Column Name"
+            identity.label: "Use as Identity Field"
+            order.label:    "Column Position"
             
         import:
             error:          "Errors occurred during file import."
@@ -22,3 +22,6 @@ oro:
             success:        "File was successful imported."
             entity:         Import %entityName%
             tempate:        Import Data Template
+
+"Identity only": "Identity only"
+"All": "All"
