@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\FormBundle\Entity\PrimaryItem;
+use Doctrine\ORM\Mapping as ORM;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**
  * @ORM\MappedSuperclass
@@ -29,6 +30,13 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="phone", type="string", length=255, nullable=false)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $phone;
 

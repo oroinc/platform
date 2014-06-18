@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -40,18 +40,20 @@ class ExportHandler extends AbstractHandler
     }
 
     /**
-     * Handles export action
+     * Get export result
      *
      * @param string $jobName
      * @param string $processorAlias
+     * @param string $processorType
      * @param string $outputFormat
      * @param string $outputFilePrefix
-     * @param array  $options
-     * @return Response
+     * @param array $options
+     * @return array
      */
-    public function handleExport(
+    public function getExportResult(
         $jobName,
         $processorAlias,
+        $processorType = ProcessorRegistry::TYPE_EXPORT,
         $outputFormat = 'csv',
         $outputFilePrefix = null,
         array $options = []
@@ -61,12 +63,12 @@ class ExportHandler extends AbstractHandler
         }
         $fileName   = $this->generateExportFileName($outputFilePrefix, $outputFormat);
         $entityName = $this->processorRegistry->getProcessorEntityName(
-            ProcessorRegistry::TYPE_EXPORT,
+            $processorType,
             $processorAlias
         );
 
         $configuration = array(
-            'export' =>
+            $processorType =>
                 array_merge(
                     array(
                         'processorAlias' => $processorAlias,
@@ -82,7 +84,7 @@ class ExportHandler extends AbstractHandler
         $readsCount  = 0;
 
         $jobResult = $this->jobExecutor->executeJob(
-            ProcessorRegistry::TYPE_EXPORT,
+            $processorType,
             $jobName,
             $configuration
         );
@@ -104,12 +106,41 @@ class ExportHandler extends AbstractHandler
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
+        return array(
+            'success'     => $jobResult->isSuccessful(),
+            'url'         => $url,
+            'readsCount'  => $readsCount,
+            'errorsCount' => $errorsCount,
+        );
+    }
+
+    /**
+     * Handles export action
+     *
+     * @param string $jobName
+     * @param string $processorAlias
+     * @param string $exportType
+     * @param string $outputFormat
+     * @param string $outputFilePrefix
+     * @param array $options
+     * @return JsonResponse
+     */
+    public function handleExport(
+        $jobName,
+        $processorAlias,
+        $exportType = 'export',
+        $outputFormat = 'csv',
+        $outputFilePrefix = null,
+        array $options = []
+    ) {
         return new JsonResponse(
-            array(
-                'success'     => $jobResult->isSuccessful(),
-                'url'         => $url,
-                'readsCount'  => $readsCount,
-                'errorsCount' => $errorsCount,
+            $this->getExportResult(
+                $jobName,
+                $processorAlias,
+                $exportType,
+                $outputFormat,
+                $outputFilePrefix,
+                $options
             )
         );
     }

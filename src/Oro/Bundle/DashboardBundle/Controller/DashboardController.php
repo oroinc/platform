@@ -40,7 +40,9 @@ class DashboardController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_dashboard.dashboard_entity.class')
+        ];
     }
 
     /**

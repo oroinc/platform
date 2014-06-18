@@ -125,7 +125,12 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->indexManager
             ->expects($this->once())
-            ->method('createIndexes');
+            ->method('createIndexes')
+            ->will($this->returnValue(true));
+
+        $this->output
+            ->expects($this->exactly(2))
+            ->method('writeln');
 
         $this->listener->onConsoleTerminate($this->eventMock);
     }
