@@ -1,6 +1,14 @@
 parameters:
+    oro_activity.activity_helper.class:                 Oro\Bundle\ActivityBundle\Tools\ActivityHelper
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
+
 services:
+    oro_activity.activity_helper:
+        class: %oro_activity.activity_helper.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.orm.entity_class_resolver
+
     oro_activity.migration.extension.activity:
         class: %oro_activity.migration.extension.activity.class%
         tags:
