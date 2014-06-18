@@ -46,31 +46,6 @@ class ProcessJobRepositoryTest extends WebTestCase
         $this->repository = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
     }
 
-    public function testFindEntity()
-    {
-        $entity = $this->getUser();
-        $entityClass = ClassUtils::getClass($entity);
-        $entityId = $entity->getId();
-
-        $processDefinition = new ProcessDefinition();
-        $processDefinition
-            ->setName('test')
-            ->setLabel('Test')
-            ->setRelatedEntity($entityClass);
-
-        $processTrigger = new ProcessTrigger();
-        $processTrigger
-            ->setDefinition($processDefinition)
-            ->setEvent(ProcessTrigger::EVENT_UPDATE);
-
-        $processJob = new ProcessJob();
-        $processJob
-            ->setProcessTrigger($processTrigger)
-            ->setEntityId($entityId);
-
-        $this->assertEquals($entity, $this->repository->findEntity($processJob));
-    }
-
     public function testDeleteByHashes()
     {
         // prepare environment

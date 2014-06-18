@@ -10,27 +10,6 @@ class ProcessJobRepository extends EntityRepository
     const DELETE_HASH_BATCH = 100;
 
     /**
-     * @param ProcessJob $processJob
-     * @return null|object
-     */
-    public function findEntity(ProcessJob $processJob)
-    {
-        $trigger = $processJob->getProcessTrigger();
-        if (!$trigger) {
-            return null;
-        }
-
-        $definition = $trigger->getDefinition();
-        if (!$definition) {
-            return null;
-        }
-
-        $entityClass = $definition->getRelatedEntity();
-
-        return $this->getEntityManager()->getRepository($entityClass)->find($processJob->getEntityId());
-    }
-
-    /**
      * @param array $hashes
      */
     public function deleteByHashes(array $hashes)
