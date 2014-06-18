@@ -151,6 +151,6 @@ services:
         class: %oro_integration.form.type.oro_integration_type_select.class%
         arguments:
             - @oro_integration.manager.types_registry
-            - @service_container
+            - @translator
         tags:
             - { name: form.type, alias: oro_integration_type_select }

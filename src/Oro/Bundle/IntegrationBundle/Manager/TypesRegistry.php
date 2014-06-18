@@ -100,21 +100,6 @@ class TypesRegistry
     }
 
     /**
-     * @return array
-     */
-    protected function getAvailableChannelTypes()
-    {
-        $registry = $this;
-        $types    = $registry->getRegisteredChannelTypes();
-        $types    = $types->partition(
-            function ($key, ChannelInterface $type) use ($registry) {
-                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
-            }
-        );
-        return $types[0];
-    }
-
-    /**
      * Register transport for channel type
      *
      * @param string             $typeName
@@ -329,5 +314,20 @@ class TypesRegistry
         )->toArray();
 
         return array_combine($keys, $values);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAvailableChannelTypes()
+    {
+        $registry = $this;
+        $types    = $registry->getRegisteredChannelTypes();
+        $types    = $types->partition(
+            function ($key, ChannelInterface $type) use ($registry) {
+                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
+            }
+        );
+        return $types[0];
     }
 }

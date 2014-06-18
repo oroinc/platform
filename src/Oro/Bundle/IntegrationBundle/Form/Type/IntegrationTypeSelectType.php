@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Composer\DependencyResolver\Transaction;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class IntegrationTypeSelectType extends AbstractType
@@ -16,12 +16,13 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    protected $container;
+    /** @var TranslatorInterface */
+    protected $translator;
 
-    public function __construct(TypesRegistry $registry, Container $container)
+    public function __construct(TypesRegistry $registry, TranslatorInterface $translator)
     {
         $this->registry = $registry;
-        $this->container = $container;
+        $this->translator = $translator;
     }
 
     /**
@@ -29,14 +30,9 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $options['choice_list'] = $this->rebuildChoiceList($options['choice_list']->getRemainingViews());
+        $this->rebuildChoiceList($options['choice_list']->getRemainingViews());
 
-        parent::buildView($view, $form, $options);
-
-        $vars = [
-            'configs' => $options['configs'],
-            'choices' => $options['choice_list']->getRemainingViews()
-        ];
+        $vars = ['configs' => $options['configs']];
 
         if ($form->getData()) {
             $vars['attr'] = [
@@ -81,29 +77,16 @@ class IntegrationTypeSelectType extends AbstractType
     }
 
     /**
-     * @param string $subject
-     *
-     * @return string
-     */
-    protected function getTranslation($subject)
-    {
-        return $this->container->get('translator')->trans($subject);
-    }
-
-    /**
      * @param array $choiceList
      *
      * @return SimpleChoiceList
      */
     protected function rebuildChoiceList(array $choiceList)
     {
-        $newChoiceList = [];
-
         foreach ($choiceList as $row) {
-            $label = json_decode($row->label, 1);
-            $label['label'] = $this->getTranslation($label['label']);
-            $newChoiceList[$row->value] = json_encode($label);
+            $data = json_decode($row->label, 1);
+            $data['label'] = $this->translator->trans($data['label']);
+            $row->label = json_encode($data);
         }
-        return new SimpleChoiceList($newChoiceList);
     }
 }
