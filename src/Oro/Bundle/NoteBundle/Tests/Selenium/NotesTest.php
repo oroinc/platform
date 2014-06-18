@@ -8,6 +8,9 @@ class NotesTest extends Selenium2TestCase
 {
     protected $username = 'admin';
 
+    /**
+     * Test that user entity do not have Notes functionality On by default
+     */
     public function testAddNoteNotAvailable()
     {
         $login = $this->login();
@@ -20,6 +23,7 @@ class NotesTest extends Selenium2TestCase
     }
 
     /**
+     * Test Notes functionality set On and add new Note to User entity
      * @depends testAddNoteNotAvailable
      * @return string
      */
@@ -53,6 +57,7 @@ class NotesTest extends Selenium2TestCase
     }
 
     /**
+     * Test editing of existing Note
      * @depends testAddNoteOn
      * @param $note
      * @return string
@@ -77,6 +82,7 @@ class NotesTest extends Selenium2TestCase
     }
 
     /**
+     * Test deletion of existing Note
      * @depends testEditNote
      * @param $note
      */
@@ -93,6 +99,7 @@ class NotesTest extends Selenium2TestCase
     }
 
     /**
+     * Test turn Off Notes functionality at user entity
      * @depends testAddNoteOn
      */
     public function testAddNoteOff()

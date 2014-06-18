@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class Notes
  *
  * @package Oro\Bundle\NoteBundle\Pages\Objects
- * @method Notes openNotes() openTags(string)
+ * @method Notes openNotes() openNotes(string)
  * {@inheritdoc}
  */
 class Notes extends AbstractPageEntity
