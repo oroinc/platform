@@ -31,7 +31,8 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetGet($property, $value = null, $expected = null)
     {
-        return;
+        $this->markTestSkipped('entity was changed');
+
         if ($value !== null) {
             call_user_func_array(array($this->entity, 'set' . ucfirst($property)), [$value]);
         }
