@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrganizationSubscriber implements EventSubscriberInterface
 {
-    /** @var ObjectManager  */
+    /** @var ObjectManager */
     protected $entityManager;
 
     public function __construct(ObjectManager $entityManager)
@@ -34,23 +34,19 @@ class OrganizationSubscriber implements EventSubscriberInterface
      */
     public function postSet(FormEvent $event)
     {
-        $data = $event->getData();
-        $form = $event->getForm();
+        $data          = $event->getData();
+        $form          = $event->getForm();
+        $organizations = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->findAll();
 
-        if ($data && !$data->getId() && !$data->getOrganization() || null === $data) {
-            $organizations = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->findAll();
+        if (!$form->has('organization')) {
+            $modifier = $this->addOrganizationFieldClosure();
+            $modifier($form, (count($organizations) === 1));
+        }
 
-            if (count($organizations) === 1) {
-                $modifier = $this->addOrganizationFieldClosure();
-                $modifier($form, true);
-            } else {
-                $modifier = $this->addOrganizationFieldClosure();
-                $modifier($form, false);
-            }
-
-            if ($form->has('organization')) {
-                $form->get('organization')->setData($organizations[0]);
-            }
+        if ($form->has('organization') && ($data && !$data->getOrganization() || empty($data))) {
+            $form->get('organization')->setData($organizations[0]);
+        } else {
+            $form->get('organization')->setData($data->getOrganization());
         }
     }
 
@@ -59,7 +55,7 @@ class OrganizationSubscriber implements EventSubscriberInterface
      */
     protected function addOrganizationFieldClosure()
     {
-        return function (FormInterface $form, $isHidden) {
+        return function (FormInterface $form, $isHidden = true) {
             $form->add(
                 'organization',
                 'oro_organization_select',
