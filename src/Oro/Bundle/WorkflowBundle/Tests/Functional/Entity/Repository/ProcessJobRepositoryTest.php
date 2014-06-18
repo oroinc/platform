@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
  * @dbIsolation
@@ -38,7 +39,7 @@ class ProcessJobRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->registry= $this->getContainer()->get('doctrine');
+        $this->registry = $this->getContainer()->get('doctrine');
 
         $this->entityManager = $this->registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
         $this->repository = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
@@ -90,5 +91,52 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $foundEntity = $this->repository->findEntity($processJob);
         $this->assertEquals($foundEntity, $entityFirst);
+    }
+
+    public function testDeleteByHashes()
+    {
+        // prepare environment
+        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
+
+        $definition = $this->entityManager->find(
+            'OroWorkflowBundle:ProcessDefinition',
+            LoadProcessEntities::FIRST_DEFINITION
+        );
+        $trigger = $this->entityManager->getRepository('OroWorkflowBundle:ProcessTrigger')
+            ->findOneBy(array('definition' => $definition));
+
+        // fixture data
+        $jobsAmount = ProcessJobRepository::DELETE_HASH_BATCH + 1;
+        $entityHashes = array();
+
+        for ($i = 0; $i < $jobsAmount; $i++) {
+            $job = new ProcessJob();
+            $job->setProcessTrigger($trigger)
+                ->setEntityId($i);
+            $this->entityManager->persist($job);
+
+            $entityHashes[] = $job->getEntityHash();
+        }
+
+        $this->entityManager->flush();
+
+        // test
+        $this->assertEquals($jobsAmount, $this->getJobsCount($entityHashes));
+        $this->repository->deleteByHashes($entityHashes);
+        $this->assertEquals(0, $this->getJobsCount($entityHashes));
+    }
+
+    /**
+     * @param array $hashes
+     * @return int
+     */
+    protected function getJobsCount(array $hashes)
+    {
+        $queryBuilder = $this->repository->createQueryBuilder('job')
+            ->select('COUNT(job.id) as jobsCount');
+
+        return (int)$queryBuilder->where($queryBuilder->expr()->in('job.entityHash', $hashes))
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

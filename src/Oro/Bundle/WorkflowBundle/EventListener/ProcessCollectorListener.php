@@ -56,6 +56,11 @@ class ProcessCollectorListener
     protected $removedEntityHashes = array();
 
     /**
+     * @var bool
+     */
+    protected $forceQueued = false;
+
+    /**
      * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
      * @param ProcessHandler $handler
@@ -209,7 +214,7 @@ class ProcessCollectorListener
                 /** @var ProcessData $data */
                 $data = $entityProcess['data'];
 
-                if ($trigger->isQueued()) {
+                if ($trigger->isQueued() || $this->forceQueued) {
                     $processJob = $this->queueProcess($trigger, $data);
                     $entityManager->persist($processJob);
                     $this->queuedJobs[] = $processJob;
@@ -294,5 +299,13 @@ class ProcessCollectorListener
     protected function getClass($entity)
     {
         return ClassUtils::getClass($entity);
+    }
+
+    /**
+     * @param bool $forceQueued
+     */
+    public function setForceQueued($forceQueued)
+    {
+        $this->forceQueued = $forceQueued;
     }
 }
