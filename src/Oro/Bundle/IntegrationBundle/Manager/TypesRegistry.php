@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistry
@@ -76,7 +77,11 @@ class TypesRegistry
         $keys   = $types->getKeys();
         $values = $types->map(
             function (ChannelInterface $type) {
-                return $type->getLabel();
+                $result = ['label' => $type->getLabel()];
+                if ($type instanceof IconAwareIntegrationInterface) {
+                    $result['icon'] = $type->getIcon();
+                }
+                return json_encode($result);
             }
         )->toArray();
 
