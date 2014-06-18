@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ObjectManager;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -12,6 +14,7 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
 
 class ChannelType extends AbstractType
 {
@@ -24,10 +27,19 @@ class ChannelType extends AbstractType
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    public function __construct(TypesRegistry $registry, SecurityFacade $securityFacade)
+    /** @var ObjectManager */
+    protected $entityManager;
+
+    /**
+     * @param TypesRegistry  $registry
+     * @param SecurityFacade $securityFacade
+     * @param ObjectManager  $entityManager
+     */
+    public function __construct(TypesRegistry $registry, SecurityFacade $securityFacade, ObjectManager $entityManager)
     {
         $this->registry       = $registry;
         $this->securityFacade = $securityFacade;
+        $this->entityManager  = $entityManager;
     }
 
     /**
@@ -38,6 +50,7 @@ class ChannelType extends AbstractType
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
         $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityFacade));
+        $builder->addEventSubscriber(new OrganizationSubscriber($this->entityManager));
 
         $builder->add(
             self::TYPE_FIELD_NAME,
@@ -49,16 +62,6 @@ class ChannelType extends AbstractType
             ]
         );
         $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
-
-        $builder->add(
-            'organization',
-            'oro_organization_select',
-            [
-                'required' => true,
-                'label'    => 'oro.integration.integration.organization.label',
-                'tooltip'  => 'oro.integration.integration.organization.tooltip'
-            ]
-        );
 
         // add transport type selector
         $builder->add(
