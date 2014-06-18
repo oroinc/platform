@@ -206,7 +206,7 @@ class ProcessCollectorListener
         $entityManager = $args->getEntityManager();
 
         // handle processes
-        $hasHandledProcessed = false;
+        $hasHandledProcesses = false;
         foreach ($this->scheduledProcesses as $entityClass => &$entityProcesses) {
             while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
@@ -222,12 +222,12 @@ class ProcessCollectorListener
                     $this->handler->handleTrigger($trigger, $data);
                 }
 
-                $hasHandledProcessed = true;
+                $hasHandledProcesses = true;
             }
         }
 
-        // save both handled entities and queued ProcessJobs
-        if ($hasHandledProcessed) {
+        // save both handled entities and queued process jobs
+        if ($hasHandledProcesses) {
             $entityManager->flush();
         }
 
@@ -237,11 +237,11 @@ class ProcessCollectorListener
             $this->removedEntityHashes = array();
         }
 
-        // create JMS Jobs for queued jobs
+        // create JMS jobs for queued process jobs
         $hasQueuedJobs = false;
         /** @var ProcessJob $processJob */
         while ($processJob = array_shift($this->queuedJobs)) {
-            $jmsJob = new Job(ExecuteProcessJobCommand::NAME, ['--id=' . $processJob->getId()]);
+            $jmsJob = new Job(ExecuteProcessJobCommand::NAME, array('--id=' . $processJob->getId()));
 
             $timeShiftInterval = $processJob->getProcessTrigger()->getTimeShiftInterval();
             if ($timeShiftInterval) {
@@ -254,7 +254,7 @@ class ProcessCollectorListener
             $hasQueuedJobs = true;
         }
 
-        // save JMS Job instances
+        // save JMS job instances
         if ($hasQueuedJobs) {
             $entityManager->flush();
         }

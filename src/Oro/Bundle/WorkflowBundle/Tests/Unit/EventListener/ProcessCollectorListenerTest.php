@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 
 class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -163,7 +167,6 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         // test
         $this->listener->onClear($args);
 
-        // assert internal data
         if ($hasTriggers) {
             $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
         } else {
@@ -203,6 +206,140 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testPostFlushHandledProcess()
+    {
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $entityManager = $this->getEntityManager();
+
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
+
+        $this->listener->prePersist(new LifecycleEventArgs($entity, $entityManager));
+
+        $expectedTrigger = $triggers['create'];
+        $expectedData = new ProcessData(array('entity' => $entity));
+
+        $this->handler->expects($this->once())->method('handleTrigger')->with($expectedTrigger, $expectedData);
+        $entityManager->expects($this->once())->method('flush');
+
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testPostFlushQueuedProcessJob()
+    {
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $entityManager = $this->getEntityManager();
+
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
+        $changeSet = array();
+        $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+
+        $this->listener->preUpdate($args);
+
+        $expectedTrigger = $triggers['updateEntity'];
+        $expectedData = new ProcessData(array('entity' => $entity));
+        $expectedJobId = 12;
+
+        $entityManager->expects($this->at(0))->method('persist')
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
+            ->will(
+                $this->returnCallback(
+                    function (ProcessJob $processJob) use ($expectedTrigger, $expectedData, $expectedJobId) {
+                        $this->assertEquals($expectedTrigger, $processJob->getProcessTrigger());
+                        $this->assertEquals($expectedData, $processJob->getData());
+
+                        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
+                        $idReflection->setAccessible(true);
+                        $idReflection->setValue($processJob, $expectedJobId);
+                    }
+                )
+            );
+        $entityManager->expects($this->at(1))->method('flush');
+        $entityManager->expects($this->at(2))->method('persist')
+            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
+            ->will(
+                $this->returnCallback(
+                    function (Job $jmsJob) use ($expectedJobId) {
+                        $this->assertEquals(ExecuteProcessJobCommand::NAME, $jmsJob->getCommand());
+                        $this->assertEquals(array('--id=' . $expectedJobId), $jmsJob->getArgs());
+                        $this->assertNotNull($jmsJob->getExecuteAfter());
+                        $this->assertGreaterThan(new \DateTime(), $jmsJob->getExecuteAfter());
+                    }
+                )
+            );
+        $entityManager->expects($this->at(3))->method('flush');
+
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertAttributeEmpty('queuedJobs', $this->listener);
+    }
+
+    public function testPostFlushForceQueued()
+    {
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $entityManager = $this->getEntityManager();
+
+        $this->listener->setForceQueued(true);
+
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
+        $args = new LifecycleEventArgs($entity, $entityManager);
+
+        // persist trigger is not queued
+        $this->listener->prePersist($args);
+
+        // there is no need to check all trace - just ensure that job was queued
+        $entityManager->expects($this->exactly(2))->method('persist');
+        $entityManager->expects($this->exactly(2))->method('flush');
+
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testPostFlushRemovedEntityHashes()
+    {
+        $this->prepareRegistry(array());
+        $entityManager = $this->getEntityManager();
+
+        $entityClass = self::ENTITY;
+        $entityId = 1;
+        $entity = new $entityClass();
+
+        // expectations
+        $expectedEntityHashes = array(ProcessJob::generateEntityHash($entityClass, $entityId));
+
+        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
+            ->will($this->returnValue($entityId));
+
+        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository')
+            ->disableOriginalConstructor()
+            ->setMethods(array('deleteByHashes'))
+            ->getMock();
+        $repository->expects($this->once())->method('deleteByHashes');
+
+        $this->registry->expects($this->at(1))->method('getRepository')->with('OroWorkflowBundle:ProcessJob')
+            ->will($this->returnValue($repository));
+
+        // test
+        $this->listener->preRemove(new LifecycleEventArgs($entity, $entityManager));
+
+        $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
+
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertAttributeEmpty('removedEntityHashes', $this->listener);
+    }
+
+    public function testSetForceQueued()
+    {
+        $this->assertAttributeEquals(false, 'forceQueued', $this->listener);
+        $this->listener->setForceQueued(true);
+        $this->assertAttributeEquals(true, 'forceQueued', $this->listener);
+    }
+
     /**
      * @param ProcessTrigger[] $triggers
      */
@@ -215,7 +352,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $repository->expects($this->any())->method('findAllWithDefinitions')
             ->will($this->returnValue($triggers));
 
-        $this->registry->expects($this->any())->method('getRepository')->with('OroWorkflowBundle:ProcessTrigger')
+        $this->registry->expects($this->at(0))->method('getRepository')->with('OroWorkflowBundle:ProcessTrigger')
             ->will($this->returnValue($repository));
     }
 
@@ -233,7 +370,9 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
         $updateEntityTrigger = new ProcessTrigger();
         $updateEntityTrigger->setDefinition($definition)
-            ->setEvent(ProcessTrigger::EVENT_UPDATE);
+            ->setEvent(ProcessTrigger::EVENT_UPDATE)
+            ->setQueued(true)
+            ->setTimeShift(60);
 
         $updateFieldTrigger = new ProcessTrigger();
         $updateFieldTrigger->setDefinition($definition)
@@ -280,7 +419,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EntityManager
+     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
      */
     protected function getEntityManager()
     {
