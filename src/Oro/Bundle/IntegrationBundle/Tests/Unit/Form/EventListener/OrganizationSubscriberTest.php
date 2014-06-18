@@ -22,14 +22,11 @@ class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var Organization */
     protected $organization;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $formData;
 
     public function setUp()
     {
-        $this->formMock      = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->eventMock     = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()->getMock();
-
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()->getMock();
 
@@ -52,7 +49,7 @@ class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @@dataProvider formDataProvider
+     * @dataProvider formDataProvider
      *
      * @param Channel|null $formData
      */
