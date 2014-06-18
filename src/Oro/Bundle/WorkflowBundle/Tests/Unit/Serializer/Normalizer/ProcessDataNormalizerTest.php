@@ -407,6 +407,13 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $unitOfWork->expects($this->exactly(empty($context) ? 0 : 2))
+            ->method('propertyChanged')
+            ->will($this->returnSelf());
+
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -414,6 +421,9 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getClassMetadata')
             ->with($className)
             ->will($this->returnValue($classMetadata));
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
 
         if (empty($context) || $context['event'] == ProcessTrigger::EVENT_DELETE) {
             $classMetadata->expects($this->never())->method('getIdentifierFieldNames');
@@ -425,7 +435,6 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnCallback(function ($entity, $name) use ($fields) {
                     return isset($fields[$name]) ? $fields[$name] : null;
                 }));
-
             $classMetadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -441,7 +450,9 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
                 ->method('getIdentifierFieldNames')
                 ->will($this->returnValue(array(self::ENTITY_ID)));
             $classMetadata->expects($this->never())->method('getFieldNames');
-            $classMetadata->expects($this->never())->method('getFieldValue');
+            $classMetadata->expects($this->once())
+                ->method('getFieldValue')
+                ->will($this->returnValue($fields[self::ENTITY_ID]));
         }
 
         $this->registry->expects($this->any())
@@ -465,14 +476,9 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
         $processJob->expects($this->once())
             ->method('getProcessTrigger')
             ->will($this->returnValue($processTrigger));
-
-        if (!$id) {
-            $processJob->expects($this->never())->method('getEntityId');
-        } else {
-            $processJob->expects($this->once())
-                ->method('getEntityId')
-                ->will($this->returnValue($id));
-        }
+        $processJob->expects($this->any())
+            ->method('getEntityId')
+            ->will($this->returnValue($id));
 
         return $processJob;
     }

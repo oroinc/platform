@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -220,10 +221,15 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
             $processJob = $context['processJob'];
 
             if ($this->getEvent($context) != ProcessTrigger::EVENT_DELETE) {
-                $identifierNames = $classMetadata->getIdentifierFieldNames();
-                $normalizedData['classData'][reset($identifierNames)] = $processJob->getEntityId();
+                $identifierName  = reset($classMetadata->getIdentifierFieldNames());
+                $identifierValue = $classMetadata->getFieldValue($entity, $identifierName);
+                $this->setEntityIdForProcessJob($processJob, $identifierValue);
+                $normalizedData['classData'][$identifierName] = $processJob->getEntityId();
                 return $normalizedData;
+            } else {
+                $this->setEntityIdForProcessJob($processJob, 0);
             }
+
         }
 
         $fieldNames = $classMetadata->getFieldNames();
@@ -288,15 +294,6 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     }
 
     /**
-     * @param mixed $value
-     * @return string
-     */
-    protected function serialize($value)
-    {
-        return array(self::SERIALIZED => base64_encode(serialize($value)));
-    }
-
-    /**
      * Checks if the given class is ProcessData or it's ancestor.
      *
      * @param string $class
@@ -323,6 +320,28 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     public function supportsNormalization($data, $format = null)
     {
         return is_object($data) && $this->supportsClass($this->getClass($data));
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function serialize($value)
+    {
+        return array(self::SERIALIZED => base64_encode(serialize($value)));
+    }
+
+    protected function setEntityIdForProcessJob(ProcessJob $processJob, $newId)
+    {
+        $oldId   = $processJob->getEntityId();
+        $oldHash = $processJob->getEntityHash();
+        /** @var UnitOfWork $unitOfWork */
+        $unitOfWork = $this->registry->getManager()->getUnitOfWork();
+        $processJob->setEntityId($newId);
+
+        $newHash = $processJob->getEntityHash();
+        $unitOfWork->propertyChanged($processJob, 'entityId', $oldId, $newId);
+        $unitOfWork->propertyChanged($processJob, 'entityHash', $oldHash, $newHash);
     }
 
     /**
