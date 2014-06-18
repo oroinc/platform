@@ -40,7 +40,7 @@ class IntegrationTypeSelectType extends AbstractType
 
         if ($form->getData()) {
             $vars['attr'] = [
-                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData(), 'icon'=>'png']])
+                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData()]])
             ];
         }
 
