@@ -82,7 +82,7 @@ class ActivityHelper
             ->innerJoin(
                 sprintf(
                     'filterActivityEntity.%s',
-                    strtolower(ExtendHelper::getShortClassName($entityClass))
+                    ExtendHelper::buildAssociationName($entityClass)
                 ),
                 'filterTargetEntity'
             )

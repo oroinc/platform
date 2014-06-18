@@ -74,7 +74,7 @@ class ActivityHelperTest extends OrmTestCase
             . ' WHERE activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
-            . ' INNER JOIN filterActivityEntity.target filterTargetEntity'
+            . ' INNER JOIN filterActivityEntity.target_bcaa0d48 filterTargetEntity'
             . ' WHERE filterTargetEntity.id = :targetEntityId)',
             $qb->getQuery()->getDQL()
         );
@@ -107,7 +107,7 @@ class ActivityHelperTest extends OrmTestCase
             . ' WHERE another.id = activity.id AND activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
-            . ' INNER JOIN filterActivityEntity.target filterTargetEntity'
+            . ' INNER JOIN filterActivityEntity.target_bcaa0d48 filterTargetEntity'
             . ' WHERE filterTargetEntity.id = :targetEntityId)',
             $qb->getQuery()->getDQL()
         );

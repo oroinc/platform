@@ -26,5 +26,5 @@ class Activity
      * @ORM\ManyToMany(targetEntity="Target")
      * @ORM\JoinTable(name="test_activity_to_target")
      */
-    protected $target;
+    protected $target_bcaa0d48;
 }
