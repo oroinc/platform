@@ -21,13 +21,20 @@ class AssociationBuildHelper
     }
 
     /**
-     * @param string $scope
+     * @param string      $scope
+     * @param null|string $entityClass
      *
      * @return array|ConfigInterface[]
      */
-    public function getScopeConfigs($scope)
+    public function getScopeConfigs($scope, $entityClass = null)
     {
-        return $this->configManager->getProvider($scope)->getConfigs();
+        $provider = $this->configManager->getProvider($scope);
+
+        if (is_null($entityClass)) {
+            return $provider->getConfigs();
+        } else {
+            return $provider->getConfig($entityClass);
+        }
     }
 
     /**
@@ -45,9 +52,7 @@ class AssociationBuildHelper
             'manyToMany'
         );
 
-        $targetEntityConfig = $this->configManager
-            ->getProvider('entity')
-            ->getConfig($targetEntityClass);
+        $targetEntityConfig = $this->getScopeConfigs('entity', $targetEntityClass);
         $label              = $targetEntityConfig->get(
             'label',
             false,
@@ -117,9 +122,7 @@ class AssociationBuildHelper
             'manyToOne'
         );
 
-        $targetEntityConfig = $this->configManager
-            ->getProvider('entity')
-            ->getConfig($targetEntityClass);
+        $targetEntityConfig = $this->getScopeConfigs('entity', $targetEntityClass);
         $label              = $targetEntityConfig->get(
             'label',
             false,
