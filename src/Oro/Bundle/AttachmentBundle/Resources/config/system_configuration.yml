@@ -2,18 +2,18 @@ oro_system_configuration:
     groups:
         attachment_settings:
             icon:   icon-file
-            title:  'Upload Settings'
+            title:  oro.attachment.config.attachment.label
         attachment_mime_types_settings:
-            title:  'Mime types'
+            title:  oro.attachment.config.mime_types.label
     fields:
         oro_attachment.upload_mime_types:
             type: textarea
             options:
-                label: 'File mime types'
+                label: oro.attachment.config.upload_mime_types.label
         oro_attachment.upload_image_mime_types:
             type: textarea
             options:
-                label: 'Image mime types'
+                label: oro.attachment.config.upload_image_mime_types.label
     tree:
         system_configuration:
             platform:

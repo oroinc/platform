@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -12,14 +13,14 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 class AttachmentController extends Controller
 {
     /**
-     * @Route("/{type}/{id}/{filename}", name="oro_attachment_file", requirements={"id"="\d+", "type"="get|download"})
-     *
-     * @param string     $type
-     * @param Attachment $attachment
-     * @return Response
+     * @Route("attachment/{type}/{id}/{filename}",
+     *   name="oro_attachment_file",
+     *   requirements={"id"="\d+", "type"="get|download"}
+     * )
      */
-    public function getAttachmentAction($type, Attachment $attachment)
+    public function getAttachmentAction($type, $id, $filename)
     {
+        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
         $response = new Response();
         $response->headers->set('Cache-Control', 'public');
         if ($type == 'get') {
@@ -38,15 +39,14 @@ class AttachmentController extends Controller
     }
 
     /**
-     * @Route("/resize/{id}/{width}/{height}/{filename}", name="oro_resize_attachment", requirements={"id"="\d+"})
-     *
-     * @param Attachment $attachment
-     * @param int        $width
-     * @param int        $height
-     * @return Response
+     * @Route("media/cache/attachment/resize/{id}/{width}/{height}/{filename}",
+     *  name="oro_resize_attachment",
+     *  requirements={"id"="\d+"}
+     * )
      */
-    public function getResizedAttachmentImageAction(Attachment $attachment, $width, $height)
+    public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
+        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
         $path = substr($this->getRequest()->getPathInfo(), 1);
         $filterName = 'attachment_' . $width . '_' . $height;
 
@@ -65,5 +65,28 @@ class AttachmentController extends Controller
         $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
         return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+    }
+
+    /**
+     * Get attachment
+     *
+     * @param $id
+     * @param $fileName
+     * @return Attachment
+     * @throws NotFoundHttpException
+     */
+    protected function getAttachmentByIdAndFileName($id, $fileName)
+    {
+        $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
+            [
+                'id' => $id,
+                'originalFilename' => $fileName
+            ]
+        );
+        if (!$attachment) {
+            throw new NotFoundHttpException('File not found');
+        }
+
+        return $attachment;
     }
 }

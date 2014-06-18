@@ -145,7 +145,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             if (!$label) {
                 $label = $fieldName;
             }
-            $dynamicRow[] = array(
+            $dynamicRow[$fieldName] = array(
                 'type'  => $fieldConfigId->getFieldType(),
                 'label' => $label,
                 'value' => $value,

@@ -9,8 +9,7 @@
                 {{ form_row(form.emptyFile) }}
             {% endif %}
             {% if value.originalFilename is not empty %}
-                <i class="{{ oro_attachment_icon(value) }}"></i>
-                <a href="{{ oro_attachment_url(value, 'download', true) }}" class="no-hash">{{ value.originalFilename }}</a>
+                {{ oro_file_view(value) }}
             {% endif %}
         {% endif %}
     {% endspaceless %}

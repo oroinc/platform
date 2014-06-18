@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Form;
+namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,9 +36,6 @@ class FileType extends AbstractType
             [
                 'label' => 'oro.attachment.file.label',
                 'required'  => false,
-                'constraints' => [
-                    new File()
-                ]
             ]
         );
 
