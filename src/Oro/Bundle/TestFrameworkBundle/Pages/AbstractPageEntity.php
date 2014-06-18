@@ -10,7 +10,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  */
 abstract class AbstractPageEntity extends AbstractPage
 {
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    /** @var string */
     protected $owner;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
@@ -143,5 +143,27 @@ abstract class AbstractPageEntity extends AbstractPage
     public function getId($paramName = 'view')
     {
         return $this->getParam($paramName);
+    }
+
+    /**
+     * @param $owner
+     *
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        if (isset($this->owner)) {
+            $ownerObject = $this->test->byXPath($this->owner);
+            $ownerObject->click();
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
+            $this->waitForAjax();
+            $this->assertElementPresent(
+                "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
+                "Owner autocomplete doesn't return search value"
+            );
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
+        }
+        return $this;
     }
 }

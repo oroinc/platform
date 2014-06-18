@@ -158,6 +158,45 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
+     * @param \PHPUnit_Extensions_Selenium2TestCase_Element $rows
+     *
+     * @return array
+     */
+    public function getData($rows)
+    {
+        $header = $this->getHeadersName();
+        $data = array();
+        foreach ($rows as $row) {
+            /** @var  $row \PHPUnit_Extensions_Selenium2TestCase_Element */
+            $columns = $row->elements($this->test->using('xpath')->value("//td[not(contains(@style, 'display: none;'))]"));
+
+            $rowData = array();
+            foreach ($columns as $column)
+            {
+                /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element $column*/
+                $rowData[] = $column->text();
+            }
+            $data[] = array_combine($header, $rowData);
+        }
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeadersName()
+    {
+        $headers = $this->getHeaders();
+        $data = array();
+        foreach($headers as $header) {
+            /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $header */
+            $data[] = $header->text();
+        }
+
+        return $data;
+    }
+
+    /**
      * Verify entity exist on the current page
      *
      * @param array $entityData
