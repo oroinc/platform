@@ -1,5 +1,8 @@
 parameters:
     oro_attachment.form.type.attachment_config.class: Oro\Bundle\AttachmentBundle\Form\Type\AttachmentConfigType
+    oro_attachment.form.type.file.class:              Oro\Bundle\AttachmentBundle\Form\Type\FileType
+    oro_attachment.form.type.image.class:             Oro\Bundle\AttachmentBundle\Form\Type\ImageType
+    oro_attachment.form.file_subscriber.class:        Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
 
 services:
     oro_attachment.form.type.attachment_config:
@@ -8,3 +11,19 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_attachment_config }
+
+    oro_attachment.form.type.file:
+        class: %oro_attachment.form.type.file.class%
+        calls:
+            - [setEventListener, [@oro_attachment.form.file_subscriber]]
+        tags:
+            - { name: form.type, alias: oro_file }
+
+    oro_attachment.form.type.image:
+        class: %oro_attachment.form.type.image.class%
+        tags:
+            - { name: form.type, alias: oro_image }
+
+    oro_attachment.form.file_subscriber:
+        class: %oro_attachment.form.file_subscriber.class%
+        arguments: [@validator, @oro_entity_config.config_manager, @oro_config.user]

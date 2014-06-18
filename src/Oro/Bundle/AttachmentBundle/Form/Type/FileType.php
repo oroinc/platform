@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Form;
+namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

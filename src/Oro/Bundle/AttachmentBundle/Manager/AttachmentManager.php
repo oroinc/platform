@@ -22,6 +22,7 @@ class AttachmentManager
     /** @var  Router */
     protected $router;
 
+    /** @var  array */
     protected $fileIcons;
 
     /**
