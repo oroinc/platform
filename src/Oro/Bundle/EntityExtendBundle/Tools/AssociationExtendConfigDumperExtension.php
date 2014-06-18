@@ -62,7 +62,7 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
         $targetEntities       = $this->getTargetEntities();
 
         foreach ($targetEntities as $targetEntityClass) {
-            $this->assocBuildHelper->createManyToOneRelation($entityClass, $targetEntityClass);
+            $this->assocBuildHelper->createManyToOneAssociation($entityClass, $targetEntityClass);
         }
     }
 

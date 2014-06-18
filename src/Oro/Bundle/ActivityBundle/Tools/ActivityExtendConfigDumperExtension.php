@@ -73,7 +73,7 @@ class ActivityExtendConfigDumperExtension extends ExtendConfigDumperExtension
             // create many-to-many unidirectional relation between/from activity to association entity:
             // e.g. contact, account, etc
             foreach ($activityEntityNames as $activityEntityName) {
-                $this->assocBuildHelper->createManyToManyRelation($activityEntityName, $targetEntityName);
+                $this->assocBuildHelper->createManyToManyAssociation($activityEntityName, $targetEntityName);
             }
         }
     }

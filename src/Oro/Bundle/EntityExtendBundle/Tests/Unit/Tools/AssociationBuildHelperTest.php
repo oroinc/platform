@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuildHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Util\ReflectionUtil;
 
@@ -36,7 +37,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuildHelper $helper */
         $helper = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuildHelper',
-            ['getFieldNames', 'createField', 'addManyToManyRelation', 'getScopeConfigs'],
+            ['getFieldNames', 'createFieldModel', 'addManyToManyRelation', 'getScopeConfigs'],
             [$this->configManagerMock]
         );
 
@@ -51,7 +52,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fieldNames));
 
         $helper->expects($this->once())
-            ->method('createField')
+            ->method('createFieldModel')
             ->with(
                 $sourceClass,
                 'more_929b3e16',
@@ -91,7 +92,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
                 true
             );
 
-        $helper->createManyToManyRelation($sourceClass, $targetClass);
+        $helper->createManyToManyAssociation($sourceClass, $targetClass);
     }
 
     /**
@@ -153,7 +154,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuildHelper',
             [
                 'getPrimaryKeyColumnNames',
-                'createField',
+                'createFieldModel',
                 'addManyToOneRelation',
                 'addManyToOneRelationTargetSide',
                 'getScopeConfigs'
@@ -172,7 +173,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fieldNames));
 
         $helper->expects($this->once())
-            ->method('createField')
+            ->method('createFieldModel')
             ->with(
                 $sourceClass,
                 'more_929b3e16',
@@ -217,7 +218,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
                 'manyToOne|Test\Activity|Test\Something\More|more_929b3e16'
             );
 
-        $helper->createManyToOneRelation($sourceClass, $targetClass);
+        $helper->createManyToOneAssociation($sourceClass, $targetClass);
     }
 
     /**
@@ -335,7 +336,7 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test createField method call configManager and updateFieldConfigs
+     * Test createFieldModel method call configManager and updateFieldConfigs
      */
     public function testCreateField()
     {
@@ -358,102 +359,203 @@ class AssociationBuildHelperTest extends \PHPUnit_Framework_TestCase
 
         ReflectionUtil::callProtectedMethod(
             $helper,
-            'createField',
+            'createFieldModel',
             ['Test\Entity', 'entity', 'manyToOne', []]
         );
     }
 
-//    public function testAddManyToOneRelation()
-//    {
-//        $extension = $this->getExtensionMock();
-//
-//        $targetEntityName = 'Test\TargetEntity';
-//        $sourceEntityName = 'Test\SourceEntity';
-//        $relationName     = 'entity';
-//        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
-//
-//        $extendConfig = new Config(new EntityConfigId('extend', $sourceEntityName));
-//
-//        $expectedExtendConfig = new Config(new EntityConfigId('extend', $sourceEntityName));
-//        $expectedExtendConfig->set(
-//            'relation',
-//            [
-//                $relationKey => [
-//                    'assign'          => false,
-//                    'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
-//                    'owner'           => true,
-//                    'target_entity'   => $targetEntityName,
-//                    'target_field_id' => false
-//                ]
-//            ]
-//        );
-//        $expectedExtendConfig->set(
-//            'schema',
-//            ['relation' => [$relationName => $relationName]]
-//        );
-//        $expectedExtendConfig->set(
-//            'index',
-//            [$relationName => null]
-//        );
-//
-//        $this->extendConfigProvider->expects($this->once())
-//            ->method('getConfig')
-//            ->with($sourceEntityName)
-//            ->will($this->returnValue($extendConfig));
-//
-//        $this->extendConfigProvider->expects($this->once())
-//            ->method('persist')
-//            ->with($this->identicalTo($extendConfig));
-//
-//        self::callProtectedMethod(
-//            $extension,
-//            'addManyToOneRelation',
-//            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
-//        );
-//
-//        $this->assertEquals($expectedExtendConfig, $extendConfig);
-//    }
-//
-//    public function testAddManyToOneRelationTargetSide()
-//    {
-//        $extension = $this->getExtensionMock();
-//
-//        $targetEntityName = 'Test\TargetEntity';
-//        $sourceEntityName = 'Test\SourceEntity';
-//        $relationName     = 'entity';
-//        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
-//
-//        $extendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
-//
-//        $expectedExtendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
-//        $expectedExtendConfig->set(
-//            'relation',
-//            [
-//                $relationKey => [
-//                    'assign'          => false,
-//                    'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
-//                    'owner'           => false,
-//                    'target_entity'   => $sourceEntityName,
-//                    'field_id'        => false
-//                ]
-//            ]
-//        );
-//
-//        $this->extendConfigProvider->expects($this->once())
-//            ->method('getConfig')
-//            ->with($targetEntityName)
-//            ->will($this->returnValue($extendConfig));
-//
-//        $this->extendConfigProvider->expects($this->once())
-//            ->method('persist')
-//            ->with($this->identicalTo($extendConfig));
-//
-//        self::callProtectedMethod(
-//            $extension,
-//            'addManyToOneRelationTargetSide',
-//            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
-//        );
-//
-//        $this->assertEquals($expectedExtendConfig, $extendConfig);
-//    }
+    /**
+     * Test method call config provider with correct params
+     */
+    public function testAddManyToOneRelation()
+    {
+        $targetEntityName = 'Test\TargetEntity';
+        $sourceEntityName = 'Test\SourceEntity';
+        $relationName     = 'entity';
+        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
+
+        $extendConfig = new Config(new EntityConfigId('extend', $sourceEntityName));
+
+        $expectedExtendConfig = new Config(new EntityConfigId('extend', $sourceEntityName));
+        $expectedExtendConfig->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
+                    'owner'           => true,
+                    'target_entity'   => $targetEntityName,
+                    'target_field_id' => false
+                ]
+            ]
+        );
+        $expectedExtendConfig->set(
+            'schema',
+            ['relation' => [$relationName => $relationName]]
+        );
+        $expectedExtendConfig->set(
+            'index',
+            [$relationName => null]
+        );
+
+        $extendConfigProvider = $this->configureExtendConfigProvider($sourceEntityName, $extendConfig);
+
+        $extendConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($extendConfig));
+
+        $this->configManagerMock->expects($this->once())
+            ->method('calculateConfigChangeSet')
+            ->with($this->identicalTo($extendConfig));
+
+        ReflectionUtil::callProtectedMethod(
+            $this->helper,
+            'addManyToOneRelation',
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
+        );
+
+        $this->assertEquals($expectedExtendConfig, $extendConfig);
+    }
+
+    /**
+     * Test method correctly configure manyToOne relation on target side
+     */
+    public function testAddManyToOneRelationTargetSide()
+    {
+        $targetEntityName = 'Test\TargetEntity';
+        $sourceEntityName = 'Test\SourceEntity';
+        $relationName     = 'entity';
+        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
+
+        $extendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
+
+        $expectedExtendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
+        $expectedExtendConfig->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
+                    'owner'           => false,
+                    'target_entity'   => $sourceEntityName,
+                    'field_id'        => false
+                ]
+            ]
+        );
+
+        $extendConfigProvider = $this->configureExtendConfigProvider($targetEntityName, $extendConfig);
+
+        $extendConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($extendConfig));
+
+        $this->configManagerMock->expects($this->once())
+            ->method('calculateConfigChangeSet')
+            ->with($this->identicalTo($extendConfig));
+
+        ReflectionUtil::callProtectedMethod(
+            $this->helper,
+            'addManyToOneRelationTargetSide',
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey]
+        );
+
+        $this->assertEquals($expectedExtendConfig, $extendConfig);
+    }
+
+    /**
+     * Test method correctly configure manyToMany bidirectional relation
+     *
+     * @param   bool $isUnidirectional
+     * @dataProvider manyToManyDataProvider
+     */
+    public function testAddManyToManyRelationBidirectional($isUnidirectional)
+    {
+        $targetEntityName = 'Test\TargetEntity';
+        $sourceEntityName = 'Test\SourceEntity';
+        $relationName     = 'entity';
+        $relationKey      = 'manyToOne|Test\SourceEntity|Test\TargetEntity|entity';
+
+        $extendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
+
+        $targetFieldId = null;
+        if (!$isUnidirectional) {
+            $targetFieldId = new FieldConfigId(
+                'extend',
+                $targetEntityName,
+                'source_entity_' . $relationName,
+                'manyToMany'
+            );
+        }
+
+        $expectedExtendConfig = new Config(new EntityConfigId('extend', $targetEntityName));
+        $expectedExtendConfig->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToMany'),
+                    'owner'           => true,
+                    'target_entity'   => $targetEntityName,
+                    'target_field_id' => $targetFieldId,
+                ]
+            ]
+        );
+        $expectedExtendConfig->set('index', [$relationName => null]);
+
+        $extendConfigProvider = $this->configureExtendConfigProvider($sourceEntityName, $extendConfig);
+
+        $extendConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($extendConfig));
+
+        $this->configManagerMock->expects($this->once())
+            ->method('calculateConfigChangeSet')
+            ->with($this->identicalTo($extendConfig));
+
+        ReflectionUtil::callProtectedMethod(
+            $this->helper,
+            'addManyToManyRelation',
+            [$targetEntityName, $sourceEntityName, $relationName, $relationKey, $isUnidirectional]
+        );
+
+        $this->assertEquals($expectedExtendConfig, $extendConfig);
+    }
+
+    /**
+     * Uni- and bi- directional flags
+     *
+     * @return array
+     */
+    public function manyToManyDataProvider()
+    {
+        return [
+            'unidirectional' => [true],
+            'bidirectional'  => [false],
+        ];
+    }
+
+    /**
+     * @param string $sourceEntityName
+     * @param Config $extendConfig
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function configureExtendConfigProvider($sourceEntityName, $extendConfig)
+    {
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configManagerMock->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($sourceEntityName)
+            ->will($this->returnValue($extendConfig));
+
+        return $extendConfigProvider;
+    }
 }

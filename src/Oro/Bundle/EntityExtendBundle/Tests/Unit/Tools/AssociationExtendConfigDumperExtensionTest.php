@@ -94,11 +94,11 @@ class AssociationExtendConfigDumperExtensionTest extends \PHPUnit_Framework_Test
             ->will($this->returnValue(['Test\Entity', 'Test\Entity2']));
 
         $this->assocHelperMock->expects($this->at(0))
-            ->method('createManyToOneRelation')
+            ->method('createManyToOneAssociation')
             ->with($assocClassName, 'Test\Entity');
 
         $this->assocHelperMock->expects($this->at(1))
-            ->method('createManyToOneRelation')
+            ->method('createManyToOneAssociation')
             ->with($assocClassName, 'Test\Entity2');
 
         $extension->preUpdate($configs);

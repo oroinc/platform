@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -42,7 +43,7 @@ class AssociationBuildHelper
      * @param string $targetEntityClass
      * @param bool   $unidirectional
      */
-    public function createManyToManyRelation($sourceEntityClass, $targetEntityClass, $unidirectional = true)
+    public function createManyToManyAssociation($sourceEntityClass, $targetEntityClass, $unidirectional = true)
     {
         $relationName = $this->getRelationName($targetEntityClass);
         $relationKey = $this->getRelationKey(
@@ -69,7 +70,7 @@ class AssociationBuildHelper
         $targetFieldName    = array_shift($targetEntityFields);
 
         // create field
-        $this->createField(
+        $this->createFieldModel(
             $sourceEntityClass,
             $relationName,
             'manyToMany',
@@ -112,7 +113,7 @@ class AssociationBuildHelper
      * @param string $sourceEntityClass
      * @param string $targetEntityClass
      */
-    public function createManyToOneRelation($sourceEntityClass, $targetEntityClass)
+    public function createManyToOneAssociation($sourceEntityClass, $targetEntityClass)
     {
         $relationName = $this->getRelationName($targetEntityClass);
         $relationKey = $this->getRelationKey(
@@ -139,7 +140,7 @@ class AssociationBuildHelper
         $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
 
         // create field
-        $this->createField(
+        $this->createFieldModel(
             $sourceEntityClass,
             $relationName,
             'manyToOne',
@@ -259,7 +260,7 @@ class AssociationBuildHelper
      * @param string $fieldType
      * @param array  $values
      */
-    protected function createField($className, $fieldName, $fieldType, $values)
+    protected function createFieldModel($className, $fieldName, $fieldType, $values)
     {
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
 
@@ -297,7 +298,7 @@ class AssociationBuildHelper
             $targetFieldId = new FieldConfigId(
                 'extend',
                 $targetEntityName,
-                $this->getRelationName($sourceEntityName) . '_' . $relationName,
+                Inflector::tableize(ExtendHelper::getShortClassName($sourceEntityName)) . '_' . $relationName,
                 'manyToMany'
             );
         }
