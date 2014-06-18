@@ -3,10 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Model\IntegrationSettings;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_STRING = 'testString';
+    const TEST_STRING  = 'testString';
     const TEST_BOOLEAN = true;
 
     /** @var array */
@@ -69,5 +70,17 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
 
         $this->entity->clearTransport();
         $this->assertAttributeEmpty('transport', $this->entity);
+    }
+
+    public function testSynchronizationSettings()
+    {
+        $value = $this->entity->getSynchronizationSettings();
+        $this->assertNotEmpty($value);
+
+        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Model\IntegrationSettings', $value);
+
+        $this->entity->setSynchronizationSettings(new IntegrationSettings());
+
+        $this->assertNotSame($value, $this->entity->getSynchronizationSettings());
     }
 }

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\IntegrationBundle\Model\IntegrationSettings;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -76,6 +77,13 @@ class Channel
     protected $isTwoWaySyncEnabled;
 
     /**
+     * @var IntegrationSettings
+     *
+     * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
+     */
+    protected $synchronizationSettings;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="sync_priority", type="string", length=255, nullable=true)
@@ -112,8 +120,9 @@ class Channel
 
     public function __construct()
     {
-        $this->statuses            = new ArrayCollection();
-        $this->isTwoWaySyncEnabled = false;
+        $this->statuses                = new ArrayCollection();
+        $this->synchronizationSettings = new IntegrationSettings();
+        $this->isTwoWaySyncEnabled     = false;
     }
 
     /**
@@ -212,6 +221,22 @@ class Channel
     public function getConnectors()
     {
         return $this->connectors;
+    }
+
+    /**
+     * @param IntegrationSettings $synchronizationSettings
+     */
+    public function setSynchronizationSettings($synchronizationSettings)
+    {
+        $this->synchronizationSettings = $synchronizationSettings;
+    }
+
+    /**
+     * @return IntegrationSettings
+     */
+    public function getSynchronizationSettings()
+    {
+        return $this->synchronizationSettings;
     }
 
     /**
