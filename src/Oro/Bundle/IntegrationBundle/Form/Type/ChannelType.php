@@ -34,7 +34,7 @@ class ChannelType extends AbstractType
     {
         $this->registry       = $registry;
         $this->securityFacade = $securityFacade;
-        $this->entityManager = $entityManager;
+        $this->entityManager  = $entityManager;
     }
 
     /**
@@ -45,7 +45,7 @@ class ChannelType extends AbstractType
         $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
         $builder->addEventSubscriber(new ChannelFormTwoWaySyncSubscriber($this->registry));
         $builder->addEventSubscriber(new DefaultUserOwnerSubscriber($this->securityFacade));
-        $builder->addEventSubscriber(new OrganizationSubscriber($this->securityFacade, $this->entityManager));
+        $builder->addEventSubscriber(new OrganizationSubscriber($this->entityManager));
 
         $builder->add(
             self::TYPE_FIELD_NAME,

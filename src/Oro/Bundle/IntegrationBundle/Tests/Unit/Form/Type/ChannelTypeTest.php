@@ -22,6 +22,9 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
+    /** @var /Doctrine\Common\Persistence\ObjectManager|\PHPUnit_Framework_MockObject_MockObject  */
+    protected $objectManager;
+
     public function setUp()
     {
         $this->registry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
@@ -30,8 +33,10 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
+        $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->type = new ChannelType($this->registry, $this->securityFacade);
+        $this->type = new ChannelType($this->registry, $this->securityFacade, $this->objectManager);
     }
 
     public function tearDown()
@@ -44,14 +49,20 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->at(0))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber'));
+
         $this->builder->expects($this->at(1))
             ->method('addEventSubscriber')
             ->with(
                 $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber')
             );
+
         $this->builder->expects($this->at(2))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
+
+        $this->builder->expects($this->at(3))
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber'));
 
         $this->type->buildForm($this->builder, array());
     }

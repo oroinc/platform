@@ -65,7 +65,7 @@ class ChannelControllersTest extends WebTestCase
         );
 
         $this->assertEquals(
-            '',
+            $organization->getId(),
             $form['oro_integration_channel_form[organization]']->getValue(),
             'Should contains predefined organization'
         );
