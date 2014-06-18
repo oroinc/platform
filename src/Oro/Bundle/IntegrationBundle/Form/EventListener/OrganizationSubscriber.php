@@ -54,6 +54,9 @@ class OrganizationSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return \Closure
+     */
     protected function addOrganizationFieldClosure()
     {
         return function (FormInterface $form, $isHidden) {
