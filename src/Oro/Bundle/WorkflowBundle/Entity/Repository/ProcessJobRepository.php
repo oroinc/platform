@@ -15,10 +15,19 @@ class ProcessJobRepository extends EntityRepository
      */
     public function findEntity(ProcessJob $processJob)
     {
-        if ($entityClass = $processJob->getProcessTrigger()->getDefinition()->getRelatedEntity()) {
-            return $this->getEntityManager()->getRepository($entityClass)->find($processJob->getEntityId());
+        $trigger = $processJob->getProcessTrigger();
+        if (!$trigger) {
+            return null;
         }
-        return null;
+
+        $definition = $trigger->getDefinition();
+        if (!$definition) {
+            return null;
+        }
+
+        $entityClass = $definition->getRelatedEntity();
+
+        return $this->getEntityManager()->getRepository($entityClass)->find($processJob->getEntityId());
     }
 
     /**

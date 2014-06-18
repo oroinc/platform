@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
@@ -47,12 +48,7 @@ class ProcessJobRepositoryTest extends WebTestCase
 
     public function testFindEntity()
     {
-        /** @var User $entity */
-        $entity = $this->registry->getRepository('OroUserBundle:User')
-            ->createQueryBuilder('user')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleResult();
+        $entity = $this->getUser();
         $entityClass = ClassUtils::getClass($entity);
         $entityId = $entity->getId();
 
@@ -88,13 +84,15 @@ class ProcessJobRepositoryTest extends WebTestCase
             ->findOneBy(array('definition' => $definition));
 
         // fixture data
+        $entity = $this->getUser();
         $jobsAmount = ProcessJobRepository::DELETE_HASH_BATCH + 1;
         $entityHashes = array();
 
         for ($i = 0; $i < $jobsAmount; $i++) {
             $job = new ProcessJob();
             $job->setProcessTrigger($trigger)
-                ->setEntityId($i);
+                ->setEntityId($i)
+                ->setData(new ProcessData(array('entity' => $entity)));
             $this->entityManager->persist($job);
 
             $entityHashes[] = $job->getEntityHash();
@@ -120,5 +118,17 @@ class ProcessJobRepositoryTest extends WebTestCase
         return (int)$queryBuilder->where($queryBuilder->expr()->in('job.entityHash', $hashes))
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        return $this->registry->getRepository('OroUserBundle:User')
+            ->createQueryBuilder('user')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleResult();
     }
 }
