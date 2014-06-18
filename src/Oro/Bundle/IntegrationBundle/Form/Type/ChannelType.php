@@ -30,6 +30,11 @@ class ChannelType extends AbstractType
     /** @var ObjectManager */
     protected $entityManager;
 
+    /**
+     * @param TypesRegistry  $registry
+     * @param SecurityFacade $securityFacade
+     * @param ObjectManager  $entityManager
+     */
     public function __construct(TypesRegistry $registry, SecurityFacade $securityFacade, ObjectManager $entityManager)
     {
         $this->registry       = $registry;
