@@ -45,47 +45,65 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $denormalizedData = array();
-
-        foreach ($data as $key => $value) {
-            if ($this->isEntityValue($value)) {
-                $denormalizedData[$key] = $this->denormalizeEntity($value);
-            } elseif ($this->isUnserializable($value)) {
-                $denormalizedData[$key] = $this->unserialize($value);
-            } elseif (is_array($value)) {
-                $denormalizedData[$key] = $this->denormalize($value, $class, $format, $context);
-            } else {
-                $denormalizedData[$key] = $value;
-            }
-        }
+        $denormalizedData = $this->denormalizeIterable($data, $context);
 
         return new ProcessData($denormalizedData);
     }
 
     /**
-     * Returns a completed entity
-     *
-     * @param array $objectData
-     * @return object
+     * @param array|\Iterator $data
+     * @param array $context
+     * @return array
      */
-    protected function denormalizeEntity(array $objectData)
+    protected function denormalizeIterable($data, array $context = array())
     {
-        $className = $objectData['className'];
+        $denormalizedData = array();
 
-        if (!empty($objectData['entityId'])) {
-            return $this->registry->getManagerForClass($className)->find($className, $objectData['entityId']);
+        foreach ($data as $key => $value) {
+            $denormalizedData[$key] = $this->denormalizeValue($value, $context);
         }
 
-        $entityData = !empty($objectData['entityData']) ? $objectData['entityData'] : array();
+        return $denormalizedData;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $context
+     * @return mixed
+     */
+    protected function denormalizeValue($value, array $context = array())
+    {
+        if ($this->isEntityValue($value)) {
+            $value = $this->denormalizeEntity($value);
+        } elseif ($this->isUnserializable($value)) {
+            $value = $this->unserialize($value);
+        } elseif (is_array($value)) {
+            $value = $this->denormalizeIterable($value, $context);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Returns a completed entity
+     *
+     * @param array $entityData
+     * @return object
+     */
+    protected function denormalizeEntity(array $entityData)
+    {
+        $className = $entityData['className'];
+
+        if (!empty($entityData['entityId'])) {
+            return $this->registry->getManagerForClass($className)->find($className, $entityData['entityId']);
+        }
+
+        $entityData = !empty($entityData['entityData']) ? $entityData['entityData'] : array();
         $classMetadata = $this->getClassMetadata($className);
         $entity = $classMetadata->getReflectionClass()->newInstanceWithoutConstructor();
 
         foreach ($entityData as $name => $value) {
-            if ($this->isEntityValue($value)) {
-                $value = $this->denormalizeEntity($value);
-            } elseif ($this->isUnserializable($value)) {
-                $value = $this->unserialize($value);
-            }
+            $value = $this->denormalizeValue($value);
 
             $reflectionProperty = $classMetadata->getReflectionProperty($name);
             $reflectionProperty->setAccessible(true);
@@ -113,33 +131,43 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
             $processJob->setEntityId($entityId);
         }
 
+        return $this->normalizeIterable($object, $context);
+    }
+
+    /**
+     * @param array|\Iterator $data
+     * @param array $context
+     * @return array
+     */
+    protected function normalizeIterable($data, array $context = array())
+    {
         $normalizedData = array();
 
-        foreach ($object as $key => $value) {
-            if (is_object($value)) {
-                $normalizedData[$key] = $this->normalizeObject($value, $context);
-            } elseif (is_array($value)) {
-                $normalizedData[$key] = $this->normalize($value, $format, $context);
-            } else {
-                $normalizedData[$key] = $value;
-            }
+        foreach ($data as $key => $value) {
+            $normalizedData[$key] = $this->normalizeValue($value, $context);
         }
 
         return $normalizedData;
     }
 
     /**
-     * @param object $value
+     * @param mixed $value
      * @param array $context
      * @return array
      */
-    protected function normalizeObject($value, array $context = array())
+    protected function normalizeValue($value, array $context = array())
     {
-        if ($this->doctrineHelper->isManageableEntity($value)) {
-            return $this->normalizeEntity($value, $context);
-        } else {
-            return $this->serialize($value);
+        if (is_object($value)) {
+            if ($this->doctrineHelper->isManageableEntity($value)) {
+                $value = $this->normalizeEntity($value, $context);
+            } else {
+                $value = $this->serialize($value);
+            }
+        } elseif (is_array($value)) {
+            $value = $this->normalizeIterable($value, $context);
         }
+
+        return $value;
     }
 
     /**
@@ -160,19 +188,14 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
             return $normalizedData;
         }
 
+        $normalizedData['entityData'] = array();
+
         $classMetadata  = $this->getClassMetadata($entityClass);
         $fieldNames = $classMetadata->getFieldNames();
 
-        $normalizedData['entityData'] = array();
-
         foreach ($fieldNames as $fieldName) {
             $fieldValue = $classMetadata->getFieldValue($entity, $fieldName);
-
-            if (is_object($fieldValue)) {
-                $fieldValue = $this->normalizeObject($fieldValue, $context);
-            }
-
-            $normalizedData['entityData'][$fieldName] = $fieldValue;
+            $normalizedData['entityData'][$fieldName] = $this->normalizeValue($fieldValue);
         }
 
         return $normalizedData;
