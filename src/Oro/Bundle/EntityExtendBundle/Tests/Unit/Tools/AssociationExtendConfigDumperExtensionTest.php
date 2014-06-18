@@ -63,7 +63,27 @@ class AssociationExtendConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         );
 
         $assocClassName = 'Test\AssocEntity';
+
         $configs = [];
+
+//        $targetEntity   = 'Test\Entity';
+//        $relationKey    = 'manyToOne|Test\AssocEntity|Test\Entity|entity_2929d33a';
+//        $relationName   = 'entity_2929d33a';
+//
+//        $assocConfig = new Config(new EntityConfigId('assoc', $targetEntity));
+//        $assocConfig->set('enabled', true);
+//        $this->assocConfigProvider->expects($this->once())
+//            ->method('getConfigs')
+//            ->will($this->returnValue([$assocConfig]));
+//
+//        $entityConfig = new Config(new EntityConfigId('entity', $targetEntity));
+//        $entityConfig->set('label', 'test');
+//        $entityConfig->set('description', 'test');
+//        $this->entityConfigProvider->expects($this->once())
+//            ->method('getConfig')
+//            ->with($targetEntity)
+//            ->will($this->returnValue($entityConfig));
+
 
         $extension->expects($this->once())
             ->method('getAssociationEntityClass')

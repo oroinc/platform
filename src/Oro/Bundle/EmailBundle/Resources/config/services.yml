@@ -16,6 +16,7 @@ parameters:
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
+    oro_email.event_listener.activity_grid_listener.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -248,3 +249,10 @@ services:
         class: %oro_email.email_synchronization_manager.class%
         arguments:
             - @service_container
+
+    oro_email.event_listener.activity_grid_listener:
+        class: %oro_email.event_listener.activity_grid_listener.class%
+        arguments:
+            - @oro_activity.activity_helper
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
