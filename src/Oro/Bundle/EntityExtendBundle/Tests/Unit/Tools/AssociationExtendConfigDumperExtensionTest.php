@@ -100,8 +100,8 @@ class AssociationExtendConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         $configs        = [];
         $assocClassName = 'Test\AssocEntity';
         $targetEntity   = 'Test\Entity';
-        $relationKey    = 'manyToOne|Test\AssocEntity|Test\Entity|entity';
-        $relationName   = 'entity';
+        $relationKey    = 'manyToOne|Test\AssocEntity|Test\Entity|entity_2929d33a';
+        $relationName   = 'entity_2929d33a';
 
         $assocConfig = new Config(new EntityConfigId('assoc', $targetEntity));
         $assocConfig->set('enabled', true);
