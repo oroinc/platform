@@ -4,6 +4,7 @@ parameters:
     oro_attachment.twig.attachment_extension.class:      Oro\Bundle\AttachmentBundle\Twig\AttachmentExtension
 
     oro_attachment.entity_extend.dumper_extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentExtendConfigDumperExtension
+    oro_attachment.migration.extension.attachment.class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
 services:
     oro_attachment.manager:
@@ -31,3 +32,10 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_entity_extend.dumper_extension }
+
+    oro_attachment.migration.extension.attachment:
+        class: %oro_attachment.migration.extension.attachment.class%
+        arguments:
+            - @oro_entity_extend.migration.options_manager
+        tags:
+            - { name: oro_migration.extension, extension_name: attachment }
