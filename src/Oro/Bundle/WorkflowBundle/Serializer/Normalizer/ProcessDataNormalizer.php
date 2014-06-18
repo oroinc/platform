@@ -74,7 +74,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     protected function denormalizeValue($value, array $context = array())
     {
         if ($this->isEntityValue($value)) {
-            $value = $this->denormalizeEntity($value);
+            $value = $this->denormalizeEntity($value, $context);
         } elseif ($this->isUnserializable($value)) {
             $value = $this->unserialize($value);
         } elseif (is_array($value)) {
@@ -88,9 +88,10 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      * Returns a completed entity
      *
      * @param array $entityData
+     * @param array $context
      * @return object
      */
-    protected function denormalizeEntity(array $entityData)
+    protected function denormalizeEntity(array $entityData, array $context = array())
     {
         $className = $entityData['className'];
 
@@ -103,7 +104,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
         $entity = $classMetadata->getReflectionClass()->newInstanceWithoutConstructor();
 
         foreach ($entityData as $name => $value) {
-            $value = $this->denormalizeValue($value);
+            $value = $this->denormalizeValue($value, $context);
 
             $reflectionProperty = $classMetadata->getReflectionProperty($name);
             $reflectionProperty->setAccessible(true);
@@ -195,7 +196,7 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
 
         foreach ($fieldNames as $fieldName) {
             $fieldValue = $classMetadata->getFieldValue($entity, $fieldName);
-            $normalizedData['entityData'][$fieldName] = $this->normalizeValue($fieldValue);
+            $normalizedData['entityData'][$fieldName] = $this->normalizeValue($fieldValue, $context);
         }
 
         return $normalizedData;
