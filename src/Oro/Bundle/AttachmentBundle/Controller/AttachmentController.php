@@ -5,6 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -13,14 +15,24 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 class AttachmentController extends Controller
 {
     /**
-     * @Route("attachment/{type}/{id}/{filename}",
+     * @Route("attachment/{codedString}.{extension}",
      *   name="oro_attachment_file",
-     *   requirements={"id"="\d+", "type"="get|download", "filename"="\w+"}
+     *   requirements={"extension"="\w+"}
      * )
      */
-    public function getAttachmentAction($type, $id, $filename)
+    public function getAttachmentAction($codedString, $extension)
     {
-        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
+        list($parentClass, $fieldName, $parentId, $type, $filename) =
+            $this->get('oro_attachment.manager')->decodeAttachmentUrl($codedString);
+        $parentEntity = $this->getDoctrine()->getRepository($parentClass)->find($parentId);
+        if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $parentEntity)) {
+            throw new AccessDeniedException();
+        }
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $attachment = $accessor->getValue($parentEntity, $fieldName);
+        if ($attachment->getOriginalFilename() !== $filename) {
+            throw new NotFoundHttpException();
+        }
         $response = new Response();
         $response->headers->set('Cache-Control', 'public');
         if ($type == 'get') {
@@ -41,7 +53,7 @@ class AttachmentController extends Controller
     /**
      * @Route("media/cache/attachment/resize/{id}/{width}/{height}/{filename}",
      *  name="oro_resize_attachment",
-     *  requirements={"id"="\d+", "width"="\d+", "height"="\d+", "filename"="\w+"}
+     *  requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)

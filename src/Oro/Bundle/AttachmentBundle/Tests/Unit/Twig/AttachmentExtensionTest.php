@@ -68,11 +68,13 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAttachmentUrl()
     {
+        $parentEntity = new TestClass();
+        $parentField = 'test_field';
         $this->manager->expects($this->once())
             ->method('getAttachmentUrl')
-            ->with($this->attachment, 'download', true);
+            ->with($parentEntity, $parentField, $this->attachment, 'download', true);
 
-        $this->extension->getAttachmentUrl($this->attachment, 'download', true);
+        $this->extension->getAttachmentUrl($parentEntity, $parentField, $this->attachment, 'download', true);
     }
 
     public function testGetResizedImageUrl()
@@ -95,14 +97,17 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptyFileView()
     {
+        $parentEntity = new TestClass();
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->assertEquals('', $this->extension->getFileView($environment, $this->attachment));
+        $this->assertEquals('', $this->extension->getFileView($environment, $parentEntity, $this->attachment));
     }
 
     public function testGetFileView()
     {
+        $parentEntity = new TestClass();
+        $parentField = 'test_field';
         $this->attachment->setFilename('test.doc');
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
@@ -115,9 +120,8 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getAttachmentIconClass')
             ->with($this->attachment);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl')
-            ->with($this->attachment);
-        $this->extension->getFileView($environment, $this->attachment);
+            ->method('getAttachmentUrl');
+        $this->extension->getFileView($environment, $parentEntity, $parentField, $this->attachment);
     }
 
     public function testGetEmptyImageView()
@@ -130,6 +134,7 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetImageView()
     {
+        $parentEntity = new TestClass();
         $this->attachment->setFilename('test.doc');
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
@@ -144,11 +149,12 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getAttachmentUrl');
 
-        $this->extension->getImageView($environment, $this->attachment);
+        $this->extension->getImageView($environment, $parentEntity, $this->attachment);
     }
 
     public function testGetImageViewConfigured()
     {
+        $parentEntity = new TestClass();
         $this->attachment->setFilename('test.doc');
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
@@ -172,6 +178,6 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getAttachmentUrl');
 
-        $this->extension->getImageView($environment, $this->attachment, new TestClass(), 'testField');
+        $this->extension->getImageView($environment, $parentEntity, $this->attachment, new TestClass(), 'testField');
     }
 }

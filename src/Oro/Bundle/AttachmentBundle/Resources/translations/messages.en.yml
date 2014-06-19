@@ -22,6 +22,8 @@ oro:
         extension.label:         Extension
         file.label:              File
         delete_file.label:       Delete
+        file_size.label:         File size
+        mime_type.label:         Mime type
 
     entity_extend:
         form:

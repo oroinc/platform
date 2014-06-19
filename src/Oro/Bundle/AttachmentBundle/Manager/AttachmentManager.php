@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
@@ -30,8 +31,11 @@ class AttachmentManager
      * @param Router        $router
      * @param array         $fileIcons
      */
-    public function __construct(FilesystemMap $filesystemMap, Router $router, $fileIcons)
-    {
+    public function __construct(
+        FilesystemMap $filesystemMap,
+        Router $router,
+        $fileIcons
+    ) {
         $this->filesystem = $filesystemMap->get('attachments');
         $this->router = $router;
         $this->fileIcons = $fileIcons;
@@ -51,32 +55,32 @@ class AttachmentManager
             $entity->setFilename(null);
             $entity->setExtension(null);
             $entity->setOriginalFilename(null);
-        } else {
-            if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
-                $file = $entity->getFile();
-                if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
-                    $this->filesystem->delete($entity->getFilename());
-                }
-                $entity->setExtension($file->guessExtension());
+        }
 
-                if ($file instanceof UploadedFile) {
-                    $entity->setOriginalFilename($file->getClientOriginalName());
-                    $entity->setMimeType($file->getClientMimeType());
-                    $entity->setFileSize($file->getClientSize());
-                } else {
-                    $entity->setOriginalFilename($file->getFileName());
-                    $entity->setMimeType($file->getMimeType());
-                    $entity->setFileSize($file->getSize());
-                }
+        if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
+            $file = $entity->getFile();
+            if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
+                $this->filesystem->delete($entity->getFilename());
+            }
+            $entity->setExtension($file->guessExtension());
 
-                $entity->setFilename(uniqid() . '.' . $entity->getExtension());
+            if ($file instanceof UploadedFile) {
+                $entity->setOriginalFilename($file->getClientOriginalName());
+                $entity->setMimeType($file->getClientMimeType());
+                $entity->setFileSize($file->getClientSize());
+            } else {
+                $entity->setOriginalFilename($file->getFileName());
+                $entity->setMimeType($file->getMimeType());
+                $entity->setFileSize($file->getSize());
+            }
 
-                if ($this->filesystem->getAdapter() instanceof MetadataSupporter) {
-                    $this->filesystem->getAdapter()->setMetadata(
-                        $entity->getFilename(),
-                        ['contentType' => $entity->getMimeType()]
-                    );
-                }
+            $entity->setFilename(uniqid() . '.' . $entity->getExtension());
+
+            if ($this->filesystem->getAdapter() instanceof MetadataSupporter) {
+                $this->filesystem->getAdapter()->setMetadata(
+                    $entity->getFilename(),
+                    ['contentType' => $entity->getMimeType()]
+                );
             }
         }
     }
@@ -88,7 +92,7 @@ class AttachmentManager
      */
     public function upload(Attachment $entity)
     {
-        if (!$entity->isEmptyFile() && $entity->getFile() !== null && $entity->getFile()->isFile()) {
+        if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
             $file = $entity->getFile();
 
             $src = new LocalStream($file->getPathname());
@@ -119,22 +123,57 @@ class AttachmentManager
     /**
      * Get attachment url
      *
+     * @param object     $parentEntity
+     * @param string     $fieldName
      * @param Attachment $entity
-     * @param bool       $absolute
      * @param string     $type
+     * @param bool       $absolute
      * @return string
      */
-    public function getAttachmentUrl(Attachment $entity, $type = 'get', $absolute = false)
+    public function getAttachmentUrl($parentEntity, $fieldName, Attachment $entity, $type = 'get', $absolute = false)
     {
+        $parentClass = ClassUtils::getRealClass($parentEntity);
+        $urlString = base64_encode(
+            implode(
+                '|',
+                [
+                    $parentClass,
+                    $fieldName,
+                    $parentEntity->getId(),
+                    $type,
+                    $entity->getOriginalFilename()
+                ]
+            )
+        );
         return $this->router->generate(
             'oro_attachment_file',
             [
-                'type' => $type,
-                'id' => $entity->getId(),
-                'filename' => $entity->getOriginalFilename()
+                'codedString' => $urlString,
+                'extension' => $entity->getExtension()
             ],
             $absolute
         );
+    }
+
+    /**
+     * Return url parameters from encoded string
+     *
+     * @param $urlString
+     * @return array
+     *   - parent class
+     *   - field name
+     *   - entity id
+     *   - download type
+     *   - original filename
+     * @throws \LogicException
+     */
+    public function decodeAttachmentUrl($urlString)
+    {
+        if (!($decodedString = base64_decode($urlString)) || count($result = explode('|', $decodedString)) < 5) {
+            throw new \LogicException('Input string is not correct attachment encoded parameters');
+        }
+
+        return $result;
     }
 
     /**

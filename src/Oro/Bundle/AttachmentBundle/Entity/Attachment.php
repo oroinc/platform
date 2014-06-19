@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
 /**
@@ -83,14 +82,6 @@ class Attachment extends ExtendAttachment
      * @ORM\Column(name="updated_at", type="datetime")
      */
     protected $updatedAt;
-
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
 
     /**
      * @var File $file
@@ -202,22 +193,6 @@ class Attachment extends ExtendAttachment
     public function getUpdatedAt()
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * @param User $owner
-     */
-    public function setOwner(User $owner)
-    {
-        $this->owner = $owner;
-    }
-
-    /**
-     * @return User
-     */
-    public function getOwner()
-    {
-        return $this->owner;
     }
 
     /**

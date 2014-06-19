@@ -46,7 +46,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $filename = 'testFile.doc';
         $originalFileName = 'original.doc';
         $date = new \DateTime('now');
-        $owner = new User();
         $file = new File('testPath', false);
         $extension = 'txt';
         $type = 'text/doc';
@@ -57,7 +56,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             'originalFileName' => ['originalFileName', $originalFileName, $originalFileName],
             'createdAt' => ['createdAt', $date, $date],
             'updatedAt' => ['updatedAt', $date, $date],
-            'owner' => ['owner', $owner, $owner],
             'file' => ['file', $file, $file],
             'extension' => ['extension', $extension, $extension],
             'mimeType' => ['mimeType', $type, $type],
@@ -74,5 +72,20 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getCreatedAt()->format('Y-m-d'));
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getUpdatedAt()->format('Y-m-d'));
+    }
+
+    public function testEmptyFile()
+    {
+        $this->assertNull($this->entity->isEmptyFile());
+        $this->entity->setEmptyFile(true);
+        $this->assertTrue($this->entity->isEmptyFile());
+    }
+
+    public function testToString()
+    {
+        $this->assertEquals('', $this->entity->__toString());
+        $this->entity->setFilename('file.doc');
+        $this->entity->setOriginalFilename('original.doc');
+        $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());
     }
 }

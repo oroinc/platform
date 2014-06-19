@@ -54,6 +54,7 @@ class AttachmentExtension extends \Twig_Extension
             ),
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -65,14 +66,21 @@ class AttachmentExtension extends \Twig_Extension
     /**
      * Get attachment file url
      *
+     * @param object     $parentEntity
+     * @param string     $fieldName
      * @param Attachment $attachment
-     * @param bool       $absolute
      * @param string     $type
+     * @param bool       $absolute
      * @return string
      */
-    public function getAttachmentUrl(Attachment $attachment, $type = 'get', $absolute = false)
-    {
-        return $this->manager->getAttachmentUrl($attachment, $type, $absolute);
+    public function getAttachmentUrl(
+        $parentEntity,
+        $fieldName,
+        Attachment $attachment,
+        $type = 'get',
+        $absolute = false
+    ) {
+        return $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
     }
 
     /**
@@ -106,16 +114,18 @@ class AttachmentExtension extends \Twig_Extension
      * Get file view html block
      *
      * @param \Twig_Environment $environment
+     * @param object            $parentEntity
+     * @param string            $fieldName
      * @param Attachment        $attachment
      * @return string
      */
-    public function getFileView(\Twig_Environment $environment, $attachment = null)
+    public function getFileView(\Twig_Environment $environment, $parentEntity, $fieldName, $attachment = null)
     {
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url' => $this->manager->getAttachmentUrl($attachment, 'download', true),
+                    'url' => $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );
@@ -128,6 +138,7 @@ class AttachmentExtension extends \Twig_Extension
      * Get Image html block
      *
      * @param \Twig_Environment $environment
+     * @param object            $parentEntity
      * @param Attachment        $attachment
      * @param string|object     $entityClass
      * @param string            $fieldName
@@ -135,6 +146,7 @@ class AttachmentExtension extends \Twig_Extension
      */
     public function getImageView(
         \Twig_Environment $environment,
+        $parentEntity,
         Attachment $attachment = null,
         $entityClass = null,
         $fieldName = ''
@@ -154,7 +166,7 @@ class AttachmentExtension extends \Twig_Extension
             return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
                 [
                     'imagePath' => $this->manager->getResizedImageUrl($attachment, $width, $height),
-                    'url' => $this->manager->getAttachmentUrl($attachment, 'download', true),
+                    'url' => $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );
