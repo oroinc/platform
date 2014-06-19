@@ -46,7 +46,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $filename = 'testFile.doc';
         $originalFileName = 'original.doc';
         $date = new \DateTime('now');
-        $owner = new User();
         $file = new File('testPath', false);
         $extension = 'txt';
         $type = 'text/doc';
@@ -57,7 +56,6 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             'originalFileName' => ['originalFileName', $originalFileName, $originalFileName],
             'createdAt' => ['createdAt', $date, $date],
             'updatedAt' => ['updatedAt', $date, $date],
-            'owner' => ['owner', $owner, $owner],
             'file' => ['file', $file, $file],
             'extension' => ['extension', $extension, $extension],
             'mimeType' => ['mimeType', $type, $type],

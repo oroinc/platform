@@ -13,6 +13,7 @@ use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class AttachmentManager
 {
@@ -119,21 +120,52 @@ class AttachmentManager
     /**
      * Get attachment url
      *
+     * @param object     $parentEntity
+     * @param string     $fieldName
      * @param Attachment $entity
-     * @param bool       $absolute
      * @param string     $type
+     * @param bool       $absolute
      * @return string
      */
-    public function getAttachmentUrl(Attachment $entity, $type = 'get', $absolute = false)
+    public function getAttachmentUrl($parentEntity, $fieldName, Attachment $entity, $type = 'get', $absolute = false)
     {
+        $parentClass = ClassUtils::getRealClass($parentEntity);
+        $urlString = base64_encode(implode(
+            '/',
+            [
+                $parentClass,
+                $fieldName,
+                $parentEntity->getId(),
+                $type,
+                $entity->getOriginalFilename()
+            ]
+        ));
         return $this->router->generate(
             'oro_attachment_file',
             [
-                'type' => $type,
-                'id' => $entity->getId(),
-                'filename' => $entity->getOriginalFilename()
+                'codedString' => $urlString,
+                'extension' => $entity->getExtension()
             ],
             $absolute
+        );
+    }
+
+    /**
+     * Return url parameters from encoded string
+     *
+     * @param $urlString
+     * @return array
+     *   - parent class
+     *   - field name
+     *   - entity id
+     *   - download type
+     *   - original filename
+     */
+    public function decodeAttachmentUrl($urlString)
+    {
+        return explode(
+            '/',
+            base64_decode($urlString)
         );
     }
 
