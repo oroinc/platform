@@ -15,8 +15,8 @@ class OroEmbeddedFormBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_embedded_form');
-        $table->getColumn('channel_id');
         $table->removeForeignKey('FK_F7A34C172F5A1AA');
         $table->dropIndex('IDX_F7A34C172F5A1AA');
+        $table->dropColumn('channel_id');
     }
 }
