@@ -7,6 +7,7 @@ parameters:
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
     oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
     oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
+    oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
@@ -77,6 +78,13 @@ services:
         class: %oro_workflow.process.process_handler.class%
         arguments:
             - @oro_workflow.process.process_factory
+            - @oro_workflow.process.logger
+
+    oro_workflow.process.logger:
+        class: %oro_workflow.process.logger.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @?logger
 
     oro_workflow.registry:
         class: %oro_workflow.registry.class%

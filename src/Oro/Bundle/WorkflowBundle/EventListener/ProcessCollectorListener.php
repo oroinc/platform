@@ -17,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 
 class ProcessCollectorListener
 {
@@ -34,6 +35,11 @@ class ProcessCollectorListener
      * @var ProcessHandler
      */
     protected $handler;
+
+    /**
+     * @var ProcessLogger
+     */
+    protected $logger;
 
     /**
      * @var array
@@ -64,12 +70,26 @@ class ProcessCollectorListener
      * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
      * @param ProcessHandler $handler
+     * @param ProcessLogger $logger
      */
-    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper, ProcessHandler $handler)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        DoctrineHelper $doctrineHelper,
+        ProcessHandler $handler,
+        ProcessLogger $logger
+    ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->handler = $handler;
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param bool $forceQueued
+     */
+    public function setForceQueued($forceQueued)
+    {
+        $this->forceQueued = $forceQueued;
     }
 
     /**
@@ -223,6 +243,7 @@ class ProcessCollectorListener
                     $entityManager->persist($processJob);
                     $this->queuedJobs[] = $processJob;
                 } else {
+                    $this->logger->debug('Process handled', $trigger, $data);
                     $this->handler->handleTrigger($trigger, $data);
                 }
 
@@ -256,6 +277,8 @@ class ProcessCollectorListener
 
             $entityManager->persist($jmsJob);
             $hasQueuedJobs = true;
+
+            $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
         }
 
         // save JMS job instances
@@ -305,13 +328,5 @@ class ProcessCollectorListener
     protected function getClass($entity)
     {
         return ClassUtils::getClass($entity);
-    }
-
-    /**
-     * @param bool $forceQueued
-     */
-    public function setForceQueued($forceQueued)
-    {
-        $this->forceQueued = $forceQueued;
     }
 }

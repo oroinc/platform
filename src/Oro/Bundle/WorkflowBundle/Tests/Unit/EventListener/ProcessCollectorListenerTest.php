@@ -38,6 +38,11 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     protected $handler;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
+
+    /**
      * @var ProcessCollectorListener
      */
     protected $listener;
@@ -54,7 +59,16 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new ProcessCollectorListener($this->registry, $this->doctrineHelper, $this->handler);
+        $this->logger = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessLogger')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new ProcessCollectorListener(
+            $this->registry,
+            $this->doctrineHelper,
+            $this->handler,
+            $this->logger
+        );
     }
 
     public function testPrePersist()
@@ -222,7 +236,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $expectedTrigger = $triggers['create'];
         $expectedData = $this->createProcessData(array('data' => $entity));
 
-        $this->handler->expects($this->once())->method('handleTrigger')->with($expectedTrigger, $expectedData);
+        $this->logger->expects($this->once())->method('debug')
+            ->with('Process handled', $expectedTrigger, $expectedData);
+        $this->handler->expects($this->once())->method('handleTrigger')
+            ->with($expectedTrigger, $expectedData);
         $entityManager->expects($this->once())->method('flush');
 
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
@@ -273,6 +290,9 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $entityManager->expects($this->at(3))->method('flush');
+
+        $this->logger->expects($this->once())->method('debug')
+            ->with('Process queued', $expectedTrigger, $expectedData);
 
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
 

@@ -11,14 +11,21 @@ class ProcessHandler
     /**
      * @var ProcessFactory
      */
-    protected $processFactory;
+    protected $factory;
 
     /**
-     * @param ProcessFactory $processFactory
+     * @var ProcessLogger
      */
-    public function __construct(ProcessFactory $processFactory)
+    protected $logger;
+
+    /**
+     * @param ProcessFactory $factory
+     * @param ProcessLogger $logger
+     */
+    public function __construct(ProcessFactory $factory, ProcessLogger $logger)
     {
-        $this->processFactory = $processFactory;
+        $this->factory = $factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -31,8 +38,11 @@ class ProcessHandler
         if (!$processData['data']) {
             throw new InvalidParameterException('Invalid process data. Entity can not be empty.');
         }
-        $process = $this->processFactory->create($processTrigger->getDefinition());
+
+        $process = $this->factory->create($processTrigger->getDefinition());
         $process->execute($processData);
+
+        $this->logger->debug('Process executed', $processTrigger, $processData);
     }
 
     /**

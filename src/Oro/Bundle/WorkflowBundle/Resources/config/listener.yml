@@ -39,6 +39,7 @@ services:
             - @doctrine
             - @oro_entity.doctrine_helper
             - @oro_workflow.process.process_handler
+            - @oro_workflow.process.logger
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -9,20 +10,29 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $processFactory;
+    protected $factory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $logger;
 
     /**
      * @var ProcessHandler
      */
-    protected $processHandler;
+    protected $handler;
 
     protected function setUp()
     {
-        $this->processFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessFactory')
+        $this->factory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processHandler = new ProcessHandler($this->processFactory);
+        $this->logger = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessLogger')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->handler = new ProcessHandler($this->factory, $this->logger);
     }
 
     /**
@@ -39,8 +49,8 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $process->expects($this->never())->method('execute');
 
-        $this->processFactory->expects($this->never())->method('create');
-        $this->processHandler->handleTrigger($processTrigger, new ProcessData(array('entity' => null)));
+        $this->factory->expects($this->never())->method('create');
+        $this->handler->handleTrigger($processTrigger, new ProcessData(array('entity' => null)));
     }
 
     public function testHandleTrigger()
@@ -51,11 +61,11 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             'new'  => array('label' => 'after')
         ));
 
-        $processTrigger = $this->assetHandleTrigger($processData);
-        $this->processHandler->handleTrigger($processTrigger, $processData);
+        $processTrigger = $this->prepareHandleTrigger($processData);
+        $this->handler->handleTrigger($processTrigger, $processData);
     }
 
-    public function assetHandleTrigger($expected)
+    public function prepareHandleTrigger($processData)
     {
         $processDefinition = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
         $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
@@ -68,13 +78,16 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $process->expects($this->once())
             ->method('execute')
-            ->with($expected)
+            ->with($processData)
             ->will($this->returnValue($processDefinition));
 
-        $this->processFactory->expects($this->once())
+        $this->factory->expects($this->once())
             ->method('create')
             ->with($processDefinition)
             ->will($this->returnValue($process));
+        $this->logger->expects($this->once())
+            ->method('debug')
+            ->with('Process executed', $processTrigger, $processData);
 
         return $processTrigger;
     }
@@ -84,7 +97,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleJob($data)
     {
-        $processTrigger = $this->assetHandleTrigger($data);
+        $processTrigger = $this->prepareHandleTrigger($data);
 
         $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
         $processJob->expects($this->once())
@@ -94,7 +107,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($data));
 
-        $this->processHandler->handleJob($processJob);
+        $this->handler->handleJob($processJob);
     }
 
     public function handleJobProvider()
