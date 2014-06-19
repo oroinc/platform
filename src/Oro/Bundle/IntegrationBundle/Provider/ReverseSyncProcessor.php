@@ -59,33 +59,35 @@ class ReverseSyncProcessor
      */
     public function process(Channel $channel, $connector, array $parameters)
     {
-        if (!$channel->getDisabled()) {
-            try {
-                $this->logger->info(sprintf('Start processing "%s" connector', $connector));
+        if ($channel->getDisabled()) {
+            return $this;
+        }
 
-                $realConnector = $this->getRealConnector($channel, $connector);
+        try {
+            $this->logger->info(sprintf('Start processing "%s" connector', $connector));
 
-                if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
-                    throw new \Exception('This connector doesn`t support two-way sync.');
-                }
+            $realConnector = $this->getRealConnector($channel, $connector);
 
-            } catch (\Exception $e) {
-                return $this->logger->error($e->getMessage());
+            if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
+                throw new \Exception('This connector doesn`t support two-way sync.');
             }
 
-            $configuration = [
-                ProcessorRegistry::TYPE_EXPORT =>
-                    array_merge(
-                        [
-                            'entityName' => $realConnector->getImportEntityFQCN(),
-                            'channel'    => $channel->getId()
-                        ],
-                        $parameters
-                    ),
-            ];
-
-            $this->processExport($realConnector->getExportJobName(), $configuration);
+        } catch (\Exception $e) {
+            return $this->logger->error($e->getMessage());
         }
+
+        $configuration = [
+            ProcessorRegistry::TYPE_EXPORT =>
+                array_merge(
+                    [
+                        'entityName' => $realConnector->getImportEntityFQCN(),
+                        'channel'    => $channel->getId()
+                    ],
+                    $parameters
+                ),
+        ];
+
+        $this->processExport($realConnector->getExportJobName(), $configuration);
 
         return $this;
     }
