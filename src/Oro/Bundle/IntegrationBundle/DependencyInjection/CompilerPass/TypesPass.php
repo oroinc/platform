@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass;
 
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -23,30 +22,10 @@ class TypesPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $manager = $container->getDefinition(self::MANAGER_ID);
-        if (!$manager) {
-            return;
-        }
 
-        $this->processConfigs($manager, $container);
         $this->processChannelTypes($manager, $container);
         $this->processTransportTypes($manager, $container);
         $this->processConnectorTypes($manager, $container);
-    }
-
-    protected function processConfigs(Definition $managerDefinition, ContainerBuilder $container)
-    {
-        $configs      = [];
-
-        $configLoader = new CumulativeConfigLoader(
-            'oro_integration_settings',
-            new YamlCumulativeFileLoader('Resources/config/integration_settings.yml')
-        );
-        $resources    = $configLoader->load($container);
-        foreach ($resources as $resource) {
-            $config = $resource->data[Configuration::ROOT_NODE_NAME];
-
-            $configs[] = $config;
-        }
     }
 
     /**

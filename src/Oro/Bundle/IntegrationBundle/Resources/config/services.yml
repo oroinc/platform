@@ -23,9 +23,9 @@ parameters:
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
+    oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
 
-    #Reader
-
+    oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -144,3 +144,12 @@ services:
     oro_integration.sync_scheduler.link:
         tags:
             - { name: oro_service_link,  service: oro_integration.sync_scheduler }
+
+    oro_integration.provider.settings_provider:
+        class: %oro_integration.provider.settings_provider.class%
+        arguments:
+            - []
+            - @oro_integration.config_resolver
+
+    oro_integration.config_resolver:
+        class: %oro_integration.config_resolver.class%
