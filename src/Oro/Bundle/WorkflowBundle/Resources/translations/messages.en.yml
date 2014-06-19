@@ -94,7 +94,7 @@ oro:
                             delete:  Deleted
                             update:  Updated
                         immediately: Immediately
-                        record:      record
+                        entity:      entity
 
         entity_config:
             active_workflow:
