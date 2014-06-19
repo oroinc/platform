@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -46,6 +47,13 @@ class Group
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
      * @JMS\Type("string")
      * @JMS\Expose
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $name;
 

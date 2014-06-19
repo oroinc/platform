@@ -1,0 +1,5 @@
+oro:
+    importexport:
+        entity_config:
+            full.tooltip:   "All fields of the related entity will be exported"
+            header.tooltip: "If blank Label will be used"
