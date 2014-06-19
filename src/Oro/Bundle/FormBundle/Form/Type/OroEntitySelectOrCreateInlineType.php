@@ -78,7 +78,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                         }
                     }
 
-                    return $createEnabled;
+                    $createRouteName = $options->get('create_form_route');
+                    return $createEnabled && !empty($createRouteName);
                 }
             )
         );
@@ -91,7 +92,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     {
         $view->vars['grid_name'] = $options['grid_name'];
         $view->vars['existing_entity_grid_id'] = $options['existing_entity_grid_id'];
-        $view->vars['create_enabled'] = $options['existing_entity_grid_id'];
+        $view->vars['create_enabled'] = $options['create_enabled'];
         $view->vars['create_form_route'] = $options['create_form_route'];
         $view->vars['create_form_route_parameters'] = $options['create_form_route_parameters'];
     }

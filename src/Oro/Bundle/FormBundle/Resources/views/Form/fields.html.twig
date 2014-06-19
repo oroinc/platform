@@ -575,5 +575,77 @@
 {% endblock %}
 
 {% block oro_entity_create_or_select_inline_widget %}
-    {{ form_widget(form) }} <i class="icon-align-justify"></i> <i class="icon-plus"></i>
+    <div id="{{ id }}-el">
+        {{ form_widget(form) }}
+        <div class="btn-group" style="margin-left: 5px;">
+            <button class="btn entity-select-btn"><i class="icon-align-justify"></i></button>
+            {% if form.vars.create_enabled %}
+                <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+            {% endif %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/dialog-widget', 'jquery.select2'],
+        function ($, _, DialogWidget) {
+            $(function() {
+
+                // Handler. TODO: move to separate module
+                var createSelectInlineHandler = function(
+                    container,
+                    selectorEl,
+                    label,
+                    gridUrl,
+                    existingEntityGridId,
+                    entityCreateUrl
+                ) {
+                    var handleGridSelect = function (e) {
+                        e.preventDefault();
+
+                        var entitySelectDialog = new DialogWidget({
+                            title: 'Select ' + label,
+                            url: gridUrl,
+                            stateEnabled: false,
+                            dialogOptions: {
+                                'modal': true,
+                                'width': 1024,
+                                'height': 500
+                            }
+                        });
+
+                        var processSelectedEntities = function (data) {
+                            selectorEl.select2('val', data.model.get(existingEntityGridId));
+                            entitySelectDialog.remove();
+                        };
+
+                        entitySelectDialog.on('grid-row-select', _.bind(processSelectedEntities, this));
+                        entitySelectDialog.render();
+                    };
+
+                    var handleCreate = function (e) {
+                        e.preventDefault();
+                    };
+
+                    container.find('.entity-select-btn').on('click', handleGridSelect);
+                    {% if form.vars.create_enabled %}
+                        container.find('.entity-create-btn').on('click', handleCreate);
+                    {% endif %}
+                };
+
+                // Initialize handler
+                {% set createFormUrl = form.vars.create_enabled
+                    ? path(form.vars.create_form_route, form.vars.create_form_route_parameters)
+                    : null
+                %}
+                createSelectInlineHandler(
+                    $('#{{ id }}-el'),
+                    $('#{{ id }}'),
+                    {{ label|trans|json_encode|raw }},
+                    {{ path('oro_datagrid_widget', {'gridName': form.vars.grid_name})|json_encode|raw }},
+                    {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
+                    {{ createFormUrl|json_encode|raw }}
+                );
+            });
+        });
+    </script>
 {% endblock %}

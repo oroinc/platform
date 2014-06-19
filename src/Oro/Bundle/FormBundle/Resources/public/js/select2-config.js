@@ -119,14 +119,41 @@ define(['jquery', 'underscore'
         },
 
         initSelection: function(element, callback) {
-            var data = element.data('selected-data')
-                ? element.data('selected-data')
-                : [{'id': element.val(), 'text': element.val()}];
+            var self = this;
 
-            if (this.config.multiple === true) {
-                callback(data);
+            var handleResults = function(data) {
+                if (self.config.multiple === true) {
+                    callback(data);
+                } else {
+                    callback(data.pop());
+                }
+            };
+
+            var setSelect2ValueById = function(id) {
+                var select2Obj = element.data('select2');
+                var select2AjaxOptions = select2Obj.opts.ajax;
+                var searchData = select2AjaxOptions.data(id, 1);
+                var url = (typeof select2AjaxOptions.url === 'function')
+                    ? select2AjaxOptions.url.call(select2Obj, id, 1)
+                    : select2AjaxOptions.url;
+
+                searchData.search_by_id = true;
+                $.ajax({
+                    'url': url,
+                    'data': searchData,
+                    'success': function(response) {
+                        if (typeof response.results != 'undefined' && response.results.length > 0) {
+                            handleResults(response.results);
+                        }
+                    }
+                });
+            };
+
+            var elementData = element.data('selected-data');
+            if (elementData) {
+                handleResults(elementData);
             } else {
-                callback(data.pop());
+                setSelect2ValueById(element.val());
             }
         },
 
