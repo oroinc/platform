@@ -1,0 +1,65 @@
+oro_entity_config:
+    importexport:
+        field:
+            items:
+                # custom field header, by default field label is used
+                header:
+                    options: []
+                    form:
+                        type:               text
+                        options:
+                            label:          oro.importexport.entity_config.header.label
+                            required:       false
+                            block:          import and export
+                            tooltip:        oro.importexport.entity_config.header.tooltip
+                # field order in result file
+                order:
+                    options: []
+                    form:
+                        type:               integer
+                        options:
+                            label:          oro.importexport.entity_config.order.label
+                            precision:      0
+                            empty_data:     ''
+                            required:       false
+                            block:          import and export
+                # is filed will be used to find existing entity
+                identity:
+                    options: []
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.identity.label
+                            choices:
+                                false:      'No'
+                                true:       'Yes'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                # is field must be excluded from import/export
+                excluded:
+                    options: []
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.excluded.label
+                            choices:
+                                false:      'No'
+                                true:       'Yes'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                # is relation must be represented by all it's fields
+                full:
+                    options: []
+                    form:
+                        type:               oro_importexport_full_option
+                        options:
+                            label:          oro.importexport.entity_config.full.label
+                            choices:
+                                false:      'Identity only'
+                                true:       'All'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                            tooltip:        'oro.importexport.entity_config.full.tooltip'

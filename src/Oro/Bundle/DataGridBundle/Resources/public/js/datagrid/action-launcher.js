@@ -30,6 +30,9 @@ define(['jquery', 'underscore', 'backbone'
         label: undefined,
 
         /** @property {String} */
+        title: undefined,
+
+        /** @property {String} */
         icon: undefined,
 
         /** @property {String} */
@@ -58,7 +61,7 @@ define(['jquery', 'underscore', 'backbone'
                     '<% if (links) { %> dropdown-toggle<% } %>' +
                 '"' +
                 ' <%= attributesTemplate({attributes: attributes}) %>' +
-                ' title="<%= label %>"' +
+                ' title="<%= title %>"' +
                 '<% if (links) { %> data-toggle="dropdown"<% } %>' +
             '>' +
                 '<% if (icon) { %>' +
@@ -128,6 +131,10 @@ define(['jquery', 'underscore', 'backbone'
                 this.label = options.label;
             }
 
+            if (options.title) {
+                this.title = options.title;
+            }
+
             if (options.icon) {
                 this.icon = options.icon;
             }
@@ -173,9 +180,11 @@ define(['jquery', 'underscore', 'backbone'
         render: function () {
             this.$el.empty();
 
+            var label = this.label || this.action.label;
             var $el = $(this.template({
                 label: this.label || this.action.label,
                 icon: this.icon,
+                title: this.title || label,
                 className: this.className,
                 iconClassName: this.iconClassName,
                 link: this.link,

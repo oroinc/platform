@@ -54,7 +54,7 @@ Parameters *jobType* and *jobName* of executeJob method corresponds to configura
 Parameter *configuration* is a specific configuration of job, that will be passed to Context. Reader, Processor and
 Writer aware of Context and can obtain their configuration from it.
 
-#### Parameters jobType and jobName in jobs configuration o OroBatchBundle
+#### Parameters jobType and jobName in jobs configuration of OroBatchBundle
 
 ```
 connector:
@@ -244,13 +244,6 @@ with items, that were first read by Reader and than processed by Processor.
 
 ### Csv File Writer
 **Interface:**
-Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter
-
-**Description:**
-This class performs writing of data to CSV file. It is used in export job, when entities are exported to CSV file.
-
-### Csv File Writer
-**Class:**
 Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter
 
 **Description:**
