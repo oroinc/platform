@@ -74,7 +74,12 @@ Reset workflow data: Reset workflow data
 oro:
     workflow:
         action:
-            general: "Workflow manipulations"
+            process:
+                activate:   Activate
+                deactivate: Deactivate
+
+            workflow:
+                general: Workflow manipulations
 
         block:
             title:
@@ -105,6 +110,11 @@ oro:
         menu:
             process_definition_list.description:  Process management UI
             workflow_definition_list.description: Workflow management UI
+
+        notification:
+            process:
+                activated:   Process has been activated successfully
+                deactivated: Process has been deactivated successfully
 
         processdefinition:
             entity_label:                 Process

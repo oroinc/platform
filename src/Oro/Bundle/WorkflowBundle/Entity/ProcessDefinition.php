@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
+use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
+
 /**
  * @ORM\Table("oro_process_definition")
  * @ORM\Entity()
@@ -26,7 +28,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class ProcessDefinition
+class ProcessDefinition implements DomainObjectInterface
 {
     /**
      * @var string
@@ -268,5 +270,15 @@ class ProcessDefinition
             ->setActionsConfiguration($definition->getActionsConfiguration());
 
         return $this;
+    }
+
+    /**
+     * Returns a unique identifier for this domain object.
+     *
+     * @return string
+     */
+    public function getObjectIdentifier()
+    {
+        return $this->getName();
     }
 }

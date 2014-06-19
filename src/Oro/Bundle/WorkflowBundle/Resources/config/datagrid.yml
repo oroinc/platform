@@ -28,7 +28,7 @@ datagrid:
                 data_name:     relatedEntity
                 frontend_type: select
                 choices:       @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
-            execution_order:
+            executionOrder:
                 label:         oro.workflow.processdefinition.execution_order.label
                 frontend_type: integer
             enabled:
@@ -43,6 +43,15 @@ datagrid:
 
         properties:
             name:              ~
+            processDefinition: ~
+            activate_link:
+                type:   url
+                route:  oro_workflow_api_rest_process_activate
+                params: [ processDefinition ]
+            deactivate_link:
+                type:   url
+                route:  oro_workflow_api_rest_process_deactivate
+                params: [ processDefinition ]
             view_link:
                 type:   url
                 route:  oro_process_definition_view
@@ -50,7 +59,7 @@ datagrid:
 
         sorters:
             columns:
-                execution_order:
+                executionOrder:
                     data_name: process.executionOrder
                 label:
                     data_name: process.label
@@ -62,6 +71,18 @@ datagrid:
                 label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         actions:
+            activate:
+                type:         ajax
+                acl_resource: oro_process_definition_update
+                label:        oro.workflow.action.process.activate
+                icon:         ok
+                link:         activate_link
+            deactivate:
+                type:         ajax
+                acl_resource: oro_process_definition_update
+                label:        oro.workflow.action.process.deactivate
+                icon:         remove
+                link:         deactivate_link
             view:
                 type:         navigate
                 acl_resource: oro_process_definition_view
@@ -69,6 +90,8 @@ datagrid:
                 icon:         eye-open
                 link:         view_link
                 rowAction:    true
+
+        action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getProcessDefinitionPermissions"]
 
         filters:
             columns:
@@ -91,7 +114,7 @@ datagrid:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflows
+            entityHint: workflowssss
             export:     false
         source:
             type: orm
