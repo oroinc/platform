@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager as OrmEntityManager;
+use Doctrine\ORM\EntityManager;
+
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -14,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class NoteManager
 {
-    /** @var OrmEntityManager */
+    /** @var EntityManager */
     protected $em;
 
     /** @var SecurityFacade */
@@ -30,14 +31,14 @@ class NoteManager
     protected $imageCacheManager;
 
     /**
-     * @param OrmEntityManager $em
-     * @param SecurityFacade   $securityFacade
-     * @param AclHelper        $aclHelper
-     * @param NameFormatter    $nameFormatter
-     * @param CacheManager     $imageCacheManager
+     * @param EntityManager  $em
+     * @param SecurityFacade $securityFacade
+     * @param AclHelper      $aclHelper
+     * @param NameFormatter  $nameFormatter
+     * @param CacheManager   $imageCacheManager
      */
     public function __construct(
-        OrmEntityManager $em,
+        EntityManager $em,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         NameFormatter $nameFormatter,
@@ -113,8 +114,9 @@ class NoteManager
             $result[$attrName]               = $this->nameFormatter->format($user);
             $result[$attrName . '_id']       = $user->getId();
             $result[$attrName . '_viewable'] = $this->securityFacade->isGranted('VIEW', $user);
-            $result[$attrName . '_avatar']   = $user->getImagePath()
-                ? $this->imageCacheManager->getBrowserPath($user->getImagePath(), 'avatar_xsmall')
+            $imagePath                       = $user->getImagePath();
+            $result[$attrName . '_avatar']   = $imagePath
+                ? $this->imageCacheManager->getBrowserPath($imagePath, 'avatar_xsmall')
                 : null;
         }
     }
