@@ -87,14 +87,16 @@ oro:
             view:
                 process:
                     trigger:
-                        property:    property
-                        entity:      entity
                         description: %when% after the %after% has been %event%
+                        when:
+                            immediately: Immediately
+                        after:
+                            property: property
+                            entity:   entity
                         event:
                             create:  created
                             delete:  deleted
                             update:  updated
-                        immediately: immediately
 
         entity_config:
             active_workflow:

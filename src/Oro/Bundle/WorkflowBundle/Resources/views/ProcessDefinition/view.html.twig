@@ -103,14 +103,14 @@
                 {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
                 {% set when = trigger.queued ?
                     trigger.timeShift|oro_format_duration :
-                    'oro.workflow.block.view.process.trigger.immediately'|trans
+                    'oro.workflow.block.view.process.trigger.when.immediately'|trans
                 %}
 
                 {% if trigger.field %}
                     {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
-                    {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.property'|trans %}
+                    {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.property'|trans %}
                 {% else %}
-                    {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.entity'|trans %}
+                    {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.entity'|trans %}
                 {% endif %}
 
                 {{ 'oro.workflow.block.view.process.trigger.description'|trans({
