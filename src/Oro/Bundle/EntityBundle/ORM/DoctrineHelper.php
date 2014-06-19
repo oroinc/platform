@@ -142,7 +142,7 @@ class DoctrineHelper
     /**
      * @param string $entityClass
      * @param mixed  $entityId
-     * @return mixed
+     * @return object
      */
     public function getEntityReference($entityClass, $entityId)
     {

@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
-use Oro\Bundle\ActivityBundle\Tools\ActivityHelper;
+use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class ActivityGridListener
 {
-    /** @var ActivityHelper */
-    protected $activityHelper;
+    /** @var ActivityManager */
+    protected $activityManager;
 
     /**
-     * @param ActivityHelper $activityHelper
+     * @param ActivityManager $activityManager
      */
-    public function __construct(ActivityHelper $activityHelper)
+    public function __construct(ActivityManager $activityManager)
     {
-        $this->activityHelper = $activityHelper;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -28,7 +28,7 @@ class ActivityGridListener
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
             $parameters = $datagrid->getParameters();
-            $this->activityHelper->addFilterByTargetEntity(
+            $this->activityManager->addFilterByTargetEntity(
                 $datasource->getQueryBuilder(),
                 $parameters->get('entity')
             );

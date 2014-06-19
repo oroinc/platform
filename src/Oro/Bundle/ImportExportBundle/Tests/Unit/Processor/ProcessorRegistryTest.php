@@ -18,19 +18,29 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterProcessor()
     {
-        $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'processor_alias';
-        $processor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        $importProcessor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        $exportProcessor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor');
+        $exportProcessor->expects($this->once())->method('setEntityName')->with($entityName);
 
-        $this->registry->registerProcessor($processor, $type, $entityName, $alias);
+        $this->registry->registerProcessor($importProcessor, ProcessorRegistry::TYPE_IMPORT, $entityName, $alias);
+        $this->registry->registerProcessor($exportProcessor, ProcessorRegistry::TYPE_EXPORT, $entityName, $alias);
         $this->assertAttributeEquals(
-            array($type => array($alias => $processor)),
+            array(
+                ProcessorRegistry::TYPE_IMPORT => array($alias => $importProcessor),
+                ProcessorRegistry::TYPE_EXPORT => array($alias => $exportProcessor),
+            ),
             'processors',
             $this->registry
         );
         $this->assertAttributeEquals(
-            array($entityName => array($type => array($alias => $processor))),
+            array(
+                $entityName => array(
+                    ProcessorRegistry::TYPE_IMPORT => array($alias => $importProcessor),
+                    ProcessorRegistry::TYPE_EXPORT => array($alias => $exportProcessor)
+                )
+            ),
             'processorsByEntity',
             $this->registry
         );

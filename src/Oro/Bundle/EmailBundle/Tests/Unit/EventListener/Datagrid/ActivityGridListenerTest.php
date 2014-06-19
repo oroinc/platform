@@ -13,15 +13,15 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $activityHelper;
+    private $activityManager;
 
     protected function setUp()
     {
-        $this->activityHelper = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Tools\ActivityHelper')
+        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new ActivityGridListener($this->activityHelper);
+        $this->listener = new ActivityGridListener($this->activityManager);
     }
 
     public function testOnBuildAfter()
@@ -45,7 +45,7 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getParameters')
             ->will($this->returnValue(new ParameterBag(['entity' => $entity])));
 
-        $this->activityHelper->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),

@@ -367,7 +367,8 @@ define(function (require) {
                 grid.exportAction = new ExportAction({
                     datagrid: grid,
                     launcherOptions: {
-                        label: 'Export',
+                        label: __('oro.datagrid.extension.export.label'),
+                        title: __('oro.datagrid.extension.export.tooltip'),
                         className: 'btn',
                         iconClassName: 'icon-download-alt',
                         links: links
