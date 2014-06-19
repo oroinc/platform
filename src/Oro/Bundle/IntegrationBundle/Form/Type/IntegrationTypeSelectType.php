@@ -6,7 +6,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -78,8 +77,6 @@ class IntegrationTypeSelectType extends AbstractType
 
     /**
      * @param array $choiceList
-     *
-     * @return SimpleChoiceList
      */
     protected function rebuildChoiceList(array $choiceList)
     {
