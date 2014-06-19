@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\ActivityBundle\DependencyInjection\Compiler\ActivityWidgetProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\ActivityBundle\DependencyInjection\Compiler\ActivityWidgetProviderPass;
 
 class ActivityWidgetProviderPassTest extends \PHPUnit_Framework_TestCase
 {
