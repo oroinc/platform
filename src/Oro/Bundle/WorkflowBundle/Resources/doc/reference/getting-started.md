@@ -183,7 +183,7 @@ class User
 
 ### REST API
 
-WorkflowBunlde provides REST API the allows to activate or deactivate workflow.
+WorkflowBundle provides REST API the allows to activate or deactivate workflow.
 
 Activation URL attributes:
 * **route:** oro_workflow_api_rest_workflow_activate or oro_api_workflow_activate
