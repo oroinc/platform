@@ -1,4 +1,4 @@
-/*jslint nomen:true*/
+/*jslint nomen:true, eqeq:true*/
 /*global define*/
 define([
     'underscore',
@@ -42,7 +42,8 @@ define([
          */
         current = {
             tags: [],
-            url: null,
+            path: null,
+            query: null,
             page: null, // object with page content
             state: {} // each page component can cache own state
         },
@@ -68,18 +69,22 @@ define([
     /**
      * On URL changes clean up tags collection and set a new URL as current
      *
-     * @param {string} newUrl
+     * @param {string} path
+     * @param {string} query
      */
-    function changeUrl(newUrl) {
-        var oldUrl = current.url;
-        if (oldUrl !== null && !pagesCache[oldUrl]) {
-            delete pagesTags[oldUrl];
+    function changeUrl(path, query) {
+        var oldPath = current.path;
+        if (oldPath !== null && !pagesCache[oldPath]) {
+            delete pagesTags[oldPath];
         }
-        current.tags = [];
-        current.url = newUrl;
-        current.page = null;
-        current.state = {};
-        pagesTags[current.url] = current.tags;
+        current = {
+            tags: [],
+            path: path,
+            query: query,
+            page: null,
+            state: {}
+        };
+        pagesTags[current.path] = current.tags;
     }
 
     /**
@@ -87,10 +92,10 @@ define([
      *
      * shows notification of outdated content
      *
-     * @param {string} url
+     * @param {string} path
      */
-    function defaultCallback(url) {
-        var page = contentManager.getPage(url),
+    function defaultCallback(path) {
+        var page = contentManager.get(path),
             title = page ? '<b>' + page.titleShort + '</b>' : 'the';
         if (notifier) {
             notifier.close();
@@ -102,14 +107,48 @@ define([
     }
 
     /**
+     * Tags come from server in following structure
+     * [
+     *  { tagname: TAG, username: AUTHOR},
+     *  ...
+     *  { tagname: TAG2, username: AUTHOR},
+     *  ...
+     * ]
+     *
+     * @param {string} tags
+     * @return []
+     */
+    function prepareTags(tags) {
+        tags = _.reject(JSON.parse(tags), function (tag) {
+            return (tag.username || null) === currentUser;
+        });
+        return _.pluck(tags, 'tagname');
+    }
+
+    /**
+     * Page refresh handler, check whenever
+     *
+     * @param {string} path
+     * @param {Array} callbacks
+     * @param {Object} obj
+     */
+    function refreshHandler(path, callbacks, obj) {
+        if (path === obj.path) {
+            _.each(callbacks, function (callback) {
+                callback(path);
+            });
+        }
+    }
+
+    /**
      * Handler of content update message from server
      *
-     * @param {String} tags
+     * @param {string} tags
      */
     function onUpdate(tags) {
         tags = prepareTags(tags);
 
-        _.each(pagesTags, function (items, url) {
+        _.each(pagesTags, function (items, path) {
             var handler, callbacks = [];
             // collect callbacks for outdated contents
             _.each(items, function (options) {
@@ -123,67 +162,35 @@ define([
 
             // filter only unique callbacks to protects notification duplication
             callbacks = _.uniq(callbacks);
-            if (url === current.url) {
+            if (path === current.path) {
                 // current page is outdated - execute all callbacks
                 _.each(callbacks, function (callback) {
-                    callback(url);
+                    callback(path);
                 });
             } else {
-                if (!outdatedPageHandlers[url]) {
-                    handler = _.partial(refreshHandler, url, callbacks);
-
-                    outdatedPageHandlers[url] = handler;
+                if (!outdatedPageHandlers[path]) {
+                    handler = _.partial(refreshHandler, path, callbacks);
+                    outdatedPageHandlers[path] = handler;
                     mediator.on('hash_navigation_request:refresh', handler);
                 }
             }
-            mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === current.url });
-        });
-    }
-
-    /**
-     * Page refresh handler, check whenever
-     *
-     * @param {string} url
-     * @param {Array} callbacks
-     * @param {Object} obj
-     */
-    function refreshHandler(url, callbacks, obj) {
-        if (url === obj.url) {
-            _.each(callbacks, function (callback) {
-                callback(url);
+            mediator.trigger('content-manager:content-outdated', {
+                path: path,
+                isCurrentPage: path === current.path
             });
-        }
-    }
-
-    /**
-     * Tags come from server in following structure
-     * [
-     *  { tagname: TAG, username: AUTHOR},
-     *  ...
-     *  { tagname: TAG2, username: AUTHOR},
-     *  ...
-     * ]
-     *
-     * @param {String} tags
-     * @return []
-     */
-    function prepareTags(tags) {
-        tags = _.reject(JSON.parse(tags), function (tag) {
-            return (tag.username || null) === currentUser;
         });
-        return _.pluck(tags, 'tagname');
     }
 
-    // handles page changing
-    mediator.on('page_fetch:request', function (args) {
-        changeUrl(args.route.path);
+    // handles page request
+    mediator.on('page:request', function (args) {
+        changeUrl(args.route.path, args.route.query);
         if (notifier) {
             notifier.close();
         }
     });
 
-    // handles page changing
-    mediator.on('page_fetch:update', function (page, args) {
+    // handles page update
+    mediator.on('page:update', function (page, args) {
         current.page = page;
         // if it's forced page reload and page was in a cache, update it
         if (args.options.force === true && contentManager.get()) {
@@ -204,11 +211,12 @@ define([
         /**
          * Setups content management component, sets initial URL
          *
-         * @param {string} url
+         * @param {string} path
+         * @param {string} query
          * @param {string} userName
          */
-        init: function (url, userName) {
-            changeUrl(url);
+        init: function (path, query, userName) {
+            changeUrl(path, query);
             currentUser = userName;
         },
 
@@ -234,19 +242,19 @@ define([
         /**
          * Clear cached data, by default for current url
          *
-         * @param {string=} url
+         * @param {string=} path part of URL
          */
-        remove: function (url) {
-            if (!_.isUndefined(url)) {
-                url = current.url;
+        remove: function (path) {
+            if (!_.isUndefined(path)) {
+                path = current.path;
             } else {
-                delete pagesTags[url];
+                delete pagesTags[path];
             }
-            delete pagesCache[url];
+            delete pagesCache[path];
 
-            if (outdatedPageHandlers[url]) {
-                mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[url]);
-                delete outdatedPageHandlers[url];
+            if (outdatedPageHandlers[path]) {
+                mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[path]);
+                delete outdatedPageHandlers[path];
             }
         },
 
@@ -254,22 +262,22 @@ define([
          * Add current page to permanent cache
          */
         add: function () {
-            var url;
-            url = current.url;
-            pagesCache[url] = current;
+            var path;
+            path = current.path;
+            pagesCache[path] = current;
         },
 
         /**
          * Fetches cache data for url, by default for current url
          *
-         * @param {string=} url
+         * @param {string=} path part of URL
          * @return {Object|boolean}
          */
-        get: function (url) {
-            if (_.isUndefined(url)) {
-                url = current.url;
+        get: function (path) {
+            if (_.isUndefined(path)) {
+                path = current.path;
             }
-            return pagesCache[url] || undefined;
+            return pagesCache[path] || undefined;
         },
 
         /**
@@ -293,10 +301,39 @@ define([
         },
 
         /**
+         * Retrieve meaningful part of path from url and compares it with reference path
+         * (assumes that URL contains only path and query)
+         *
+         * @param {script} url
+         * @param {script} refPath
+         * @returns {boolean}
+         */
+        compareUrl: function (url, refPath) {
+            var comparePath, _ref;
+            if (refPath == null) {
+                refPath = current.path;
+            }
+            _ref = url.split('?');
+            comparePath = mediator.execute('retrievePath', _ref[0]);
+            return refPath === comparePath;
+        },
+
+        /**
+         * Combines route URL for current page
+         *
+         * @returns {script}
+         */
+        currentUrl: function () {
+            var url;
+            url = mediator.execute('combineRouteUrl', current.path, current.query);
+            return url;
+        },
+
+        /**
          * Prevents storing current page in cache
          */
         cacheIgnore: function () {
-            mediator.once('page_fetch:before', function (oldRoute) {
+            mediator.once('page:beforeChange', function (oldRoute) {
                 contentManager.remove(oldRoute.path);
             });
         }

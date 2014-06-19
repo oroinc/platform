@@ -4,8 +4,12 @@ define([
 ], function (PageRegionView) {
     'use strict';
 
-    var PageMainMenuView = PageRegionView.extend({
-        template: '<%= mainMenu %>',
+    var PageMainMenuView;
+
+    PageMainMenuView = PageRegionView.extend({
+        template: function (data) {
+            return data.mainMenu;
+        },
         pageItems: ['mainMenu']
     });
 

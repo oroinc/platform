@@ -4,8 +4,12 @@ define([
 ], function (PageRegionView) {
     'use strict';
 
-    var PageContentView = PageRegionView.extend({
-        template: '<%= content %>',
+    var PageContentView;
+
+    PageContentView = PageRegionView.extend({
+        template: function (data) {
+            return data.content;
+        },
         pageItems: ['content', 'scripts'],
 
         render: function () {

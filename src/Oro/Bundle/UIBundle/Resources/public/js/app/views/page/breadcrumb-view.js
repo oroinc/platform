@@ -4,8 +4,12 @@ define([
 ], function (PageRegionView) {
     'use strict';
 
-    var PageBreadcrumbView = PageRegionView.extend({
-        template: '<%= breadcrumb %>',
+    var PageBreadcrumbView;
+
+    PageBreadcrumbView = PageRegionView.extend({
+        template: function (data) {
+            return data.breadcrumb;
+        },
         pageItems: ['breadcrumb']
     });
 

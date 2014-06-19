@@ -6,7 +6,9 @@ define([
 ], function (_, BaseModel) {
     'use strict';
 
-    var PageModel = BaseModel.extend({
+    var PageModel;
+
+    PageModel = BaseModel.extend({
         defaults: {
             content: '',
             scripts: '',
@@ -43,7 +45,7 @@ define([
                     'x-oro-hash-navigation': 'true'
                 }
             });
-            BaseModel.prototype.fetch.call(this, options);
+            PageModel.__super__.fetch.call(this, options);
         },
 
         /**

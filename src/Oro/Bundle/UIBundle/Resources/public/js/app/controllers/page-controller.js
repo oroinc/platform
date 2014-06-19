@@ -21,7 +21,7 @@ define([
          * @override
          */
         initialize: function () {
-            BaseController.prototype.initialize.apply(this, arguments);
+            PageController.__super__.initialize.apply(this, arguments);
             this.model = new PageModel();
         },
 
@@ -53,9 +53,9 @@ define([
             if (cacheItem && options.force !== true) {
                 options.fromCache = true;
                 this.model.set(cacheItem.page, {actionArgs: args});
-                this.publishEvent('page_fetch:after', args);
+                this.publishEvent('page:afterChange', args);
             } else {
-                url = this._combineRoutePath(route);
+                url = this._combineRouteUrl(route);
                 this.model.fetch({
                     url: url,
                     validate: true,
@@ -67,7 +67,7 @@ define([
         /**
          * Does preparation for page loading
          *  - adds event listeners on page model
-         *  - triggers 'page_fetch:before' event with two parameters oldRoute and newRoute
+         *  - triggers 'page:beforeChange' event with two parameters oldRoute and newRoute
          *
          * @param {Object} route
          * @param {Object} params
@@ -86,24 +86,24 @@ define([
             this.listenTo(page, 'sync', this.onPageUpdated);
             this.listenTo(page, 'invalid', this.onPageInvalid);
 
-            this.publishEvent('page_fetch:before', oldRoute, newRoute, options);
+            this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
         },
 
         /**
          * Handles page request
-         *  - triggers 'page_fetch:request' event
+         *  - triggers 'page:request' event
          *
          * @param {Chaplin.Model} model
          * @param {XMLHttpRequest} xhr
          * @param {Object} options
          */
         onPageRequest: function (model, xhr, options) {
-            this.publishEvent('page_fetch:request', options.actionArgs);
+            this.publishEvent('page:request', options.actionArgs);
         },
 
         /**
          * Handles page request done
-         *  - triggers 'page_fetch:update' event with
+         *  - triggers 'page:update' event with
          *  - updates page title
          *
          * @param {Chaplin.Model} model
@@ -112,20 +112,20 @@ define([
         onPageLoaded: function (model, options) {
             var attributes;
             attributes = model.getAttributes();
-            this.publishEvent('page_fetch:update', attributes, options.actionArgs);
+            this.publishEvent('page:update', attributes, options.actionArgs);
             this.adjustTitle(attributes.title);
         },
 
         /**
          * Handles page synchronization done
-         *  - triggers 'page_fetch:after' event with
+         *  - triggers 'page:afterChange' event with
          *
          * @param {Chaplin.Model} model
          * @param {Object} resp
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            this.publishEvent('page_fetch:after', options.actionArgs);
+            this.publishEvent('page:afterChange', options.actionArgs);
         },
 
         /**
@@ -159,7 +159,7 @@ define([
                 parser = document.createElement('a');
                 parser.href = url;
                 url = parser.pathname + (parser.search || '');
-                this.publishEvent('page_fetch:redirect');
+                this.publishEvent('page:redirect');
                 utils.redirectTo({url: url}, {forceStartup: true, force: true});
             }
         }

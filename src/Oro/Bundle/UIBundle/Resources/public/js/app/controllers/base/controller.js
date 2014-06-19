@@ -1,15 +1,13 @@
-/*jslint define*/
+/*jslint nomen:true*/
 /*global define*/
 define([
     'chaplin'
 ], function (Chaplin) {
     'use strict';
 
-    var Controller, reuses;
+    var BaseController, reuses;
 
-    reuses = [];
-
-    Controller = Chaplin.Controller.extend({
+    BaseController = Chaplin.Controller.extend({
         /**
          * Handles before-action activity
          *
@@ -20,10 +18,14 @@ define([
 
             if (!route.previous) {
                 // if it's first time route, initializes page cache
-                this.cache.init(route.path, Chaplin.mediator.execute('retrieveOption', 'userName') || false);
+                this.cache.init(
+                    route.path,
+                    route.query,
+                    Chaplin.mediator.execute('retrieveOption', 'userName') || false
+                );
             }
 
-            Chaplin.Controller.prototype.beforeAction.apply(this, arguments);
+            BaseController.__super__.beforeAction.apply(this, arguments);
 
             // compose global instances
             for (i = 0; i < reuses.length; i += 1) {
@@ -38,11 +40,10 @@ define([
          * @returns {string}
          * @private
          */
-        _combineRoutePath: function (route) {
-            var path, basePath;
-            basePath = Chaplin.mediator.execute('retrieveOption', 'root');
-            path = basePath + route.path + (route.query ? '?' + route.query : '');
-            return path;
+        _combineRouteUrl: function (route) {
+            var url;
+            url = Chaplin.mediator.execute('combineFullUrl', route.path, route.query);
+            return url;
         },
 
         /**
@@ -53,13 +54,14 @@ define([
              * Executes 'init' handler for pageCache manager
              *
              * @param {string} path
+             * @param {string} query
              * @param {string} userName
              */
-            init: function (path, userName) {
+            init: function (path, query, userName) {
                 Chaplin.mediator.execute({
                     name: 'pageCache:init',
                     silent: true
-                }, path, userName);
+                }, path, query, userName);
             },
 
             /**
@@ -99,14 +101,16 @@ define([
         }
     });
 
+    reuses = [];
+
     /**
      * Collects compositions to reuse before controller action
      * @static
      */
-    Controller.addBeforeActionReuse = function () {
+    BaseController.addBeforeActionReuse = function () {
         var args = Array.prototype.slice.call(arguments, 0);
         reuses.push(args);
     };
 
-    return Controller;
+    return BaseController;
 });

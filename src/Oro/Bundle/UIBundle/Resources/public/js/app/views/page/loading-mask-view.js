@@ -12,8 +12,8 @@ define([
     // copy prototype of LoadingMask and extend it with own properties
     prototype = _.extend({}, LoadingMaskView.prototype, {
         listen: {
-            'page_fetch:before mediator': 'show',
-            'page_fetch:after mediator': 'hide'
+            'page:beforeChange mediator': 'show',
+            'page:afterChange mediator': 'hide'
         }
     });
     delete prototype.constructor;

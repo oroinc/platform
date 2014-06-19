@@ -1,12 +1,15 @@
-/*jslint nomen:true*/
+/*jslint nomen:true, eqeq:true*/
 /*global define*/
 define([
+    'jquery',
     'underscore',
     'chaplin'
-], function (_, Chaplin) {
+], function ($, _, Chaplin) {
     'use strict';
 
-    var View = Chaplin.View.extend({
+    var BaseView;
+
+    BaseView = Chaplin.View.extend({
 
         getTemplateFunction: function () {
             var template, templateFunc;
@@ -22,8 +25,48 @@ define([
             }
 
             return templateFunc;
+        },
+
+        /**
+         * Tries to find element in already declared regions, otherwise calls super _ensureElement method
+         *
+         * @private
+         * @override
+         */
+        _ensureElement: function () {
+            var $el;
+            if (this.el && typeof this.el === 'string') {
+                $el = this._findRegionElem(this.el);
+            }
+
+            if ($el) {
+                this.setElement($el, false);
+            } else {
+                BaseView.__super__._ensureElement.call(this);
+            }
+        },
+
+        /**
+         * Tries to find element by region name
+         *
+         * @param {string} name
+         * @returns {jQuery|undefined}
+         * @private
+         */
+        _findRegionElem: function (name) {
+            var $el, region, instance;
+            region = Chaplin.mediator.execute('region:find', name);
+            if (region != null) {
+                instance = region.instance;
+                if (instance.container != null) {
+                    $el = instance.region != null ? $(instance.container).find(region.selector) : instance.container;
+                } else {
+                    $el = instance.$(region.selector);
+                }
+            }
+            return $el;
         }
     });
 
-    return View;
+    return BaseView;
 });

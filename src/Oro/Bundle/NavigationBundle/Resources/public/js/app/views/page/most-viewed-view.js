@@ -1,11 +1,16 @@
+/*jslint nomen:true*/
 /*global define*/
 define([
     'oroui/js/app/views/base/page/region-view'
 ], function (PageRegionView) {
     'use strict';
 
-    var PageMostViewedView = PageRegionView.extend({
-        template: '<%= mostviewed %>',
+    var PageMostViewedView;
+
+    PageMostViewedView = PageRegionView.extend({
+        template: function (data) {
+            return data.mostviewed;
+        },
         pageItems: ['mostviewed'],
 
         render: function () {
@@ -14,7 +19,7 @@ define([
                 return;
             }
 
-            PageRegionView.prototype.render.call(this);
+            PageMostViewedView.__super__.render.call(this);
         }
     });
 

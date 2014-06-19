@@ -1,11 +1,16 @@
+/*jslint nomen:true*/
 /*global define*/
 define([
     'oroui/js/app/views/base/page/region-view'
 ], function (PageRegionView) {
     'use strict';
 
-    var PageHistoryView = PageRegionView.extend({
-        template: '<%= history %>',
+    var PageHistoryView;
+
+    PageHistoryView = PageRegionView.extend({
+        template: function (data) {
+            return data.history;
+        },
         pageItems: ['history'],
 
         render: function () {
@@ -14,7 +19,7 @@ define([
                 return;
             }
 
-            PageRegionView.prototype.render.call(this);
+            PageHistoryView.__super__.render.call(this);
         }
     });
 
