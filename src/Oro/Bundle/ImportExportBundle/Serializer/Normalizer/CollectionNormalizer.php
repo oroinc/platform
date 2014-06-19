@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,8 +26,8 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    'Symfony\Component\Serializer\Normalizer\NormalizerInterface',
-                    'Symfony\Component\Serializer\Normalizer\DenormalizerInterface'
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface',
+                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface'
                 )
             );
         }
@@ -98,7 +96,7 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return $data instanceof Collection;
     }
@@ -106,7 +104,7 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return (bool)preg_match(
             '/^(Doctrine\\\Common\\\Collections\\\ArrayCollection|ArrayCollection)(<[\w_<>\\\]+>)?$/',
