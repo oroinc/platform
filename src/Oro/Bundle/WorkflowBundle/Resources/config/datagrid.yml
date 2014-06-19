@@ -1,8 +1,98 @@
 datagrid:
+    process-definitions-grid:
+        options:
+            entityHint: processes
+            export:     false
+
+        source:
+            type:         orm
+            acl_resource: oro_process_definition_view
+            query:
+                select:
+                    - process.createdAt
+                    - process.enabled
+                    - process.executionOrder
+                    - process.label
+                    - process.name
+                    - process.name as processDefinition
+                    - process.relatedEntity
+                    - process.updatedAt
+                from:
+                    - { table: %oro_workflow.process_definition.entity.class%, alias: process }
+
+        columns:
+            label:
+                label: oro.workflow.processdefinition.label.label
+            relatedEntity:
+                label:         oro.workflow.processdefinition.related_entity.label
+                data_name:     relatedEntity
+                frontend_type: select
+                choices:       @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
+            execution_order:
+                label:         oro.workflow.processdefinition.execution_order.label
+                frontend_type: integer
+            enabled:
+                label:         oro.workflow.processdefinition.enabled.label
+                frontend_type: boolean
+            createdAt:
+                label:         oro.workflow.processdefinition.created_at.label
+                frontend_type: datetime
+            updatedAt:
+                label:         oro.workflow.processdefinition.updated_at.label
+                frontend_type: datetime
+
+        properties:
+            name:              ~
+            view_link:
+                type:   url
+                route:  oro_process_definition_view
+                params: [ name ]
+
+        sorters:
+            columns:
+                execution_order:
+                    data_name: process.executionOrder
+                label:
+                    data_name: process.label
+                createdAt:
+                    data_name: process.createdAt
+                updatedAt:
+                    data_name: process.updatedAt
+            default:
+                label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+        actions:
+            view:
+                type:         navigate
+                acl_resource: oro_process_definition_view
+                label:        oro.workflow.processdefinition.datagrid.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
+
+        filters:
+            columns:
+                label:
+                    type:      string
+                    data_name: process.label
+                relatedEntity:
+                    type:      choice
+                    data_name: process.relatedEntity
+                    options:
+                        field_options:
+                            multiple: true
+                            choices:  @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
+                createdAt:
+                    type:      datetime
+                    data_name: process.createdAt
+                updatedAt:
+                    type:      datetime
+                    data_name: process.createdAt
+
     workflow-definitions-grid:
         options:
             entityHint: workflows
-            export: false
+            export:     false
         source:
             type: orm
             acl_resource: oro_workflow_definition_view

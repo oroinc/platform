@@ -1,0 +1,83 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as macros %}
+
+{% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
+
+{% block stats %}
+    <li>{{ 'oro.workflow.processdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.processdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_process_definition_index'),
+        'indexLabel': 'oro.workflow.processdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {%- set processDefinitionInfo -%}
+        <style>
+            .process-triggers-list li {
+                list-style:     none;
+                padding-bottom: 5px;
+                margin-left:    -25px;
+            }
+        </style>
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
+                {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
+                {{ UI.renderProperty('oro.workflow.processdefinition.label.label'|trans, entity.label) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.related_entity.label'|trans, relatedEntityLabel) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.execution_order.label'|trans, entity.executionOrder) }}
+            </div>
+        </div>
+        {%- set triggerData -%}
+            <ul class="process-triggers-list">
+                {%- for trigger in triggers -%}
+                    {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
+                    {% set when = trigger.queued ?
+                        trigger.timeShift|oro_format_duration :
+                        'oro.workflow.block.view.process.trigger.immediately'|trans
+                    %}
+
+                    {% if trigger.field %}
+                        {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
+                        {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.attribute'|trans %}
+                    {% else %}
+                        {% set after = 'oro.workflow.block.view.process.trigger.record'|trans %}
+                    {% endif %}
+
+                    <li>
+                        {{ 'oro.workflow.block.view.process.trigger.description'|trans({
+                                '%after%': after,
+                                '%event%': '<b>' ~ event|trans ~ '</b>',
+                                '%when%':  '<b>' ~ when ~ '</b>'
+                            })|raw
+                        }}
+                    </li>
+                {%- endfor -%}
+            </ul>
+
+        {%- endset -%}
+        {{ UI.renderHtmlProperty('oro.workflow.processtrigger.entity_plural_label'|trans, triggerData) }}
+    {%- endset -%}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.workflow.block.title.process_info'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [processDefinitionInfo] },
+            ]
+        }
+    ] %}
+
+    {% set id = 'processDefinitionView' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {{ parent() }}
+{% endblock content_data %}

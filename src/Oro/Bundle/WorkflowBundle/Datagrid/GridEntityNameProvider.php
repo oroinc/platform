@@ -3,25 +3,32 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
+
 use Symfony\Component\Translation\TranslatorInterface;
 
-class WorkflowDefinitionGridEntityNameProvider
+class GridEntityNameProvider
 {
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
     /**
      * @var array
      */
     protected $relatedEntities = array();
 
     /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
      * @var ConfigProviderInterface
      */
     protected $configProvider;
+
+    /**
+     * @var string
+     */
+    protected $tableName;
 
     /**
      * @var TranslatorInterface
@@ -30,31 +37,36 @@ class WorkflowDefinitionGridEntityNameProvider
 
     /**
      * @param ConfigProviderInterface $configProvider
-     * @param EntityManager $em
+     * @param EntityManager $entityManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
         ConfigProviderInterface $configProvider,
-        EntityManager $em,
+        EntityManager $entityManager,
         TranslatorInterface $translator
     ) {
         $this->configProvider = $configProvider;
-        $this->em = $em;
+        $this->entityManager = $entityManager;
         $this->translator = $translator;
     }
 
     /**
      * Get workflow definition related entities.
      *
+     * @throws MissedRequiredOptionException
      * @return array
      */
     public function getRelatedEntitiesChoice()
     {
+        if (!$this->tableName) {
+            throw new MissedRequiredOptionException('Parameter "tableName" is required.');
+        }
+
         if (empty($this->relatedEntities)) {
-            $qb = $this->em->createQueryBuilder();
-            $qb->select('w.relatedEntity')
-                ->from('OroWorkflowBundle:WorkflowDefinition', 'w')
-                ->distinct('w.relatedEntity');
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->select('table.relatedEntity')
+                ->from($this->tableName, 'table')
+                ->distinct('table.relatedEntity');
 
             $result = (array)$qb->getQuery()->getArrayResult();
 
@@ -71,5 +83,10 @@ class WorkflowDefinitionGridEntityNameProvider
         }
 
         return $this->relatedEntities;
+    }
+
+    public function setTableName($tableName)
+    {
+        $this->tableName = $tableName;
     }
 }

@@ -11,8 +11,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_workflow_definition_index",
- *  routeView="oro_workflow_definition_view",
+ *  routeName="oro_process_definition_index",
+ *  routeView="oro_process_definition_view",
  *  defaultValues={
  *      "entity"={
  *          "label"="Process",
