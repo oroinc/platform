@@ -47,8 +47,10 @@ class ChainActivityWidgetProvider implements ActivityWidgetProviderInterface
         }
 
         // sort by priority and flatten
-        ksort($result);
-        $result = call_user_func_array('array_merge', $result);
+        if (!empty($result)) {
+            ksort($result);
+            $result = call_user_func_array('array_merge', $result);
+        }
 
         return $result;
     }

@@ -1,3 +1,6 @@
 oro:
     activity:
         activities:           Activities
+
+        sections:
+            activities:       Activities
