@@ -2,7 +2,6 @@ parameters:
     oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
     oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
     oro_embedded_form.back_link.twig.extension.class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
-    oro_embedded_form.delete_provider.class: Oro\Bundle\EmbeddedFormBundle\Manager\DeleteProvider
 services:
     oro_embedded_form.form_type.available_embedded_form:
         class: %oro.embedded_form.form_type.available_form.class%
@@ -24,10 +23,3 @@ services:
             - @translator
         tags:
             - { name: twig.extension }
-
-    oro_embedded_form.delete_provider:
-        class: %oro_embedded_form.delete_provider.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: oro_integration.delete_provider }
