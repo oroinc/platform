@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EntityManager
+class NoteManager
 {
     /** @var OrmEntityManager */
     protected $em;

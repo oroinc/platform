@@ -14,3 +14,19 @@ oro_entity_config:
                             required:       false
                             label:          oro.activity.activities
                             association_class: activity
+
+                # the route name for the controller that can be used to render the list of activities
+                # assigned to some entity
+                # this controller must have $entity parameter which is used to pass the target entity
+                # this attribute must be defined for each activity entity (an entity included in 'activity' group,
+                # see 'grouping' scope)
+                route: # string
+                    options: []
+                # the ACL ancestor that is used to check whether this type of activities can be shown
+                # in the current security context
+                acl: # string
+                    options: []
+                # the priority of this type of activities. This attribute can be used to change
+                # the order of activities on UI
+                priority: # integer
+                    options: []

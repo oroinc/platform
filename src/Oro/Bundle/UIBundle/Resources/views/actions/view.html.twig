@@ -102,6 +102,22 @@
             {% if data is defined and data.dataBlocks is defined %}
                 {% set dataBlocks = data.dataBlocks %}
 
+                {%- set activitiesData -%}
+                    {% placeholder view_content_data_activities with {entity: entity} %}
+                {%- endset -%}
+
+                {% if activitiesData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Activities'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [activitiesData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
                 {%- set communicationsData -%}
                     {% placeholder view_content_data_communications with {entity: entity} %}
                 {%- endset -%}

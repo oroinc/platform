@@ -16,6 +16,7 @@ parameters:
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
+    oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
 
 services:
     oro_entity.listener.navigation_listener:
@@ -138,3 +139,9 @@ services:
         class: %oro_entity.twig.extension.class_name.class%
         tags:
             - { name: twig.extension }
+
+    oro_entity.routing_helper:
+        class: %oro_entity.routing_helper.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @router
