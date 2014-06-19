@@ -14,7 +14,7 @@ datagrid:
                     - process.executionOrder
                     - process.label
                     - process.name
-                    - process.name as Definition
+                    - process.name as processDefinition
                     - process.relatedEntity
                     - process.updatedAt
                 from:
@@ -42,7 +42,7 @@ datagrid:
                 frontend_type: datetime
 
         properties:
-            name: ~
+            name:              ~
             view_link:
                 type:   url
                 route:  oro_process_definition_view
@@ -62,21 +62,13 @@ datagrid:
                 label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         actions:
-            activate_link:
-                type:       url
-                route:      oro_api_process_definition_activate
-                params:     [ workflowDefinition ]
-            deactivate_link:
-                type:       url
-                route:      oro_api_process_definition_deactivate
-                params:     [ workflowDefinition ]
             view:
-                type:          navigate
-                acl_resource:  oro_process_definition_view
-                label:         oro.workflow.processdefinition.datagrid.view
-                icon:          eye-open
-                link:          view_link
-                rowAction:     true
+                type:         navigate
+                acl_resource: oro_process_definition_view
+                label:        oro.workflow.processdefinition.datagrid.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
 
         filters:
             columns:
