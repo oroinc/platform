@@ -73,4 +73,19 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getCreatedAt()->format('Y-m-d'));
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getUpdatedAt()->format('Y-m-d'));
     }
+
+    public function testEmptyFile()
+    {
+        $this->assertNull($this->entity->isEmptyFile());
+        $this->entity->setEmptyFile(true);
+        $this->assertTrue($this->entity->isEmptyFile());
+    }
+
+    public function testToString()
+    {
+        $this->assertEquals('', $this->entity->__toString());
+        $this->entity->setFilename('file.doc');
+        $this->entity->setOriginalFilename('original.doc');
+        $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());
+    }
 }

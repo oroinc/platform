@@ -58,9 +58,8 @@ class FileSubscriber implements EventSubscriberInterface
         if (is_object($entity) && $entity->getId() && $entity->getFilename() !== null) {
             $form->add(
                 'emptyFile',
-                'checkbox',
+                'hidden',
                 [
-                    'label' => 'oro.attachment.delete_file.label',
                     'required'  => false,
                 ]
             );
@@ -105,7 +104,7 @@ class FileSubscriber implements EventSubscriberInterface
         /** @var Config $entityExtendConfig */
         $entityExtendConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
 
-        $fileSize = $entityExtendConfig->get('maxsize') * 1024 *1024;
+        $fileSize = $entityExtendConfig->get('maxsize') * 1024 * 1024;
         $fileField = $form->get('file');
 
         if ($entityExtendConfig->getId()->getFieldType() === 'attachment') {

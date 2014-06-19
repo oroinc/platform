@@ -5,13 +5,32 @@
             {{ form_errors(form.file) }}
         </div>
         {% if value is not empty %}
-            {% if form.emptyFile is defined %}
-                {{ form_row(form.emptyFile) }}
-            {% endif %}
             {% if value.originalFilename is not empty %}
-                {% set panentEntity = form.parent.vars.value %}
+                {% set parentEntity = form.parent.vars.value %}
                 {% set fieldName = form.vars.name %}
-                {{ oro_file_view(panentEntity, fieldName, value) }}
+
+                {% set inputId = form.emptyFile.vars.id %}
+                {% set buttonId = inputId ~ 'btn' %}
+                {% set divId = inputId ~ 'div' %}
+                <div id="{{ divId }}" class="oro_attachment_file">
+                    {{ oro_file_view(parentEntity, fieldName, value) }}
+                    {{ form_row(form.emptyFile) }}
+                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">
+                        <i class="icon-remove"></i>
+                    </button>
+                </div>
+                <script type="text/javascript">
+                    require(['jquery'],
+                        function($){
+                            $(function() {
+                                $(document).on('click', '#{{ buttonId }}', function() {
+                                    $('#{{ divId }}').hide();
+                                    $('#{{ inputId }}').val('true');
+                                    return false;
+                                });
+                            });
+                        });
+                </script>
             {% endif %}
         {% endif %}
     {% endspaceless %}
@@ -24,16 +43,34 @@
             {{ form_errors(form.file) }}
         </div>
         {% if value is not empty %}
-            {% if form.emptyFile is defined %}
-                {{ form_row(form.emptyFile) }}
-            {% endif %}
             {% if value.originalFilename is not empty %}
-                {% set panentEntity = form.parent.vars.value %}
+                {% set parentEntity = form.parent.vars.value %}
                 {% set fieldName = form.vars.name %}
-                <a href="{{ oro_attachment_url(panentEntity, fieldName, value, 'download', true) }}" class="no-hash">
-                    <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
-                    {{ value.originalFilename }}
-                </a>
+                {% set inputId = form.emptyFile.vars.id %}
+                {% set buttonId = inputId ~ 'btn' %}
+                {% set divId = inputId ~ 'div' %}
+                <div id="{{ divId }}" class="oro_attachment_file">
+                    <a href="{{ oro_attachment_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                        <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
+                        {{ value.originalFilename }}
+                    </a>
+                    {{ form_row(form.emptyFile) }}
+                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">
+                        <i class="icon-remove"></i>
+                    </button>
+                    <script type="text/javascript">
+                        require(['jquery'],
+                            function($){
+                                $(function() {
+                                    $(document).on('click', '#{{ buttonId }}', function() {
+                                        $('#{{ divId }}').hide();
+                                        $('#{{ inputId }}').val('true');
+                                        return false;
+                                    });
+                                });
+                            });
+                    </script>
+                </div>
             {% endif %}
         {% endif %}
     {% endspaceless %}

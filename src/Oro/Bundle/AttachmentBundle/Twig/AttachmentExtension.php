@@ -54,6 +54,7 @@ class AttachmentExtension extends \Twig_Extension
             ),
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -65,13 +66,20 @@ class AttachmentExtension extends \Twig_Extension
     /**
      * Get attachment file url
      *
+     * @param object     $parentEntity
+     * @param string     $fieldName
      * @param Attachment $attachment
-     * @param bool       $absolute
      * @param string     $type
+     * @param bool       $absolute
      * @return string
      */
-    public function getAttachmentUrl($parentEntity, $fieldName, Attachment $attachment, $type = 'get', $absolute = false)
-    {
+    public function getAttachmentUrl(
+        $parentEntity,
+        $fieldName,
+        Attachment $attachment,
+        $type = 'get',
+        $absolute = false
+    ) {
         return $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
     }
 

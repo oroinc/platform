@@ -6,6 +6,7 @@ use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 
 class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,18 +78,50 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetAttachmentUrl()
     {
         $this->attachment->setId(1);
+        $this->attachment->setExtension('txt');
+        $fieldName = 'testField';
+        $parentEntity = new TestClass();
+        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RGaW'.
+            'VsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA==';
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
                 'oro_attachment_file',
                 [
-                    'type' => 'download',
-                    'id' => 1,
-                    'filename' => 'testFile.txt'
+                    'codedString' => $expectsString,
+                    'extension' => 'txt'
                 ],
                 true
             );
-        $this->attachmentManager->getAttachmentUrl($this->attachment, 'download', true);
+        $this->attachmentManager->getAttachmentUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+    }
+
+    public function testDecodeAttachmentUrl()
+    {
+        $this->assertEquals(
+            [
+                'Oro\Test\TestClass',
+                'testField',
+                1,
+                'download',
+                'testFile.txt'
+            ],
+            $this->attachmentManager->decodeAttachmentUrl(
+                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA=='
+            )
+        );
+    }
+
+    public function testWrongAttachmentUrl()
+    {
+        $this->setExpectedException('\LogicException');
+        $this->attachmentManager->decodeAttachmentUrl('bm90Z29vZHN0cmluZw==');
+    }
+
+    public function testNoneBase64AttachmentUrl()
+    {
+        $this->setExpectedException('\LogicException');
+        $this->attachmentManager->decodeAttachmentUrl('bad string');
     }
 
     public function testGetResizedImageUrl()
