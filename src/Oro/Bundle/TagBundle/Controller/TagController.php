@@ -32,7 +32,9 @@ class TagController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_tag.tag.entity.class')
+        );
     }
 
     /**

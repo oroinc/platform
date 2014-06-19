@@ -68,7 +68,9 @@ class GroupController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_user.group.entity.class')
+        );
     }
 
     /**

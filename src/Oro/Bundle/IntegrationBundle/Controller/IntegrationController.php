@@ -36,7 +36,9 @@ class IntegrationController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_integration.channel.entity.class')
+        ];
     }
 
     /**
