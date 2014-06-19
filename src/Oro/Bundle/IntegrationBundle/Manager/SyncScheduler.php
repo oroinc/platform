@@ -44,6 +44,10 @@ class SyncScheduler
      */
     public function schedule(Channel $channel, $connectorType, $params = [], $useFlush = true)
     {
+        if ($channel->getDisabled()) {
+            return;
+        }
+
         $connector = $this->typesRegistry->getConnectorType($channel->getType(), $connectorType);
 
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
