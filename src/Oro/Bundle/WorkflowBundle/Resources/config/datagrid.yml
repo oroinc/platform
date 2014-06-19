@@ -37,9 +37,6 @@ datagrid:
             createdAt:
                 label:         oro.workflow.processdefinition.created_at.label
                 frontend_type: datetime
-            updatedAt:
-                label:         oro.workflow.processdefinition.updated_at.label
-                frontend_type: datetime
 
         properties:
             name:              ~
@@ -65,12 +62,17 @@ datagrid:
                     data_name: process.label
                 createdAt:
                     data_name: process.createdAt
-                updatedAt:
-                    data_name: process.updatedAt
             default:
                 label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         actions:
+            view:
+                type:         navigate
+                acl_resource: oro_process_definition_view
+                label:        oro.workflow.processdefinition.datagrid.view
+                icon:         eye-open
+                link:         view_link
+                rowAction:    true
             activate:
                 type:         ajax
                 acl_resource: oro_process_definition_update
@@ -83,13 +85,6 @@ datagrid:
                 label:        oro.workflow.action.process.deactivate
                 icon:         remove
                 link:         deactivate_link
-            view:
-                type:         navigate
-                acl_resource: oro_process_definition_view
-                label:        oro.workflow.processdefinition.datagrid.view
-                icon:         eye-open
-                link:         view_link
-                rowAction:    true
 
         action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getProcessDefinitionPermissions"]
 
@@ -106,9 +101,6 @@ datagrid:
                             multiple: true
                             choices:  @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
                 createdAt:
-                    type:      datetime
-                    data_name: process.createdAt
-                updatedAt:
                     type:      datetime
                     data_name: process.createdAt
 

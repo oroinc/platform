@@ -95,10 +95,12 @@
                 margin-left:    -25px;
             }
         </style>
+
+        {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
+        {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
+
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
-                {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
-                {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
                 {{ UI.renderProperty('oro.workflow.processdefinition.label.label'|trans, entity.label) }}
                 {{ UI.renderProperty('oro.workflow.processdefinition.related_entity.label'|trans, relatedEntityLabel) }}
                 {{ UI.renderProperty('oro.workflow.processdefinition.execution_order.label'|trans, entity.executionOrder) }}
@@ -117,7 +119,7 @@
                         {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
                         {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.attribute'|trans %}
                     {% else %}
-                        {% set after = 'oro.workflow.block.view.process.trigger.record'|trans %}
+                        {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.entity'|trans %}
                     {% endif %}
 
                     <li>
