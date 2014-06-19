@@ -25,7 +25,6 @@ class OroAddressExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('form_types.yml');
-        $loader->load('importexport.yml');
 
         $container->setParameter('oro_address', $config);
     }
