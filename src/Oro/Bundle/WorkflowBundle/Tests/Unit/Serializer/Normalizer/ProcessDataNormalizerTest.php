@@ -314,7 +314,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
             $reflection->setAccessible(true);
             $attribute = $reflection->getValue($entity);
             if (is_object($attribute)) {
-                $attribute = array(ProcessDataNormalizer::SERIALIZED => base64_encode(serialize($attribute)));
+                // $attribute = array(ProcessDataNormalizer::SERIALIZED => base64_encode(serialize($attribute)));
             }
             $normalizedData['classData'][$name] = is_object($attribute) ? null : $attribute;
         }

@@ -5,12 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 {
+    const TEST_CLASS = 'Test\Class';
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -30,41 +34,51 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider onFlushProvider
      */
-    public function testOnFlush($entityCount, $entity, $serializedData)
+    public function testOnFlush($entity, $serializedData)
     {
-        $this->markTestIncomplete('Should be fixed in scope of CRM-763');
-
-        $processData = new ProcessData();
-        $entities = array_fill(0, $entityCount, $entity);
-
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
         $unitOfWork->expects($this->once())
             ->method('getScheduledEntityInsertions')
-            ->will($this->returnValue($entities));
+            ->will($this->returnValue(array($entity)));
         $unitOfWork->expects($this->once())
             ->method('getScheduledEntityUpdates')
-            ->will($this->returnValue($entities));
-        $unitOfWork->expects($this->any())
-            ->method('propertyChanged')
-            ->will($this->returnValue($entity));
+            ->will($this->returnValue(array($entity)));
+
+        if ($entity instanceof ProcessJob) {
+            $entityId = 1;
+            $entityHash = ProcessJob::generateEntityHash(self::TEST_CLASS, $entityId);
+
+            $this->serializer->expects($this->once())
+                ->method('serialize')
+                ->with($entity->getData(), 'json', array('processJob' => $entity))
+                ->will(
+                    $this->returnCallback(
+                        function () use ($entity, $entityId, $serializedData) {
+                            $entity->setEntityId($entityId);
+                            return $serializedData;
+                        }
+                    )
+                );
+
+            $unitOfWork->expects($this->at(1))->method('propertyChanged')
+                ->with($entity, 'serializedData', null, $serializedData);
+            $unitOfWork->expects($this->at(2))->method('propertyChanged')
+                ->with($entity, 'entityId', null, $entityId);
+            $unitOfWork->expects($this->at(3))->method('propertyChanged')
+                ->with($entity, 'entityHash', null, $entityHash);
+        } else {
+            $this->serializer->expects($this->never())->method('serialize');
+            $unitOfWork->expects($this->never())->method('propertyChanged');
+        }
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityManager->expects($this->once())
+        $entityManager->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
-
-        if ($entity instanceof ProcessJob) {
-            $this->serializer->expects($this->any())
-                ->method('serialize')
-                ->with($processData, 'json', array('processJob' => $entity))
-                ->will($this->returnValue($serializedData));
-        } else {
-            $this->serializer->expects($this->never())->method('serialize');
-        }
 
         $onFlushArgs = new OnFlushEventArgs($entityManager);
         $this->listener->onFlush($onFlushArgs);
@@ -72,20 +86,30 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function onFlushProvider()
     {
+        $processDefinition = new ProcessDefinition();
+        $processDefinition->setRelatedEntity(self::TEST_CLASS);
+
+        $processTrigger = new ProcessTrigger();
+        $processTrigger->setDefinition($processDefinition);
+
+        $processData = new ProcessData();
+        $processData->set('test', 'value');
+
+        $processJob = new ProcessJob();
+        $processJob->setProcessTrigger($processTrigger)
+            ->setData($processData);
+
         return array(
             'string instead class' => array(
-                'callCount'      => 3,
                 'entity'         => 'some class',
                 'serializedData' => 'serializedData'
             ),
             'invalid class' => array(
-                'callCount'      => 3,
                 'entity'         => new \stdClass(),
                 'serializedData' => 'serializedData'
             ),
             'valid class' => array(
-                'callCount'      => 3,
-                'entity'         => new ProcessJob(),
+                'entity'         => $processJob,
                 'serializedData' => 'serializedData'
             ),
         );

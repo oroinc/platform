@@ -3,18 +3,16 @@ parameters:
     oro_workflow.serializer.data.attribute_normalizer.standard.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer
     oro_workflow.serializer.data.normalizer.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer
     oro_workflow.serializer.data.serializer.class: Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer
-    oro_workflow.serializer.data.process_normalizer.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer
-    oro_workflow.serializer.data.process_serializer.class: Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer
-
     oro_workflow.serializer.handler.workflow_result.class: Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler
 
-services:
-    oro_workflow.serializer.data.process_serializer:
-        class: %oro_workflow.serializer.data.process_serializer.class%
-        arguments:
-          - [@oro_workflow.serializer.data.process_normalizer]
-          - [@serializer.encoder.json]
+    oro_workflow.serializer.process.serializer.class: Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer
+    oro_workflow.serializer.process.normalizer.process_data.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer
+    oro_workflow.serializer.process.normalizer.entity.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessEntityNormalizer
+    oro_workflow.serializer.process.normalizer.object.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessObjectNormalizer
+    oro_workflow.serializer.process.normalizer.traversable.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer
+    oro_workflow.serializer.process.normalizer.scalar.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessScalarNormalizer
 
+services:
     # Services for WorkflowData serialization
     oro_workflow.serializer.data.serializer:
         class: %oro_workflow.serializer.data.serializer.class%
@@ -26,12 +24,6 @@ services:
 
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
-
-    oro_workflow.serializer.data.process_normalizer:
-        class: %oro_workflow.serializer.data.process_normalizer.class%
-        arguments:
-            - @doctrine
-            - @oro_entity.doctrine_helper
 
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: %oro_workflow.serializer.data.attribute_normalizer.standard.class%
@@ -57,3 +49,36 @@ services:
               type: %oro_workflow.workflow_result.class%
               format: json
               direction: serialization
+
+    # Services for ProcessData serialization
+    oro_workflow.serializer.process.serializer:
+        class: %oro_workflow.serializer.process.serializer.class%
+        arguments:
+          -
+              - @oro_workflow.serializer.process.normalizer.process_data
+              - @oro_workflow.serializer.process.normalizer.entity
+              - @oro_workflow.serializer.process.normalizer.object
+              - @oro_workflow.serializer.process.normalizer.traversable
+              - @oro_workflow.serializer.process.normalizer.scalar
+
+          - [@serializer.encoder.json]
+
+    oro_workflow.serializer.process.normalizer.process_data:
+        class: %oro_workflow.serializer.process.normalizer.process_data.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+
+    oro_workflow.serializer.process.normalizer.entity:
+        class: %oro_workflow.serializer.process.normalizer.entity.class%
+        arguments:
+            - @doctrine
+            - @oro_entity.doctrine_helper
+
+    oro_workflow.serializer.process.normalizer.object:
+        class: %oro_workflow.serializer.process.normalizer.object.class%
+
+    oro_workflow.serializer.process.normalizer.traversable:
+        class: %oro_workflow.serializer.process.normalizer.traversable.class%
+
+    oro_workflow.serializer.process.normalizer.scalar:
+        class: %oro_workflow.serializer.process.normalizer.scalar.class%

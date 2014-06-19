@@ -10,11 +10,17 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     protected $data;
 
     /**
+     * @var bool
+     */
+    protected $modified;
+
+    /**
      * Constructor
      */
     public function __construct(array $data = array())
     {
         $this->data = $data;
+        $this->modified = false;
     }
 
     /**
@@ -28,6 +34,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     {
         if (!isset($this->data[$name]) || $this->data[$name] != $value) {
             $this->data[$name] = $value;
+            $this->modified = true;
         }
         return $this;
     }
@@ -104,6 +111,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     {
         if (isset($this->data[$name])) {
             unset($this->data[$name]);
+            $this->modified = true;
         }
         return $this;
     }
@@ -116,6 +124,24 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function isEmpty()
     {
         return empty($this->data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModified()
+    {
+        return $this->modified;
+    }
+
+    /**
+     * This method should be called only by system listeners
+     *
+     * @param bool $modified
+     */
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
     }
 
     /**

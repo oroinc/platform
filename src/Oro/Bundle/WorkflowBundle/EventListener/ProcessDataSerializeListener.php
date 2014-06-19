@@ -60,6 +60,7 @@ class ProcessDataSerializeListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $unitOfWork = $args->getEntityManager()->getUnitOfWork();
+
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
             if ($this->isSupported($entity)) {
                 $this->serialize($entity, $unitOfWork);
@@ -95,28 +96,33 @@ class ProcessDataSerializeListener
      */
     protected function serialize(ProcessJob $processJob, UnitOfWork $unitOfWork)
     {
-        $oldSerializedData = $processJob->getSerializedData();
-        $oldEntityId = $processJob->getEntityId();
-        $oldEntityHash = $processJob->getEntityHash();
+        $processData = $processJob->getData();
+        if ($processData->isModified()) {
+            $oldSerializedData = $processJob->getSerializedData();
+            $oldEntityId = $processJob->getEntityId();
+            $oldEntityHash = $processJob->getEntityHash();
 
-        $newSerializedData = $this->serializer->serialize(
-            $processJob->getData(),
-            $this->format,
-            array('processJob' => $processJob)
-        );
-        $newEntityId = $processJob->getEntityId();
-        $newEntityHash = $processJob->getEntityHash();
+            $newSerializedData = $this->serializer->serialize(
+                $processData,
+                $this->format,
+                array('processJob' => $processJob)
+            );
+            $newEntityId = $processJob->getEntityId();
+            $newEntityHash = $processJob->getEntityHash();
 
-        $processJob->setSerializedData($newSerializedData);
+            $processJob->setSerializedData($newSerializedData);
 
-        if ($newSerializedData != $oldSerializedData) {
-            $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
-        }
-        if ($newEntityId != $oldEntityId) {
-            $unitOfWork->propertyChanged($processJob, 'entityId', $oldEntityId, $newEntityId);
-        }
-        if ($newEntityHash != $oldEntityHash) {
-            $unitOfWork->propertyChanged($processJob, 'entityHash', $oldEntityHash, $newEntityHash);
+            if ($newSerializedData != $oldSerializedData) {
+                $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
+            }
+            if ($newEntityId != $oldEntityId) {
+                $unitOfWork->propertyChanged($processJob, 'entityId', $oldEntityId, $newEntityId);
+            }
+            if ($newEntityHash != $oldEntityHash) {
+                $unitOfWork->propertyChanged($processJob, 'entityHash', $oldEntityHash, $newEntityHash);
+            }
+
+            $processData->setModified(false);
         }
     }
 }

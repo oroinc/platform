@@ -155,7 +155,11 @@ class ProcessCollectorListener
         foreach (array_keys($args->getEntityChangeSet()) as $field) {
             $fieldTriggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_UPDATE, $field);
             foreach ($fieldTriggers as $trigger) {
-                $this->scheduleProcess($trigger, $entity, $args->getOldValue($field), $args->getNewValue($field));
+                $oldValue = $args->getOldValue($field);
+                $newValue = $args->getNewValue($field);
+                if ($newValue != $oldValue) {
+                    $this->scheduleProcess($trigger, $entity, $oldValue, $newValue);
+                }
             }
         }
     }
@@ -284,7 +288,9 @@ class ProcessCollectorListener
     {
         $entityClass = $this->getClass($entity);
 
-        $data = new ProcessData(array('entity' => $entity));
+        // important to set modified flag to true
+        $data = new ProcessData();
+        $data->set('entity', $entity);
         if ($old || $new) {
             $data->set('old', $old)->set('new', $new);
         }

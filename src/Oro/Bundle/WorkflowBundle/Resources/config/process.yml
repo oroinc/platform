@@ -28,6 +28,11 @@ triggers:
             queued: true
             time_shift: 60
         -
+            event: update
+            field: loginCount
+            queued: true
+            time_shift: 60
+        -
             event: create
             queued: true
             time_shift: P6YT5M

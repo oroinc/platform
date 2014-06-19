@@ -8,7 +8,7 @@ services:
     oro_workflow.listener.process_data_serialize:
         class: %oro_workflow.listener.process_data_serialize.class%
         arguments:
-            - @oro_workflow.serializer.data.process_serializer
+            - @oro_workflow.serializer.process.serializer
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postLoad }
