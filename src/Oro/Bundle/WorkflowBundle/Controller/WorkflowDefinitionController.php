@@ -32,7 +32,9 @@ class WorkflowDefinitionController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_workflow.workflow_definition.entity.class')
+        );
     }
 
     /**

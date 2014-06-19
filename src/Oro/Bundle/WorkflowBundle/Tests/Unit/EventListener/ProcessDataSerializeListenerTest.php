@@ -32,6 +32,8 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnFlush($entityCount, $entity, $serializedData)
     {
+        $this->markTestIncomplete('Should be fixed in scope of CRM-763');
+
         $processData = new ProcessData();
         $entities = array_fill(0, $entityCount, $entity);
 

@@ -19,7 +19,7 @@ class OroWorkflowBundle implements Migration
         $definitionTable->addColumn('name', 'string', ['length' => 255]);
         $definitionTable->addColumn('label', 'string', ['length' => 255]);
         $definitionTable->addColumn('enabled', 'boolean', []);
-        $definitionTable->addColumn('related_entity', 'string', ['notnull' => false, 'length' => 255]);
+        $definitionTable->addColumn('related_entity', 'string', ['length' => 255]);
         $definitionTable->addColumn('execution_order', 'smallint', []);
         $definitionTable->addColumn('actions_configuration', 'array', ['comment' => '(DC2Type:array)']);
         $definitionTable->addColumn('created_at', 'datetime', []);

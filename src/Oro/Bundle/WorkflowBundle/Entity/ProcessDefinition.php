@@ -53,7 +53,7 @@ class ProcessDefinition
     /**
      * @var string
      *
-     * @ORM\Column(name="related_entity", type="string", length=255, nullable=true)
+     * @ORM\Column(name="related_entity", type="string", length=255)
      */
     protected $relatedEntity;
 

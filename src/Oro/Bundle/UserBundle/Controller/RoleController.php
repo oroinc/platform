@@ -63,7 +63,9 @@ class RoleController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
+        );
     }
 
     /**

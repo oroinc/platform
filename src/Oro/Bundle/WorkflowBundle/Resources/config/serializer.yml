@@ -31,6 +31,7 @@ services:
         class: %oro_workflow.serializer.data.process_normalizer.class%
         arguments:
             - @doctrine
+            - @oro_entity.doctrine_helper
 
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: %oro_workflow.serializer.data.attribute_normalizer.standard.class%

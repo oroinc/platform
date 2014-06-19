@@ -24,7 +24,7 @@ triggers:
     test_definition:
         -
             event: update
-            field: loginCount
+            field: birthday
             queued: true
             time_shift: 60
         -
@@ -33,9 +33,11 @@ triggers:
             time_shift: P6YT5M
         -
             event: delete
+            queued: true
 
     contact_definition:
         -
             event: update
+            field: reportsTo
             queued: true
             time_shift: 60

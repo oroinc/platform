@@ -2,32 +2,23 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\UnitOfWork;
-
-use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
-/**
- * Class ProcessDataNormalizer
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 class ProcessDataNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    const MAX_DEEP_LEVEL = 1;
-    const SERIALIZED     = '__SERIALIZED__';
-    /**
-     * @var ClassMetadata
-     */
-    protected $classMetadata;
+    const SERIALIZED = '__SERIALIZED__';
 
     /**
      * @var Registry
@@ -35,21 +26,18 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     protected $registry;
 
     /**
-     * @var array
+     * @var DoctrineHelper
      */
-    protected $managedEntities;
-
-    /**
-     * @var string
-     */
-    protected $currentEvent;
+    protected $doctrineHelper;
 
     /**
      * @param Registry $registry
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(Registry $registry)
+    public function __construct(Registry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -57,253 +45,178 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $denormalizedData = $this->denormalizeValues($data);
+        $denormalizedData = $this->denormalizeIterable($data, $context);
 
-        if (!empty($context['processJob'])) {
-            /** @var ProcessJob $processJob */
-            $processJob = $context['processJob'];
-            return $this->prepareDenormalizedData($denormalizedData, $processJob);
-        } else {
-            return new $class($denormalizedData);
-        }
+        return new ProcessData($denormalizedData);
     }
 
     /**
-     * Returns a completed entity
-     *
-     * @param string $className
-     * @param array $attributes
-     * @return object
+     * @param array|\Iterator $data
+     * @param array $context
+     * @return array
      */
-    protected function denormalizeEntity($className, $attributes = array())
-    {
-        $classMetadata = $this->getClassMetadata($className);
-        $entity        = $classMetadata->getReflectionClass();
-
-        foreach ($attributes as $name => $value) {
-            if (is_array($value) && !empty($value[self::SERIALIZED])) {
-                $value = $this->unserialize($value[self::SERIALIZED]);
-            }
-            $this->writeProperty($entity, $name, $value);
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @param array $values
-     * @return array denormalized data
-     */
-    protected function denormalizeValues(array $values)
+    protected function denormalizeIterable($data, array $context = array())
     {
         $denormalizedData = array();
 
-        foreach ($values as $key => $value) {
-            if (!empty($value['className'])) {
-                $denormalizedData[$key] = $this->denormalizeEntity($value['className'], $value['classData']);
-            } elseif (is_array($value)) {
-                $denormalizedData[$key] = $this->denormalizeValues($value);
-            } else {
-                $denormalizedData[$key] = $value;
-            }
+        foreach ($data as $key => $value) {
+            $denormalizedData[$key] = $this->denormalizeValue($value, $context);
         }
 
         return $denormalizedData;
     }
 
     /**
-     * @param object $entity
-     * @return string
+     * @param mixed $value
+     * @param array $context
+     * @return mixed
      */
-    protected function getClass($entity)
+    protected function denormalizeValue($value, array $context = array())
     {
-        return ClassUtils::getClass($entity);
+        if ($this->isEntityValue($value)) {
+            $value = $this->denormalizeEntity($value, $context);
+        } elseif ($this->isUnserializable($value)) {
+            $value = $this->unserialize($value);
+        } elseif (is_array($value)) {
+            $value = $this->denormalizeIterable($value, $context);
+        }
+
+        return $value;
     }
 
     /**
-     * @param string|object $className
-     * @return ClassMetadata
+     * Returns a completed entity
+     *
+     * @param array $entityData
+     * @param array $context
+     * @return object
      */
-    protected function getClassMetadata($className)
+    protected function denormalizeEntity(array $entityData, array $context = array())
     {
-        if (!$this->classMetadata) {
-            if (is_object($className)) {
-                $className = $this->getClass($className);
-            }
-            $this->classMetadata = $this->registry->getManager()->getClassMetadata($className);
+        $className = $entityData['className'];
+
+        if (!empty($entityData['entityId'])) {
+            return $this->registry->getManagerForClass($className)->find($className, $entityData['entityId']);
         }
 
-        return $this->classMetadata;
-    }
+        $entityData = !empty($entityData['entityData']) ? $entityData['entityData'] : array();
+        $classMetadata = $this->getClassMetadata($className);
+        $entity = $classMetadata->getReflectionClass()->newInstanceWithoutConstructor();
 
-    protected function getEvent($context)
-    {
-        if (!$this->currentEvent && !empty($context['processJob'])) {
-            /** @var ProcessJob $processJob */
-            $processJob = $context['processJob'];
-            $this->currentEvent = $processJob->getProcessTrigger()->getEvent();
+        foreach ($entityData as $name => $value) {
+            $value = $this->denormalizeValue($value, $context);
+
+            $reflectionProperty = $classMetadata->getReflectionProperty($name);
+            $reflectionProperty->setAccessible(true);
+            $reflectionProperty->setValue($entity, $value);
         }
 
-        return $this->currentEvent;
-    }
-
-    /**
-     * @return \Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository
-     */
-    protected function getRepository()
-    {
-        return $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
-    }
-
-    /**
-     * @param object $entity
-     * @return bool
-     */
-    protected function isEntityManaged($entity)
-    {
-        if (!$this->managedEntities) {
-            $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
-            /** @var ClassMetadata $metadata */
-            foreach ($allMetadata as $metadata) {
-                $this->managedEntities[] = $metadata->getName();
-            }
-        }
-
-        if (count($this->managedEntities) > 1) {
-            return in_array($this->getClass($entity), $this->managedEntities);
-        } else {
-            return !empty($this->managedEntities) && reset($this->managedEntities) == $this->getClass($entity);
-        }
+        return $entity;
     }
 
     /**
      * {@inheritdoc}
-     * @param object|array $object
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        $processJob = $this->getProcessJob($context);
+        $entity = $object['entity'];
+        if (!$entity) {
+            throw new \LogicException('Process entity is not specified');
+        }
+
+        if ($processJob->getProcessTrigger()->getEvent() == ProcessTrigger::EVENT_DELETE) {
+            $processJob->setEntityId(null);
+        } else {
+            $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $processJob->setEntityId($entityId);
+        }
+
+        return $this->normalizeIterable($object, $context);
+    }
+
+    /**
+     * @param array|\Iterator $data
+     * @param array $context
+     * @return array
+     */
+    protected function normalizeIterable($data, array $context = array())
+    {
         $normalizedData = array();
-        $currentEvent   = $this->getEvent($context);
 
-        foreach ($object as $key => $value) {
-            if ($currentEvent && $currentEvent != ProcessTrigger::EVENT_UPDATE && ('old' == $key || 'new' == $key)) {
-                continue;
-            }
-
-            if (is_object($value)) {
-                $normalizedData[$key] = $this->normalizeEntity($value, $context);
-            } elseif (is_array($value)) {
-                $normalizedData[$key] = $this->normalize($value, $format, $context);
-            } else {
-                $normalizedData[$key] = $value;
-            }
+        foreach ($data as $key => $value) {
+            $normalizedData[$key] = $this->normalizeValue($value, $context);
         }
 
         return $normalizedData;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $context
+     * @return array
+     */
+    protected function normalizeValue($value, array $context = array())
+    {
+        if (is_object($value)) {
+            if ($this->doctrineHelper->isManageableEntity($value)) {
+                $value = $this->normalizeEntity($value, $context);
+            } else {
+                $value = $this->serialize($value);
+            }
+        } elseif (is_array($value)) {
+            $value = $this->normalizeIterable($value, $context);
+        }
+
+        return $value;
     }
 
     /**
      * @param object $entity
      * @param array $context
-     * @param integer $deepLevel
      * @return array
      */
-    protected function normalizeEntity($entity, $context, $deepLevel = 0)
+    protected function normalizeEntity($entity, array $context = array())
     {
-        $classMetadata  = $this->getClassMetadata($entity);
-        $normalizedData = array(
-            'className' => $this->getClass($entity),
-            'classData' => array()
-        );
+        $processJob = $this->getProcessJob($context);
+        $entityClass = $this->getClass($entity);
+        $normalizedData = array('className' => $entityClass);
 
-        if (!empty($context['processJob'])) {
-            /** @var ProcessJob $processJob */
-            $processJob = $context['processJob'];
+        if ($processJob->getProcessTrigger()->getEvent() != ProcessTrigger::EVENT_DELETE) {
+            $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $normalizedData['entityId'] = $entityId;
 
-            if ($this->getEvent($context) != ProcessTrigger::EVENT_DELETE) {
-                $identifierName  = reset($classMetadata->getIdentifierFieldNames());
-                $identifierValue = $classMetadata->getFieldValue($entity, $identifierName);
-                $this->setEntityIdForProcessJob($processJob, $identifierValue);
-                $normalizedData['classData'][$identifierName] = $processJob->getEntityId();
-                return $normalizedData;
-            } else {
-                $this->setEntityIdForProcessJob($processJob, 0);
-            }
-
+            return $normalizedData;
         }
 
+        $normalizedData['entityData'] = array();
+
+        $classMetadata  = $this->getClassMetadata($entityClass);
         $fieldNames = $classMetadata->getFieldNames();
+
         foreach ($fieldNames as $fieldName) {
             $fieldValue = $classMetadata->getFieldValue($entity, $fieldName);
-
-            if (is_object($fieldValue)) {
-                if ($this->isEntityManaged($fieldValue) && $deepLevel <= self::MAX_DEEP_LEVEL) {
-                    $fieldValue = $this->normalizeEntity($fieldValue, $context, $deepLevel + 1);
-                } else {
-                    $fieldValue = $this->serialize($fieldValue);
-                }
-            }
-
-            $normalizedData['classData'][$fieldName] = $fieldValue;
+            $normalizedData['entityData'][$fieldName] = $this->normalizeValue($fieldValue, $context);
         }
 
         return $normalizedData;
     }
 
     /**
-     * @param array $processData
-     * @param ProcessJob $processJob
-     * @return ProcessData
-     * @throws InvalidParameterException
+     * @param string $className
+     * @return ClassMetadata
      */
-    protected function prepareDenormalizedData($processData, $processJob)
+    protected function getClassMetadata($className)
     {
-        $triggerEvent = $processJob->getProcessTrigger()->getEvent();
-        switch ($triggerEvent) {
-            case ProcessTrigger::EVENT_DELETE:
-                if (empty($processData['entity'])) {
-                    throw new InvalidParameterException(
-                        'Invalid process job data for the delete event. Entity can not be empty.'
-                    );
-                } elseif (!is_object($processData['entity'])) {
-                    throw new InvalidParameterException(
-                        'Invalid process job data for the delete event. Entity must be an object.'
-                    );
-                }
-                return new ProcessData(array(
-                    'entity' => $processData['entity'],
-                    'old'    => null,
-                    'new'    => null
-                ));
-            case ProcessTrigger::EVENT_UPDATE:
-                return new ProcessData(array(
-                    'entity' => $this->getRepository()->findEntity($processJob),
-                    'old'    => $processData['old'],
-                    'new'    => $processData['new']
-                ));
-            break;
-            case ProcessTrigger::EVENT_CREATE:
-                return new ProcessData(array(
-                    'entity' => $this->getRepository()->findEntity($processJob),
-                    'old'    => null,
-                    'new'    => null
-                ));
-            default:
-                throw new InvalidParameterException(sprintf('Got invalid or unregister event "%s"', $triggerEvent));
-        }
+        return $this->registry->getManagerForClass($className)->getClassMetadata($className);
     }
 
     /**
-     * Checks if the given class is ProcessData or it's ancestor.
-     *
-     * @param string $class
-     * @return boolean
+     * @return ProcessJobRepository
      */
-    protected function supportsClass($class)
+    protected function getProcessJobRepository()
     {
-        $processDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-        return $processDataClass == $class ||
-               (is_string($class) && class_exists($class) && in_array($processDataClass, class_parents($class)));
+        return $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
     }
 
     /**
@@ -323,33 +236,39 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     }
 
     /**
+     * Checks if the given class is ProcessData or it's ancestor.
+     *
+     * @param string $class
+     * @return boolean
+     */
+    protected function supportsClass($class)
+    {
+        $processDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
+        return $processDataClass == $class ||
+               (is_string($class) && class_exists($class) && in_array($processDataClass, class_parents($class)));
+    }
+
+    /**
      * @param mixed $value
-     * @return string
+     * @return array
      */
     protected function serialize($value)
     {
         return array(self::SERIALIZED => base64_encode(serialize($value)));
     }
 
-    protected function setEntityIdForProcessJob(ProcessJob $processJob, $newId)
-    {
-        $oldId   = $processJob->getEntityId();
-        $oldHash = $processJob->getEntityHash();
-        /** @var UnitOfWork $unitOfWork */
-        $unitOfWork = $this->registry->getManager()->getUnitOfWork();
-        $processJob->setEntityId($newId);
-
-        $newHash = $processJob->getEntityHash();
-        $unitOfWork->propertyChanged($processJob, 'entityId', $oldId, $newId);
-        $unitOfWork->propertyChanged($processJob, 'entityHash', $oldHash, $newHash);
-    }
-
     /**
-     * @param string $value
+     * @param array $value
      * @return mixed|null
      */
-    protected function unserialize($value)
+    protected function unserialize(array $value)
     {
+        if (!$this->isUnserializable($value)) {
+            return null;
+        }
+
+        $value = $value[self::SERIALIZED];
+
         if (!is_string($value)) {
             return null;
         }
@@ -364,14 +283,46 @@ class ProcessDataNormalizer extends SerializerAwareNormalizer implements Normali
     }
 
     /**
-     * @param object $class
-     * @param string $propertyName
-     * @param mixed $propertyValue
+     * @param mixed $value
+     * @return bool
      */
-    private function writeProperty($class, $propertyName, $propertyValue)
+    protected function isUnserializable($value)
     {
-        $reflectionProperty = $this->getClassMetadata($class)->getReflectionProperty($propertyName);
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($class, $propertyValue);
+        return is_array($value) && !empty($value[self::SERIALIZED]);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    protected function isEntityValue($value)
+    {
+        return is_array($value) && !empty($value['className']);
+    }
+
+    /**
+     * @param array $context
+     * @return ProcessJob
+     */
+    protected function getProcessJob(array $context)
+    {
+        if (empty($context['processJob'])) {
+            throw new \LogicException('Process job is not defined');
+        }
+
+        if (!$context['processJob'] instanceof ProcessJob) {
+            throw new \LogicException('Invalid process job entity');
+        }
+
+        return $context['processJob'];
+    }
+
+    /**
+     * @param object $entity
+     * @return string
+     */
+    protected function getClass($entity)
+    {
+        return ClassUtils::getClass($entity);
     }
 }

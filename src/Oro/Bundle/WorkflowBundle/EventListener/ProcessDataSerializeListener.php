@@ -96,13 +96,27 @@ class ProcessDataSerializeListener
     protected function serialize(ProcessJob $processJob, UnitOfWork $unitOfWork)
     {
         $oldSerializedData = $processJob->getSerializedData();
+        $oldEntityId = $processJob->getEntityId();
+        $oldEntityHash = $processJob->getEntityHash();
+
         $newSerializedData = $this->serializer->serialize(
             $processJob->getData(),
             $this->format,
             array('processJob' => $processJob)
         );
+        $newEntityId = $processJob->getEntityId();
+        $newEntityHash = $processJob->getEntityHash();
 
         $processJob->setSerializedData($newSerializedData);
-        $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
+
+        if ($newSerializedData != $oldSerializedData) {
+            $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
+        }
+        if ($newEntityId != $oldEntityId) {
+            $unitOfWork->propertyChanged($processJob, 'entityId', $oldEntityId, $newEntityId);
+        }
+        if ($newEntityHash != $oldEntityHash) {
+            $unitOfWork->propertyChanged($processJob, 'entityHash', $oldEntityHash, $newEntityHash);
+        }
     }
 }
