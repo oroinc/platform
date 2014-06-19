@@ -52,23 +52,29 @@ class ActivityManager
     {
         $result = [];
 
+        if (!$this->activityConfigProvider->hasConfig($entityClass)) {
+            return $result;
+        }
+
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
-        if (!empty($activityClassNames)) {
-            foreach ($activityClassNames as $activityClassName) {
-                $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
-                $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-                $item           = [
-                    'className'       => $activityClassName,
-                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
-                    'label'           => $entityConfig->get('plural_label'),
-                    'route'           => $activityConfig->get('route')
-                ];
-                $acl            = $activityConfig->get('acl');
-                if (!empty($acl)) {
-                    $item['acl'] = $acl;
-                }
-                $result[] = $item;
+        if (empty($activityClassNames)) {
+            return $result;
+        }
+
+        foreach ($activityClassNames as $activityClassName) {
+            $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
+            $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
+            $item           = [
+                'className'       => $activityClassName,
+                'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                'label'           => $entityConfig->get('plural_label'),
+                'route'           => $activityConfig->get('route')
+            ];
+            $acl            = $activityConfig->get('acl');
+            if (!empty($acl)) {
+                $item['acl'] = $acl;
             }
+            $result[] = $item;
         }
 
         return $result;
