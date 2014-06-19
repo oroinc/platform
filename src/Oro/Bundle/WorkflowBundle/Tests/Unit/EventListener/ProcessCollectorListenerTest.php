@@ -73,7 +73,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             self::ENTITY => array(
                 array(
                     'trigger' => $triggers['create'],
-                    'data' => $this->createProcessData(array('entity' => $entity))
+                    'data' => $this->createProcessData(array('data' => $entity))
                 )
             )
         );
@@ -101,12 +101,12 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             self::ENTITY => array(
                 array(
                     'trigger' => $triggers['updateEntity'],
-                    'data' => $this->createProcessData(array('entity' => $entity))
+                    'data' => $this->createProcessData(array('data' => $entity))
                 ),
                 array(
                     'trigger' => $triggers['updateField'],
                     'data' => $this->createProcessData(
-                        array('entity' => $entity, 'old' => $oldValue, 'new' => $newValue)
+                        array('data' => $entity, 'old' => $oldValue, 'new' => $newValue)
                     )
                 ),
             ),
@@ -136,7 +136,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             self::ENTITY => array(
                 array(
                     'trigger' => $triggers['delete'],
-                    'data' => $this->createProcessData(array('entity' => $entity))
+                    'data' => $this->createProcessData(array('data' => $entity))
                 )
             )
         );
@@ -220,7 +220,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->prePersist(new LifecycleEventArgs($entity, $entityManager));
 
         $expectedTrigger = $triggers['create'];
-        $expectedData = $this->createProcessData(array('entity' => $entity));
+        $expectedData = $this->createProcessData(array('data' => $entity));
 
         $this->handler->expects($this->once())->method('handleTrigger')->with($expectedTrigger, $expectedData);
         $entityManager->expects($this->once())->method('flush');
@@ -242,7 +242,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->preUpdate($args);
 
         $expectedTrigger = $triggers['updateEntity'];
-        $expectedData = $this->createProcessData(array('entity' => $entity));
+        $expectedData = $this->createProcessData(array('data' => $entity));
         $expectedJobId = 12;
 
         $entityManager->expects($this->at(0))->method('persist')

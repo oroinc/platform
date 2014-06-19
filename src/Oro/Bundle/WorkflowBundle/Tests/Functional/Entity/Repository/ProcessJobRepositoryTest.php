@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
@@ -64,10 +63,13 @@ class ProcessJobRepositoryTest extends WebTestCase
         $entityHashes = array();
 
         for ($i = 0; $i < $jobsAmount; $i++) {
+            $processData = new ProcessData();
+            $processData->set('data', $entity);
+
             $job = new ProcessJob();
             $job->setProcessTrigger($trigger)
                 ->setEntityId($i)
-                ->setData(new ProcessData(array('entity' => $entity)));
+                ->setData($processData);
             $this->entityManager->persist($job);
 
             $entityHashes[] = $job->getEntityHash();

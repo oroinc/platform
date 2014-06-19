@@ -39,7 +39,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     {
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
-        $entity = $object['entity'];
+        $entity = $object['data'];
         if (!$entity) {
             throw new \LogicException('Process entity is not specified');
         }

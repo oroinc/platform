@@ -27,7 +27,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Invalid process data. Entity parameter can not be empty.
+     * @expectedExceptionMessage Invalid process data. Entity can not be empty.
      */
     public function testHandleTriggerException()
     {
@@ -46,9 +46,9 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleTrigger()
     {
         $processData = new ProcessData(array(
-            'entity' => new \DateTime(),
-            'old'    => array('label' => 'before'),
-            'new'    => array('label' => 'after')
+            'data' => new \DateTime(),
+            'old'  => array('label' => 'before'),
+            'new'  => array('label' => 'after')
         ));
 
         $processTrigger = $this->assetHandleTrigger($processData);
@@ -103,14 +103,14 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
         return array(
             'event create or delete' => array(
                 'data' => new ProcessData(array(
-                    'entity' => $entity
+                    'data' => $entity
                 ))
             ),
             'event update' => array(
                 'data' => new ProcessData(array(
-                    'entity' => $entity,
-                    'old'    => array('label' => 'before'),
-                    'new'    => array('label' => 'after'),
+                    'data' => $entity,
+                    'old'  => array('label' => 'before'),
+                    'new'  => array('label' => 'after'),
                 ))
             ),
         );

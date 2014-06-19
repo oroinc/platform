@@ -290,7 +290,7 @@ class ProcessCollectorListener
 
         // important to set modified flag to true
         $data = new ProcessData();
-        $data->set('entity', $entity);
+        $data->set('data', $entity);
         if ($old || $new) {
             $data->set('old', $old)->set('new', $new);
         }
