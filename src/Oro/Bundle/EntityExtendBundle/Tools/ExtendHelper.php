@@ -26,14 +26,20 @@ class ExtendHelper
     }
 
     /**
+     * Returns a string that can be used as a field name to the relation to the given entity.
+     *
+     * To prevent name collisions this method adds a hash built based on the full class name to the association name.
+     *
      * @param string $targetEntityClassName
      *
      * @return string
      */
     public static function buildAssociationName($targetEntityClassName)
     {
-        return Inflector::tableize(
-            ExtendHelper::getShortClassName($targetEntityClassName)
+        return sprintf(
+            '%s_%s',
+            Inflector::tableize(ExtendHelper::getShortClassName($targetEntityClassName)),
+            strtolower(dechex(crc32($targetEntityClassName)))
         );
     }
 
@@ -73,18 +79,10 @@ class ExtendHelper
      */
     public static function getShortClassName($className)
     {
-        /*
-         * @todo: in future to prevent collisions we should do the following
-         * For ORO classes this method returns the part without the namespace.
-         * For other classes this method returns the vendor name + the part without the namespace.
-        $vendor = substr($className, 0, strpos($className, '\\'));
-        $name   = substr($className, strrpos($className, '\\') + 1);
+        $lastDelimiter = strrpos($className, '\\');
 
-        return in_array(strtolower($vendor), ['oro', 'orocrm'], true)
-            ? $name
-            : sprintf('%s_%s', $vendor, $name);
-        */
-
-        return substr($className, strrpos($className, '\\') + 1);
+        return false === $lastDelimiter
+            ? $className
+            : substr($className, $lastDelimiter + 1);
     }
 }

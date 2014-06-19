@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
@@ -145,7 +145,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return is_object($data) && $this->supportsClass(get_class($data));
     }
@@ -153,7 +153,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * {@inheritDoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return $this->supportsClass($type);
     }
