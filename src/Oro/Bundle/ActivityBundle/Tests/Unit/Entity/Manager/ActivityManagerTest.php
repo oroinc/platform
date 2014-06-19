@@ -75,6 +75,21 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
+    public function testGetAssociatedActivityInfoForNonConfigurableEntity()
+    {
+        $targetEntityClass = 'Test\Entity';
+
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(false));
+
+        $this->assertEquals(
+            [],
+            $this->manager->getAssociatedActivityInfo($targetEntityClass)
+        );
+    }
+
     public function testGetAssociatedActivityInfo()
     {
         $targetEntityClass = 'Test\Entity';
@@ -95,6 +110,10 @@ class ActivityManagerTest extends OrmTestCase
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
         $activity2ActivityConfig->set('route', 'route2');
 
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(true));
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
