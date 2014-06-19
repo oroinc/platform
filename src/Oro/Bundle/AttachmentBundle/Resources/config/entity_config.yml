@@ -41,7 +41,7 @@ oro_entity_config:
                     form:
                         type:           integer
                         options:
-                            required:   false
+                            required:   true
                             label:      oro.attachment.config.thumb_width.label
                             block:      entity
                             subblock:   properties
@@ -58,7 +58,7 @@ oro_entity_config:
                     form:
                         type:           integer
                         options:
-                            required:   false
+                            required:   true
                             label:      oro.attachment.config.thumb_height.label
                             block:      entity
                             subblock:   properties

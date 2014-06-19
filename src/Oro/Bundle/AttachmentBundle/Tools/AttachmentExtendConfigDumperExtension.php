@@ -139,8 +139,15 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $extendConfigProvider->persist($entityExtendConfig);
         $this->configManager->calculateConfigChangeSet($entityExtendConfig);
-
     }
+
+    /**
+     *  TODO:
+     *      Next methods (createField, updateFieldConfigs, addManyToOneRelation)
+     *      is copy-past from AssociationExtendConfigDumperExtension
+     *      and as discussed with Bravo team will be refactored.
+     *
+     */
 
     /**
      * @param string $className
