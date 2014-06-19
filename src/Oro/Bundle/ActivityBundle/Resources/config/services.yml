@@ -1,5 +1,7 @@
 parameters:
-    oro_activity.entity_extend.dumper_extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
+    oro_activity.entity_extend.dumper_extension.class:    Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
+    oro_activity.entity_extend.generator_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension
+
     oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
     oro_activity.widget_provider.class:                 Oro\Bundle\ActivityBundle\Provider\ChainActivityWidgetProvider
@@ -39,3 +41,9 @@ services:
             - @oro_entity.routing_helper
         tags:
             - { name: oro_activity.widget_provider }
+
+    oro_activity.entity_extend.generator_extension:
+        class: %oro_activity.entity_extend.generator_extension.class%
+        arguments:
+        tags:
+            - { name: oro_entity_extend.generator_extension }

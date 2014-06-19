@@ -16,7 +16,26 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
      */
     public function supports($actionType, array $schemas)
     {
-        return ExtendEntityGenerator::ACTION_GENERATE == $actionType && !empty($schemas['relation']);
+        $result = ExtendEntityGenerator::ACTION_GENERATE == $actionType &&
+            !empty($schemas['relation']) &&
+            !empty($schemas['relationData']);
+
+        if (!$result) {
+            return false;
+        }
+
+        foreach ($schemas['relationData'] as $relationData) {
+            /** @var FieldConfigId $fieldConfig */
+            $fieldConfig = $relationData['field_id'];
+
+            // TODO: probably we should check classname - if it's activity or not
+
+            if ($fieldConfig instanceof FieldConfigId && $fieldConfig->getFieldType() == 'manyToMany') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -35,6 +54,7 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
         $supportedEntities = [];
 
         foreach ($relationData as $relationItem) {
+            //var_dump($relationItem);
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $relationItem['field_id'];
 
