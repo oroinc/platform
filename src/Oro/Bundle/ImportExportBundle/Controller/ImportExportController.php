@@ -2,24 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class ImportExportController extends Controller
 {
@@ -45,9 +39,7 @@ class ImportExportController extends Controller
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
 
-                /** @var ImportHandler $handler */
-                $handler = $this->get('oro_importexport.handler.import');
-                $handler->saveImportingFile($file, $processorAlias, 'csv');
+                $this->getImportHandler()->saveImportingFile($file, $processorAlias, 'csv');
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',
@@ -72,10 +64,7 @@ class ImportExportController extends Controller
      */
     public function importValidateAction($processorAlias)
     {
-        /** @var ImportHandler $handler */
-        $handler = $this->get('oro_importexport.handler.import');
-
-        return $handler->handleImportValidation(
+        return $this->getImportHandler()->handleImportValidation(
             JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
             $processorAlias
         );
@@ -90,10 +79,7 @@ class ImportExportController extends Controller
      */
     public function importProcessAction($processorAlias)
     {
-        /** @var ImportHandler $handler */
-        $handler = $this->get('oro_importexport.handler.import');
-
-        return $handler->handleImport(
+        return $this->getImportHandler()->handleImport(
             JobExecutor::JOB_IMPORT_FROM_CSV,
             $processorAlias
         );
@@ -108,13 +94,29 @@ class ImportExportController extends Controller
      */
     public function instantExportAction($processorAlias)
     {
-        /** @var ExportHandler $handler */
-        $handler = $this->get('oro_importexport.handler.export');
-
-        return $handler->handleExport(
+        return $this->getExportHandler()->handleExport(
             JobExecutor::JOB_EXPORT_TO_CSV,
-            $processorAlias
+            $processorAlias,
+            ProcessorRegistry::TYPE_EXPORT
         );
+    }
+
+    /**
+     * @Route("/export/template/{processorAlias}", name="oro_importexport_export_template")
+     * @AclAncestor("oro_importexport_export")
+     *
+     * @param string $processorAlias
+     * @return Response
+     */
+    public function templateExportAction($processorAlias)
+    {
+        $result = $this->getExportHandler()->getExportResult(
+            JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
+            $processorAlias,
+            ProcessorRegistry::TYPE_EXPORT_TEMPLATE
+        );
+
+        return $this->redirect($result['url']);
     }
 
     /**
@@ -123,10 +125,7 @@ class ImportExportController extends Controller
      */
     public function downloadExportResultAction($fileName)
     {
-        /** @var ExportHandler $handler */
-        $handler = $this->get('oro_importexport.handler.export');
-
-        return $handler->handleDownloadExportResult($fileName);
+        return $this->getExportHandler()->handleDownloadExportResult($fileName);
     }
 
     /**
@@ -135,8 +134,7 @@ class ImportExportController extends Controller
      */
     public function errorLogAction($jobCode)
     {
-        /** @var JobExecutor $jobExecutor */
-        $jobExecutor = $this->get('oro_importexport.job_executor');
+        $jobExecutor = $this->getJobExecutor();
         $errors  = array_merge(
             $jobExecutor->getJobFailureExceptions($jobCode),
             $jobExecutor->getJobErrors($jobCode)
@@ -144,5 +142,29 @@ class ImportExportController extends Controller
         $content = implode("\r\n", $errors);
 
         return new Response($content, 200, array('Content-Type' => 'text/x-log'));
+    }
+
+    /**
+     * @return ImportHandler
+     */
+    protected function getImportHandler()
+    {
+        return $this->get('oro_importexport.handler.import');
+    }
+
+    /**
+     * @return ExportHandler
+     */
+    protected function getExportHandler()
+    {
+        return $this->get('oro_importexport.handler.export');
+    }
+
+    /**
+     * @return JobExecutor
+     */
+    protected function getJobExecutor()
+    {
+        return $this->get('oro_importexport.job_executor');
     }
 }

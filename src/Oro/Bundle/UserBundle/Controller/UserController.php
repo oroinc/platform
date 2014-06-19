@@ -127,7 +127,9 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_user.entity.class')
+        );
     }
 
     /**

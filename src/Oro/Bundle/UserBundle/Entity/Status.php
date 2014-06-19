@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity()
@@ -31,6 +32,13 @@ class Status
     /**
      * @var string
      * @ORM\Column(type="string", nullable=false)
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $status;
 

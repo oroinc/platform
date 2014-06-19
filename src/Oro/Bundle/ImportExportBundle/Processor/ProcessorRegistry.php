@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 class ProcessorRegistry
 {
     const TYPE_EXPORT = 'export';
+    const TYPE_EXPORT_TEMPLATE = 'export_template';
     const TYPE_IMPORT = 'import';
     const TYPE_IMPORT_VALIDATION = 'import_validation';
 
@@ -62,6 +63,10 @@ class ProcessorRegistry
             throw new LogicException(
                 sprintf('Processor with type "%s" and alias "%s" already exists', $type, $entityName)
             );
+        }
+
+        if ($processor instanceof EntityNameAwareInterface) {
+            $processor->setEntityName($entityName);
         }
 
         $this->processors[$type][$alias] = $processor;
