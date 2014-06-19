@@ -10,7 +10,7 @@ class IntegrationConfiguration implements ConfigurationInterface
 {
     const ROOT_NODE_NAME         = 'oro_integration';
     const SYNC_SETTING_ROOT_NODE = 'synchronization_settings';
-    const FORM_NODE_NAME = 'form';
+    const FORM_NODE_NAME         = 'form';
 
     /**
      * {@inheritDoc}
@@ -39,7 +39,6 @@ class IntegrationConfiguration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode('type')->isRequired()->end()
-                    ->scalarNode('label')->isRequired()->end()
                     ->arrayNode('options')
                         ->prototype('variable')->end()
                     ->end()

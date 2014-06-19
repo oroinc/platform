@@ -3,9 +3,7 @@ oro_integration:
         synchronization_settings:
             schedule:
                 type: schedule_form_type
-                label: Schedule
                 applicable: @test.client->test()
             some_setting:
                 type: choice
-                label: Some setting
                 applicable: [simple]

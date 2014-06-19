@@ -18,20 +18,17 @@ class IntegrationConfigurationTest extends \PHPUnit_Framework_TestCase
                 'synchronization_settings' => [
                     'schedule'     => [
                         'type'       => 'schedule_form_type',
-                        'label'      => 'Schedule',
                         'applicable' => ['@test.client->test()'],
                         'options'    => []
                     ],
                     'enabled'      => [
                         'type'       => 'choice',
-                        'label'      => 'Enabled',
                         'options'    => ['choices' => ['Enabled', 'Disabled']],
                         'priority'   => -200,
                         'applicable' => [],
                     ],
                     'some_setting' => [
                         'type'       => 'choice',
-                        'label'      => 'Some setting',
                         'applicable' => ['simple'],
                         'options'    => [],
                     ],

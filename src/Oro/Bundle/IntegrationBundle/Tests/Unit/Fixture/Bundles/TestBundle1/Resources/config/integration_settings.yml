@@ -3,10 +3,8 @@ oro_integration:
         synchronization_settings:
             schedule:
                 type: schedule_form_type
-                label: Schedule
             enabled:
                 type: choice
-                label: Enabled
                 priority: -200
                 options:
                     choices:

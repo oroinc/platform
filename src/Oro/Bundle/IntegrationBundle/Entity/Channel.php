@@ -5,10 +5,10 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
-use Oro\Bundle\IntegrationBundle\Model\IntegrationSettings;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -77,7 +77,7 @@ class Channel
     protected $isTwoWaySyncEnabled;
 
     /**
-     * @var IntegrationSettings
+     * @var ConfigObject
      *
      * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
      */
@@ -121,7 +121,7 @@ class Channel
     public function __construct()
     {
         $this->statuses                = new ArrayCollection();
-        $this->synchronizationSettings = new IntegrationSettings();
+        $this->synchronizationSettings = ConfigObject::create([]);
         $this->isTwoWaySyncEnabled     = false;
     }
 
@@ -224,7 +224,7 @@ class Channel
     }
 
     /**
-     * @param IntegrationSettings $synchronizationSettings
+     * @param ConfigObject $synchronizationSettings
      */
     public function setSynchronizationSettings($synchronizationSettings)
     {
@@ -232,11 +232,11 @@ class Channel
     }
 
     /**
-     * @return IntegrationSettings
+     * @return ConfigObject
      */
     public function getSynchronizationSettings()
     {
-        return $this->synchronizationSettings;
+        return clone $this->synchronizationSettings;
     }
 
     /**

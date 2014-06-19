@@ -29,12 +29,11 @@ class SettingsProvider
      *
      * @param string $name        - node name that specifies which form settings needed
      * @param string $channelType - channel type name for applicable check
-     * @param array  $context     - resolver context
      *
      * @throws \LogicException
      * @return array
      */
-    public function getFormSettings($name, $channelType, $context = [])
+    public function getFormSettings($name, $channelType)
     {
         if (!isset(
             $this->settings[IntegrationConfiguration::FORM_NODE_NAME],
@@ -47,7 +46,7 @@ class SettingsProvider
 
         $result = $priorities = [];
         foreach ($formData as $fieldName => $field) {
-            $field = $this->resolver->resolve($field, $context);
+            $field = $this->resolver->resolve($field, ['channelType' => $channelType]);
 
             // if applicable node not set, then applicable to all
             if ($this->isApplicable($field, $channelType)) {

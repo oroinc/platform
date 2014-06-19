@@ -17,12 +17,8 @@
         {{ form_widget(form.transport) }}
     {% endif %}
 
-    {% if (form.isTwoWaySyncEnabled is defined) %}
-        {{ form_row(form.isTwoWaySyncEnabled) }}
-    {% endif %}
-
-    {% if (form.syncPriority is defined) %}
-        {{ form_row(form.syncPriority) }}
+    {% if (form.synchronizationSettings is defined) %}
+        {{ form_widget(form.synchronizationSettings) }}
     {% endif %}
 
     {% if (form.connectors is defined) %}
