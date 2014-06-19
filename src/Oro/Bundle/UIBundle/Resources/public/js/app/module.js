@@ -5,10 +5,20 @@
  */
 require([
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page-view'
-], function (BaseController, PageView) {
+    'oroui/js/app/views/base/view'
+], function (BaseController, BaseView) {
     'use strict';
-    BaseController.addBeforeActionReuse('page', PageView);
+    BaseController.addBeforeActionReuse('page', BaseView, {
+        el: 'body',
+        keepElement: true,
+        regions: {
+            mainContainer: '#container',
+            mainMenu: '#main-menu',
+            userMenu: '#top-page .user-menu',
+            breadcrumb: '#breadcrumb',
+            loadingMask: '#main .hash-loading-mask'
+        }
+    });
 });
 
 /**

@@ -3,7 +3,7 @@
 define([
     'underscore',
     'chaplin',
-    './../view'
+    './view'
 ], function (_, Chaplin, BaseView) {
     'use strict';
 

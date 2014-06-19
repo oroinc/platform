@@ -1,6 +1,6 @@
 /*global define*/
 define([
-    './../base/page/region-view'
+    './../base/page-region-view'
 ], function (PageRegionView) {
     'use strict';
 
