@@ -56,6 +56,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
             'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
             'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
+            'disabled'            => ['disabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
         ];
     }
 

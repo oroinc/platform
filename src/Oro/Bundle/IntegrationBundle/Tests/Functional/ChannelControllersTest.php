@@ -43,15 +43,15 @@ class ChannelControllersTest extends WebTestCase
 
     public function testCreate()
     {
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var User $user */
         $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
-        $em->persist($newUser);
-        $em->flush($newUser);
+        $entityManager->persist($newUser);
+        $entityManager->flush($newUser);
 
         $organization = $this->getOrganization();
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
@@ -75,6 +75,7 @@ class ChannelControllersTest extends WebTestCase
         $form['oro_integration_channel_form[organization]'] = $organization->getId();
         $form['oro_integration_channel_form[type]'] = 'simple';
         $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
+        $form['oro_integration_channel_form[disabled]'] = false;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -126,6 +127,7 @@ class ChannelControllersTest extends WebTestCase
 
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
+        $form['oro_integration_channel_form[disabled]'] = true;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

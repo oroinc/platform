@@ -84,6 +84,14 @@ class Channel
     protected $syncPriority;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="disabled", type="boolean", nullable=true)
+     * @Oro\Versioned()
+     */
+    protected $disabled;
+
+    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
@@ -329,5 +337,21 @@ class Channel
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @param boolean $disabled
+     */
+    public function setDisabled($disabled)
+    {
+        $this->disabled = $disabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getDisabled()
+    {
+        return $this->disabled;
     }
 }

@@ -90,6 +90,9 @@ class SyncProcessor
      */
     protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
     {
+        if ($channel->getDisabled()) {
+            return;
+        }
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
             /**

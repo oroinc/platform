@@ -25,6 +25,10 @@
         {{ form_row(form.syncPriority) }}
     {% endif %}
 
+    {% if (form.disabled is defined) %}
+        {{ form_row(form.disabled) }}
+    {% endif %}
+
     {% if (form.connectors is defined) %}
         <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
             {{ form_row(form.connectors) }}
