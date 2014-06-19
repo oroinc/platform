@@ -53,6 +53,18 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return array
+     */
+    public function setGetDataProvider()
+    {
+        return array(
+            'processTrigger' => array('processTrigger', new ProcessTrigger()),
+            'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
+            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData()),
+        );
+    }
+
+    /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\SerializerException
      * @expectedExceptionMessage Cannot deserialize data of process job. Serializer is not available.
      */
@@ -127,18 +139,6 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
         $data = 'serialized_data';
         $this->entity->setSerializedData($data);
         $this->assertEquals($data, $this->entity->getSerializedData());
-    }
-
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
-    {
-        return array(
-            'processTrigger' => array('processTrigger', new ProcessTrigger()),
-            'serializedData' => array('serializedData', serialize(array('some' => 'data'))),
-            'data' => array('data', new ProcessData(array('some' => 'data')), new ProcessData()),
-        );
     }
 
     public function testSetGetEntityIdAndHash()

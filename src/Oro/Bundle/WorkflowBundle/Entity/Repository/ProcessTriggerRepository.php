@@ -37,7 +37,7 @@ class ProcessTriggerRepository extends EntityRepository
     /**
      * @return ProcessTrigger[]
      */
-    public function findAllWithDefinitions()
+    public function findAllWithEnabledDefinitions()
     {
         return $this->createQueryBuilder('trigger')
             ->select('trigger, definition')

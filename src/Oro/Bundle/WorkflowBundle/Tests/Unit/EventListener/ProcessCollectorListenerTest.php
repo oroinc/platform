@@ -369,9 +369,9 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     {
         $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository')
             ->disableOriginalConstructor()
-            ->setMethods(array('findAllWithDefinitions'))
+            ->setMethods(array('findAllWithEnabledDefinitions'))
             ->getMock();
-        $repository->expects($this->any())->method('findAllWithDefinitions')
+        $repository->expects($this->any())->method('findAllWithEnabledDefinitions')
             ->will($this->returnValue($triggers));
 
         $this->registry->expects($this->at(0))->method('getRepository')->with('OroWorkflowBundle:ProcessTrigger')

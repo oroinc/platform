@@ -33,7 +33,7 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $doctrine = $this->getContainer()->get('doctrine');
         $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
 
-        $this->entityManager = $doctrine->getManagerForClass('OroWorkflowBundle:ProcessTrigger');
+        $this->entityManager = $doctrine->getManager();
         $this->repository = $doctrine->getRepository('OroWorkflowBundle:ProcessTrigger');
     }
 
@@ -63,27 +63,40 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $this->assertFalse($this->repository->isEqualTriggerExists($notEqualTrigger));
     }
 
-    public function testFindAllWithDefinitions()
+    public function testfindAllWithEnabledDefinitions()
     {
         $expectedCount = (int)$this->repository->createQueryBuilder('trigger')
             ->select('COUNT(trigger.id) as triggerCount')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $triggers = $this->repository->findAllWithDefinitions();
+        $triggers = $this->repository->findAllWithEnabledDefinitions();
         $this->assertCount($expectedCount, $triggers);
 
+        $definition    = null;
         $previousOrder = null;
         foreach ($triggers as $trigger) {
             $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
 
-            $executionOrder = $trigger->getDefinition()->getExecutionOrder();
+            $definition     = $trigger->getDefinition();
+            $executionOrder = $definition->getExecutionOrder();
+
             if ($previousOrder === null) {
                 $previousOrder = $executionOrder;
             }
 
             $this->assertGreaterThanOrEqual($previousOrder, $executionOrder);
             $previousOrder = $executionOrder;
+        }
+
+        // check is the function returns only enabled process definitions
+        if ($definition) {
+            $definition->setEnabled(false);
+            $this->entityManager->persist($definition);
+            $this->entityManager->flush();
+
+            $triggersAfter = $this->repository->findAllWithEnabledDefinitions();
+            $this->assertLessThan(count($triggers), count($triggersAfter));
         }
     }
 }

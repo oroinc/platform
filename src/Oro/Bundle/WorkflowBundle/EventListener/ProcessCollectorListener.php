@@ -98,7 +98,9 @@ class ProcessCollectorListener
     protected function initializeTriggers()
     {
         if (null === $this->triggers) {
-            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')->findAllWithDefinitions();
+            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')
+                ->findAllWithEnabledDefinitions();
+
             $this->triggers = array();
             foreach ($triggers as $trigger) {
                 $entityClass = $trigger->getDefinition()->getRelatedEntity();

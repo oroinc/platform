@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class LoadProcessConfigurationCommand extends ContainerAwareCommand
 {
@@ -26,11 +25,6 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
      * @var EntityRepository
      */
     protected $definitionRepository;
-
-    /**
-     * @var ProcessTriggerRepository
-     */
-    protected $triggerRepository;
 
     /**
      * @var ProcessConfigurationBuilder
@@ -60,19 +54,6 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         }
 
         return $this->definitionRepository;
-    }
-
-    /**
-     * @return ProcessTriggerRepository
-     */
-    protected function getTriggerRepository()
-    {
-        if (!$this->triggerRepository) {
-            $this->triggerRepository
-                = $this->getEntityManager()->getRepository('OroWorkflowBundle:ProcessTrigger');
-        }
-
-        return $this->triggerRepository;
     }
 
     /**
@@ -185,7 +166,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
             $output->writeln('Loading process triggers...');
 
             $entityManager = $this->getEntityManager();
-            $triggerRepository = $this->getTriggerRepository();
+            $triggerRepository = $entityManager->getRepository('OroWorkflowBundle:ProcessTrigger');
 
             foreach ($triggers as $trigger) {
                 $output->writeln(
