@@ -95,9 +95,4 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
             'incorrectEntity' => [$incorrectEntity, false]
         ];
     }
-
-    public function testCheckUpdateEntityByDeleteFile()
-    {
-
-    }
 }
