@@ -31,7 +31,8 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "permissions"="VIEW;CREATE",
  *          "group_name"=""
  *      },
- *      "grouping"={"groups"={"activity"}}
+ *      "grouping"={"groups"={"activity"}},
+ *      "activity"={"route"="oro_email_activity_view", "acl"="oro_email_view"}
  *  }
  * )
  */

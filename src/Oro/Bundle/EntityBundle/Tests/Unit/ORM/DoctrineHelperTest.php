@@ -449,6 +449,53 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->getEntityMetadata($class);
     }
 
+    public function testGetEntityManagerByEntity()
+    {
+        $entity = new ItemStubProxy();
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($this->doctrineHelper->getEntityClass($entity))
+            ->will($this->returnValue($this->em));
+
+        $this->assertSame(
+            $this->em,
+            $this->doctrineHelper->getEntityManager($entity)
+        );
+    }
+
+    public function testGetEntityManagerByClass()
+    {
+        $class = 'ItemStubProxy';
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertSame(
+            $this->em,
+            $this->doctrineHelper->getEntityManager($class)
+        );
+    }
+
+    public function testGetEntityManagerNotManageableEntity()
+    {
+        $class = 'ItemStubProxy';
+
+        $this->setExpectedException(
+            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
+            sprintf('Entity class "%s" is not manageable', $class)
+        );
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityManager($class);
+    }
+
     public function testGetEntityReference()
     {
         $expectedResult = $this->getMock('MockEntityReference');

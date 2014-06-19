@@ -4,13 +4,13 @@ oro_entity_config:
             form:
                 block_config:
                     general:
-                        title:              oro.entity_config.form.block.general
+                        title:              oro.entity_config.block_titles.general.label
                         priority:           100
                     associations:
-                        title:              oro.entity_config.form.block.associations
+                        title:              oro.entity_config.block_titles.associations.label
                         priority:           50
                     other:
-                        title:              oro.entity_config.form.block.other
+                        title:              oro.entity_config.block_titles.other.label
                         priority:           -255
 
             items:
@@ -73,10 +73,10 @@ oro_entity_config:
             form:
                 block_config:
                     general:
-                        title:              oro.entity_config.form.block.general
+                        title:              oro.entity_config.block_titles.general.label
                         priority:           100
                     other:
-                        title:              oro.entity_config.form.block.other
+                        title:              oro.entity_config.block_titles.other.label
                         priority:           -255
 
             items:
