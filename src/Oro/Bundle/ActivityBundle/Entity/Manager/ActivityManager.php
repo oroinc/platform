@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Tools;
+namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityHelper
+class ActivityManager
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -16,16 +17,61 @@ class ActivityHelper
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
+    /** @var ConfigProvider */
+    protected $activityConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
+     * @param ConfigProvider      $activityConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityClassResolver $entityClassResolver
+        EntityClassResolver $entityClassResolver,
+        ConfigProvider $activityConfigProvider,
+        ConfigProvider $entityConfigProvider
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->entityClassResolver = $entityClassResolver;
+        $this->doctrineHelper         = $doctrineHelper;
+        $this->entityClassResolver    = $entityClassResolver;
+        $this->activityConfigProvider = $activityConfigProvider;
+        $this->entityConfigProvider   = $entityConfigProvider;
+    }
+
+    /**
+     * Returns an array contains info about activities associated with the given entity type
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function getAssociatedActivityInfo($entityClass)
+    {
+        $result = [];
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        if (!empty($activityClassNames)) {
+            foreach ($activityClassNames as $activityClassName) {
+                $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
+                $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
+                $item           = [
+                    'className'       => $activityClassName,
+                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                    'label'           => $entityConfig->get('plural_label'),
+                    'route'           => $activityConfig->get('route')
+                ];
+                $acl            = $activityConfig->get('acl');
+                if (!empty($acl)) {
+                    $item['acl'] = $acl;
+                }
+                $result[] = $item;
+            }
+        }
+
+        return $result;
     }
 
     /**

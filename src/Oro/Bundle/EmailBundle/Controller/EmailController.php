@@ -42,12 +42,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/widget/info/{id}", name="oro_email_widget_info", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_email_view",
-     *      type="entity",
-     *      class="OroEmailBundle:Email",
-     *      permission="VIEW"
-     * )
+     * @AclAncestor("oro_email_view")
      * @Template
      */
     public function infoAction(Email $entity)
@@ -56,6 +51,25 @@ class EmailController extends Controller
 
         return array(
             'entity' => $entity
+        );
+    }
+
+    /**
+     * This action is used to render the list of emails associated with the given entity
+     * on the view page of this entity
+     *
+     * @Route(
+     *      "/activity/view/{entityClass}/{entityId}",
+     *      name="oro_email_activity_view"
+     * )
+     *
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function activityAction($entityClass, $entityId)
+    {
+        return array(
+            'entity' => $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId)
         );
     }
 
@@ -82,21 +96,6 @@ class EmailController extends Controller
         $responseData['form'] = $this->get('oro_email.form.email')->createView();
 
         return $responseData;
-    }
-
-    /**
-     * Get email list
-     * TODO: This is a temporary action created for demo purposes. It will be removed when 'display activities'
-     *       functionality is implemented
-     *
-     * @AclAncestor("oro_email_view")
-     * @Template
-     */
-    public function activitiesAction($emails)
-    {
-        return array(
-            'entities' => array()
-        );
     }
 
     /**
