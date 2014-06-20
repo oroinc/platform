@@ -1,0 +1,6 @@
+parameters:
+    oro_importexport.template_fixture.registry.class: Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry
+
+services:
+    oro_importexport.template_fixture.registry:
+        class: %oro_importexport.template_fixture.registry.class%

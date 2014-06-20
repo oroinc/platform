@@ -150,6 +150,10 @@ class FieldGenerator
         $viewConfigProvider = $this->configManager->getProvider('view');
         $viewFieldConfig = $viewConfigProvider->getConfig($entityClass, $fieldName);
         $viewFieldConfig->set('is_displayable', false);
+
+        $importExportConfigProvider = $this->configManager->getProvider('importexport');
+        $importExportFieldConfig = $importExportConfigProvider->getConfig($entityClass, $fieldName);
+        $importExportFieldConfig->set('excluded', true);
     }
 
     /**

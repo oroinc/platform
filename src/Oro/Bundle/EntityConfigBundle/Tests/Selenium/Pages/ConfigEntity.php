@@ -101,6 +101,17 @@ class ConfigEntity extends CustomEntity
         return $this;
     }
 
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function enableNotes($value = 'Yes')
+    {
+        $field = $this->test->select($this->test->byId('oro_entity_config_type_note_enabled'));
+        $field->selectOptionByLabel($value);
+        return $this;
+    }
+
     public function edit()
     {
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Edit')]")->click();
