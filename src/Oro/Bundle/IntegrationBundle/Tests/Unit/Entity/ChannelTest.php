@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\DataGridBundle\Common\Object;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Model\IntegrationSettings;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,8 +54,6 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
             'type'                => ['type', self::TEST_STRING, self::TEST_STRING],
             'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
-            'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
-            'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
             'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
         ];
     }
@@ -77,10 +75,9 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
         $value = $this->entity->getSynchronizationSettings();
         $this->assertNotEmpty($value);
 
-        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Model\IntegrationSettings', $value);
+        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\Object', $value);
 
-        $this->entity->setSynchronizationSettings(new IntegrationSettings());
-
+        $this->entity->setSynchronizationSettings(Object::create([]));
         $this->assertNotSame($value, $this->entity->getSynchronizationSettings());
     }
 }
