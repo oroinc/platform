@@ -61,7 +61,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                 'create_enabled' => true,
                 'create_acl' => null,
                 'create_form_route' => null,
-                'create_form_route_parameters' => null
+                'create_form_route_parameters' => array()
             )
         );
 
