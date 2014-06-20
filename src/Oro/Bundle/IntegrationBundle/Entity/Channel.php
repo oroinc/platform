@@ -223,6 +223,14 @@ class Channel
     }
 
     /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettingsReference()
+    {
+        return $this->synchronizationSettings;
+    }
+
+    /**
      * @param Status $status
      *
      * @return $this
