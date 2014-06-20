@@ -26,6 +26,10 @@ class SyncScheduler
     /** @var TypesRegistry */
     protected $typesRegistry;
 
+    /**
+     * @param EntityManager $em
+     * @param TypesRegistry $typesRegistry
+     */
     public function __construct(EntityManager $em, TypesRegistry $typesRegistry)
     {
         $this->em            = $em;
