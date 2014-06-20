@@ -213,13 +213,27 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected function getSearchQueryBuilder($search)
     {
-        return $this->em->createQueryBuilder()
-            ->select(['users'])
-            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
-            ->where('users.firstName like :searchString')
-            ->orWhere('users.lastName like :searchString')
-            ->orWhere('users.username like :searchString')
-            ->setParameter('searchString', $search . '%');
+        $words = explode(' ', $search);
+        if (count($words) == 2) {
+            $searchPart1 = $words[0];
+            $searchPart2 = $words[1];
+            $queryBuilder = $this->em->createQueryBuilder()
+                ->select(['users'])
+                ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
+                ->where('users.firstName like :searchStringPart1 AND users.lastName like :searchStringPart2')
+                ->orWhere('users.firstName like :searchStringPart2 AND users.lastName like :searchStringPart1')
+                ->setParameter('searchStringPart1', $searchPart1 . '%')
+                ->setParameter('searchStringPart2', $searchPart2 . '%');
+        } else {
+            $queryBuilder = $this->em->createQueryBuilder()
+                ->select(['users'])
+                ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
+                ->where('users.firstName like :searchString')
+                ->orWhere('users.lastName like :searchString')
+                ->orWhere('users.username like :searchString')
+                ->setParameter('searchString', $search . '%');
+        }
+        return $queryBuilder;
     }
 
     /**
