@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Util;
 
 class ReflectionUtil
 {
