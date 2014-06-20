@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -19,6 +20,9 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var  CoreAssetsHelper */
+    protected $assetHelper;
+
     /**
      * Setup test env
      */
@@ -28,7 +32,9 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()->getMock();
-        $this->type       = new IntegrationTypeSelectType($this->registry, $this->translator);
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
+            ->disableOriginalConstructor()->getMock();
+        $this->type       = new IntegrationTypeSelectType($this->registry, $this->translator, $this->assetHelper);
     }
 
     public function testSetDefaultOptions()
@@ -50,10 +56,15 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $choiceView = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\View\ChoiceView')
             ->disableOriginalConstructor()->getMock();
+        $choiceView->label = json_encode(['icon'=>'path/to/icon.png', 'label'=>'for.translation']);
         $choiceList->expects($this->once())
             ->method('getRemainingViews')
             ->will($this->returnValue([$choiceView]));
         $options['choice_list'] = $choiceList;
+        $this->translator->expects($this->once())
+            ->method('trans');
+        $this->assetHelper->expects($this->once())
+            ->method('getUrl');
         $this->type->buildView($view, $form, $options);
     }
 
@@ -66,5 +77,4 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('oro_integration_type_select', $this->type->getName());
     }
-
 }

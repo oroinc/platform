@@ -19,8 +19,14 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var CoreAssetsHelper */
     protected $assetHelper;
 
+    /**
+     * @param TypesRegistry       $registry
+     * @param TranslatorInterface $translator
+     * @param CoreAssetsHelper    $assetHelper
+     */
     public function __construct(TypesRegistry $registry, TranslatorInterface $translator, CoreAssetsHelper $assetHelper)
     {
         $this->registry = $registry;
