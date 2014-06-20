@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistry
@@ -63,20 +64,35 @@ class TypesRegistry
      */
     public function getAvailableChannelTypesChoiceList()
     {
-        $registry = $this;
-        $types    = $registry->getRegisteredChannelTypes();
-        $types    = $types->partition(
-            function ($key, ChannelInterface $type) use ($registry) {
-                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
-            }
-        );
-
         /** @var ArrayCollection $types */
-        $types  = $types[0];
+        $types  = $this->getAvailableChannelTypes();
         $keys   = $types->getKeys();
         $values = $types->map(
             function (ChannelInterface $type) {
                 return $type->getLabel();
+            }
+        )->toArray();
+
+        return array_combine($keys, $values);
+    }
+
+    /**
+     * Collect available types for choice field with icon
+     *
+     * @return array
+     */
+    public function getAvailableIntegrationTypesDetailedChoiceList()
+    {
+        /** @var ArrayCollection $types */
+        $types  = $this->getAvailableChannelTypes();
+        $keys   = $types->getKeys();
+        $values = $types->map(
+            function (ChannelInterface $type) {
+                $result = ['label' => $type->getLabel()];
+                if ($type instanceof IconAwareIntegrationInterface) {
+                    $result['icon'] = $type->getIcon();
+                }
+                return json_encode($result);
             }
         )->toArray();
 
@@ -298,5 +314,20 @@ class TypesRegistry
         )->toArray();
 
         return array_combine($keys, $values);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAvailableChannelTypes()
+    {
+        $registry = $this;
+        $types    = $registry->getRegisteredChannelTypes();
+        $types    = $types->partition(
+            function ($key, ChannelInterface $type) use ($registry) {
+                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
+            }
+        );
+        return $types[0];
     }
 }

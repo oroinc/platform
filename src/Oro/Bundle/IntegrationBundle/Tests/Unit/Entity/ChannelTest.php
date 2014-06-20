@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\DataGridBundle\Common\Object;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_STRING = 'testString';
+    const TEST_STRING  = 'testString';
     const TEST_BOOLEAN = true;
 
     /** @var array */
@@ -53,8 +54,6 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
             'type'                => ['type', self::TEST_STRING, self::TEST_STRING],
             'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
-            'syncPriority'        => ['syncPriority', self::TEST_STRING, self::TEST_STRING],
-            'isTwoWaySyncEnabled' => ['isTwoWaySyncEnabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
             'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
         ];
     }
@@ -69,5 +68,16 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
 
         $this->entity->clearTransport();
         $this->assertAttributeEmpty('transport', $this->entity);
+    }
+
+    public function testSynchronizationSettings()
+    {
+        $value = $this->entity->getSynchronizationSettings();
+        $this->assertNotEmpty($value);
+
+        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\Object', $value);
+
+        $this->entity->setSynchronizationSettings(Object::create([]));
+        $this->assertNotSame($value, $this->entity->getSynchronizationSettings());
     }
 }
