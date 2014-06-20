@@ -11,5 +11,7 @@ services:
 
     oro_importexport.form.type.full_option:
         class: %oro_importexport.form.type.full_option.class%
+        arguments:
+            - @oro_entity_extend.extend.field_type_helper
         tags:
             - { name: form.type, alias: oro_importexport_full_option }

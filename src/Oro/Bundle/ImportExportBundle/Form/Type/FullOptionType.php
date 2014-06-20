@@ -7,9 +7,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FullOptionType extends AbstractType
 {
+    /** @var  FieldTypeHelper */
+    protected $fieldTypeHelper;
+
+    public function __construct(FieldTypeHelper $fieldTypeHelper)
+    {
+        $this->fieldTypeHelper = $fieldTypeHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +57,10 @@ class FullOptionType extends AbstractType
      */
     public function isSingleRelation($type)
     {
-        return in_array($type, array('ref-one', 'oneToOne', 'manyToOne'));
+        return in_array(
+            $this->fieldTypeHelper->getUnderlyingType($type),
+            array('ref-one', 'oneToOne', 'manyToOne')
+        );
     }
 
     /**
@@ -57,6 +69,9 @@ class FullOptionType extends AbstractType
      */
     public function isMultipleRelation($type)
     {
-        return in_array($type, array('ref-many', 'oneToMany', 'manyToMany'));
+        return in_array(
+            $this->fieldTypeHelper->getUnderlyingType($type),
+            array('ref-many', 'oneToMany', 'manyToMany')
+        );
     }
 }

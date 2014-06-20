@@ -12,7 +12,7 @@ class FieldTypeHelper
     protected $typeMap = [
         'manyToOne' => [
             'attachment',
-            'attachmnetImage'
+            'attachmentImage'
         ]
     ];
 
