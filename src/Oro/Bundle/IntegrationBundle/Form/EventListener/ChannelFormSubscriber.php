@@ -239,7 +239,18 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             }
 
             $formType = $registry->getTransportType($channelType, $transportType)->getSettingsFormType();
+
+            $connectorsKey = 'connectors';
+            $children      = $form->getIterator();
+
             $form->add('transport', $formType, ['required' => true]);
+
+            // re-add connectors to the end of list
+            if (isset($children[$connectorsKey])) {
+                $connectors = $children[$connectorsKey];
+                unset($children[$connectorsKey]);
+                $children[$connectorsKey] = $connectors;
+            }
         };
     }
 
