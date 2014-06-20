@@ -37,9 +37,9 @@ should be performed - immediately or after some delay (and size of this delay in
 
 * **Job** - entity that contain information special to perform process when it should be started after some delay
 (in that case will be created job in JMS). According to event will be saved different data:
-    - create event - will be saved identity of the specific entity;
-    - update event - will be saved identity of the specific entity and old and new states of the updated field;
-    - delete event - will be saved all entity data (scalar values and managed by doctrine objects, without references).
+    - ``create`` event - will be saved identity of the specific entity;
+    - ``update`` event - will be saved identity of the specific entity and old and new states of the updated field;
+    - ``delete`` event - will be saved all entity data (scalar values and managed by doctrine objects, without references).
 Also each job entity contains relation on the trigger, that was creating this job and entity hash (full class name
 of the related entity and identity of the specific entity). This entity hash is needed to provide possibility to easy
 and fast find all registered jobs for the same specific entity.
@@ -122,6 +122,6 @@ First of them will be performed immediately after the contact will be created, s
 new process job and then job will be placed to JMS queue, where job will be performed after delay in ``60`` seconds.
 
 **Note:** If you want to test this process configuration in real application, you can put this configuration in file
-Oro/Bundle/WorkflowBundle/Resources/config/process.yml, reload definitions using console command
+``Oro/Bundle/WorkflowBundle/Resources/config/process.yml``, reload definitions using console command
 ``app/console oro:process:configuration:load``
 after that you can go to ``Contact`` view page and test it.

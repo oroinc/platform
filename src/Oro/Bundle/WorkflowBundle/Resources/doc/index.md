@@ -1,5 +1,5 @@
 OroWorkflowBundle Documentation
 ===============================
 
-- [Workflow Documentation](./workflow/index.md)
-- [Processes Documentation](./processes/index.md)
+- [Workflow Documentation](./reference/workflow/index.md)
+- [Processes Documentation](./reference/processes/index.md)
