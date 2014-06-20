@@ -12,7 +12,7 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
         $normalizedData = array();
 
         foreach ($object as $key => $value) {
-            $normalizedData[$key] = $this->serializer->normalize($value, $context);
+            $normalizedData[$key] = $this->serializer->normalize($value, $format, $context);
         }
 
         return $normalizedData;

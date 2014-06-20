@@ -1,344 +1,157 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer;
 
 class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASS_NAME   = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-    const ENTITY_CLASS = 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition';
-    const ENTITY_ID    = 'name';
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $registry;
-
-    /**
-     * @var ProcessDataNormalizer
-     */
-    protected $normalizer;
+    protected $doctrineHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $serializer;
 
+    /**
+     * @var ProcessDataNormalizer
+     */
+    protected $normalizer;
+
     protected function setUp()
     {
-        $this->markTestIncomplete('Should be fixed in scope of CRM-763');
-
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->serializer = $this->getMockForAbstractClass('Symfony\Component\Serializer\SerializerInterface');
-        $this->normalizer = new ProcessDataNormalizer($this->registry);
-    }
+        $this->serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    /**
-     * @dataProvider denormalizeException
-     */
-    public function testDenormalizeException($data, $context, $exceptionType, $exceptionMessage)
-    {
-        $this->setExpectedException($exceptionType, $exceptionMessage);
-        $this->normalizer->denormalize($data, self::CLASS_NAME, 'json', $context);
-    }
-
-    public function denormalizeException()
-    {
-        $unexpectedEvent = 'some-test-unexpected-event';
-        return array(
-            'empty entity' => array(
-                'data'             => array('entity' => null),
-                'context'          => array('processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_DELETE)),
-                'exceptionType'    => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Invalid process job data for the delete event. Entity can not be empty.'
-            ),
-            'wrong entity format' => array(
-                'data'             => array('entity' => 'some-string'),
-                'context'          => array('processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_DELETE)),
-                'exceptionType'    => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Invalid process job data for the delete event. Entity must be an object.'
-            ),
-            'unexpected event' => array(
-                'data'             => array('entity' => 'some-string'),
-                'context'          => array('processJob' => $this->getMockProcessJob($unexpectedEvent)),
-                'exceptionType'    => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
-                'exceptionMessage' => sprintf('Got invalid or unregister event "%s"', $unexpectedEvent)
-            )
-        );
-    }
-
-    /**
-     * @dataProvider denormalizeDataProvider
-     */
-    public function testDenormalize($normalizedData, $denormalizedData, $context = array())
-    {
+        $this->normalizer = new ProcessDataNormalizer($this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
-
-        $this->assetReflectionMockForDenormalization($denormalizedData['entity']);
-
-        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        if (empty($context) || $context['event'] == ProcessTrigger::EVENT_DELETE) {
-            $repository->expects($this->never())
-                ->method('findEntity');
-            $this->registry->expects($this->never())
-                ->method('getRepository');
-        } else {
-            $repository->expects($this->once())
-                ->method('findEntity')
-                ->will($this->returnValue($denormalizedData['entity']));
-
-            $this->registry->expects($this->once())
-                ->method('getRepository')
-                ->with('OroWorkflowBundle:ProcessJob')
-                ->will($this->returnValue($repository));
-        }
-
-        $this->assertEquals(
-            $denormalizedData,
-            $this->normalizer->denormalize($normalizedData, self::CLASS_NAME, 'json', $context)
-        );
-    }
-
-    public function denormalizeDataProvider()
-    {
-        $denormalizedEntity = $this->createEntity();
-        $normalizedEntity   = $this->normalizeEntity($denormalizedEntity);
-        $data = array(
-            'entity' => $normalizedEntity,
-            'new' => array(
-                'new_attribute1' => 'value1',
-                'new_attribute2' => 'value2'
-            ),
-            'old' => array(
-                'old_attribute1' => 'value1',
-                'old_attribute2' => 'value2'
-            )
-        );
-        return array(
-            'without context' => array(
-                'normalizedData'   => $data,
-                'denormalizedData' => new ProcessData(array(
-                    'entity' => $denormalizedEntity,
-                    'new' => array(
-                        'new_attribute1' => 'value1',
-                        'new_attribute2' => 'value2'
-                    ),
-                    'old' => array(
-                        'old_attribute1' => 'value1',
-                        'old_attribute2' => 'value2'
-                    )
-                ))
-            ),
-            'create event' => array(
-                'normalizedData'   => $data,
-                'denormalizedData' => new ProcessData(array(
-                    'entity' => $denormalizedEntity,
-                    'old'    => null,
-                    'new'    => null
-                )),
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_CREATE,
-                    'processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_CREATE)
-                )
-            ),
-            'update event' => array(
-                'normalizedData'   => $data,
-                'denormalizedData' => new ProcessData(array(
-                    'entity' => $denormalizedEntity,
-                    'new' => array(
-                        'new_attribute1' => 'value1',
-                        'new_attribute2' => 'value2'
-                    ),
-                    'old' => array(
-                        'old_attribute1' => 'value1',
-                        'old_attribute2' => 'value2'
-                    )
-                )),
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_UPDATE,
-                    'processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_UPDATE)
-                )
-            ),
-            'delete event' => array(
-                'normalizedData'   => $data,
-                'denormalizedData' => new ProcessData(array(
-                    'entity' => $denormalizedEntity,
-                    'old'    => null,
-                    'new'    => null
-                )),
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_DELETE,
-                    'processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_DELETE)
-                )
-            )
-        );
     }
 
     /**
+     * @param ProcessData $object
+     * @param array $context
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize($denormalizedValue, $normalizedValue, $context = array())
+    public function testNormalize($object, array $context)
     {
-        $this->normalizer->setSerializer($this->serializer);
+        $entity = $object['data'];
+        $entityId = 1;
+        $format = 'json';
+        /** @var ProcessJob $processJob */
+        $processJob = $context['processJob'];
+        $triggerEvent = $processJob->getProcessTrigger()->getEvent();
 
-        if (!empty($denormalizedValue['entity'])) {
-            $this->assetReflectionMockForNormalization($denormalizedValue['entity'], $context);
+        $normalizedData = array('serialized', 'data');
+
+        if ($triggerEvent == ProcessTrigger::EVENT_DELETE) {
+            $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
+        } else {
+            $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity)
+                ->will($this->returnValue($entityId));
         }
 
-        $this->assertEquals($normalizedValue, $this->normalizer->normalize($denormalizedValue, 'json', $context));
-    }
+        $this->serializer->expects($this->once())->method('normalize')
+            ->with($object->getValues(), $format, $context)->will($this->returnValue($normalizedData));
 
-    public function normalizeDataProvider()
-    {
-        $simple     = array('test_attribute' => 'value');
-        $complexity = array(
-            'new' => array(
-                'new_attribute1' => 'value1',
-                'new_attribute2' => 'value2'
-            ),
-            'old' => array(
-                'old_attribute1' => 'value1',
-                'old_attribute2' => 'value2'
-            )
-        );
-
-        $entity              = $this->createEntity();
-        $normalizedForDelete = array('entity' => $this->normalizeEntity($entity));
-        $normalizedForFull   = array_merge($normalizedForDelete, $complexity);
-        $normalizedForCreate = array(
-            'entity' => array(
-                'className' => self::ENTITY_CLASS,
-                'classData' => array(self::ENTITY_ID => $entity->getName())
-            ),
-        );
-        $normalizedForUpdate = array_merge($normalizedForCreate, $complexity);
-        $denormalizedEntity  = array_merge(array('entity' => $entity), $complexity);
-
-        return array(
-            'simple' => array(
-                'denormalizedData' => new ProcessData($simple),
-                'normalizedData'   => $simple,
-            ),
-            'more complexity' => array(
-                'denormalizedData' => new ProcessData($complexity),
-                'normalizedData'   => $complexity,
-            ),
-            'with entity without context' => array(
-                'denormalizedData' => new ProcessData($denormalizedEntity),
-                'normalizedData'   => $normalizedForFull,
-            ),
-            'with entity event create' => array(
-                'denormalizedData' => new ProcessData($denormalizedEntity),
-                'normalizedData'   => $normalizedForCreate,
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_CREATE,
-                    'processJob' => $this->getMockProcessJob(
-                        ProcessTrigger::EVENT_CREATE,
-                        $entity->getName()
-                    )
-                )
-            ),
-            'with entity event update' => array(
-                'denormalizedData' => new ProcessData($denormalizedEntity),
-                'normalizedData'   => $normalizedForUpdate,
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_UPDATE,
-                    'processJob' => $this->getMockProcessJob(
-                        ProcessTrigger::EVENT_UPDATE,
-                        $entity->getName()
-                    )
-                )
-            ),
-            'with entity event delete' => array(
-                'denormalizedData' => new ProcessData($denormalizedEntity),
-                'normalizedData'   => $normalizedForDelete,
-                'context' => array(
-                    'event'      => ProcessTrigger::EVENT_DELETE,
-                    'processJob' => $this->getMockProcessJob(ProcessTrigger::EVENT_DELETE)
-                )
-            ),
-        );
-    }
-
-    protected function createEntity()
-    {
-        $attributes = array(
-            'createdAt'           => new \DateTime('yesterday'),
-            'configuration'       => array('first', 'second', 'third'),
-            'entityAcls'          => new ArrayCollection(array('acl1', 'acl2', 'acl3')),
-            'entityAttributeName' => 'testEntityAttributeName',
-            'label'               => 'testStepLabel',
-            'name'                => 'testStepName',
-            'relatedEntity'       => 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger',
-            'startStep'           => $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep'),
-            'steps'               => new ArrayCollection(array('step1', 'step2', 'step3')),
-            'stepsDisplayOrdered' => false,
-            'system'              => true,
-            'updatedAt'           => new \DateTime('now'),
-        );
-        $reflection = new \ReflectionClass(self::ENTITY_CLASS);
-        $entity     = $reflection->newInstanceWithoutConstructor();
-
-        foreach ($attributes as $name => $value) {
-            $reflectionProperty = new \ReflectionProperty($entity, $name);
-            $reflectionProperty->setAccessible(true);
-            $reflectionProperty->setValue($entity, $value);
+        $this->assertEquals($normalizedData, $this->normalizer->normalize($object, $format, $context));
+        if ($triggerEvent == ProcessTrigger::EVENT_DELETE) {
+            $this->assertNull($processJob->getEntityId());
+        } else {
+            $this->assertEquals($entityId, $processJob->getEntityId());
         }
-
-        return $entity;
-    }
-
-    protected function normalizeEntity($entity)
-    {
-        $normalizedData = array(
-            'className' => ClassUtils::getClass($entity),
-            'classData' => array()
-        );
-        $reflection = new \ReflectionClass($entity);
-        $properties = $reflection->getProperties();
-
-        foreach ($properties as $property) {
-            $name = $property->getName();
-            $reflection = new \ReflectionProperty($entity, $name);
-            $reflection->setAccessible(true);
-            $attribute = $reflection->getValue($entity);
-            if (is_object($attribute)) {
-                // $attribute = array(ProcessDataNormalizer::SERIALIZED => base64_encode(serialize($attribute)));
-            }
-            $normalizedData['classData'][$name] = is_object($attribute) ? null : $attribute;
-        }
-
-        return $normalizedData;
     }
 
     /**
-     * @dataProvider supportsDenormalizationDataProvider
+     * @return array
      */
-    public function testSupportsDenormalization($type, $expected)
-    {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization('any_value', $type));
-    }
-
-    public function supportsDenormalizationDataProvider()
+    public function normalizeDataProvider()
     {
         return array(
-            'null'        => array(null, false),
-            'string'      => array('string', false),
-            'dateTime'    => array('DateTime', false),
-            'processData' => array(self::CLASS_NAME, true),
-            'stdClass'    => array('stdClass', false),
+            'create' => array(
+                'object' => new ProcessData(array('data' => new \stdClass())),
+                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE)),
+            ),
+            'update' => array(
+                'object' => new ProcessData(array('data' => new \stdClass(), 'old' => 1, 'new' => 2)),
+                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_UPDATE)),
+            ),
+            'delete' => array(
+                'object' => new ProcessData(array('data' => new \stdClass())),
+                'context' => array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)),
+            ),
         );
+    }
+
+    /**
+     * @param ProcessData $object
+     * @param array $context
+     * @param string $exception
+     * @param string $message
+     * @dataProvider normalizeExceptionDataProvider
+     */
+    public function testNormalizeException($object, array $context, $exception, $message)
+    {
+        $this->setExpectedException($exception, $message);
+        $this->normalizer->normalize($object, 'json', $context);
+    }
+
+    /**
+     * @return array
+     */
+    public function normalizeExceptionDataProvider()
+    {
+        return array(
+            'no process job' => array(
+                'object'    => new ProcessData(array('data' => new \stdClass())),
+                'context'   => array(),
+                'exception' => '\LogicException',
+                'message'   => 'Process job is not defined',
+            ),
+            'invalid process job' => array(
+                'object'    => new ProcessData(array('data' => new \stdClass())),
+                'context'   => array('processJob' => new \stdClass()),
+                'exception' => '\LogicException',
+                'message'   => 'Invalid process job entity',
+            ),
+            'no entity' => array(
+                'object'    => new ProcessData(),
+                'context'   => array('processJob' => new ProcessJob()),
+                'exception' => '\LogicException',
+                'message'   => 'Process entity is not specified',
+            ),
+        );
+    }
+
+    public function testDenormalize()
+    {
+        $data = array('data' => new \stdClass(), 'old' => 1, 'new' => 2);
+        $class = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
+        $format = 'json';
+        $context = array('processJob' => new ProcessJob());
+        $denormalizedData = array('denormalized', 'data');
+
+        $this->serializer->expects($this->once())->method('denormalize')->with($data, null, $format, $context)
+            ->will($this->returnValue($denormalizedData));
+
+        /** @var ProcessData $processData */
+        $processData = $this->normalizer->denormalize($data, $class, $format, $context);
+        $this->assertInstanceOf($class, $processData);
+        $this->assertFalse($processData->isModified());
     }
 
     /**
@@ -346,7 +159,7 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsNormalization($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data, 'anyValue'));
+        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
     public function supportsNormalizationDataProvider()
@@ -360,147 +173,41 @@ class ProcessDataNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function assetReflectionMockForDenormalization($entity)
+    /**
+     * @dataProvider supportsDenormalizationDataProvider
+     */
+    public function testSupportsDenormalization($type, $expected)
     {
-        $className  = ClassUtils::getClass($entity);
-        $reflection = new \ReflectionClass($entity);
-        $properties = $reflection->getProperties();
-
-        $classMetadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($className)
-            ->will($this->returnValue($classMetadata));
-        $entityManager->expects($this->never())->method('getUnitOfWork');
-
-        $classMetadata->expects($this->any())
-            ->method('getReflectionClass')
-            ->will($this->returnValue($entity));
-        $classMetadata->expects($this->any())
-            ->method('getReflectionProperty')
-            ->will($this->returnCallback(
-                function ($propertyName) use ($properties) {
-                    foreach ($properties as $property) {
-                        if ($property->getName() == $propertyName) {
-                            return $property;
-                        }
-                    }
-                    return false;
-                }
-            ));
-
-        $this->registry->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization(array(), $type));
     }
 
-    protected function assetReflectionMockForNormalization($entity, $context = array())
+    public function supportsDenormalizationDataProvider()
     {
-        $className  = ClassUtils::getClass($entity);
-        $fields     = $this->getFields($entity);
-
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $unitOfWork->expects($this->exactly(empty($context) ? 0 : 2))
-            ->method('propertyChanged')
-            ->will($this->returnSelf());
-
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($className)
-            ->will($this->returnValue($classMetadata));
-        $entityManager->expects($this->any())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
-
-        if (empty($context) || $context['event'] == ProcessTrigger::EVENT_DELETE) {
-            $classMetadata->expects($this->never())->method('getIdentifierFieldNames');
-            $classMetadata->expects($this->any())
-                ->method('getFieldNames')
-                ->will($this->returnValue(array_keys($fields)));
-            $classMetadata->expects($this->any())
-                ->method('getFieldValue')
-                ->will($this->returnCallback(function ($entity, $name) use ($fields) {
-                    return isset($fields[$name]) ? $fields[$name] : null;
-                }));
-            $classMetadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $classMetadataFactory->expects($this->any())
-                ->method('getAllMetadata')
-                ->will($this->returnValue(array()));
-
-            $entityManager->expects($this->any())
-                ->method('getMetadataFactory')
-                ->will($this->returnValue($classMetadataFactory));
-        } else {
-            $classMetadata->expects($this->once())
-                ->method('getIdentifierFieldNames')
-                ->will($this->returnValue(array(self::ENTITY_ID)));
-            $classMetadata->expects($this->never())->method('getFieldNames');
-            $classMetadata->expects($this->once())
-                ->method('getFieldValue')
-                ->will($this->returnValue($fields[self::ENTITY_ID]));
-        }
-
-        $this->registry->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($entityManager));
+        return array(
+            'null'        => array(null, false),
+            'string'      => array('string', false),
+            'dateTime'    => array('DateTime', false),
+            'processData' => array('Oro\Bundle\WorkflowBundle\Model\ProcessData', true),
+            'stdClass'    => array('stdClass', false),
+        );
     }
 
     /**
      * @param string $event
-     * @param string $id
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ProcessJob
      */
-    protected function getMockProcessJob($event, $id = null)
+    protected function createProcessJob($event)
     {
-        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
-        $processTrigger->expects($this->once())
-            ->method('getEvent')
-            ->will($this->returnValue($event));
+        $definition = new ProcessDefinition();
+        $definition->setRelatedEntity('Test\Entity');
 
-        $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
-        $processJob->expects($this->once())
-            ->method('getProcessTrigger')
-            ->will($this->returnValue($processTrigger));
-        $processJob->expects($this->any())
-            ->method('getEntityId')
-            ->will($this->returnValue($id));
+        $trigger = new ProcessTrigger();
+        $trigger->setDefinition($definition)
+            ->setEvent($event);
 
-        return $processJob;
-    }
+        $job = new ProcessJob();
+        $job->setProcessTrigger($trigger);
 
-    /**
-     * @param object $entity
-     * @return array
-     */
-    protected function getFields($entity)
-    {
-        $reflection = new \ReflectionClass($entity);
-        $properties = $reflection->getProperties();
-        $fields = array();
-
-        foreach ($properties as $property) {
-            $property->setAccessible(true);
-            $name = $property->getName();
-            $fields[$name] = $property->getValue($entity);
-        }
-
-        return $fields;
+        return $job;
     }
 }
