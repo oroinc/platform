@@ -550,13 +550,13 @@ disabled look for disabled choices in the results dropdown
 .select2-offscreen, .select2-offscreen:focus {
   clip: rect(0 0 0 0);
   border: none !important;
-  width: 1px;
-  height: 1px;
-  border: 0;
-  margin: 0;
-  padding: 0;
+  width: 1px !important;
+  height: 1px !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   overflow: hidden;
-  position: absolute;
+  position: absolute !important;
   outline: 0;
   left: 0px;
 }
@@ -638,4 +638,20 @@ disabled look for disabled choices in the results dropdown
       }
     }
   }
+}
+
+.input-prepend .select2-container,
+.input-append .select2-container {
+  width: 264px;
+  height: 28px;
+}
+
+.input-append .select2-container {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-prepend .select2-container {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }

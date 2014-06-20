@@ -48,8 +48,8 @@ class UpdateHandler
     /**
      * @param object $entity
      * @param FormInterface $form
-     * @param array $saveAndStayRoute
-     * @param array $saveAndCloseRoute
+     * @param array|callable $saveAndStayRoute
+     * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
      * @param null $formHandler
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -57,8 +57,8 @@ class UpdateHandler
     public function handleUpdate(
         $entity,
         FormInterface $form,
-        array $saveAndStayRoute,
-        array $saveAndCloseRoute,
+        $saveAndStayRoute,
+        $saveAndCloseRoute,
         $saveMessage,
         $formHandler = null
     ) {
@@ -103,16 +103,16 @@ class UpdateHandler
     /**
      * @param FormInterface $form
      * @param object $entity
-     * @param array $saveAndStayRoute
-     * @param array $saveAndCloseRoute
+     * @param array|callable $saveAndStayRoute
+     * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function processSave(
         FormInterface $form,
         $entity,
-        array $saveAndStayRoute,
-        array $saveAndCloseRoute,
+        $saveAndStayRoute,
+        $saveAndCloseRoute,
         $saveMessage
     ) {
         if ($this->request->get('_wid')) {
@@ -123,6 +123,12 @@ class UpdateHandler
             );
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);
+            if (is_callable($saveAndStayRoute)) {
+                $saveAndStayRoute = call_user_func($saveAndStayRoute, $entity);
+            }
+            if (is_callable($saveAndCloseRoute)) {
+                $saveAndCloseRoute = call_user_func($saveAndCloseRoute, $entity);
+            }
             return $this->router->redirectAfterSave($saveAndStayRoute, $saveAndCloseRoute, $entity);
         }
     }
