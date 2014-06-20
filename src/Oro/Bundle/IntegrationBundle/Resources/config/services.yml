@@ -46,6 +46,7 @@ services:
         arguments:
             - @oro_integration.manager.types_registry
             - @oro_security.security_facade
+            - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 

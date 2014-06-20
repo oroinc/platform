@@ -20,6 +20,11 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     protected $backendToFrontendHeader;
 
     /**
+     * @var array
+     */
+    protected $headerConversionRules;
+
+    /**
      * {@inheritDoc}
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
@@ -119,6 +124,18 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     }
 
     /**
+     * @return array
+     */
+    protected function receiveHeaderConversionRules()
+    {
+        if (null === $this->headerConversionRules) {
+            $this->headerConversionRules = $this->getHeaderConversionRules();
+        }
+
+        return $this->headerConversionRules;
+    }
+
+    /**
      * @param array $backendHeader
      * @return array
      */
@@ -143,7 +160,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     protected function convertHeader(array $header, $direction)
     {
-        $conversionRules = $this->getHeaderConversionRules();
+        $conversionRules = $this->receiveHeaderConversionRules();
         $result = array();
 
         foreach ($header as $hint) {
