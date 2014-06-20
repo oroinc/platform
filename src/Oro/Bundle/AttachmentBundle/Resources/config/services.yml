@@ -6,6 +6,8 @@ parameters:
     oro_attachment.entity_extend.dumper_extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentExtendConfigDumperExtension
     oro_attachment.migration.extension.attachment.class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
+    oro_attachment.serializer.attachment_normalizer:     Oro\Bundle\AttachmentBundle\ImportExport\AttachmentNormalizer
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -39,3 +41,8 @@ services:
             - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
+
+    oro_attachment.serializer.attachment_normalizer:
+        class: %oro_attachment.serializer.attachment_normalizer%
+        tags:
+            - { name: oro_importexport.normalizer}
