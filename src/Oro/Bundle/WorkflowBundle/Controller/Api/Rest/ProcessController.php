@@ -72,12 +72,7 @@ class ProcessController extends FOSRestController
      *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ApiDoc(description="Deactivate process", resource=true)
-     * @Acl(
-     *      id="oro_process_definition_update",
-     *      type="entity",
-     *      class="OroWorkflowBundle:ProcessDefinition",
-     *      permission="EDIT"
-     * )
+     * @AclAncestor("oro_process_definition_update")
      *
      * @param ProcessDefinition $processDefinition
      * @return Response
