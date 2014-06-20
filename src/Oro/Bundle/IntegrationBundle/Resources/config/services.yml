@@ -24,6 +24,8 @@ parameters:
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
 
+    oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
+
     #Reader
 
 services:
@@ -144,3 +146,14 @@ services:
     oro_integration.sync_scheduler.link:
         tags:
             - { name: oro_service_link,  service: oro_integration.sync_scheduler }
+
+
+    oro_integration.form.type.oro_integration_type_select:
+        class: %oro_integration.form.type.oro_integration_type_select.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @translator
+            - @templating.helper.assets
+        scope: request
+        tags:
+            - { name: form.type, alias: oro_integration_type_select }
