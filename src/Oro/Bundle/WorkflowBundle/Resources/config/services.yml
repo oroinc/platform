@@ -1,35 +1,18 @@
 parameters:
-    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
-    oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
-    oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
-    oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
-    oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
-    oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
     oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
+    oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
+    oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
+    oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
+    oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
+    oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
+    oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
+    oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
+    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+    oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
 
 services:
-    oro_workflow.context_accessor:
-        class: %oro_workflow.context_accessor.class%
-
-    oro_workflow.entity_connector:
-        class: %oro_workflow.entity_connector.class%
-
-    oro_workflow.registry:
-        class: %oro_workflow.registry.class%
-        arguments:
-            - @doctrine
-            - @oro_workflow.workflow_assembler
-            - @oro_entity_config.provider.workflow
-
-    oro_workflow.manager:
-        class: %oro_workflow.manager.class%
-        arguments:
-            - @doctrine
-            - @oro_workflow.registry
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.config_manager
-
     oro_workflow.attribute_guesser:
         class: %oro_workflow.attribute_guesser.class%
         arguments:
@@ -66,8 +49,47 @@ services:
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
 
+    oro_workflow.context_accessor:
+        class: %oro_workflow.context_accessor.class%
+
     oro_workflow.datagrid.action.workflow_activate:
         class: %oro_workflow.datagrid.action.workflow_activate.class%
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: workflow-activate }
+
+    oro_workflow.entity_connector:
+        class: %oro_workflow.entity_connector.class%
+
+    oro_workflow.manager:
+        class: %oro_workflow.manager.class%
+        arguments:
+            - @doctrine
+            - @oro_workflow.registry
+            - @oro_entity.doctrine_helper
+            - @oro_entity_config.config_manager
+
+    oro_workflow.process.process_factory:
+        class: %oro_workflow.process.process_factory.class%
+        arguments:
+            - @oro_workflow.action_assembler
+
+    oro_workflow.process.process_handler:
+        class: %oro_workflow.process.process_handler.class%
+        arguments:
+            - @oro_workflow.process.process_factory
+            - @oro_workflow.process.logger
+
+    oro_workflow.process.logger:
+        class: %oro_workflow.process.logger.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @?logger
+
+    oro_workflow.registry:
+        class: %oro_workflow.registry.class%
+        arguments:
+            - @doctrine
+            - @oro_workflow.workflow_assembler
+            - @oro_entity_config.provider.workflow
+

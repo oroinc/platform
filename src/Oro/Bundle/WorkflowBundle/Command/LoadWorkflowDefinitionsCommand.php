@@ -11,7 +11,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
@@ -67,7 +66,6 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
             $configurationBuilder = $container->get('oro_workflow.configuration.builder.workflow_definition');
             $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
-            /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
             $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
             foreach ($workflowDefinitions as $workflowDefinition) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));

@@ -187,6 +187,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 )
             )
             ->runCommand(
+                'oro:process:configuration:load',
+                array(
+                    '--process-isolation' => true
+                )
+            )
+            ->runCommand(
                 'oro:migration:data:load',
                 array(
                     '--process-isolation' => true,

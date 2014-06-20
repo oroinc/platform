@@ -60,8 +60,8 @@ class ActionAssembler extends AbstractAssembler
      */
     public function assemble(array $configuration)
     {
-        /** @var TreeExecutor $treePostAction */
-        $treePostAction = $this->actionFactory->create(
+        /** @var TreeExecutor $treeAction */
+        $treeAction = $this->actionFactory->create(
             TreeExecutor::ALIAS,
             array(),
             $this->createConfigurableCondition($configuration)
@@ -77,22 +77,22 @@ class ActionAssembler extends AbstractAssembler
                 $serviceName = $this->getServiceName($actionType);
 
                 if ($serviceName == TreeExecutor::ALIAS) {
-                    $postAction = $this->assemble($options);
+                    $action = $this->assemble($options);
                 } else {
                     $actionParameters = $this->getOption($options, self::PARAMETERS_KEY, $options);
                     $passedActionParameters = $this->passConfiguration($actionParameters);
-                    $postAction = $this->actionFactory->create(
+                    $action = $this->actionFactory->create(
                         $serviceName,
                         $passedActionParameters,
                         $this->createConfigurableCondition($options)
                     );
                 }
 
-                $treePostAction->addAction($postAction, $breakOnFailure);
+                $treeAction->addAction($action, $breakOnFailure);
             }
         }
 
-        return $treePostAction;
+        return $treeAction;
     }
 
     /**
