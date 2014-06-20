@@ -24,17 +24,6 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        $denormalizedData = $this->serializer->denormalize($data, null, $format, $context);
-        $denormalizedData = $denormalizedData ?: array();
-
-        return new ProcessData($denormalizedData);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function normalize($object, $format = null, array $context = array())
     {
         /** @var ProcessData $object */
@@ -55,11 +44,14 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function denormalize($data, $class, $format = null, array $context = array())
     {
-        return $this->supportsClass($type);
+        $denormalizedData = $this->serializer->denormalize($data, null, $format, $context);
+        $denormalizedData = $denormalizedData ?: array();
+
+        return new ProcessData($denormalizedData);
     }
 
     /**
@@ -68,6 +60,14 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     public function supportsNormalization($data, $format = null)
     {
         return is_object($data) && $this->supportsClass($this->getClass($data));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return $this->supportsClass($type);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 class ProcessEntityNormalizer extends AbstractProcessNormalizer
 {
     /**
-     * @var Registry
+     * @var ManagerRegistry
      */
     protected $registry;
 
@@ -21,10 +21,10 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     protected $doctrineHelper;
 
     /**
-     * @param Registry $registry
+     * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(Registry $registry, DoctrineHelper $doctrineHelper)
+    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
