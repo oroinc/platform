@@ -2,6 +2,7 @@ parameters:
     oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
+    oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
     oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
 
     oro_integration.form.subscriber.channel_subscriber.class:             Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
@@ -55,6 +56,16 @@ services:
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 
+    oro_integration.form.type.oro_integration_type_select:
+        class: %oro_integration.form.type.oro_integration_type_select.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @translator
+            - @templating.helper.assets
+        scope: request
+        tags:
+            - { name: form.type, alias: oro_integration_type_select }
+            
     oro_integration.form.subscriber.channel_subscriber:
         class: %oro_integration.form.subscriber.channel_subscriber.class%
         arguments:
@@ -183,3 +194,4 @@ services:
         class: %oro_integration.utils.form_utils.class%
         arguments:
             - @oro_integration.manager.types_registry
+
