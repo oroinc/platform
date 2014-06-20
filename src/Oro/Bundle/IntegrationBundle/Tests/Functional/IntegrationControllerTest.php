@@ -12,7 +12,7 @@ use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusines
  * @outputBuffering enabled
  * @dbIsolation
  */
-class ChannelControllersTest extends WebTestCase
+class IntegrationControllerTest extends WebTestCase
 {
     protected function setUp()
     {

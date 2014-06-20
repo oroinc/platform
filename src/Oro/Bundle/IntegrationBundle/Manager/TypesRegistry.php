@@ -13,7 +13,7 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 class TypesRegistry
 {
     /** @var ArrayCollection|ChannelInterface[] */
-    protected $channelTypes = [];
+    protected $integrationTypes = [];
 
     /** @var array|ArrayCollection[] */
     protected $transportTypes = [];
@@ -23,7 +23,7 @@ class TypesRegistry
 
     public function __construct()
     {
-        $this->channelTypes = new ArrayCollection();
+        $this->integrationTypes = new ArrayCollection();
     }
 
     /**
@@ -37,8 +37,8 @@ class TypesRegistry
      */
     public function addChannelType($typeName, ChannelInterface $type)
     {
-        if (!$this->channelTypes->containsKey($typeName)) {
-            $this->channelTypes->set($typeName, $type);
+        if (!$this->integrationTypes->containsKey($typeName)) {
+            $this->integrationTypes->set($typeName, $type);
         } else {
             throw new \LogicException(sprintf('Trying to redeclare integration type "%s".', $typeName));
         }
@@ -53,7 +53,7 @@ class TypesRegistry
      */
     public function getRegisteredChannelTypes()
     {
-        return $this->channelTypes;
+        return $this->integrationTypes;
     }
 
     /**
