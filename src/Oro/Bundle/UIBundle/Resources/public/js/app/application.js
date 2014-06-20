@@ -14,6 +14,7 @@ define([
             Chaplin.mediator.setHandler('retrievePath', this.retrievePath, this);
             Chaplin.mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
             Chaplin.mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
+            Chaplin.mediator.setHandler('redirectTo', Chaplin.utils.redirectTo);
             Application.__super__.initialize.apply(this, arguments);
         },
 

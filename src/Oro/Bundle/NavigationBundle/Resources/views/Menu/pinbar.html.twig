@@ -8,12 +8,17 @@
         {%- endif %}
     {%- endfor %}
     {%- if options %}
-        {{- options|json_encode|raw -}}
+        {{- options|json_encode -}}
     {% endif %}
 {% endmacro %}
 
+{% block root %}
+    {% if isDesktopVersion() %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
 {% block list %}
-    <ul class="extra-list"></ul>
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
         {% set pinbarItems = [] %}
         {% for pinbarItem in item.children %}
@@ -23,22 +28,8 @@
         {% endfor %}
     {% endif %}
     {% import _self as pinbar %}
-    <script type="text/javascript">
-        require(['jquery', 'oronavigation/js/pinbar/view', 'oronavigation/js/navigation', 'oroui/js/tools'],
-                function ($, PinbarView, Navigation, tools) {
-            if (tools.isMobile()) {
-                return;
-            }
-
-            $(function () {
-                /** @type {oronavigation.pinbar.View} */
-                var pinbarView = new PinbarView({{- pinbar.get_options(['maxPinbarItems', 'el', 'listBar', 'tabTitle', 'tabIcon', 'minimizeButton', 'closeButton', 'defaultUrl'], options) -}});
-                Navigation.registerPinbarView(pinbarView);
-
-                {% if pinbarItems is defined %}
-                pinbarView.resetCollection({{ pinbarItems|json_encode|raw }});
-                {% endif %}
-            });
-        });
-    </script>
+    {% set frontendOptions = ['maxPinbarItems', 'el', 'listBar', 'tabTitle', 'tabIcon', 'minimizeButton', 'closeButton', 'defaultUrl'] %}
+    <div data-data="{{ pinbarItems|json_encode }}" data-options="{{- pinbar.get_options(frontendOptions, options) -}}"></div>
+    <ul class="extra-list"></ul>
+    <div class="dot-menu-empty-message">{{ 'No items'|trans|raw }}</div>
 {% endblock %}

@@ -191,9 +191,11 @@ define([
 
     // handles page update
     mediator.on('page:update', function (page, args) {
+        var options;
         current.page = page;
+        options = args.options;
         // if it's forced page reload and page was in a cache, update it
-        if (args.options.force === true && contentManager.get()) {
+        if (options.cache === true || (options.force === true && contentManager.get())) {
             contentManager.add();
         }
     });
@@ -202,10 +204,19 @@ define([
     sync.subscribe('oro/data/update', onUpdate);
 
     /**
-     * Router for hash navigation
+     * Takes url, picks out path and trims root part
      *
-     * @export oronavigation/js/content-manager
-     * @name   oronavigation.contentManager
+     * @param url
+     * @returns {*}
+     */
+    function fetchPath(url) {
+        var _ref;
+        _ref = url.split('?');
+        return mediator.execute('retrievePath', _ref[0]);
+    }
+
+    /**
+     * Router for hash navigation
      */
     contentManager = {
         /**
@@ -245,9 +256,10 @@ define([
          * @param {string=} path part of URL
          */
         remove: function (path) {
-            if (!_.isUndefined(path)) {
+            if (_.isUndefined(path)) {
                 path = current.path;
             } else {
+                path = fetchPath(path);
                 delete pagesTags[path];
             }
             delete pagesCache[path];
@@ -274,9 +286,7 @@ define([
          * @return {Object|boolean}
          */
         get: function (path) {
-            if (_.isUndefined(path)) {
-                path = current.path;
-            }
+            path = _.isUndefined(path) ? current.path : fetchPath(path);
             return pagesCache[path] || undefined;
         },
 
@@ -309,12 +319,11 @@ define([
          * @returns {boolean}
          */
         compareUrl: function (url, refPath) {
-            var comparePath, _ref;
+            var comparePath;
             if (refPath == null) {
                 refPath = current.path;
             }
-            _ref = url.split('?');
-            comparePath = mediator.execute('retrievePath', _ref[0]);
+            comparePath = fetchPath(url);
             return refPath === comparePath;
         },
 

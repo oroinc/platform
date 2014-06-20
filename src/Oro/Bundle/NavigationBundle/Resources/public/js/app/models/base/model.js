@@ -1,14 +1,15 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'routing', 'backbone'
-    ], function (_, routing, Backbone) {
+define([
+    'underscore',
+    'routing',
+    'oroui/js/app/models/base/model'
+], function (_, routing, BaseModel) {
     'use strict';
 
-    /**
-     * @export  oronavigation/js/model
-     * @class   oronavigationModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var Model;
+
+    Model = BaseModel.extend({
         defaults: {
             title: '',
             title_rendered: '',
@@ -17,7 +18,7 @@ define(['underscore', 'routing', 'backbone'
             type: null
         },
 
-        url: function() {
+        url: function () {
             var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url');
             if (base && base.indexOf(this.get('type')) === -1) {
                 base += (base.charAt(base.length - 1) === '/' ? '' : '/') + this.get('type');
@@ -30,4 +31,6 @@ define(['underscore', 'routing', 'backbone'
             return base + (base.charAt(base.length - 1) === '/' ? '' : '/') + 'ids/' + encodeURIComponent(this.id);
         }
     });
+
+    return Model;
 });

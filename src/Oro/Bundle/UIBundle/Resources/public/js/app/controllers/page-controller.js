@@ -52,8 +52,9 @@ define([
 
             if (cacheItem && options.force !== true) {
                 options.fromCache = true;
+                this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
-                this.publishEvent('page:afterChange', args);
+                this.onPageUpdated(this.model, null, {actionArgs: args});
             } else {
                 url = this._combineRouteUrl(route);
                 this.model.fetch({

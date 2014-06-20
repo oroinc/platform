@@ -27,16 +27,62 @@ require([
 });
 
 /**
- * Init PinBar and Favorite related views
+ * Init Favorite related views
+ */
+/*require([
+    'oroui/js/app/controllers/base/controller',
+    'oronavigation/js/app/views/page/favorite-button-view',
+    'oronavigation/js/app/models/favorite-model',
+    'oronavigation/js/app/models/favorite-collection'
+], function (BaseController, FavoriteButtonView, FavoriteModel, FavoriteCollection) {
+    'use strict';
+    var favoriteCollection = new FavoriteCollection({
+        model: FavoriteModel
+    });
+
+    BaseController.addBeforeActionReuse('favoriteButton', FavoriteButtonView, {
+        el: '#pin-button-div .favorite-button',
+        collection: favoriteCollection
+    });
+});*/
+
+/**
+ * Init PinBar related views
  */
 require([
+    'jquery',
     'oroui/js/app/controllers/base/controller',
-    'oronavigation/js/app/views/page/pin-buttons-view'
-], function (BaseController, PagePinButtonsView) {
+    'oronavigation/js/app/views/page/pin/view',
+    'oronavigation/js/app/models/pin-model',
+    'oroui/js/app/models/base/collection'
+], function ($, BaseController, PinView, Model, Collection) {
     'use strict';
-    BaseController.addBeforeActionReuse('pinButtons', PagePinButtonsView, {
-        el: '#pin-button-div',
-        buttons: '.minimize-button, .favorite-button'
+    var collection;
+
+    collection = new Collection([], {
+        model: Model
+    });
+
+    BaseController.addBeforeActionReuse('pagePin', PinView, {
+        el: 'body',
+        keepElement: true,
+        dataSource: '#pinbar-content [data-data]',
+        regions: {
+            pinButton: '#pin-button-div .minimize-button',
+            pinTab: '#pinbar-content',
+            pinBar: '.list-bar'
+        },
+        tabItemTemplate: $('#template-tab-pin-item').html(),
+        tabOptions: {
+            listSelector: '.extra-list',
+            fallbackSelector: '.dot-menu-empty-message'
+        },
+        barItemTemplate: $('#template-list-pin-item').html(),
+        barOptions: {
+            listSelector: 'ul',
+            fallbackSelector: '.pin-bar-empty'
+        },
+        collection: collection
     });
 });
 
@@ -44,15 +90,17 @@ require([
  * Init ContentManager
  */
 require([
-    'chaplin',
+    'oroui/js/mediator',
     'oronavigation/js/content-manager'
-], function (Chaplin, contentManager) {
+], function (mediator, contentManager) {
     'use strict';
 
-    Chaplin.mediator.setHandler('pageCache:init', contentManager.init);
-    Chaplin.mediator.setHandler('pageCache:add', contentManager.add);
-    Chaplin.mediator.setHandler('pageCache:get', contentManager.get);
-    Chaplin.mediator.setHandler('pageCache:remove', contentManager.remove);
-    Chaplin.mediator.setHandler('pageCache:state:save', contentManager.saveState);
-    Chaplin.mediator.setHandler('pageCache:state:fetch', contentManager.fetchState);
+    mediator.setHandler('pageCache:init', contentManager.init);
+    mediator.setHandler('pageCache:add', contentManager.add);
+    mediator.setHandler('pageCache:get', contentManager.get);
+    mediator.setHandler('pageCache:remove', contentManager.remove);
+    mediator.setHandler('pageCache:state:save', contentManager.saveState);
+    mediator.setHandler('pageCache:state:fetch', contentManager.fetchState);
+    mediator.setHandler('compareUrl', contentManager.compareUrl);
+    mediator.setHandler('currentUrl', contentManager.currentUrl);
 });
