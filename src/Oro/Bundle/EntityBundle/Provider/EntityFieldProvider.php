@@ -21,7 +21,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- * TODO: passing parameter $withExclusions into getFields method should be refactored
+ * TODO: passing parameter $applyExclusions into getFields method should be refactored
  */
 class EntityFieldProvider
 {
@@ -116,7 +116,7 @@ class EntityFieldProvider
      * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
      * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
      * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
-     * @param bool   $withExclusions     Indicates whether exclusion logic should be applied.
+     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
      * @param bool   $translate          Flag means that label, plural label should be translated
      *
      * @return array of fields sorted by field label (relations follows fields)
@@ -141,21 +141,21 @@ class EntityFieldProvider
         $withVirtualFields = false,
         $withEntityDetails = false,
         $withUnidirectional = false,
-        $withExclusions = true,
+        $applyExclusions = true,
         $translate = true
     ) {
         $result    = [];
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
 
-        $this->addFields($result, $className, $em, $withVirtualFields, $withExclusions, $translate);
+        $this->addFields($result, $className, $em, $withVirtualFields, $applyExclusions, $translate);
         if ($withRelations) {
             $this->addRelations(
                 $result,
                 $className,
                 $em,
                 $withEntityDetails,
-                $withExclusions,
+                $applyExclusions,
                 $translate
             );
 
@@ -165,7 +165,7 @@ class EntityFieldProvider
                     $className,
                     $em,
                     $withEntityDetails,
-                    $withExclusions,
+                    $applyExclusions,
                     $translate
                 );
             }
@@ -182,7 +182,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withVirtualFields
-     * @param bool          $withExclusions
+     * @param bool          $applyExclusions
      * @param bool          $translate
      */
     protected function addFields(
@@ -190,7 +190,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withVirtualFields,
-        $withExclusions,
+        $applyExclusions,
         $translate
     ) {
         // only configurable entities are supported
@@ -203,7 +203,7 @@ class EntityFieldProvider
                     continue;
                 }
 
-                if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+                if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
 
@@ -220,7 +220,7 @@ class EntityFieldProvider
 
             // add virtual fields
             if ($withVirtualFields) {
-                $this->addVirtualFields($result, $metadata, $withExclusions, $translate);
+                $this->addVirtualFields($result, $metadata, $applyExclusions, $translate);
             }
         }
     }
@@ -230,13 +230,13 @@ class EntityFieldProvider
      *
      * @param array         $result
      * @param ClassMetadata $metadata
-     * @param bool          $withExclusions
+     * @param bool          $applyExclusions
      * @param bool          $translate
      */
     protected function addVirtualFields(
         array &$result,
         ClassMetadata $metadata,
-        $withExclusions,
+        $applyExclusions,
         $translate
     ) {
         $className     = $metadata->getName();
@@ -246,7 +246,7 @@ class EntityFieldProvider
                 continue;
             }
 
-            if ($withExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
+            if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
 
@@ -314,7 +314,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
-     * @param bool          $withExclusions
+     * @param bool          $applyExclusions
      * @param bool          $translate
      */
     protected function addRelations(
@@ -322,7 +322,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
-        $withExclusions,
+        $applyExclusions,
         $translate
     ) {
         // only configurable entities are supported
@@ -339,7 +339,7 @@ class EntityFieldProvider
                     continue;
                 }
 
-                if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
+                if ($applyExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
 
@@ -368,7 +368,7 @@ class EntityFieldProvider
      * @param string        $className
      * @param EntityManager $em
      * @param bool          $withEntityDetails
-     * @param bool          $withExclusions
+     * @param bool          $applyExclusions
      * @param bool          $translate
      */
     protected function addUnidirectionalRelations(
@@ -376,7 +376,7 @@ class EntityFieldProvider
         $className,
         EntityManager $em,
         $withEntityDetails,
-        $withExclusions,
+        $applyExclusions,
         $translate
     ) {
         $relations = $this->getUnidirectionalRelations($em, $className);
@@ -390,7 +390,7 @@ class EntityFieldProvider
                 continue;
             }
 
-            if ($withExclusions && $this->exclusionProvider->isIgnoredRelation($classMetadata, $fieldName)) {
+            if ($applyExclusions && $this->exclusionProvider->isIgnoredRelation($classMetadata, $fieldName)) {
                 continue;
             }
 
