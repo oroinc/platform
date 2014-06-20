@@ -41,6 +41,7 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
         $firstDefinition = new ProcessDefinition();
         $firstDefinition->setName(self::FIRST_DEFINITION)
             ->setLabel(self::FIRST_DEFINITION)
+            ->setRelatedEntity('Test\Entity')
             ->setExecutionOrder(10);
 
         $updateTrigger = new ProcessTrigger();
@@ -55,6 +56,7 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
         $secondDefinition  = new ProcessDefinition();
         $secondDefinition->setName(self::SECOND_DEFINITION)
             ->setLabel(self::SECOND_DEFINITION)
+            ->setRelatedEntity('Test\Entity')
             ->setExecutionOrder(20);
 
         $createTrigger = new ProcessTrigger();
