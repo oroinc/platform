@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

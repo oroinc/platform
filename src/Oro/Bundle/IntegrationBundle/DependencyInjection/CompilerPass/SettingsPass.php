@@ -8,7 +8,6 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Bundle\IntegrationBundle\DependencyInjection\IntegrationConfiguration;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
