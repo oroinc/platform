@@ -2,7 +2,7 @@ OroWorkflowBundle
 =================
 
 In the scope of this bundle existed two useful features,
-to wit - [workflow](./Resources/doc/workflow/index.md) and [processes](./Resources/doc/processes/index.md)
+to wit - [workflow](./Resources/doc/reference/workflow/index.md) and [processes](./Resources/doc/reference/processes/index.md)
 
 Workflow is a complex solution that allows user to perform set of actions with predefined conditions -
 each next action depends on previous. Also Workflow can be described as some kind of wizard that helps user
