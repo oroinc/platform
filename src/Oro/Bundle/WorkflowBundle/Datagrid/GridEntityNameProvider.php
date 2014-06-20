@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
-
-use Symfony\Component\Translation\TranslatorInterface;
 
 class GridEntityNameProvider
 {
@@ -28,7 +28,7 @@ class GridEntityNameProvider
     /**
      * @var string
      */
-    protected $tableName;
+    protected $entityName;
 
     /**
      * @var TranslatorInterface
@@ -58,15 +58,15 @@ class GridEntityNameProvider
      */
     public function getRelatedEntitiesChoice()
     {
-        if (!$this->tableName) {
-            throw new MissedRequiredOptionException('Parameter "tableName" is required.');
+        if (!$this->entityName) {
+            throw new MissedRequiredOptionException('Entity name is required.');
         }
 
         if (empty($this->relatedEntities)) {
             $qb = $this->entityManager->createQueryBuilder();
-            $qb->select('table.relatedEntity')
-                ->from($this->tableName, 'table')
-                ->distinct('table.relatedEntity');
+            $qb->select('entity.relatedEntity')
+                ->from($this->entityName, 'entity')
+                ->distinct('entity.relatedEntity');
 
             $result = (array)$qb->getQuery()->getArrayResult();
 
@@ -85,8 +85,11 @@ class GridEntityNameProvider
         return $this->relatedEntities;
     }
 
-    public function setTableName($tableName)
+    /**
+     * @param string $tableName
+     */
+    public function setEntityName($tableName)
     {
-        $this->tableName = $tableName;
+        $this->entityName = $tableName;
     }
 }

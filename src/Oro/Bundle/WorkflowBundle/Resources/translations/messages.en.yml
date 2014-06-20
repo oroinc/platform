@@ -126,8 +126,8 @@ oro:
             actions_configuration.label:  Actions configuration
             enabled.label:                Enabled
             execution_order.label:        Execution order
-            name.label:                   Name
-            label.label:                  Label
+            name.label:                   Code
+            label.label:                  Name
             related_entity.label:         Related entity
 
         processtrigger:

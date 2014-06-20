@@ -1,26 +1,24 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as macros %}
 
 {% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
 
 {% block navButtons %}
     {% if resource_granted('oro_process_definition_update') %}
+        {% set idButton = entity.name ~ '-process-deactivate-btn' %}
         {% if entity.enabled %}
-            {% set idButton = entity.name ~ '-process-deactivate-btn' %}
             {{ UI.button({
                 'aCss':  'no-hash btn-danger',
                 'iCss':  'icon-remove',
-                'id':    entity.name ~ '-process-deactivate-btn',
+                'id':    idButton,
                 'label': 'oro.workflow.action.process.deactivate',
                 'path':  path('oro_workflow_api_rest_process_deactivate', {'processDefinition': entity.name}),
                 'title': 'oro.workflow.action.process.deactivate',
             }) }}
         {% else %}
-            {% set idButton = entity.name ~ '-process-activate-btn' %}
             {{ UI.button({
                 'iCss':  'icon-ok',
                 'aCss':  'no-hash btn-success',
-                'id':    entity.name ~ '-process-activate-btn',
+                'id':    idButton,
                 'label': 'oro.workflow.action.process.activate',
                 'path':  path('oro_workflow_api_rest_process_activate', {'processDefinition': entity.name}),
                 'title': 'oro.workflow.action.process.activate',
@@ -91,13 +89,6 @@
         {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
         {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
 
-        <div class="row-fluid form-horizontal">
-            <div class="responsive-block">
-                {{ UI.renderProperty('oro.workflow.processdefinition.label.label'|trans, entity.label) }}
-                {{ UI.renderProperty('oro.workflow.processdefinition.related_entity.label'|trans, relatedEntityLabel) }}
-                {{ UI.renderProperty('oro.workflow.processdefinition.execution_order.label'|trans, entity.executionOrder) }}
-            </div>
-        </div>
         {%- set triggerData -%}
             {%- for trigger in triggers -%}
                 {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
@@ -122,7 +113,15 @@
                 <br />
             {%- endfor -%}
         {%- endset -%}
-        {{ UI.renderHtmlProperty('oro.workflow.processtrigger.entity_plural_label'|trans, triggerData) }}
+
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.workflow.processdefinition.label.label'|trans, entity.label) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.related_entity.label'|trans, relatedEntityLabel) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.execution_order.label'|trans, entity.executionOrder) }}
+                {{ UI.renderHtmlProperty('oro.workflow.processtrigger.entity_plural_label'|trans, triggerData) }}
+            </div>
+        </div>
     {%- endset -%}
 
     {% set dataBlocks = [

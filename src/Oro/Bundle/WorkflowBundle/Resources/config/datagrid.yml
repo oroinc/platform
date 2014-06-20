@@ -9,14 +9,13 @@ datagrid:
             acl_resource: oro_process_definition_view
             query:
                 select:
-                    - process.createdAt
-                    - process.enabled
-                    - process.executionOrder
-                    - process.label
                     - process.name
-                    - process.name as processDefinition
+                    - process.label
                     - process.relatedEntity
-                    - process.updatedAt
+                    - process.executionOrder
+                    - process.enabled
+                    - process.createdAt
+                    - process.name as processDefinition
                 from:
                     - { table: %oro_workflow.process_definition.entity.class%, alias: process }
 
@@ -41,6 +40,10 @@ datagrid:
         properties:
             name:              ~
             processDefinition: ~
+            view_link:
+                type:   url
+                route:  oro_process_definition_view
+                params: [ name ]
             activate_link:
                 type:   url
                 route:  oro_workflow_api_rest_process_activate
@@ -49,10 +52,6 @@ datagrid:
                 type:   url
                 route:  oro_workflow_api_rest_process_deactivate
                 params: [ processDefinition ]
-            view_link:
-                type:   url
-                route:  oro_process_definition_view
-                params: [ name ]
 
         sorters:
             columns:

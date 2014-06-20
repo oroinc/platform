@@ -41,7 +41,7 @@ class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->translator
         );
-        $this->provider->setTableName('test');
+        $this->provider->setEntityName('test');
     }
 
     public function testGetRelatedEntitiesChoiceConfigurable()
