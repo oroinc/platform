@@ -159,7 +159,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
             if (isset($field['normalizedValue'])) {
                 $fieldValue = $object->$fieldName;
-                $fieldContext = isset($field['fieldContext']) ? $field['fieldContext'] : $context;
+                $fieldContext = $context;
+                if (isset($field['fieldContext'])) {
+                    $fieldContext = $field['fieldContext'];
+                }
                 $normalizedMap[] = array($fieldValue, null, $fieldContext, $field['normalizedValue']);
             }
 
