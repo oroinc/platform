@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 /**
- * TODO: passing parameter $withExclusions into getFields method should be refactored
+ * TODO: passing parameter $applyExclusions into getFields method should be refactored
  */
 class EntityWithFieldsProvider
 {
@@ -23,7 +23,7 @@ class EntityWithFieldsProvider
      * @param bool $withVirtualFields
      * @param bool $withUnidirectional
      * @param bool $withRelations
-     * @param bool $withExclusions
+     * @param bool $applyExclusions
      * @param bool $translate
      *
      * @return array
@@ -32,11 +32,11 @@ class EntityWithFieldsProvider
         $withVirtualFields = false,
         $withUnidirectional = false,
         $withRelations = true,
-        $withExclusions = true,
+        $applyExclusions = true,
         $translate = true
     ) {
         $result   = [];
-        $entities = $this->entityProvider->getEntities(true, $withExclusions);
+        $entities = $this->entityProvider->getEntities(true, $applyExclusions);
         foreach ($entities as $entityData) {
             $currentClassName = $entityData['name'];
 
@@ -46,7 +46,7 @@ class EntityWithFieldsProvider
                 $withVirtualFields,
                 false,
                 $withUnidirectional,
-                $withExclusions,
+                $applyExclusions,
                 $translate
             );
 
