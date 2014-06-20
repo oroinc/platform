@@ -8,6 +8,7 @@ class ProcessDataSerializer extends Serializer
 {
     /**
      * {@inheritdoc}
+     * @param object|array $data object to normalize
      */
     public function normalize($data, $format = null, array $context = array())
     {

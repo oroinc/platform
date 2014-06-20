@@ -23,6 +23,7 @@ abstract class AbstractProcessNormalizer extends SerializerAwareNormalizer imple
     /**
      * @param array $context
      * @return ProcessJob
+     * @throws \LogicException
      */
     protected function getProcessJob(array $context)
     {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
