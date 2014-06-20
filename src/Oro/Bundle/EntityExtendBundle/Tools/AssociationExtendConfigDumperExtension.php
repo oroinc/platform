@@ -2,19 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumperExtension
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+
+abstract class AssociationExtendConfigDumperExtension extends AbstractAssociationExtendConfigDumperExtension
 {
-    /** @var AssociationBuildHelper */
-    protected $assocBuildHelper;
-
-    /** @var string[] */
-    private $targetEntityNames;
-
-    public function __construct(AssociationBuildHelper $assocBuildHelper)
-    {
-        $this->assocBuildHelper = $assocBuildHelper;
-    }
-
     /**
      * Gets the entity class who is owning side of the association
      *
@@ -23,16 +14,15 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     abstract protected function getAssociationEntityClass();
 
     /**
-     * Gets the scope name where the association is declared
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    abstract protected function getAssociationScope();
+    protected function getAssociationType()
+    {
+        return 'manyToOne';
+    }
 
     /**
-     * Gets the config attribute name which indicates whether the association is enabled or not
-     *
-     * @return string
+     * {@inheritdoc}
      */
     protected function getAssociationAttributeName()
     {
@@ -42,15 +32,9 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
     /**
      * {@inheritdoc}
      */
-    public function supports($actionType)
+    protected function isTargetEntityApplicable(ConfigInterface $targetEntityConfig)
     {
-        if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
-            $targetEntities = $this->getTargetEntities();
-
-            return !empty($targetEntities);
-        }
-
-        return false;
+        return $targetEntityConfig->is($this->getAssociationAttributeName());
     }
 
     /**
@@ -58,32 +42,10 @@ abstract class AssociationExtendConfigDumperExtension extends ExtendConfigDumper
      */
     public function preUpdate(array &$extendConfigs)
     {
-        $entityClass          = $this->getAssociationEntityClass();
-        $targetEntities       = $this->getTargetEntities();
-
-        foreach ($targetEntities as $targetEntityClass) {
-            $this->assocBuildHelper->createManyToOneAssociation($entityClass, $targetEntityClass);
+        $targetEntityConfigs = $this->getTargetEntityConfigs();
+        $entityClass         = $this->getAssociationEntityClass();
+        foreach ($targetEntityConfigs as $targetEntityConfig) {
+            $this->createAssociation($entityClass, $targetEntityConfig->getId()->getClassName());
         }
-    }
-
-    /**
-     * Gets the list of class names for entities which can the target of the association
-     *
-     * @return string[] the list of class names
-     */
-    protected function getTargetEntities()
-    {
-        if (null === $this->targetEntityNames) {
-            $this->targetEntityNames = [];
-
-            $configs = $this->assocBuildHelper->getScopeConfigs($this->getAssociationScope());
-            foreach ($configs as $config) {
-                if ($config->is($this->getAssociationAttributeName())) {
-                    $this->targetEntityNames[] = $config->getId()->getClassName();
-                }
-            }
-        }
-
-        return $this->targetEntityNames;
     }
 }

@@ -1,8 +1,7 @@
 parameters:
-    oro_activity.entity_extend.dumper_extension.class:    Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
-    oro_activity.entity_extend.generator_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension
-
     oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager
+    oro_activity.entity_extend.dumper_extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
+    oro_activity.entity_extend.generator_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
     oro_activity.widget_provider.class:                 Oro\Bundle\ActivityBundle\Provider\ChainActivityWidgetProvider
     oro_activity.widget_provider.main.class:            Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
@@ -10,12 +9,6 @@ parameters:
 
 
 services:
-    oro_activity.entity_extend.dumper_extension:
-        class: %oro_activity.entity_extend.dumper_extension.class%
-        parent: oro_entity_extend.config_dumper_extension
-        tags:
-            - { name: oro_entity_extend.dumper_extension }
-
     oro_activity.manager:
         class: %oro_activity.manager.class%
         arguments:
@@ -23,6 +16,12 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @oro_entity_config.provider.activity
             - @oro_entity_config.provider.entity
+
+    oro_activity.entity_extend.dumper_extension:
+        class: %oro_activity.entity_extend.dumper_extension.class%
+        parent: oro_entity_extend.config_dumper_extension
+        tags:
+            - { name: oro_entity_extend.dumper_extension }
 
     oro_activity.migration.extension.activity:
         class: %oro_activity.migration.extension.activity.class%
