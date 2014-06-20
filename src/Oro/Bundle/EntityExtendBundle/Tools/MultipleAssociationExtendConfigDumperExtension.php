@@ -33,8 +33,9 @@ abstract class MultipleAssociationExtendConfigDumperExtension extends AbstractAs
         foreach ($targetEntityConfigs as $targetEntityConfig) {
             $entityClasses = $targetEntityConfig->get($this->getAssociationAttributeName());
             if (!empty($entityClasses)) {
+                $targetEntityClass = $targetEntityConfig->getId()->getClassName();
                 foreach ($entityClasses as $entityClass) {
-                    $this->createAssociation($entityClass, $targetEntityConfig->getId()->getClassName());
+                    $this->createAssociation($entityClass, $targetEntityClass);
                 }
             }
         }
