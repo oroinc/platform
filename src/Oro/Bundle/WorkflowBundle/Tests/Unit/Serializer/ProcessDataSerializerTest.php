@@ -3,23 +3,22 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessObjectNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 
 class ProcessDataSerializerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNormalizeAndDenormalize()
     {
-        $normalizer = new ProcessObjectNormalizer();
-        $serializer = new ProcessDataSerializer(array($normalizer));
+        $objectNormalizer = new ProcessObjectNormalizer();
+        $traversableNormalizer = new ProcessTraversableNormalizer();
+        $serializer = new ProcessDataSerializer(array($objectNormalizer, $traversableNormalizer));
 
-        $originalObject = new \DateTime();
+        $originalData = array('old' => new \DateTime(), 'new' => new \DateTime());
 
-        $normalizedObject = $serializer->normalize($originalObject);
-        $this->assertAttributeEmpty('normalizerCache', $serializer);
+        $normalizedData = $serializer->normalize($originalData);
+        $denormalizedData = $serializer->denormalize($normalizedData, null);
 
-        $denormalizedObject = $serializer->denormalize($normalizedObject, null);
-        $this->assertAttributeEmpty('denormalizerCache', $serializer);
-
-        $this->assertEquals($originalObject, $denormalizedObject);
+        $this->assertEquals($originalData, $denormalizedData);
     }
 }

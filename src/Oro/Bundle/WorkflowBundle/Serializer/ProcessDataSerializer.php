@@ -11,11 +11,9 @@ class ProcessDataSerializer extends Serializer
      */
     public function normalize($data, $format = null, array $context = array())
     {
-        $result = parent::normalize($data, $format, $context);
-
         $this->normalizerCache = array(); // disable internal cache
 
-        return $result;
+        return parent::normalize($data, $format, $context);
     }
 
     /**
@@ -23,10 +21,8 @@ class ProcessDataSerializer extends Serializer
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
-        $result = parent::denormalize($data, $type, $format, $context);
+        $this->denormalizerCache = array(); // disable internal cache;
 
-        $this->denormalizerCache = array(); // disable internal cache
-
-        return $result;
+        return parent::denormalize($data, $type, $format, $context);
     }
 }

@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;

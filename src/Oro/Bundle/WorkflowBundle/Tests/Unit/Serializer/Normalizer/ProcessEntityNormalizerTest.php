@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessEntityNormalizer;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer\Stub\Entity;
 
 class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,7 +48,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeExistingEntity()
     {
-        $entity = new \stdClass();
+        $entity = new Entity();
         $entityId = 1;
         $format = 'json';
         $context = array('processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE));
@@ -63,7 +64,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeDeletedEntity()
     {
-        $entity = new \stdClass();
+        $entity = new Entity();
         $entity->first = 1;
         $entity->second = 2;
         $format = 'json';
@@ -81,7 +82,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizeExistingEntity()
     {
-        $entity = new \stdClass();
+        $entity = new Entity();
         $entityId = 1;
         $className = get_class($entity);
 
@@ -102,7 +103,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizeDeletedEntity()
     {
-        $entity = new \stdClass();
+        $entity = new Entity();
         $entity->first = 1;
         $entity->second = 2;
         $className = get_class($entity);
@@ -144,19 +145,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($name) use ($className) {
-                        $reflection = $this->getMockBuilder('\ReflectionProperty')
-                            ->disableOriginalConstructor()
-                            ->setMethods(array('setAccessible', 'setValue'))
-                            ->getMock();
-                        $reflection->expects($this->atLeastOnce())->method('setAccessible')->with(true);
-                        $reflection->expects($this->any())->method('setValue')->will(
-                            $this->returnCallback(
-                                function ($entity, $value) use ($name) {
-                                    return $entity->$name = $value;
-                                }
-                            )
-                        );
-                        return $reflection;
+                        return new \ReflectionProperty($className, $name);
                     }
                 )
             );
