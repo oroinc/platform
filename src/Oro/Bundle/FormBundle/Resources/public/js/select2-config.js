@@ -149,11 +149,12 @@ define(['jquery', 'underscore'
                 });
             };
 
+            var currentValue = element.val();
             var elementData = element.data('selected-data');
-            if (elementData) {
+            if (_.isArray(elementData) && elementData.length > 0 && elementData[0].id == currentValue) {
                 handleResults(elementData);
             } else {
-                setSelect2ValueById(element.val());
+                setSelect2ValueById(currentValue);
             }
         },
 
