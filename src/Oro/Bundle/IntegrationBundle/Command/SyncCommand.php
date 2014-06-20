@@ -100,7 +100,7 @@ class SyncCommand extends AbstractSyncCronCommand
         if ($integrationId) {
             $integration = $repository->getOrLoadById($integrationId);
             if (!$integration) {
-                throw new \InvalidArgumentException('Channel with given ID not found');
+                throw new \InvalidArgumentException('Integration with given ID not found');
             }
             $integrations = [$integration];
         } else {
@@ -110,7 +110,7 @@ class SyncCommand extends AbstractSyncCronCommand
         /** @var Channel $integration */
         foreach ($integrations as $integration) {
             try {
-                $logger->notice(sprintf('Run sync for "%s" channel.', $integration->getName()));
+                $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
 
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
@@ -118,7 +118,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 $processor->process($integration, $connector, $connectorParameters);
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-                //process another channel even in case if exception thrown
+                //process another integration even in case if exception thrown
                 continue;
             }
         }
