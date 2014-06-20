@@ -22,6 +22,10 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     /** @var SettingsProvider */
     protected $settingsProvider;
 
+    /**
+     * @param TypesRegistry    $registry
+     * @param SettingsProvider $settingsProvider
+     */
     public function __construct(TypesRegistry $registry, SettingsProvider $settingsProvider)
     {
         $this->registry         = $registry;
