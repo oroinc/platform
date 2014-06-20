@@ -81,7 +81,7 @@ class TypesRegistry
      *
      * @return array
      */
-    public function getAvailableChannelTypesChoiceListWithIcon()
+    public function getAvailableIntegrationTypesChoiceListWithIcon()
     {
         /** @var ArrayCollection $types */
         $types  = $this->getAvailableChannelTypes();
