@@ -1,0 +1,38 @@
+namespace Test;
+
+class Entity
+{
+    /**
+     * Gets the entities this activity is associated with
+     *
+     * @return object[]|null Any configurable entity
+     */
+    public function getTargets()
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if (!in_array($className, ['Test\TargetEntity1', 'Test\TargetEntity2'])) {
+            throw new \RuntimeException(
+               sprintf('The association with "%s" entity was not configured.', $className)
+            );
+        }
+        if ($className == 'Test\TargetEntity1') { return $this->targetField1; }
+        if ($className == 'Test\TargetEntity2') { return $this->targetField2; }
+    }
+
+    /**
+     * Add associated entity
+     *
+     * @param object $target Any configurable entity that can be used with associations
+     */
+    public function addTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if (!in_array($className, ['Test\TargetEntity1', 'Test\TargetEntity2'])) {
+            throw new \RuntimeException(
+               sprintf('The association with "%s" entity was not configured.', $className)
+            );
+        }
+        if ($className == 'Test\TargetEntity1') { $this->targetField1[] = $target; }
+        if ($className == 'Test\TargetEntity2') { $this->targetField2[] = $target; }
+    }
+}

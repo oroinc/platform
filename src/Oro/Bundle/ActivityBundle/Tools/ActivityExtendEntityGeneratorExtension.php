@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 {
@@ -28,9 +29,14 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
             /** @var FieldConfigId $fieldConfig */
             $fieldConfig = $relationData['field_id'];
 
-            // TODO: probably we should check classname - if it's activity or not
+            $fieldConditionPassed = $fieldConfig instanceof FieldConfigId &&
+                $fieldConfig->getFieldType() == 'manyToMany';
+            if (!$fieldConditionPassed) {
+                continue;
+            }
 
-            if ($fieldConfig instanceof FieldConfigId && $fieldConfig->getFieldType() == 'manyToMany') {
+            // TODO: probably we should check classname - if it's activity or not from grouping scope
+            if (ExtendHelper::buildAssociationName($relationData['target_entity']) == $fieldConfig->getFieldName()) {
                 return true;
             }
         }
@@ -54,7 +60,6 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
         $supportedEntities = [];
 
         foreach ($relationData as $relationItem) {
-            //var_dump($relationItem);
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $relationItem['field_id'];
 
@@ -68,8 +73,8 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
             'if (!in_array($className, [' . implode(', ', $supportedEntities) . '])) {',
             '    throw new \RuntimeException(',
-                    'sprintf(\'The association with "%s" entity was not configured.\', $className)',
-                 ');',
+            '       sprintf(\'The association with "%s" entity was not configured.\', $className)',
+            '    );',
             '}',
         ];
 
@@ -89,9 +94,9 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
         }
 
         $getMethodDocblock = "/**\n"
-            . " * Gets the entity this note is associated with\n"
+            . " * Gets the entities this activity is associated with\n"
             . " *\n"
-            . " * @return object|null Any configurable entity\n"
+            . " * @return object[]|null Any configurable entity\n"
             . " */";
         $addMethodDocblock = "/**\n"
             . " * Add associated entity\n"
