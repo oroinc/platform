@@ -17,8 +17,3 @@ oro_integration:
                         remote: oro.integration.integration.remote_wins.label
                         local:  oro.integration.integration.local_wins.label
                 applicable: @oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)
-            someField:
-                type: text
-                options:
-                    label: Some Field
-                    required: true

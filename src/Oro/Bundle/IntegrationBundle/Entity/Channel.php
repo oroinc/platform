@@ -106,7 +106,6 @@ class Channel
     {
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
-        $this->isTwoWaySyncEnabled     = false;
     }
 
     /**

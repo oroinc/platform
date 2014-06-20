@@ -65,7 +65,7 @@ services:
         scope: request
         tags:
             - { name: form.type, alias: oro_integration_type_select }
-            
+
     oro_integration.form.subscriber.channel_subscriber:
         class: %oro_integration.form.subscriber.channel_subscriber.class%
         arguments:

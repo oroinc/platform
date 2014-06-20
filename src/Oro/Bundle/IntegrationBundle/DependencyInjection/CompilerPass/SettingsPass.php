@@ -30,8 +30,7 @@ class SettingsPass implements CompilerPassInterface
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
-            $config    = $resource->data[IntegrationConfiguration::ROOT_NODE_NAME];
-            $configs[] = $config;
+            $configs[] = $resource->data[IntegrationConfiguration::ROOT_NODE_NAME];
         }
 
         $processor = new Processor();
