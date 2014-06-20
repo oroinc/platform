@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Stub;
 
-
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 
 class IntegrationTypeWithoutIcon implements ChannelInterface

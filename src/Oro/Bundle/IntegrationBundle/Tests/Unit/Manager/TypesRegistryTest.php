@@ -9,8 +9,8 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    const CHANNEL_TYPE_ONE = 'type1';
-    const CHANNEL_TYPE_TWO = 'type2';
+    const CHANNEL_TYPE_ONE   = 'type1';
+    const CHANNEL_TYPE_TWO   = 'type2';
     const TRANSPORT_TYPE_ONE = 'transport1';
     const TRANSPORT_TYPE_TWO = 'transport2';
 
@@ -53,7 +53,7 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetAvailableChannelTypesChoiceList()
     {
         $this->assertEquals(
-            [self::CHANNEL_TYPE_ONE=>"oro.type1.label", self::CHANNEL_TYPE_TWO=>"oro.type2.label"],
+            [self::CHANNEL_TYPE_ONE => "oro.type1.label", self::CHANNEL_TYPE_TWO => "oro.type2.label"],
             $this->typesRegistry->getAvailableChannelTypesChoiceList()
         );
     }
@@ -62,13 +62,12 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                self::CHANNEL_TYPE_ONE=>'{"label":"oro.type1.label","icon":"bundles\/acmedemo\/img\/logo.png"}',
-                self::CHANNEL_TYPE_TWO=>'{"label":"oro.type2.label"}'
+                self::CHANNEL_TYPE_ONE => '{"label":"oro.type1.label","icon":"bundles\/acmedemo\/img\/logo.png"}',
+                self::CHANNEL_TYPE_TWO => '{"label":"oro.type2.label"}'
             ],
             $this->typesRegistry->getAvailableIntegrationTypesChoiceListWithIcon()
         );
     }
-
 
     public function testGetTransportType()
     {
@@ -79,8 +78,8 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-    * @expectedException \LogicException
-    */
+     * @expectedException \LogicException
+     */
     public function testGetTransportType1()
     {
         $this->assertEquals(
