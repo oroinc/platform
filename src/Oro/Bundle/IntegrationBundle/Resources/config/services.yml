@@ -152,5 +152,7 @@ services:
         arguments:
             - @oro_integration.manager.types_registry
             - @translator
+            - @templating.helper.assets
+        scope: request
         tags:
             - { name: form.type, alias: oro_integration_type_select }

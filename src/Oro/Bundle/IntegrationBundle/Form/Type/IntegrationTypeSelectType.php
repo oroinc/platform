@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -18,10 +19,13 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    public function __construct(TypesRegistry $registry, TranslatorInterface $translator)
+    protected $assetHelper;
+
+    public function __construct(TypesRegistry $registry, TranslatorInterface $translator, CoreAssetsHelper $assetHelper)
     {
         $this->registry = $registry;
         $this->translator = $translator;
+        $this->assetHelper = $assetHelper;
     }
 
     /**
@@ -83,6 +87,9 @@ class IntegrationTypeSelectType extends AbstractType
         foreach ($choiceList as $row) {
             $data = json_decode($row->label, 1);
             $data['label'] = $this->translator->trans($data['label']);
+            if (!empty($data['icon'])) {
+                $data['icon'] = $this->assetHelper->getUrl($data['icon']);
+            }
             $row->label = json_encode($data);
         }
     }

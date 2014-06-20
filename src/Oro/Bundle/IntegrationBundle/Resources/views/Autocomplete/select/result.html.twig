@@ -2,11 +2,11 @@
 var data = JSON.parse(text);
 var background = '';
 if (data.icon) {
-    background = 'style="background: url(/' + data.icon + ') no-repeat; height: 16px; width: 16px; background-size: contain; display: inline-block;"';
+    background = 'style="background: url(' + data.icon + ') no-repeat;"';
 }
 %>
-<span  <%= background %> ></span>
+<span class="aware-icon-block aware-icon-block-text"  <%= background %> ></span>
 &nbsp;
-<span style="display: inline-block;"><%= highlight(data.label) %></span>
+<span class="aware-icon-block-text"><%= highlight(data.label) %></span>
 
 

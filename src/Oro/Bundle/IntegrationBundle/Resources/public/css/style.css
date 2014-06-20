@@ -1,5 +1,12 @@
-.aware-icon-block {
+.select2-choice .select2-chosen .aware-icon-block, .select2-results .select2-result-label .aware-icon-block{
     height: 16px;
     width: 16px;
-    background-size: contain;
+    background-size: contain!important;
+}
+.select2-choice .select2-chosen .aware-icon-block-selected, .select2-results .select2-result-label .aware-icon-block-selected{
+    margin-bottom: 5px;
+}
+
+.select2-choice .select2-chosen .aware-icon-block-text, .select2-results .select2-result-label .aware-icon-block-text{
+    display: inline-block;
 }
