@@ -201,7 +201,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsDenormalization($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, 'json'));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
     }
 
     public function supportsDenormalizationDataProvider()
