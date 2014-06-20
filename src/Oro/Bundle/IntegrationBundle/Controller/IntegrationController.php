@@ -66,18 +66,18 @@ class IntegrationController extends Controller
      * )
      * @Template()
      */
-    public function updateAction(Channel $channel)
+    public function updateAction(Channel $integration)
     {
-        return $this->update($channel);
+        return $this->update($integration);
     }
 
     /**
      * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
      * @AclAncestor("oro_integration_update")
      */
-    public function scheduleAction(Channel $channel)
+    public function scheduleAction(Channel $integration)
     {
-        $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v']);
+        $job = new Job(SyncCommand::COMMAND_NAME, ['--integration-id=' . $integration->getId(), '-v']);
 
         $status  = Codes::HTTP_OK;
         $response = [
@@ -116,28 +116,28 @@ class IntegrationController extends Controller
     }
 
     /**
-     * @param Channel $channel
+     * @param Channel $integration
      *
      * @return array
      */
-    protected function update(Channel $channel)
+    protected function update(Channel $integration)
     {
-        if ($this->get('oro_integration.form.handler.channel')->process($channel)) {
+        if ($this->get('oro_integration.form.handler.channel')->process($integration)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_integration_update', 'parameters' => ['id' => $channel->getId()]],
+                ['route' => 'oro_integration_update', 'parameters' => ['id' => $integration->getId()]],
                 ['route' => 'oro_integration_index'],
-                $channel
+                $integration
             );
         }
         $form = $this->getForm();
 
         return [
-            'entity'   => $channel,
+            'entity'   => $integration,
             'form'     => $form->createView(),
         ];
     }
