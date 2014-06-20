@@ -17,8 +17,7 @@ define([
         events: {
             'click .btn-close': 'toRemove',
             'click .close': 'toRemove',
-            'click .pin-holder div a': 'toMaximize',
-            'click span': 'toMaximize'
+            'click a': 'toMaximize'
         },
 
         listen: {
@@ -26,7 +25,7 @@ define([
         },
 
         /**
-         * Change active pinbar item after hash navigation request is completed
+         * Change active item after hash navigation request is completed
          */
         onPageUpdated: function () {
             this.setActiveItem();
@@ -36,8 +35,9 @@ define([
             this.model.collection.trigger('toRemove', this.model);
         },
 
-        toMaximize: function () {
+        toMaximize: function (e) {
             this.model.collection.trigger('toMaximize', this.model);
+            e.stopPropagation();
         },
 
         /**

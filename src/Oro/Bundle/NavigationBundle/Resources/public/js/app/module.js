@@ -29,22 +29,36 @@ require([
 /**
  * Init Favorite related views
  */
-/*require([
+require([
+    'jquery',
     'oroui/js/app/controllers/base/controller',
-    'oronavigation/js/app/views/page/favorite-button-view',
-    'oronavigation/js/app/models/favorite-model',
-    'oronavigation/js/app/models/favorite-collection'
-], function (BaseController, FavoriteButtonView, FavoriteModel, FavoriteCollection) {
+    'oronavigation/js/app/views/page/favorite/view',
+    'oronavigation/js/app/models/base/model',
+    'oroui/js/app/models/base/collection'
+], function ($, BaseController, FavoriteView, Model, Collection) {
     'use strict';
-    var favoriteCollection = new FavoriteCollection({
-        model: FavoriteModel
+    var collection;
+
+    collection = new Collection([], {
+        model: Model
     });
 
-    BaseController.addBeforeActionReuse('favoriteButton', FavoriteButtonView, {
-        el: '#pin-button-div .favorite-button',
-        collection: favoriteCollection
+    BaseController.addBeforeActionReuse('pageFavorite', FavoriteView, {
+        el: 'body',
+        keepElement: true,
+        dataSource: '#favorite-content [data-data]',
+        regions: {
+            pinButton: '#pin-button-div .favorite-button',
+            pinTab: '#favorite-content'
+        },
+        tabItemTemplate: $('#template-dot-menu-item').html(),
+        tabOptions: {
+            listSelector: '.extra-list',
+            fallbackSelector: '.dot-menu-empty-message'
+        },
+        collection: collection
     });
-});*/
+});
 
 /**
  * Init PinBar related views
@@ -72,7 +86,7 @@ require([
             pinTab: '#pinbar-content',
             pinBar: '.list-bar'
         },
-        tabItemTemplate: $('#template-tab-pin-item').html(),
+        tabItemTemplate: $('#template-dot-menu-item').html(),
         tabOptions: {
             listSelector: '.extra-list',
             fallbackSelector: '.dot-menu-empty-message'

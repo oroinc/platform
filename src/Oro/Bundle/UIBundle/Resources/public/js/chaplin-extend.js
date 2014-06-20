@@ -1,11 +1,16 @@
-/*jslint nomen:true, white:true, eqeq:true*/
+/*jslint browser:true, nomen:true, white:true, eqeq:true*/
 /*global define*/
-define(['underscore', 'chaplin'], function (_, Chaplin) {
+define([
+    'jquery',
+    'underscore',
+    'chaplin'
+], function ($, _, Chaplin) {
     'use strict';
 
-    var utils;
+    var utils, location;
 
     utils = Chaplin.utils;
+    location = window.location;
 
     /**
      * Fixes issue where path '/' was converted to boolean false value
@@ -68,6 +73,32 @@ define(['underscore', 'chaplin'], function (_, Chaplin) {
             }
         }
     };
+
+    /**
+     * Fixes issues
+     *  - empty hashes (like '#')
+     *  - routing full url (containing protocol and host)
+     * @override
+     */
+    Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
+        var el, href;
+        el = event.currentTarget;
+
+        if (el.nodeName === 'A') {
+            href = el.getAttribute('href');
+            // prevent click by empty hashes
+            if (el.getAttribute('href') === '#') {
+                event.preventDefault();
+                return;
+            }
+            // fixes issue of routing full url
+            if (href.indexOf(':\/\/') !== -1 && el.host === location.host) {
+                el.setAttribute('href', el.pathname + el.search + el.hash);
+            }
+        }
+
+        func.call(this, event);
+    });
 
     return Chaplin;
 });

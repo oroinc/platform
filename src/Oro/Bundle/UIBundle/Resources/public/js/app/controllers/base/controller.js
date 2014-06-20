@@ -75,28 +75,6 @@ define([
                     name: 'pageCache:get',
                     silent: true
                 }, path);
-            },
-
-            /**
-             * Executes 'add' handler for pageCache manager
-             */
-            add: function () {
-                Chaplin.mediator.execute({
-                    name: 'pageCache:add',
-                    silent: true
-                });
-            },
-
-            /**
-             * Executes 'remove' handler for pageCache manager
-             *
-             * @param {string=} path
-             */
-            remove: function (path) {
-                Chaplin.mediator.execute({
-                    name: 'pageCache:remove',
-                    silent: true
-                }, path);
             }
         }
     });

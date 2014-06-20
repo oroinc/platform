@@ -4,6 +4,7 @@
 
 require(['oroui/js/mediator'], function (mediator) {
     'use strict';
+    // @TODO utilize other event to mark page as rendered
     mediator.once('tab:changed', function () {
         setTimeout(function () {
             // emulates 'document ready state' for selenium tests

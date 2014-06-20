@@ -1,4 +1,3 @@
-/*jshint browser:true*/
 /*jslint nomen:true*/
 /*global define*/
 define([
@@ -6,18 +5,16 @@ define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     '../base/button-view',
-    './collection-view',
+    'oroui/js/app/views/base/collection-view',
     './item-view',
     'oroui/js/tools',
     'oroui/js/error'
 ], function (_, mediator, BaseView, ButtonView, CollectionView, ItemView, tools, error) {
     'use strict';
 
-    var PinView;
+    var FavoriteView;
 
-    PinView = BaseView.extend({
-        maxItems: 7,
-
+    FavoriteView = BaseView.extend({
         /**
          * Keeps separately extended options,
          * to prevent disposing the view each time by Composer
@@ -25,12 +22,8 @@ define([
         _options: {},
 
         listen: {
-            'add collection': 'onAdd',
-            'remove collection': 'onRemove',
-
             'toAdd collection': 'toAdd',
             'toRemove collection': 'toRemove',
-            'toMaximize collection': 'toMaximize',
 
             'pagestate:change meditor': 'onPageStateChange'
         },
@@ -44,7 +37,7 @@ define([
             $dataEl.remove();
             this._options = _.defaults({}, options || {}, extraOptions);
 
-            PinView.__super__.initialize.call(this, options);
+            FavoriteView.__super__.initialize.call(this, options);
 
             this.collection.reset(data);
         },
@@ -54,11 +47,9 @@ define([
         },
 
         createSubViews: function (options) {
-            var _this, collection, button,
-                barView, BarItemView, barOptions,
+            var collection, button,
                 tabView, TabItemView, tabOptions;
 
-            _this = this;
             collection = this.collection;
 
             // button view
@@ -69,22 +60,6 @@ define([
             });
             this.subview('button', button);
 
-            // bar view
-            BarItemView = ItemView.extend({
-                template: options.barItemTemplate
-            });
-            barOptions = _.extend(options.barOptions, {
-                autoRender: true,
-                el: 'pinBar',
-                collection: collection,
-                itemView: BarItemView,
-                filterer: function (item, index) {
-                    return index < _this.maxItems;
-                }
-            });
-            barView = new CollectionView(barOptions);
-            this.subview('bar', barView);
-
             // tab view
             TabItemView = ItemView.extend({
                 template: options.tabItemTemplate
@@ -93,10 +68,7 @@ define([
                 autoRender: true,
                 el: 'pinTab',
                 collection: collection,
-                itemView: TabItemView,
-                filterer: function (item, index) {
-                    return index >= _this.maxItems;
-                }
+                itemView: TabItemView
             });
             tabView = new CollectionView(tabOptions);
             this.subview('tab', tabView);
@@ -125,8 +97,8 @@ define([
         toAdd: function (model) {
             var collection;
             collection = this.collection;
-            model.set('type', 'pinbar');
-            model.set('position', 0);
+            model.set('type', 'favorite');
+            model.set('position', this.collection.length);
             model.save(null, {
                 success: function () {
                     var item;
@@ -142,48 +114,14 @@ define([
             });
         },
 
-        /**
-         * Handle item minimize/maximize state change
-         *
-         * @param model
-         */
-        toMaximize: function (model) {
-            var url;
-            url = model.get('url');
-            if (!mediator.execute('compareUrl', url)) {
-                mediator.execute('redirectTo', {url: url}, {cache: true});
-            }
-        },
-
-        onAdd: function () {
-            mediator.execute({name: 'pageCache:add', silent: true});
-            this.reorder();
-        },
-
-        onRemove: function (model) {
-            var url;
-            url = model.get('url');
-            mediator.execute({name: 'pageCache:remove', silent: true}, url);
-            this.reorder();
-        },
-
         onPageStateChange: function () {
             var model, url;
             model = this.getCurrentModel();
             url = mediator.execute('currentUrl');
             model.set({url: url});
             model.save();
-        },
-
-        /**
-         * Change position property of model based on current order
-         */
-        reorder: function () {
-            this.collection.each(function (module, position) {
-                module.set({position: position});
-            });
         }
     });
 
-    return PinView;
+    return FavoriteView;
 });

@@ -1,6 +1,7 @@
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action'
-    ], function (_, __, messenger, mediator, ModelAction) {
+define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action',
+    'chaplin'
+    ], function (_, __, messenger, mediator, ModelAction, Chaplin) {
     'use strict';
 
     /**
@@ -47,7 +48,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oro
          * Execute redirect
          */
         execute: function () {
-            window.location.href = this.getLink();
+            mediator.execute('redirectTo', {url: this.getLink()});
         },
 
         /**
