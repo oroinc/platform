@@ -98,48 +98,6 @@ class ActivityManager
     }
 
     /**
-     * Returns an array contains info about all activity actions for the given entity type
-     *
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    public function getActivityActions($entityClass)
-    {
-        $result = [];
-
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
-        foreach ($activityClassNames as $activityClassName) {
-            $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-            $route          = $activityConfig->get('action_route');
-            if (!empty($route)) {
-                $item = [
-                    'className'       => $activityClassName,
-                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
-                    'route'           => $route
-                ];
-
-                $group = $activityConfig->get('action_group');
-                if (!empty($group)) {
-                    $item['group'] = $group;
-                }
-                $priority = $activityConfig->get('priority');
-                if (!empty($priority)) {
-                    $item['priority'] = $priority;
-                }
-                $acl = $activityConfig->get('action_acl');
-                if (!empty($acl)) {
-                    $item['acl'] = $acl;
-                }
-
-                $result[] = $item;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Adds filter by $entity DQL to the given query builder
      *
      * @param QueryBuilder  $qb                  The query builder that is used to get the list of activities
