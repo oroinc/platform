@@ -192,7 +192,7 @@ Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
 **Description:**
 Reads entities defined as import templates using Doctrine.
 
-**Configuration Options**
+**Configuration Options:**
 * **entityName** - the name or class name of entity to read
 
 Processor
@@ -289,13 +289,13 @@ services:
 **Methods:**
 * **registerProcessor(ProcessorInterface, type, entityName, alias)** - register processor using input parameters
 * **unregisterProcessor(type, entityName, alias)** - unregister processor using input parameters
-* **hasProcessor($type, $alias)** - checks that processor registered
+* **hasProcessor(type, alias)** - checks that processor registered
 * **getProcessor(type, alias)** - gets registered processor
 * **getProcessorsByEntity(type, entityName)** - gets registered processor by entity, import could have several
 processors for some entity, for example one processor for "Add and Replace" import behaviour and other for "Delete"
 import behaviour,
 * **getProcessorAliasesByEntity(type, entityName)** - get all processors aliases by type and entity name
-* **getProcessorEntityName($type, $alias)** - get entity name by processor type and alias
+* **getProcessorEntityName(type, alias)** - get entity name by processor type and alias
 
 ### Registry Delegate Processor
 **Class:**
@@ -304,7 +304,7 @@ Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor
 **Description:**
 This processor uses Processor Registry and configuration options from Context to delegate processing.
 
-**Classes:*
+**Classes:**
 * **Processor Registry** - processor storage
 * **Context Registry** - context storage
 * **Step Execution** - batch domain object representation the execution of a step
