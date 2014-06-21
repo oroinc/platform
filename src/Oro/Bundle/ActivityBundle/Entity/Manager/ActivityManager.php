@@ -42,39 +42,98 @@ class ActivityManager
     }
 
     /**
-     * Returns an array contains info about activities associated with the given entity type
+     * Indicates whether the given entity type has any activity associations or not
+     *
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    public function hasActivityAssociations($entityClass)
+    {
+        if (!$this->activityConfigProvider->hasConfig($entityClass)) {
+            return false;
+        }
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+
+        return !empty($activityClassNames);
+    }
+
+    /**
+     * Returns an array contains info about all activity associations for the given entity type
      *
      * @param string $entityClass
      *
      * @return array
      */
-    public function getAssociatedActivityInfo($entityClass)
+    public function getActivityAssociations($entityClass)
     {
         $result = [];
 
-        if (!$this->activityConfigProvider->hasConfig($entityClass)) {
-            return $result;
-        }
-
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
-        if (empty($activityClassNames)) {
-            return $result;
-        }
-
         foreach ($activityClassNames as $activityClassName) {
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-            $item           = [
+
+            $item = [
                 'className'       => $activityClassName,
                 'associationName' => ExtendHelper::buildAssociationName($entityClass),
                 'label'           => $entityConfig->get('plural_label'),
                 'route'           => $activityConfig->get('route')
             ];
-            $acl            = $activityConfig->get('acl');
+
+            $priority = $activityConfig->get('priority');
+            if (!empty($priority)) {
+                $item['priority'] = $priority;
+            }
+            $acl = $activityConfig->get('acl');
             if (!empty($acl)) {
                 $item['acl'] = $acl;
             }
+
             $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an array contains info about all activity actions for the given entity type
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function getActivityActions($entityClass)
+    {
+        $result = [];
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        foreach ($activityClassNames as $activityClassName) {
+            $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
+            $route          = $activityConfig->get('action_route');
+            if (!empty($route)) {
+                $item = [
+                    'className'       => $activityClassName,
+                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                    'route'           => $route
+                ];
+
+                $group = $activityConfig->get('action_group');
+                if (!empty($group)) {
+                    $item['group'] = $group;
+                }
+                $priority = $activityConfig->get('priority');
+                if (!empty($priority)) {
+                    $item['priority'] = $priority;
+                }
+                $acl = $activityConfig->get('action_acl');
+                if (!empty($acl)) {
+                    $item['acl'] = $acl;
+                }
+
+                $result[] = $item;
+            }
         }
 
         return $result;

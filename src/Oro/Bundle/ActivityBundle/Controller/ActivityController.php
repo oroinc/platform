@@ -25,7 +25,7 @@ class ActivityController extends Controller
      */
     public function activitiesAction($entity)
     {
-        $widgetProvider = $this->get('oro_activity.widget_provider');
+        $widgetProvider = $this->get('oro_activity.widget_provider.activities');
 
         $widgets = $widgetProvider->supports($entity)
             ? $widgetProvider->getWidgets($entity)

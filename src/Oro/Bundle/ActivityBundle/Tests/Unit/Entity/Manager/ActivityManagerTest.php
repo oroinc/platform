@@ -75,7 +75,48 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetAssociatedActivityInfoForNonConfigurableEntity()
+    public function testHasActivityAssociations()
+    {
+        $targetEntityClass = 'Test\Entity';
+
+        $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
+        $targetEntityActivityConfig->set('activities', ['Test\Entity1', 'Test\Entity2']);
+
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(true));
+        $this->activityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue($targetEntityActivityConfig));
+
+        $this->assertTrue(
+            $this->manager->hasActivityAssociations($targetEntityClass)
+        );
+    }
+
+    public function testHasActivityAssociationsForNoActivities()
+    {
+        $targetEntityClass = 'Test\Entity';
+
+        $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
+
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(true));
+        $this->activityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue($targetEntityActivityConfig));
+
+        $this->assertFalse(
+            $this->manager->hasActivityAssociations($targetEntityClass)
+        );
+    }
+
+    public function testHasActivityAssociationsForNonConfigurableEntity()
     {
         $targetEntityClass = 'Test\Entity';
 
@@ -84,13 +125,12 @@ class ActivityManagerTest extends OrmTestCase
             ->with($targetEntityClass)
             ->will($this->returnValue(false));
 
-        $this->assertEquals(
-            [],
-            $this->manager->getAssociatedActivityInfo($targetEntityClass)
+        $this->assertFalse(
+            $this->manager->hasActivityAssociations($targetEntityClass)
         );
     }
 
-    public function testGetAssociatedActivityInfo()
+    public function testGetActivityAssociations()
     {
         $targetEntityClass = 'Test\Entity';
         $activity1Class    = 'Test\Activity1';
@@ -110,10 +150,6 @@ class ActivityManagerTest extends OrmTestCase
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
         $activity2ActivityConfig->set('route', 'route2');
 
-        $this->activityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($targetEntityClass)
-            ->will($this->returnValue(true));
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
@@ -152,7 +188,7 @@ class ActivityManagerTest extends OrmTestCase
                     'route'           => 'route2',
                 ],
             ],
-            $this->manager->getAssociatedActivityInfo($targetEntityClass)
+            $this->manager->getActivityAssociations($targetEntityClass)
         );
     }
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ActivityBundle\Provider\ChainActivityWidgetProvider;
+use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
 
-class ChainActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
+class ChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ChainActivityWidgetProvider */
+    /** @var ChainWidgetProvider */
     protected $chainProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -20,14 +20,14 @@ class ChainActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->chainProvider = new ChainActivityWidgetProvider();
+        $this->chainProvider = new ChainWidgetProvider();
 
         $this->highPriorityProvider =
-            $this->getMock('Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProviderInterface');
+            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->lowPriorityProvider  =
-            $this->getMock('Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProviderInterface');
+            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->unsupportedProvider  =
-            $this->getMock('Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProviderInterface');
+            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
 
         $this->chainProvider->addProvider($this->lowPriorityProvider);
         $this->chainProvider->addProvider($this->highPriorityProvider);

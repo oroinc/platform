@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Placeholder;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\NoteBundle\Placeholder\Filter;
@@ -21,10 +20,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->filter = new Filter(
-            $this->noteConfigProvider,
-            new EntityClassAccessor()
-        );
+        $this->filter = new Filter($this->noteConfigProvider);
     }
 
     public function testIsNoteAssociationEnabledWithNull()

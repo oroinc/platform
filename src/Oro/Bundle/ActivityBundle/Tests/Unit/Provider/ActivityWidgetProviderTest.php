@@ -42,9 +42,32 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSupports()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports($isSupported)
     {
-        $this->assertTrue($this->provider->supports(new \stdClass()));
+        $entity      = new \stdClass();
+        $entityClass = 'Test\Entity';
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($this->identicalTo($entity))
+            ->will($this->returnValue($entityClass));
+        $this->activityManager->expects($this->once())
+            ->method('hasActivityAssociations')
+            ->with($entityClass)
+            ->will($this->returnValue($isSupported));
+
+        $this->assertEquals($isSupported, $this->provider->supports($entity));
+    }
+
+    public function supportsProvider()
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 
     public function testGetWidgets()
@@ -78,11 +101,15 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->entityRoutingHelper->expects($this->at(0))
-            ->method('getEntityClassAndId')
+            ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue([$entityClass, $entityId]));
+            ->will($this->returnValue($entityClass));
+        $this->entityRoutingHelper->expects($this->at(1))
+            ->method('getSingleEntityIdentifier')
+            ->with($this->identicalTo($entity))
+            ->will($this->returnValue($entityId));
         $this->activityManager->expects($this->once())
-            ->method('getAssociatedActivityInfo')
+            ->method('getActivityAssociations')
             ->with($entityClass)
             ->will($this->returnValue($activities));
 
@@ -95,11 +122,11 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ->with('acl2')
             ->will($this->returnValue(true));
 
-        $this->entityRoutingHelper->expects($this->at(1))
+        $this->entityRoutingHelper->expects($this->at(2))
             ->method('generateUrl')
             ->with('route2', $entityClass, $entityId)
             ->will($this->returnValue('url2'));
-        $this->entityRoutingHelper->expects($this->at(2))
+        $this->entityRoutingHelper->expects($this->at(3))
             ->method('generateUrl')
             ->with('route3', $entityClass, $entityId)
             ->will($this->returnValue('url3'));

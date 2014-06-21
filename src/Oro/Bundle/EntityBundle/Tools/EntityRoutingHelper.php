@@ -91,18 +91,27 @@ class EntityRoutingHelper
     }
 
     /**
-     * Returns an array contains the class name and id of the given entity object
+     * Returns the class name of the given entity object
      *
      * @param object $entity
      *
-     * @return array (entity class, entity id)
+     * @return string
      */
-    public function getEntityClassAndId($entity)
+    public function getEntityClass($entity)
     {
-        return [
-            $this->doctrineHelper->getEntityClass($entity),
-            $this->doctrineHelper->getSingleEntityIdentifier($entity)
-        ];
+        return $this->doctrineHelper->getEntityClass($entity);
+    }
+
+    /**
+     * Gets the id of the given entity object
+     *
+     * @param object $entity
+     *
+     * @return mixed
+     */
+    public function getSingleEntityIdentifier($entity)
+    {
+        return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
     /**

@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigConfigurationPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\PlaceholderFilterCompilerPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ViewActionWidgetProviderPass;
 
 class OroUIBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroUIBundle extends Bundle
 
         $container->addCompilerPass(new TwigConfigurationPass());
         $container->addCompilerPass(new PlaceholderFilterCompilerPass());
+        $container->addCompilerPass(new ViewActionWidgetProviderPass());
     }
 }
