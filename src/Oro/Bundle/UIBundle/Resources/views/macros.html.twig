@@ -201,7 +201,7 @@
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
-                {{ parameters.html }}
+                {{ parameters.html|raw }}
             {% endif %}
         </ul>
     </div>

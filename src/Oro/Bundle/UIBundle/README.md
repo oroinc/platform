@@ -46,14 +46,14 @@ placeholders:
         order: 100                 # sort order in placeholder
       <another_item_name>:
         order: 200
-      <one_more_item_name>: ~      # sort order will be set to 1
+      <one_more_item_name>: ~      # sort order will be set to 0
 ```
 
 Any configuration defined in bundle `placeholders.yml` file can be overridden in `app/config/config.yml` file.
 
 ```yaml
 oro_ui:
-    placeholder_items:
+    placeholders:
         <placeholder_name>:
             items:
                 <item_name>:

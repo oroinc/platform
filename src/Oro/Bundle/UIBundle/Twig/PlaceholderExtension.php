@@ -95,6 +95,10 @@ class PlaceholderExtension extends \Twig_Extension
      */
     protected function renderItemContent(array $item, array $variables)
     {
+        if (isset($item['data']) || array_key_exists('data', $item)) {
+            $variables['data'] = $item['data'];
+        }
+
         if (isset($item['template'])) {
             return $this->environment->render($item['template'], $variables);
         }

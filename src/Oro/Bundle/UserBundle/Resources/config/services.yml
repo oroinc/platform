@@ -1,19 +1,19 @@
 parameters:
-    oro_user.manager.class:             Oro\Bundle\UserBundle\Entity\UserManager
-    oro_user.manager.api.class:         Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.status.manager.class:      Oro\Bundle\UserBundle\Entity\Manager\StatusManager
-    oro_user.entity.class:              Oro\Bundle\UserBundle\Entity\User
-    oro_user.group.entity.class:        Oro\Bundle\UserBundle\Entity\Group
-    oro_user.role.entity.class:         Oro\Bundle\UserBundle\Entity\Role
-    oro_user.security.provider.class:   Oro\Bundle\UserBundle\Security\UserProvider
-    oro_user.security.login.class:      Oro\Bundle\UserBundle\EventListener\LoginSubscriber
-    oro_user.acl.twig.class:            Oro\Bundle\UserBundle\Twig\OroUserExtension
-    oro_user.user_menu.builder.class:   Oro\Bundle\UserBundle\Menu\UserMenuBuilder
-    oro_user.role.listener.class:       Oro\Bundle\UserBundle\EventListener\RoleListener
-    oro_user.role.manager.class:        Oro\Bundle\UserBundle\Entity\Manager\RoleManager
-    oro_user.role.manager.api.class:    Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.group.manager.class:       Oro\Bundle\UserBundle\Entity\Manager\GroupManager
-    oro_user.group.manager.api.class:   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_user.manager.class:                       Oro\Bundle\UserBundle\Entity\UserManager
+    oro_user.manager.api.class:                   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_user.status.manager.class:                Oro\Bundle\UserBundle\Entity\Manager\StatusManager
+    oro_user.entity.class:                        Oro\Bundle\UserBundle\Entity\User
+    oro_user.group.entity.class:                  Oro\Bundle\UserBundle\Entity\Group
+    oro_user.role.entity.class:                   Oro\Bundle\UserBundle\Entity\Role
+    oro_user.security.provider.class:             Oro\Bundle\UserBundle\Security\UserProvider
+    oro_user.security.login.class:                Oro\Bundle\UserBundle\EventListener\LoginSubscriber
+    oro_user.acl.twig.class:                      Oro\Bundle\UserBundle\Twig\OroUserExtension
+    oro_user.user_menu.builder.class:             Oro\Bundle\UserBundle\Menu\UserMenuBuilder
+    oro_user.role.listener.class:                 Oro\Bundle\UserBundle\EventListener\RoleListener
+    oro_user.role.manager.class:                  Oro\Bundle\UserBundle\Entity\Manager\RoleManager
+    oro_user.role.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
+    oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.entity_with_image.listener.class:              Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageListener
     oro_user.autocomplete.user.search_handler:              Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
     oro_user.autocomplete.user.search_acl_handler.class:    Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
@@ -21,10 +21,10 @@ parameters:
     oro_user.gender_provider.class:                         Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.change_password.subscriber.class:              Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
     oro_user.event_listener.user_email_grid_listener.class: Oro\Bundle\UserBundle\EventListener\UserEmailGridListener
-    oro_user.handler.delete.class:      Oro\Bundle\UserBundle\Handler\UserDeleteHandler
-    oro_user.role.handler.delete.class: Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
-    oro_user.entity_role.listener.class: Oro\Bundle\UserBundle\Entity\EventListener\UserRoleListener
-    oro_user.activity_widget_provider.class: %oro_activity.widget_provider.menu.class%
+    oro_user.handler.delete.class:                Oro\Bundle\UserBundle\Handler\UserDeleteHandler
+    oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
+    oro_user.entity_role.listener.class:          Oro\Bundle\UserBundle\Entity\EventListener\UserRoleListener
+    oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
 
 services:
     oro_user.manager:
@@ -203,9 +203,9 @@ services:
     oro_user.activity_widget_provider:
         class: %oro_user.activity_widget_provider.class%
         arguments:
-           - @oro_entity.doctrine_helper
+           - @oro_entity.entity_identifier_accessor
            - @oro_ui.twig.tab_extension
            - 'user_activity_tab_panel'
            - %oro_user.entity.class%
         tags:
-           - { name: oro_activity.widget_provider }
+           - { name: oro_activity.activity_widget_provider }

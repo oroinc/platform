@@ -92,6 +92,21 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetEntityIdentifierWithGetIdMethod()
+    {
+        $identifiers = array('id' => self::TEST_IDENTIFIER);
+
+        $entity = new TestEntity($identifiers['id']);
+
+        $this->registry->expects($this->never())
+            ->method('getManagerForClass');
+
+        $this->assertEquals(
+            $identifiers,
+            $this->doctrineHelper->getEntityIdentifier($entity)
+        );
+    }
+
     /**
      * @param object $entity
      * @param string $class

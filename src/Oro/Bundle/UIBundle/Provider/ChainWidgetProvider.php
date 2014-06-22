@@ -1,20 +1,24 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Provider;
+namespace Oro\Bundle\UIBundle\Provider;
 
-class ChainActivityWidgetProvider implements ActivityWidgetProviderInterface
+/**
+ * This provider calls all registered leaf providers in a chain, merges widgets returned by each leaf provider
+ * and orders result widgets by priority.
+ */
+class ChainWidgetProvider implements WidgetProviderInterface
 {
     /**
-     * @var ActivityWidgetProviderInterface[]
+     * @var WidgetProviderInterface[]
      */
     protected $providers = [];
 
     /**
      * Registers the given provider in the chain
      *
-     * @param ActivityWidgetProviderInterface $provider
+     * @param WidgetProviderInterface $provider
      */
-    public function addProvider(ActivityWidgetProviderInterface $provider)
+    public function addProvider(WidgetProviderInterface $provider)
     {
         $this->providers[] = $provider;
     }
@@ -24,7 +28,7 @@ class ChainActivityWidgetProvider implements ActivityWidgetProviderInterface
      */
     public function supports($entity)
     {
-        return true;
+        return !empty($this->providers);
     }
 
     /**
@@ -38,10 +42,12 @@ class ChainActivityWidgetProvider implements ActivityWidgetProviderInterface
         foreach ($this->providers as $provider) {
             if ($provider->supports($entity)) {
                 $widgets = $provider->getWidgets($entity);
-                foreach ($widgets as $widget) {
-                    $priority = isset($widget['priority']) ? $widget['priority'] : 0;
-                    unset($widget['priority']);
-                    $result[$priority][] = $widget;
+                if (!empty($widgets)) {
+                    foreach ($widgets as $widget) {
+                        $priority = isset($widget['priority']) ? $widget['priority'] : 0;
+                        unset($widget['priority']);
+                        $result[$priority][] = $widget;
+                    }
                 }
             }
         }
