@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Twig;
 
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 
 class EmailExtension extends \Twig_Extension
 {
@@ -14,39 +14,31 @@ class EmailExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_is_email_holder', [$this, 'isEmailHolder']),
+            new \Twig_SimpleFunction('oro_has_email', [$this, 'hasEmail']),
             new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
         ];
     }
 
     /**
-     * Checks if the given object implements EmailHolderInterface
+     * Checks if the given object can have the email address
      *
-     * @param object $object
+     * @param object|string $objectOrClassName
      * @return bool
      */
-    public function isEmailHolder($object)
+    public function hasEmail($objectOrClassName)
     {
-        if (!is_object($object)) {
-            return false;
-        }
-
-        return $object instanceof EmailHolderInterface;
+        return EmailUtil::hasEmail($objectOrClassName);
     }
 
     /**
-     * Gets the email address of the given object if it implements EmailHolderInterface
+     * Gets the email address of the given object
      *
      * @param object $object
-     * @return string
+     * @return string The email address or empty string if the object has no email
      */
     public function getEmail($object)
     {
-        $result = null;
-
-        if ($this->isEmailHolder($object)) {
-            $result = $object->getEmail();
-        }
+        $result = EmailUtil::getEmail($object);
 
         return null !== $result
             ? $result

@@ -149,6 +149,7 @@ class ActivityManagerTest extends OrmTestCase
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
         $activity2ActivityConfig->set('route', 'route2');
+        $activity2ActivityConfig->set('priority', 100);
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
@@ -186,9 +187,72 @@ class ActivityManagerTest extends OrmTestCase
                     'associationName' => 'entity_2929d33a',
                     'label'           => 'lbl.activity2',
                     'route'           => 'route2',
+                    'priority'        => 100,
                 ],
             ],
             $this->manager->getActivityAssociations($targetEntityClass)
+        );
+    }
+
+    public function testGetActivityActions()
+    {
+        $targetEntityClass = 'Test\Entity';
+        $activity1Class    = 'Test\Activity1';
+        $activity2Class    = 'Test\Activity2';
+
+        $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
+        $targetEntityActivityConfig->set('activities', [$activity1Class, $activity2Class]);
+
+        $activity1EntityConfig = new Config(new EntityConfigId('entity', $activity1Class));
+        $activity1EntityConfig->set('plural_label', 'lbl.activity1');
+        $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
+        $activity1ActivityConfig->set('action_widget', 'widget1');
+        $activity1ActivityConfig->set('action_group', 'group1');
+
+        $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
+        $activity2EntityConfig->set('plural_label', 'lbl.activity2');
+        $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
+        $activity2ActivityConfig->set('action_widget', 'widget2');
+        $activity2ActivityConfig->set('priority', 100);
+
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$activity1Class, null, $activity1EntityConfig],
+                        [$activity2Class, null, $activity2EntityConfig],
+                    ]
+                )
+            );
+        $this->activityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$targetEntityClass, null, $targetEntityActivityConfig],
+                        [$activity1Class, null, $activity1ActivityConfig],
+                        [$activity2Class, null, $activity2ActivityConfig],
+                    ]
+                )
+            );
+
+        $this->assertEquals(
+            [
+                [
+                    'className'       => 'Test\Activity1',
+                    'associationName' => 'entity_2929d33a',
+                    'widget'          => 'widget1',
+                    'group'           => 'group1',
+                ],
+                [
+                    'className'       => 'Test\Activity2',
+                    'associationName' => 'entity_2929d33a',
+                    'widget'          => 'widget2',
+                    'priority'        => 100,
+                ],
+            ],
+            $this->manager->getActivityActions($targetEntityClass)
         );
     }
 
