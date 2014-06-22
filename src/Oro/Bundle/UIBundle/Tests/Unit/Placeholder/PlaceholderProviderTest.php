@@ -12,6 +12,11 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     protected $resolver;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityFacade;
+
+    /**
      * @var PlaceholderProvider
      */
     protected $provider;
@@ -19,7 +24,7 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     protected $placeholders = [
         'placeholders' => [
             'test_placeholder' => [
-                'items' => ['item1', 'item2', 'item3', 'item4', 'item5']
+                'items' => ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7']
             ]
         ],
         'items'        => [
@@ -44,14 +49,25 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
                 'template'   => 'template5',
                 'applicable' => false
             ],
+            'item6' => [
+                'template' => 'template6',
+                'acl'      => 'acl_ancestor'
+            ],
+            'item7' => [
+                'template' => 'template7',
+                'acl'      => 'acl_ancestor'
+            ],
         ]
     ];
 
     protected function setUp()
     {
-        $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver       = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver);
+        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver, $this->securityFacade);
     }
 
     public function testGetPlaceholderItems()
@@ -93,8 +109,21 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
             ->method('resolve')
             ->with(['applicable' => $items['item5']['applicable']], $variables)
             ->will($this->returnValue(['applicable' => $items['item5']['applicable']]));
+        $this->securityFacade->expects($this->at(0))
+            ->method('isGranted')
+            ->with('acl_ancestor')
+            ->will($this->returnValue(false));
+        $this->securityFacade->expects($this->at(1))
+            ->method('isGranted')
+            ->with('acl_ancestor')
+            ->will($this->returnValue(true));
+        unset($items['item7']['acl']);
+        $this->resolver->expects($this->at($index++))
+            ->method('resolve')
+            ->with($items['item7'], $variables)
+            ->will($this->returnValue($items['item7']));
 
-        $expexted = [$items['item1'], $items['item2'], $items['item4']];
+        $expexted = [$items['item1'], $items['item2'], $items['item4'], $items['item7']];
 
         $this->assertEquals(
             $expexted,

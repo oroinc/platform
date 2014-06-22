@@ -142,6 +142,12 @@ class EmailHandler
         if ($this->request->query->has('gridName')) {
             $model->setGridName($this->request->query->get('gridName'));
         }
+        if ($this->request->query->has('entityClass')) {
+            $model->setEntityClass($this->request->query->get('entityClass'));
+        }
+        if ($this->request->query->has('entityId')) {
+            $model->setEntityId($this->request->query->get('entityId'));
+        }
         if ($this->request->query->has('from')) {
             $from = $this->request->query->get('from');
             if (!empty($from)) {

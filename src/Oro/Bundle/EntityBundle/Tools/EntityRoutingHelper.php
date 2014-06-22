@@ -91,30 +91,6 @@ class EntityRoutingHelper
     }
 
     /**
-     * Returns the class name of the given entity object
-     *
-     * @param object $entity
-     *
-     * @return string
-     */
-    public function getEntityClass($entity)
-    {
-        return $this->doctrineHelper->getEntityClass($entity);
-    }
-
-    /**
-     * Gets the id of the given entity object
-     *
-     * @param object $entity
-     *
-     * @return mixed
-     */
-    public function getSingleEntityIdentifier($entity)
-    {
-        return $this->doctrineHelper->getSingleEntityIdentifier($entity);
-    }
-
-    /**
      * Returns the entity object by its class name and id
      *
      * @param string $entityClass The class name. Also the _ char can be used instead of \

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -98,6 +99,44 @@ class ActivityManager
     }
 
     /**
+     * Returns an array contains info about all activity actions for the given entity type
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function getActivityActions($entityClass)
+    {
+        $result = [];
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        foreach ($activityClassNames as $activityClassName) {
+            $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
+            $widget         = $activityConfig->get('action_widget');
+            if (!empty($widget)) {
+                $item = [
+                    'className'       => $activityClassName,
+                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                    'widget'          => $widget
+                ];
+
+                $group = $activityConfig->get('action_group');
+                if (!empty($group)) {
+                    $item['group'] = $group;
+                }
+                $priority = $activityConfig->get('priority');
+                if (!empty($priority)) {
+                    $item['priority'] = $priority;
+                }
+
+                $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Adds filter by $entity DQL to the given query builder
      *
      * @param QueryBuilder  $qb                  The query builder that is used to get the list of activities
@@ -111,7 +150,7 @@ class ActivityManager
         $entity,
         $activityEntityClass = null
     ) {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $entityId    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
         $activityEntityAlias = null;
@@ -128,7 +167,7 @@ class ActivityManager
             $activityEntityClass = $rootEntities[0];
             $activityEntityAlias = $qb->getRootAliases()[0];
         } else {
-            $normalizedActivityEntityClass = $this->doctrineHelper->getEntityClass(
+            $normalizedActivityEntityClass = ClassUtils::getRealClass(
                 $this->entityClassResolver->getEntityClass($activityEntityClass)
             );
             foreach ($rootEntities as $i => $className) {

@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ActivityBundle\Provider;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
@@ -20,25 +23,31 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EntityIdentifierAccessor */
+    protected $entityIdentifierAccessor;
+
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
     /**
-     * @param ActivityManager     $activityManager
-     * @param SecurityFacade      $securityFacade
-     * @param TranslatorInterface $translator
-     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param ActivityManager          $activityManager
+     * @param SecurityFacade           $securityFacade
+     * @param TranslatorInterface      $translator
+     * @param EntityIdentifierAccessor $entityIdentifierAccessor
+     * @param EntityRoutingHelper      $entityRoutingHelper
      */
     public function __construct(
         ActivityManager $activityManager,
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
+        EntityIdentifierAccessor $entityIdentifierAccessor,
         EntityRoutingHelper $entityRoutingHelper
     ) {
-        $this->activityManager     = $activityManager;
-        $this->securityFacade      = $securityFacade;
-        $this->translator          = $translator;
-        $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->activityManager          = $activityManager;
+        $this->securityFacade           = $securityFacade;
+        $this->translator               = $translator;
+        $this->entityIdentifierAccessor = $entityIdentifierAccessor;
+        $this->entityRoutingHelper      = $entityRoutingHelper;
     }
 
     /**
@@ -46,9 +55,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
      */
     public function supports($entity)
     {
-        return $this->activityManager->hasActivityAssociations(
-            $this->entityRoutingHelper->getEntityClass($entity)
-        );
+        return $this->activityManager->hasActivityAssociations(ClassUtils::getClass($entity));
     }
 
     /**
@@ -58,8 +65,8 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     {
         $result = [];
 
-        $entityClass = $this->entityRoutingHelper->getEntityClass($entity);
-        $entityId    = $this->entityRoutingHelper->getSingleEntityIdentifier($entity);
+        $entityClass = ClassUtils::getClass($entity);
+        $entityId    = $this->entityIdentifierAccessor->getIdentifier($entity);
 
         $items = $this->activityManager->getActivityAssociations($entityClass);
         foreach ($items as $item) {

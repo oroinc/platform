@@ -32,7 +32,11 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "group_name"=""
  *      },
  *      "grouping"={"groups"={"activity"}},
- *      "activity"={"route"="oro_email_activity_view", "acl"="oro_email_view"}
+ *      "activity"={
+ *          "route"="oro_email_activity_view",
+ *          "acl"="oro_email_view",
+ *          "action_widget"="oro_send_email_button"
+ *      }
  *  }
  * )
  */
