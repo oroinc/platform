@@ -12,71 +12,92 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
     protected $resolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $filter;
-
-    /**
      * @var PlaceholderProvider
      */
     protected $provider;
 
-    protected $placeholders = array(
-        'test_placeholder' => array(
-            'items' => array(
-                array('template' => 'template1'),
-                array('template' => 'template2'),
-                array('template' => 'template3'),
-                array('template' => 'template4'),
-            )
-        )
-    );
+    protected $placeholders = [
+        'placeholders' => [
+            'test_placeholder' => [
+                'items' => ['item1', 'item2', 'item3', 'item4', 'item5']
+            ]
+        ],
+        'items'        => [
+            'item1' => [
+                'template' => 'template1'
+            ],
+            'item2' => [
+                'template'   => 'template2',
+                'applicable' => '@service->isApplicable($entity$)',
+                'data'       => '@service->getData($entity$)'
+            ],
+            'item3' => [
+                'template'   => 'template3',
+                'applicable' => '@service->isApplicable($entity$)',
+                'data'       => '@service->getData($entity$)'
+            ],
+            'item4' => [
+                'template'   => 'template4',
+                'applicable' => true
+            ],
+            'item5' => [
+                'template'   => 'template5',
+                'applicable' => false
+            ],
+        ]
+    ];
 
     protected function setUp()
     {
         $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
-        $this->filter   = $this->getMock('Oro\Bundle\UIBundle\Placeholder\Filter\PlaceholderFilterInterface');
-        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver, array($this->filter));
+
+        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver);
     }
 
     public function testGetPlaceholderItems()
     {
         $placeholderName = 'test_placeholder';
 
-        $variables = array('foo' => 'bar');
+        $variables = ['foo' => 'bar'];
 
-        $items = $this->placeholders[$placeholderName]['items'];
+        $items = $this->placeholders['items'];
 
-        $this->resolver->expects($this->at(0))
+        $index = 0;
+        $this->resolver->expects($this->at($index++))
             ->method('resolve')
-            ->with($items[0], $variables)
-            ->will($this->returnValue($items[0]));
-        $this->resolver->expects($this->at(1))
+            ->with($items['item1'], $variables)
+            ->will($this->returnValue($items['item1']));
+        $this->resolver->expects($this->at($index++))
             ->method('resolve')
-            ->with($items[1], $variables)
-            ->will($this->returnValue($items[1]));
-        $item3 = $items[2];
-        $item3['applicable'] = true;
-        $this->resolver->expects($this->at(2))
+            ->with(['applicable' => $items['item2']['applicable']], $variables)
+            ->will($this->returnValue(['applicable' => true]));
+        unset($items['item2']['applicable']);
+        $this->resolver->expects($this->at($index++))
             ->method('resolve')
-            ->with($items[2], $variables)
-            ->will($this->returnValue($item3));
-        $item = $items[3];
-        $item['applicable'] = false;
-        $this->resolver->expects($this->at(3))
+            ->with($items['item2'], $variables)
+            ->will($this->returnValue($items['item2']));
+        $this->resolver->expects($this->at($index++))
             ->method('resolve')
-            ->with($items[3], $variables)
-            ->will($this->returnValue($item));
+            ->with(['applicable' => $items['item3']['applicable']], $variables)
+            ->will($this->returnValue(['applicable' => false]));
+        $this->resolver->expects($this->at($index++))
+            ->method('resolve')
+            ->with(['applicable' => $items['item4']['applicable']], $variables)
+            ->will($this->returnValue(['applicable' => $items['item4']['applicable']]));
+        unset($items['item4']['applicable']);
+        $this->resolver->expects($this->at($index++))
+            ->method('resolve')
+            ->with($items['item4'], $variables)
+            ->will($this->returnValue($items['item4']));
+        $this->resolver->expects($this->at($index++))
+            ->method('resolve')
+            ->with(['applicable' => $items['item5']['applicable']], $variables)
+            ->will($this->returnValue(['applicable' => $items['item5']['applicable']]));
 
-        $itemsToFilter = array($items[0], $items[1], $item3);
-        $filteredItems = array($items[1]);
-        $this->filter->expects($this->once())
-            ->method('filter')
-            ->with($itemsToFilter, $variables)
-            ->will($this->returnValue($filteredItems));
+        $expexted = [$items['item1'], $items['item2'], $items['item4']];
 
         $this->assertEquals(
-            $filteredItems,
+            $expexted,
             $this->provider->getPlaceholderItems($placeholderName, $variables)
         );
     }

@@ -44,7 +44,7 @@ class GroupingChainWidgetProvider extends ChainWidgetProvider
                 $result[$groupName] = [
                     'widgets' => []
                 ];
-                if ($this->groupNameProvider) {
+                if ($this->groupNameProvider && !empty($groupName)) {
                     $result[$groupName]['label'] = $this->groupNameProvider->getLabel(
                         [
                             'groupName'   => $groupName,

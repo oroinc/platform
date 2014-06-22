@@ -42,10 +42,12 @@ class ChainWidgetProvider implements WidgetProviderInterface
         foreach ($this->providers as $provider) {
             if ($provider->supports($entity)) {
                 $widgets = $provider->getWidgets($entity);
-                foreach ($widgets as $widget) {
-                    $priority = isset($widget['priority']) ? $widget['priority'] : 0;
-                    unset($widget['priority']);
-                    $result[$priority][] = $widget;
+                if (!empty($widgets)) {
+                    foreach ($widgets as $widget) {
+                        $priority = isset($widget['priority']) ? $widget['priority'] : 0;
+                        unset($widget['priority']);
+                        $result[$priority][] = $widget;
+                    }
                 }
             }
         }

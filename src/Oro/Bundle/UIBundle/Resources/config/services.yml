@@ -1,8 +1,7 @@
 parameters:
     oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
     oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\Filter\Filter
-    oro_ui.placeholder.filter.sorter.class:                Oro\Bundle\UIBundle\Placeholder\Filter\Sorter
+    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
 
     oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
     oro_ui.view.listener.class:                            Oro\Bundle\UIBundle\EventListener\TemplateListener
@@ -18,7 +17,6 @@ services:
         arguments:
             - %oro_ui.placeholders%
             - @oro_ui.placeholder.resolver
-            - []
 
     oro_ui.placeholder.resolver:
         class: %oro_ui.placeholder.resolver.class%
@@ -27,11 +25,6 @@ services:
 
     oro_ui.placeholder.filter:
         class: %oro_ui.placeholder.filter.class%
-
-    oro_ui.placeholder.filter.sorter:
-        class: %oro_ui.placeholder.filter.sorter.class%
-        tags:
-            - { name: oro_ui_placeholder.filter }
 
     # Other services
     oro_ui.router:

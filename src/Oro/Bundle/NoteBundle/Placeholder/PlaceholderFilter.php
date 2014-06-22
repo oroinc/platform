@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class Filter
+class PlaceholderFilter
 {
     /**
      * @var ConfigProvider

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UIBundle\Placeholder;
 
-use Oro\Bundle\UIBundle\Placeholder\Filter\PlaceholderFilterInterface;
-
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class PlaceholderProvider
@@ -14,46 +12,69 @@ class PlaceholderProvider
     /** @var array */
     protected $placeholders;
 
-    /** @var PlaceholderFilterInterface[] */
-    protected $filters;
-
     /**
-     * @param array                        $placeholders
-     * @param ResolverInterface            $resolver
-     * @param PlaceholderFilterInterface[] $filters
+     * @param array             $placeholders
+     * @param ResolverInterface $resolver
      */
-    public function __construct(array $placeholders, ResolverInterface $resolver, array $filters)
+    public function __construct(array $placeholders, ResolverInterface $resolver)
     {
         $this->placeholders = $placeholders;
         $this->resolver     = $resolver;
-        $this->filters      = $filters;
     }
 
     /**
-     * Get items by placeholder name
+     * Gets items by placeholder name
      *
      * @param string $placeholderName
      * @param array  $variables
+     *
      * @return array
      */
     public function getPlaceholderItems($placeholderName, array $variables)
     {
         $result = [];
 
-        $items = isset($this->placeholders[$placeholderName]['items'])
-            ? $this->placeholders[$placeholderName]['items']
-            : array();
-        foreach ($items as $item) {
-            $item = $this->resolver->resolve($item, $variables);
-            if (!isset($item['applicable']) || $item['applicable'] === true) {
+        if (!isset($this->placeholders['placeholders'][$placeholderName])) {
+            return $result;
+        }
+
+        foreach ($this->placeholders['placeholders'][$placeholderName]['items'] as $itemName) {
+            $item = $this->getItem($itemName, $variables);
+            if (!empty($item)) {
                 $result[] = $item;
             }
         }
 
-        foreach ($this->filters as $filter) {
-            $result = $filter->filter($result, $variables);
+        return $result;
+    }
+
+    /**
+     * Gets item by name
+     *
+     * @param string $itemName
+     * @param array  $variables
+     *
+     * @return array|null
+     */
+    public function getItem($itemName, array $variables)
+    {
+        if (!isset($this->placeholders['items'][$itemName])) {
+            // the requested item does not exist
+            return null;
         }
 
-        return $result;
+        $item = $this->placeholders['items'][$itemName];
+        if (isset($item['applicable'])) {
+            $resolved = $this->resolver->resolve(['applicable' => $item['applicable']], $variables);
+            if ($resolved['applicable'] === true) {
+                // remove 'applicable' attribute as it is not needed anymore
+                unset($item['applicable']);
+            } else {
+                // the requested item is not applicable in the current context
+                return null;
+            }
+        }
+
+        return $this->resolver->resolve($item, $variables);
     }
 }

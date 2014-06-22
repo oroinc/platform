@@ -151,7 +151,6 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 ''           => [
-                    'label'   => ' - stdClass',
                     'widgets' => [
                         ['name' => 'widget4'],
                         ['name' => 'widget13'],
