@@ -11,7 +11,6 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
-use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
 
 /**
@@ -43,8 +42,6 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  */
 class Email extends ExtendEmail
 {
-    use ExtendActivity;
-
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
