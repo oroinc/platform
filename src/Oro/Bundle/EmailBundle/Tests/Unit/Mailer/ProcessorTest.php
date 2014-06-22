@@ -15,10 +15,13 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $emailEntityBuilder;
+    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailEntityBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailOwnerProvider;
@@ -31,20 +34,28 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->mailer = $this->getMockBuilder('\Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManager')
+            ->with('OroEmailBundle:Email')
+            ->will($this->returnValue($this->em));
+
         $this->emailProcessor = new Processor(
-            $this->em,
-            $this->emailEntityBuilder,
+            $this->doctrineHelper,
             $this->mailer,
+            $this->emailEntityBuilder,
             $this->emailOwnerProvider
         );
     }
@@ -333,9 +344,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
                 ->setConstructorArgs(
                     [
-                        $this->em,
-                        $this->emailEntityBuilder,
+                        $this->doctrineHelper,
                         $this->mailer,
+                        $this->emailEntityBuilder,
                         $this->emailOwnerProvider
                     ]
                 )

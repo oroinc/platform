@@ -225,9 +225,9 @@ services:
     oro_email.mailer.processor:
         class: %oro_email.mailer.processor.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_email.email.entity.builder=
+            - @oro_entity.doctrine_helper
             - @oro_email.direct_mailer
+            - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
 
     oro_email.workflow.action.send_email:
