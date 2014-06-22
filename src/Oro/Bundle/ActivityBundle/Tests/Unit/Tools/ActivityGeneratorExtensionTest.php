@@ -9,6 +9,7 @@ use CG\Generator\PhpClass;
 use Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +21,113 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new ActivityExtendEntityGeneratorExtension();
     }
 
-    public function testSupports()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports($actionType, $schemas, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->extension->supports($actionType, $schemas)
+        );
+    }
+
+    public function supportsProvider()
+    {
+        return [
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                [
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        'test' => [
+                            'target_entity' => 'Entity\Target',
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Entity\Test',
+                                    ExtendHelper::buildAssociationName('Entity\Target'),
+                                    'manyToMany'
+                                ),
+                        ],
+                    ]
+                ],
+                true,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_PRE_PROCESS,
+                [
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        'test' => [
+                            'target_entity' => 'Entity\Target',
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Entity\Test',
+                                    ExtendHelper::buildAssociationName('Entity\Target'),
+                                    'manyToMany'
+                                ),
+                        ],
+                    ]
+                ],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                [
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        'test' => [
+                            'target_entity' => 'Entity\Target',
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Entity\Test',
+                                    'target',
+                                    'manyToMany'
+                                ),
+                        ],
+                    ]
+                ],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                [
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        'test' => [
+                            'target_entity' => 'Entity\Target',
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Entity\Test',
+                                    ExtendHelper::buildAssociationName('Entity\Target'),
+                                    'manyToOne'
+                                ),
+                        ],
+                    ]
+                ],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                [
+                    'relation'     => [],
+                    'relationData' => []
+                ],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                [],
+                false,
+            ],
+        ];
+    }
+
+    public function atestSupports1()
     {
         $schemas = [];
         $result  = $this->extension->supports(ExtendEntityGenerator::ACTION_PRE_PROCESS, $schemas);
@@ -37,12 +144,12 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'relation'     => ['test' => 'test'],
                 'relationData' => [
-                    'test' => [
+                    'test'    => [
                         'field_id' => new FieldConfigId('extend', 'Entity\Test', 'name', 'manyToOne'),
                     ],
                     'another' => [
                         'target_entity' => 'Entity\Test',
-                        'field_id' => new FieldConfigId('extend', 'Entity\Test', 'org_2342', 'manyToMany'),
+                        'field_id'      => new FieldConfigId('extend', 'Entity\Test', 'org_2342', 'manyToMany'),
                     ],
                 ]
             ]

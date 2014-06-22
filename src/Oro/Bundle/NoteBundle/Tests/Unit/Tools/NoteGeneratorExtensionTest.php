@@ -21,23 +21,41 @@ class NoteGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new NoteExtendEntityGeneratorExtension();
     }
 
-    public function testSupports()
+    /**
+     * @dataProvider supportsProvider
+     */
+    public function testSupports($actionType, $schemas, $expected)
     {
-        $schemas = [];
-        $result  = $this->extension->supports(ExtendEntityGenerator::ACTION_PRE_PROCESS, $schemas);
-        $this->assertFalse($result, 'Pre processing not supported');
-
-        $result = $this->extension->supports(
-            ExtendEntityGenerator::ACTION_GENERATE,
-            ['class' => 'Test\Entity', 'relation' => 'test']
+        $this->assertEquals(
+            $expected,
+            $this->extension->supports($actionType, $schemas)
         );
-        $this->assertFalse($result, 'Generate action, entity not matched');
+    }
 
-        $result = $this->extension->supports(
-            ExtendEntityGenerator::ACTION_GENERATE,
-            ['class' => Note::ENTITY_NAME]
-        );
-        $this->assertFalse($result, 'Generate action, entity matched, relation absent');
+    public function supportsProvider()
+    {
+        return [
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                ['class' => Note::ENTITY_NAME, 'relation' => 'test'],
+                true,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_PRE_PROCESS,
+                ['class' => Note::ENTITY_NAME, 'relation' => 'test'],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                ['class' => Note::ENTITY_NAME],
+                false,
+            ],
+            [
+                ExtendEntityGenerator::ACTION_GENERATE,
+                ['class' => 'Test\Entity', 'relation' => 'test'],
+                false,
+            ],
+        ];
     }
 
     public function testGenerate()
