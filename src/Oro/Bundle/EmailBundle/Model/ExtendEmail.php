@@ -2,20 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
+
 class ExtendEmail
 {
-    public function getAssociations()
-    {
-        //
-    }
-
-    public function addAssociation()
-    {
-        //
-    }
-
-    public function removeAssociation()
-    {
-        //
-    }
+    use ExtendActivity;
 }
