@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\NoteBundle\Placeholder;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
+use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class Filter
+class PlaceholderFilter
 {
     /**
      * @var ConfigProvider
@@ -13,20 +14,11 @@ class Filter
     protected $noteConfigProvider;
 
     /**
-     * @var EntityClassAccessor
-     */
-    protected $entityClassAccessor;
-
-    /**
      * @param ConfigProvider      $noteConfigProvider
-     * @param EntityClassAccessor $entityClassAccessor
      */
-    public function __construct(
-        ConfigProvider $noteConfigProvider,
-        EntityClassAccessor $entityClassAccessor
-    ) {
+    public function __construct(ConfigProvider $noteConfigProvider)
+    {
         $this->noteConfigProvider  = $noteConfigProvider;
-        $this->entityClassAccessor = $entityClassAccessor;
     }
 
     /**
@@ -41,7 +33,7 @@ class Filter
             return false;
         }
 
-        $className = $this->entityClassAccessor->getClass($entity);
+        $className = ClassUtils::getClass($entity);
 
         return
             $this->noteConfigProvider->hasConfig($className)

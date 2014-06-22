@@ -7,8 +7,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
-class ActivityWidgetProvider implements ActivityWidgetProviderInterface
+class ActivityWidgetProvider implements WidgetProviderInterface
 {
     /** @var ActivityManager */
     protected $activityManager;
@@ -45,7 +46,9 @@ class ActivityWidgetProvider implements ActivityWidgetProviderInterface
      */
     public function supports($entity)
     {
-        return true;
+        return $this->activityManager->hasActivityAssociations(
+            $this->entityRoutingHelper->getEntityClass($entity)
+        );
     }
 
     /**
@@ -55,20 +58,21 @@ class ActivityWidgetProvider implements ActivityWidgetProviderInterface
     {
         $result = [];
 
-        list($entityClass, $entityId) = $this->entityRoutingHelper->getEntityClassAndId($entity);
+        $entityClass = $this->entityRoutingHelper->getEntityClass($entity);
+        $entityId    = $this->entityRoutingHelper->getSingleEntityIdentifier($entity);
 
-        $activities = $this->activityManager->getAssociatedActivityInfo($entityClass);
-        foreach ($activities as $activity) {
-            if (empty($activity['acl']) || $this->securityFacade->isGranted($activity['acl'])) {
-                $url    = $this->entityRoutingHelper->generateUrl($activity['route'], $entityClass, $entityId);
+        $items = $this->activityManager->getActivityAssociations($entityClass);
+        foreach ($items as $item) {
+            if (empty($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
+                $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
                 $widget = [
                     'widgetType' => 'block',
-                    'alias'      => $activity['associationName'],
-                    'label'      => $this->translator->trans($activity['label']),
-                    'url'        => $url,
+                    'alias'      => $item['associationName'],
+                    'label'      => $this->translator->trans($item['label']),
+                    'url'        => $url
                 ];
-                if (isset($activity['priority'])) {
-                    $widget['priority'] = $activity['priority'];
+                if (isset($item['priority'])) {
+                    $widget['priority'] = $item['priority'];
                 }
                 $result[] = $widget;
             }

@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Placeholder;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\NoteBundle\Placeholder\Filter;
+use Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter;
 
-class FilterTest extends \PHPUnit_Framework_TestCase
+class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $noteConfigProvider;
 
-    /** @var Filter */
+    /** @var PlaceholderFilter */
     protected $filter;
 
     protected function setUp()
@@ -21,10 +20,7 @@ class FilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->filter = new Filter(
-            $this->noteConfigProvider,
-            new EntityClassAccessor()
-        );
+        $this->filter = new PlaceholderFilter($this->noteConfigProvider);
     }
 
     public function testIsNoteAssociationEnabledWithNull()

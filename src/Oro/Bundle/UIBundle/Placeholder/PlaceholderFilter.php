@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Placeholder\Filter;
+namespace Oro\Bundle\UIBundle\Placeholder;
 
-class Filter
+class PlaceholderFilter
 {
     /**
      * Checks the object is an instance of a given class.

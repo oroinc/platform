@@ -3,9 +3,9 @@ parameters:
     oro_activity.entity_extend.dumper_extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
     oro_activity.entity_extend.generator_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
-    oro_activity.widget_provider.class:                 Oro\Bundle\ActivityBundle\Provider\ChainActivityWidgetProvider
-    oro_activity.widget_provider.main.class:            Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
-    oro_activity.widget_provider.menu.class:            Oro\Bundle\ActivityBundle\Provider\MenuActivityWidgetProvider
+    oro_activity.widget_provider.activities.class:      Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
+    oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
+    oro_activity.widget_provider.activities.menu.class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
 
 
 services:
@@ -28,11 +28,11 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: activity }
 
-    oro_activity.widget_provider:
-        class: %oro_activity.widget_provider.class%
+    oro_activity.widget_provider.activities:
+        class: %oro_activity.widget_provider.activities.class%
 
-    oro_activity.widget_provider.main:
-        class: %oro_activity.widget_provider.main.class%
+    oro_activity.widget_provider.activities.main:
+        class: %oro_activity.widget_provider.activities.main.class%
         arguments:
             - @oro_activity.manager
             - @oro_security.security_facade
