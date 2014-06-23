@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
@@ -68,20 +69,11 @@ class Channel
     protected $connectors;
 
     /**
-     * @var boolean
+     * @var ConfigObject
      *
-     * @ORM\Column(name="is_two_way_sync_enabled", type="boolean", nullable=true)
-     * @Oro\Versioned()
+     * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
      */
-    protected $isTwoWaySyncEnabled;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sync_priority", type="string", length=255, nullable=true)
-     * @Oro\Versioned()
-     */
-    protected $syncPriority;
+    protected $synchronizationSettings;
 
     /**
      * @var boolean
@@ -120,8 +112,8 @@ class Channel
 
     public function __construct()
     {
-        $this->statuses            = new ArrayCollection();
-        $this->isTwoWaySyncEnabled = false;
+        $this->statuses                = new ArrayCollection();
+        $this->synchronizationSettings = ConfigObject::create([]);
     }
 
     /**
@@ -223,6 +215,30 @@ class Channel
     }
 
     /**
+     * @param ConfigObject $synchronizationSettings
+     */
+    public function setSynchronizationSettings($synchronizationSettings)
+    {
+        $this->synchronizationSettings = $synchronizationSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettings()
+    {
+        return clone $this->synchronizationSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettingsReference()
+    {
+        return $this->synchronizationSettings;
+    }
+
+    /**
      * @param Status $status
      *
      * @return $this
@@ -261,46 +277,6 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
-    }
-
-    /**
-     * @param string $syncPriority
-     *
-     * @return $this
-     */
-    public function setSyncPriority($syncPriority)
-    {
-        $this->syncPriority = $syncPriority;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSyncPriority()
-    {
-        return $this->syncPriority;
-    }
-
-    /**
-     * @param boolean $isTwoWaySyncEnabled
-     *
-     * @return $this
-     */
-    public function setIsTwoWaySyncEnabled($isTwoWaySyncEnabled)
-    {
-        $this->isTwoWaySyncEnabled = $isTwoWaySyncEnabled;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getIsTwoWaySyncEnabled()
-    {
-        return $this->isTwoWaySyncEnabled;
     }
 
     /**

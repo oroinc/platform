@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -17,6 +18,10 @@ class OroIntegrationBundle implements Migration
         $table = $schema->getTable('oro_integration_channel');
         $table->addColumn('disabled', 'boolean', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('synchronization_settings', Type::TEXT, ['notnull' => true, 'comment' => '(DC2Type:object)']);
+        $table->dropColumn('is_two_way_sync_enabled');
+        $table->dropColumn('sync_priority');
+
         $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
