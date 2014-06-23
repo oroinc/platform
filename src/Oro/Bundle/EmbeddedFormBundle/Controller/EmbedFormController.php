@@ -36,32 +36,6 @@ class EmbedFormController extends Controller
         $formManager = $this->get('oro_embedded_form.manager');
         $form        = $formManager->createForm($formEntity->getFormType());
 
-        // avoid coming empty channel from client side
-        if ($form->has('channel')) {
-            $type = $form->get('channel')->getConfig()->getType()->getInnerType();
-            $configOptions = $form->get('channel')->getConfig()->getOptions();
-
-            $channel = $formEntity->getChannel();
-            $channelClassName = ClassUtils::getClass($channel);
-
-            /**
-             * @var ClassMetadataInfo $channelMetadata
-             */
-            $channelMetadata = $this->getDoctrine()
-                ->getManagerForClass($channelClassName)
-                ->getClassMetadata($channelClassName);
-
-            $configOptions = array_merge(
-                $configOptions,
-                [
-                    'auto_initialize' => false,
-                    'property'        => $channelMetadata->getSingleIdentifierFieldName(),
-                    'empty_data'      => $channel
-                ]
-            );
-            $form->add('channel', $type, $configOptions);
-        }
-
         $form->handleRequest($request);
         if ($form->isValid()) {
             $entity = $form->getData();
