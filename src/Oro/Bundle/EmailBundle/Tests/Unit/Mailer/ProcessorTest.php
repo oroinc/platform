@@ -300,34 +300,34 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     public function messageDataProvider()
     {
         return array(
-//            array(
-//                array(
-//                    'from' => 'from@test.com',
-//                    'to' => array('to@test.com'),
-//                    'subject' => 'subject',
-//                    'body' => 'body'
-//                ),
-//                array(
-//                    'from' => array('from@test.com'),
-//                    'to' => array('to@test.com'),
-//                    'subject' => 'subject',
-//                    'body' => 'body'
-//                )
-//            ),
-//            array(
-//                array(
-//                    'from' => 'Test <from@test.com>',
-//                    'to' => array('To <to@test.com>', 'to2@test.com'),
-//                    'subject' => 'subject',
-//                    'body' => 'body'
-//                ),
-//                array(
-//                    'from' => array('from@test.com' => 'Test'),
-//                    'to' => array('to@test.com' => 'To', 'to2@test.com'),
-//                    'subject' => 'subject',
-//                    'body' => 'body'
-//                )
-//            ),
+            array(
+                array(
+                    'from' => 'from@test.com',
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body'
+                ),
+                array(
+                    'from' => array('from@test.com'),
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body'
+                )
+            ),
+            array(
+                array(
+                    'from' => 'Test <from@test.com>',
+                    'to' => array('To <to@test.com>', 'to2@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body'
+                ),
+                array(
+                    'from' => array('from@test.com' => 'Test'),
+                    'to' => array('to@test.com' => 'To', 'to2@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body'
+                )
+            ),
             array(
                 array(
                     'from' => 'from@test.com',
