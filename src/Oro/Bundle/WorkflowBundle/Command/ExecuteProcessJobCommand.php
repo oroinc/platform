@@ -38,8 +38,8 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Execute process job with received identity')
-            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Identity of the process job that should be executed');
+            ->setDescription('Execute process job with specified identifier')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Identifier of the process job');
     }
 
     /**
