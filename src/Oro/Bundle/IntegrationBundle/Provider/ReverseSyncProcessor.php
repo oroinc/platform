@@ -59,7 +59,7 @@ class ReverseSyncProcessor
      */
     public function process(Channel $channel, $connector, array $parameters)
     {
-        if ($channel->getDisabled()) {
+        if (!$channel->getEnabled()) {
             return $this;
         }
 

@@ -48,7 +48,7 @@ class SyncScheduler
      */
     public function schedule(Channel $channel, $connectorType, $params = [], $useFlush = true)
     {
-        if ($channel->getDisabled()) {
+        if ($channel->getEnabled()) {
             return;
         }
 

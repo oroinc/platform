@@ -101,15 +101,6 @@ class ChannelType extends AbstractType
                 'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip'
             ]
         );
-
-        $builder->add(
-            'disabled',
-            'checkbox',
-            [
-                'label'    => 'oro.integration.integration.disabled.label',
-                'required' => false,
-            ]
-        );
     }
 
     /**

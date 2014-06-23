@@ -75,7 +75,7 @@ class ChannelControllersTest extends WebTestCase
         $form['oro_integration_channel_form[organization]'] = $organization->getId();
         $form['oro_integration_channel_form[type]'] = 'simple';
         $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
-        $form['oro_integration_channel_form[disabled]'] = false;
+        $form['oro_integration_channel_form[enabled]'] = false;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -127,7 +127,7 @@ class ChannelControllersTest extends WebTestCase
 
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
-        $form['oro_integration_channel_form[disabled]'] = true;
+        $form['oro_integration_channel_form[enabled]'] = true;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

@@ -78,10 +78,10 @@ class Channel
     /**
      * @var boolean
      *
-     * @ORM\Column(name="disabled", type="boolean", nullable=true)
+     * @ORM\Column(name="enabled", type="boolean", nullable=true)
      * @Oro\Versioned()
      */
-    protected $disabled;
+    protected $enabled;
 
     /**
      * @var User
@@ -316,18 +316,18 @@ class Channel
     }
 
     /**
-     * @param boolean $disabled
+     * @param boolean $enabled
      */
-    public function setDisabled($disabled)
+    public function setEnabled($enabled)
     {
-        $this->disabled = $disabled;
+        $this->enabled = $enabled;
     }
 
     /**
      * @return boolean
      */
-    public function getDisabled()
+    public function getEnabled()
     {
-        return $this->disabled;
+        return $this->enabled;
     }
 }

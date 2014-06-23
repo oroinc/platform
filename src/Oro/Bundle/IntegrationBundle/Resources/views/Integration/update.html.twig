@@ -9,6 +9,17 @@
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}
 {% endif %}
 
+{% block breadcrumbs %}
+    {{ parent() }}
+    <div class="status-enabled pull-left">
+        {% if entity.enabled %}
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+        {% else %}
+            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
 {% block navButtons %}
     {% if entity.id and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
@@ -20,6 +31,22 @@
             'entity_label': 'oro.integration.integration.entity_label'|trans,
             'dataMessage': 'oro.integration.delete_sync_integration.content',
             'successMessage': 'oro.integration.delete_sync_integration.success'
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+
+    {% if entity.id and entity.enabled == true %}
+        {{ UI.button({
+            'path': path('oro_integration_toggle', {'id': entity.id}),
+            'title' : 'oro.integration.deactivate'|trans,
+            'label' : 'oro.integration.deactivate'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% elseif entity.id %}
+        {{ UI.button({
+            'path': path('oro_integration_toggle', {'id': entity.id}),
+            'title' : 'oro.integration.activate'|trans,
+            'label' : 'oro.integration.activate'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}

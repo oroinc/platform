@@ -90,7 +90,7 @@ class SyncProcessor
      */
     protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
     {
-        if ($channel->getDisabled()) {
+        if (!$channel->getEnabled()) {
             return;
         }
         try {
