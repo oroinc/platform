@@ -74,7 +74,7 @@ class UpdateHandler
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
-            'isWidgetContext' => $this->request->get('_wid')
+            'isWidgetContext' => (bool) $this->request->get('_wid', false)
         );
     }
 
@@ -122,7 +122,7 @@ class UpdateHandler
                 'form'   => $form->createView(),
                 'entity' => $entity,
                 'savedId' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
-                'isWidgetContext' => $this->request->get('_wid')
+                'isWidgetContext' => (bool) $this->request->get('_wid')
             );
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);
