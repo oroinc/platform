@@ -58,38 +58,15 @@
 
 {% block content_data %}
     {% set id = 'channel-update' %}
-    {% set dataBlocks = [] %}
-
-    {% if (form.synchronizationSettings is defined and form.synchronizationSettings.count) %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Synchronization Settings'|trans,
-            'class': 'active',
-            'subblocks': [{
-                'title': '',
-                'data':  [form_widget(form.synchronizationSettings)]
-            }]
-        }]) %}
-    {% endif %}
-
-    {% if (form.mappingSettings is defined and form.mappingSettings.count) %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Mapping Settings'|trans,
-            'class': 'active',
-            'subblocks': [{
-                'title': '',
-                'data':  [form_widget(form.synchronizationSettings)]
-            }]
-        }]) %}
-    {% endif %}
-
+    {% set formData = form_widget(form) %}
     {% set dataBlocks = [{
-        'title': 'General'|trans,
+        'title': 'General',
         'class': 'active',
         'subblocks': [{
-            'title': 'Basic Information'|trans,
-            'data':  [form_widget(form)]
+            'title': 'Basic Information',
+            'data':  [formData]
         }]
-    }]|merge(dataBlocks) %}
+    }] %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,

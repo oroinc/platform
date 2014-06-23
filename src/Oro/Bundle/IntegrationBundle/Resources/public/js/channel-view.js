@@ -119,11 +119,10 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
                     formContent.validate({});
 
                     // trigger hash navigation event for processing UI decorators
-                    navigation.processClicks(formContent.find(navigation.selectors.links));
-                    navigation.processAnchors(formContent.find(navigation.selectors.scrollLinks));
+                    navigation.processClicks(formContent.find('a'));
                     // update wdt
                     navigation.updateDebugToolbar(jqXHR);
-                    mediator.trigger("hash_navigation_request:complete", navigation);
+                    mediator.trigger("hash_navigation_request:complete", this);
                 }
             }).always(function () {
                 if (navigation) {
