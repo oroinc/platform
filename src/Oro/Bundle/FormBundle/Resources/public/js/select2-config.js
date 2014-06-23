@@ -21,15 +21,15 @@ define(['jquery', 'underscore'
             // and if this object was not created in extra config block
             if (this.config.ajax === undefined && this.url) {
                 this.config.ajax = {
-                    'url': this.url,
-                    'data': function (query, page) {
+                    url: this.url,
+                    data: function (query, page) {
                         return {
-                            'page': page,
-                            'per_page': self.perPage,
-                            'query': query
+                            page: page,
+                            per_page: self.perPage,
+                            query: query
                         };
                     },
-                    'results': function (data, page) {
+                    results: function (data, page) {
                         return data;
                     }
                 };
@@ -139,9 +139,9 @@ define(['jquery', 'underscore'
 
                 searchData.search_by_id = true;
                 $.ajax({
-                    'url': url,
-                    'data': searchData,
-                    'success': function(response) {
+                    url: url,
+                    data: searchData,
+                    success: function(response) {
                         if (typeof response.results != 'undefined' && response.results.length > 0) {
                             handleResults(response.results);
                         }

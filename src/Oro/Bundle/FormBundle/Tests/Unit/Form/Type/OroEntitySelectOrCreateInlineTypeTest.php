@@ -27,6 +27,9 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $this->formType = new OroEntitySelectOrCreateInlineType($this->securityFacade);
     }
 
+    /**
+     * @return array
+     */
     protected function getExtensions()
     {
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -53,6 +56,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider requiredOptionsDataProvider
      * @param array $inputOptions
+     * @param string $exceptionMessage
      */
     public function testRequiredOptions(array $inputOptions, $exceptionMessage)
     {
@@ -64,6 +68,9 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $form->submit(null);
     }
 
+    /**
+     * @return array
+     */
     public function requiredOptionsDataProvider()
     {
         return array(

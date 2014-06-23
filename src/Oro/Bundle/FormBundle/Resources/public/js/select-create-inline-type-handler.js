@@ -19,15 +19,15 @@ function (DialogWidget, __) {
             e.preventDefault();
 
             var entitySelectDialog = new DialogWidget({
-                'title': __('Select {{ entity }}', {'entity': label}),
-                'url': gridUrl,
-                'stateEnabled': false,
-                'incrementalPosition': false,
+                title: __('Select {{ entity }}', {'entity': label}),
+                url: gridUrl,
+                stateEnabled: false,
+                incrementalPosition: false,
                 dialogOptions: {
-                    'modal': true,
-                    'allowMaximize': true,
-                    'width': 1280,
-                    'height': 650
+                    modal: true,
+                    allowMaximize: true,
+                    width: 1280,
+                    height: 650
                 }
             });
 
@@ -44,15 +44,15 @@ function (DialogWidget, __) {
             e.preventDefault();
 
             var entityCreateDialog = new DialogWidget({
-                'title': __('Create {{ entity }}', {'entity': label}),
-                'url': entityCreateUrl,
-                'stateEnabled': false,
-                'incrementalPosition': false,
+                title: __('Create {{ entity }}', {'entity': label}),
+                url: entityCreateUrl,
+                stateEnabled: false,
+                incrementalPosition: false,
                 dialogOptions: {
-                    'modal': true,
-                    'allowMaximize': true,
-                    'width': 1280,
-                    'height': 650
+                    modal: true,
+                    allowMaximize: true,
+                    width: 1280,
+                    height: 650
                 }
             });
 

@@ -20,12 +20,19 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
      */
     protected $searchRegistry;
 
+    /**
+     * @param EntityManager  $em
+     * @param SearchRegistry $searchRegistry
+     */
     public function __construct(EntityManager $em, SearchRegistry $searchRegistry)
     {
         $this->em = $em;
         $this->searchRegistry = $searchRegistry;
     }
 
+    /**
+     * @return array|\Symfony\Component\Form\FormTypeInterface[]
+     */
     protected function loadTypes()
     {
         return array(

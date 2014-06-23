@@ -2,19 +2,26 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 class OroEntitySelectOrCreateInlineType extends AbstractType
 {
     const NAME = 'oro_entity_create_or_select_inline';
 
+    /**
+     * @var \Oro\Bundle\SecurityBundle\SecurityFacade
+     */
     protected $securityFacade;
 
+    /**
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;

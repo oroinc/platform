@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Model;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -52,7 +53,7 @@ class UpdateHandler
      * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
      * @param null $formHandler
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|RedirectResponse
      */
     public function handleUpdate(
         $entity,
@@ -107,7 +108,7 @@ class UpdateHandler
      * @param array|callable $saveAndStayRoute
      * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|RedirectResponse
      */
     protected function processSave(
         FormInterface $form,
