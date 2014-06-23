@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AttachmentExtension extends \Twig_Extension
 {
-    const DEFAULT_THUMB_SIZE = 32;
+    const DEFAULT_THUMB_SIZE = 16;
 
     const FILES_TEMPLATE = 'OroAttachmentBundle:Twig:file.html.twig';
     const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
