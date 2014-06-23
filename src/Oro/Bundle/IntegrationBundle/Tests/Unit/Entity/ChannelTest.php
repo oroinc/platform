@@ -80,4 +80,15 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
         $this->entity->setSynchronizationSettings(Object::create([]));
         $this->assertNotSame($value, $this->entity->getSynchronizationSettings());
     }
+
+    public function testMappingSettings()
+    {
+        $value = $this->entity->getMappingSettings();
+        $this->assertNotEmpty($value);
+
+        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\Object', $value);
+
+        $this->entity->setMappingSettings(Object::create([]));
+        $this->assertNotSame($value, $this->entity->getMappingSettings());
+    }
 }
