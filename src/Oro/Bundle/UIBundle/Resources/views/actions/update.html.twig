@@ -1,3 +1,4 @@
+{% set isWidgetContext = isWidgetContext is defined ? isWidgetContext : false %}
 {% extends isWidgetContext ? 'OroFormBundle:Layout:widgetForm.html.twig' : bap.layout %}
 
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
