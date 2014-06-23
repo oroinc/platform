@@ -6,6 +6,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserSelectType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -21,6 +24,9 @@ class UserSelectType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'oro_entity_create_or_select_inline';
