@@ -68,6 +68,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $resolver->setNormalizers(
             array(
                 'create_enabled' => function (Options $options, $createEnabled) {
+                    $createRouteName = $options->get('create_form_route');
+                    $createEnabled = $createEnabled && !empty($createRouteName);
                     if ($createEnabled) {
                         $aclName = $options->get('create_acl');
                         if (empty($aclName)) {
@@ -78,8 +80,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                         }
                     }
 
-                    $createRouteName = $options->get('create_form_route');
-                    return $createEnabled && !empty($createRouteName);
+                    return $createEnabled;
                 }
             )
         );
