@@ -3,9 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -25,6 +30,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailOwnerProvider;
+
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $activityConfigProvider;
 
     /** @var Processor */
     protected $emailProcessor;
@@ -46,6 +54,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->activityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
@@ -56,7 +67,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->mailer,
             $this->emailEntityBuilder,
-            $this->emailOwnerProvider
+            $this->emailOwnerProvider,
+            $this->activityConfigProvider
         );
     }
 
@@ -227,44 +239,111 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $batch->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->em));
-        $this->em->expects($this->once())
-            ->method('flush');
+
+        if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
+            $this->setAddAssociationsExpectations($data, $email);
+            $this->em->expects($this->exactly(2))->method('flush');
+        } else {
+            $this->em->expects($this->once())->method('flush');
+        }
 
         $model = $this->createEmailModel($data);
         $this->assertSame($email, $this->emailProcessor->process($model));
     }
 
+    /**
+     * @param array $data
+     * @param \PHPUnit_Framework_MockObject_MockObject $email
+     */
+    protected function setAddAssociationsExpectations($data, $email)
+    {
+        $targetEntity = new TestUser();
+        $emailOwner1 = new TestUser();
+        $emailOwner2 = new TestUser();
+        $recipient1 = new EmailRecipient();
+        $emailAddr1 = new EmailAddress();
+        $recipient1->setEmailAddress($emailAddr1);
+        $emailAddr1->setOwner($emailOwner1);
+        $recipient2 = new EmailRecipient();
+        $emailAddr2 = new EmailAddress();
+        $recipient2->setEmailAddress($emailAddr2);
+        $emailAddr2->setOwner($emailOwner2);
+        $recipient3 = new EmailRecipient();
+        $emailAddr3 = new EmailAddress();
+        $recipient3->setEmailAddress($emailAddr3);
+        $emailAddr3->setOwner($targetEntity);
+
+        $activityConfig1 = new Config(new EntityConfigId(get_class($targetEntity)));
+        $activityConfig1->set('activities', [get_class($email)]);
+        $activityConfig2 = new Config(new EntityConfigId(get_class($emailOwner1)));
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntity')
+            ->with($data['entityClass'], $data['entityId'])
+            ->will($this->returnValue($targetEntity));
+        $email->expects($this->once())
+            ->method('getRecipients')
+            ->will($this->returnValue([$recipient1, $recipient2, $recipient3]));
+        $this->activityConfigProvider->expects($this->exactly(3))
+            ->method('hasConfig')
+            ->with(get_class($targetEntity))
+            ->will($this->onConsecutiveCalls(true, true, false));
+        $this->activityConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->with(get_class($targetEntity))
+            ->will($this->onConsecutiveCalls($activityConfig1, $activityConfig2));
+        $email->expects($this->once())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+    }
+
     public function messageDataProvider()
     {
         return array(
+//            array(
+//                array(
+//                    'from' => 'from@test.com',
+//                    'to' => array('to@test.com'),
+//                    'subject' => 'subject',
+//                    'body' => 'body'
+//                ),
+//                array(
+//                    'from' => array('from@test.com'),
+//                    'to' => array('to@test.com'),
+//                    'subject' => 'subject',
+//                    'body' => 'body'
+//                )
+//            ),
+//            array(
+//                array(
+//                    'from' => 'Test <from@test.com>',
+//                    'to' => array('To <to@test.com>', 'to2@test.com'),
+//                    'subject' => 'subject',
+//                    'body' => 'body'
+//                ),
+//                array(
+//                    'from' => array('from@test.com' => 'Test'),
+//                    'to' => array('to@test.com' => 'To', 'to2@test.com'),
+//                    'subject' => 'subject',
+//                    'body' => 'body'
+//                )
+//            ),
             array(
                 array(
                     'from' => 'from@test.com',
-                    'to' => array('to@test.com'),
+                    'to' => array('to1@test.com', 'to1@test.com', 'to2@test.com'),
                     'subject' => 'subject',
-                    'body' => 'body'
+                    'body' => 'body',
+                    'entityClass' => 'Entity\Target',
+                    'entityId' => 123
                 ),
                 array(
                     'from' => array('from@test.com'),
-                    'to' => array('to@test.com'),
+                    'to' => array('to1@test.com', 'to1@test.com', 'to2@test.com'),
                     'subject' => 'subject',
                     'body' => 'body'
                 )
             ),
-            array(
-                array(
-                    'from' => 'Test <from@test.com>',
-                    'to' => array('To <to@test.com>', 'to2@test.com'),
-                    'subject' => 'subject',
-                    'body' => 'body'
-                ),
-                array(
-                    'from' => array('from@test.com' => 'Test'),
-                    'to' => array('to@test.com' => 'To', 'to2@test.com'),
-                    'subject' => 'subject',
-                    'body' => 'body'
-                )
-            )
         );
     }
 
@@ -347,7 +426,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         $this->doctrineHelper,
                         $this->mailer,
                         $this->emailEntityBuilder,
-                        $this->emailOwnerProvider
+                        $this->emailOwnerProvider,
+                        $this->activityConfigProvider
                     ]
                 )
                 ->setMethods(['createUserInternalOrigin'])

@@ -229,6 +229,7 @@ services:
             - @oro_email.direct_mailer
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
+            - @oro_entity_config.provider.activity
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
