@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDefinitionGridEntityNameProvider;
+use Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider;
 
-class WorkflowDefinitionGridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -22,7 +22,7 @@ class WorkflowDefinitionGridEntityNameProviderTest extends \PHPUnit_Framework_Te
     protected $translator;
 
     /**
-     * @var WorkflowDefinitionGridEntityNameProvider
+     * @var GridEntityNameProvider
      */
     protected $provider;
 
@@ -36,11 +36,12 @@ class WorkflowDefinitionGridEntityNameProviderTest extends \PHPUnit_Framework_Te
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
-        $this->provider = new WorkflowDefinitionGridEntityNameProvider(
+        $this->provider = new GridEntityNameProvider(
             $this->configProvider,
             $this->em,
             $this->translator
         );
+        $this->provider->setEntityName('test');
     }
 
     public function testGetRelatedEntitiesChoiceConfigurable()
