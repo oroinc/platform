@@ -18,6 +18,10 @@ class DefaultOwnerHelper
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
 
+    /**
+     * @param EntityManager             $em
+     * @param OwnershipMetadataProvider $ownershipMetadataProvider
+     */
     public function __construct(EntityManager $em, OwnershipMetadataProvider $ownershipMetadataProvider)
     {
         $this->em                        = $em;

@@ -133,12 +133,23 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $entityName = get_class($object);
 
         $fieldsValueMap = array(
-            array($entityName, true, $fields),
-            array('DateTime', true, array())
+            $entityName => $fields,
+            'DateTime' => array()
         );
+
         $this->fieldHelper->expects($this->atLeastOnce())
             ->method('getFields')
-            ->will($this->returnValueMap($fieldsValueMap));
+            ->will(
+                $this->returnCallback(
+                    function ($className) use ($fieldsValueMap) {
+                        if (empty($fieldsValueMap[$className])) {
+                            return [];
+                        }
+
+                        return $fieldsValueMap[$className];
+                    }
+                )
+            );
 
         $configValueMap = array();
         $normalizedMap = array();
@@ -148,7 +159,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
             if (isset($field['normalizedValue'])) {
                 $fieldValue = $object->$fieldName;
-                $fieldContext = isset($field['fieldContext']) ? $field['fieldContext'] : $context;
+                $fieldContext = $context;
+                if (isset($field['fieldContext'])) {
+                    $fieldContext = $field['fieldContext'];
+                }
                 $normalizedMap[] = array($fieldValue, null, $fieldContext, $field['normalizedValue']);
             }
 

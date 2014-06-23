@@ -8,18 +8,28 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
+use Oro\Bundle\IntegrationBundle\Utils\FormUtils as IntegrationFormUtils;
+use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
 
 class ChannelFormSubscriber implements EventSubscriberInterface
 {
     /** @var TypesRegistry */
     protected $registry;
 
-    public function __construct(TypesRegistry $registry)
+    /** @var SettingsProvider */
+    protected $settingsProvider;
+
+    /**
+     * @param TypesRegistry    $registry
+     * @param SettingsProvider $settingsProvider
+     */
+    public function __construct(TypesRegistry $registry, SettingsProvider $settingsProvider)
     {
-        $this->registry = $registry;
+        $this->registry         = $registry;
+        $this->settingsProvider = $settingsProvider;
     }
 
     /**
@@ -60,6 +70,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
         $connectorsModifier = $this->getConnectorsModifierClosure($type);
         $connectorsModifier($form);
+
+        $synchronizationSettingsModifier = $this->getSynchronizationSettingsModifierClosure($type);
+        $synchronizationSettingsModifier($form);
 
         $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
@@ -131,6 +144,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
             $connectorsModifier = $this->getConnectorsModifierClosure($type);
             $connectorsModifier($form);
+
+            $synchronizationSettingsModifier = $this->getSynchronizationSettingsModifierClosure($type);
+            $synchronizationSettingsModifier($form);
 
             // value that was set on postSet is replaced by null from request
             $typeChoices           = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
@@ -239,6 +255,27 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param string $type
+     *
+     * @return callable
+     */
+    protected function getSynchronizationSettingsModifierClosure($type)
+    {
+        $settingsProvider = $this->settingsProvider;
+
+        return function (FormInterface $form) use ($type, $settingsProvider) {
+            if (!$type) {
+                return;
+            }
+
+            $fields = $settingsProvider->getFormSettings('synchronization_settings', $type);
+            if ($fields) {
+                $form->add('synchronizationSettings', new IntegrationSettingsDynamicFormType($fields));
+            }
+        };
+    }
+
+    /**
      * Disable fields that are not allowed to be modified since channel has at least one sync completed
      *
      * @param FormInterface $form
@@ -251,25 +288,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (static::wasChannelSynced($channel)) {
+        if (IntegrationFormUtils::wasSyncedAtLeastOnce($channel)) {
             // disable type field
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
         }
-    }
-
-    /**
-     * Return true if channel was synced at least once
-     *
-     * @param Channel $channel
-     *
-     * @return bool
-     */
-    public static function wasChannelSynced(Channel $channel)
-    {
-        return $channel->getStatuses()->exists(
-            function ($key, Status $status) {
-                return intval($status->getCode()) === Status::STATUS_COMPLETED;
-            }
-        );
     }
 }

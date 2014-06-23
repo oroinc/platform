@@ -14,6 +14,9 @@ class OrganizationSubscriber implements EventSubscriberInterface
     /** @var ObjectManager */
     protected $entityManager;
 
+    /**
+     * @param ObjectManager $entityManager
+     */
     public function __construct(ObjectManager $entityManager)
     {
         $this->entityManager = $entityManager;
