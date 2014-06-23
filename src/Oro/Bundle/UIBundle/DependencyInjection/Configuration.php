@@ -107,6 +107,7 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
             ->children()
                 ->scalarNode('applicable')->end()
+                ->scalarNode('acl')->end()
                 ->scalarNode('action')->end()
                 ->scalarNode('template')->end()
                 ->variableNode('data')->end()

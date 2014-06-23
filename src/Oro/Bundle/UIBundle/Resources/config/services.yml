@@ -17,6 +17,7 @@ services:
         arguments:
             - %oro_ui.placeholders%
             - @oro_ui.placeholder.resolver
+            - @oro_security.security_facade
 
     oro_ui.placeholder.resolver:
         class: %oro_ui.placeholder.resolver.class%

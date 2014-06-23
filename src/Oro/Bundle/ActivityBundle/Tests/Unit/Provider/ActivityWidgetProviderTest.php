@@ -19,6 +19,9 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityIdentifierAccessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityRoutingHelper;
 
     protected function setUp()
@@ -30,6 +33,9 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator          = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->entityIdentifierAccessor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,6 +44,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->securityFacade,
             $this->translator,
+            $this->entityIdentifierAccessor,
             $this->entityRoutingHelper
         );
     }
@@ -48,12 +55,8 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     public function testSupports($isSupported)
     {
         $entity      = new \stdClass();
-        $entityClass = 'Test\Entity';
+        $entityClass = 'stdClass';
 
-        $this->entityRoutingHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($this->identicalTo($entity))
-            ->will($this->returnValue($entityClass));
         $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
             ->with($entityClass)
@@ -73,7 +76,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgets()
     {
         $entity      = new \stdClass();
-        $entityClass = 'Test\Entity';
+        $entityClass = 'stdClass';
         $entityId    = 123;
 
         $activities = [
@@ -100,12 +103,8 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->entityRoutingHelper->expects($this->at(0))
-            ->method('getEntityClass')
-            ->with($this->identicalTo($entity))
-            ->will($this->returnValue($entityClass));
-        $this->entityRoutingHelper->expects($this->at(1))
-            ->method('getSingleEntityIdentifier')
+        $this->entityIdentifierAccessor->expects($this->once())
+            ->method('getIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue($entityId));
         $this->activityManager->expects($this->once())
@@ -122,11 +121,11 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ->with('acl2')
             ->will($this->returnValue(true));
 
-        $this->entityRoutingHelper->expects($this->at(2))
+        $this->entityRoutingHelper->expects($this->at(0))
             ->method('generateUrl')
             ->with('route2', $entityClass, $entityId)
             ->will($this->returnValue('url2'));
-        $this->entityRoutingHelper->expects($this->at(3))
+        $this->entityRoutingHelper->expects($this->at(1))
             ->method('generateUrl')
             ->with('route3', $entityClass, $entityId)
             ->will($this->returnValue('url3'));

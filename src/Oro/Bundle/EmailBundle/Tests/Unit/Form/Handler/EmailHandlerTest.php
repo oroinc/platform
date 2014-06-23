@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
 class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +41,9 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $nameFormatter;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityRoutingHelper;
+
     /** @var Email */
     protected $model;
 
@@ -54,18 +59,21 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em                  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
+        $this->translator          = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityContext     = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
+        $this->emailProcessor      = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->logger              = $this->getMock('Psr\Log\LoggerInterface');
         $this->nameFormatter       = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -100,7 +108,8 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             $this->emailAddressManager,
             $this->emailProcessor,
             $this->logger,
-            $this->nameFormatter
+            $this->nameFormatter,
+            $this->entityRoutingHelper
         );
     }
 
@@ -115,7 +124,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->never())
             ->method('submit');
 
-        $user  = new TestUser('test@example.com', 'John', 'Smith');
+        $user = new TestUser('test@example.com', 'John', 'Smith');
 
         $this->nameFormatter->expects($this->any())
             ->method('format')
@@ -160,7 +169,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('testGrid', $this->model->getGridName());
         $this->assertEquals('FirstName LastName <from@example.com>', $this->model->getFrom());
-        $this->assertEquals(array('FirstName LastName <to@example.com>'), $this->model->getTo());
+        $this->assertEquals(['FirstName LastName <to@example.com>'], $this->model->getTo());
         $this->assertEquals('testSubject', $this->model->getSubject());
     }
 
@@ -172,7 +181,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->setMethod($method);
         $this->model
             ->setFrom('from@example.com')
-            ->setTo(array('to@example.com'))
+            ->setTo(['to@example.com'])
             ->setSubject('testSubject')
             ->setBody('testBody');
 
@@ -203,7 +212,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->setMethod($method);
         $this->model
             ->setFrom('from@example.com')
-            ->setTo(array('to@example.com'))
+            ->setTo(['to@example.com'])
             ->setSubject('testSubject')
             ->setBody('testBody');
 
@@ -233,18 +242,71 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->logger->expects($this->once())
             ->method('error')
-            ->with('Email sending failed.', array('exception' => $exception));
+            ->with('Email sending failed.', ['exception' => $exception]);
         $this->form->expects($this->once())
             ->method('addError')
             ->with($this->isInstanceOf('Symfony\Component\Form\FormError'));
         $this->assertFalse($this->handler->process($this->model));
     }
 
+    /**
+     * @dataProvider preciseFullEmailAddressProvider
+     */
+    public function testPreciseFullEmailAddress($expected, $emailAddress, $ownerClass, $ownerId)
+    {
+        $this->nameFormatter->expects($this->any())
+            ->method('format')
+            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser'))
+            ->will(
+                $this->returnCallback(
+                    function ($obj) {
+                        return $obj->getFirstName() . ' ' . $obj->getLastName();
+                    }
+                )
+            );
+        if ($ownerId) {
+            $this->entityRoutingHelper->expects($this->once())
+                ->method('getEntity')
+                ->with($ownerClass, $ownerId)
+                ->will($this->returnValue(new TestUser($emailAddress, 'OwnerFirstName', 'OwnerLastName')));
+        }
+
+        $srcEmailAddress = $emailAddress;
+        $param = [&$emailAddress, $ownerClass, $ownerId];
+        ReflectionUtil::callProtectedMethod($this->handler, 'preciseFullEmailAddress', $param);
+
+        $this->assertEquals($expected, $emailAddress);
+    }
+
+    public function preciseFullEmailAddressProvider()
+    {
+        return [
+            [
+                'FirstName LastName <test@example.com>',
+                'test@example.com',
+                null,
+                null
+            ],
+            [
+                'FirstName LastName <test@example.com>',
+                'test@example.com',
+                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
+                null
+            ],
+            [
+                'OwnerFirstName OwnerLastName <test@example.com>',
+                'test@example.com',
+                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
+                123
+            ],
+        ];
+    }
+
     public function supportedMethods()
     {
-        return array(
-            array('POST'),
-            //array('PUT')
-        );
+        return [
+            ['POST'],
+            ['PUT']
+        ];
     }
 }

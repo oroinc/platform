@@ -2,24 +2,30 @@
 
 namespace Oro\Bundle\UIBundle\Placeholder;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class PlaceholderProvider
 {
+    /** @var array */
+    protected $placeholders;
+
     /** @var ResolverInterface */
     protected $resolver;
 
-    /** @var array */
-    protected $placeholders;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /**
      * @param array             $placeholders
      * @param ResolverInterface $resolver
+     * @param SecurityFacade    $securityFacade
      */
-    public function __construct(array $placeholders, ResolverInterface $resolver)
+    public function __construct(array $placeholders, ResolverInterface $resolver, SecurityFacade $securityFacade)
     {
-        $this->placeholders = $placeholders;
-        $this->resolver     = $resolver;
+        $this->placeholders   = $placeholders;
+        $this->resolver       = $resolver;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -64,6 +70,15 @@ class PlaceholderProvider
         }
 
         $item = $this->placeholders['items'][$itemName];
+        if (isset($item['acl'])) {
+            if ($this->securityFacade->isGranted($item['acl'])) {
+                // remove 'acl' attribute as it is not needed anymore
+                unset($item['acl']);
+            } else {
+                // the access denied for the requested item
+                return null;
+            }
+        }
         if (isset($item['applicable'])) {
             $resolved = $this->resolver->resolve(['applicable' => $item['applicable']], $variables);
             if ($resolved['applicable'] === true) {
