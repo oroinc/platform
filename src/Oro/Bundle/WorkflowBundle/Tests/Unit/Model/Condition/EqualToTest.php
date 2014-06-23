@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Condition;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
