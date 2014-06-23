@@ -132,14 +132,43 @@ class AttachmentManager
      */
     public function getAttachmentUrl($parentEntity, $fieldName, Attachment $entity, $type = 'get', $absolute = false)
     {
-        $parentClass = ClassUtils::getRealClass($parentEntity);
+        return $this->getAttachment(
+            ClassUtils::getRealClass($parentEntity),
+            $parentEntity->getId(),
+            $fieldName,
+            $entity,
+            $type = 'get',
+            $absolute
+        );
+    }
+
+    /**
+     * Get attachment url
+     *
+     * @param string     $parentClass
+     * @param int        $parentId
+     * @param string     $fieldName
+     * @param Attachment $entity
+     * @param string     $type
+     * @param bool       $absolute
+     * @return string
+     */
+    public function getAttachment(
+        $parentClass,
+        $parentId,
+        $fieldName,
+        Attachment $entity,
+        $type = 'get',
+        $absolute = false
+    ) {
+
         $urlString = base64_encode(
             implode(
                 '|',
                 [
                     $parentClass,
                     $fieldName,
-                    $parentEntity->getId(),
+                    $parentId,
                     $type,
                     $entity->getOriginalFilename()
                 ]

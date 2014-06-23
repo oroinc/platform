@@ -9,13 +9,12 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 
-
 class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     /** @var  AttachmentManager */
     protected $attachmentManager;
 
-    public function construct(AttachmentManager $manager)
+    public function setAttachmentManager(AttachmentManager $manager)
     {
         $this->attachmentManager = $manager;
     }
@@ -49,8 +48,13 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        //todo: 1. refactor getAttachmentUrl method to support parent entity class and id without object
-        //      2. in ConfigurableEntityNormalizer add parent entity id in context
-        return $this->attachmentManager->getAttachmentUrl($context['entityName'], $context['fieldName'])
+        return $this->attachmentManager->getAttachment(
+            $context['entityName'],
+            $context['entityId'],
+            $context['field']['name'],
+            $object,
+            'download',
+            true
+        );
     }
 }

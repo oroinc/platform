@@ -120,6 +120,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
                 $fieldContext['field'] = $field;
+                $fieldContext['entityId'] = $object->getId();
                 $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
 
                 // Do not export relation in short mode if it does not contain identity fields
