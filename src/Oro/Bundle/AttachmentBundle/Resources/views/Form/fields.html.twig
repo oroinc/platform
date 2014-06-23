@@ -15,9 +15,7 @@
                 <div id="{{ divId }}" class="oro_attachment_file">
                     {{ oro_file_view(parentEntity, fieldName, value) }}
                     {{ form_row(form.emptyFile) }}
-                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">
-                        <i class="icon-remove"></i>
-                    </button>
+                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">x</button>
                 </div>
                 <script type="text/javascript">
                     require(['jquery'],
@@ -55,9 +53,7 @@
                         {{ value.originalFilename }}
                     </a>
                     {{ form_row(form.emptyFile) }}
-                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">
-                        <i class="icon-remove"></i>
-                    </button>
+                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">x</button>
                     <script type="text/javascript">
                         require(['jquery'],
                             function($){
