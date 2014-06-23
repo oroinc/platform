@@ -1,0 +1,140 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_process_definition_update') %}
+        {% set idButton = entity.name ~ '-process-deactivate-btn' %}
+        {% if entity.enabled %}
+            {{ UI.button({
+                'aCss':  'no-hash btn-danger',
+                'iCss':  'icon-remove',
+                'id':    idButton,
+                'label': 'oro.workflow.action.process.deactivate',
+                'path':  path('oro_workflow_api_rest_process_deactivate', {'processDefinition': entity.name}),
+                'title': 'oro.workflow.action.process.deactivate',
+            }) }}
+        {% else %}
+            {{ UI.button({
+                'iCss':  'icon-ok',
+                'aCss':  'no-hash btn-success',
+                'id':    idButton,
+                'label': 'oro.workflow.action.process.activate',
+                'path':  path('oro_workflow_api_rest_process_activate', {'processDefinition': entity.name}),
+                'title': 'oro.workflow.action.process.activate',
+            }) }}
+        {% endif %}
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
+            function($, Messenger, Navigation, mediator, Error) {
+                var navigation = Navigation.getInstance();
+                $('#{{ idButton }}').on('click', function(e) {
+                    e.preventDefault();
+                    var el = $(this);
+                    $.ajax({
+                        url: el.prop('href'),
+                        type: 'GET',
+                        success: function(response) {
+                            if (navigation) {
+                                if (response.message) {
+                                    mediator.once('hash_navigation_request:complete', function() {
+                                        Messenger.notificationFlashMessage('success', response.message);
+                                    });
+                                }
+                                navigation.loadPage(true);
+
+                            } else {
+                                window.location.reload();
+                            }
+                        },
+                        error: function(xhr) {
+                            Error.handle({}, xhr, {enforce: true});
+                        }
+                    })
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock navButtons %}
+
+{% block breadcrumbs %}
+    {{ parent() }}
+
+    <div class="status-enabled pull-left">
+        {% if entity.enabled %}
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+        {% else %}
+            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
+{% block stats %}
+    <li>{{ 'oro.workflow.processdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.processdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_process_definition_index'),
+        'indexLabel': 'oro.workflow.processdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {%- set processDefinitionInfo -%}
+        {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
+        {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
+
+        {%- set triggerData -%}
+            {%- for trigger in triggers -%}
+                {% set event = 'oro.workflow.block.view.process.trigger.event.' ~ trigger.event  %}
+                {% set when = trigger.queued ?
+                    trigger.timeShift|oro_format_duration :
+                    'oro.workflow.block.view.process.trigger.when.immediately'|trans
+                %}
+
+                {% if trigger.field %}
+                    {% set field = entityConfig.trigger.field.lable|default(trigger.field) %}
+                    {% set after = '<b>' ~ field ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.property'|trans %}
+                {% else %}
+                    {% set after = '<b>' ~ relatedEntityLabel ~ '</b> ' ~ 'oro.workflow.block.view.process.trigger.after.entity'|trans %}
+                {% endif %}
+
+                {{ 'oro.workflow.block.view.process.trigger.description'|trans({
+                        '%after%': after,
+                        '%event%': '<b>' ~ event|trans ~ '</b>',
+                        '%when%':  '<b>' ~ when ~ '</b>'
+                    })|raw
+                }}
+                <br />
+            {%- endfor -%}
+        {%- endset -%}
+
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.workflow.processdefinition.label.label'|trans, entity.label) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.related_entity.label'|trans, relatedEntityLabel) }}
+                {{ UI.renderProperty('oro.workflow.processdefinition.execution_order.label'|trans, entity.executionOrder) }}
+                {{ UI.renderHtmlProperty('oro.workflow.processtrigger.entity_plural_label'|trans, triggerData) }}
+            </div>
+        </div>
+    {%- endset -%}
+
+    {% set dataBlocks = [
+        {
+            'title': 'oro.workflow.block.title.process_info'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [processDefinitionInfo] },
+            ]
+        }
+    ] %}
+
+    {% set id = 'processDefinitionView' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {{ parent() }}
+{% endblock content_data %}
