@@ -9,19 +9,20 @@
 {% block navButtons %}
     {% if resource_granted('oro_workflow') %}
         {% if isActive %}
+            {% set idButton = entity.name ~ '-workflow-deactivate-btn' %}
             {{ UI.button({
-                'iCss': 'icon-remove',
-                'aCss': 'no-hash btn-danger',
-                'id': entity.name ~ '-workflow-deactivate-btn',
+                'aCss':  'no-hash btn-danger',
+                'iCss':  'icon-remove',
+                'id':    idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'path':  path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
                 'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
-                'path': path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
             }) }}
             <script type="text/javascript">
                 require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
                 function($, Messenger, Navigation, mediator, Error) {
                     var navigation = Navigation.getInstance();
-                    $('#{{ entity.name }}-workflow-deactivate-btn').on('click', function(e) {
+                    $('#{{ idButton }}').on('click', function(e) {
                         e.preventDefault();
                         var el = $(this);
                         $.ajax({
@@ -48,19 +49,20 @@
                 });
             </script>
         {% else %}
+            {% set idButton = entity.name ~ '-workflow-activate-btn' %}
             {{ UI.button({
-                'iCss': 'icon-ok',
-                'aCss': 'no-hash btn-success',
-                'id': entity.name ~ '-workflow-activate-btn',
+                'aCss':  'no-hash btn-success',
+                'iCss':  'icon-ok',
+                'id':    idButton,
                 'label': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'path':  path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
                 'title': 'oro.workflow.workflowdefinition.datagrid.activate',
-                'path': path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
             }) }}
             <script type="text/javascript">
                 require(['jquery', 'oroworkflow/js/activation-handler', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/messenger'],
                 function($, activationHandler, Navigation, mediator, Messenger) {
                     var navigation = Navigation.getInstance();
-                    $('#{{ entity.name }}-workflow-activate-btn').on('click', function(e) {
+                    $('#{{ idButton }}').on('click', function(e) {
                         e.preventDefault();
                         var el = $(this);
                         el.on('activation_success', function(e, response) {

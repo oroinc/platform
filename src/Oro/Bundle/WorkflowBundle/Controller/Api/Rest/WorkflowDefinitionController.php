@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
