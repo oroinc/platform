@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 
 class FieldHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -119,6 +120,10 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfigValue($expected, $entityName, $fieldName, $parameter, $default = null)
     {
+        if (!is_null($expected)) {
+            $this->assertTrue($this->helper->hasConfig($entityName, $fieldName));
+        }
+
         $this->assertSame(
             $expected,
             $this->helper->getConfigValue($entityName, $fieldName, $parameter, $default)
@@ -318,5 +323,77 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                 'field' => array('type' => 'string'),
             ),
         );
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed  $value
+     * @param array  $exception
+     *
+     * @dataProvider objectValueProvider
+     */
+    public function testSetObjectValue($object, $fieldName, $value, array $exception)
+    {
+        if ($exception) {
+            list($class, $message) = $exception;
+            $this->setExpectedException($class, $message);
+        }
+
+        $this->helper->setObjectValue($object, $fieldName, $value);
+
+        $this->assertSame($value, $this->helper->getObjectValue($object, $fieldName));
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed  $value
+     * @param array  $exception
+     *
+     * @dataProvider objectValueProvider
+     */
+    public function testGetObjectValue($object, $fieldName, $value, array $exception)
+    {
+        if ($exception) {
+            list($class, $message) = $exception;
+            $this->setExpectedException($class, $message);
+        }
+
+        $this->assertEquals(null, $this->helper->getObjectValue($object, $fieldName));
+        $this->helper->setObjectValue($object, $fieldName, $value);
+        $this->assertEquals($value, $this->helper->getObjectValue($object, $fieldName));
+    }
+
+    /**
+     * @return array
+     */
+    public function objectValueProvider()
+    {
+        $object = new ImportEntity();
+
+        return [
+            'not_exists' => [
+                'object'    => $object,
+                'fieldName' => 'not_exists',
+                'value'     => 'test',
+                'exception' => [
+                    '\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException',
+                    'Neither the property "not_exists" nor one of the methods '
+                ]
+            ],
+            'protected'  => [
+                'object'    => $object,
+                'fieldName' => 'twitter',
+                'value'     => 'username',
+                'exception' => []
+            ],
+            'private'    => [
+                'object'    => $object,
+                'fieldName' => 'private',
+                'value'     => 'should_be_set',
+                'exception' => []
+            ],
+        ];
     }
 }

@@ -120,7 +120,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var Country
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Country", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Country")
      * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
      * @Soap\ComplexType("string", nillable=false)
      * @ConfigField(
@@ -137,7 +137,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var Region
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region")
      * @ORM\JoinColumn(name="region_code", referencedColumnName="combined_code")
      * @Soap\ComplexType("string", nillable=true)
      * @ConfigField(

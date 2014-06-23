@@ -42,7 +42,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      description="Indicates whether Unidirectional association fields should be returned.")
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
      * @QueryParam(
-     *      name="with-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
+     *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entity fields",
@@ -58,7 +58,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $withExclusions     = ('1' == $this->getRequest()->query->get('with-exclusions'));
+        $applyExclusions    = ('1' == $this->getRequest()->query->get('apply-exclusions'));
 
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
@@ -71,7 +71,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $withVirtualFields,
                 $withEntityDetails,
                 $withUnidirectional,
-                $withExclusions
+                $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;

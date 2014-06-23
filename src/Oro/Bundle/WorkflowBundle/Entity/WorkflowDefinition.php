@@ -16,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @Config(
  *  routeName="oro_workflow_definition_index",
- *  routeView="oro_workflow_definition_update",
+ *  routeView="oro_workflow_definition_view",
  *  defaultValues={
  *      "entity"={
  *          "label"="Workflow",

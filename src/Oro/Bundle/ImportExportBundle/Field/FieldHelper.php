@@ -32,12 +32,33 @@ class FieldHelper
 
     /**
      * @param string $entityName
-     * @param bool $withRelations
+     * @param bool   $withRelations
+     * @param bool   $withVirtualFields
+     * @param bool   $withEntityDetails
+     * @param bool   $withUnidirectional
+     * @param bool   $applyExclusions
+     * @param bool   $translate
      * @return array
      */
-    public function getFields($entityName, $withRelations = false)
-    {
-        return $this->fieldProvider->getFields($entityName, $withRelations);
+    public function getFields(
+        $entityName,
+        $withRelations = false,
+        $withVirtualFields = false,
+        $withEntityDetails = false,
+        $withUnidirectional = false,
+        $applyExclusions = false,
+        $translate = true
+    ) {
+        return $this
+            ->fieldProvider->getFields(
+                $entityName,
+                $withRelations,
+                $withVirtualFields,
+                $withEntityDetails,
+                $withUnidirectional,
+                $applyExclusions,
+                $translate
+            );
     }
 
     /**

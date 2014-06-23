@@ -46,6 +46,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $commandExecutor
                 ->runCommand('oro:migration:load', array('--process-isolation' => true, '--force' => true))
                 ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
+                ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('oro:assets:install', array('--exclude' => array('OroInstallerBundle')))
