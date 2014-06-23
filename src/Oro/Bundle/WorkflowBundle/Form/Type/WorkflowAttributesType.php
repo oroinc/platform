@@ -7,10 +7,6 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\FormTypeGuesserInterface;
-
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;

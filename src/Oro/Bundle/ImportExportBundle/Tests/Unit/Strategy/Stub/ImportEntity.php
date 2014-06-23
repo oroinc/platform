@@ -15,6 +15,11 @@ class ImportEntity
     protected $twitter;
 
     /**
+     * @var
+     */
+    private $private;
+
+    /**
      * @return int
      */
     public function getId()

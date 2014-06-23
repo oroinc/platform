@@ -4,7 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
@@ -19,24 +18,22 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
     /** @var  FormBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $builder;
 
-    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
-    /** @var /Doctrine\Common\Persistence\ObjectManager|\PHPUnit_Framework_MockObject_MockObject  */
-    protected $objectManager;
-
     public function setUp()
     {
         $this->registry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
             ->disableOriginalConstructor()->getMock();
-        $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-        $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->builder  = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new ChannelType($this->registry, $this->securityFacade, $this->objectManager);
+        $subscribersNS      = 'Oro\\Bundle\\IntegrationBundle\\Form\\EventListener\\';
+        $channelFS          = $this->getMockBuilder($subscribersNS . 'ChannelFormSubscriber')
+            ->disableOriginalConstructor()->getMock();
+        $defaultUserOwnerFS = $this->getMockBuilder($subscribersNS . 'DefaultUserOwnerSubscriber')
+            ->disableOriginalConstructor()->getMock();
+        $organizationFS     = $this->getMockBuilder($subscribersNS . 'OrganizationSubscriber')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->type = new ChannelType($this->registry, $defaultUserOwnerFS, $channelFS, $organizationFS);
     }
 
     public function tearDown()
@@ -51,17 +48,12 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber'));
         $this->builder->expects($this->at(1))
             ->method('addEventSubscriber')
-            ->with(
-                $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormTwoWaySyncSubscriber')
-            );
-        $this->builder->expects($this->at(2))
-            ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
-        $this->builder->expects($this->at(3))
+        $this->builder->expects($this->at(2))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber'));
 
-        $this->type->buildForm($this->builder, array());
+        $this->type->buildForm($this->builder, []);
     }
 
     public function testGetName()

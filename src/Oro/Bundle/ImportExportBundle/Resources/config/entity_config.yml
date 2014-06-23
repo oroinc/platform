@@ -25,7 +25,19 @@ oro_entity_config:
                             block:          import and export
                 # is filed will be used to find existing entity
                 identity:
-                    options: []
+                    options:
+                        allowed_type: 
+                            - string
+                            - integer
+                            - smallint
+                            - bigint
+                            - boolean
+                            - decimal
+                            - date
+                            - text
+                            - float
+                            - money
+                            - percent
                     form:
                         type:               choice
                         options:
@@ -51,9 +63,10 @@ oro_entity_config:
                             block:          import and export
                 # is relation must be represented by all it's fields
                 full:
-                    options: []
+                    options:
+                        allowed_type:       [ref-one, oneToOne, manyToOne, ref-many, oneToMany, manyToMany]
                     form:
-                        type:               oro_importexport_full_option
+                        type:               choice
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:
