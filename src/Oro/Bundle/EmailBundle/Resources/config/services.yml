@@ -259,13 +259,6 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
-    oro_email.listener.datagrid.myemails:
-        class: %oro_email.listener.datagrid.myemails.class%
-        arguments:
-            - @oro_email.datagrid_query_factory
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.my-emails-grid, method: onBuildAfter }
-
     oro_entity.twig.extension.email:
         class: %oro_entity.twig.extension.email.class%
         tags:
