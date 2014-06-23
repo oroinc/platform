@@ -62,9 +62,6 @@ datagrid:
     activity-email-grid:
         extends: email-grid
 
-    my-emails-grid:
-        extends: email-grid
-
     email-templates:
         source:
             type: orm

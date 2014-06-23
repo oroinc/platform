@@ -26,9 +26,9 @@ class UserEmailGridListener
         EmailSynchronizationManager $emailSyncManager,
         EmailQueryFactory $factory = null
     ) {
-        $this->em      = $em;
+        $this->em               = $em;
         $this->emailSyncManager = $emailSyncManager;
-        $this->queryFactory = $factory;
+        $this->queryFactory     = $factory;
     }
 
     public function onBuildAfter(BuildAfter $event)

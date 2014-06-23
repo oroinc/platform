@@ -17,25 +17,20 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class EmailController extends Controller
 {
     /**
-     * @Route("/my-emails", name="oro_email_index")
+     * @Route("/my-emails", name="oro_email_myemails")
      * @AclAncestor("oro_email_view")
      * @Template
      */
     public function myEmailsAction()
     {
-        /** @var User $user */
-        $user = $this->getUser();
-
         return [
             'entity_class' => $this->container->getParameter('oro_email.email.entity.class'),
-//            'user'         => $user,
         ];
     }
 

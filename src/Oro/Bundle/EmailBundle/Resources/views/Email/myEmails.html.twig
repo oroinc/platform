@@ -2,15 +2,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
-{% set gridName = 'my-emails-grid' %}
+{% set gridName = 'users-email-grid' %}
 {# grid params #}
-{% set params = {user: app.user} %}
-
-{% block navButtons %}
-    {% if resource_granted('oro_email_create') %}
-        {{ UI.addButton({
-            'path': path('oro_email_email_create'),
-            'entity_label': 'oro.email.entity_label'|trans
-        }) }}
-    {% endif %}
-{% endblock %}
+{% set params = {'userId': app.user.id} %}
