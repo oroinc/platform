@@ -1,17 +1,18 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define([
+    'jquery',
+    'underscore',
+    './app/views/base/view'
+], function ($, _, BaseView) {
     'use strict';
+
+    var LoadingMaskView;
 
     /**
      * Loading mask widget
-     *
-     * @export  oroui/js/loading-mask
-     * @class   oroui.LoadingMask
-     * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    LoadingMaskView = BaseView.extend({
 
         /** @property {Boolean} */
         displayed: false,
@@ -55,7 +56,7 @@ define(['jquery', 'underscore', 'backbone'
                 updateProxy = $.proxy(this.updatePos, this);
                 $(window).resize(updateProxy).scroll(updateProxy);
             }
-            this.constructor.__super__.initialize.apply(this, arguments);
+            BaseView.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -149,4 +150,6 @@ define(['jquery', 'underscore', 'backbone'
             return this;
         }
     });
+
+    return LoadingMaskView;
 });

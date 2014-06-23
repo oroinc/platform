@@ -23,7 +23,7 @@ define([
             titleSerialized: '',
             titleShort: '',
 
-            flashMessages: [],
+            flashMessages: {},
             showPinButton: false
         },
 

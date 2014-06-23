@@ -16,7 +16,8 @@ require([
             mainMenu: '#main-menu',
             userMenu: '#top-page .user-menu',
             breadcrumb: '#breadcrumb',
-            loadingMask: '#main .hash-loading-mask'
+            loadingMask: '#main .hash-loading-mask',
+            messages: '#flash-messages .flash-messages-holder'
         }
     });
 });
@@ -83,5 +84,18 @@ require([
     'use strict';
     BaseController.addBeforeActionReuse('loadingMask', PageLoadingMaskView, {
         region: 'loadingMask'
+    });
+});
+
+/**
+ * Init PageMessagesView
+ */
+require([
+    'oroui/js/app/controllers/base/controller',
+    'oroui/js/app/views/page/messages-view'
+], function (BaseController, PageMessagesView) {
+    'use strict';
+    BaseController.addBeforeActionReuse('messages', PageMessagesView, {
+        el: 'messages'
     });
 });
