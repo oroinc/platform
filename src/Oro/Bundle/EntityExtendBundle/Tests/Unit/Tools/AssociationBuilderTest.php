@@ -70,7 +70,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                         'owner'           => 'System',
                         'state'           => 'New',
                         'extend'          => true,
-                        'is_inverse'      => false,
+                        'without_default' => true,
                         'relation_key'    => 'manyToMany|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332',
                         'target_entity'   => self::TARGET_CLASS,
                         'target_grid'     => ['id'],

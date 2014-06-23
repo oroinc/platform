@@ -17,16 +17,25 @@ oro_entity_config:
 
                 # the route name for the controller that can be used to render the list of activities
                 # assigned to some entity
-                # this controller must have $entity parameter which is used to pass the target entity
+                # this controller must have $entityClass and $entityId parameters are used to pass the target entity
                 # this attribute must be defined for each activity entity (an entity included in 'activity' group,
                 # see 'grouping' scope)
                 route: # string
                     options: []
-                # the ACL ancestor that is used to check whether this type of activities can be shown
+                # the ACL ancestor that is used to check whether this type of activity is available
                 # in the current security context
                 acl: # string
                     options: []
-                # the priority of this type of activities. This attribute can be used to change
-                # the order of activities on UI
+                # this attribute can be used to change the order of this type of activity on UI
                 priority: # integer
+                    options: []
+                # the widget name of the activity action. This widget must be defined in placeholders.yml
+                # this attribute can be defined for activity entity
+                action_widget: # string
+                    options: []
+                # the name of a group in which the activity action is included.
+                # this attribute can be defined for activity entity
+                # if this attribute is not specified the activity action is rendered standalone;
+                # otherwise, it is grouped with other activity actions included in the same group
+                action_group: # string
                     options: []

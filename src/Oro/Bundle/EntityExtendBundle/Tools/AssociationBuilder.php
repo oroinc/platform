@@ -64,7 +64,7 @@ class AssociationBuilder
                     'owner'           => ExtendScope::OWNER_SYSTEM,
                     'state'           => ExtendScope::STATE_NEW,
                     'extend'          => true,
-                    'is_inverse'      => false,
+                    'without_default' => true,
                     'relation_key'    => $relationKey,
                     'target_entity'   => $targetEntityClass,
                     'target_grid'     => $targetEntityPrimaryKeyColumns,

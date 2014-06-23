@@ -1,12 +1,14 @@
 parameters:
     oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
     oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\Filter\Filter
-    oro_ui.placeholder.filter.sorter.class:                Oro\Bundle\UIBundle\Placeholder\Filter\Sorter
+    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
 
     oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
     oro_ui.view.listener.class:                            Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
+
+    oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
+    oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
 
 services:
     # Placeholder services
@@ -15,7 +17,7 @@ services:
         arguments:
             - %oro_ui.placeholders%
             - @oro_ui.placeholder.resolver
-            - []
+            - @oro_security.security_facade
 
     oro_ui.placeholder.resolver:
         class: %oro_ui.placeholder.resolver.class%
@@ -24,11 +26,6 @@ services:
 
     oro_ui.placeholder.filter:
         class: %oro_ui.placeholder.filter.class%
-
-    oro_ui.placeholder.filter.sorter:
-        class: %oro_ui.placeholder.filter.sorter.class%
-        tags:
-            - { name: oro_ui_placeholder.filter }
 
     # Other services
     oro_ui.router:
@@ -49,3 +46,13 @@ services:
             - @oro_locale.formatter.date_time
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
+
+    oro_ui.label_provider.action_button_group:
+        class: %oro_ui.label_provider.action_button_group.class%
+        arguments:
+            - @translator
+
+    oro_ui.widget_provider.view_actions:
+        class: %oro_ui.widget_provider.view_actions.class%
+        arguments:
+            - @oro_ui.label_provider.action_button_group

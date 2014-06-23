@@ -36,6 +36,11 @@ class DoctrineHelper
      */
     public function getEntityIdentifier($entity)
     {
+        // check if we can use getId method to fast get the identifier
+        if (method_exists($entity, 'getId')) {
+            return ['id' => $entity->getId()];
+        }
+
         return $this
             ->getEntityMetadata($entity)
             ->getIdentifierValues($entity);
@@ -44,7 +49,7 @@ class DoctrineHelper
     /**
      * @param object $entity
      * @param bool   $triggerException
-     * @return integer|null
+     * @return mixed|null
      * @throws Exception\InvalidEntityException
      */
     public function getSingleEntityIdentifier($entity, $triggerException = true)

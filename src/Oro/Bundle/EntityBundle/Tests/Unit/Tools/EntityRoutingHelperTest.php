@@ -98,25 +98,6 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetEntityClassAndId()
-    {
-        $entity = new \stdClass();
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($this->identicalTo($entity))
-            ->will($this->returnValue('stdClass'));
-        $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->with($this->identicalTo($entity))
-            ->will($this->returnValue(123));
-
-        $this->assertEquals(
-            ['stdClass', 123],
-            $this->entityRoutingHelper->getEntityClassAndId($entity)
-        );
-    }
-
     public function testGetEntity()
     {
         $entity = new \stdClass();

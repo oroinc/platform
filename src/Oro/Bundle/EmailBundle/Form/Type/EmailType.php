@@ -15,6 +15,8 @@ class EmailType extends AbstractType
     {
         $builder
             ->add('gridName', 'hidden', array('required' => false))
+            ->add('entityClass', 'hidden', array('required' => false))
+            ->add('entityId', 'hidden', array('required' => false))
             ->add(
                 'from',
                 'oro_email_email_address',

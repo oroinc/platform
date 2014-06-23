@@ -18,6 +18,7 @@ parameters:
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
     oro_email.event_listener.activity_grid_listener.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.myemails.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MyEmailsGridListener
+    oro_entity.twig.extension.email.class:        Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -264,3 +265,8 @@ services:
             - @oro_email.datagrid_query_factory
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.my-emails-grid, method: onBuildAfter }
+
+    oro_entity.twig.extension.email:
+        class: %oro_entity.twig.extension.email.class%
+        tags:
+            - { name: twig.extension }

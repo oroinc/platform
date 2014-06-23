@@ -22,8 +22,11 @@ class ExtendNote
      * The real implementation of this method is auto generated.
      *
      * @param object $target Any configurable entity that can have notes
+     *
+     * @return object This object
      */
     public function setTarget($target)
     {
+        return $this;
     }
 }

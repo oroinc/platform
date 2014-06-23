@@ -13,26 +13,18 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 {
     /**
-     * Check if generator extension supports configuration pre-processing or can generate code
-     *
-     * @param string $actionType pre-process or generate
-     * @param array  $schemas    whole schemas when actionType is pre-process,
-     *                           entity schema when actionType is generate
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function supports($actionType, array $schemas)
     {
-        return ExtendEntityGenerator::ACTION_GENERATE == $actionType &&
-        $schemas['class'] == Note::ENTITY_NAME &&
-        !empty($schemas['relation']);
+        return
+            ExtendEntityGenerator::ACTION_GENERATE === $actionType
+            && $schemas['class'] === Note::ENTITY_NAME
+            && !empty($schemas['relation']);
     }
 
     /**
-     * @param array    $schema
-     * @param PhpClass $class
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function generate(array $schema, PhpClass $class)
     {
@@ -61,12 +53,8 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 
         $getMethodBody = [];
         $setMethodBody = [
-            '// The note can be associated with one entity only',
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
-            'if (!in_array($className, [' . implode(', ', $supportedEntities) . '])) {',
-            '    throw new \RuntimeException(sprintf('
-            . '\'The association with "%s" entity was not configured.\', $className));',
-            '}'
+            '// The note can be associated with one entity only',
         ];
 
         foreach ($relationNames as $fieldName => $targetClassName) {
@@ -76,7 +64,7 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
                 $fieldName
             );
             $setMethodBody[] = sprintf(
-                'if ($className == \'%s\') { $this->resetTargets(); $this->%s = %s; }',
+                'if ($className === \'%s\') { $this->resetTargets(); $this->%s = %s; return $this; }',
                 $targetClassName,
                 $fieldName,
                 '$target'
@@ -84,6 +72,8 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
         }
 
         $getMethodBody[] = 'return null;';
+        $setMethodBody[] = 'throw new \RuntimeException(sprintf('
+            . '\'The association with "%s" entity was not configured.\', $className));';
 
         $getMethodDocblock = "/**\n"
             . " * Gets the entity this note is associated with\n"
@@ -94,6 +84,7 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
             . " * Sets the entity this note is associated with\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can have notes\n"
+            . " * @return object This object\n"
             . " */";
 
         $class

@@ -1,5 +1,5 @@
 oro_workflow:
-    label: oro.workflow.action.general
-    type: action
+    label:      oro.workflow.action.general
+    type:       action
     group_name: ""
-    bindings: ~
+    bindings:   ~

@@ -93,7 +93,7 @@ abstract class AbstractAssociationExtendConfigDumperExtension extends ExtendConf
      *
      * @return ConfigInterface[]
      */
-    protected function &getTargetEntityConfigs()
+    protected function getTargetEntityConfigs()
     {
         if (null === $this->targetEntityConfigs) {
             $this->targetEntityConfigs = [];

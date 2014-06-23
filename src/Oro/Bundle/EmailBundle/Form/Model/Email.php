@@ -12,6 +12,16 @@ class Email
     /**
      * @var string
      */
+    protected $entityClass;
+
+    /**
+     * @var mixed
+     */
+    protected $entityId;
+
+    /**
+     * @var string
+     */
     protected $from;
 
     /**
@@ -56,6 +66,52 @@ class Email
     public function setGridName($gridName)
     {
         $this->gridName = $gridName;
+
+        return $this;
+    }
+
+    /**
+     * Get class name of the target entity
+     *
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * Set class name of the target entity
+     *
+     * @param string $entityClass
+     * @return $this
+     */
+    public function setEntityClass($entityClass)
+    {
+        $this->entityClass = $entityClass;
+
+        return $this;
+    }
+
+    /**
+     * Get id of the target entity
+     *
+     * @return string
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * Set id of the target entity
+     *
+     * @param string $entityId
+     * @return $this
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
 
         return $this;
     }
