@@ -1,6 +1,5 @@
 parameters:
     oro_importexport.form.type.import.class: Oro\Bundle\ImportExportBundle\Form\Type\ImportType
-    oro_importexport.form.type.full_option.class: Oro\Bundle\ImportExportBundle\Form\Type\FullOptionType
 
 services:
     oro_importexport.form.type.import:
@@ -8,8 +7,3 @@ services:
         arguments: [@oro_importexport.processor.registry]
         tags:
             - { name: form.type, alias: oro_importexport_import }
-
-    oro_importexport.form.type.full_option:
-        class: %oro_importexport.form.type.full_option.class%
-        tags:
-            - { name: form.type, alias: oro_importexport_full_option }
