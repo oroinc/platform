@@ -38,6 +38,7 @@ define([
         toMaximize: function (e) {
             this.model.collection.trigger('toMaximize', this.model);
             e.stopPropagation();
+            e.preventDefault();
         },
 
         /**

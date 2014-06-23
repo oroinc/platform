@@ -67,7 +67,7 @@ require([
     'jquery',
     'oroui/js/app/controllers/base/controller',
     'oronavigation/js/app/views/page/pin/view',
-    'oronavigation/js/app/models/pin-model',
+    'oronavigation/js/app/models/base/model',
     'oroui/js/app/models/base/collection'
 ], function ($, BaseController, PinView, Model, Collection) {
     'use strict';
