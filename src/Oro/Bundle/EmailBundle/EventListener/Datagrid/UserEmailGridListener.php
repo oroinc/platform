@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\EventListener;
+namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
-use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 
 class UserEmailGridListener
 {
@@ -26,9 +26,9 @@ class UserEmailGridListener
         EmailSynchronizationManager $emailSyncManager,
         EmailQueryFactory $factory = null
     ) {
-        $this->em      = $em;
+        $this->em               = $em;
         $this->emailSyncManager = $emailSyncManager;
-        $this->queryFactory = $factory;
+        $this->queryFactory     = $factory;
     }
 
     public function onBuildAfter(BuildAfter $event)
