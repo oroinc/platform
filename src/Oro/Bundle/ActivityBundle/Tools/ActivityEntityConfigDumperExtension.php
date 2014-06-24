@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Tools;
 
-use Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationExtendConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationEntityConfigDumperExtension;
 
-class ActivityExtendConfigDumperExtension extends MultipleAssociationExtendConfigDumperExtension
+class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
 {
     /**
      * {@inheritdoc}

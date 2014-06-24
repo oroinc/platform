@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NoteBundle\Tools;
 
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationExtendConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationEntityConfigDumperExtension;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
-class NoteExtendConfigDumperExtension extends AssociationExtendConfigDumperExtension
+class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExtension
 {
     /**
      * {@inheritdoc}

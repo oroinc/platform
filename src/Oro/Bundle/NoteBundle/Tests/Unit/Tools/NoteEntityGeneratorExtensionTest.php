@@ -7,28 +7,27 @@ use CG\Core\DefaultGeneratorStrategy;
 
 use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Tools\NoteExtendEntityGeneratorExtension;
+use Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension;
 
-class NoteGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var NoteExtendEntityGeneratorExtension */
+    /** @var NoteEntityGeneratorExtension */
     protected $extension;
 
     public function setUp()
     {
-        $this->extension = new NoteExtendEntityGeneratorExtension();
+        $this->extension = new NoteEntityGeneratorExtension();
     }
 
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports($actionType, $schemas, $expected)
+    public function testSupports($schemas, $expected)
     {
         $this->assertEquals(
             $expected,
-            $this->extension->supports($actionType, $schemas)
+            $this->extension->supports($schemas)
         );
     }
 
@@ -36,22 +35,14 @@ class NoteGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 ['class' => Note::ENTITY_NAME, 'relation' => 'test'],
                 true,
             ],
             [
-                ExtendEntityGenerator::ACTION_PRE_PROCESS,
-                ['class' => Note::ENTITY_NAME, 'relation' => 'test'],
-                false,
-            ],
-            [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 ['class' => Note::ENTITY_NAME],
                 false,
             ],
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 ['class' => 'Test\Entity', 'relation' => 'test'],
                 false,
             ],

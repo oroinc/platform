@@ -5,26 +5,20 @@ namespace Oro\Bundle\ActivityBundle\Tools;
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityGeneratorExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
+class ActivityEntityGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     /**
      * {@inheritdoc}
      */
-    public function supports($actionType, array $schemas)
+    public function supports(array $schema)
     {
-        $result =
-            ExtendEntityGenerator::ACTION_GENERATE === $actionType
-            && !empty($schemas['relation'])
-            && !empty($schemas['relationData']);
-
+        $result = !empty($schema['relation']) && !empty($schema['relationData']);
         if ($result) {
             $result = false;
-            foreach ($schemas['relationData'] as $relationData) {
+            foreach ($schema['relationData'] as $relationData) {
                 /** @var FieldConfigId $fieldConfig */
                 $fieldConfig = $relationData['field_id'];
 
@@ -48,8 +42,6 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
      */
     public function generate(array $schema, PhpClass $class)
     {
-        $classBuilder = new ClassBuilder();
-
         $relationData = empty($schema['relationData']) ? [] : $schema['relationData'];
 
         $relationNames     = [];
@@ -125,17 +117,17 @@ class ActivityExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtens
 
         $class
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('getActivityTargets', implode("\n", $getMethodBody), ['targetClass'])
                     ->setDocblock($getMethodDocblock)
             )
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('addActivityTarget', implode("\n", $addMethodBody), ['target'])
                     ->setDocblock($addMethodDocblock)
             )
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('removeActivityTarget', implode("\n", $removeMethodBody), ['target'])
                     ->setDocblock($removeMethodDocblock)
             );

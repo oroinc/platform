@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
-abstract class AssociationExtendConfigDumperExtension extends AbstractAssociationExtendConfigDumperExtension
+abstract class AssociationEntityConfigDumperExtension extends AbstractAssociationEntityConfigDumperExtension
 {
     /**
      * Gets the entity class who is owning side of the association

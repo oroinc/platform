@@ -183,6 +183,8 @@ class Email extends ExtendEmail
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
         $this->emailBody  = new ArrayCollection();
