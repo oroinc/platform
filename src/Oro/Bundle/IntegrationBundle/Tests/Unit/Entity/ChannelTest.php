@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Util\Inflector;
+
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\DataGridBundle\Common\Object;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
@@ -50,11 +54,11 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         return [
-            'id'                  => ['id'],
-            'name'                => ['name', self::TEST_STRING, self::TEST_STRING],
-            'type'                => ['type', self::TEST_STRING, self::TEST_STRING],
-            'connectors'          => ['connectors', self::$testConnectors, self::$testConnectors],
-            'defaultUserOwner'    => ['defaultUserOwner', $user, $user],
+            'id'               => ['id'],
+            'name'             => ['name', self::TEST_STRING, self::TEST_STRING],
+            'type'             => ['type', self::TEST_STRING, self::TEST_STRING],
+            'connectors'       => ['connectors', self::$testConnectors, self::$testConnectors],
+            'defaultUserOwner' => ['defaultUserOwner', $user, $user],
         ];
     }
 
@@ -70,14 +74,39 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEmpty('transport', $this->entity);
     }
 
-    public function testSynchronizationSettings()
+    /**
+     * @dataProvider integrationSettingFieldsProvider
+     *
+     * @param string $fieldName
+     */
+    public function testIntegrationSettings($fieldName)
     {
-        $value = $this->entity->getSynchronizationSettings();
+        $accessor        = PropertyAccess::createPropertyAccessor();
+        $referenceGetter = Inflector::camelize('get_' . $fieldName . '_reference');
+        $this->assertTrue(method_exists($this->entity, $referenceGetter));
+
+        $value = $accessor->getValue($this->entity, $fieldName);
         $this->assertNotEmpty($value);
 
         $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Common\Object', $value);
 
-        $this->entity->setSynchronizationSettings(Object::create([]));
-        $this->assertNotSame($value, $this->entity->getSynchronizationSettings());
+        $newValue = Object::create([]);
+        $accessor->setValue($this->entity, $fieldName, $newValue);
+        $this->assertNotSame($value, $this->entity->$referenceGetter());
+
+        $this->assertEquals($newValue, $accessor->getValue($this->entity, $fieldName));
+        $this->assertNotSame($newValue, $accessor->getValue($this->entity, $fieldName));
+        $this->assertSame($newValue, $this->entity->$referenceGetter());
+    }
+
+    /**
+     * @return array
+     */
+    public function integrationSettingFieldsProvider()
+    {
+        return [
+            ['synchronizationSettings'],
+            ['mappingSettings']
+        ];
     }
 }

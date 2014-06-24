@@ -21,6 +21,10 @@
         {{ form_widget(form.synchronizationSettings) }}
     {% endif %}
 
+    {% if (form.mappingSettings is defined) %}
+        {{ form_widget(form.mappingSettings) }}
+    {% endif %}
+
     {% if (form.connectors is defined) %}
         <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
             {{ form_row(form.connectors) }}
