@@ -4,7 +4,13 @@
     dynamically via ajax depends on type and transportType fields value
 #}
 {% block oro_integration_channel_form_widget %}
-    {{ form_row(form.type) }}
+
+    {% if form.type.vars.choices is empty %}
+        {{ form_row(form.type, {'attr': {'disabled':true} } ) }}
+    {% else %}
+        {{ form_row(form.type) }}
+    {% endif %}
+
     {{ form_row(form.name) }}
 
     {% if (form.organization is defined) %}

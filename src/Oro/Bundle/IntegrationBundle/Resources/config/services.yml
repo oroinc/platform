@@ -12,8 +12,6 @@ parameters:
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
-    oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
-    oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
 
     # Import/export utils
@@ -137,16 +135,6 @@ services:
           - @oro_integration.manager.types_registry
           - @oro_integration.logger.strategy
         lazy: true
-
-    oro_integration.provider.channel_type.simple:
-        class: %oro_integration.provider.channel_type.simple.class%
-        tags:
-            - { name: oro_integration.channel, type: simple }
-
-    oro_integration.provider.simple_transport:
-        class: %oro_integration.provider.simple_transport.class%
-        tags:
-            - { name: oro_integration.transport, type: simple, channel_type: simple }
 
     oro_integration.provider.connector_context_mediator:
         class: %oro_integration.provider.connector_context_mediator.class%

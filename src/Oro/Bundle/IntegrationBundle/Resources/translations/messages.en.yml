@@ -20,13 +20,6 @@ oro:
                     activated: Integration activated
                     deactivated: Integration deactivated
 
-        integration_type:
-            simple:
-                label: Simple
-
-        transport:
-            simple: Simple
-
         integration:
             entity_label:        Integration
             entity_plural_label: Integrations
@@ -68,3 +61,6 @@ oro:
         delete_sync_integration:
             content: "Warning: Removing the integration will delete all related data"
             success: Integration and all related data were deleted
+
+        form:
+          no_available_integrations: No integrations available
