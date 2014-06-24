@@ -59,6 +59,10 @@ class ReverseSyncProcessor
      */
     public function process(Channel $channel, $connector, array $parameters)
     {
+        if (!$channel->getEnabled()) {
+            return $this;
+        }
+
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
 

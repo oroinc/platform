@@ -59,6 +59,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'type'             => ['type', self::TEST_STRING, self::TEST_STRING],
             'connectors'       => ['connectors', self::$testConnectors, self::$testConnectors],
             'defaultUserOwner' => ['defaultUserOwner', $user, $user],
+            'enabled'          => ['enabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
         ];
     }
 
