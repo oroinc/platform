@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 

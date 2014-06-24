@@ -30,5 +30,6 @@ config:
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
         'oroform/js/select2_relevancy_order_handler': 'bundles/oroform/js/select2-relevancy-order-handler.js'
         'oroform/js/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'
+        'oroform/js/select-create-inline-type-handler': 'bundles/oroform/js/select-create-inline-type-handler.js'
 
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
