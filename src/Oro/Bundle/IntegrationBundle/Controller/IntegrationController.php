@@ -129,14 +129,14 @@ class IntegrationController extends Controller
         if ($integration->getEnabled()) {
             $integration->setEnabled(false);
             $this->get('session')->getFlashBag()->add(
-                'info',
+                'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.deactivated')
             );
 
         } else {
             $integration->setEnabled(true);
             $this->get('session')->getFlashBag()->add(
-                'info',
+                'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.activated')
             );
         }

@@ -122,6 +122,7 @@ class Channel
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
         $this->mappingSettings         = ConfigObject::create([]);
+        $this->enabled                 = true;
     }
 
     /**
