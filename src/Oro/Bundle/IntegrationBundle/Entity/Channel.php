@@ -253,7 +253,7 @@ class Channel
      */
     public function getMappingSettings()
     {
-        return $this->mappingSettings;
+        return clone $this->mappingSettings;
     }
 
     /**
