@@ -35,28 +35,27 @@ class SettingsProvider
      */
     public function getFormSettings($name, $channelType)
     {
-        if (!isset(
+        $result = $priorities = [];
+
+        if (isset(
             $this->settings[IntegrationConfiguration::FORM_NODE_NAME],
             $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])
         ) {
-            throw new \LogicException('Form settings not found');
-        }
+            $formData = $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name];
 
-        $formData = $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name];
+            foreach ($formData as $fieldName => $field) {
+                $field = $this->resolver->resolve($field, ['channelType' => $channelType]);
 
-        $result = $priorities = [];
-        foreach ($formData as $fieldName => $field) {
-            $field = $this->resolver->resolve($field, ['channelType' => $channelType]);
-
-            // if applicable node not set, then applicable to all
-            if ($this->isApplicable($field, $channelType)) {
-                $priority           = isset($field['priority']) ? $field['priority'] : 0;
-                $priorities[]       = $priority;
-                $result[$fieldName] = $field;
+                // if applicable node not set, then applicable to all
+                if ($this->isApplicable($field, $channelType)) {
+                    $priority           = isset($field['priority']) ? $field['priority'] : 0;
+                    $priorities[]       = $priority;
+                    $result[$fieldName] = $field;
+                }
             }
-        }
 
-        array_multisort($priorities, SORT_ASC, $result);
+            array_multisort($priorities, SORT_ASC, $result);
+        }
 
         return $result;
     }

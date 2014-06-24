@@ -76,11 +76,18 @@ class Channel
     protected $synchronizationSettings;
 
     /**
-     * @var boolean
+     * @var ConfigObject
      *
-     * @ORM\Column(name="enabled", type="boolean", nullable=true)
-     * @Oro\Versioned()
+     * @ORM\Column(name="mapping_settings", type="object", nullable=false)
      */
+    protected $mappingSettings;
+
+    /**
+     * @var boolean
+    *
+    * @ORM\Column(name="enabled", type="boolean", nullable=true)
+    * @Oro\Versioned()
+    */
     protected $enabled;
 
     /**
@@ -114,6 +121,7 @@ class Channel
     {
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
+        $this->mappingSettings         = ConfigObject::create([]);
     }
 
     /**
@@ -231,11 +239,39 @@ class Channel
     }
 
     /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
      * @return ConfigObject
      */
     public function getSynchronizationSettingsReference()
     {
         return $this->synchronizationSettings;
+    }
+
+    /**
+     * @param ConfigObject $mappingSettings
+     */
+    public function setMappingSettings($mappingSettings)
+    {
+        $this->mappingSettings = $mappingSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getMappingSettings()
+    {
+        return clone $this->mappingSettings;
+    }
+
+    /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
+     * @return ConfigObject
+     */
+    public function getMappingSettingsReference()
+    {
+        return $this->mappingSettings;
     }
 
     /**
