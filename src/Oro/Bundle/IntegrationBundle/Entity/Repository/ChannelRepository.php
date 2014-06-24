@@ -23,10 +23,12 @@ class ChannelRepository extends EntityRepository
     public function getConfiguredChannelsForSync($type = null)
     {
         $qb = $this->createQueryBuilder('c')
-            ->where('c.transport is NOT NULL');
+            ->where('c.transport is NOT NULL')
+            ->andWhere('c.enabled = :isEnabled')
+            ->setParameter('isEnabled', true);
 
         if (null !== $type) {
-            $qb->where('c.type = :type')
+            $qb->andWhere('c.type = :type')
                 ->setParameter('type', $type);
         }
 
