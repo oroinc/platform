@@ -1,3 +1,5 @@
 Default: Default
 Remove: Remove
 Add: Add
+"Select {{ entity }}": "Select {{ entity }}"
+"Create {{ entity }}": "Create {{ entity }}"

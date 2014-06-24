@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class Processor
@@ -18,41 +22,50 @@ class Processor
     /** @var EntityManager */
     protected $em;
 
-    /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
+    /** @var  DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var \Swift_Mailer */
     protected $mailer;
 
+    /** @var EmailEntityBuilder */
+    protected $emailEntityBuilder;
+
     /** @var  EmailOwnerProvider */
     protected $emailOwnerProvider;
 
+    /** @var  ConfigProvider */
+    protected $activityConfigProvider;
+
     /**
-     * @param EntityManager      $em
-     * @param EmailEntityBuilder $emailEntityBuilder
+     * @param DoctrineHelper     $doctrineHelper
      * @param \Swift_Mailer      $mailer
+     * @param EmailEntityBuilder $emailEntityBuilder
      * @param EmailOwnerProvider $emailOwnerProvider
+     * @param ConfigProvider     $activityConfigProvider
      */
     public function __construct(
-        EntityManager $em,
-        EmailEntityBuilder $emailEntityBuilder,
+        DoctrineHelper $doctrineHelper,
         \Swift_Mailer $mailer,
-        EmailOwnerProvider $emailOwnerProvider
+        EmailEntityBuilder $emailEntityBuilder,
+        EmailOwnerProvider $emailOwnerProvider,
+        ConfigProvider $activityConfigProvider
     ) {
-        $this->em                 = $em;
-        $this->emailEntityBuilder = $emailEntityBuilder;
-        $this->mailer             = $mailer;
-        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->doctrineHelper         = $doctrineHelper;
+        $this->mailer                 = $mailer;
+        $this->emailEntityBuilder     = $emailEntityBuilder;
+        $this->emailOwnerProvider     = $emailOwnerProvider;
+        $this->activityConfigProvider = $activityConfigProvider;
     }
 
     /**
      * Process email model sending.
      *
-     * @param Email  $model
-     * @return \Oro\Bundle\EmailBundle\Entity\Email
+     * @param EmailModel $model
+     * @return Email
      * @throws \Swift_SwiftException
      */
-    public function process(Email $model)
+    public function process(EmailModel $model)
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -87,8 +100,10 @@ class Processor
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
         $email->setMessageId($messageId);
 
-        $this->emailEntityBuilder->getBatch()->persist($this->em);
-        $this->em->flush();
+        $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+        $this->getEntityManager()->flush();
+
+        $this->addAssociations($model, $email);
 
         return $email;
     }
@@ -103,7 +118,7 @@ class Processor
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
         $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-            $this->em,
+            $this->getEntityManager(),
             EmailUtil::extractPureEmailAddress($email)
         );
 
@@ -119,7 +134,7 @@ class Processor
                 $origin = $this->createUserInternalOrigin($emailOwner);
             }
         } else {
-            $origin = $this->em
+            $origin = $this->getEntityManager()
                 ->getRepository('OroEmailBundle:InternalEmailOrigin')
                 ->findOneBy(array('internalName' => $originName));
         }
@@ -148,17 +163,17 @@ class Processor
 
         $emailOwner->addEmailOrigin($origin);
 
-        $this->em->persist($origin);
-        $this->em->persist($emailOwner);
+        $this->getEntityManager()->persist($origin);
+        $this->getEntityManager()->persist($emailOwner);
 
         return $origin;
     }
 
     /**
-     * @param Email $model
+     * @param EmailModel $model
      * @throws \InvalidArgumentException
      */
-    protected function assertModel(Email $model)
+    protected function assertModel(EmailModel $model)
     {
         if (!$model->getFrom()) {
             throw new \InvalidArgumentException('Sender can not be empty');
@@ -199,5 +214,88 @@ class Processor
         }
 
         return $result;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        if (null === $this->em) {
+            $this->em = $this->doctrineHelper->getEntityManager('OroEmailBundle:Email');
+        }
+
+        return $this->em;
+    }
+
+    /**
+     * @param EmailModel $model
+     * @param Email      $email
+     */
+    protected function addAssociations(EmailModel $model, Email $email)
+    {
+        $targetEntityClass = $model->getEntityClass();
+        if (empty($targetEntityClass)) {
+            return;
+        }
+        $targetEntityId = $model->getEntityId();
+        if (empty($targetEntityId)) {
+            return;
+        }
+
+        // prepare the list of association targets
+        $targets      = [];
+        $targetEntity = $this->doctrineHelper->getEntity($targetEntityClass, $targetEntityId);
+        if ($targetEntity) {
+            $targets[] = $targetEntity;
+        }
+        $this->addEmailRecipientOwnersToAssociationTargets($targets, $email);
+
+        // add associations
+        $hasChanges = false;
+        $emailClass = ClassUtils::getClass($email);
+        foreach ($targets as $target) {
+            $targetClass = ClassUtils::getClass($target);
+            if (!$this->activityConfigProvider->hasConfig($targetClass)) {
+                continue;
+            }
+            $config     = $this->activityConfigProvider->getConfig($targetClass);
+            $activities = $config->get('activities');
+            if (empty($activities) || !in_array($emailClass, $activities)) {
+                continue;
+            }
+            $email->addActivityTarget($target);
+            $hasChanges = true;
+        }
+
+        // flush if needed
+        if ($hasChanges) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * @param array $targets
+     * @param Email $email
+     */
+    protected function addEmailRecipientOwnersToAssociationTargets(&$targets, Email $email)
+    {
+        $recipients = $email->getRecipients();
+        foreach ($recipients as $recipient) {
+            $emailOwner = $recipient->getEmailAddress()->getOwner();
+            if (!$emailOwner) {
+                continue;
+            }
+            $alreadyExists = false;
+            foreach ($targets as $target) {
+                if ($emailOwner === $target) {
+                    $alreadyExists = true;
+                    break;
+                }
+            }
+            if (!$alreadyExists) {
+                $targets[] = $emailOwner;
+            }
+        }
     }
 }
