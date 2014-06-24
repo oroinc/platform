@@ -80,14 +80,10 @@ class CommandExecutor
     {
         $params = array_merge(
             [
-                'command'    => $command,
-                '--no-debug' => true,
+                'command' => $command
             ],
             $params
         );
-        if (!$params['--no-debug']) {
-            unset($params['--no-debug']);
-        }
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
         }

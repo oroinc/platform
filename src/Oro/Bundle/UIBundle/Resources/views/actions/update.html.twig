@@ -1,12 +1,33 @@
-{% extends bap.layout %}
+{% set isWidgetContext = isWidgetContext is defined ? isWidgetContext : false %}
+{% extends isWidgetContext ? 'OroFormBundle:Layout:widgetForm.html.twig' : bap.layout %}
+
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set entity = entity is defined ? entity : null %}
 
 {% block content %}
+    {% if isWidgetContext and savedId is defined and savedId %}
+        <script type="text/javascript">
+            require(['oroui/js/widget-manager'],
+            function(widgetManager) {
+                widgetManager.getWidgetInstance(
+                    {{ app.request.get('_wid')|json_encode|raw }},
+                    function (widget) {
+                        widget.trigger('formSave', {{ savedId|json_encode|raw }});
+                    }
+                );
+            });
+        </script>
+    {% else %}
     <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
           method="post" data-collect="true">
+        {% if isWidgetContext %}
+            <div class="widget-actions">
+                <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
+                <button type="submit" class="btn btn-success">{{ 'Save'|trans }}</button>
+            </div>
+        {% else %}
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">
                 <div class="row">
@@ -40,8 +61,20 @@
                                         <ul class="inline">
                                             {% block stats %}
                                                 {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
-                                                    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                                    <li>{{ 'Updated'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                                    <li>
+                                                        {{ 'oro.ui.created'|trans }}:
+                                                        {{ breadcrumbs.entity.createdAt ?
+                                                            breadcrumbs.entity.createdAt|oro_format_datetime :
+                                                            'oro.ui.empty'|trans
+                                                        }}
+                                                    </li>
+                                                    <li>
+                                                        {{ 'oro.ui.updated'|trans }}:
+                                                        {{ breadcrumbs.entity.updatedAt ?
+                                                            breadcrumbs.entity.updatedAt|oro_format_datetime :
+                                                            'oro.ui.empty'|trans
+                                                        }}
+                                                    </li>
                                                 {% endif %}
                                             {% endblock stats %}
                                         </ul>
@@ -76,6 +109,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
         <div class="layout-content">
             {% block content_data %}
                 {% set data = oro_form_process(data, form) %}
@@ -88,4 +122,5 @@
         {% endblock %}
     </form>
     {{ oro_form_js_validation(form) }}
+    {% endif %}
 {% endblock content %}

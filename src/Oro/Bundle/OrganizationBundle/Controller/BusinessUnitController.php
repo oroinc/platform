@@ -83,7 +83,9 @@ class BusinessUnitController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_organization.business_unit.entity.class')
+        );
     }
 
     /**

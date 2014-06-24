@@ -73,8 +73,106 @@ Reset workflow data: Reset workflow data
 
 oro:
     workflow:
+        action:
+            process:
+                activate:   Activate
+                deactivate: Deactivate
+
+            workflow:
+                general: Workflow manipulations
+
+        block:
+            title:
+                process_info: Process Information
+            view:
+                process:
+                    trigger:
+                        description: %when% after the %after% has been %event%
+                        when:
+                            immediately: Immediately
+                        after:
+                            property: property
+                            entity:   entity
+                        event:
+                            create:  created
+                            delete:  deleted
+                            update:  updated
+                workflow:
+                    default_step: Default step
+
+        entity_config:
+            active_workflow:
+                label: 'Active workflow'
+                none:  'none'
+
+            show_step_in_grid.choice:
+                hide: 'Hide'
+                show: 'Show'
+
+            show_step_in_grid.label: 'Workflow step in grid'
+
         menu:
+            process_definition_list.description:  Process management UI
             workflow_definition_list.description: Workflow management UI
+
+        notification:
+            process:
+                activated:   Process has been activated successfully
+                deactivated: Process has been deactivated successfully
+
+        processdefinition:
+            entity_label:                 Process
+            entity_plural_label:          Processes
+            created_at.label:             Created
+            updated_at.label:             Updated
+            actions_configuration.label:  Actions configuration
+            enabled.label:                Enabled
+            execution_order.label:        Execution order
+            name.label:                   Code
+            label.label:                  Name
+            related_entity.label:         Related entity
+
+        processtrigger:
+            entity_label:         Process Trigger
+            entity_plural_label:  Process Triggers
+            id.label:             ID
+            created_at.label:     Created
+            updated_at.label:     Updated
+            definition.label:     Process definition
+            event.label:          Event
+            field.label:          Field
+            queued.label:         Queued
+            time_shift.label:     Time shift
+
+        transition:
+            start: "Start %workflow%"
+
+        workflowdefinition:
+            entity_label:                 Workflow
+            entity_plural_label:          Workflows
+            created_at.label:             Created
+            updated_at.label:             Updated
+            label.label:                  Name # this translation has been chosen because it doesn't confuse users
+            system.label:                 System
+            configuration.label:          Configuration
+            entity_acls.label:            Entity ACLs
+            entity_attribute_name.label:  Entity attribute name
+            name.label:                   Code # this translation has been chosen because it doesn't confuse users
+            related_entity.label:         Related entity
+            start_step.label:             Start step
+            steps.label:                  Steps
+            steps_display_ordered.label:  Display steps ordered
+            active.label:                 Active
+            clone_label_prefix:           'Copy of '
+
+            datagrid:
+                view: View
+                update: Edit
+                clone:  Clone
+                delete: Delete
+                activate: Activate
+                deactivate: Deactivate
+
         workflowitem:
             entity_label:             Workflow Item
             entity_plural_label:      Workflow Items
@@ -107,42 +205,3 @@ oro:
             related_entity.label:       Workflow Step
             related_entity.description: Related field for Workflow Step
             grid.label:                 Step
-
-        workflowdefinition:
-            entity_label:                 Workflow
-            entity_plural_label:          Workflows
-            created_at.label:             Created
-            updated_at.label:             Updated
-            label.label:                  Name # this translation has been chosen because it doesn't confuse users
-            system.label:                 System
-            configuration.label:          Configuration
-            entity_acls.label:            Entity ACLs
-            entity_attribute_name.label:  Entity attribute name
-            name.label:                   Code # this translation has been chosen because it doesn't confuse users
-            related_entity.label:         Related entity
-            start_step.label:             Start step
-            steps.label:                  Steps
-            steps_display_ordered.label:  Display steps ordered
-            active.label:                 Active
-            clone_label_prefix:           'Copy of '
-
-            datagrid:
-                view: View
-                update: Edit
-                clone:  Clone
-                delete: Delete
-                activate: Activate
-                deactivate: Deactivate
-        action:
-            general: "Workflow manipulations"
-
-        transition:
-            start: "Start %workflow%"
-
-        entity_config:
-            active_workflow.label:        'Active workflow'
-            active_workflow.none:         'none'
-            show_step_in_grid.label:      'Workflow step in grid'
-            show_step_in_grid.choice:
-                hide:                     'Hide'
-                show:                     'Show'

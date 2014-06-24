@@ -28,7 +28,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      * Get entities.
      *
      * @QueryParam(
-     *      name="with-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
+     *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
      *
      * @ApiDoc(
@@ -40,11 +40,11 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      */
     public function cgetAction()
     {
-        $withExclusions     = ('1' == $this->getRequest()->query->get('with-exclusions'));
+        $applyExclusions     = ('1' == $this->getRequest()->query->get('apply-exclusions'));
 
         /** @var EntityProvider $provider */
         $provider = $this->get('oro_entity.entity_provider');
-        $result = $provider->getEntities(false, $withExclusions);
+        $result = $provider->getEntities(false, $applyExclusions);
 
         return $this->handleView($this->view($result, Codes::HTTP_OK));
     }
@@ -62,7 +62,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether Unidirectional association fields should be returned.")
      * @QueryParam(
-     *      name="with-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
+     *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entities with fields",
@@ -77,7 +77,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
         $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
         $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $withExclusions     = ('1' == $this->getRequest()->query->get('with-exclusions'));
+        $applyExclusions    = ('1' == $this->getRequest()->query->get('apply-exclusions'));
 
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_entity.entity_field_list_provider');
@@ -88,7 +88,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
                 $withVirtualFields,
                 $withUnidirectional,
                 $withRelations,
-                $withExclusions
+                $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
