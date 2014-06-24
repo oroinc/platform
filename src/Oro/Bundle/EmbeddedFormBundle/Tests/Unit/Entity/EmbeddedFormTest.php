@@ -2,7 +2,6 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class EmbeddedFormTest extends \PHPUnit_Framework_TestCase
 {
