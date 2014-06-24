@@ -57,7 +57,7 @@ class AttachmentManager
             $fileName = substr($fileName, 0, $parametersPosition);
         }
         $filesystem = new SymfonyFileSystem();
-        $tmpFile = sys_get_temp_dir() . $fileName;
+        $tmpFile = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
         $filesystem->copy($fileUrl, $tmpFile, true);
         $file = new File($tmpFile);
         $attachment = new Attachment();
