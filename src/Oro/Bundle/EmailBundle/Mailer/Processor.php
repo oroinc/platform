@@ -102,7 +102,7 @@ class Processor
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
 
-        // associate the email with the target entity id any
+        // associate the email with the target entity if exist
         if ($model->hasEntity()) {
             $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
             if ($targetEntity) {
