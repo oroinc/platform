@@ -79,7 +79,7 @@ class Tag extends AbstractPageEntity
     {
         $this->test->byXpath("//button[contains(., 'Save')]")->click();
         $this->waitPageToLoad();
-        $this->waitForAjax();
+
         return $this;
     }
 }
