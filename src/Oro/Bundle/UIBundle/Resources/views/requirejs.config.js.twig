@@ -9,6 +9,7 @@ require({
             headerId: {{ oro_hash_navigation_header()|json_encode|raw }},
             userName: {{ userName|json_encode|raw }},
             root: {{ app.request.getBaseURL()|json_encode|raw }} + '\/',
+            debug: Boolean({{ app.debug }}),
             controllerPath: 'controllers/',
             controllerSuffix: '-controller',
             // preserves url path as it is (does not add/remove trailing slash)

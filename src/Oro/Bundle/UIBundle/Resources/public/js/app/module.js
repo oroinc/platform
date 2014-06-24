@@ -1,101 +1,112 @@
 /*global require*/
-
-/**
- * Init PageView
- */
 require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/base/view'
-], function (BaseController, BaseView) {
+    'oroui/js/app/controllers/base/controller'
+], function (BaseController) {
     'use strict';
-    BaseController.addBeforeActionReuse('page', BaseView, {
-        el: 'body',
-        keepElement: true,
-        regions: {
-            mainContainer: '#container',
-            mainMenu: '#main-menu',
-            userMenu: '#top-page .user-menu',
-            breadcrumb: '#breadcrumb',
-            loadingMask: '#main .hash-loading-mask',
-            messages: '#flash-messages .flash-messages-holder'
-        }
-    });
-});
 
-/**
- * Init PageBreadcrumbView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/breadcrumb-view'
-], function (BaseController, PageBreadcrumbView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('breadcrumb', PageBreadcrumbView, {
-        el: 'breadcrumb'
+    /**
+     * Init PageView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/base/view'
+    ], function (BaseView) {
+        BaseController.addToReuse('page', BaseView, {
+            el: 'body',
+            keepElement: true,
+            regions: {
+                mainContainer: '#container',
+                mainMenu: '#main-menu',
+                userMenu: '#top-page .user-menu',
+                breadcrumb: '#breadcrumb',
+                loadingMask: '#main .hash-loading-mask',
+                messages: '#flash-messages .flash-messages-holder'
+            }
+        });
     });
-});
 
-/**
- * Init PageContentView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/content-view'
-], function (BaseController, PageContentView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('content', PageContentView, {
-        el: 'mainContainer'
+    /**
+     * Init PageBreadcrumbView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/breadcrumb-view'
+    ], function (PageBreadcrumbView) {
+        BaseController.addToReuse('breadcrumb', PageBreadcrumbView, {
+            el: 'breadcrumb'
+        });
     });
-});
 
-/**
- * Init PageMainMenuView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/main-menu-view'
-], function (BaseController, PageMainMenuView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('mainMenu', PageMainMenuView, {
-        el: 'mainMenu'
+    /**
+     * Init PageContentView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/content-view'
+    ], function (PageContentView) {
+        BaseController.addToReuse('content', PageContentView, {
+            el: 'mainContainer'
+        });
     });
-});
 
-/**
- * Init PageUserMenuView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/user-menu-view'
-], function (BaseController, PageUserMenuView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('userMenu', PageUserMenuView, {
-        el: 'userMenu'
+    /**
+     * Init PageMainMenuView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/main-menu-view'
+    ], function (PageMainMenuView) {
+        BaseController.addToReuse('mainMenu', PageMainMenuView, {
+            el: 'mainMenu'
+        });
     });
-});
 
-/**
- * Init PageLoadingMaskView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/loading-mask-view'
-], function (BaseController, PageLoadingMaskView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('loadingMask', PageLoadingMaskView, {
-        region: 'loadingMask'
+    /**
+     * Init PageUserMenuView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/user-menu-view'
+    ], function (PageUserMenuView) {
+        BaseController.addToReuse('userMenu', PageUserMenuView, {
+            el: 'userMenu'
+        });
     });
-});
 
-/**
- * Init PageMessagesView
- */
-require([
-    'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page/messages-view'
-], function (BaseController, PageMessagesView) {
-    'use strict';
-    BaseController.addBeforeActionReuse('messages', PageMessagesView, {
-        el: 'messages'
+    /**
+     * Init PageLoadingMaskView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/loading-mask-view'
+    ], function (PageLoadingMaskView) {
+        BaseController.addToReuse('loadingMask', PageLoadingMaskView, {
+            region: 'loadingMask'
+        });
     });
+
+    /**
+     * Init PageMessagesView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/messages-view'
+    ], function (PageMessagesView) {
+        BaseController.addToReuse('messages', PageMessagesView, {
+            el: 'messages'
+        });
+    });
+
+    /**
+     * Init DebugToolbarView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/mediator',
+        'oroui/js/app/views/page/debug-toolbar-view'
+    ], function (mediator, DebugToolbarView) {
+        BaseController.addToReuse('debugToolbar', {
+            compose: function () {
+                if (!mediator.execute('retrieveOption', 'debug')) {
+                    return;
+                }
+                this.view = new DebugToolbarView({
+                    el: 'body .sf-toolbar'
+                });
+            }
+        });
+    });
+
 });

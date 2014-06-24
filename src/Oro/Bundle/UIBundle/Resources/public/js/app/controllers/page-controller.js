@@ -113,7 +113,7 @@ define([
         onPageLoaded: function (model, options) {
             var attributes;
             attributes = model.getAttributes();
-            this.publishEvent('page:update', attributes, options.actionArgs);
+            this.publishEvent('page:update', attributes, options.actionArgs, options.xhr);
             this.adjustTitle(attributes.title);
         },
 

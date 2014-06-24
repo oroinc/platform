@@ -1,20 +1,23 @@
 /*jslint nomen:true*/
-/*global define*/
+/*global define, require*/
 define([
+    'jquery',
     'chaplin'
-], function (Chaplin) {
+], function ($, Chaplin) {
     'use strict';
 
-    var BaseController, reuses;
+    var BaseController, reuses, promises;
 
     BaseController = Chaplin.Controller.extend({
         /**
          * Handles before-action activity
+         *  - initializes cache (on first route)
+         *  - when all compositions are ready to reuse, resolves the deferred to execute action
          *
          * @override
          */
         beforeAction: function (params, route, options) {
-            var i;
+            var i, deferred, self;
 
             if (!route.previous) {
                 // if it's first time route, initializes page cache
@@ -27,10 +30,19 @@ define([
 
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            // compose global instances
-            for (i = 0; i < reuses.length; i += 1) {
-                this.reuse.apply(this, reuses[i]);
-            }
+            deferred = $.Deferred();
+            self = this;
+
+            $.when.apply($, promises).then(function () {
+                // compose global instances
+                for (i = 0; i < reuses.length; i += 1) {
+                    self.reuse.apply(self, reuses[i]);
+                }
+                // all compositions are ready, allows to execute action
+                deferred.resolve();
+            });
+
+            return deferred;
         },
 
         /**
@@ -80,14 +92,37 @@ define([
     });
 
     reuses = [];
+    promises = [];
 
     /**
      * Collects compositions to reuse before controller action
      * @static
      */
-    BaseController.addBeforeActionReuse = function () {
+    BaseController.addToReuse = function () {
         var args = Array.prototype.slice.call(arguments, 0);
         reuses.push(args);
+    };
+
+    /**
+     * Wrapper over "require" method.
+     *  - loads modules, executes callback and resolves deferred object
+     *
+     * @param {Array} modules
+     * @param {function(...[*])} initCallback
+     * @returns {jQuery.Deferred}
+     * @static
+     */
+    BaseController.loadBeforeAction = function (modules, initCallback) {
+        var deferred, callback;
+        deferred = $.Deferred();
+        promises.push(deferred);
+        callback = function () {
+            var args;
+            args = Array.prototype.slice.call(arguments, 0);
+            initCallback.apply(null, args);
+            deferred.resolve();
+        };
+        require(modules, callback);
     };
 
     return BaseController;
