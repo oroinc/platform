@@ -46,6 +46,22 @@ representation.
 Writer as the name implies is responsible for saving result in destination. In terms of import it's a storage,
 encapsulated with Doctrine. In terms of export it's a plain CSV file.
 
+### Serializer
+
+Serializer namespace contains dummy encoder (encoding/decoding is not needed for csv import), normalizers
+(collection, datetime, entity) and required interfaces. It also contains Serializer class extended from
+`Symfony\Component\Serializer\Serializer` to use extended `supportsDenormalization` and `supportsNormalization` methods.
+
+### Strategy
+
+Strategy namespace contains strategy helper with generic import entities and ConfigurableAddOrReplaceStrategy that
+manages entity import. StrategyInterface defines interface for custom strategies.
+
+### TemplateFixture
+
+TemplateFixture namespace contains template fixtures functionality, TemplateFixtureInterface - interface used to create
+fixtures. TemplateFixtureRegistry is a storage for import template fixtures.
+
 OroBatchBundle Configuration
 ----------------------------
 

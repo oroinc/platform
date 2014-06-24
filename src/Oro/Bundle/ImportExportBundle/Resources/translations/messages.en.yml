@@ -21,7 +21,7 @@ oro:
             label:          Import
             success:        "File was successful imported."
             entity:         Import %entityName%
-            tempate:        Import Data Template
+            tempate:        Download Data Template
 
 "Identity only": "Identity only"
 "All": "All"

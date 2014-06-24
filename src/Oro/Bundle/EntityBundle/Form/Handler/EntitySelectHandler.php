@@ -73,7 +73,7 @@ class EntitySelectHandler implements SearchHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function search($query, $page, $perPage)
+    public function search($query, $page, $perPage, $searchById = false)
     {
         list($query, $targetEntity, $targetField) = explode(',', $query);
 
