@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\FIle;
+use Symfony\Component\HttpFoundation\File\File;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
@@ -43,18 +43,26 @@ class AttachmentManager
         $this->fileIcons = $fileIcons;
     }
 
-    public function uploadRemoteFile($fileUrl)
+    /**
+     * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return Attachment entity record
+     *
+     * @param string $fileUrl
+     * @return Attachment
+     */
+    public function prepareRemoteFile($fileUrl)
     {
+        $fileName = pathinfo($fileUrl)['basename'];
+        $parametersPosition = strpos($fileName, '?');
+        if ($parametersPosition) {
+            $fileName = substr($fileName, 0, $parametersPosition);
+        }
         $filesystem = new SymfonyFileSystem();
-        $tmpFile = tempnam('upload', uniqid());
-        $filesystem->copy($fileUrl, '/tmp/testFIle', true);
+        $tmpFile = sys_get_temp_dir() . $fileName;
+        $filesystem->copy($fileUrl, $tmpFile, true);
         $file = new File($tmpFile);
-
         $attachment = new Attachment();
         $attachment->setFile($file);
-
         $this->preUpload($attachment);
-        $this->upload($attachment);
 
         return $attachment;
     }

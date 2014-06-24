@@ -6,33 +6,23 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileSubscriber implements EventSubscriberInterface
 {
-    /** @var Validator  */
+    /** @var ConfigFileValidator  */
     protected $validator;
 
-    /** @var UserConfigManager */
-    protected $config;
-
-    /** @var ConfigProvider */
-    protected $attachmentConfigProvider;
-
-    public function __construct(Validator $validator, ConfigManager $configManager, UserConfigManager $config)
+    /**
+     * @param ConfigFileValidator $validator
+     */
+    public function __construct(ConfigFileValidator $validator)
     {
         $this->validator = $validator;
-        $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->config = $config;
     }
 
     /**
@@ -101,36 +91,10 @@ class FileSubscriber implements EventSubscriberInterface
         $fieldName = $form->getName();
         $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
 
-        /** @var Config $entityExtendConfig */
-        $entityExtendConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
-
-        $fileSize = $entityExtendConfig->get('maxsize') * 1024 * 1024;
-        $fileField = $form->get('file');
-
-        if ($entityExtendConfig->getId()->getFieldType() === 'attachment') {
-            $configValue = 'upload_mime_types';
-        } else {
-            $configValue = 'upload_image_mime_types';
-        }
-
-        $mimeTypes = explode("\n", $this->config->get('oro_attachment.' . $configValue));
-        foreach ($mimeTypes as $id => $value) {
-            $mimeTypes[$id] = trim($value);
-        }
-
-        $violations = $this->validator->validateValue(
-            $entity->getFile(),
-            [
-                new File(
-                    [
-                        'maxSize' => $fileSize,
-                        'mimeTypes' => $mimeTypes
-                    ]
-                )
-            ]
-        );
+        $violations = $this->validator->validate($dataClass, $fieldName, $entity);
 
         if (!empty($violations)) {
+            $fileField = $form->get('file');
             /** @var $violation ConstraintViolation */
             foreach ($violations as $violation) {
                 $error = new FormError(

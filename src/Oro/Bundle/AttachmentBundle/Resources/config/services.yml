@@ -46,5 +46,6 @@ services:
         class: %oro_attachment.serializer.attachment_normalizer%
         calls:
             - [setAttachmentManager, [@oro_attachment.manager]]
+            - [setValidator, [@oro_attachment.validator.file_config_validator]]
         tags:
             - { name: oro_importexport.normalizer}
