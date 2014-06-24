@@ -12,5 +12,3 @@ oro:
         channel.sync_priority.tooltip: >
             Select if your local version of the data or    the remote application
             data get priority in the case that both were updated since the last sync process.
-        activate: Activate
-        deactivate: Deactivate
