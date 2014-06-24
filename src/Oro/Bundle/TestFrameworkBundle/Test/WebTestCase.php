@@ -76,7 +76,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var ReferenceRepository
      */
-    protected $referenceRepository;
+    private static $referenceRepository;
 
     protected function tearDown()
     {
@@ -316,7 +316,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
-        $this->referenceRepository = $executor->getReferenceRepository();
+        self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
     }
 
@@ -331,11 +331,11 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository
+     * @return ReferenceRepository|null
      */
     protected function getReferenceRepository()
     {
-        return $this->referenceRepository;
+        return self::$referenceRepository;
     }
 
     /**
