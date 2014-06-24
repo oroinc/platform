@@ -15,7 +15,7 @@ What are Processes?
 
 Processes provide possibility to automate tasks related to entity management. They are using main doctrine events
 to perform described tasks at the right time. Each process can be performed immediately or after some timeout.
-Processes use JMS Job bundle to provide possibility of delayed startup.
+Processes use JMS Job bundle to provide possibility of delayed execution.
 
 Main Entities
 -------------
@@ -116,14 +116,14 @@ Console commands
 
 WorkflowBundle provides two following console commands to work with processes.
 
-### oro:process:configuration:load
+#### oro:process:configuration:load
 
 This command loads processes configuration from *.yml configuration files to the database. It used
 during application installation and update. Command has two optional options:
     - **--directories** - specifies directories used to find configuration files (multiple values allowed);
     - **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
 
-### oro:process:execute:job
+#### oro:process:execute:job
 
 This command simply executes process job with specified identifier. It used in the JMS jobs to execute delayed
 processes. Command has one required option:
