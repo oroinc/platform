@@ -99,6 +99,10 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->never())
             ->method('getRepository');
 
+        $this->channel->expects($this->once())
+            ->method('getEnabled')
+            ->will($this->returnValue(true));
+
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);

@@ -16,8 +16,10 @@ class OroIntegrationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_integration_channel');
+        $table->addColumn('enabled', 'boolean', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('synchronization_settings', Type::TEXT, ['notnull' => true, 'comment' => '(DC2Type:object)']);
+        $table->addColumn('mapping_settings', Type::TEXT, ['notnull' => true, 'comment' => '(DC2Type:object)']);
         $table->dropColumn('is_two_way_sync_enabled');
         $table->dropColumn('sync_priority');
 

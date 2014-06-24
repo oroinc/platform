@@ -17,6 +17,8 @@ oro:
             integration:
                 message:
                     saved: Integration saved
+                    activated: Integration activated
+                    deactivated: Integration deactivated
 
         integration_type:
             simple:
@@ -42,6 +44,7 @@ oro:
             local_wins.label: Local wins
             default_user_owner.label: Default owner
             organization.label: Organization
+            enabled.label: Enabled the channel
         channel:
             entity_label:        Integration
             entity_plural_label: Integrations
@@ -59,6 +62,8 @@ oro:
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: Failed to add sync job to the queue. Error: %s.
         progress: Check progress.
+        activate: Activate
+        deactivate: Deactivate
 
         delete_sync_integration:
             content: "Warning: Removing the integration will delete all related data"

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
+use Doctrine\Common\Util\Inflector;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -71,8 +73,11 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $connectorsModifier = $this->getConnectorsModifierClosure($type);
         $connectorsModifier($form);
 
-        $synchronizationSettingsModifier = $this->getSynchronizationSettingsModifierClosure($type);
+        $synchronizationSettingsModifier = $this->getDynamicModifierClosure($type, 'synchronization_settings');
         $synchronizationSettingsModifier($form);
+
+        $mappingSettingsModifier = $this->getDynamicModifierClosure($type, 'mapping_settings');
+        $mappingSettingsModifier($form);
 
         $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
@@ -145,8 +150,11 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $connectorsModifier = $this->getConnectorsModifierClosure($type);
             $connectorsModifier($form);
 
-            $synchronizationSettingsModifier = $this->getSynchronizationSettingsModifierClosure($type);
+            $synchronizationSettingsModifier = $this->getDynamicModifierClosure($type, 'synchronization_settings');
             $synchronizationSettingsModifier($form);
+
+            $mappingSettingsModifier = $this->getDynamicModifierClosure($type, 'mapping_settings');
+            $mappingSettingsModifier($form);
 
             // value that was set on postSet is replaced by null from request
             $typeChoices           = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
@@ -256,21 +264,22 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * @param string $type
+     * @param string $formName
      *
      * @return callable
      */
-    protected function getSynchronizationSettingsModifierClosure($type)
+    protected function getDynamicModifierClosure($type, $formName)
     {
         $settingsProvider = $this->settingsProvider;
 
-        return function (FormInterface $form) use ($type, $settingsProvider) {
+        return function (FormInterface $form) use ($type, $settingsProvider, $formName) {
             if (!$type) {
                 return;
             }
 
-            $fields = $settingsProvider->getFormSettings('synchronization_settings', $type);
+            $fields = $settingsProvider->getFormSettings($formName, $type);
             if ($fields) {
-                $form->add('synchronizationSettings', new IntegrationSettingsDynamicFormType($fields));
+                $form->add(Inflector::camelize($formName), new IntegrationSettingsDynamicFormType($fields));
             }
         };
     }

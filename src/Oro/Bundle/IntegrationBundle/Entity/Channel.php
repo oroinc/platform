@@ -76,6 +76,21 @@ class Channel
     protected $synchronizationSettings;
 
     /**
+     * @var ConfigObject
+     *
+     * @ORM\Column(name="mapping_settings", type="object", nullable=false)
+     */
+    protected $mappingSettings;
+
+    /**
+     * @var boolean
+    *
+    * @ORM\Column(name="enabled", type="boolean", nullable=true)
+    * @Oro\Versioned()
+    */
+    protected $enabled;
+
+    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
@@ -106,6 +121,8 @@ class Channel
     {
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
+        $this->mappingSettings         = ConfigObject::create([]);
+        $this->enabled                 = true;
     }
 
     /**
@@ -223,11 +240,39 @@ class Channel
     }
 
     /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
      * @return ConfigObject
      */
     public function getSynchronizationSettingsReference()
     {
         return $this->synchronizationSettings;
+    }
+
+    /**
+     * @param ConfigObject $mappingSettings
+     */
+    public function setMappingSettings($mappingSettings)
+    {
+        $this->mappingSettings = $mappingSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getMappingSettings()
+    {
+        return clone $this->mappingSettings;
+    }
+
+    /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
+     * @return ConfigObject
+     */
+    public function getMappingSettingsReference()
+    {
+        return $this->mappingSettings;
     }
 
     /**
@@ -305,5 +350,21 @@ class Channel
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @param boolean $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
     }
 }
