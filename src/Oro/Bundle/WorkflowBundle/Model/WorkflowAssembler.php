@@ -175,6 +175,7 @@ class WorkflowAssembler extends AbstractAssembler
                     'step_to' => $workflowDefinition->getStartStep()->getName(),
                     'is_start' => true,
                     'is_hidden' => true,
+                    'is_unavailable_hidden' => true,
                     'transition_definition' => $startTransitionDefinitionName,
                 );
         }
