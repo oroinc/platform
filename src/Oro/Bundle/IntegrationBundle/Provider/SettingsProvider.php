@@ -38,8 +38,8 @@ class SettingsProvider
         $result = $priorities = [];
 
         if (isset(
-        $this->settings[IntegrationConfiguration::FORM_NODE_NAME],
-        $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])
+            $this->settings[IntegrationConfiguration::FORM_NODE_NAME],
+            $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])
         ) {
             $formData = $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name];
 

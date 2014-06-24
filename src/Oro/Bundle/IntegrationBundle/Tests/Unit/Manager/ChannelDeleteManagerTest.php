@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
-use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestChannelDeleteProvider;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationDeleteProvider;
 
 class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,7 +43,7 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
         $this->connection->expects($this->any())
             ->method('beginTransaction');
         $this->deleteManager = new DeleteManager($this->em);
-        $this->deleteManager->addProvider(new TestChannelDeleteProvider());
+        $this->deleteManager->addProvider(new TestIntegrationDeleteProvider());
         $this->testIntegration = new Integration();
         $this->testIntegration->setType('test');
     }
@@ -61,7 +61,7 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->deleteManager->delete($this->testIntegration));
     }
 
-    public function testDeleteChannelWithErrors()
+    public function testDeleteIntegrationWithErrors()
     {
         $this->em->expects($this->any())
             ->method('remove')

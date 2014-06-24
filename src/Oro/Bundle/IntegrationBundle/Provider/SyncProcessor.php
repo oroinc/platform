@@ -61,11 +61,11 @@ class SyncProcessor
     public function process(Integration $integration, $connector = '', array $parameters = [])
     {
         if ($connector) {
-            $this->processChannelConnector($integration, $connector, $parameters, false);
+            $this->processIntegrationConnector($integration, $connector, $parameters, false);
         } else {
             $connectors = $integration->getConnectors();
             foreach ((array)$connectors as $connector) {
-                $this->processChannelConnector($integration, $connector, $parameters);
+                $this->processIntegrationConnector($integration, $connector, $parameters);
             }
         }
     }
@@ -88,7 +88,7 @@ class SyncProcessor
      * @param array       $parameters  Connector additional parameters
      * @param boolean     $saveStatus  Do we need to save new status to bd
      */
-    protected function processChannelConnector(
+    protected function processIntegrationConnector(
         Integration $integration,
         $connector,
         array $parameters = [],

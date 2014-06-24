@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DeleteChannelProvidersPass implements CompilerPassInterface
+class DeleteIntegrationProvidersPass implements CompilerPassInterface
 {
     const DELETE_PROVIDER_TAG = 'oro_integration.delete_provider';
     const DELETE_MANAGER      = 'oro_integration.delete_manager';

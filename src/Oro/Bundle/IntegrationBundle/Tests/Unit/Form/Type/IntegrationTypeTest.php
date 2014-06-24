@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilder;
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType as IntegrationType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
-class ChannelTypeTest extends \PHPUnit_Framework_TestCase
+class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var IntegrationType */
     protected $type;

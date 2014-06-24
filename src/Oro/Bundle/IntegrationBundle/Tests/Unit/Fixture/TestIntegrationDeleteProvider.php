@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteProviderInterface;
 
-class TestChannelDeleteProvider implements DeleteProviderInterface
+class TestIntegrationDeleteProvider implements DeleteProviderInterface
 {
     /**
      * {@inheritdoc}

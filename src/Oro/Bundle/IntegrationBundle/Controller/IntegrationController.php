@@ -160,7 +160,7 @@ class IntegrationController extends Controller
      */
     protected function update(Integration $integration)
     {
-        if ($this->get('oro_integration.form.handler.channel')->process($integration)) {
+        if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.saved')

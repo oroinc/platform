@@ -13,7 +13,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
-class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
+class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface */
     protected $form;
