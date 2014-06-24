@@ -132,7 +132,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             $fieldOrder = (int)$fieldOrder;
 
             // process relations
-            if ($this->fieldHelper->isRelation($field)) {
+            if ($this->fieldHelper->isRelation($field)
+                && !$this->fieldHelper->processAsScalar($entityName, $fieldName)
+            ) {
                 $isSingleRelation = $this->fieldHelper->isSingleRelation($field) && $singleRelationDeepLevel > 0;
                 $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 

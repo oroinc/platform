@@ -100,6 +100,9 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                                     'label'       => $label,
                                     'description' => '',
                                 ],
+                                'importexport' => [
+                                    'process_as_scalar' => true
+                                ]
                             ]
                         );
 

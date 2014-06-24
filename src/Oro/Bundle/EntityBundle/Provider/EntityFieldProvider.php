@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -335,6 +336,18 @@ class EntityFieldProvider
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                /**
+                 * Skip association if its state is "Deleted"
+                 */
+                if ($this->extendConfigProvider->hasConfig($className, $associationName)
+                    && $this->extendConfigProvider->getConfig($className, $associationName)->is(
+                        'state',
+                        ExtendScope::STATE_DELETED
+                    )
+                ) {
+                    continue;
+                }
+
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
