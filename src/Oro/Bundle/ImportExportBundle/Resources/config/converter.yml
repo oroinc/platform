@@ -26,7 +26,6 @@ services:
         class: %oro_importexport.data_converter.relation_calculator.class%
         arguments:
             - @doctrine
-            - @oro_entity.entity_field_provider
             - @oro_importexport.field.field_helper
 
     oro_importexport.data_converter.template_fixture.relation_calculator:

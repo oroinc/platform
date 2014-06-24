@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
@@ -18,9 +17,9 @@ class RelationCalculator implements RelationCalculatorInterface
     protected $registry;
 
     /**
-     * @var EntityFieldProvider
+     * @var FieldHelper
      */
-    protected $fieldProvider;
+    protected $fieldHelper;
 
     /**
      * @var FieldHelper
@@ -29,16 +28,13 @@ class RelationCalculator implements RelationCalculatorInterface
 
     /**
      * @param ManagerRegistry $registry
-     * @param EntityFieldProvider $fieldProvider
      * @param FieldHelper $fieldHelper
      */
     public function __construct(
         ManagerRegistry $registry,
-        EntityFieldProvider $fieldProvider,
         FieldHelper $fieldHelper
     ) {
         $this->registry = $registry;
-        $this->fieldProvider = $fieldProvider;
         $this->fieldHelper = $fieldHelper;
     }
 
@@ -86,7 +82,7 @@ class RelationCalculator implements RelationCalculatorInterface
      */
     protected function getRelationEntityName($entityName, $fieldName)
     {
-        $fields = $this->fieldProvider->getFields($entityName, true);
+        $fields = $this->fieldHelper->getFields($entityName, true);
         foreach ($fields as $field) {
             if ($field['name'] == $fieldName && $this->fieldHelper->isMultipleRelation($field)) {
                 return $field['related_entity_name'];
